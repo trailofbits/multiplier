@@ -82,6 +82,28 @@ static void DispatchSerializeType(EntityMapper &em,
   }
 }
 
+static void DispatchSerializeAttr(EntityMapper &em,
+                                  mx::ast::Attr::Builder builder,
+                                  const pasta::Attr &entity) {
+
+  // Second pass actually does the real serialization.
+  switch (entity.Kind()) {
+#define MX_VISIT_ATTR(type) \
+  case pasta::AttrKind::k ## type: \
+    Serialize ## type ## Attr ( \
+        em, builder, \
+        reinterpret_cast<const pasta::type ## Attr &>(entity)); \
+    break;
+
+    PASTA_FOR_EACH_ATTR_IMPL(MX_VISIT_ATTR,
+                             PASTA_IGNORE_ABSTRACT)
+#undef MX_VISIT_ATTR
+    default:
+      assert(false);
+      break;
+  }
+}
+
 }  // namespace
 
 void PendingFragment::Serialize(EntityMapper &em,
@@ -106,6 +128,13 @@ void PendingFragment::Serialize(EntityMapper &em,
       static_cast<unsigned>(types_to_serialize.size()));
   for (const pasta::Type &entity : types_to_serialize) {
     DispatchSerializeType(em, type_builder[i++], entity);
+  }
+
+  i = 0u;
+  auto attr_builder = b.initAttributes(
+      static_cast<unsigned>(attrs_to_serialize.size()));
+  for (const pasta::Attr &entity : attrs_to_serialize) {
+    DispatchSerializeAttr(em, attr_builder[i++], entity);
   }
 
   i = 0u;

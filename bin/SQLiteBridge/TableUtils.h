@@ -78,6 +78,21 @@ template <> struct FromEntityId<mx::Type> {
   }
 };
 
+template <> struct FromEntityId<mx::Attr> {
+  std::optional<mx::Attr> get(mx::Index &index, mx::EntityId id) {
+    auto vid{id.Unpack()};
+    if (!std::holds_alternative<mx::AttributeId>(vid)) {
+      return std::nullopt;
+    }
+
+    auto variant{index.entity(id)};
+    if (std::holds_alternative<mx::Attr>(variant)) {
+      return std::get<mx::Attr>(variant);
+    }
+    return std::nullopt;
+  }
+};
+
 template <> struct FromEntityId<mx::Token> {
   std::optional<mx::Token> get(mx::Index &index, mx::EntityId id) {
     auto vid{id.Unpack()};
@@ -147,6 +162,7 @@ template <typename T> constexpr inline bool has_containing = false;
 template <> constexpr inline bool has_containing<mx::Decl> = true;
 template <> constexpr inline bool has_containing<mx::Stmt> = true;
 template <> constexpr inline bool has_containing<mx::Type> = true;
+// template <> constexpr inline bool has_containing<mx::Attr> = true;
 
 using PredType = bool(mx::Index &index, mx::EntityId ancestor_eid,
                       mx::EntityId descendant_eid);

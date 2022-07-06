@@ -46,6 +46,7 @@ class FragmentImpl {
   unsigned num_decls{0u};
   unsigned num_stmts{0u};
   unsigned num_types{0u};
+  unsigned num_attrs{0u};
   unsigned num_pseudos{0u};
   unsigned num_tokens{0u};
 
@@ -72,6 +73,7 @@ class FragmentImpl {
   virtual DeclReader NthDecl(unsigned offset) const = 0;
   virtual StmtReader NthStmt(unsigned offset) const = 0;
   virtual TypeReader NthType(unsigned offset) const = 0;
+  virtual AttrReader NthAttr(unsigned offset) const = 0;
   virtual PseudoReader NthPseudo(unsigned offset) const = 0;
 
   virtual std::string_view SourceIR(void) const = 0;
@@ -96,6 +98,10 @@ class FragmentImpl {
 
   // Return the type associated with a specific entity ID.
   std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
+
+  // Return the attribute associated with a specific entity ID.
+  std::optional<Attr> AttrFor(const FragmentImpl::Ptr &, EntityId id,
                               bool can_fail=true) const;
 };
 
@@ -156,6 +162,7 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   DeclReader NthDecl(unsigned offset) const final;
   StmtReader NthStmt(unsigned offset) const final;
   TypeReader NthType(unsigned offset) const final;
+  AttrReader NthAttr(unsigned offset) const final;
   PseudoReader NthPseudo(unsigned offset) const final;
 
   std::string_view SourceIR(void) const final;

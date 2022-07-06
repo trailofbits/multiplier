@@ -58,6 +58,7 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
   return ret;
 }
 
+// Return the declaration associated with this context, if any.
 std::optional<Decl> TokenContext::as_declaration(void) const {
   EntityId id(entity_id);
   if (impl && std::holds_alternative<DeclarationId>(id.Unpack())) {
@@ -67,6 +68,7 @@ std::optional<Decl> TokenContext::as_declaration(void) const {
   }
 }
 
+// Return the statement associated with this context, if any.
 std::optional<Stmt> TokenContext::as_statement(void) const {
   EntityId id(entity_id);
   if (impl && std::holds_alternative<StatementId>(id.Unpack())) {
@@ -76,10 +78,21 @@ std::optional<Stmt> TokenContext::as_statement(void) const {
   }
 }
 
+// Return the type associated with this context, if any.
 std::optional<Type> TokenContext::as_type(void) const {
   EntityId id(entity_id);
   if (impl && std::holds_alternative<TypeId>(id.Unpack())) {
     return impl->TypeFor(impl, id);
+  } else {
+    return std::nullopt;
+  }
+}
+
+// Return the attribute associated with this context, if any.
+std::optional<Attr> TokenContext::as_attribute(void) const {
+  EntityId id(entity_id);
+  if (impl && std::holds_alternative<AttributeId>(id.Unpack())) {
+    return impl->AttrFor(impl, id);
   } else {
     return std::nullopt;
   }

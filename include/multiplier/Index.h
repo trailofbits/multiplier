@@ -177,8 +177,10 @@ class EntityProvider {
 
 class NotAnEntity {};
 
-using VariantEntity = std::variant<Decl, Stmt, Type, Token, TokenSubstitution,
-                                   Designator, Fragment, File, NotAnEntity>;
+using VariantEntity = std::variant<Decl, Stmt, Type, Attr,
+                                   Token, TokenSubstitution,
+                                   Designator, Fragment, File,
+                                   NotAnEntity>;
 
 // Access to the indexed code.
 class Index {

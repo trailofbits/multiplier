@@ -50,6 +50,7 @@ ResultType MultiplierModule::Create(sqlite3 *db,
   }
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
   else {
     vtab = GetListTable(*ep, table);

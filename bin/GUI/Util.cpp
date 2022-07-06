@@ -332,18 +332,18 @@ TokenClass ClassifyToken(const Token &tok) {
     case TokenKind::KEYWORD___READ_WRITE:
     case TokenKind::KEYWORD___BUILTIN_ASTYPE:
     case TokenKind::KEYWORD_VEC_STEP:
-    case TokenKind::KEYWORD_IMAGE1_DT:
-    case TokenKind::KEYWORD_IMAGE1_DARRAY_T:
-    case TokenKind::KEYWORD_IMAGE1_DBUFFER_T:
-    case TokenKind::KEYWORD_IMAGE2_DT:
-    case TokenKind::KEYWORD_IMAGE2_DARRAY_T:
-    case TokenKind::KEYWORD_IMAGE2_DDEPTH_T:
-    case TokenKind::KEYWORD_IMAGE2_DARRAY_DEPTH_T:
-    case TokenKind::KEYWORD_IMAGE2_DMSAA_T:
-    case TokenKind::KEYWORD_IMAGE2_DARRAY_MSAA_T:
-    case TokenKind::KEYWORD_IMAGE2_DMSAA_DEPTH_T:
-    case TokenKind::KEYWORD_IMAGE2_DARRAY_MSAA_DEPTH_T:
-    case TokenKind::KEYWORD_IMAGE3_DT:
+    case TokenKind::KEYWORD_IMAGE_1D_T:
+    case TokenKind::KEYWORD_IMAGE_1D_ARRAY_T:
+    case TokenKind::KEYWORD_IMAGE_1D_BUFFER_T:
+    case TokenKind::KEYWORD_IMAGE_2D_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_T:
+    case TokenKind::KEYWORD_IMAGE_2D_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_2D_MSAA_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_MSAA_T:
+    case TokenKind::KEYWORD_IMAGE_2D_MSAA_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_2D_ARRAY_MSAA_DEPTH_T:
+    case TokenKind::KEYWORD_IMAGE_3D_T:
     case TokenKind::KEYWORD_PIPE:
     case TokenKind::KEYWORD_ADDRSPACE_CAST:
     case TokenKind::KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN:

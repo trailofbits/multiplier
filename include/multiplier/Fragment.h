@@ -16,6 +16,7 @@
 
 namespace mx {
 
+class Attr;
 class Decl;
 class EntityProvider;
 class File;
@@ -135,6 +136,7 @@ class FragmentList {
 // trees, and tokens.
 class Fragment {
  private:
+  friend class Attr;
   friend class Decl;
   friend class EntityProvider;
   friend class File;
@@ -171,6 +173,7 @@ class Fragment {
   static Fragment containing(const Decl &);
   static Fragment containing(const Stmt &);
   static Fragment containing(const Type &);
+  static Fragment containing(const Attr &);
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const TokenSubstitution &);
   static Fragment containing(const UseBase &);

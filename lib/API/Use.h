@@ -34,12 +34,14 @@ class UseIteratorImpl : public BaseUseIteratorImpl {
   UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity);
+  UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity);
   UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity);
 
   // Methods for finding the next user.
   bool FindNextDecl(UseIteratorBase &self);
   bool FindNextStmt(UseIteratorBase &self);
   bool FindNextType(UseIteratorBase &self);
+  bool FindNextAttr(UseIteratorBase &self);
   bool FindNextPseudo(UseIteratorBase &self);
   bool FindNext(UseIteratorBase &self);
 };

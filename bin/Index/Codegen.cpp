@@ -20,6 +20,8 @@ VAST_RELAX_WARNINGS
 #include <mlir/InitAllDialects.h>
 VAST_UNRELAX_WARNINGS
 
+#include <glog/logging.h>
+
 #include <pasta/AST/Decl.h>
 
 #include <vast/Util/Common.hpp>
@@ -94,16 +96,21 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   llvm::ScopedHashTableScope func_scope(tctx.functions);
   llvm::ScopedHashTableScope glob_scope(tctx.vars);
 
-  vast::hl::CodeGenVisitor visitor(tctx);
-  for (const pasta::Decl &decl : decls) {
-    vast::ValueOrStmt hl_decl =
-        visitor.Visit(const_cast<clang::Decl *>(decl.RawDecl()));
-    if (std::holds_alternative<vast::Value>(hl_decl)) {
-      vast::Value val = std::get<vast::Value>(hl_decl);
-      if (mx::RawEntityId id = em.EntityId(decl)) {
-        val.setLoc(mlir::OpaqueLoc::get(reinterpret_cast<void *>(id), &context));
+  try {
+    vast::hl::CodeGenVisitor visitor(tctx);
+    for (const pasta::Decl &decl : decls) {
+      vast::ValueOrStmt hl_decl =
+          visitor.Visit(const_cast<clang::Decl *>(decl.RawDecl()));
+      if (std::holds_alternative<vast::Value>(hl_decl)) {
+        vast::Value val = std::get<vast::Value>(hl_decl);
+        if (mx::RawEntityId id = em.EntityId(decl)) {
+          val.setLoc(mlir::OpaqueLoc::get(reinterpret_cast<void *>(id), &context));
+        }
       }
     }
+  } catch (std::exception &e) {
+    LOG(ERROR) << e.what();
+    return ret;
   }
 
   llvm::raw_string_ostream os(ret);

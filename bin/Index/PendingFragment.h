@@ -12,6 +12,7 @@
 #include <multiplier/AST.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Types.h>
+#include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Stmt.h>
@@ -77,6 +78,7 @@ struct PendingFragment {
   std::vector<pasta::Decl> decls_to_serialize;
   std::vector<pasta::Stmt> stmts_to_serialize;
   std::vector<pasta::Type> types_to_serialize;
+  std::vector<pasta::Attr> attrs_to_serialize;
 
   // We distinguish entities from "pseudo" entities, where an entity is uniquely
   // identifiable via an `mx::EntityId`, whereas a pseudo entity is not uniquely

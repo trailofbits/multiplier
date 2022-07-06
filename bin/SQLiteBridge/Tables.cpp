@@ -159,6 +159,7 @@ namespace sqlite_bridge {
 #define MX_BEGIN_VISIT_DECL(NAME) static std::vector<FieldDescriptor> NAME##Table_fields({
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BOOL(TYPE, NAME, ...)                                         \
@@ -191,6 +192,7 @@ namespace sqlite_bridge {
   });
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
@@ -200,6 +202,7 @@ namespace sqlite_bridge {
     auto out_it{std::back_inserter(fields)};
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BASE(NAME, BASE)                                              \
@@ -213,6 +216,7 @@ namespace sqlite_bridge {
       Get##NAME##TableSchema();
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
@@ -288,6 +292,7 @@ namespace sqlite_bridge {
 
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
 #define MX_BEGIN_VISIT_DECL(NAME)                                              \
@@ -298,11 +303,13 @@ namespace sqlite_bridge {
 
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
 #define MX_BEGIN_VISIT_DECL(NAME) static std::vector<ListDescriptor> NAME##Table_lists({
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BOOL_LIST(TABLE, LOWERCASE, IGNORE1, IGNORE2, NAME, ...)      \
@@ -417,6 +424,7 @@ namespace sqlite_bridge {
   });
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
@@ -426,6 +434,7 @@ namespace sqlite_bridge {
     auto out_it{std::back_inserter(fields)};
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 
 #define MX_VISIT_BASE(NAME, BASE)                                              \
@@ -438,6 +447,7 @@ namespace sqlite_bridge {
   static std::vector<ListDescriptor> NAME##TableLists = Get##NAME##TableLists();
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
@@ -453,6 +463,7 @@ std::unique_ptr<VirtualTable> GetListTable(mx::EntityProvider::Ptr ep,
   }
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
   return nullptr;

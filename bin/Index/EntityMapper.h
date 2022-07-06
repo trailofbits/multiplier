@@ -40,6 +40,7 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::Token &entity);
   mx::RawEntityId EntityId(const pasta::FileToken &entity);
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
+  mx::RawEntityId EntityId(const pasta::Attr &entity) const;
 
   uint32_t PseudoId(const pasta::TemplateArgument &pseudo) const;
   uint32_t PseudoId(const pasta::TemplateParameterList &pseudo) const;

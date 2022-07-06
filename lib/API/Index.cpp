@@ -80,6 +80,14 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
     ptr = impl->FragmentFor(
         impl, std::get<mx::StatementId>(opt_id).fragment_id);
 
+  } else if (std::holds_alternative<mx::TypeId>(opt_id)) {
+    ptr = impl->FragmentFor(
+        impl, std::get<mx::TypeId>(opt_id).fragment_id);
+
+  } else if (std::holds_alternative<mx::AttributeId>(opt_id)) {
+    ptr = impl->FragmentFor(
+        impl, std::get<mx::AttributeId>(opt_id).fragment_id);
+
   } else if (std::holds_alternative<mx::FragmentTokenId>(opt_id)) {
     ptr = impl->FragmentFor(
         impl, std::get<mx::FragmentTokenId>(opt_id).fragment_id);
@@ -144,6 +152,21 @@ VariantEntity Index::entity(EntityId eid) const {
         Type type(std::move(frag_ptr), id.offset);
         if (type.id() == eid) {
           return type;
+        } else {
+          assert(false);
+        }
+      }
+    }
+
+  // It's a reference to an attribute.
+  } else if (std::holds_alternative<AttributeId>(vid)) {
+    AttributeId id = std::get<AttributeId>(vid);
+    assert(id == EntityId(id));
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
+      if (id.offset < frag_ptr->num_attrs) {
+        Attr attr(std::move(frag_ptr), id.offset);
+        if (attr.id() == eid) {
+          return attr;
         } else {
           assert(false);
         }

@@ -45,6 +45,11 @@ namespace {
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Type::Reader &);
 
+#define MX_BEGIN_VISIT_ATTR(name) \
+    static void FindReferences_ ## name ( \
+        std::unordered_set<mx::RawEntityId> &entity_ids, \
+        const mx::ast::Attr::Reader &);
+
 #define MX_BEGIN_VISIT_PSEUDO(name) \
     static void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
@@ -55,6 +60,7 @@ namespace {
 #define MX_END_VISIT_DECL(name) }
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
 #define MX_BEGIN_VISIT_DECL(name) \
@@ -75,6 +81,13 @@ namespace {
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Type::Reader &reader) { \
+      (void) entity_ids; \
+      (void) reader;
+
+#define MX_BEGIN_VISIT_ATTR(name) \
+    void FindReferences_ ## name ( \
+        std::unordered_set<mx::RawEntityId> &entity_ids, \
+        const mx::ast::Attr::Reader &reader) { \
       (void) entity_ids; \
       (void) reader;
 
@@ -163,6 +176,21 @@ void PendingFragment::FindDeclarationUses(
     }
 
 #undef MX_VISIT_TYPE
+  }
+
+  // Look for type methods with a return value of the corresponding
+  // entity ID.
+  for (mx::ast::Attr::Reader entity : b.getAttributes().asReader()) {
+#define MX_VISIT_ATTR(type) \
+    case pasta::AttrKind::k ## type: \
+      FindReferences_ ## type ## Attr(entity_ids, entity); \
+      break;
+
+    switch (Get_Attr_Kind(entity)) {
+    PASTA_FOR_EACH_ATTR_IMPL(MX_VISIT_ATTR, PASTA_IGNORE_ABSTRACT)
+    }
+
+#undef MX_VISIT_ATTR
   }
 
   // Look for pseudo-entity methods with a return value of the corresponding

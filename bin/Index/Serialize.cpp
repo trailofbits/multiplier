@@ -9,6 +9,7 @@
 #include "Serialize.h"
 
 #include <multiplier/RPC.capnp.h>
+#include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Type.h>
@@ -30,7 +31,8 @@ void SerializeDesignator(EntityMapper &es, mx::ast::Pseudo::Builder b, const pas
   b.setVal3(e.IsArrayRangeDesignator());
   auto v4 = e.Field();
   if (v4) {
-    auto id4 = es.EntityId(v4.value());    b.setVal4(id4);
+    auto id4 = es.EntityId(v4.value());
+    b.setVal4(id4);
     b.setVal5(id4 != mx::kInvalidEntityId);
   } else {
     b.setVal4(mx::kInvalidEntityId);
@@ -71,7 +73,8 @@ void SerializeTemplateParameterList(EntityMapper &es, mx::ast::Pseudo::Builder b
   b.setVal2(e.HasParameterPack());
   auto v4 = e.RequiresClause();
   if (v4) {
-    auto id4 = es.EntityId(v4.value());    b.setVal4(id4);
+    auto id4 = es.EntityId(v4.value());
+    b.setVal4(id4);
     b.setVal3(id4 != mx::kInvalidEntityId);
   } else {
     b.setVal4(mx::kInvalidEntityId);
@@ -111,7 +114,8 @@ void SerializeTemplateArgument(EntityMapper &es, mx::ast::Pseudo::Builder b, con
   b.setVal14(e.IsPackExpansion());
   auto v4 = e.AsDeclaration();
   if (v4) {
-    auto id4 = es.EntityId(v4.value());    b.setVal4(id4);
+    auto id4 = es.EntityId(v4.value());
+    b.setVal4(id4);
     b.setVal19(id4 != mx::kInvalidEntityId);
   } else {
     b.setVal4(mx::kInvalidEntityId);
@@ -119,7 +123,8 @@ void SerializeTemplateArgument(EntityMapper &es, mx::ast::Pseudo::Builder b, con
   }
   auto v6 = e.AsType();
   if (v6) {
-    auto id6 = es.EntityId(v6.value());    b.setVal6(id6);
+    auto id6 = es.EntityId(v6.value());
+    b.setVal6(id6);
     b.setVal20(id6 != mx::kInvalidEntityId);
   } else {
     b.setVal6(mx::kInvalidEntityId);
@@ -127,7 +132,8 @@ void SerializeTemplateArgument(EntityMapper &es, mx::ast::Pseudo::Builder b, con
   }
   auto v7 = e.ParameterTypeForDeclaration();
   if (v7) {
-    auto id7 = es.EntityId(v7.value());    b.setVal7(id7);
+    auto id7 = es.EntityId(v7.value());
+    b.setVal7(id7);
     b.setVal21(id7 != mx::kInvalidEntityId);
   } else {
     b.setVal7(mx::kInvalidEntityId);
@@ -135,7 +141,8 @@ void SerializeTemplateArgument(EntityMapper &es, mx::ast::Pseudo::Builder b, con
   }
   auto v8 = e.NullPointerType();
   if (v8) {
-    auto id8 = es.EntityId(v8.value());    b.setVal8(id8);
+    auto id8 = es.EntityId(v8.value());
+    b.setVal8(id8);
     b.setVal22(id8 != mx::kInvalidEntityId);
   } else {
     b.setVal8(mx::kInvalidEntityId);
@@ -160,7 +167,8 @@ void SerializeCXXBaseSpecifier(EntityMapper &es, mx::ast::Pseudo::Builder b, con
   b.setVal3(e.ConstructorsAreInherited());
   auto v8 = e.EllipsisToken();
   if (v8) {
-    auto id8 = es.EntityId(v8.value());    b.setVal8(id8);
+    auto id8 = es.EntityId(v8.value());
+    b.setVal8(id8);
     b.setVal5(id8 != mx::kInvalidEntityId);
   } else {
     b.setVal8(mx::kInvalidEntityId);
@@ -169,6 +177,3830 @@ void SerializeCXXBaseSpecifier(EntityMapper &es, mx::ast::Pseudo::Builder b, con
   b.setVal23(static_cast<unsigned char>(mx::FromPasta(e.SemanticAccessSpecifier())));
   b.setVal24(static_cast<unsigned char>(mx::FromPasta(e.LexicalAccessSpecifier())));
   b.setVal9(es.EntityId(e.BaseType()));
+}
+
+void SerializeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Attr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  auto t0 = e.Token();
+  b.setVal0(es.EntityId(t0));
+  b.setVal1(e.IsImplicit());
+  b.setVal2(e.IsInherited());
+  b.setVal3(e.IsLateParsed());
+  b.setVal4(e.IsPackExpansion());
+  b.setVal5(static_cast<unsigned short>(mx::FromPasta(e.Kind())));
+  if (auto r6 = e.Tokens(); auto rs6 = r6.Size()) {
+    b.setVal6(es.EntityId(r6[0]));
+    b.setVal7(es.EntityId(r6[rs6 - 1u]));
+  } else {
+    b.setVal6(0);
+    b.setVal7(0);
+  }
+}
+
+void SerializeAlignValueAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignValueAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Alignment()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAliasAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AliasAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Aliasee();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeAbiTagAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AbiTagAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTypeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+}
+
+void SerializeSPtrAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SPtrAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePtr64Attr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Ptr64Attr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePtr32Attr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Ptr32Attr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLPrivateAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLPrivateAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLLocalAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLLocalAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLGlobalHostAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalHostAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLGlobalDeviceAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalDeviceAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLGlobalAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGlobalAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLGenericAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLGenericAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLConstantAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLConstantAddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCKindOfAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCKindOfAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCInertUnsafeUnretainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCInertUnsafeUnretainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCGCAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCGCAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoDerefAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDerefAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCmseNSCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CmseNSCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeBTFTypeTagAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFTypeTagAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.BTFTypeTag();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeArmMveStrictPolymorphismAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmMveStrictPolymorphismAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAddressSpaceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AddressSpaceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUPtrAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UPtrAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTypeNullableResultAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullableResultAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTypeNullableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTypeNullUnspecifiedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNullUnspecifiedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTypeNonNullAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeNonNullAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeTypeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeThreadAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ThreadAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftObjCMembersAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftObjCMembersAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeStmtAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StmtAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+}
+
+void SerializeOpenCLUnrollHintAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLUnrollHintAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMustTailAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MustTailAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLikelyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LikelyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeFallThroughAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FallThroughAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUnlikelyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnlikelyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSuppressAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SuppressAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeRenderScriptKernelAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RenderScriptKernelAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOverloadableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OverloadableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLAccessAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLAccessAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal12(e.IsReadOnly());
+  b.setVal13(e.IsReadWrite());
+  b.setVal14(e.IsWriteOnly());
+}
+
+void SerializeObjCRuntimeVisibleAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeVisibleAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCRuntimeNameAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRuntimeNameAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.MetadataName();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeObjCNonRuntimeProtocolAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonRuntimeProtocolAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCNonLazyClassAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNonLazyClassAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCDirectMembersAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDirectMembersAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCDirectAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDirectAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCDesignatedInitializerAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCDesignatedInitializerAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCClassStubAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCClassStubAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCBoxableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBoxableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPReferencedVarAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPReferencedVarAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Reference()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPDeclareSimdDeclAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareSimdDeclAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.BranchState())));
+  b.setVal8(es.EntityId(e.Simdlen()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPCaptureKindAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureKindAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoEscapeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoEscapeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoBuiltinAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoBuiltinAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeModeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ModeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLoopHintAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoopHintAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Option())));
+  b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal16(static_cast<unsigned char>(mx::FromPasta(e.State())));
+  b.setVal8(es.EntityId(e.Value()));
+}
+
+void SerializeLoaderUninitializedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LoaderUninitializedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeInitSegAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InitSegAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Section();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeInheritableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal12(e.ShouldInheritEvenIfAlreadyPresent());
+}
+
+void SerializeIBOutletCollectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletCollectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Interface()));
+  b.setVal17(es.EntityId(e.InterfaceToken()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeIBOutletAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBOutletAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeIBActionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IBActionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeHotAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HotAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeHIPManagedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::HIPManagedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeGuardedVarAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GuardedVarAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeGuardedByAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GuardedByAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Argument()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeGNUInlineAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::GNUInlineAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeFormatAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeFormatArgAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FormatArgAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeFlattenAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FlattenAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeFlagEnumAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FlagEnumAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeFinalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FinalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsSpelledAsSealed());
+}
+
+void SerializeFastCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::FastCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeExternalSourceSymbolAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExternalSourceSymbolAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.DefinedIn();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.GeneratedDeclaration());
+  auto v10 = e.Language();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  auto v18 = e.Spelling();
+  std::string s18(v18.data(), v18.size());
+  b.setVal18(s18);
+}
+
+void SerializeExclusiveTrylockFunctionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExclusiveTrylockFunctionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.SuccessValue()));
+}
+
+void SerializeExcludeFromExplicitInstantiationAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ExcludeFromExplicitInstantiationAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeErrorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ErrorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.UserDiagnostic();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  b.setVal13(e.IsError());
+  b.setVal14(e.IsWarning());
+}
+
+void SerializeEnumExtensibilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnumExtensibilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Extensibility())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeEnforceTCBLeafAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBLeafAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.TCBName();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeEnforceTCBAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnforceTCBAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.TCBName();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeEnableIfAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EnableIfAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Condition()));
+  auto v9 = e.Message();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeEmptyBasesAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::EmptyBasesAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDisableTailCallsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DisableTailCallsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDisableSanitizerInstrumentationAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DisableSanitizerInstrumentationAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDiagnoseIfAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseIfAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.ArgumentDependent());
+  b.setVal8(es.EntityId(e.Condition()));
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.DiagnosticType())));
+  auto v9 = e.Message();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal17(es.EntityId(e.Parent()));
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  b.setVal14(e.IsError());
+  b.setVal19(e.IsWarning());
+}
+
+void SerializeDiagnoseAsBuiltinAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DiagnoseAsBuiltinAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Function()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDestructorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DestructorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDeprecatedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeprecatedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Message();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Replacement();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  auto v18 = e.Spelling();
+  std::string s18(v18.data(), v18.size());
+  b.setVal18(s18);
+}
+
+void SerializeDeclOrStmtAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DeclOrStmtAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+}
+
+void SerializeNoMergeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMergeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeDeclOrStmtAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDLLImportStaticLocalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportStaticLocalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDLLImportAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLImportAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDLLExportStaticLocalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLExportStaticLocalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeDLLExportAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::DLLExportAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeConvergentAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConvergentAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeConsumableSetOnReadAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableSetOnReadAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeConsumableAutoCastAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableAutoCastAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeConsumableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConsumableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.DefaultState())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeConstructorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstructorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeConstInitAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstInitAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsConstinit());
+}
+
+void SerializeConstAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ConstAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCommonAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CommonAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeColdAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ColdAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCodeSegAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CodeSegAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeCmseNSEntryAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CmseNSEntryAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCleanupAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CleanupAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.FunctionDeclaration()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCapturedRecordAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapturedRecordAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCapabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CapabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  b.setVal13(e.IsShared());
+}
+
+void SerializeCallbackAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallbackAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCallableWhenAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CallableWhenAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCXX11NoReturnAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CXX11NoReturnAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDASharedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDASharedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDALaunchBoundsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDALaunchBoundsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.MaxThreads()));
+  b.setVal17(es.EntityId(e.MinBlocks()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDAInvalidTargetAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAInvalidTargetAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDAHostAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAHostAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDAGlobalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAGlobalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDADeviceBuiltinTextureTypeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceBuiltinTextureTypeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDADeviceBuiltinSurfaceTypeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceBuiltinSurfaceTypeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDADeviceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDADeviceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCUDAConstantAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CUDAConstantAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCPUSpecificAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CPUSpecificAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCPUDispatchAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CPUDispatchAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFUnknownTransferAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFUnknownTransferAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFReturnsRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFReturnsRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFReturnsNotRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFReturnsNotRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFICanonicalJumpTableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFICanonicalJumpTableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFGuardAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFGuardAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Guard())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFAuditedTransferAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFAuditedTransferAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCDeclAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CDeclAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeC11NoReturnAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::C11NoReturnAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeBuiltinAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BuiltinAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeBlocksAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BlocksAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Type())));
+}
+
+void SerializeBTFDeclTagAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BTFDeclTagAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.BTFDeclTag();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeBPFPreserveAccessIndexAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BPFPreserveAccessIndexAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAvailabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AvailabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Message();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Replacement();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  auto v18 = e.Spelling();
+  std::string s18(v18.data(), v18.size());
+  b.setVal18(s18);
+  b.setVal13(e.Strict());
+  b.setVal14(e.Unavailable());
+}
+
+void SerializeAssumptionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumptionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Assumption();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeAssumeAlignedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssumeAlignedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Alignment()));
+  b.setVal17(es.EntityId(e.Offset()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAssertSharedLockAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertSharedLockAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAssertExclusiveLockAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertExclusiveLockAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAssertCapabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AssertCapabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsShared());
+}
+
+void SerializeAsmLabelAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AsmLabelAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.IsLiteralLabel());
+  auto v9 = e.Label();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeArtificialAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArtificialAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeArmBuiltinAliasAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArmBuiltinAliasAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeArgumentWithTypeTagAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArgumentWithTypeTagAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.IsPointer());
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeArcWeakrefUnavailableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ArcWeakrefUnavailableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAnyX86NoCfCheckAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86NoCfCheckAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAnyX86NoCallerSavedRegistersAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86NoCallerSavedRegistersAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAnyX86InterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnyX86InterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAnalyzerNoReturnAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnalyzerNoReturnAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAlwaysInlineAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlwaysInlineAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAlwaysDestroyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlwaysDestroyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAllocSizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AllocSizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAllocAlignAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AllocAlignAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAlignedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.AlignmentExpression()));
+  b.setVal17(es.EntityId(e.AlignmentType()));
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsAlignas());
+  b.setVal14(e.IsAlignmentDependent());
+  b.setVal19(e.IsAlignmentErrorDependent());
+  b.setVal20(e.IsAlignmentExpression());
+  b.setVal21(e.IsC11());
+  b.setVal22(e.IsDeclspec());
+  b.setVal23(e.IsGNU());
+}
+
+void SerializeAlignNaturalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignNaturalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAlignMac68kAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignMac68kAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAcquiredBeforeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquiredBeforeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAcquiredAfterAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquiredAfterAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAcquireHandleAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireHandleAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.HandleType();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeAcquireCapabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AcquireCapabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsShared());
+}
+
+void SerializeAVRSignalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRSignalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAVRInterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AVRInterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeARMInterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ARMInterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAMDGPUWavesPerEUAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUWavesPerEUAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Max()));
+  b.setVal17(es.EntityId(e.Min()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAMDGPUNumVGPRAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumVGPRAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAMDGPUNumSGPRAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUNumSGPRAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAMDGPUFlatWorkGroupSizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AMDGPUFlatWorkGroupSizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Max()));
+  b.setVal17(es.EntityId(e.Min()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAArch64VectorPcsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AArch64VectorPcsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeXRayLogArgsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayLogArgsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeXRayInstrumentAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::XRayInstrumentAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.AlwaysXRayInstrument());
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal14(e.NeverXRayInstrument());
+}
+
+void SerializeX86ForceAlignArgPointerAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::X86ForceAlignArgPointerAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeWorkGroupSizeHintAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WorkGroupSizeHintAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeWebAssemblyImportNameAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportNameAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.ImportName();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeWebAssemblyImportModuleAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyImportModuleAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.ImportModule();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeWebAssemblyExportNameAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WebAssemblyExportNameAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.ExportName();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeWeakRefAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakRefAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Aliasee();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeWeakImportAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakImportAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeWeakAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WeakAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeWarnUnusedResultAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedResultAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.IsCXX11NoDiscard());
+  auto v9 = e.Message();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeWarnUnusedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::WarnUnusedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeVisibilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VisibilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
+}
+
+void SerializeVectorCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VectorCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeVecTypeHintAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecTypeHintAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.TypeHint()));
+  b.setVal17(es.EntityId(e.TypeHintToken()));
+}
+
+void SerializeVecReturnAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::VecReturnAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUuidAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UuidAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Guid();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.GuidDeclaration()));
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeUsingIfExistsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsingIfExistsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUsedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UsedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUnusedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnusedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUninitializedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UninitializedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeUnavailableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UnavailableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.ImplicitReason())));
+  auto v9 = e.Message();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeTypeVisibilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeVisibilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
+}
+
+void SerializeTypeTagForDatatypeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TypeTagForDatatypeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.LayoutCompatible());
+  b.setVal8(es.EntityId(e.MatchingCType()));
+  b.setVal17(es.EntityId(e.MatchingCTypeToken()));
+  b.setVal14(e.MustBeNull());
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTryAcquireCapabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TryAcquireCapabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.SuccessValue()));
+  b.setVal13(e.IsShared());
+}
+
+void SerializeTrivialABIAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TrivialABIAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTransparentUnionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TransparentUnionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeThisCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ThisCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTestTypestateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TestTypestateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.TestState())));
+}
+
+void SerializeTargetClonesAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetClonesAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeTargetAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TargetAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Architecture();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.FeaturesString();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+  auto v18 = e.Spelling();
+  std::string s18(v18.data(), v18.size());
+  b.setVal18(s18);
+  b.setVal13(e.IsDefaultVersion());
+}
+
+void SerializeTLSModelAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::TLSModelAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Model();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeSysVABIAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SysVABIAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftPrivateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftPrivateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftNewTypeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNewTypeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.NewtypeKind())));
+  b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftNameAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftNameAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeSwiftErrorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftErrorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftBridgedTypedefAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftBridgedTypedefAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftBridgeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftBridgeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.SwiftType();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeSwiftAttrAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAttrAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Attribute();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeSwiftAsyncNameAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncNameAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeSwiftAsyncErrorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncErrorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Convention())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftAsyncCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftAsyncAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeStrictFPAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StrictFPAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeStdCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StdCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeStandaloneDebugAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::StandaloneDebugAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSpeculativeLoadHardeningAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SpeculativeLoadHardeningAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSharedTrylockFunctionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SharedTrylockFunctionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.SuccessValue()));
+}
+
+void SerializeSetTypestateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SetTypestateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.NewState())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSentinelAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SentinelAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSelectAnyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SelectAnyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeScopedLockableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ScopedLockableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSYCLSpecialClassAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SYCLSpecialClassAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSYCLKernelAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SYCLKernelAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeReturnsTwiceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnsTwiceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeReturnsNonNullAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnsNonNullAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeReturnTypestateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReturnTypestateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.State())));
+}
+
+void SerializeRetainAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RetainAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeRestrictAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RestrictAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeRequiresCapabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RequiresCapabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsShared());
+}
+
+void SerializeReqdWorkGroupSizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReqdWorkGroupSizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeReleaseCapabilityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseCapabilityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsGeneric());
+  b.setVal14(e.IsShared());
+}
+
+void SerializeReinitializesAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReinitializesAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeRegCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RegCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeRISCVInterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::RISCVInterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePureAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PureAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePtGuardedVarAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PtGuardedVarAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePtGuardedByAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PtGuardedByAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Argument()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePreserveMostAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveMostAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePreserveAllAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreserveAllAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePreferredNameAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PreferredNameAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.TypedefType()));
+  b.setVal17(es.EntityId(e.TypedefTypeToken()));
+}
+
+void SerializePragmaClangTextSectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangTextSectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializePragmaClangRodataSectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRodataSectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializePragmaClangRelroSectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangRelroSectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializePragmaClangDataSectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangDataSectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializePragmaClangBSSSectionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PragmaClangBSSSectionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Name();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializePointerAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PointerAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.DerefType()));
+  b.setVal17(es.EntityId(e.DerefTypeToken()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePcsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PcsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.PCS())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePatchableFunctionEntryAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PatchableFunctionEntryAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePascalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PascalAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeParamTypestateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParamTypestateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.ParameterState())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializePackedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PackedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOwnershipAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnershipAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.OwnKind())));
+  b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsHolds());
+  b.setVal14(e.IsReturns());
+  b.setVal19(e.IsTakes());
+}
+
+void SerializeOwnerAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OwnerAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.DerefType()));
+  b.setVal17(es.EntityId(e.DerefTypeToken()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOverrideAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OverrideAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOptimizeNoneAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OptimizeNoneAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLKernelAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLKernelAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOpenCLIntelReqdSubGroupSizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OpenCLIntelReqdSubGroupSizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCSubclassingRestrictedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCSubclassingRestrictedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCRootClassAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRootClassAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCReturnsInnerPointerAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCReturnsInnerPointerAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCRequiresSuperAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRequiresSuperAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCRequiresPropertyDefsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCRequiresPropertyDefsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCPreciseLifetimeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCPreciseLifetimeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCOwnershipAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCOwnershipAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCNSObjectAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCNSObjectAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCMethodFamilyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCMethodFamilyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Family())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCIndependentClassAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCIndependentClassAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCExternallyRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExternallyRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCExplicitProtocolImplAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExplicitProtocolImplAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCExceptionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCExceptionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCBridgeRelatedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeRelatedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCBridgeMutableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeMutableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeObjCBridgeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ObjCBridgeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOSReturnsRetainedOnZeroAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedOnZeroAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOSReturnsRetainedOnNonZeroAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedOnNonZeroAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOSReturnsRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOSReturnsNotRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSReturnsNotRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOSConsumesThisAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSConsumesThisAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPThreadPrivateDeclAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPThreadPrivateDeclAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPDeclareVariantAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareVariantAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal8(es.EntityId(e.VariantFuncReference()));
+}
+
+void SerializeOMPDeclareTargetDeclAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPDeclareTargetDeclAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.DevType())));
+  b.setVal13(e.Indirect());
+  b.setVal8(es.EntityId(e.IndirectExpression()));
+  b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.MapType())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPCaptureNoInitAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPCaptureNoInitAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOMPAllocateDeclAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OMPAllocateDeclAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Alignment()));
+  b.setVal17(es.EntityId(e.Allocator()));
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.AllocatorType())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNotTailCalledAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NotTailCalledAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoUniqueAddressAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoUniqueAddressAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoThrowAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoThrowAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoThreadSafetyAnalysisAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoThreadSafetyAnalysisAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoStackProtectorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoStackProtectorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoSplitStackAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSplitStackAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoSpeculativeLoadHardeningAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSpeculativeLoadHardeningAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoSanitizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoSanitizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.HasCoverage());
+}
+
+void SerializeNoReturnAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoReturnAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoProfileFunctionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoProfileFunctionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoMips16Attr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMips16Attr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoMicroMipsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoMicroMipsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoInstrumentFunctionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoInstrumentFunctionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoInlineAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoInlineAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoDuplicateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDuplicateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoDestroyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDestroyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoDebugAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoDebugAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoCommonAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoCommonAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNoAliasAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NoAliasAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNakedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NakedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNSReturnsRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNSReturnsNotRetainedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsNotRetainedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNSReturnsAutoreleasedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSReturnsAutoreleasedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNSErrorDomainAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSErrorDomainAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.ErrorDomain()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNSConsumesSelfAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSConsumesSelfAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMipsShortCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsShortCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMipsLongCallAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsLongCallAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMipsInterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MipsInterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.Interrupt())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMips16Attr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::Mips16Attr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMinVectorWidthAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MinVectorWidthAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMinSizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MinSizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMicroMipsAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MicroMipsAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMayAliasAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MayAliasAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMaxFieldAlignmentAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MaxFieldAlignmentAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMSVtorDispAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSVtorDispAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.VtorDispMode())));
+}
+
+void SerializeMSStructAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSStructAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMSP430InterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSP430InterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMSNoVTableAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSNoVTableAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMSInheritanceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSInheritanceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal13(e.BestCase());
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.InheritanceModel())));
+  b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMSAllocatorAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSAllocatorAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMSABIAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MSABIAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeMIGServerRoutineAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::MIGServerRoutineAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeM68kInterruptAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::M68kInterruptAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLocksExcludedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LocksExcludedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLockReturnedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LockReturnedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  b.setVal8(es.EntityId(e.Argument()));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLifetimeBoundAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LifetimeBoundAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLeafAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LeafAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLayoutVersionAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LayoutVersionAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeLTOVisibilityPublicAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::LTOVisibilityPublicAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeInternalLinkageAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InternalLinkageAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeIntelOclBiccAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IntelOclBiccAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeInitPriorityAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InitPriorityAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeInheritableParamAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::InheritableParamAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableAttr(es, b, e);
+}
+
+void SerializeCarriesDependencyAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CarriesDependencyAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeCFConsumedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CFConsumedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeAnnotateAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AnnotateAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.Annotation();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeUseHandleAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::UseHandleAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.HandleType();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeReleaseHandleAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ReleaseHandleAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.HandleType();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializePassObjectSizeAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::PassObjectSizeAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  b.setVal13(e.IsDynamic());
+}
+
+void SerializeParameterABIAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::ParameterABIAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.ABI())));
+}
+
+void SerializeSwiftIndirectResultAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftIndirectResultAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeParameterABIAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftErrorResultAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftErrorResultAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeParameterABIAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftContextAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftContextAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeParameterABIAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeSwiftAsyncContextAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::SwiftAsyncContextAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeParameterABIAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeOSConsumedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::OSConsumedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNonNullAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NonNullAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeNSConsumedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::NSConsumedAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeInheritableParamAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeIFuncAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::IFuncAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Resolver();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+  auto v10 = e.Spelling();
+  std::string s10(v10.data(), v10.size());
+  b.setVal10(s10);
+}
+
+void SerializeCalledOnceAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::CalledOnceAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
+}
+
+void SerializeBuiltinAliasAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::BuiltinAliasAttr &e) {
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeAttr(es, b, e);
+  b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
+  auto v9 = e.Spelling();
+  std::string s9(v9.data(), v9.size());
+  b.setVal9(s9);
 }
 
 void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type &e) {
@@ -184,7 +4016,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   b.setVal6(e.ContainsUnexpandedParameterPack());
   auto v7 = e.ArrayElementTypeNoTypeQualified();
   if (v7) {
-    auto id7 = es.EntityId(v7.value());    b.setVal7(id7);
+    auto id7 = es.EntityId(v7.value());
+    b.setVal7(id7);
     b.setVal8(id7 != mx::kInvalidEntityId);
   } else {
     b.setVal7(mx::kInvalidEntityId);
@@ -192,7 +4025,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v9 = e.AsCXXRecordDeclaration();
   if (v9) {
-    auto id9 = es.EntityId(v9.value());    b.setVal9(id9);
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
     b.setVal10(id9 != mx::kInvalidEntityId);
   } else {
     b.setVal9(mx::kInvalidEntityId);
@@ -200,7 +4034,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v11 = e.AsComplexIntegerType();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal12(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -208,7 +4043,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v13 = e.AsObjCInterfacePointerType();
   if (v13) {
-    auto id13 = es.EntityId(v13.value());    b.setVal13(id13);
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
     b.setVal14(id13 != mx::kInvalidEntityId);
   } else {
     b.setVal13(mx::kInvalidEntityId);
@@ -216,7 +4052,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v15 = e.AsObjCInterfaceType();
   if (v15) {
-    auto id15 = es.EntityId(v15.value());    b.setVal15(id15);
+    auto id15 = es.EntityId(v15.value());
+    b.setVal15(id15);
     b.setVal16(id15 != mx::kInvalidEntityId);
   } else {
     b.setVal15(mx::kInvalidEntityId);
@@ -224,7 +4061,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v17 = e.AsObjCQualifiedClassType();
   if (v17) {
-    auto id17 = es.EntityId(v17.value());    b.setVal17(id17);
+    auto id17 = es.EntityId(v17.value());
+    b.setVal17(id17);
     b.setVal18(id17 != mx::kInvalidEntityId);
   } else {
     b.setVal17(mx::kInvalidEntityId);
@@ -232,7 +4070,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v19 = e.AsObjCQualifiedIdType();
   if (v19) {
-    auto id19 = es.EntityId(v19.value());    b.setVal19(id19);
+    auto id19 = es.EntityId(v19.value());
+    b.setVal19(id19);
     b.setVal20(id19 != mx::kInvalidEntityId);
   } else {
     b.setVal19(mx::kInvalidEntityId);
@@ -240,7 +4079,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v21 = e.AsObjCQualifiedInterfaceType();
   if (v21) {
-    auto id21 = es.EntityId(v21.value());    b.setVal21(id21);
+    auto id21 = es.EntityId(v21.value());
+    b.setVal21(id21);
     b.setVal22(id21 != mx::kInvalidEntityId);
   } else {
     b.setVal21(mx::kInvalidEntityId);
@@ -248,7 +4088,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v23 = e.AsPlaceholderType();
   if (v23) {
-    auto id23 = es.EntityId(v23.value());    b.setVal23(id23);
+    auto id23 = es.EntityId(v23.value());
+    b.setVal23(id23);
     b.setVal24(id23 != mx::kInvalidEntityId);
   } else {
     b.setVal23(mx::kInvalidEntityId);
@@ -256,7 +4097,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v25 = e.AsRecordDeclaration();
   if (v25) {
-    auto id25 = es.EntityId(v25.value());    b.setVal25(id25);
+    auto id25 = es.EntityId(v25.value());
+    b.setVal25(id25);
     b.setVal26(id25 != mx::kInvalidEntityId);
   } else {
     b.setVal25(mx::kInvalidEntityId);
@@ -264,7 +4106,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v27 = e.AsStructureType();
   if (v27) {
-    auto id27 = es.EntityId(v27.value());    b.setVal27(id27);
+    auto id27 = es.EntityId(v27.value());
+    b.setVal27(id27);
     b.setVal28(id27 != mx::kInvalidEntityId);
   } else {
     b.setVal27(mx::kInvalidEntityId);
@@ -272,7 +4115,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v29 = e.AsTagDeclaration();
   if (v29) {
-    auto id29 = es.EntityId(v29.value());    b.setVal29(id29);
+    auto id29 = es.EntityId(v29.value());
+    b.setVal29(id29);
     b.setVal30(id29 != mx::kInvalidEntityId);
   } else {
     b.setVal29(mx::kInvalidEntityId);
@@ -280,7 +4124,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v31 = e.AsUnionType();
   if (v31) {
-    auto id31 = es.EntityId(v31.value());    b.setVal31(id31);
+    auto id31 = es.EntityId(v31.value());
+    b.setVal31(id31);
     b.setVal32(id31 != mx::kInvalidEntityId);
   } else {
     b.setVal31(mx::kInvalidEntityId);
@@ -288,7 +4133,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v33 = e.ContainedAutoType();
   if (v33) {
-    auto id33 = es.EntityId(v33.value());    b.setVal33(id33);
+    auto id33 = es.EntityId(v33.value());
+    b.setVal33(id33);
     b.setVal34(id33 != mx::kInvalidEntityId);
   } else {
     b.setVal33(mx::kInvalidEntityId);
@@ -296,7 +4142,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v35 = e.ContainedDeducedType();
   if (v35) {
-    auto id35 = es.EntityId(v35.value());    b.setVal35(id35);
+    auto id35 = es.EntityId(v35.value());
+    b.setVal35(id35);
     b.setVal36(id35 != mx::kInvalidEntityId);
   } else {
     b.setVal35(mx::kInvalidEntityId);
@@ -313,7 +4160,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v41 = e.PointeeCXXRecordDeclaration();
   if (v41) {
-    auto id41 = es.EntityId(v41.value());    b.setVal41(id41);
+    auto id41 = es.EntityId(v41.value());
+    b.setVal41(id41);
     b.setVal42(id41 != mx::kInvalidEntityId);
   } else {
     b.setVal41(mx::kInvalidEntityId);
@@ -321,7 +4169,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v43 = e.PointeeOrArrayElementType();
   if (v43) {
-    auto id43 = es.EntityId(v43.value());    b.setVal43(id43);
+    auto id43 = es.EntityId(v43.value());
+    b.setVal43(id43);
     b.setVal44(id43 != mx::kInvalidEntityId);
   } else {
     b.setVal43(mx::kInvalidEntityId);
@@ -329,7 +4178,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v45 = e.PointeeType();
   if (v45) {
-    auto id45 = es.EntityId(v45.value());    b.setVal45(id45);
+    auto id45 = es.EntityId(v45.value());
+    b.setVal45(id45);
     b.setVal46(id45 != mx::kInvalidEntityId);
   } else {
     b.setVal45(mx::kInvalidEntityId);
@@ -344,7 +4194,8 @@ void SerializeType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::Type
   }
   auto v49 = e.SveElementType();
   if (v49) {
-    auto id49 = es.EntityId(v49.value());    b.setVal49(id49);
+    auto id49 = es.EntityId(v49.value());
+    b.setVal49(id49);
     b.setVal50(id49 != mx::kInvalidEntityId);
   } else {
     b.setVal49(mx::kInvalidEntityId);
@@ -647,7 +4498,8 @@ void SerializeTemplateTypeParmType(EntityMapper &es, mx::ast::Type::Builder b, c
   b.setVal308(es.EntityId(e.Desugar()));
   auto v309 = e.Declaration();
   if (v309) {
-    auto id309 = es.EntityId(v309.value());    b.setVal309(id309);
+    auto id309 = es.EntityId(v309.value());
+    b.setVal309(id309);
     b.setVal310(id309 != mx::kInvalidEntityId);
   } else {
     b.setVal309(mx::kInvalidEntityId);
@@ -665,7 +4517,8 @@ void SerializeTemplateSpecializationType(EntityMapper &es, mx::ast::Type::Builde
   b.setVal308(es.EntityId(e.Desugar()));
   auto v309 = e.AliasedType();
   if (v309) {
-    auto id309 = es.EntityId(v309.value());    b.setVal309(id309);
+    auto id309 = es.EntityId(v309.value());
+    b.setVal309(id309);
     b.setVal310(id309 != mx::kInvalidEntityId);
   } else {
     b.setVal309(mx::kInvalidEntityId);
@@ -829,7 +4682,8 @@ void SerializeObjCObjectType(EntityMapper &es, mx::ast::Type::Builder b, const p
   b.setVal315(es.EntityId(e.Interface()));
   auto v317 = e.SuperClassType();
   if (v317) {
-    auto id317 = es.EntityId(v317.value());    b.setVal317(id317);
+    auto id317 = es.EntityId(v317.value());
+    b.setVal317(id317);
     b.setVal310(id317 != mx::kInvalidEntityId);
   } else {
     b.setVal317(mx::kInvalidEntityId);
@@ -1040,7 +4894,8 @@ void SerializeFunctionProtoType(EntityMapper &es, mx::ast::Type::Builder b, cons
   b.setVal317(es.EntityId(t317));
   auto v331 = e.ExceptionSpecDeclaration();
   if (v331) {
-    auto id331 = es.EntityId(v331.value());    b.setVal331(id331);
+    auto id331 = es.EntityId(v331.value());
+    b.setVal331(id331);
     b.setVal323(id331 != mx::kInvalidEntityId);
   } else {
     b.setVal331(mx::kInvalidEntityId);
@@ -1048,7 +4903,8 @@ void SerializeFunctionProtoType(EntityMapper &es, mx::ast::Type::Builder b, cons
   }
   auto v332 = e.ExceptionSpecTemplate();
   if (v332) {
-    auto id332 = es.EntityId(v332.value());    b.setVal332(id332);
+    auto id332 = es.EntityId(v332.value());
+    b.setVal332(id332);
     b.setVal324(id332 != mx::kInvalidEntityId);
   } else {
     b.setVal332(mx::kInvalidEntityId);
@@ -1057,7 +4913,8 @@ void SerializeFunctionProtoType(EntityMapper &es, mx::ast::Type::Builder b, cons
   b.setVal337(static_cast<unsigned char>(mx::FromPasta(e.ExceptionSpecType())));
   auto v338 = e.NoexceptExpression();
   if (v338) {
-    auto id338 = es.EntityId(v338.value());    b.setVal338(id338);
+    auto id338 = es.EntityId(v338.value());
+    b.setVal338(id338);
     b.setVal325(id338 != mx::kInvalidEntityId);
   } else {
     b.setVal338(mx::kInvalidEntityId);
@@ -1169,7 +5026,8 @@ void SerializeDeducedType(EntityMapper &es, mx::ast::Type::Builder b, const past
   b.setVal308(es.EntityId(e.Desugar()));
   auto v309 = e.ResolvedType();
   if (v309) {
-    auto id309 = es.EntityId(v309.value());    b.setVal309(id309);
+    auto id309 = es.EntityId(v309.value());
+    b.setVal309(id309);
     b.setVal310(id309 != mx::kInvalidEntityId);
   } else {
     b.setVal309(mx::kInvalidEntityId);
@@ -1203,7 +5061,8 @@ void SerializeAutoType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::
   } while (false);
   auto v315 = e.TypeConstraintConcept();
   if (v315) {
-    auto id315 = es.EntityId(v315.value());    b.setVal315(id315);
+    auto id315 = es.EntityId(v315.value());
+    b.setVal315(id315);
     b.setVal313(id315 != mx::kInvalidEntityId);
   } else {
     b.setVal315(mx::kInvalidEntityId);
@@ -1368,7 +5227,8 @@ void SerializeConstantArrayType(EntityMapper &es, mx::ast::Type::Builder b, cons
   b.setVal309(es.EntityId(e.Desugar()));
   auto v315 = e.SizeExpression();
   if (v315) {
-    auto id315 = es.EntityId(v315.value());    b.setVal315(id315);
+    auto id315 = es.EntityId(v315.value());
+    b.setVal315(id315);
     b.setVal310(id315 != mx::kInvalidEntityId);
   } else {
     b.setVal315(mx::kInvalidEntityId);
@@ -1412,7 +5272,8 @@ void SerializeElaboratedType(EntityMapper &es, mx::ast::Type::Builder b, const p
   b.setVal309(es.EntityId(e.NamedType()));
   auto v315 = e.OwnedTagDeclaration();
   if (v315) {
-    auto id315 = es.EntityId(v315.value());    b.setVal315(id315);
+    auto id315 = es.EntityId(v315.value());
+    b.setVal315(id315);
     b.setVal310(id315 != mx::kInvalidEntityId);
   } else {
     b.setVal315(mx::kInvalidEntityId);
@@ -1592,7 +5453,8 @@ void SerializeReturnStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   SerializeStmt(es, b, e);
   auto v9 = e.NRVOCandidate();
   if (v9) {
-    auto id9 = es.EntityId(v9.value());    b.setVal9(id9);
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
     b.setVal12(id9 != mx::kInvalidEntityId);
   } else {
     b.setVal9(mx::kInvalidEntityId);
@@ -1600,7 +5462,8 @@ void SerializeReturnStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   }
   auto v10 = e.ReturnValue();
   if (v10) {
-    auto id10 = es.EntityId(v10.value());    b.setVal10(id10);
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
     b.setVal15(id10 != mx::kInvalidEntityId);
   } else {
     b.setVal10(mx::kInvalidEntityId);
@@ -2112,7 +5975,8 @@ void SerializeIndirectGotoStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const
   SerializeStmt(es, b, e);
   auto v9 = e.ConstantTarget();
   if (v9) {
-    auto id9 = es.EntityId(v9.value());    b.setVal9(id9);
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
     b.setVal12(id9 != mx::kInvalidEntityId);
   } else {
     b.setVal9(mx::kInvalidEntityId);
@@ -2130,7 +5994,8 @@ void SerializeIfStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::If
   b.setVal9(es.EntityId(e.Condition()));
   auto v10 = e.ConditionVariable();
   if (v10) {
-    auto id10 = es.EntityId(v10.value());    b.setVal10(id10);
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
     b.setVal12(id10 != mx::kInvalidEntityId);
   } else {
     b.setVal10(mx::kInvalidEntityId);
@@ -2138,7 +6003,8 @@ void SerializeIfStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::If
   }
   auto v11 = e.ConditionVariableDeclarationStatement();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal15(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -2146,7 +6012,8 @@ void SerializeIfStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::If
   }
   auto v13 = e.Else();
   if (v13) {
-    auto id13 = es.EntityId(v13.value());    b.setVal13(id13);
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
     b.setVal20(id13 != mx::kInvalidEntityId);
   } else {
     b.setVal13(mx::kInvalidEntityId);
@@ -2158,7 +6025,8 @@ void SerializeIfStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::If
   b.setVal17(es.EntityId(t17));
   auto v18 = e.Initializer();
   if (v18) {
-    auto id18 = es.EntityId(v18.value());    b.setVal18(id18);
+    auto id18 = es.EntityId(v18.value());
+    b.setVal18(id18);
     b.setVal21(id18 != mx::kInvalidEntityId);
   } else {
     b.setVal18(mx::kInvalidEntityId);
@@ -2194,7 +6062,8 @@ void SerializeForStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::F
   b.setVal9(es.EntityId(e.Body()));
   auto v10 = e.Condition();
   if (v10) {
-    auto id10 = es.EntityId(v10.value());    b.setVal10(id10);
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
     b.setVal12(id10 != mx::kInvalidEntityId);
   } else {
     b.setVal10(mx::kInvalidEntityId);
@@ -2202,7 +6071,8 @@ void SerializeForStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::F
   }
   auto v11 = e.ConditionVariable();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal15(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -2210,7 +6080,8 @@ void SerializeForStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::F
   }
   auto v13 = e.ConditionVariableDeclarationStatement();
   if (v13) {
-    auto id13 = es.EntityId(v13.value());    b.setVal13(id13);
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
     b.setVal20(id13 != mx::kInvalidEntityId);
   } else {
     b.setVal13(mx::kInvalidEntityId);
@@ -2220,7 +6091,8 @@ void SerializeForStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::F
   b.setVal14(es.EntityId(t14));
   auto v17 = e.Increment();
   if (v17) {
-    auto id17 = es.EntityId(v17.value());    b.setVal17(id17);
+    auto id17 = es.EntityId(v17.value());
+    b.setVal17(id17);
     b.setVal21(id17 != mx::kInvalidEntityId);
   } else {
     b.setVal17(mx::kInvalidEntityId);
@@ -2228,7 +6100,8 @@ void SerializeForStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::F
   }
   auto v18 = e.Initializer();
   if (v18) {
-    auto id18 = es.EntityId(v18.value());    b.setVal18(id18);
+    auto id18 = es.EntityId(v18.value());
+    b.setVal18(id18);
     b.setVal57(id18 != mx::kInvalidEntityId);
   } else {
     b.setVal18(mx::kInvalidEntityId);
@@ -2265,7 +6138,8 @@ void SerializeDeclStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   } while (false);
   auto v9 = e.SingleDeclaration();
   if (v9) {
-    auto id9 = es.EntityId(v9.value());    b.setVal9(id9);
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
     b.setVal12(id9 != mx::kInvalidEntityId);
   } else {
     b.setVal9(mx::kInvalidEntityId);
@@ -2324,7 +6198,8 @@ void SerializeCompoundStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   b.setVal10(es.EntityId(t10));
   auto v11 = e.StatementExpressionResult();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal12(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -2371,7 +6246,8 @@ void SerializeCXXForRangeStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const 
   b.setVal19(es.EntityId(e.Increment()));
   auto v26 = e.Initializer();
   if (v26) {
-    auto id26 = es.EntityId(v26.value());    b.setVal26(id26);
+    auto id26 = es.EntityId(v26.value());
+    b.setVal26(id26);
     b.setVal12(id26 != mx::kInvalidEntityId);
   } else {
     b.setVal26(mx::kInvalidEntityId);
@@ -2392,7 +6268,8 @@ void SerializeCXXCatchStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   b.setVal10(es.EntityId(e.CaughtType()));
   auto v11 = e.ExceptionDeclaration();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal12(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -2600,7 +6477,8 @@ void SerializeWhileStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta:
   b.setVal10(es.EntityId(e.Condition()));
   auto v11 = e.ConditionVariable();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal12(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -2608,7 +6486,8 @@ void SerializeWhileStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta:
   }
   auto v13 = e.ConditionVariableDeclarationStatement();
   if (v13) {
-    auto id13 = es.EntityId(v13.value());    b.setVal13(id13);
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
     b.setVal15(id13 != mx::kInvalidEntityId);
   } else {
     b.setVal13(mx::kInvalidEntityId);
@@ -2627,7 +6506,8 @@ void SerializeValueStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta:
   SerializeStmt(es, b, e);
   auto v9 = e.ExpressionStatement();
   if (v9) {
-    auto id9 = es.EntityId(v9.value());    b.setVal9(id9);
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
     b.setVal12(id9 != mx::kInvalidEntityId);
   } else {
     b.setVal9(mx::kInvalidEntityId);
@@ -2669,7 +6549,8 @@ void SerializeExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr
   b.setVal32(es.EntityId(t32));
   auto v33 = e.ObjCProperty();
   if (v33) {
-    auto id33 = es.EntityId(v33.value());    b.setVal33(id33);
+    auto id33 = es.EntityId(v33.value());
+    b.setVal33(id33);
     b.setVal57(id33 != mx::kInvalidEntityId);
   } else {
     b.setVal33(mx::kInvalidEntityId);
@@ -2678,7 +6559,8 @@ void SerializeExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr
   b.setVal56(static_cast<unsigned char>(mx::FromPasta(e.ObjectKind())));
   auto v34 = e.ReferencedDeclarationOfCallee();
   if (v34) {
-    auto id34 = es.EntityId(v34.value());    b.setVal34(id34);
+    auto id34 = es.EntityId(v34.value());
+    b.setVal34(id34);
     b.setVal58(id34 != mx::kInvalidEntityId);
   } else {
     b.setVal34(mx::kInvalidEntityId);
@@ -2686,7 +6568,8 @@ void SerializeExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr
   }
   auto v35 = e.SourceBitField();
   if (v35) {
-    auto id35 = es.EntityId(v35.value());    b.setVal35(id35);
+    auto id35 = es.EntityId(v35.value());
+    b.setVal35(id35);
     b.setVal59(id35 != mx::kInvalidEntityId);
   } else {
     b.setVal35(mx::kInvalidEntityId);
@@ -2694,7 +6577,8 @@ void SerializeExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::Expr
   }
   auto v36 = e.Type();
   if (v36) {
-    auto id36 = es.EntityId(v36.value());    b.setVal36(id36);
+    auto id36 = es.EntityId(v36.value());
+    b.setVal36(id36);
     b.setVal60(id36 != mx::kInvalidEntityId);
   } else {
     b.setVal36(mx::kInvalidEntityId);
@@ -2897,7 +6781,8 @@ void SerializeCastExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   b.setVal65(s65);
   auto v37 = e.ConversionFunction();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -2907,7 +6792,8 @@ void SerializeCastExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   b.setVal39(es.EntityId(e.SubExpressionAsWritten()));
   auto v40 = e.TargetUnionField();
   if (v40) {
-    auto id40 = es.EntityId(v40.value());    b.setVal40(id40);
+    auto id40 = es.EntityId(v40.value());
+    b.setVal40(id40);
     b.setVal96(id40 != mx::kInvalidEntityId);
   } else {
     b.setVal40(mx::kInvalidEntityId);
@@ -3014,7 +6900,8 @@ void SerializeCallExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   b.setVal38(es.EntityId(e.Callee()));
   auto v39 = e.CalleeDeclaration();
   if (v39) {
-    auto id39 = es.EntityId(v39.value());    b.setVal39(id39);
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
     b.setVal95(id39 != mx::kInvalidEntityId);
   } else {
     b.setVal39(mx::kInvalidEntityId);
@@ -3022,7 +6909,8 @@ void SerializeCallExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   }
   auto v40 = e.DirectCallee();
   if (v40) {
-    auto id40 = es.EntityId(v40.value());    b.setVal40(id40);
+    auto id40 = es.EntityId(v40.value());
+    b.setVal40(id40);
     b.setVal96(id40 != mx::kInvalidEntityId);
   } else {
     b.setVal40(mx::kInvalidEntityId);
@@ -3030,57 +6918,68 @@ void SerializeCallExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   }
   auto t41 = e.RParenToken();
   b.setVal41(es.EntityId(t41));
-  b.setVal97(e.HasStoredFPFeatures());
-  b.setVal98(e.HasUnusedResultAttribute());
-  b.setVal99(e.IsBuiltinAssumeFalse());
-  b.setVal101(e.IsCallToStdMove());
-  b.setVal103(e.IsUnevaluatedBuiltinCall());
-  b.setVal104(e.UsesADL());
+  auto v42 = e.UnusedResultAttribute();
+  if (v42) {
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
+    b.setVal97(id42 != mx::kInvalidEntityId);
+  } else {
+    b.setVal42(mx::kInvalidEntityId);
+    b.setVal97(false);
+  }
+  b.setVal98(e.HasStoredFPFeatures());
+  b.setVal99(e.HasUnusedResultAttribute());
+  b.setVal101(e.IsBuiltinAssumeFalse());
+  b.setVal103(e.IsCallToStdMove());
+  b.setVal104(e.IsUnevaluatedBuiltinCall());
+  b.setVal105(e.UsesADL());
 }
 
 void SerializeCXXOperatorCallExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXOperatorCallExpr &e) {
   SerializeCallExpr(es, b, e);
   b.setVal102(static_cast<unsigned char>(mx::FromPasta(e.Operator())));
-  auto t42 = e.OperatorToken();
-  b.setVal42(es.EntityId(t42));
-  b.setVal105(e.IsAssignmentOperation());
-  b.setVal106(e.IsComparisonOperation());
-  b.setVal107(e.IsInfixBinaryOperation());
+  auto t43 = e.OperatorToken();
+  b.setVal43(es.EntityId(t43));
+  b.setVal106(e.IsAssignmentOperation());
+  b.setVal107(e.IsComparisonOperation());
+  b.setVal108(e.IsInfixBinaryOperation());
 }
 
 void SerializeCXXMemberCallExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXMemberCallExpr &e) {
   SerializeCallExpr(es, b, e);
-  b.setVal42(es.EntityId(e.ImplicitObjectArgument()));
-  auto v43 = e.MethodDeclaration();
-  if (v43) {
-    auto id43 = es.EntityId(v43.value());    b.setVal43(id43);
-    b.setVal105(id43 != mx::kInvalidEntityId);
+  b.setVal43(es.EntityId(e.ImplicitObjectArgument()));
+  auto v44 = e.MethodDeclaration();
+  if (v44) {
+    auto id44 = es.EntityId(v44.value());
+    b.setVal44(id44);
+    b.setVal106(id44 != mx::kInvalidEntityId);
   } else {
-    b.setVal43(mx::kInvalidEntityId);
-    b.setVal105(false);
+    b.setVal44(mx::kInvalidEntityId);
+    b.setVal106(false);
   }
-  b.setVal44(es.EntityId(e.ObjectType()));
-  b.setVal45(es.EntityId(e.RecordDeclaration()));
+  b.setVal45(es.EntityId(e.ObjectType()));
+  b.setVal46(es.EntityId(e.RecordDeclaration()));
 }
 
 void SerializeCUDAKernelCallExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CUDAKernelCallExpr &e) {
   SerializeCallExpr(es, b, e);
-  b.setVal42(es.EntityId(e.Config()));
+  b.setVal43(es.EntityId(e.Config()));
 }
 
 void SerializeUserDefinedLiteral(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::UserDefinedLiteral &e) {
   SerializeCallExpr(es, b, e);
-  b.setVal42(es.EntityId(e.CookedLiteral()));
+  b.setVal43(es.EntityId(e.CookedLiteral()));
   b.setVal102(static_cast<unsigned char>(mx::FromPasta(e.LiteralOperatorKind())));
-  auto t43 = e.UDSuffixToken();
-  b.setVal43(es.EntityId(t43));
+  auto t44 = e.UDSuffixToken();
+  b.setVal44(es.EntityId(t44));
 }
 
 void SerializeCXXUuidofExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::CXXUuidofExpr &e) {
   SerializeExpr(es, b, e);
   auto v37 = e.ExpressionOperand();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -3115,7 +7014,8 @@ void SerializeCXXTypeidExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pa
   SerializeExpr(es, b, e);
   auto v37 = e.ExpressionOperand();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -3138,7 +7038,8 @@ void SerializeCXXThrowExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   SerializeExpr(es, b, e);
   auto v37 = e.SubExpression();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -3196,7 +7097,8 @@ void SerializeCXXPseudoDestructorExpr(EntityMapper &es, mx::ast::Stmt::Builder b
   b.setVal41(es.EntityId(t41));
   auto v42 = e.ScopeType();
   if (v42) {
-    auto id42 = es.EntityId(v42.value());    b.setVal42(id42);
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
     b.setVal95(id42 != mx::kInvalidEntityId);
   } else {
     b.setVal42(mx::kInvalidEntityId);
@@ -3226,7 +7128,8 @@ void SerializeCXXNewExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal37(es.EntityId(e.AllocatedType()));
   auto v38 = e.ArraySize();
   if (v38) {
-    auto id38 = es.EntityId(v38.value());    b.setVal38(id38);
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
     b.setVal96(id38 != mx::kInvalidEntityId);
   } else {
     b.setVal38(mx::kInvalidEntityId);
@@ -3234,7 +7137,8 @@ void SerializeCXXNewExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   }
   auto v39 = e.ConstructExpression();
   if (v39) {
-    auto id39 = es.EntityId(v39.value());    b.setVal39(id39);
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
     b.setVal97(id39 != mx::kInvalidEntityId);
   } else {
     b.setVal39(mx::kInvalidEntityId);
@@ -3250,7 +7154,8 @@ void SerializeCXXNewExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal100(static_cast<unsigned char>(mx::FromPasta(e.InitializationStyle())));
   auto v42 = e.Initializer();
   if (v42) {
-    auto id42 = es.EntityId(v42.value());    b.setVal42(id42);
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
     b.setVal98(id42 != mx::kInvalidEntityId);
   } else {
     b.setVal42(mx::kInvalidEntityId);
@@ -3301,9 +7206,9 @@ void SerializeCXXFoldExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const past
   b.setVal40(es.EntityId(e.LHS()));
   auto t41 = e.LParenToken();
   b.setVal41(es.EntityId(t41));
-  auto v108 = e.NumExpansions();
-  if (v108) {
-    b.setVal108(static_cast<unsigned>(v108.value()));
+  auto v109 = e.NumExpansions();
+  if (v109) {
+    b.setVal109(static_cast<unsigned>(v109.value()));
     b.setVal95(true);
   } else {
     b.setVal95(false);
@@ -3321,7 +7226,8 @@ void SerializeCXXDependentScopeMemberExpr(EntityMapper &es, mx::ast::Stmt::Build
   SerializeExpr(es, b, e);
   auto v37 = e.Base();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -3330,7 +7236,8 @@ void SerializeCXXDependentScopeMemberExpr(EntityMapper &es, mx::ast::Stmt::Build
   b.setVal38(es.EntityId(e.BaseType()));
   auto v39 = e.FirstQualifierFoundInScope();
   if (v39) {
-    auto id39 = es.EntityId(v39.value());    b.setVal39(id39);
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
     b.setVal96(id39 != mx::kInvalidEntityId);
   } else {
     b.setVal39(mx::kInvalidEntityId);
@@ -3367,7 +7274,8 @@ void SerializeCXXDefaultInitExpr(EntityMapper &es, mx::ast::Stmt::Builder b, con
   SerializeExpr(es, b, e);
   auto v37 = e.Expression();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -3461,7 +7369,7 @@ void SerializeBinaryOperator(EntityMapper &es, mx::ast::Stmt::Builder b, const p
   b.setVal105(e.IsLogicalOperation());
   b.setVal106(e.IsMultiplicativeOperation());
   b.setVal107(e.IsPointerMemoryOperation());
-  b.setVal109(e.IsRelationalOperation());
+  b.setVal108(e.IsRelationalOperation());
   b.setVal110(e.IsShiftAssignOperation());
   b.setVal111(e.IsShiftOperation());
 }
@@ -3480,7 +7388,8 @@ void SerializeAtomicExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal38(es.EntityId(e.Order()));
   auto v39 = e.OrderFail();
   if (v39) {
-    auto id39 = es.EntityId(v39.value());    b.setVal39(id39);
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
     b.setVal95(id39 != mx::kInvalidEntityId);
   } else {
     b.setVal39(mx::kInvalidEntityId);
@@ -3491,7 +7400,8 @@ void SerializeAtomicExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal41(es.EntityId(t41));
   auto v42 = e.Scope();
   if (v42) {
-    auto id42 = es.EntityId(v42.value());    b.setVal42(id42);
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
     b.setVal96(id42 != mx::kInvalidEntityId);
   } else {
     b.setVal42(mx::kInvalidEntityId);
@@ -3499,7 +7409,8 @@ void SerializeAtomicExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   }
   auto v43 = e.Value1();
   if (v43) {
-    auto id43 = es.EntityId(v43.value());    b.setVal43(id43);
+    auto id43 = es.EntityId(v43.value());
+    b.setVal43(id43);
     b.setVal97(id43 != mx::kInvalidEntityId);
   } else {
     b.setVal43(mx::kInvalidEntityId);
@@ -3507,7 +7418,8 @@ void SerializeAtomicExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   }
   auto v44 = e.Value2();
   if (v44) {
-    auto id44 = es.EntityId(v44.value());    b.setVal44(id44);
+    auto id44 = es.EntityId(v44.value());
+    b.setVal44(id44);
     b.setVal98(id44 != mx::kInvalidEntityId);
   } else {
     b.setVal44(mx::kInvalidEntityId);
@@ -3516,7 +7428,8 @@ void SerializeAtomicExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal45(es.EntityId(e.ValueType()));
   auto v46 = e.Weak();
   if (v46) {
-    auto id46 = es.EntityId(v46.value());    b.setVal46(id46);
+    auto id46 = es.EntityId(v46.value());
+    b.setVal46(id46);
     b.setVal99(id46 != mx::kInvalidEntityId);
   } else {
     b.setVal46(mx::kInvalidEntityId);
@@ -3635,7 +7548,8 @@ void SerializeUnaryExprOrTypeTraitExpr(EntityMapper &es, mx::ast::Stmt::Builder 
   SerializeExpr(es, b, e);
   auto v37 = e.ArgumentExpression();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -3643,7 +7557,8 @@ void SerializeUnaryExprOrTypeTraitExpr(EntityMapper &es, mx::ast::Stmt::Builder 
   }
   auto v38 = e.ArgumentType();
   if (v38) {
-    auto id38 = es.EntityId(v38.value());    b.setVal38(id38);
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
     b.setVal96(id38 != mx::kInvalidEntityId);
   } else {
     b.setVal38(mx::kInvalidEntityId);
@@ -3766,9 +7681,9 @@ void SerializeSizeOfPackExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const p
   auto t37 = e.OperatorToken();
   b.setVal37(es.EntityId(t37));
   b.setVal38(es.EntityId(e.Pack()));
-  auto v108 = e.PackLength();
-  if (v108) {
-    b.setVal108(static_cast<unsigned>(v108.value()));
+  auto v109 = e.PackLength();
+  if (v109) {
+    b.setVal109(static_cast<unsigned>(v109.value()));
     b.setVal95(true);
   } else {
     b.setVal95(false);
@@ -3911,9 +7826,9 @@ void SerializePackExpansionExpr(EntityMapper &es, mx::ast::Stmt::Builder b, cons
   SerializeExpr(es, b, e);
   auto t37 = e.EllipsisToken();
   b.setVal37(es.EntityId(t37));
-  auto v108 = e.NumExpansions();
-  if (v108) {
-    b.setVal108(static_cast<unsigned>(v108.value()));
+  auto v109 = e.NumExpansions();
+  if (v109) {
+    b.setVal109(static_cast<unsigned>(v109.value()));
     b.setVal95(true);
   } else {
     b.setVal95(false);
@@ -3929,7 +7844,8 @@ void SerializeOverloadExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   b.setVal38(es.EntityId(t38));
   auto v39 = e.NamingClass();
   if (v39) {
-    auto id39 = es.EntityId(v39.value());    b.setVal39(id39);
+    auto id39 = es.EntityId(v39.value());
+    b.setVal39(id39);
     b.setVal95(id39 != mx::kInvalidEntityId);
   } else {
     b.setVal39(mx::kInvalidEntityId);
@@ -4249,7 +8165,8 @@ void SerializeMaterializeTemporaryExpr(EntityMapper &es, mx::ast::Stmt::Builder 
   SerializeExpr(es, b, e);
   auto v37 = e.ExtendingDeclaration();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -4257,7 +8174,8 @@ void SerializeMaterializeTemporaryExpr(EntityMapper &es, mx::ast::Stmt::Builder 
   }
   auto v38 = e.LifetimeExtendedTemporaryDeclaration();
   if (v38) {
-    auto id38 = es.EntityId(v38.value());    b.setVal38(id38);
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
     b.setVal96(id38 != mx::kInvalidEntityId);
   } else {
     b.setVal38(mx::kInvalidEntityId);
@@ -4312,16 +8230,17 @@ void SerializeLambdaExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
     b.setVal42(0);
   }
   b.setVal43(es.EntityId(e.LambdaClass()));
-  auto v108 = e.TemplateParameterList();
-  if (v108) {
-    b.setVal108(es.PseudoId(v108.value()));
+  auto v109 = e.TemplateParameterList();
+  if (v109) {
+    b.setVal109(es.PseudoId(v109.value()));
     b.setVal95(true);
   } else {
     b.setVal95(false);
   }
   auto v44 = e.TrailingRequiresClause();
   if (v44) {
-    auto id44 = es.EntityId(v44.value());    b.setVal44(id44);
+    auto id44 = es.EntityId(v44.value());
+    b.setVal44(id44);
     b.setVal96(id44 != mx::kInvalidEntityId);
   } else {
     b.setVal44(mx::kInvalidEntityId);
@@ -4343,7 +8262,8 @@ void SerializeInitListExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   SerializeExpr(es, b, e);
   auto v37 = e.ArrayFiller();
   if (v37) {
-    auto id37 = es.EntityId(v37.value());    b.setVal37(id37);
+    auto id37 = es.EntityId(v37.value());
+    b.setVal37(id37);
     b.setVal95(id37 != mx::kInvalidEntityId);
   } else {
     b.setVal37(mx::kInvalidEntityId);
@@ -4351,7 +8271,8 @@ void SerializeInitListExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   }
   auto v38 = e.InitializedFieldInUnion();
   if (v38) {
-    auto id38 = es.EntityId(v38.value());    b.setVal38(id38);
+    auto id38 = es.EntityId(v38.value());
+    b.setVal38(id38);
     b.setVal96(id38 != mx::kInvalidEntityId);
   } else {
     b.setVal38(mx::kInvalidEntityId);
@@ -4363,7 +8284,8 @@ void SerializeInitListExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   b.setVal40(es.EntityId(t40));
   auto v41 = e.SemanticForm();
   if (v41) {
-    auto id41 = es.EntityId(v41.value());    b.setVal41(id41);
+    auto id41 = es.EntityId(v41.value());
+    b.setVal41(id41);
     b.setVal97(id41 != mx::kInvalidEntityId);
   } else {
     b.setVal41(mx::kInvalidEntityId);
@@ -4371,7 +8293,8 @@ void SerializeInitListExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   }
   auto v42 = e.SyntacticForm();
   if (v42) {
-    auto id42 = es.EntityId(v42.value());    b.setVal42(id42);
+    auto id42 = es.EntityId(v42.value());
+    b.setVal42(id42);
     b.setVal98(id42 != mx::kInvalidEntityId);
   } else {
     b.setVal42(mx::kInvalidEntityId);
@@ -4395,9 +8318,9 @@ void SerializeInitListExpr(EntityMapper &es, mx::ast::Stmt::Builder b, const pas
   auto v107 = e.IsTransparent();
   if (v107) {
     b.setVal107(static_cast<bool>(v107.value()));
-    b.setVal109(true);
+    b.setVal108(true);
   } else {
-    b.setVal109(false);
+    b.setVal108(false);
   }
 }
 
@@ -4504,6 +8427,15 @@ void SerializeAttributedStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const p
   SerializeValueStmt(es, b, e);
   auto t10 = e.AttributeToken();
   b.setVal10(es.EntityId(t10));
+  do {
+    auto v16 = e.Attributes();
+    auto sv16 = b.initVal16(static_cast<unsigned>(v16.size()));
+    auto i16 = 0u;
+    for (const auto &e16 : v16) {
+      sv16.set(i16, es.EntityId(e16));
+      ++i16;
+    }
+  } while (false);
   b.setVal11(es.EntityId(e.SubStatement()));
 }
 
@@ -4513,7 +8445,8 @@ void SerializeSwitchStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal10(es.EntityId(e.Condition()));
   auto v11 = e.ConditionVariable();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal12(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -4521,7 +8454,8 @@ void SerializeSwitchStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   }
   auto v13 = e.ConditionVariableDeclarationStatement();
   if (v13) {
-    auto id13 = es.EntityId(v13.value());    b.setVal13(id13);
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
     b.setVal15(id13 != mx::kInvalidEntityId);
   } else {
     b.setVal13(mx::kInvalidEntityId);
@@ -4529,7 +8463,8 @@ void SerializeSwitchStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   }
   auto v14 = e.Initializer();
   if (v14) {
-    auto id14 = es.EntityId(v14.value());    b.setVal14(id14);
+    auto id14 = es.EntityId(v14.value());
+    b.setVal14(id14);
     b.setVal20(id14 != mx::kInvalidEntityId);
   } else {
     b.setVal14(mx::kInvalidEntityId);
@@ -4541,7 +8476,8 @@ void SerializeSwitchStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal18(es.EntityId(t18));
   auto v19 = e.FirstSwitchCase();
   if (v19) {
-    auto id19 = es.EntityId(v19.value());    b.setVal19(id19);
+    auto id19 = es.EntityId(v19.value());
+    b.setVal19(id19);
     b.setVal21(id19 != mx::kInvalidEntityId);
   } else {
     b.setVal19(mx::kInvalidEntityId);
@@ -4562,7 +8498,8 @@ void SerializeSwitchCase(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta
   b.setVal10(es.EntityId(t10));
   auto v11 = e.NextSwitchCase();
   if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
+    auto id11 = es.EntityId(v11.value());
+    b.setVal11(id11);
     b.setVal12(id11 != mx::kInvalidEntityId);
   } else {
     b.setVal11(mx::kInvalidEntityId);
@@ -4587,7 +8524,8 @@ void SerializeCaseStmt(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::
   b.setVal18(es.EntityId(e.LHS()));
   auto v19 = e.RHS();
   if (v19) {
-    auto id19 = es.EntityId(v19.value());    b.setVal19(id19);
+    auto id19 = es.EntityId(v19.value());
+    b.setVal19(id19);
     b.setVal20(id19 != mx::kInvalidEntityId);
   } else {
     b.setVal19(mx::kInvalidEntityId);
@@ -4602,76 +8540,105 @@ void SerializeDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::Decl
   b.setVal0(es.ParentDeclId(e));
   b.setVal1(es.ParentStmtId(e));
   b.setVal2(IsDefinition(e));
-  b.setVal3(static_cast<unsigned char>(mx::FromPasta(e.Access())));
-  b.setVal4(static_cast<unsigned char>(mx::FromPasta(e.Availability())));
-  auto v5 = e.DescribedTemplateParameters();
-  if (v5) {
-    b.setVal5(es.PseudoId(v5.value()));
-    b.setVal6(true);
-  } else {
-    b.setVal6(false);
-  }
-  b.setVal7(static_cast<unsigned char>(mx::FromPasta(e.FriendObjectKind())));
-  auto v8 = e.FunctionType();
-  if (v8) {
-    auto id8 = es.EntityId(v8.value());    b.setVal8(id8);
-    b.setVal9(id8 != mx::kInvalidEntityId);
-  } else {
-    b.setVal8(mx::kInvalidEntityId);
-    b.setVal9(false);
-  }
-  b.setVal10(static_cast<unsigned char>(mx::FromPasta(e.ModuleOwnershipKind())));
-  auto v11 = e.NonClosureContext();
-  if (v11) {
-    auto id11 = es.EntityId(v11.value());    b.setVal11(id11);
-    b.setVal12(id11 != mx::kInvalidEntityId);
-  } else {
-    b.setVal11(mx::kInvalidEntityId);
-    b.setVal12(false);
-  }
-  b.setVal13(e.HasAttributes());
-  b.setVal14(e.HasDefiningAttribute());
-  b.setVal15(e.HasOwningModule());
-  b.setVal16(e.HasTagIdentifierNamespace());
-  b.setVal17(e.IsDefinedOutsideFunctionOrMethod());
-  b.setVal18(e.IsDeprecated());
-  b.setVal19(e.IsFunctionOrFunctionTemplate());
-  b.setVal20(e.IsImplicit());
-  b.setVal21(e.IsInAnonymousNamespace());
-  b.setVal22(e.IsInExportDeclarationContext());
-  b.setVal23(e.IsInLocalScopeForInstantiation());
-  b.setVal24(e.IsInStdNamespace());
-  b.setVal25(e.IsInvalidDeclaration());
-  b.setVal26(e.IsModulePrivate());
-  b.setVal27(e.IsOutOfLine());
-  b.setVal28(e.IsParameterPack());
-  b.setVal29(e.IsTemplateDeclaration());
-  b.setVal30(e.IsTemplateParameter());
-  b.setVal31(e.IsTemplateParameterPack());
-  b.setVal32(e.IsTemplated());
-  b.setVal33(e.IsTopLevelDeclarationInObjCContainer());
-  b.setVal34(e.IsUnavailable());
-  b.setVal35(e.IsUnconditionallyVisible());
-  b.setVal36(e.IsWeakImported());
   do {
-    auto v37 = e.Redeclarations();
-    auto sv37 = b.initVal37(static_cast<unsigned>(v37.size()));
-    auto i37 = 0u;
-    for (const auto &e37 : v37) {
-      sv37.set(i37, es.EntityId(e37));
-      ++i37;
+    auto v3 = e.Attributes();
+    auto sv3 = b.initVal3(static_cast<unsigned>(v3.size()));
+    auto i3 = 0u;
+    for (const auto &e3 : v3) {
+      sv3.set(i3, es.EntityId(e3));
+      ++i3;
     }
   } while (false);
-  b.setVal38(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
-  b.setVal39(static_cast<unsigned char>(mx::FromPasta(e.Category())));
-  auto t40 = e.Token();
-  b.setVal40(es.EntityId(t40));
-  if (auto r41 = e.Tokens(); auto rs41 = r41.Size()) {
-    b.setVal41(es.EntityId(r41[0]));
-    b.setVal42(es.EntityId(r41[rs41 - 1u]));
+  b.setVal4(static_cast<unsigned char>(mx::FromPasta(e.Access())));
+  b.setVal5(static_cast<unsigned char>(mx::FromPasta(e.Availability())));
+  auto v6 = e.DefiningAttribute();
+  if (v6) {
+    auto id6 = es.EntityId(v6.value());
+    b.setVal6(id6);
+    b.setVal7(id6 != mx::kInvalidEntityId);
   } else {
-    b.setVal41(0);
-    b.setVal42(0);
+    b.setVal6(mx::kInvalidEntityId);
+    b.setVal7(false);
+  }
+  auto v8 = e.DescribedTemplateParameters();
+  if (v8) {
+    b.setVal8(es.PseudoId(v8.value()));
+    b.setVal9(true);
+  } else {
+    b.setVal9(false);
+  }
+  auto v10 = e.ExternalSourceSymbolAttribute();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
+    b.setVal11(id10 != mx::kInvalidEntityId);
+  } else {
+    b.setVal10(mx::kInvalidEntityId);
+    b.setVal11(false);
+  }
+  b.setVal12(static_cast<unsigned char>(mx::FromPasta(e.FriendObjectKind())));
+  auto v13 = e.FunctionType();
+  if (v13) {
+    auto id13 = es.EntityId(v13.value());
+    b.setVal13(id13);
+    b.setVal14(id13 != mx::kInvalidEntityId);
+  } else {
+    b.setVal13(mx::kInvalidEntityId);
+    b.setVal14(false);
+  }
+  b.setVal15(static_cast<unsigned char>(mx::FromPasta(e.ModuleOwnershipKind())));
+  auto v16 = e.NonClosureContext();
+  if (v16) {
+    auto id16 = es.EntityId(v16.value());
+    b.setVal16(id16);
+    b.setVal17(id16 != mx::kInvalidEntityId);
+  } else {
+    b.setVal16(mx::kInvalidEntityId);
+    b.setVal17(false);
+  }
+  b.setVal18(e.HasAttributes());
+  b.setVal19(e.HasDefiningAttribute());
+  b.setVal20(e.HasOwningModule());
+  b.setVal21(e.HasTagIdentifierNamespace());
+  b.setVal22(e.IsDefinedOutsideFunctionOrMethod());
+  b.setVal23(e.IsDeprecated());
+  b.setVal24(e.IsFunctionOrFunctionTemplate());
+  b.setVal25(e.IsImplicit());
+  b.setVal26(e.IsInAnonymousNamespace());
+  b.setVal27(e.IsInExportDeclarationContext());
+  b.setVal28(e.IsInLocalScopeForInstantiation());
+  b.setVal29(e.IsInStdNamespace());
+  b.setVal30(e.IsInvalidDeclaration());
+  b.setVal31(e.IsModulePrivate());
+  b.setVal32(e.IsOutOfLine());
+  b.setVal33(e.IsParameterPack());
+  b.setVal34(e.IsTemplateDeclaration());
+  b.setVal35(e.IsTemplateParameter());
+  b.setVal36(e.IsTemplateParameterPack());
+  b.setVal37(e.IsTemplated());
+  b.setVal38(e.IsTopLevelDeclarationInObjCContainer());
+  b.setVal39(e.IsUnavailable());
+  b.setVal40(e.IsUnconditionallyVisible());
+  b.setVal41(e.IsWeakImported());
+  do {
+    auto v42 = e.Redeclarations();
+    auto sv42 = b.initVal42(static_cast<unsigned>(v42.size()));
+    auto i42 = 0u;
+    for (const auto &e42 : v42) {
+      sv42.set(i42, es.EntityId(e42));
+      ++i42;
+    }
+  } while (false);
+  b.setVal43(static_cast<unsigned char>(mx::FromPasta(e.Kind())));
+  b.setVal44(static_cast<unsigned char>(mx::FromPasta(e.Category())));
+  auto t45 = e.Token();
+  b.setVal45(es.EntityId(t45));
+  if (auto r46 = e.Tokens(); auto rs46 = r46.Size()) {
+    b.setVal46(es.EntityId(r46[0]));
+    b.setVal47(es.EntityId(r46[rs46 - 1u]));
+  } else {
+    b.setVal46(0);
+    b.setVal47(0);
   }
 }
 
@@ -4680,8 +8647,8 @@ void SerializeClassScopeFunctionSpecializationDecl(EntityMapper &es, mx::ast::De
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  b.setVal43(es.EntityId(e.Specialization()));
-  b.setVal44(e.HasExplicitTemplateArguments());
+  b.setVal48(es.EntityId(e.Specialization()));
+  b.setVal49(e.HasExplicitTemplateArguments());
 }
 
 void SerializeCapturedDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CapturedDecl &e) {
@@ -4689,24 +8656,24 @@ void SerializeCapturedDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pas
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  b.setVal43(es.EntityId(e.ContextParameter()));
-  b.setVal44(e.IsNothrow());
+  b.setVal48(es.EntityId(e.ContextParameter()));
+  b.setVal49(e.IsNothrow());
   do {
-    auto v45 = e.Parameters();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Parameters();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
-  pasta::DeclContext dc46(e);
-  auto v46 = dc46.AlreadyLoadedDeclarations();
-  auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-  auto i46 = 0u;
-  for (const pasta::Decl &e46 : v46) {
-    sv46.set(i46, es.EntityId(e46));
-    ++i46;
+  pasta::DeclContext dc51(e);
+  auto v51 = dc51.AlreadyLoadedDeclarations();
+  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+  auto i51 = 0u;
+  for (const pasta::Decl &e51 : v51) {
+    sv51.set(i51, es.EntityId(e51));
+    ++i51;
   }
 }
 
@@ -4715,50 +8682,51 @@ void SerializeBlockDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta:
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  b.setVal44(e.BlockMissingReturnType());
-  b.setVal47(e.CanAvoidCopyToHeap());
-  b.setVal48(e.CapturesCXXThis());
-  b.setVal49(e.DoesNotEscape());
-  auto v43 = e.BlockManglingContextDeclaration();
-  if (v43) {
-    auto id43 = es.EntityId(v43.value());    b.setVal43(id43);
-    b.setVal50(id43 != mx::kInvalidEntityId);
+  b.setVal49(e.BlockMissingReturnType());
+  b.setVal52(e.CanAvoidCopyToHeap());
+  b.setVal53(e.CapturesCXXThis());
+  b.setVal54(e.DoesNotEscape());
+  auto v48 = e.BlockManglingContextDeclaration();
+  if (v48) {
+    auto id48 = es.EntityId(v48.value());
+    b.setVal48(id48);
+    b.setVal55(id48 != mx::kInvalidEntityId);
   } else {
-    b.setVal43(mx::kInvalidEntityId);
-    b.setVal50(false);
+    b.setVal48(mx::kInvalidEntityId);
+    b.setVal55(false);
   }
-  auto t51 = e.CaretToken();
-  b.setVal51(es.EntityId(t51));
-  b.setVal52(es.EntityId(e.CompoundBody()));
-  b.setVal53(es.EntityId(e.SignatureAsWritten()));
-  b.setVal54(e.HasCaptures());
-  b.setVal55(e.IsConversionFromLambda());
-  b.setVal56(e.IsVariadic());
+  auto t56 = e.CaretToken();
+  b.setVal56(es.EntityId(t56));
+  b.setVal57(es.EntityId(e.CompoundBody()));
+  b.setVal58(es.EntityId(e.SignatureAsWritten()));
+  b.setVal59(e.HasCaptures());
+  b.setVal60(e.IsConversionFromLambda());
+  b.setVal61(e.IsVariadic());
   do {
-    auto v45 = e.Parameters();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Parameters();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
   do {
-    auto v46 = e.ParameterDeclarations();
-    auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-    auto i46 = 0u;
-    for (const auto &e46 : v46) {
-      sv46.set(i46, es.EntityId(e46));
-      ++i46;
+    auto v51 = e.ParameterDeclarations();
+    auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+    auto i51 = 0u;
+    for (const auto &e51 : v51) {
+      sv51.set(i51, es.EntityId(e51));
+      ++i51;
     }
   } while (false);
-  pasta::DeclContext dc57(e);
-  auto v57 = dc57.AlreadyLoadedDeclarations();
-  auto sv57 = b.initVal57(static_cast<unsigned>(v57.size()));
-  auto i57 = 0u;
-  for (const pasta::Decl &e57 : v57) {
-    sv57.set(i57, es.EntityId(e57));
-    ++i57;
+  pasta::DeclContext dc62(e);
+  auto v62 = dc62.AlreadyLoadedDeclarations();
+  auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
+  auto i62 = 0u;
+  for (const pasta::Decl &e62 : v62) {
+    sv62.set(i62, es.EntityId(e62));
+    ++i62;
   }
 }
 
@@ -4767,10 +8735,10 @@ void SerializeAccessSpecDecl(EntityMapper &es, mx::ast::Decl::Builder b, const p
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  auto t43 = e.AccessSpecifierToken();
-  b.setVal43(es.EntityId(t43));
-  auto t51 = e.ColonToken();
-  b.setVal51(es.EntityId(t51));
+  auto t48 = e.AccessSpecifierToken();
+  b.setVal48(es.EntityId(t48));
+  auto t56 = e.ColonToken();
+  b.setVal56(es.EntityId(t56));
 }
 
 void SerializeOMPDeclarativeDirectiveDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveDecl &e) {
@@ -4786,12 +8754,12 @@ void SerializeOMPThreadPrivateDecl(EntityMapper &es, mx::ast::Decl::Builder b, c
   (void) e;
   SerializeOMPDeclarativeDirectiveDecl(es, b, e);
   do {
-    auto v45 = e.Varlists();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Varlists();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
 }
@@ -4809,12 +8777,12 @@ void SerializeOMPAllocateDecl(EntityMapper &es, mx::ast::Decl::Builder b, const 
   (void) e;
   SerializeOMPDeclarativeDirectiveDecl(es, b, e);
   do {
-    auto v45 = e.Varlists();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Varlists();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
 }
@@ -4823,13 +8791,13 @@ void SerializeTranslationUnitDecl(EntityMapper &es, mx::ast::Decl::Builder b, co
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -4838,11 +8806,11 @@ void SerializeStaticAssertDecl(EntityMapper &es, mx::ast::Decl::Builder b, const
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  b.setVal43(es.EntityId(e.AssertExpression()));
-  b.setVal51(es.EntityId(e.Message()));
-  auto t52 = e.RParenToken();
-  b.setVal52(es.EntityId(t52));
-  b.setVal44(e.IsFailed());
+  b.setVal48(es.EntityId(e.AssertExpression()));
+  b.setVal56(es.EntityId(e.Message()));
+  auto t57 = e.RParenToken();
+  b.setVal57(es.EntityId(t57));
+  b.setVal49(e.IsFailed());
 }
 
 void SerializeRequiresExprBodyDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::RequiresExprBodyDecl &e) {
@@ -4850,13 +8818,13 @@ void SerializeRequiresExprBodyDecl(EntityMapper &es, mx::ast::Decl::Builder b, c
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -4865,12 +8833,12 @@ void SerializePragmaDetectMismatchDecl(EntityMapper &es, mx::ast::Decl::Builder 
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  auto v58 = e.Name();
-  std::string s58(v58.data(), v58.size());
-  b.setVal58(s58);
-  auto v59 = e.Value();
-  std::string s59(v59.data(), v59.size());
-  b.setVal59(s59);
+  auto v63 = e.Name();
+  std::string s63(v63.data(), v63.size());
+  b.setVal63(s63);
+  auto v64 = e.Value();
+  std::string s64(v64.data(), v64.size());
+  b.setVal64(s64);
 }
 
 void SerializePragmaCommentDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::PragmaCommentDecl &e) {
@@ -4878,10 +8846,10 @@ void SerializePragmaCommentDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  auto v58 = e.Argument();
-  std::string s58(v58.data(), v58.size());
-  b.setVal58(s58);
-  b.setVal60(static_cast<unsigned char>(mx::FromPasta(e.CommentKind())));
+  auto v63 = e.Argument();
+  std::string s63(v63.data(), v63.size());
+  b.setVal63(s63);
+  b.setVal65(static_cast<unsigned char>(mx::FromPasta(e.CommentKind())));
 }
 
 void SerializeObjCPropertyImplDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCPropertyImplDecl &e) {
@@ -4889,16 +8857,16 @@ void SerializeObjCPropertyImplDecl(EntityMapper &es, mx::ast::Decl::Builder b, c
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  b.setVal43(es.EntityId(e.GetterCXXConstructor()));
-  b.setVal51(es.EntityId(e.GetterMethodDeclaration()));
-  b.setVal52(es.EntityId(e.PropertyDeclaration()));
-  b.setVal60(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
-  b.setVal53(es.EntityId(e.PropertyInstanceVariableDeclaration()));
-  auto t61 = e.PropertyInstanceVariableDeclarationToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal62(es.EntityId(e.SetterCXXAssignment()));
-  b.setVal63(es.EntityId(e.SetterMethodDeclaration()));
-  b.setVal44(e.IsInstanceVariableNameSpecified());
+  b.setVal48(es.EntityId(e.GetterCXXConstructor()));
+  b.setVal56(es.EntityId(e.GetterMethodDeclaration()));
+  b.setVal57(es.EntityId(e.PropertyDeclaration()));
+  b.setVal65(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
+  b.setVal58(es.EntityId(e.PropertyInstanceVariableDeclaration()));
+  auto t66 = e.PropertyInstanceVariableDeclarationToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal67(es.EntityId(e.SetterCXXAssignment()));
+  b.setVal68(es.EntityId(e.SetterMethodDeclaration()));
+  b.setVal49(e.IsInstanceVariableNameSpecified());
 }
 
 void SerializeNamedDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamedDecl &e) {
@@ -4906,26 +8874,26 @@ void SerializeNamedDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta:
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  b.setVal60(static_cast<unsigned char>(mx::FromPasta(e.FormalLinkage())));
-  b.setVal58(e.Name());
-  auto v64 = e.ObjCFStringFormattingFamily();
-  if (v64) {
-    b.setVal64(static_cast<unsigned char>(v64.value()));
-    b.setVal44(true);
+  b.setVal65(static_cast<unsigned char>(mx::FromPasta(e.FormalLinkage())));
+  b.setVal63(e.Name());
+  auto v69 = e.ObjCFStringFormattingFamily();
+  if (v69) {
+    b.setVal69(static_cast<unsigned char>(v69.value()));
+    b.setVal49(true);
   } else {
-    b.setVal44(false);
+    b.setVal49(false);
   }
-  b.setVal59(e.QualifiedNameAsString());
-  b.setVal43(es.EntityId(e.UnderlyingDeclaration()));
-  b.setVal65(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
-  b.setVal47(e.HasExternalFormalLinkage());
-  b.setVal48(e.HasLinkage());
-  b.setVal49(e.HasLinkageBeenComputed());
-  b.setVal50(e.IsCXXClassMember());
-  b.setVal54(e.IsCXXInstanceMember());
-  b.setVal55(e.IsExternallyDeclarable());
-  b.setVal56(e.IsExternallyVisible());
-  b.setVal66(e.IsLinkageValid());
+  b.setVal64(e.QualifiedNameAsString());
+  b.setVal48(es.EntityId(e.UnderlyingDeclaration()));
+  b.setVal70(static_cast<unsigned char>(mx::FromPasta(e.Visibility())));
+  b.setVal52(e.HasExternalFormalLinkage());
+  b.setVal53(e.HasLinkage());
+  b.setVal54(e.HasLinkageBeenComputed());
+  b.setVal55(e.IsCXXClassMember());
+  b.setVal59(e.IsCXXInstanceMember());
+  b.setVal60(e.IsExternallyDeclarable());
+  b.setVal61(e.IsExternallyVisible());
+  b.setVal71(e.IsLinkageValid());
 }
 
 void SerializeLabelDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LabelDecl &e) {
@@ -4933,13 +8901,13 @@ void SerializeLabelDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta:
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  auto v67 = e.MSAssemblyLabel();
-  std::string s67(v67.data(), v67.size());
-  b.setVal67(s67);
-  b.setVal51(es.EntityId(e.Statement()));
-  b.setVal68(e.IsGnuLocal());
-  b.setVal69(e.IsMSAssemblyLabel());
-  b.setVal70(e.IsResolvedMSAssemblyLabel());
+  auto v72 = e.MSAssemblyLabel();
+  std::string s72(v72.data(), v72.size());
+  b.setVal72(s72);
+  b.setVal56(es.EntityId(e.Statement()));
+  b.setVal73(e.IsGnuLocal());
+  b.setVal74(e.IsMSAssemblyLabel());
+  b.setVal75(e.IsResolvedMSAssemblyLabel());
 }
 
 void SerializeBaseUsingDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BaseUsingDecl &e) {
@@ -4948,12 +8916,12 @@ void SerializeBaseUsingDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pa
   (void) e;
   SerializeNamedDecl(es, b, e);
   do {
-    auto v45 = e.Shadows();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Shadows();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
 }
@@ -4963,11 +8931,11 @@ void SerializeUsingEnumDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pa
   (void) b;
   (void) e;
   SerializeBaseUsingDecl(es, b, e);
-  b.setVal51(es.EntityId(e.EnumDeclaration()));
-  auto t52 = e.EnumToken();
-  b.setVal52(es.EntityId(t52));
-  auto t53 = e.UsingToken();
-  b.setVal53(es.EntityId(t53));
+  b.setVal56(es.EntityId(e.EnumDeclaration()));
+  auto t57 = e.EnumToken();
+  b.setVal57(es.EntityId(t57));
+  auto t58 = e.UsingToken();
+  b.setVal58(es.EntityId(t58));
 }
 
 void SerializeUsingDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingDecl &e) {
@@ -4975,10 +8943,10 @@ void SerializeUsingDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta:
   (void) b;
   (void) e;
   SerializeBaseUsingDecl(es, b, e);
-  auto t51 = e.UsingToken();
-  b.setVal51(es.EntityId(t51));
-  b.setVal68(e.HasTypename());
-  b.setVal69(e.IsAccessDeclaration());
+  auto t56 = e.UsingToken();
+  b.setVal56(es.EntityId(t56));
+  b.setVal73(e.HasTypename());
+  b.setVal74(e.IsAccessDeclaration());
 }
 
 void SerializeValueDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ValueDecl &e) {
@@ -4986,8 +8954,8 @@ void SerializeValueDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta:
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  b.setVal51(es.EntityId(e.Type()));
-  b.setVal68(e.IsWeak());
+  b.setVal56(es.EntityId(e.Type()));
+  b.setVal73(e.IsWeak());
 }
 
 void SerializeUnresolvedUsingValueDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingValueDecl &e) {
@@ -4995,12 +8963,12 @@ void SerializeUnresolvedUsingValueDecl(EntityMapper &es, mx::ast::Decl::Builder 
   (void) b;
   (void) e;
   SerializeValueDecl(es, b, e);
-  auto t52 = e.EllipsisToken();
-  b.setVal52(es.EntityId(t52));
-  auto t53 = e.UsingToken();
-  b.setVal53(es.EntityId(t53));
-  b.setVal69(e.IsAccessDeclaration());
-  b.setVal70(e.IsPackExpansion());
+  auto t57 = e.EllipsisToken();
+  b.setVal57(es.EntityId(t57));
+  auto t58 = e.UsingToken();
+  b.setVal58(es.EntityId(t58));
+  b.setVal74(e.IsAccessDeclaration());
+  b.setVal75(e.IsPackExpansion());
 }
 
 void SerializeTemplateParamObjectDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateParamObjectDecl &e) {
@@ -5015,20 +8983,20 @@ void SerializeOMPDeclareReductionDecl(EntityMapper &es, mx::ast::Decl::Builder b
   (void) b;
   (void) e;
   SerializeValueDecl(es, b, e);
-  b.setVal52(es.EntityId(e.Combiner()));
-  b.setVal53(es.EntityId(e.CombinerIn()));
-  b.setVal61(es.EntityId(e.CombinerOut()));
-  b.setVal62(es.EntityId(e.InitializerOriginal()));
-  b.setVal63(es.EntityId(e.InitializerPrivate()));
-  b.setVal71(es.EntityId(e.Initializer()));
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.InitializerKind())));
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  b.setVal57(es.EntityId(e.Combiner()));
+  b.setVal58(es.EntityId(e.CombinerIn()));
+  b.setVal66(es.EntityId(e.CombinerOut()));
+  b.setVal67(es.EntityId(e.InitializerOriginal()));
+  b.setVal68(es.EntityId(e.InitializerPrivate()));
+  b.setVal76(es.EntityId(e.Initializer()));
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.InitializerKind())));
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -5045,29 +9013,31 @@ void SerializeIndirectFieldDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) e;
   SerializeValueDecl(es, b, e);
   do {
-    auto v45 = e.Chain();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Chain();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
-  auto v52 = e.AnonymousField();
-  if (v52) {
-    auto id52 = es.EntityId(v52.value());    b.setVal52(id52);
-    b.setVal69(id52 != mx::kInvalidEntityId);
+  auto v57 = e.AnonymousField();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+    b.setVal74(id57 != mx::kInvalidEntityId);
   } else {
-    b.setVal52(mx::kInvalidEntityId);
-    b.setVal69(false);
+    b.setVal57(mx::kInvalidEntityId);
+    b.setVal74(false);
   }
-  auto v53 = e.VariableDeclaration();
-  if (v53) {
-    auto id53 = es.EntityId(v53.value());    b.setVal53(id53);
-    b.setVal70(id53 != mx::kInvalidEntityId);
+  auto v58 = e.VariableDeclaration();
+  if (v58) {
+    auto id58 = es.EntityId(v58.value());
+    b.setVal58(id58);
+    b.setVal75(id58 != mx::kInvalidEntityId);
   } else {
-    b.setVal53(mx::kInvalidEntityId);
-    b.setVal70(false);
+    b.setVal58(mx::kInvalidEntityId);
+    b.setVal75(false);
   }
 }
 
@@ -5076,13 +9046,14 @@ void SerializeEnumConstantDecl(EntityMapper &es, mx::ast::Decl::Builder b, const
   (void) b;
   (void) e;
   SerializeValueDecl(es, b, e);
-  auto v52 = e.InitializerExpression();
-  if (v52) {
-    auto id52 = es.EntityId(v52.value());    b.setVal52(id52);
-    b.setVal69(id52 != mx::kInvalidEntityId);
+  auto v57 = e.InitializerExpression();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+    b.setVal74(id57 != mx::kInvalidEntityId);
   } else {
-    b.setVal52(mx::kInvalidEntityId);
-    b.setVal69(false);
+    b.setVal57(mx::kInvalidEntityId);
+    b.setVal74(false);
   }
 }
 
@@ -5091,29 +9062,30 @@ void SerializeDeclaratorDecl(EntityMapper &es, mx::ast::Decl::Builder b, const p
   (void) b;
   (void) e;
   SerializeValueDecl(es, b, e);
-  auto t52 = e.FirstInnerToken();
-  b.setVal52(es.EntityId(t52));
-  auto t53 = e.FirstOuterToken();
-  b.setVal53(es.EntityId(t53));
-  auto v61 = e.TrailingRequiresClause();
-  if (v61) {
-    auto id61 = es.EntityId(v61.value());    b.setVal61(id61);
-    b.setVal69(id61 != mx::kInvalidEntityId);
+  auto t57 = e.FirstInnerToken();
+  b.setVal57(es.EntityId(t57));
+  auto t58 = e.FirstOuterToken();
+  b.setVal58(es.EntityId(t58));
+  auto v66 = e.TrailingRequiresClause();
+  if (v66) {
+    auto id66 = es.EntityId(v66.value());
+    b.setVal66(id66);
+    b.setVal74(id66 != mx::kInvalidEntityId);
   } else {
-    b.setVal61(mx::kInvalidEntityId);
-    b.setVal69(false);
+    b.setVal66(mx::kInvalidEntityId);
+    b.setVal74(false);
   }
-  auto t62 = e.TypeSpecEndToken();
-  b.setVal62(es.EntityId(t62));
-  auto t63 = e.TypeSpecStartToken();
-  b.setVal63(es.EntityId(t63));
+  auto t67 = e.TypeSpecEndToken();
+  b.setVal67(es.EntityId(t67));
+  auto t68 = e.TypeSpecStartToken();
+  b.setVal68(es.EntityId(t68));
   do {
-    auto v73 = e.TemplateParameterLists();
-    auto sv73 = b.initVal73(static_cast<unsigned>(v73.size()));
-    auto i73 = 0u;
-    for (const auto &e73 : v73) {
-      sv73.set(i73, es.PseudoId(e73));
-      ++i73;
+    auto v78 = e.TemplateParameterLists();
+    auto sv78 = b.initVal78(static_cast<unsigned>(v78.size()));
+    auto i78 = 0u;
+    for (const auto &e78 : v78) {
+      sv78.set(i78, es.PseudoId(e78));
+      ++i78;
     }
   } while (false);
 }
@@ -5123,97 +9095,102 @@ void SerializeVarDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::V
   (void) b;
   (void) e;
   SerializeDeclaratorDecl(es, b, e);
-  auto v71 = e.ActingDefinition();
-  if (v71) {
-    auto id71 = es.EntityId(v71.value());    b.setVal71(id71);
-    b.setVal70(id71 != mx::kInvalidEntityId);
-  } else {
-    b.setVal71(mx::kInvalidEntityId);
-    b.setVal70(false);
-  }
-  auto v74 = e.Initializer();
-  if (v74) {
-    auto id74 = es.EntityId(v74.value());    b.setVal74(id74);
-    b.setVal75(id74 != mx::kInvalidEntityId);
-  } else {
-    b.setVal74(mx::kInvalidEntityId);
-    b.setVal75(false);
-  }
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.InitializerStyle())));
-  auto v76 = e.InitializingDeclaration();
+  auto v76 = e.ActingDefinition();
   if (v76) {
-    auto id76 = es.EntityId(v76.value());    b.setVal76(id76);
-    b.setVal77(id76 != mx::kInvalidEntityId);
+    auto id76 = es.EntityId(v76.value());
+    b.setVal76(id76);
+    b.setVal75(id76 != mx::kInvalidEntityId);
   } else {
     b.setVal76(mx::kInvalidEntityId);
-    b.setVal77(false);
+    b.setVal75(false);
   }
-  auto v78 = e.InstantiatedFromStaticDataMember();
-  if (v78) {
-    auto id78 = es.EntityId(v78.value());    b.setVal78(id78);
-    b.setVal79(id78 != mx::kInvalidEntityId);
+  auto v79 = e.Initializer();
+  if (v79) {
+    auto id79 = es.EntityId(v79.value());
+    b.setVal79(id79);
+    b.setVal80(id79 != mx::kInvalidEntityId);
   } else {
-    b.setVal78(mx::kInvalidEntityId);
-    b.setVal79(false);
+    b.setVal79(mx::kInvalidEntityId);
+    b.setVal80(false);
   }
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.LanguageLinkage())));
-  auto t81 = e.PointOfInstantiation();
-  b.setVal81(es.EntityId(t81));
-  b.setVal82(static_cast<unsigned char>(mx::FromPasta(e.StorageClass())));
-  b.setVal83(static_cast<unsigned char>(mx::FromPasta(e.StorageDuration())));
-  b.setVal84(static_cast<unsigned char>(mx::FromPasta(e.TLSKind())));
-  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.TSCSpec())));
-  auto v86 = e.TemplateInstantiationPattern();
-  if (v86) {
-    auto id86 = es.EntityId(v86.value());    b.setVal86(id86);
-    b.setVal87(id86 != mx::kInvalidEntityId);
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.InitializerStyle())));
+  auto v81 = e.InitializingDeclaration();
+  if (v81) {
+    auto id81 = es.EntityId(v81.value());
+    b.setVal81(id81);
+    b.setVal82(id81 != mx::kInvalidEntityId);
   } else {
-    b.setVal86(mx::kInvalidEntityId);
-    b.setVal87(false);
+    b.setVal81(mx::kInvalidEntityId);
+    b.setVal82(false);
   }
-  b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
-  b.setVal89(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKindForInstantiation())));
-  b.setVal90(e.HasConstantInitialization());
-  b.setVal91(e.HasDependentAlignment());
-  b.setVal92(e.HasExternalStorage());
-  b.setVal93(e.HasGlobalStorage());
-  auto v94 = e.HasICEInitializer();
-  if (v94) {
-    b.setVal94(static_cast<bool>(v94.value()));
-    b.setVal95(true);
+  auto v83 = e.InstantiatedFromStaticDataMember();
+  if (v83) {
+    auto id83 = es.EntityId(v83.value());
+    b.setVal83(id83);
+    b.setVal84(id83 != mx::kInvalidEntityId);
   } else {
-    b.setVal95(false);
+    b.setVal83(mx::kInvalidEntityId);
+    b.setVal84(false);
   }
-  b.setVal96(e.HasInitializer());
-  b.setVal97(e.HasLocalStorage());
-  b.setVal98(e.IsARCPseudoStrong());
-  b.setVal99(e.IsCXXForRangeDeclaration());
-  b.setVal100(e.IsConstexpr());
-  b.setVal101(e.IsDirectInitializer());
-  b.setVal102(e.IsEscapingByref());
-  b.setVal103(e.IsExceptionVariable());
-  b.setVal104(e.IsExternC());
-  b.setVal105(e.IsFileVariableDeclaration());
-  b.setVal106(e.IsFunctionOrMethodVariableDeclaration());
-  b.setVal107(e.IsInExternCContext());
-  b.setVal108(e.IsInExternCXXContext());
-  b.setVal109(e.IsInitializerCapture());
-  b.setVal110(e.IsInline());
-  b.setVal111(e.IsInlineSpecified());
-  b.setVal112(e.IsKnownToBeDefined());
-  b.setVal113(e.IsLocalVariableDeclaration());
-  b.setVal114(e.IsLocalVariableDeclarationOrParm());
-  b.setVal115(e.IsNRVOVariable());
-  b.setVal116(e.IsNoDestroy());
-  b.setVal117(e.IsNonEscapingByref());
-  b.setVal118(e.IsObjCForDeclaration());
-  b.setVal119(e.IsPreviousDeclarationInSameBlockScope());
-  b.setVal120(e.IsStaticDataMember());
-  b.setVal121(e.IsStaticLocal());
-  b.setVal122(e.IsThisDeclarationADemotedDefinition());
-  b.setVal123(e.IsUsableInConstantExpressions());
-  b.setVal124(e.MightBeUsableInConstantExpressions());
-  b.setVal125(static_cast<unsigned char>(mx::FromPasta(e.NeedsDestruction())));
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.LanguageLinkage())));
+  auto t86 = e.PointOfInstantiation();
+  b.setVal86(es.EntityId(t86));
+  b.setVal87(static_cast<unsigned char>(mx::FromPasta(e.StorageClass())));
+  b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.StorageDuration())));
+  b.setVal89(static_cast<unsigned char>(mx::FromPasta(e.TLSKind())));
+  b.setVal90(static_cast<unsigned char>(mx::FromPasta(e.TSCSpec())));
+  auto v91 = e.TemplateInstantiationPattern();
+  if (v91) {
+    auto id91 = es.EntityId(v91.value());
+    b.setVal91(id91);
+    b.setVal92(id91 != mx::kInvalidEntityId);
+  } else {
+    b.setVal91(mx::kInvalidEntityId);
+    b.setVal92(false);
+  }
+  b.setVal93(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
+  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKindForInstantiation())));
+  b.setVal95(e.HasConstantInitialization());
+  b.setVal96(e.HasDependentAlignment());
+  b.setVal97(e.HasExternalStorage());
+  b.setVal98(e.HasGlobalStorage());
+  auto v99 = e.HasICEInitializer();
+  if (v99) {
+    b.setVal99(static_cast<bool>(v99.value()));
+    b.setVal100(true);
+  } else {
+    b.setVal100(false);
+  }
+  b.setVal101(e.HasInitializer());
+  b.setVal102(e.HasLocalStorage());
+  b.setVal103(e.IsARCPseudoStrong());
+  b.setVal104(e.IsCXXForRangeDeclaration());
+  b.setVal105(e.IsConstexpr());
+  b.setVal106(e.IsDirectInitializer());
+  b.setVal107(e.IsEscapingByref());
+  b.setVal108(e.IsExceptionVariable());
+  b.setVal109(e.IsExternC());
+  b.setVal110(e.IsFileVariableDeclaration());
+  b.setVal111(e.IsFunctionOrMethodVariableDeclaration());
+  b.setVal112(e.IsInExternCContext());
+  b.setVal113(e.IsInExternCXXContext());
+  b.setVal114(e.IsInitializerCapture());
+  b.setVal115(e.IsInline());
+  b.setVal116(e.IsInlineSpecified());
+  b.setVal117(e.IsKnownToBeDefined());
+  b.setVal118(e.IsLocalVariableDeclaration());
+  b.setVal119(e.IsLocalVariableDeclarationOrParm());
+  b.setVal120(e.IsNRVOVariable());
+  b.setVal121(e.IsNoDestroy());
+  b.setVal122(e.IsNonEscapingByref());
+  b.setVal123(e.IsObjCForDeclaration());
+  b.setVal124(e.IsPreviousDeclarationInSameBlockScope());
+  b.setVal125(e.IsStaticDataMember());
+  b.setVal126(e.IsStaticLocal());
+  b.setVal127(e.IsThisDeclarationADemotedDefinition());
+  b.setVal128(e.IsUsableInConstantExpressions());
+  b.setVal129(e.MightBeUsableInConstantExpressions());
+  b.setVal130(static_cast<unsigned char>(mx::FromPasta(e.NeedsDestruction())));
 }
 
 void SerializeParmVarDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ParmVarDecl &e) {
@@ -5221,38 +9198,40 @@ void SerializeParmVarDecl(EntityMapper &es, mx::ast::Decl::Builder b, const past
   (void) b;
   (void) e;
   SerializeVarDecl(es, b, e);
-  auto v126 = e.DefaultArgument();
-  if (v126) {
-    auto id126 = es.EntityId(v126.value());    b.setVal126(id126);
-    b.setVal127(id126 != mx::kInvalidEntityId);
+  auto v131 = e.DefaultArgument();
+  if (v131) {
+    auto id131 = es.EntityId(v131.value());
+    b.setVal131(id131);
+    b.setVal132(id131 != mx::kInvalidEntityId);
   } else {
-    b.setVal126(mx::kInvalidEntityId);
-    b.setVal127(false);
+    b.setVal131(mx::kInvalidEntityId);
+    b.setVal132(false);
   }
-  if (auto r128 = e.DefaultArgumentRange(); auto rs128 = r128.Size()) {
-    b.setVal128(es.EntityId(r128[0]));
-    b.setVal129(es.EntityId(r128[rs128 - 1u]));
+  if (auto r133 = e.DefaultArgumentRange(); auto rs133 = r133.Size()) {
+    b.setVal133(es.EntityId(r133[0]));
+    b.setVal134(es.EntityId(r133[rs133 - 1u]));
   } else {
-    b.setVal128(0);
-    b.setVal129(0);
+    b.setVal133(0);
+    b.setVal134(0);
   }
-  b.setVal130(static_cast<unsigned char>(mx::FromPasta(e.ObjCDeclQualifier())));
-  b.setVal131(es.EntityId(e.OriginalType()));
-  auto v132 = e.UninstantiatedDefaultArgument();
-  if (v132) {
-    auto id132 = es.EntityId(v132.value());    b.setVal132(id132);
-    b.setVal133(id132 != mx::kInvalidEntityId);
+  b.setVal135(static_cast<unsigned char>(mx::FromPasta(e.ObjCDeclQualifier())));
+  b.setVal136(es.EntityId(e.OriginalType()));
+  auto v137 = e.UninstantiatedDefaultArgument();
+  if (v137) {
+    auto id137 = es.EntityId(v137.value());
+    b.setVal137(id137);
+    b.setVal138(id137 != mx::kInvalidEntityId);
   } else {
-    b.setVal132(mx::kInvalidEntityId);
-    b.setVal133(false);
+    b.setVal137(mx::kInvalidEntityId);
+    b.setVal138(false);
   }
-  b.setVal134(e.HasDefaultArgument());
-  b.setVal135(e.HasInheritedDefaultArgument());
-  b.setVal136(e.HasUninstantiatedDefaultArgument());
-  b.setVal137(e.HasUnparsedDefaultArgument());
-  b.setVal138(e.IsDestroyedInCallee());
-  b.setVal139(e.IsKNRPromoted());
-  b.setVal140(e.IsObjCMethodParameter());
+  b.setVal139(e.HasDefaultArgument());
+  b.setVal140(e.HasInheritedDefaultArgument());
+  b.setVal141(e.HasUninstantiatedDefaultArgument());
+  b.setVal142(e.HasUnparsedDefaultArgument());
+  b.setVal143(e.IsDestroyedInCallee());
+  b.setVal144(e.IsKNRPromoted());
+  b.setVal145(e.IsObjCMethodParameter());
 }
 
 void SerializeOMPCapturedExprDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPCapturedExprDecl &e) {
@@ -5267,7 +9246,7 @@ void SerializeImplicitParamDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) b;
   (void) e;
   SerializeVarDecl(es, b, e);
-  b.setVal130(static_cast<unsigned char>(mx::FromPasta(e.ParameterKind())));
+  b.setVal135(static_cast<unsigned char>(mx::FromPasta(e.ParameterKind())));
 }
 
 void SerializeDecompositionDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::DecompositionDecl &e) {
@@ -5276,12 +9255,12 @@ void SerializeDecompositionDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) e;
   SerializeVarDecl(es, b, e);
   do {
-    auto v45 = e.Bindings();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Bindings();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
 }
@@ -5291,33 +9270,33 @@ void SerializeVarTemplateSpecializationDecl(EntityMapper &es, mx::ast::Decl::Bui
   (void) b;
   (void) e;
   SerializeVarDecl(es, b, e);
-  auto t126 = e.ExternToken();
-  b.setVal126(es.EntityId(t126));
-  b.setVal130(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
+  auto t131 = e.ExternToken();
+  b.setVal131(es.EntityId(t131));
+  b.setVal135(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
   do {
-    auto v141 = e.TemplateArguments();
-    auto sv141 = b.initVal141(static_cast<unsigned>(v141.size()));
-    auto i141 = 0u;
-    for (const auto &e141 : v141) {
-      sv141.set(i141, es.PseudoId(e141));
-      ++i141;
+    auto v146 = e.TemplateArguments();
+    auto sv146 = b.initVal146(static_cast<unsigned>(v146.size()));
+    auto i146 = 0u;
+    for (const auto &e146 : v146) {
+      sv146.set(i146, es.PseudoId(e146));
+      ++i146;
     }
   } while (false);
   do {
-    auto v142 = e.TemplateInstantiationArguments();
-    auto sv142 = b.initVal142(static_cast<unsigned>(v142.size()));
-    auto i142 = 0u;
-    for (const auto &e142 : v142) {
-      sv142.set(i142, es.PseudoId(e142));
-      ++i142;
+    auto v147 = e.TemplateInstantiationArguments();
+    auto sv147 = b.initVal147(static_cast<unsigned>(v147.size()));
+    auto i147 = 0u;
+    for (const auto &e147 : v147) {
+      sv147.set(i147, es.PseudoId(e147));
+      ++i147;
     }
   } while (false);
-  auto t128 = e.TemplateKeywordToken();
-  b.setVal128(es.EntityId(t128));
-  b.setVal129(es.EntityId(e.TypeAsWritten()));
-  b.setVal127(e.IsClassScopeExplicitSpecialization());
-  b.setVal133(e.IsExplicitInstantiationOrSpecialization());
-  b.setVal134(e.IsExplicitSpecialization());
+  auto t133 = e.TemplateKeywordToken();
+  b.setVal133(es.EntityId(t133));
+  b.setVal134(es.EntityId(e.TypeAsWritten()));
+  b.setVal132(e.IsClassScopeExplicitSpecialization());
+  b.setVal138(e.IsExplicitInstantiationOrSpecialization());
+  b.setVal139(e.IsExplicitSpecialization());
 }
 
 void SerializeVarTemplatePartialSpecializationDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::VarTemplatePartialSpecializationDecl &e) {
@@ -5331,43 +9310,45 @@ void SerializeNonTypeTemplateParmDecl(EntityMapper &es, mx::ast::Decl::Builder b
   (void) b;
   (void) e;
   SerializeDeclaratorDecl(es, b, e);
-  b.setVal70(e.DefaultArgumentWasInherited());
-  auto v71 = e.DefaultArgument();
-  if (v71) {
-    auto id71 = es.EntityId(v71.value());    b.setVal71(id71);
-    b.setVal75(id71 != mx::kInvalidEntityId);
-  } else {
-    b.setVal71(mx::kInvalidEntityId);
-    b.setVal75(false);
-  }
-  auto t74 = e.DefaultArgumentToken();
-  b.setVal74(es.EntityId(t74));
-  auto v143 = e.NumExpansionTypes();
-  if (v143) {
-    b.setVal143(static_cast<unsigned>(v143.value()));
-    b.setVal77(true);
-  } else {
-    b.setVal77(false);
-  }
-  auto v76 = e.PlaceholderTypeConstraint();
+  b.setVal75(e.DefaultArgumentWasInherited());
+  auto v76 = e.DefaultArgument();
   if (v76) {
-    auto id76 = es.EntityId(v76.value());    b.setVal76(id76);
-    b.setVal79(id76 != mx::kInvalidEntityId);
+    auto id76 = es.EntityId(v76.value());
+    b.setVal76(id76);
+    b.setVal80(id76 != mx::kInvalidEntityId);
   } else {
     b.setVal76(mx::kInvalidEntityId);
-    b.setVal79(false);
+    b.setVal80(false);
   }
-  b.setVal87(e.HasDefaultArgument());
-  b.setVal90(e.HasPlaceholderTypeConstraint());
-  b.setVal91(e.IsExpandedParameterPack());
-  b.setVal92(e.IsPackExpansion());
+  auto t79 = e.DefaultArgumentToken();
+  b.setVal79(es.EntityId(t79));
+  auto v148 = e.NumExpansionTypes();
+  if (v148) {
+    b.setVal148(static_cast<unsigned>(v148.value()));
+    b.setVal82(true);
+  } else {
+    b.setVal82(false);
+  }
+  auto v81 = e.PlaceholderTypeConstraint();
+  if (v81) {
+    auto id81 = es.EntityId(v81.value());
+    b.setVal81(id81);
+    b.setVal84(id81 != mx::kInvalidEntityId);
+  } else {
+    b.setVal81(mx::kInvalidEntityId);
+    b.setVal84(false);
+  }
+  b.setVal92(e.HasDefaultArgument());
+  b.setVal95(e.HasPlaceholderTypeConstraint());
+  b.setVal96(e.IsExpandedParameterPack());
+  b.setVal97(e.IsPackExpansion());
   do {
-    auto v45 = e.ExpansionTypes();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.ExpansionTypes();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
 }
@@ -5377,8 +9358,8 @@ void SerializeMSPropertyDecl(EntityMapper &es, mx::ast::Decl::Builder b, const p
   (void) b;
   (void) e;
   SerializeDeclaratorDecl(es, b, e);
-  b.setVal70(e.HasGetter());
-  b.setVal75(e.HasSetter());
+  b.setVal75(e.HasGetter());
+  b.setVal80(e.HasSetter());
 }
 
 void SerializeFunctionDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::FunctionDecl &e) {
@@ -5386,167 +9367,170 @@ void SerializeFunctionDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pas
   (void) b;
   (void) e;
   SerializeDeclaratorDecl(es, b, e);
-  b.setVal70(e.UsesFPIntrin());
-  auto v75 = e.DoesDeclarationForceExternallyVisibleDefinition();
-  if (v75) {
-    b.setVal75(static_cast<bool>(v75.value()));
-    b.setVal77(true);
+  b.setVal75(e.UsesFPIntrin());
+  auto v80 = e.DoesDeclarationForceExternallyVisibleDefinition();
+  if (v80) {
+    b.setVal80(static_cast<bool>(v80.value()));
+    b.setVal82(true);
   } else {
-    b.setVal77(false);
+    b.setVal82(false);
   }
-  b.setVal79(e.DoesThisDeclarationHaveABody());
-  b.setVal71(es.EntityId(e.CallResultType()));
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.ConstexprKind())));
-  b.setVal74(es.EntityId(e.DeclaredReturnType()));
-  auto t76 = e.EllipsisToken();
-  b.setVal76(es.EntityId(t76));
-  if (auto r78 = e.ExceptionSpecSourceRange(); auto rs78 = r78.Size()) {
-    b.setVal78(es.EntityId(r78[0]));
-    b.setVal81(es.EntityId(r78[rs78 - 1u]));
+  b.setVal84(e.DoesThisDeclarationHaveABody());
+  b.setVal76(es.EntityId(e.CallResultType()));
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.ConstexprKind())));
+  b.setVal79(es.EntityId(e.DeclaredReturnType()));
+  auto t81 = e.EllipsisToken();
+  b.setVal81(es.EntityId(t81));
+  if (auto r83 = e.ExceptionSpecSourceRange(); auto rs83 = r83.Size()) {
+    b.setVal83(es.EntityId(r83[0]));
+    b.setVal86(es.EntityId(r83[rs83 - 1u]));
   } else {
-    b.setVal78(0);
-    b.setVal81(0);
+    b.setVal83(0);
+    b.setVal86(0);
   }
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.ExceptionSpecType())));
-  auto v86 = e.InstantiatedFromMemberFunction();
-  if (v86) {
-    auto id86 = es.EntityId(v86.value());    b.setVal86(id86);
-    b.setVal87(id86 != mx::kInvalidEntityId);
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.ExceptionSpecType())));
+  auto v91 = e.InstantiatedFromMemberFunction();
+  if (v91) {
+    auto id91 = es.EntityId(v91.value());
+    b.setVal91(id91);
+    b.setVal92(id91 != mx::kInvalidEntityId);
   } else {
-    b.setVal86(mx::kInvalidEntityId);
-    b.setVal87(false);
+    b.setVal91(mx::kInvalidEntityId);
+    b.setVal92(false);
   }
-  b.setVal82(static_cast<unsigned char>(mx::FromPasta(e.LanguageLinkage())));
-  b.setVal83(static_cast<unsigned char>(mx::FromPasta(e.MultiVersionKind())));
-  auto v143 = e.ODRHash();
-  if (v143) {
-    b.setVal143(static_cast<unsigned>(v143.value()));
-    b.setVal90(true);
+  b.setVal87(static_cast<unsigned char>(mx::FromPasta(e.LanguageLinkage())));
+  b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.MultiVersionKind())));
+  auto v148 = e.ODRHash();
+  if (v148) {
+    b.setVal148(static_cast<unsigned>(v148.value()));
+    b.setVal95(true);
   } else {
-    b.setVal90(false);
+    b.setVal95(false);
   }
-  b.setVal84(static_cast<unsigned char>(mx::FromPasta(e.OverloadedOperator())));
-  if (auto r126 = e.ParametersSourceRange(); auto rs126 = r126.Size()) {
-    b.setVal126(es.EntityId(r126[0]));
-    b.setVal128(es.EntityId(r126[rs126 - 1u]));
+  b.setVal89(static_cast<unsigned char>(mx::FromPasta(e.OverloadedOperator())));
+  if (auto r131 = e.ParametersSourceRange(); auto rs131 = r131.Size()) {
+    b.setVal131(es.EntityId(r131[0]));
+    b.setVal133(es.EntityId(r131[rs131 - 1u]));
   } else {
-    b.setVal126(0);
-    b.setVal128(0);
+    b.setVal131(0);
+    b.setVal133(0);
   }
-  auto t129 = e.PointOfInstantiation();
-  b.setVal129(es.EntityId(t129));
-  b.setVal131(es.EntityId(e.ReturnType()));
-  if (auto r132 = e.ReturnTypeSourceRange(); auto rs132 = r132.Size()) {
-    b.setVal132(es.EntityId(r132[0]));
-    b.setVal144(es.EntityId(r132[rs132 - 1u]));
+  auto t134 = e.PointOfInstantiation();
+  b.setVal134(es.EntityId(t134));
+  b.setVal136(es.EntityId(e.ReturnType()));
+  if (auto r137 = e.ReturnTypeSourceRange(); auto rs137 = r137.Size()) {
+    b.setVal137(es.EntityId(r137[0]));
+    b.setVal149(es.EntityId(r137[rs137 - 1u]));
   } else {
-    b.setVal132(0);
-    b.setVal144(0);
+    b.setVal137(0);
+    b.setVal149(0);
   }
-  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.StorageClass())));
-  auto v145 = e.TemplateInstantiationPattern();
-  if (v145) {
-    auto id145 = es.EntityId(v145.value());    b.setVal145(id145);
-    b.setVal91(id145 != mx::kInvalidEntityId);
+  b.setVal90(static_cast<unsigned char>(mx::FromPasta(e.StorageClass())));
+  auto v150 = e.TemplateInstantiationPattern();
+  if (v150) {
+    auto id150 = es.EntityId(v150.value());
+    b.setVal150(id150);
+    b.setVal96(id150 != mx::kInvalidEntityId);
   } else {
-    b.setVal145(mx::kInvalidEntityId);
-    b.setVal91(false);
+    b.setVal150(mx::kInvalidEntityId);
+    b.setVal96(false);
   }
-  b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
-  b.setVal89(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKindForInstantiation())));
-  b.setVal125(static_cast<unsigned char>(mx::FromPasta(e.TemplatedKind())));
-  b.setVal92(e.HasImplicitReturnZero());
-  b.setVal93(e.HasInheritedPrototype());
-  b.setVal94(e.HasOneParameterOrDefaultArguments());
-  b.setVal95(e.HasPrototype());
-  b.setVal96(e.HasSkippedBody());
-  b.setVal97(e.HasTrivialBody());
-  b.setVal98(e.HasWrittenPrototype());
-  b.setVal99(e.InstantiationIsPending());
-  b.setVal100(e.IsCPUDispatchMultiVersion());
-  b.setVal101(e.IsCPUSpecificMultiVersion());
-  b.setVal102(e.IsConsteval());
-  b.setVal103(e.IsConstexpr());
-  b.setVal104(e.IsConstexprSpecified());
-  b.setVal105(e.IsDefaulted());
-  b.setVal106(e.IsDeleted());
-  b.setVal107(e.IsDeletedAsWritten());
-  b.setVal108(e.IsDestroyingOperatorDelete());
-  b.setVal109(e.IsExplicitlyDefaulted());
-  b.setVal110(e.IsExternC());
-  b.setVal111(e.IsFunctionTemplateSpecialization());
-  b.setVal112(e.IsGlobal());
-  b.setVal113(e.IsImplicitlyInstantiable());
-  b.setVal114(e.IsInExternCContext());
-  b.setVal115(e.IsInExternCXXContext());
-  b.setVal116(e.IsInlineBuiltinDeclaration());
-  auto v117 = e.IsInlineDefinitionExternallyVisible();
-  if (v117) {
-    b.setVal117(static_cast<bool>(v117.value()));
-    b.setVal118(true);
-  } else {
-    b.setVal118(false);
-  }
-  b.setVal119(e.IsInlineSpecified());
-  b.setVal120(e.IsInlined());
-  b.setVal121(e.IsLateTemplateParsed());
-  auto v122 = e.IsMSExternInline();
+  b.setVal93(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
+  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKindForInstantiation())));
+  b.setVal130(static_cast<unsigned char>(mx::FromPasta(e.TemplatedKind())));
+  b.setVal97(e.HasImplicitReturnZero());
+  b.setVal98(e.HasInheritedPrototype());
+  b.setVal99(e.HasOneParameterOrDefaultArguments());
+  b.setVal100(e.HasPrototype());
+  b.setVal101(e.HasSkippedBody());
+  b.setVal102(e.HasTrivialBody());
+  b.setVal103(e.HasWrittenPrototype());
+  b.setVal104(e.InstantiationIsPending());
+  b.setVal105(e.IsCPUDispatchMultiVersion());
+  b.setVal106(e.IsCPUSpecificMultiVersion());
+  b.setVal107(e.IsConsteval());
+  b.setVal108(e.IsConstexpr());
+  b.setVal109(e.IsConstexprSpecified());
+  b.setVal110(e.IsDefaulted());
+  b.setVal111(e.IsDeleted());
+  b.setVal112(e.IsDeletedAsWritten());
+  b.setVal113(e.IsDestroyingOperatorDelete());
+  b.setVal114(e.IsExplicitlyDefaulted());
+  b.setVal115(e.IsExternC());
+  b.setVal116(e.IsFunctionTemplateSpecialization());
+  b.setVal117(e.IsGlobal());
+  b.setVal118(e.IsImplicitlyInstantiable());
+  b.setVal119(e.IsInExternCContext());
+  b.setVal120(e.IsInExternCXXContext());
+  b.setVal121(e.IsInlineBuiltinDeclaration());
+  auto v122 = e.IsInlineDefinitionExternallyVisible();
   if (v122) {
     b.setVal122(static_cast<bool>(v122.value()));
     b.setVal123(true);
   } else {
     b.setVal123(false);
   }
-  b.setVal124(e.IsMSVCRTEntryPoint());
-  b.setVal127(e.IsMain());
-  b.setVal133(e.IsMultiVersion());
-  b.setVal134(e.IsNoReturn());
-  b.setVal135(e.IsOverloadedOperator());
-  b.setVal136(e.IsPure());
-  b.setVal137(e.IsReplaceableGlobalAllocationFunction());
-  auto v138 = e.IsReservedGlobalPlacementOperator();
-  if (v138) {
-    b.setVal138(static_cast<bool>(v138.value()));
-    b.setVal139(true);
+  b.setVal124(e.IsInlineSpecified());
+  b.setVal125(e.IsInlined());
+  b.setVal126(e.IsLateTemplateParsed());
+  auto v127 = e.IsMSExternInline();
+  if (v127) {
+    b.setVal127(static_cast<bool>(v127.value()));
+    b.setVal128(true);
   } else {
-    b.setVal139(false);
+    b.setVal128(false);
   }
-  b.setVal140(e.IsStatic());
-  b.setVal146(e.IsTargetClonesMultiVersion());
-  b.setVal147(e.IsTargetMultiVersion());
-  b.setVal148(e.IsTemplateInstantiation());
-  b.setVal149(e.IsThisDeclarationInstantiatedFromAFriendDefinition());
-  b.setVal150(e.IsTrivial());
-  b.setVal151(e.IsTrivialForCall());
-  b.setVal152(e.IsUserProvided());
-  b.setVal153(e.IsVariadic());
-  b.setVal154(e.IsVirtualAsWritten());
+  b.setVal129(e.IsMSVCRTEntryPoint());
+  b.setVal132(e.IsMain());
+  b.setVal138(e.IsMultiVersion());
+  b.setVal139(e.IsNoReturn());
+  b.setVal140(e.IsOverloadedOperator());
+  b.setVal141(e.IsPure());
+  b.setVal142(e.IsReplaceableGlobalAllocationFunction());
+  auto v143 = e.IsReservedGlobalPlacementOperator();
+  if (v143) {
+    b.setVal143(static_cast<bool>(v143.value()));
+    b.setVal144(true);
+  } else {
+    b.setVal144(false);
+  }
+  b.setVal145(e.IsStatic());
+  b.setVal151(e.IsTargetClonesMultiVersion());
+  b.setVal152(e.IsTargetMultiVersion());
+  b.setVal153(e.IsTemplateInstantiation());
+  b.setVal154(e.IsThisDeclarationInstantiatedFromAFriendDefinition());
+  b.setVal155(e.IsTrivial());
+  b.setVal156(e.IsTrivialForCall());
+  b.setVal157(e.IsUserProvided());
+  b.setVal158(e.IsVariadic());
+  b.setVal159(e.IsVirtualAsWritten());
   do {
-    auto v45 = e.Parameters();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Parameters();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
-  b.setVal155(e.UsesSEHTry());
-  b.setVal156(e.WillHaveBody());
-  auto v157 = e.Body();
-  if (v157) {
-    auto id157 = es.EntityId(v157.value());    b.setVal157(id157);
-    b.setVal158(id157 != mx::kInvalidEntityId);
+  b.setVal160(e.UsesSEHTry());
+  b.setVal161(e.WillHaveBody());
+  auto v162 = e.Body();
+  if (v162) {
+    auto id162 = es.EntityId(v162.value());
+    b.setVal162(id162);
+    b.setVal163(id162 != mx::kInvalidEntityId);
   } else {
-    b.setVal157(mx::kInvalidEntityId);
-    b.setVal158(false);
+    b.setVal162(mx::kInvalidEntityId);
+    b.setVal163(false);
   }
-  pasta::DeclContext dc46(e);
-  auto v46 = dc46.AlreadyLoadedDeclarations();
-  auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-  auto i46 = 0u;
-  for (const pasta::Decl &e46 : v46) {
-    sv46.set(i46, es.EntityId(e46));
-    ++i46;
+  pasta::DeclContext dc51(e);
+  auto v51 = dc51.AlreadyLoadedDeclarations();
+  auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+  auto i51 = 0u;
+  for (const pasta::Decl &e51 : v51) {
+    sv51.set(i51, es.EntityId(e51));
+    ++i51;
   }
 }
 
@@ -5555,47 +9539,49 @@ void SerializeCXXMethodDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pa
   (void) b;
   (void) e;
   SerializeFunctionDecl(es, b, e);
-  b.setVal130(static_cast<unsigned char>(mx::FromPasta(e.ReferenceQualifier())));
-  auto v159 = e.ThisObjectType();
-  if (v159) {
-    auto id159 = es.EntityId(v159.value());    b.setVal159(id159);
-    b.setVal160(id159 != mx::kInvalidEntityId);
+  b.setVal135(static_cast<unsigned char>(mx::FromPasta(e.ReferenceQualifier())));
+  auto v164 = e.ThisObjectType();
+  if (v164) {
+    auto id164 = es.EntityId(v164.value());
+    b.setVal164(id164);
+    b.setVal165(id164 != mx::kInvalidEntityId);
   } else {
-    b.setVal159(mx::kInvalidEntityId);
-    b.setVal160(false);
+    b.setVal164(mx::kInvalidEntityId);
+    b.setVal165(false);
   }
-  auto v161 = e.ThisType();
-  if (v161) {
-    auto id161 = es.EntityId(v161.value());    b.setVal161(id161);
-    b.setVal162(id161 != mx::kInvalidEntityId);
+  auto v166 = e.ThisType();
+  if (v166) {
+    auto id166 = es.EntityId(v166.value());
+    b.setVal166(id166);
+    b.setVal167(id166 != mx::kInvalidEntityId);
   } else {
-    b.setVal161(mx::kInvalidEntityId);
-    b.setVal162(false);
+    b.setVal166(mx::kInvalidEntityId);
+    b.setVal167(false);
   }
-  b.setVal163(e.HasInlineBody());
-  b.setVal164(e.IsConst());
-  b.setVal165(e.IsCopyAssignmentOperator());
-  b.setVal166(e.IsInstance());
-  b.setVal167(e.IsLambdaStaticInvoker());
-  b.setVal168(e.IsMoveAssignmentOperator());
-  b.setVal169(e.IsVirtual());
-  b.setVal170(e.IsVolatile());
+  b.setVal168(e.HasInlineBody());
+  b.setVal169(e.IsConst());
+  b.setVal170(e.IsCopyAssignmentOperator());
+  b.setVal171(e.IsInstance());
+  b.setVal172(e.IsLambdaStaticInvoker());
+  b.setVal173(e.IsMoveAssignmentOperator());
+  b.setVal174(e.IsVirtual());
+  b.setVal175(e.IsVolatile());
   do {
-    auto v57 = e.OverriddenMethods();
-    auto sv57 = b.initVal57(static_cast<unsigned>(v57.size()));
-    auto i57 = 0u;
-    for (const auto &e57 : v57) {
-      sv57.set(i57, es.EntityId(e57));
-      ++i57;
+    auto v62 = e.OverriddenMethods();
+    auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
+    auto i62 = 0u;
+    for (const auto &e62 : v62) {
+      sv62.set(i62, es.EntityId(e62));
+      ++i62;
     }
   } while (false);
   do {
-    auto v171 = e.ParameterDeclarations();
-    auto sv171 = b.initVal171(static_cast<unsigned>(v171.size()));
-    auto i171 = 0u;
-    for (const auto &e171 : v171) {
-      sv171.set(i171, es.EntityId(e171));
-      ++i171;
+    auto v176 = e.ParameterDeclarations();
+    auto sv176 = b.initVal176(static_cast<unsigned>(v176.size()));
+    auto i176 = 0u;
+    for (const auto &e176 : v176) {
+      sv176.set(i176, es.EntityId(e176));
+      ++i176;
     }
   } while (false);
 }
@@ -5605,21 +9591,23 @@ void SerializeCXXDestructorDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) b;
   (void) e;
   SerializeCXXMethodDecl(es, b, e);
-  auto v172 = e.OperatorDelete();
-  if (v172) {
-    auto id172 = es.EntityId(v172.value());    b.setVal172(id172);
-    b.setVal173(id172 != mx::kInvalidEntityId);
+  auto v177 = e.OperatorDelete();
+  if (v177) {
+    auto id177 = es.EntityId(v177.value());
+    b.setVal177(id177);
+    b.setVal178(id177 != mx::kInvalidEntityId);
   } else {
-    b.setVal172(mx::kInvalidEntityId);
-    b.setVal173(false);
+    b.setVal177(mx::kInvalidEntityId);
+    b.setVal178(false);
   }
-  auto v174 = e.OperatorDeleteThisArgument();
-  if (v174) {
-    auto id174 = es.EntityId(v174.value());    b.setVal174(id174);
-    b.setVal175(id174 != mx::kInvalidEntityId);
+  auto v179 = e.OperatorDeleteThisArgument();
+  if (v179) {
+    auto id179 = es.EntityId(v179.value());
+    b.setVal179(id179);
+    b.setVal180(id179 != mx::kInvalidEntityId);
   } else {
-    b.setVal174(mx::kInvalidEntityId);
-    b.setVal175(false);
+    b.setVal179(mx::kInvalidEntityId);
+    b.setVal180(false);
   }
 }
 
@@ -5628,9 +9616,9 @@ void SerializeCXXConversionDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) b;
   (void) e;
   SerializeCXXMethodDecl(es, b, e);
-  b.setVal172(es.EntityId(e.ConversionType()));
-  b.setVal173(e.IsExplicit());
-  b.setVal175(e.IsLambdaToBlockPointerConversion());
+  b.setVal177(es.EntityId(e.ConversionType()));
+  b.setVal178(e.IsExplicit());
+  b.setVal180(e.IsLambdaToBlockPointerConversion());
 }
 
 void SerializeCXXConstructorDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXConstructorDecl &e) {
@@ -5638,19 +9626,20 @@ void SerializeCXXConstructorDecl(EntityMapper &es, mx::ast::Decl::Builder b, con
   (void) b;
   (void) e;
   SerializeCXXMethodDecl(es, b, e);
-  auto v172 = e.TargetConstructor();
-  if (v172) {
-    auto id172 = es.EntityId(v172.value());    b.setVal172(id172);
-    b.setVal173(id172 != mx::kInvalidEntityId);
+  auto v177 = e.TargetConstructor();
+  if (v177) {
+    auto id177 = es.EntityId(v177.value());
+    b.setVal177(id177);
+    b.setVal178(id177 != mx::kInvalidEntityId);
   } else {
-    b.setVal172(mx::kInvalidEntityId);
-    b.setVal173(false);
+    b.setVal177(mx::kInvalidEntityId);
+    b.setVal178(false);
   }
-  b.setVal175(e.IsDefaultConstructor());
-  b.setVal176(e.IsDelegatingConstructor());
-  b.setVal177(e.IsExplicit());
-  b.setVal178(e.IsInheritingConstructor());
-  b.setVal179(e.IsSpecializationCopyingObject());
+  b.setVal180(e.IsDefaultConstructor());
+  b.setVal181(e.IsDelegatingConstructor());
+  b.setVal182(e.IsExplicit());
+  b.setVal183(e.IsInheritingConstructor());
+  b.setVal184(e.IsSpecializationCopyingObject());
 }
 
 void SerializeCXXDeductionGuideDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXDeductionGuideDecl &e) {
@@ -5658,16 +9647,16 @@ void SerializeCXXDeductionGuideDecl(EntityMapper &es, mx::ast::Decl::Builder b, 
   (void) b;
   (void) e;
   SerializeFunctionDecl(es, b, e);
-  b.setVal159(es.EntityId(e.CorrespondingConstructor()));
-  b.setVal160(e.IsCopyDeductionCandidate());
-  b.setVal162(e.IsExplicit());
+  b.setVal164(es.EntityId(e.CorrespondingConstructor()));
+  b.setVal165(e.IsCopyDeductionCandidate());
+  b.setVal167(e.IsExplicit());
   do {
-    auto v57 = e.ParameterDeclarations();
-    auto sv57 = b.initVal57(static_cast<unsigned>(v57.size()));
-    auto i57 = 0u;
-    for (const auto &e57 : v57) {
-      sv57.set(i57, es.EntityId(e57));
-      ++i57;
+    auto v62 = e.ParameterDeclarations();
+    auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
+    auto i62 = 0u;
+    for (const auto &e62 : v62) {
+      sv62.set(i62, es.EntityId(e62));
+      ++i62;
     }
   } while (false);
 }
@@ -5677,39 +9666,42 @@ void SerializeFieldDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta:
   (void) b;
   (void) e;
   SerializeDeclaratorDecl(es, b, e);
-  auto v71 = e.BitWidth();
-  if (v71) {
-    auto id71 = es.EntityId(v71.value());    b.setVal71(id71);
-    b.setVal70(id71 != mx::kInvalidEntityId);
-  } else {
-    b.setVal71(mx::kInvalidEntityId);
-    b.setVal70(false);
-  }
-  auto v74 = e.CapturedVLAType();
-  if (v74) {
-    auto id74 = es.EntityId(v74.value());    b.setVal74(id74);
-    b.setVal75(id74 != mx::kInvalidEntityId);
-  } else {
-    b.setVal74(mx::kInvalidEntityId);
-    b.setVal75(false);
-  }
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.InClassInitializerStyle())));
-  auto v76 = e.InClassInitializer();
+  auto v76 = e.BitWidth();
   if (v76) {
-    auto id76 = es.EntityId(v76.value());    b.setVal76(id76);
-    b.setVal77(id76 != mx::kInvalidEntityId);
+    auto id76 = es.EntityId(v76.value());
+    b.setVal76(id76);
+    b.setVal75(id76 != mx::kInvalidEntityId);
   } else {
     b.setVal76(mx::kInvalidEntityId);
-    b.setVal77(false);
+    b.setVal75(false);
   }
-  b.setVal79(e.HasCapturedVLAType());
-  b.setVal87(e.HasInClassInitializer());
-  b.setVal90(e.IsAnonymousStructOrUnion());
-  b.setVal91(e.IsBitField());
-  b.setVal92(e.IsMutable());
-  b.setVal93(e.IsUnnamedBitfield());
-  b.setVal94(e.IsZeroLengthBitField());
-  b.setVal95(e.IsZeroSize());
+  auto v79 = e.CapturedVLAType();
+  if (v79) {
+    auto id79 = es.EntityId(v79.value());
+    b.setVal79(id79);
+    b.setVal80(id79 != mx::kInvalidEntityId);
+  } else {
+    b.setVal79(mx::kInvalidEntityId);
+    b.setVal80(false);
+  }
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.InClassInitializerStyle())));
+  auto v81 = e.InClassInitializer();
+  if (v81) {
+    auto id81 = es.EntityId(v81.value());
+    b.setVal81(id81);
+    b.setVal82(id81 != mx::kInvalidEntityId);
+  } else {
+    b.setVal81(mx::kInvalidEntityId);
+    b.setVal82(false);
+  }
+  b.setVal84(e.HasCapturedVLAType());
+  b.setVal92(e.HasInClassInitializer());
+  b.setVal95(e.IsAnonymousStructOrUnion());
+  b.setVal96(e.IsBitField());
+  b.setVal97(e.IsMutable());
+  b.setVal98(e.IsUnnamedBitfield());
+  b.setVal99(e.IsZeroLengthBitField());
+  b.setVal100(e.IsZeroSize());
 }
 
 void SerializeObjCIvarDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCIvarDecl &e) {
@@ -5717,11 +9709,11 @@ void SerializeObjCIvarDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pas
   (void) b;
   (void) e;
   SerializeFieldDecl(es, b, e);
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.AccessControl())));
-  b.setVal82(static_cast<unsigned char>(mx::FromPasta(e.CanonicalAccessControl())));
-  b.setVal78(es.EntityId(e.ContainingInterface()));
-  b.setVal81(es.EntityId(e.NextInstanceVariable()));
-  b.setVal96(e.Synthesize());
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.AccessControl())));
+  b.setVal87(static_cast<unsigned char>(mx::FromPasta(e.CanonicalAccessControl())));
+  b.setVal83(es.EntityId(e.ContainingInterface()));
+  b.setVal86(es.EntityId(e.NextInstanceVariable()));
+  b.setVal101(e.Synthesize());
 }
 
 void SerializeObjCAtDefsFieldDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCAtDefsFieldDecl &e) {
@@ -5736,9 +9728,9 @@ void SerializeBindingDecl(EntityMapper &es, mx::ast::Decl::Builder b, const past
   (void) b;
   (void) e;
   SerializeValueDecl(es, b, e);
-  b.setVal52(es.EntityId(e.Binding()));
-  b.setVal53(es.EntityId(e.DecomposedDeclaration()));
-  b.setVal61(es.EntityId(e.HoldingVariable()));
+  b.setVal57(es.EntityId(e.Binding()));
+  b.setVal58(es.EntityId(e.DecomposedDeclaration()));
+  b.setVal66(es.EntityId(e.HoldingVariable()));
 }
 
 void SerializeOMPDeclarativeDirectiveValueDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::OMPDeclarativeDirectiveValueDecl &e) {
@@ -5753,14 +9745,14 @@ void SerializeOMPDeclareMapperDecl(EntityMapper &es, mx::ast::Decl::Builder b, c
   (void) b;
   (void) e;
   SerializeOMPDeclarativeDirectiveValueDecl(es, b, e);
-  b.setVal52(es.EntityId(e.MapperVariableReference()));
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  b.setVal57(es.EntityId(e.MapperVariableReference()));
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -5769,16 +9761,17 @@ void SerializeUsingShadowDecl(EntityMapper &es, mx::ast::Decl::Builder b, const 
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  b.setVal51(es.EntityId(e.Introducer()));
-  auto v52 = e.NextUsingShadowDeclaration();
-  if (v52) {
-    auto id52 = es.EntityId(v52.value());    b.setVal52(id52);
-    b.setVal68(id52 != mx::kInvalidEntityId);
+  b.setVal56(es.EntityId(e.Introducer()));
+  auto v57 = e.NextUsingShadowDeclaration();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+    b.setVal73(id57 != mx::kInvalidEntityId);
   } else {
-    b.setVal52(mx::kInvalidEntityId);
-    b.setVal68(false);
+    b.setVal57(mx::kInvalidEntityId);
+    b.setVal73(false);
   }
-  b.setVal53(es.EntityId(e.TargetDeclaration()));
+  b.setVal58(es.EntityId(e.TargetDeclaration()));
 }
 
 void SerializeConstructorUsingShadowDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ConstructorUsingShadowDecl &e) {
@@ -5786,24 +9779,26 @@ void SerializeConstructorUsingShadowDecl(EntityMapper &es, mx::ast::Decl::Builde
   (void) b;
   (void) e;
   SerializeUsingShadowDecl(es, b, e);
-  b.setVal69(e.ConstructsVirtualBase());
-  b.setVal61(es.EntityId(e.ConstructedBaseClass()));
-  auto v62 = e.ConstructedBaseClassShadowDeclaration();
-  if (v62) {
-    auto id62 = es.EntityId(v62.value());    b.setVal62(id62);
-    b.setVal70(id62 != mx::kInvalidEntityId);
+  b.setVal74(e.ConstructsVirtualBase());
+  b.setVal66(es.EntityId(e.ConstructedBaseClass()));
+  auto v67 = e.ConstructedBaseClassShadowDeclaration();
+  if (v67) {
+    auto id67 = es.EntityId(v67.value());
+    b.setVal67(id67);
+    b.setVal75(id67 != mx::kInvalidEntityId);
   } else {
-    b.setVal62(mx::kInvalidEntityId);
-    b.setVal70(false);
-  }
-  b.setVal63(es.EntityId(e.NominatedBaseClass()));
-  auto v71 = e.NominatedBaseClassShadowDeclaration();
-  if (v71) {
-    auto id71 = es.EntityId(v71.value());    b.setVal71(id71);
-    b.setVal75(id71 != mx::kInvalidEntityId);
-  } else {
-    b.setVal71(mx::kInvalidEntityId);
+    b.setVal67(mx::kInvalidEntityId);
     b.setVal75(false);
+  }
+  b.setVal68(es.EntityId(e.NominatedBaseClass()));
+  auto v76 = e.NominatedBaseClassShadowDeclaration();
+  if (v76) {
+    auto id76 = es.EntityId(v76.value());
+    b.setVal76(id76);
+    b.setVal80(id76 != mx::kInvalidEntityId);
+  } else {
+    b.setVal76(mx::kInvalidEntityId);
+    b.setVal80(false);
   }
 }
 
@@ -5813,15 +9808,15 @@ void SerializeUsingPackDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pa
   (void) e;
   SerializeNamedDecl(es, b, e);
   do {
-    auto v45 = e.Expansions();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Expansions();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
-  b.setVal51(es.EntityId(e.InstantiatedFromUsingDeclaration()));
+  b.setVal56(es.EntityId(e.InstantiatedFromUsingDeclaration()));
 }
 
 void SerializeUsingDirectiveDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UsingDirectiveDecl &e) {
@@ -5829,13 +9824,13 @@ void SerializeUsingDirectiveDecl(EntityMapper &es, mx::ast::Decl::Builder b, con
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  auto t51 = e.IdentifierToken();
-  b.setVal51(es.EntityId(t51));
-  auto t52 = e.NamespaceKeyToken();
-  b.setVal52(es.EntityId(t52));
-  b.setVal53(es.EntityId(e.NominatedNamespaceAsWritten()));
-  auto t61 = e.UsingToken();
-  b.setVal61(es.EntityId(t61));
+  auto t56 = e.IdentifierToken();
+  b.setVal56(es.EntityId(t56));
+  auto t57 = e.NamespaceKeyToken();
+  b.setVal57(es.EntityId(t57));
+  b.setVal58(es.EntityId(e.NominatedNamespaceAsWritten()));
+  auto t66 = e.UsingToken();
+  b.setVal66(es.EntityId(t66));
 }
 
 void SerializeUnresolvedUsingIfExistsDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingIfExistsDecl &e) {
@@ -5850,13 +9845,14 @@ void SerializeTypeDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  auto v51 = e.TypeForDeclaration();
-  if (v51) {
-    auto id51 = es.EntityId(v51.value());    b.setVal51(id51);
-    b.setVal68(id51 != mx::kInvalidEntityId);
+  auto v56 = e.TypeForDeclaration();
+  if (v56) {
+    auto id56 = es.EntityId(v56.value());
+    b.setVal56(id56);
+    b.setVal73(id56 != mx::kInvalidEntityId);
   } else {
-    b.setVal51(mx::kInvalidEntityId);
-    b.setVal68(false);
+    b.setVal56(mx::kInvalidEntityId);
+    b.setVal73(false);
   }
 }
 
@@ -5865,30 +9861,32 @@ void SerializeTemplateTypeParmDecl(EntityMapper &es, mx::ast::Decl::Builder b, c
   (void) b;
   (void) e;
   SerializeTypeDecl(es, b, e);
-  b.setVal69(e.DefaultArgumentWasInherited());
-  auto v52 = e.DefaultArgument();
-  if (v52) {
-    auto id52 = es.EntityId(v52.value());    b.setVal52(id52);
-    b.setVal70(id52 != mx::kInvalidEntityId);
+  b.setVal74(e.DefaultArgumentWasInherited());
+  auto v57 = e.DefaultArgument();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+    b.setVal75(id57 != mx::kInvalidEntityId);
   } else {
-    b.setVal52(mx::kInvalidEntityId);
-    b.setVal70(false);
-  }
-  auto v53 = e.DefaultArgumentInfo();
-  if (v53) {
-    auto id53 = es.EntityId(v53.value());    b.setVal53(id53);
-    b.setVal75(id53 != mx::kInvalidEntityId);
-  } else {
-    b.setVal53(mx::kInvalidEntityId);
+    b.setVal57(mx::kInvalidEntityId);
     b.setVal75(false);
   }
-  auto t61 = e.DefaultArgumentToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal77(e.HasDefaultArgument());
-  b.setVal79(e.HasTypeConstraint());
-  b.setVal87(e.IsExpandedParameterPack());
-  b.setVal90(e.IsPackExpansion());
-  b.setVal91(e.WasDeclaredWithTypename());
+  auto v58 = e.DefaultArgumentInfo();
+  if (v58) {
+    auto id58 = es.EntityId(v58.value());
+    b.setVal58(id58);
+    b.setVal80(id58 != mx::kInvalidEntityId);
+  } else {
+    b.setVal58(mx::kInvalidEntityId);
+    b.setVal80(false);
+  }
+  auto t66 = e.DefaultArgumentToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal82(e.HasDefaultArgument());
+  b.setVal84(e.HasTypeConstraint());
+  b.setVal92(e.IsExpandedParameterPack());
+  b.setVal95(e.IsPackExpansion());
+  b.setVal96(e.WasDeclaredWithTypename());
 }
 
 void SerializeTagDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TagDecl &e) {
@@ -5896,55 +9894,56 @@ void SerializeTagDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::T
   (void) b;
   (void) e;
   SerializeTypeDecl(es, b, e);
-  if (auto r52 = e.BraceRange(); auto rs52 = r52.Size()) {
-    b.setVal52(es.EntityId(r52[0]));
-    b.setVal53(es.EntityId(r52[rs52 - 1u]));
+  if (auto r57 = e.BraceRange(); auto rs57 = r57.Size()) {
+    b.setVal57(es.EntityId(r57[0]));
+    b.setVal58(es.EntityId(r57[rs57 - 1u]));
   } else {
-    b.setVal52(0);
-    b.setVal53(0);
+    b.setVal57(0);
+    b.setVal58(0);
   }
-  auto t61 = e.FirstInnerToken();
-  b.setVal61(es.EntityId(t61));
-  auto t62 = e.FirstOuterToken();
-  b.setVal62(es.EntityId(t62));
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.TagKind())));
-  auto v63 = e.TypedefNameForAnonymousDeclaration();
-  if (v63) {
-    auto id63 = es.EntityId(v63.value());    b.setVal63(id63);
-    b.setVal69(id63 != mx::kInvalidEntityId);
+  auto t66 = e.FirstInnerToken();
+  b.setVal66(es.EntityId(t66));
+  auto t67 = e.FirstOuterToken();
+  b.setVal67(es.EntityId(t67));
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.TagKind())));
+  auto v68 = e.TypedefNameForAnonymousDeclaration();
+  if (v68) {
+    auto id68 = es.EntityId(v68.value());
+    b.setVal68(id68);
+    b.setVal74(id68 != mx::kInvalidEntityId);
   } else {
-    b.setVal63(mx::kInvalidEntityId);
-    b.setVal69(false);
+    b.setVal68(mx::kInvalidEntityId);
+    b.setVal74(false);
   }
-  b.setVal70(e.HasNameForLinkage());
-  b.setVal75(e.IsBeingDefined());
-  b.setVal77(e.IsClass());
-  b.setVal79(e.IsCompleteDefinition());
-  b.setVal87(e.IsCompleteDefinitionRequired());
-  b.setVal90(e.IsDependentType());
-  b.setVal91(e.IsEmbeddedInDeclarator());
-  b.setVal92(e.IsEnum());
-  b.setVal93(e.IsFreeStanding());
-  b.setVal94(e.IsInterface());
-  b.setVal95(e.IsStruct());
-  b.setVal96(e.IsUnion());
-  b.setVal97(e.MayHaveOutOfDateDefinition());
+  b.setVal75(e.HasNameForLinkage());
+  b.setVal80(e.IsBeingDefined());
+  b.setVal82(e.IsClass());
+  b.setVal84(e.IsCompleteDefinition());
+  b.setVal92(e.IsCompleteDefinitionRequired());
+  b.setVal95(e.IsDependentType());
+  b.setVal96(e.IsEmbeddedInDeclarator());
+  b.setVal97(e.IsEnum());
+  b.setVal98(e.IsFreeStanding());
+  b.setVal99(e.IsInterface());
+  b.setVal100(e.IsStruct());
+  b.setVal101(e.IsUnion());
+  b.setVal102(e.MayHaveOutOfDateDefinition());
   do {
-    auto v73 = e.TemplateParameterLists();
-    auto sv73 = b.initVal73(static_cast<unsigned>(v73.size()));
-    auto i73 = 0u;
-    for (const auto &e73 : v73) {
-      sv73.set(i73, es.PseudoId(e73));
-      ++i73;
+    auto v78 = e.TemplateParameterLists();
+    auto sv78 = b.initVal78(static_cast<unsigned>(v78.size()));
+    auto i78 = 0u;
+    for (const auto &e78 : v78) {
+      sv78.set(i78, es.PseudoId(e78));
+      ++i78;
     }
   } while (false);
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -5953,35 +9952,35 @@ void SerializeRecordDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta
   (void) b;
   (void) e;
   SerializeTagDecl(es, b, e);
-  b.setVal98(e.CanPassInRegisters());
+  b.setVal103(e.CanPassInRegisters());
   do {
-    auto v46 = e.Fields();
-    auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-    auto i46 = 0u;
-    for (const auto &e46 : v46) {
-      sv46.set(i46, es.EntityId(e46));
-      ++i46;
+    auto v51 = e.Fields();
+    auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+    auto i51 = 0u;
+    for (const auto &e51 : v51) {
+      sv51.set(i51, es.EntityId(e51));
+      ++i51;
     }
   } while (false);
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.ArgumentPassingRestrictions())));
-  b.setVal99(e.HasFlexibleArrayMember());
-  b.setVal100(e.HasLoadedFieldsFromExternalStorage());
-  b.setVal101(e.HasNonTrivialToPrimitiveCopyCUnion());
-  b.setVal102(e.HasNonTrivialToPrimitiveDefaultInitializeCUnion());
-  b.setVal103(e.HasNonTrivialToPrimitiveDestructCUnion());
-  b.setVal104(e.HasObjectMember());
-  b.setVal105(e.HasVolatileMember());
-  b.setVal106(e.IsAnonymousStructOrUnion());
-  b.setVal107(e.IsCapturedRecord());
-  b.setVal108(e.IsInjectedClassName());
-  b.setVal109(e.IsLambda());
-  b.setVal110(e.IsMsStruct());
-  b.setVal111(e.IsNonTrivialToPrimitiveCopy());
-  b.setVal112(e.IsNonTrivialToPrimitiveDefaultInitialize());
-  b.setVal113(e.IsNonTrivialToPrimitiveDestroy());
-  b.setVal114(e.IsOrContainsUnion());
-  b.setVal115(e.IsParameterDestroyedInCallee());
-  b.setVal116(e.MayInsertExtraPadding());
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.ArgumentPassingRestrictions())));
+  b.setVal104(e.HasFlexibleArrayMember());
+  b.setVal105(e.HasLoadedFieldsFromExternalStorage());
+  b.setVal106(e.HasNonTrivialToPrimitiveCopyCUnion());
+  b.setVal107(e.HasNonTrivialToPrimitiveDefaultInitializeCUnion());
+  b.setVal108(e.HasNonTrivialToPrimitiveDestructCUnion());
+  b.setVal109(e.HasObjectMember());
+  b.setVal110(e.HasVolatileMember());
+  b.setVal111(e.IsAnonymousStructOrUnion());
+  b.setVal112(e.IsCapturedRecord());
+  b.setVal113(e.IsInjectedClassName());
+  b.setVal114(e.IsLambda());
+  b.setVal115(e.IsMsStruct());
+  b.setVal116(e.IsNonTrivialToPrimitiveCopy());
+  b.setVal117(e.IsNonTrivialToPrimitiveDefaultInitialize());
+  b.setVal118(e.IsNonTrivialToPrimitiveDestroy());
+  b.setVal119(e.IsOrContainsUnion());
+  b.setVal120(e.IsParameterDestroyedInCallee());
+  b.setVal121(e.MayInsertExtraPadding());
 }
 
 void SerializeCXXRecordDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::CXXRecordDecl &e) {
@@ -5989,834 +9988,841 @@ void SerializeCXXRecordDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pa
   (void) b;
   (void) e;
   SerializeRecordDecl(es, b, e);
-  auto v117 = e.AllowConstDefaultInitializer();
-  if (v117) {
-    b.setVal117(static_cast<bool>(v117.value()));
-    b.setVal118(true);
-  } else {
-    b.setVal118(false);
-  }
-  do {
-    auto ov141 = e.Bases();
-    if (!ov141) {
-      b.setVal119(false);
-      break;
-    }
-    b.setVal119(true);
-    auto v141 = std::move(*ov141);
-    auto sv141 = b.initVal141(static_cast<unsigned>(v141.size()));
-    auto i141 = 0u;
-    for (const auto &e141 : v141) {
-      sv141.set(i141, es.PseudoId(e141));
-      ++i141;
-    }
-  } while (false);
-  auto v82 = e.CalculateInheritanceModel();
-  if (v82) {
-    b.setVal82(static_cast<unsigned char>(v82.value()));
-    b.setVal120(true);
-  } else {
-    b.setVal120(false);
-  }
-  do {
-    auto v57 = e.Constructors();
-    auto sv57 = b.initVal57(static_cast<unsigned>(v57.size()));
-    auto i57 = 0u;
-    for (const auto &e57 : v57) {
-      sv57.set(i57, es.EntityId(e57));
-      ++i57;
-    }
-  } while (false);
-  do {
-    auto ov171 = e.Friends();
-    if (!ov171) {
-      b.setVal121(false);
-      break;
-    }
-    b.setVal121(true);
-    auto v171 = std::move(*ov171);
-    auto sv171 = b.initVal171(static_cast<unsigned>(v171.size()));
-    auto i171 = 0u;
-    for (const auto &e171 : v171) {
-      sv171.set(i171, es.EntityId(e171));
-      ++i171;
-    }
-  } while (false);
-  auto v71 = e.Destructor();
-  if (v71) {
-    auto id71 = es.EntityId(v71.value());    b.setVal71(id71);
-    b.setVal122(id71 != mx::kInvalidEntityId);
-  } else {
-    b.setVal71(mx::kInvalidEntityId);
-    b.setVal122(false);
-  }
-  auto v143 = e.GenericLambdaTemplateParameterList();
-  if (v143) {
-    b.setVal143(es.PseudoId(v143.value()));
+  auto v122 = e.AllowConstDefaultInitializer();
+  if (v122) {
+    b.setVal122(static_cast<bool>(v122.value()));
     b.setVal123(true);
   } else {
     b.setVal123(false);
   }
-  auto v74 = e.InstantiatedFromMemberClass();
-  if (v74) {
-    auto id74 = es.EntityId(v74.value());    b.setVal74(id74);
-    b.setVal124(id74 != mx::kInvalidEntityId);
+  do {
+    auto ov146 = e.Bases();
+    if (!ov146) {
+      b.setVal124(false);
+      break;
+    }
+    b.setVal124(true);
+    auto v146 = std::move(*ov146);
+    auto sv146 = b.initVal146(static_cast<unsigned>(v146.size()));
+    auto i146 = 0u;
+    for (const auto &e146 : v146) {
+      sv146.set(i146, es.PseudoId(e146));
+      ++i146;
+    }
+  } while (false);
+  auto v87 = e.CalculateInheritanceModel();
+  if (v87) {
+    b.setVal87(static_cast<unsigned char>(v87.value()));
+    b.setVal125(true);
   } else {
-    b.setVal74(mx::kInvalidEntityId);
-    b.setVal124(false);
+    b.setVal125(false);
   }
-  auto v76 = e.LambdaCallOperator();
+  do {
+    auto v62 = e.Constructors();
+    auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
+    auto i62 = 0u;
+    for (const auto &e62 : v62) {
+      sv62.set(i62, es.EntityId(e62));
+      ++i62;
+    }
+  } while (false);
+  do {
+    auto ov176 = e.Friends();
+    if (!ov176) {
+      b.setVal126(false);
+      break;
+    }
+    b.setVal126(true);
+    auto v176 = std::move(*ov176);
+    auto sv176 = b.initVal176(static_cast<unsigned>(v176.size()));
+    auto i176 = 0u;
+    for (const auto &e176 : v176) {
+      sv176.set(i176, es.EntityId(e176));
+      ++i176;
+    }
+  } while (false);
+  auto v76 = e.Destructor();
   if (v76) {
-    auto id76 = es.EntityId(v76.value());    b.setVal76(id76);
+    auto id76 = es.EntityId(v76.value());
+    b.setVal76(id76);
     b.setVal127(id76 != mx::kInvalidEntityId);
   } else {
     b.setVal76(mx::kInvalidEntityId);
     b.setVal127(false);
   }
-  auto v83 = e.LambdaCaptureDefault();
-  if (v83) {
-    b.setVal83(static_cast<unsigned char>(v83.value()));
-    b.setVal133(true);
+  auto v148 = e.GenericLambdaTemplateParameterList();
+  if (v148) {
+    b.setVal148(es.PseudoId(v148.value()));
+    b.setVal128(true);
   } else {
-    b.setVal133(false);
+    b.setVal128(false);
   }
-  auto v78 = e.LambdaContextDeclaration();
-  if (v78) {
-    auto id78 = es.EntityId(v78.value());    b.setVal78(id78);
-    b.setVal134(id78 != mx::kInvalidEntityId);
+  auto v79 = e.InstantiatedFromMemberClass();
+  if (v79) {
+    auto id79 = es.EntityId(v79.value());
+    b.setVal79(id79);
+    b.setVal129(id79 != mx::kInvalidEntityId);
   } else {
-    b.setVal78(mx::kInvalidEntityId);
-    b.setVal134(false);
+    b.setVal79(mx::kInvalidEntityId);
+    b.setVal129(false);
   }
-  do {
-    auto ov180 = e.LambdaExplicitTemplateParameters();
-    if (!ov180) {
-      b.setVal135(false);
-      break;
-    }
-    b.setVal135(true);
-    auto v180 = std::move(*ov180);
-    auto sv180 = b.initVal180(static_cast<unsigned>(v180.size()));
-    auto i180 = 0u;
-    for (const auto &e180 : v180) {
-      sv180.set(i180, es.EntityId(e180));
-      ++i180;
-    }
-  } while (false);
-  auto v181 = e.LambdaManglingNumber();
-  if (v181) {
-    b.setVal181(static_cast<unsigned>(v181.value()));
-    b.setVal136(true);
-  } else {
-    b.setVal136(false);
-  }
-  auto v81 = e.LambdaType();
+  auto v81 = e.LambdaCallOperator();
   if (v81) {
-    auto id81 = es.EntityId(v81.value());    b.setVal81(id81);
-    b.setVal137(id81 != mx::kInvalidEntityId);
+    auto id81 = es.EntityId(v81.value());
+    b.setVal81(id81);
+    b.setVal132(id81 != mx::kInvalidEntityId);
   } else {
     b.setVal81(mx::kInvalidEntityId);
-    b.setVal137(false);
+    b.setVal132(false);
   }
-  auto v84 = e.MSInheritanceModel();
-  if (v84) {
-    b.setVal84(static_cast<unsigned char>(v84.value()));
+  auto v88 = e.LambdaCaptureDefault();
+  if (v88) {
+    b.setVal88(static_cast<unsigned char>(v88.value()));
     b.setVal138(true);
   } else {
     b.setVal138(false);
   }
-  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.MSVtorDispMode())));
-  auto v182 = e.NumBases();
-  if (v182) {
-    b.setVal182(static_cast<unsigned>(v182.value()));
-    b.setVal139(true);
+  auto v83 = e.LambdaContextDeclaration();
+  if (v83) {
+    auto id83 = es.EntityId(v83.value());
+    b.setVal83(id83);
+    b.setVal139(id83 != mx::kInvalidEntityId);
   } else {
+    b.setVal83(mx::kInvalidEntityId);
     b.setVal139(false);
   }
-  auto v183 = e.NumVirtualBases();
-  if (v183) {
-    b.setVal183(static_cast<unsigned>(v183.value()));
+  do {
+    auto ov185 = e.LambdaExplicitTemplateParameters();
+    if (!ov185) {
+      b.setVal140(false);
+      break;
+    }
     b.setVal140(true);
+    auto v185 = std::move(*ov185);
+    auto sv185 = b.initVal185(static_cast<unsigned>(v185.size()));
+    auto i185 = 0u;
+    for (const auto &e185 : v185) {
+      sv185.set(i185, es.EntityId(e185));
+      ++i185;
+    }
+  } while (false);
+  auto v186 = e.LambdaManglingNumber();
+  if (v186) {
+    b.setVal186(static_cast<unsigned>(v186.value()));
+    b.setVal141(true);
   } else {
-    b.setVal140(false);
+    b.setVal141(false);
   }
-  auto v184 = e.ODRHash();
-  if (v184) {
-    b.setVal184(static_cast<unsigned>(v184.value()));
-    b.setVal146(true);
-  } else {
-    b.setVal146(false);
-  }
-  auto v86 = e.TemplateInstantiationPattern();
+  auto v86 = e.LambdaType();
   if (v86) {
-    auto id86 = es.EntityId(v86.value());    b.setVal86(id86);
-    b.setVal147(id86 != mx::kInvalidEntityId);
+    auto id86 = es.EntityId(v86.value());
+    b.setVal86(id86);
+    b.setVal142(id86 != mx::kInvalidEntityId);
   } else {
     b.setVal86(mx::kInvalidEntityId);
-    b.setVal147(false);
+    b.setVal142(false);
   }
-  b.setVal88(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
-  auto v148 = e.HasAnyDependentBases();
-  if (v148) {
-    b.setVal148(static_cast<bool>(v148.value()));
-    b.setVal149(true);
+  auto v89 = e.MSInheritanceModel();
+  if (v89) {
+    b.setVal89(static_cast<unsigned char>(v89.value()));
+    b.setVal143(true);
   } else {
-    b.setVal149(false);
+    b.setVal143(false);
   }
-  auto v150 = e.HasConstexprDefaultConstructor();
-  if (v150) {
-    b.setVal150(static_cast<bool>(v150.value()));
+  b.setVal90(static_cast<unsigned char>(mx::FromPasta(e.MSVtorDispMode())));
+  auto v187 = e.NumBases();
+  if (v187) {
+    b.setVal187(static_cast<unsigned>(v187.value()));
+    b.setVal144(true);
+  } else {
+    b.setVal144(false);
+  }
+  auto v188 = e.NumVirtualBases();
+  if (v188) {
+    b.setVal188(static_cast<unsigned>(v188.value()));
+    b.setVal145(true);
+  } else {
+    b.setVal145(false);
+  }
+  auto v189 = e.ODRHash();
+  if (v189) {
+    b.setVal189(static_cast<unsigned>(v189.value()));
     b.setVal151(true);
   } else {
     b.setVal151(false);
   }
-  auto v152 = e.HasConstexprDestructor();
-  if (v152) {
-    b.setVal152(static_cast<bool>(v152.value()));
-    b.setVal153(true);
+  auto v91 = e.TemplateInstantiationPattern();
+  if (v91) {
+    auto id91 = es.EntityId(v91.value());
+    b.setVal91(id91);
+    b.setVal152(id91 != mx::kInvalidEntityId);
   } else {
-    b.setVal153(false);
+    b.setVal91(mx::kInvalidEntityId);
+    b.setVal152(false);
   }
-  auto v154 = e.HasConstexprNonCopyMoveConstructor();
-  if (v154) {
-    b.setVal154(static_cast<bool>(v154.value()));
-    b.setVal155(true);
+  b.setVal93(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
+  auto v153 = e.HasAnyDependentBases();
+  if (v153) {
+    b.setVal153(static_cast<bool>(v153.value()));
+    b.setVal154(true);
   } else {
-    b.setVal155(false);
+    b.setVal154(false);
   }
-  auto v156 = e.HasCopyAssignmentWithConstParameter();
-  if (v156) {
-    b.setVal156(static_cast<bool>(v156.value()));
+  auto v155 = e.HasConstexprDefaultConstructor();
+  if (v155) {
+    b.setVal155(static_cast<bool>(v155.value()));
+    b.setVal156(true);
+  } else {
+    b.setVal156(false);
+  }
+  auto v157 = e.HasConstexprDestructor();
+  if (v157) {
+    b.setVal157(static_cast<bool>(v157.value()));
     b.setVal158(true);
   } else {
     b.setVal158(false);
   }
-  auto v160 = e.HasCopyConstructorWithConstParameter();
-  if (v160) {
-    b.setVal160(static_cast<bool>(v160.value()));
-    b.setVal162(true);
+  auto v159 = e.HasConstexprNonCopyMoveConstructor();
+  if (v159) {
+    b.setVal159(static_cast<bool>(v159.value()));
+    b.setVal160(true);
   } else {
-    b.setVal162(false);
+    b.setVal160(false);
   }
-  auto v163 = e.HasDefaultConstructor();
-  if (v163) {
-    b.setVal163(static_cast<bool>(v163.value()));
-    b.setVal164(true);
+  auto v161 = e.HasCopyAssignmentWithConstParameter();
+  if (v161) {
+    b.setVal161(static_cast<bool>(v161.value()));
+    b.setVal163(true);
   } else {
-    b.setVal164(false);
+    b.setVal163(false);
   }
-  auto v165 = e.HasDefinition();
+  auto v165 = e.HasCopyConstructorWithConstParameter();
   if (v165) {
     b.setVal165(static_cast<bool>(v165.value()));
-    b.setVal166(true);
+    b.setVal167(true);
   } else {
-    b.setVal166(false);
+    b.setVal167(false);
   }
-  auto v167 = e.HasDirectFields();
-  if (v167) {
-    b.setVal167(static_cast<bool>(v167.value()));
-    b.setVal168(true);
+  auto v168 = e.HasDefaultConstructor();
+  if (v168) {
+    b.setVal168(static_cast<bool>(v168.value()));
+    b.setVal169(true);
   } else {
-    b.setVal168(false);
+    b.setVal169(false);
   }
-  auto v169 = e.HasFriends();
-  if (v169) {
-    b.setVal169(static_cast<bool>(v169.value()));
-    b.setVal170(true);
+  auto v170 = e.HasDefinition();
+  if (v170) {
+    b.setVal170(static_cast<bool>(v170.value()));
+    b.setVal171(true);
   } else {
-    b.setVal170(false);
+    b.setVal171(false);
   }
-  auto v173 = e.HasInClassInitializer();
-  if (v173) {
-    b.setVal173(static_cast<bool>(v173.value()));
+  auto v172 = e.HasDirectFields();
+  if (v172) {
+    b.setVal172(static_cast<bool>(v172.value()));
+    b.setVal173(true);
+  } else {
+    b.setVal173(false);
+  }
+  auto v174 = e.HasFriends();
+  if (v174) {
+    b.setVal174(static_cast<bool>(v174.value()));
     b.setVal175(true);
   } else {
     b.setVal175(false);
   }
-  auto v176 = e.HasInheritedAssignment();
-  if (v176) {
-    b.setVal176(static_cast<bool>(v176.value()));
-    b.setVal177(true);
-  } else {
-    b.setVal177(false);
-  }
-  auto v178 = e.HasInheritedConstructor();
+  auto v178 = e.HasInClassInitializer();
   if (v178) {
     b.setVal178(static_cast<bool>(v178.value()));
-    b.setVal179(true);
+    b.setVal180(true);
   } else {
-    b.setVal179(false);
+    b.setVal180(false);
   }
-  auto v185 = e.HasInitializerMethod();
-  if (v185) {
-    b.setVal185(static_cast<bool>(v185.value()));
-    b.setVal186(true);
+  auto v181 = e.HasInheritedAssignment();
+  if (v181) {
+    b.setVal181(static_cast<bool>(v181.value()));
+    b.setVal182(true);
   } else {
-    b.setVal186(false);
+    b.setVal182(false);
   }
-  auto v187 = e.HasIrrelevantDestructor();
-  if (v187) {
-    b.setVal187(static_cast<bool>(v187.value()));
-    b.setVal188(true);
+  auto v183 = e.HasInheritedConstructor();
+  if (v183) {
+    b.setVal183(static_cast<bool>(v183.value()));
+    b.setVal184(true);
   } else {
-    b.setVal188(false);
+    b.setVal184(false);
   }
-  auto v189 = e.HasKnownLambdaInternalLinkage();
-  if (v189) {
-    b.setVal189(static_cast<bool>(v189.value()));
-    b.setVal190(true);
+  auto v190 = e.HasInitializerMethod();
+  if (v190) {
+    b.setVal190(static_cast<bool>(v190.value()));
+    b.setVal191(true);
   } else {
-    b.setVal190(false);
+    b.setVal191(false);
   }
-  auto v191 = e.HasMoveAssignment();
-  if (v191) {
-    b.setVal191(static_cast<bool>(v191.value()));
-    b.setVal192(true);
+  auto v192 = e.HasIrrelevantDestructor();
+  if (v192) {
+    b.setVal192(static_cast<bool>(v192.value()));
+    b.setVal193(true);
   } else {
-    b.setVal192(false);
+    b.setVal193(false);
   }
-  auto v193 = e.HasMoveConstructor();
-  if (v193) {
-    b.setVal193(static_cast<bool>(v193.value()));
-    b.setVal194(true);
+  auto v194 = e.HasKnownLambdaInternalLinkage();
+  if (v194) {
+    b.setVal194(static_cast<bool>(v194.value()));
+    b.setVal195(true);
   } else {
-    b.setVal194(false);
+    b.setVal195(false);
   }
-  auto v195 = e.HasMutableFields();
-  if (v195) {
-    b.setVal195(static_cast<bool>(v195.value()));
-    b.setVal196(true);
+  auto v196 = e.HasMoveAssignment();
+  if (v196) {
+    b.setVal196(static_cast<bool>(v196.value()));
+    b.setVal197(true);
   } else {
-    b.setVal196(false);
+    b.setVal197(false);
   }
-  auto v197 = e.HasNonLiteralTypeFieldsOrBases();
-  if (v197) {
-    b.setVal197(static_cast<bool>(v197.value()));
-    b.setVal198(true);
+  auto v198 = e.HasMoveConstructor();
+  if (v198) {
+    b.setVal198(static_cast<bool>(v198.value()));
+    b.setVal199(true);
   } else {
-    b.setVal198(false);
+    b.setVal199(false);
   }
-  auto v199 = e.HasNonTrivialCopyAssignment();
-  if (v199) {
-    b.setVal199(static_cast<bool>(v199.value()));
-    b.setVal200(true);
+  auto v200 = e.HasMutableFields();
+  if (v200) {
+    b.setVal200(static_cast<bool>(v200.value()));
+    b.setVal201(true);
   } else {
-    b.setVal200(false);
+    b.setVal201(false);
   }
-  auto v201 = e.HasNonTrivialCopyConstructor();
-  if (v201) {
-    b.setVal201(static_cast<bool>(v201.value()));
-    b.setVal202(true);
+  auto v202 = e.HasNonLiteralTypeFieldsOrBases();
+  if (v202) {
+    b.setVal202(static_cast<bool>(v202.value()));
+    b.setVal203(true);
   } else {
-    b.setVal202(false);
+    b.setVal203(false);
   }
-  auto v203 = e.HasNonTrivialCopyConstructorForCall();
-  if (v203) {
-    b.setVal203(static_cast<bool>(v203.value()));
-    b.setVal204(true);
+  auto v204 = e.HasNonTrivialCopyAssignment();
+  if (v204) {
+    b.setVal204(static_cast<bool>(v204.value()));
+    b.setVal205(true);
   } else {
-    b.setVal204(false);
+    b.setVal205(false);
   }
-  auto v205 = e.HasNonTrivialDefaultConstructor();
-  if (v205) {
-    b.setVal205(static_cast<bool>(v205.value()));
-    b.setVal206(true);
+  auto v206 = e.HasNonTrivialCopyConstructor();
+  if (v206) {
+    b.setVal206(static_cast<bool>(v206.value()));
+    b.setVal207(true);
   } else {
-    b.setVal206(false);
+    b.setVal207(false);
   }
-  auto v207 = e.HasNonTrivialDestructor();
-  if (v207) {
-    b.setVal207(static_cast<bool>(v207.value()));
-    b.setVal208(true);
+  auto v208 = e.HasNonTrivialCopyConstructorForCall();
+  if (v208) {
+    b.setVal208(static_cast<bool>(v208.value()));
+    b.setVal209(true);
   } else {
-    b.setVal208(false);
+    b.setVal209(false);
   }
-  auto v209 = e.HasNonTrivialDestructorForCall();
-  if (v209) {
-    b.setVal209(static_cast<bool>(v209.value()));
-    b.setVal210(true);
+  auto v210 = e.HasNonTrivialDefaultConstructor();
+  if (v210) {
+    b.setVal210(static_cast<bool>(v210.value()));
+    b.setVal211(true);
   } else {
-    b.setVal210(false);
+    b.setVal211(false);
   }
-  auto v211 = e.HasNonTrivialMoveAssignment();
-  if (v211) {
-    b.setVal211(static_cast<bool>(v211.value()));
-    b.setVal212(true);
+  auto v212 = e.HasNonTrivialDestructor();
+  if (v212) {
+    b.setVal212(static_cast<bool>(v212.value()));
+    b.setVal213(true);
   } else {
-    b.setVal212(false);
+    b.setVal213(false);
   }
-  auto v213 = e.HasNonTrivialMoveConstructor();
-  if (v213) {
-    b.setVal213(static_cast<bool>(v213.value()));
-    b.setVal214(true);
+  auto v214 = e.HasNonTrivialDestructorForCall();
+  if (v214) {
+    b.setVal214(static_cast<bool>(v214.value()));
+    b.setVal215(true);
   } else {
-    b.setVal214(false);
+    b.setVal215(false);
   }
-  auto v215 = e.HasNonTrivialMoveConstructorForCall();
-  if (v215) {
-    b.setVal215(static_cast<bool>(v215.value()));
-    b.setVal216(true);
+  auto v216 = e.HasNonTrivialMoveAssignment();
+  if (v216) {
+    b.setVal216(static_cast<bool>(v216.value()));
+    b.setVal217(true);
   } else {
-    b.setVal216(false);
+    b.setVal217(false);
   }
-  auto v217 = e.HasPrivateFields();
-  if (v217) {
-    b.setVal217(static_cast<bool>(v217.value()));
-    b.setVal218(true);
+  auto v218 = e.HasNonTrivialMoveConstructor();
+  if (v218) {
+    b.setVal218(static_cast<bool>(v218.value()));
+    b.setVal219(true);
   } else {
-    b.setVal218(false);
+    b.setVal219(false);
   }
-  auto v219 = e.HasProtectedFields();
-  if (v219) {
-    b.setVal219(static_cast<bool>(v219.value()));
-    b.setVal220(true);
+  auto v220 = e.HasNonTrivialMoveConstructorForCall();
+  if (v220) {
+    b.setVal220(static_cast<bool>(v220.value()));
+    b.setVal221(true);
   } else {
-    b.setVal220(false);
+    b.setVal221(false);
   }
-  auto v221 = e.HasSimpleCopyAssignment();
-  if (v221) {
-    b.setVal221(static_cast<bool>(v221.value()));
-    b.setVal222(true);
+  auto v222 = e.HasPrivateFields();
+  if (v222) {
+    b.setVal222(static_cast<bool>(v222.value()));
+    b.setVal223(true);
   } else {
-    b.setVal222(false);
+    b.setVal223(false);
   }
-  auto v223 = e.HasSimpleCopyConstructor();
-  if (v223) {
-    b.setVal223(static_cast<bool>(v223.value()));
-    b.setVal224(true);
+  auto v224 = e.HasProtectedFields();
+  if (v224) {
+    b.setVal224(static_cast<bool>(v224.value()));
+    b.setVal225(true);
   } else {
-    b.setVal224(false);
+    b.setVal225(false);
   }
-  auto v225 = e.HasSimpleDestructor();
-  if (v225) {
-    b.setVal225(static_cast<bool>(v225.value()));
-    b.setVal226(true);
+  auto v226 = e.HasSimpleCopyAssignment();
+  if (v226) {
+    b.setVal226(static_cast<bool>(v226.value()));
+    b.setVal227(true);
   } else {
-    b.setVal226(false);
+    b.setVal227(false);
   }
-  auto v227 = e.HasSimpleMoveAssignment();
-  if (v227) {
-    b.setVal227(static_cast<bool>(v227.value()));
-    b.setVal228(true);
+  auto v228 = e.HasSimpleCopyConstructor();
+  if (v228) {
+    b.setVal228(static_cast<bool>(v228.value()));
+    b.setVal229(true);
   } else {
-    b.setVal228(false);
+    b.setVal229(false);
   }
-  auto v229 = e.HasSimpleMoveConstructor();
-  if (v229) {
-    b.setVal229(static_cast<bool>(v229.value()));
-    b.setVal230(true);
+  auto v230 = e.HasSimpleDestructor();
+  if (v230) {
+    b.setVal230(static_cast<bool>(v230.value()));
+    b.setVal231(true);
   } else {
-    b.setVal230(false);
+    b.setVal231(false);
   }
-  auto v231 = e.HasTrivialCopyAssignment();
-  if (v231) {
-    b.setVal231(static_cast<bool>(v231.value()));
-    b.setVal232(true);
+  auto v232 = e.HasSimpleMoveAssignment();
+  if (v232) {
+    b.setVal232(static_cast<bool>(v232.value()));
+    b.setVal233(true);
   } else {
-    b.setVal232(false);
+    b.setVal233(false);
   }
-  auto v233 = e.HasTrivialCopyConstructor();
-  if (v233) {
-    b.setVal233(static_cast<bool>(v233.value()));
-    b.setVal234(true);
+  auto v234 = e.HasSimpleMoveConstructor();
+  if (v234) {
+    b.setVal234(static_cast<bool>(v234.value()));
+    b.setVal235(true);
   } else {
-    b.setVal234(false);
+    b.setVal235(false);
   }
-  auto v235 = e.HasTrivialCopyConstructorForCall();
-  if (v235) {
-    b.setVal235(static_cast<bool>(v235.value()));
-    b.setVal236(true);
+  auto v236 = e.HasTrivialCopyAssignment();
+  if (v236) {
+    b.setVal236(static_cast<bool>(v236.value()));
+    b.setVal237(true);
   } else {
-    b.setVal236(false);
+    b.setVal237(false);
   }
-  auto v237 = e.HasTrivialDefaultConstructor();
-  if (v237) {
-    b.setVal237(static_cast<bool>(v237.value()));
-    b.setVal238(true);
+  auto v238 = e.HasTrivialCopyConstructor();
+  if (v238) {
+    b.setVal238(static_cast<bool>(v238.value()));
+    b.setVal239(true);
   } else {
-    b.setVal238(false);
+    b.setVal239(false);
   }
-  auto v239 = e.HasTrivialDestructor();
-  if (v239) {
-    b.setVal239(static_cast<bool>(v239.value()));
-    b.setVal240(true);
+  auto v240 = e.HasTrivialCopyConstructorForCall();
+  if (v240) {
+    b.setVal240(static_cast<bool>(v240.value()));
+    b.setVal241(true);
   } else {
-    b.setVal240(false);
+    b.setVal241(false);
   }
-  auto v241 = e.HasTrivialDestructorForCall();
-  if (v241) {
-    b.setVal241(static_cast<bool>(v241.value()));
-    b.setVal242(true);
+  auto v242 = e.HasTrivialDefaultConstructor();
+  if (v242) {
+    b.setVal242(static_cast<bool>(v242.value()));
+    b.setVal243(true);
   } else {
-    b.setVal242(false);
+    b.setVal243(false);
   }
-  auto v243 = e.HasTrivialMoveAssignment();
-  if (v243) {
-    b.setVal243(static_cast<bool>(v243.value()));
-    b.setVal244(true);
+  auto v244 = e.HasTrivialDestructor();
+  if (v244) {
+    b.setVal244(static_cast<bool>(v244.value()));
+    b.setVal245(true);
   } else {
-    b.setVal244(false);
+    b.setVal245(false);
   }
-  auto v245 = e.HasTrivialMoveConstructor();
-  if (v245) {
-    b.setVal245(static_cast<bool>(v245.value()));
-    b.setVal246(true);
+  auto v246 = e.HasTrivialDestructorForCall();
+  if (v246) {
+    b.setVal246(static_cast<bool>(v246.value()));
+    b.setVal247(true);
   } else {
-    b.setVal246(false);
+    b.setVal247(false);
   }
-  auto v247 = e.HasTrivialMoveConstructorForCall();
-  if (v247) {
-    b.setVal247(static_cast<bool>(v247.value()));
-    b.setVal248(true);
+  auto v248 = e.HasTrivialMoveAssignment();
+  if (v248) {
+    b.setVal248(static_cast<bool>(v248.value()));
+    b.setVal249(true);
   } else {
-    b.setVal248(false);
+    b.setVal249(false);
   }
-  auto v249 = e.HasUninitializedReferenceMember();
-  if (v249) {
-    b.setVal249(static_cast<bool>(v249.value()));
-    b.setVal250(true);
+  auto v250 = e.HasTrivialMoveConstructor();
+  if (v250) {
+    b.setVal250(static_cast<bool>(v250.value()));
+    b.setVal251(true);
   } else {
-    b.setVal250(false);
+    b.setVal251(false);
   }
-  auto v251 = e.HasUserDeclaredConstructor();
-  if (v251) {
-    b.setVal251(static_cast<bool>(v251.value()));
-    b.setVal252(true);
+  auto v252 = e.HasTrivialMoveConstructorForCall();
+  if (v252) {
+    b.setVal252(static_cast<bool>(v252.value()));
+    b.setVal253(true);
   } else {
-    b.setVal252(false);
+    b.setVal253(false);
   }
-  auto v253 = e.HasUserDeclaredCopyAssignment();
-  if (v253) {
-    b.setVal253(static_cast<bool>(v253.value()));
-    b.setVal254(true);
+  auto v254 = e.HasUninitializedReferenceMember();
+  if (v254) {
+    b.setVal254(static_cast<bool>(v254.value()));
+    b.setVal255(true);
   } else {
-    b.setVal254(false);
+    b.setVal255(false);
   }
-  auto v255 = e.HasUserDeclaredCopyConstructor();
-  if (v255) {
-    b.setVal255(static_cast<bool>(v255.value()));
-    b.setVal256(true);
+  auto v256 = e.HasUserDeclaredConstructor();
+  if (v256) {
+    b.setVal256(static_cast<bool>(v256.value()));
+    b.setVal257(true);
   } else {
-    b.setVal256(false);
+    b.setVal257(false);
   }
-  auto v257 = e.HasUserDeclaredDestructor();
-  if (v257) {
-    b.setVal257(static_cast<bool>(v257.value()));
-    b.setVal258(true);
+  auto v258 = e.HasUserDeclaredCopyAssignment();
+  if (v258) {
+    b.setVal258(static_cast<bool>(v258.value()));
+    b.setVal259(true);
   } else {
-    b.setVal258(false);
+    b.setVal259(false);
   }
-  auto v259 = e.HasUserDeclaredMoveAssignment();
-  if (v259) {
-    b.setVal259(static_cast<bool>(v259.value()));
-    b.setVal260(true);
+  auto v260 = e.HasUserDeclaredCopyConstructor();
+  if (v260) {
+    b.setVal260(static_cast<bool>(v260.value()));
+    b.setVal261(true);
   } else {
-    b.setVal260(false);
+    b.setVal261(false);
   }
-  auto v261 = e.HasUserDeclaredMoveConstructor();
-  if (v261) {
-    b.setVal261(static_cast<bool>(v261.value()));
-    b.setVal262(true);
+  auto v262 = e.HasUserDeclaredDestructor();
+  if (v262) {
+    b.setVal262(static_cast<bool>(v262.value()));
+    b.setVal263(true);
   } else {
-    b.setVal262(false);
+    b.setVal263(false);
   }
-  auto v263 = e.HasUserDeclaredMoveOperation();
-  if (v263) {
-    b.setVal263(static_cast<bool>(v263.value()));
-    b.setVal264(true);
+  auto v264 = e.HasUserDeclaredMoveAssignment();
+  if (v264) {
+    b.setVal264(static_cast<bool>(v264.value()));
+    b.setVal265(true);
   } else {
-    b.setVal264(false);
+    b.setVal265(false);
   }
-  auto v265 = e.HasUserProvidedDefaultConstructor();
-  if (v265) {
-    b.setVal265(static_cast<bool>(v265.value()));
-    b.setVal266(true);
+  auto v266 = e.HasUserDeclaredMoveConstructor();
+  if (v266) {
+    b.setVal266(static_cast<bool>(v266.value()));
+    b.setVal267(true);
   } else {
-    b.setVal266(false);
+    b.setVal267(false);
   }
-  auto v267 = e.HasVariantMembers();
-  if (v267) {
-    b.setVal267(static_cast<bool>(v267.value()));
-    b.setVal268(true);
+  auto v268 = e.HasUserDeclaredMoveOperation();
+  if (v268) {
+    b.setVal268(static_cast<bool>(v268.value()));
+    b.setVal269(true);
   } else {
-    b.setVal268(false);
+    b.setVal269(false);
   }
-  auto v269 = e.ImplicitCopyAssignmentHasConstParameter();
-  if (v269) {
-    b.setVal269(static_cast<bool>(v269.value()));
-    b.setVal270(true);
+  auto v270 = e.HasUserProvidedDefaultConstructor();
+  if (v270) {
+    b.setVal270(static_cast<bool>(v270.value()));
+    b.setVal271(true);
   } else {
-    b.setVal270(false);
+    b.setVal271(false);
   }
-  auto v271 = e.ImplicitCopyConstructorHasConstParameter();
-  if (v271) {
-    b.setVal271(static_cast<bool>(v271.value()));
-    b.setVal272(true);
+  auto v272 = e.HasVariantMembers();
+  if (v272) {
+    b.setVal272(static_cast<bool>(v272.value()));
+    b.setVal273(true);
   } else {
-    b.setVal272(false);
+    b.setVal273(false);
   }
-  auto v273 = e.IsAbstract();
-  if (v273) {
-    b.setVal273(static_cast<bool>(v273.value()));
-    b.setVal274(true);
+  auto v274 = e.ImplicitCopyAssignmentHasConstParameter();
+  if (v274) {
+    b.setVal274(static_cast<bool>(v274.value()));
+    b.setVal275(true);
   } else {
-    b.setVal274(false);
+    b.setVal275(false);
   }
-  auto v275 = e.IsAggregate();
-  if (v275) {
-    b.setVal275(static_cast<bool>(v275.value()));
-    b.setVal276(true);
+  auto v276 = e.ImplicitCopyConstructorHasConstParameter();
+  if (v276) {
+    b.setVal276(static_cast<bool>(v276.value()));
+    b.setVal277(true);
   } else {
-    b.setVal276(false);
+    b.setVal277(false);
   }
-  auto v277 = e.IsAnyDestructorNoReturn();
-  if (v277) {
-    b.setVal277(static_cast<bool>(v277.value()));
-    b.setVal278(true);
+  auto v278 = e.IsAbstract();
+  if (v278) {
+    b.setVal278(static_cast<bool>(v278.value()));
+    b.setVal279(true);
   } else {
-    b.setVal278(false);
+    b.setVal279(false);
   }
-  auto v279 = e.IsCLike();
-  if (v279) {
-    b.setVal279(static_cast<bool>(v279.value()));
-    b.setVal280(true);
+  auto v280 = e.IsAggregate();
+  if (v280) {
+    b.setVal280(static_cast<bool>(v280.value()));
+    b.setVal281(true);
   } else {
-    b.setVal280(false);
+    b.setVal281(false);
   }
-  auto v281 = e.IsCXX11StandardLayout();
-  if (v281) {
-    b.setVal281(static_cast<bool>(v281.value()));
-    b.setVal282(true);
+  auto v282 = e.IsAnyDestructorNoReturn();
+  if (v282) {
+    b.setVal282(static_cast<bool>(v282.value()));
+    b.setVal283(true);
   } else {
-    b.setVal282(false);
+    b.setVal283(false);
   }
-  b.setVal283(e.IsDependentLambda());
-  auto v284 = e.IsDynamicClass();
+  auto v284 = e.IsCLike();
   if (v284) {
     b.setVal284(static_cast<bool>(v284.value()));
     b.setVal285(true);
   } else {
     b.setVal285(false);
   }
-  auto v286 = e.IsEffectivelyFinal();
+  auto v286 = e.IsCXX11StandardLayout();
   if (v286) {
     b.setVal286(static_cast<bool>(v286.value()));
     b.setVal287(true);
   } else {
     b.setVal287(false);
   }
-  auto v288 = e.IsEmpty();
-  if (v288) {
-    b.setVal288(static_cast<bool>(v288.value()));
-    b.setVal289(true);
+  b.setVal288(e.IsDependentLambda());
+  auto v289 = e.IsDynamicClass();
+  if (v289) {
+    b.setVal289(static_cast<bool>(v289.value()));
+    b.setVal290(true);
   } else {
-    b.setVal289(false);
+    b.setVal290(false);
   }
-  b.setVal290(e.IsGenericLambda());
-  auto v291 = e.IsInterfaceLike();
+  auto v291 = e.IsEffectivelyFinal();
   if (v291) {
     b.setVal291(static_cast<bool>(v291.value()));
     b.setVal292(true);
   } else {
     b.setVal292(false);
   }
-  auto v293 = e.IsLiteral();
+  auto v293 = e.IsEmpty();
   if (v293) {
     b.setVal293(static_cast<bool>(v293.value()));
     b.setVal294(true);
   } else {
     b.setVal294(false);
   }
-  auto v126 = e.IsLocalClass();
-  if (v126) {
-    auto id126 = es.EntityId(v126.value());    b.setVal126(id126);
-    b.setVal295(id126 != mx::kInvalidEntityId);
-  } else {
-    b.setVal126(mx::kInvalidEntityId);
-    b.setVal295(false);
-  }
-  auto v296 = e.IsPOD();
+  b.setVal295(e.IsGenericLambda());
+  auto v296 = e.IsInterfaceLike();
   if (v296) {
     b.setVal296(static_cast<bool>(v296.value()));
     b.setVal297(true);
   } else {
     b.setVal297(false);
   }
-  auto v298 = e.IsPolymorphic();
+  auto v298 = e.IsLiteral();
   if (v298) {
     b.setVal298(static_cast<bool>(v298.value()));
     b.setVal299(true);
   } else {
     b.setVal299(false);
   }
-  auto v300 = e.IsStandardLayout();
-  if (v300) {
-    b.setVal300(static_cast<bool>(v300.value()));
-    b.setVal301(true);
+  auto v131 = e.IsLocalClass();
+  if (v131) {
+    auto id131 = es.EntityId(v131.value());
+    b.setVal131(id131);
+    b.setVal300(id131 != mx::kInvalidEntityId);
   } else {
-    b.setVal301(false);
+    b.setVal131(mx::kInvalidEntityId);
+    b.setVal300(false);
   }
-  auto v302 = e.IsStructural();
-  if (v302) {
-    b.setVal302(static_cast<bool>(v302.value()));
-    b.setVal303(true);
+  auto v301 = e.IsPOD();
+  if (v301) {
+    b.setVal301(static_cast<bool>(v301.value()));
+    b.setVal302(true);
   } else {
-    b.setVal303(false);
+    b.setVal302(false);
   }
-  auto v304 = e.IsTrivial();
-  if (v304) {
-    b.setVal304(static_cast<bool>(v304.value()));
-    b.setVal305(true);
+  auto v303 = e.IsPolymorphic();
+  if (v303) {
+    b.setVal303(static_cast<bool>(v303.value()));
+    b.setVal304(true);
   } else {
-    b.setVal305(false);
+    b.setVal304(false);
   }
-  auto v306 = e.IsTriviallyCopyable();
-  if (v306) {
-    b.setVal306(static_cast<bool>(v306.value()));
-    b.setVal307(true);
+  auto v305 = e.IsStandardLayout();
+  if (v305) {
+    b.setVal305(static_cast<bool>(v305.value()));
+    b.setVal306(true);
   } else {
-    b.setVal307(false);
+    b.setVal306(false);
   }
-  auto v308 = e.LambdaIsDefaultConstructibleAndAssignable();
-  if (v308) {
-    b.setVal308(static_cast<bool>(v308.value()));
-    b.setVal309(true);
+  auto v307 = e.IsStructural();
+  if (v307) {
+    b.setVal307(static_cast<bool>(v307.value()));
+    b.setVal308(true);
   } else {
-    b.setVal309(false);
+    b.setVal308(false);
   }
-  auto v310 = e.MayBeAbstract();
-  if (v310) {
-    b.setVal310(static_cast<bool>(v310.value()));
-    b.setVal311(true);
+  auto v309 = e.IsTrivial();
+  if (v309) {
+    b.setVal309(static_cast<bool>(v309.value()));
+    b.setVal310(true);
   } else {
-    b.setVal311(false);
+    b.setVal310(false);
   }
-  auto v312 = e.MayBeDynamicClass();
-  if (v312) {
-    b.setVal312(static_cast<bool>(v312.value()));
-    b.setVal313(true);
+  auto v311 = e.IsTriviallyCopyable();
+  if (v311) {
+    b.setVal311(static_cast<bool>(v311.value()));
+    b.setVal312(true);
   } else {
-    b.setVal313(false);
+    b.setVal312(false);
   }
-  auto v314 = e.MayBeNonDynamicClass();
-  if (v314) {
-    b.setVal314(static_cast<bool>(v314.value()));
-    b.setVal315(true);
+  auto v313 = e.LambdaIsDefaultConstructibleAndAssignable();
+  if (v313) {
+    b.setVal313(static_cast<bool>(v313.value()));
+    b.setVal314(true);
   } else {
-    b.setVal315(false);
+    b.setVal314(false);
+  }
+  auto v315 = e.MayBeAbstract();
+  if (v315) {
+    b.setVal315(static_cast<bool>(v315.value()));
+    b.setVal316(true);
+  } else {
+    b.setVal316(false);
+  }
+  auto v317 = e.MayBeDynamicClass();
+  if (v317) {
+    b.setVal317(static_cast<bool>(v317.value()));
+    b.setVal318(true);
+  } else {
+    b.setVal318(false);
+  }
+  auto v319 = e.MayBeNonDynamicClass();
+  if (v319) {
+    b.setVal319(static_cast<bool>(v319.value()));
+    b.setVal320(true);
+  } else {
+    b.setVal320(false);
   }
   do {
-    auto ov316 = e.Methods();
-    if (!ov316) {
-      b.setVal317(false);
+    auto ov321 = e.Methods();
+    if (!ov321) {
+      b.setVal322(false);
       break;
     }
-    b.setVal317(true);
-    auto v316 = std::move(*ov316);
-    auto sv316 = b.initVal316(static_cast<unsigned>(v316.size()));
-    auto i316 = 0u;
-    for (const auto &e316 : v316) {
-      sv316.set(i316, es.EntityId(e316));
-      ++i316;
+    b.setVal322(true);
+    auto v321 = std::move(*ov321);
+    auto sv321 = b.initVal321(static_cast<unsigned>(v321.size()));
+    auto i321 = 0u;
+    for (const auto &e321 : v321) {
+      sv321.set(i321, es.EntityId(e321));
+      ++i321;
     }
   } while (false);
-  auto v318 = e.NeedsImplicitCopyAssignment();
-  if (v318) {
-    b.setVal318(static_cast<bool>(v318.value()));
-    b.setVal319(true);
+  auto v323 = e.NeedsImplicitCopyAssignment();
+  if (v323) {
+    b.setVal323(static_cast<bool>(v323.value()));
+    b.setVal324(true);
   } else {
-    b.setVal319(false);
+    b.setVal324(false);
   }
-  auto v320 = e.NeedsImplicitCopyConstructor();
-  if (v320) {
-    b.setVal320(static_cast<bool>(v320.value()));
-    b.setVal321(true);
+  auto v325 = e.NeedsImplicitCopyConstructor();
+  if (v325) {
+    b.setVal325(static_cast<bool>(v325.value()));
+    b.setVal326(true);
   } else {
-    b.setVal321(false);
+    b.setVal326(false);
   }
-  auto v322 = e.NeedsImplicitDefaultConstructor();
-  if (v322) {
-    b.setVal322(static_cast<bool>(v322.value()));
-    b.setVal323(true);
+  auto v327 = e.NeedsImplicitDefaultConstructor();
+  if (v327) {
+    b.setVal327(static_cast<bool>(v327.value()));
+    b.setVal328(true);
   } else {
-    b.setVal323(false);
+    b.setVal328(false);
   }
-  auto v324 = e.NeedsImplicitDestructor();
-  if (v324) {
-    b.setVal324(static_cast<bool>(v324.value()));
-    b.setVal325(true);
+  auto v329 = e.NeedsImplicitDestructor();
+  if (v329) {
+    b.setVal329(static_cast<bool>(v329.value()));
+    b.setVal330(true);
   } else {
-    b.setVal325(false);
+    b.setVal330(false);
   }
-  auto v326 = e.NeedsImplicitMoveAssignment();
-  if (v326) {
-    b.setVal326(static_cast<bool>(v326.value()));
-    b.setVal327(true);
+  auto v331 = e.NeedsImplicitMoveAssignment();
+  if (v331) {
+    b.setVal331(static_cast<bool>(v331.value()));
+    b.setVal332(true);
   } else {
-    b.setVal327(false);
+    b.setVal332(false);
   }
-  auto v328 = e.NeedsImplicitMoveConstructor();
-  if (v328) {
-    b.setVal328(static_cast<bool>(v328.value()));
-    b.setVal329(true);
+  auto v333 = e.NeedsImplicitMoveConstructor();
+  if (v333) {
+    b.setVal333(static_cast<bool>(v333.value()));
+    b.setVal334(true);
   } else {
-    b.setVal329(false);
+    b.setVal334(false);
   }
-  auto v330 = e.NeedsOverloadResolutionForCopyAssignment();
-  if (v330) {
-    b.setVal330(static_cast<bool>(v330.value()));
-    b.setVal331(true);
+  auto v335 = e.NeedsOverloadResolutionForCopyAssignment();
+  if (v335) {
+    b.setVal335(static_cast<bool>(v335.value()));
+    b.setVal336(true);
   } else {
-    b.setVal331(false);
+    b.setVal336(false);
   }
-  auto v332 = e.NeedsOverloadResolutionForCopyConstructor();
-  if (v332) {
-    b.setVal332(static_cast<bool>(v332.value()));
-    b.setVal333(true);
+  auto v337 = e.NeedsOverloadResolutionForCopyConstructor();
+  if (v337) {
+    b.setVal337(static_cast<bool>(v337.value()));
+    b.setVal338(true);
   } else {
-    b.setVal333(false);
+    b.setVal338(false);
   }
-  auto v334 = e.NeedsOverloadResolutionForDestructor();
-  if (v334) {
-    b.setVal334(static_cast<bool>(v334.value()));
-    b.setVal335(true);
+  auto v339 = e.NeedsOverloadResolutionForDestructor();
+  if (v339) {
+    b.setVal339(static_cast<bool>(v339.value()));
+    b.setVal340(true);
   } else {
-    b.setVal335(false);
+    b.setVal340(false);
   }
-  auto v336 = e.NeedsOverloadResolutionForMoveAssignment();
-  if (v336) {
-    b.setVal336(static_cast<bool>(v336.value()));
-    b.setVal337(true);
+  auto v341 = e.NeedsOverloadResolutionForMoveAssignment();
+  if (v341) {
+    b.setVal341(static_cast<bool>(v341.value()));
+    b.setVal342(true);
   } else {
-    b.setVal337(false);
+    b.setVal342(false);
   }
-  auto v338 = e.NeedsOverloadResolutionForMoveConstructor();
-  if (v338) {
-    b.setVal338(static_cast<bool>(v338.value()));
-    b.setVal339(true);
+  auto v343 = e.NeedsOverloadResolutionForMoveConstructor();
+  if (v343) {
+    b.setVal343(static_cast<bool>(v343.value()));
+    b.setVal344(true);
   } else {
-    b.setVal339(false);
+    b.setVal344(false);
   }
-  auto v340 = e.NullFieldOffsetIsZero();
-  if (v340) {
-    b.setVal340(static_cast<bool>(v340.value()));
-    b.setVal341(true);
+  auto v345 = e.NullFieldOffsetIsZero();
+  if (v345) {
+    b.setVal345(static_cast<bool>(v345.value()));
+    b.setVal346(true);
   } else {
-    b.setVal341(false);
+    b.setVal346(false);
   }
   do {
-    auto ov142 = e.VirtualBases();
-    if (!ov142) {
-      b.setVal342(false);
+    auto ov147 = e.VirtualBases();
+    if (!ov147) {
+      b.setVal347(false);
       break;
     }
-    b.setVal342(true);
-    auto v142 = std::move(*ov142);
-    auto sv142 = b.initVal142(static_cast<unsigned>(v142.size()));
-    auto i142 = 0u;
-    for (const auto &e142 : v142) {
-      sv142.set(i142, es.PseudoId(e142));
-      ++i142;
+    b.setVal347(true);
+    auto v147 = std::move(*ov147);
+    auto sv147 = b.initVal147(static_cast<unsigned>(v147.size()));
+    auto i147 = 0u;
+    for (const auto &e147 : v147) {
+      sv147.set(i147, es.PseudoId(e147));
+      ++i147;
     }
   } while (false);
 }
@@ -6826,42 +10832,43 @@ void SerializeClassTemplateSpecializationDecl(EntityMapper &es, mx::ast::Decl::B
   (void) b;
   (void) e;
   SerializeCXXRecordDecl(es, b, e);
-  auto t128 = e.ExternToken();
-  b.setVal128(es.EntityId(t128));
-  auto t129 = e.PointOfInstantiation();
-  b.setVal129(es.EntityId(t129));
-  b.setVal89(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
+  auto t133 = e.ExternToken();
+  b.setVal133(es.EntityId(t133));
+  auto t134 = e.PointOfInstantiation();
+  b.setVal134(es.EntityId(t134));
+  b.setVal94(static_cast<unsigned char>(mx::FromPasta(e.SpecializationKind())));
   do {
-    auto v343 = e.TemplateArguments();
-    auto sv343 = b.initVal343(static_cast<unsigned>(v343.size()));
-    auto i343 = 0u;
-    for (const auto &e343 : v343) {
-      sv343.set(i343, es.PseudoId(e343));
-      ++i343;
+    auto v348 = e.TemplateArguments();
+    auto sv348 = b.initVal348(static_cast<unsigned>(v348.size()));
+    auto i348 = 0u;
+    for (const auto &e348 : v348) {
+      sv348.set(i348, es.PseudoId(e348));
+      ++i348;
     }
   } while (false);
   do {
-    auto v344 = e.TemplateInstantiationArguments();
-    auto sv344 = b.initVal344(static_cast<unsigned>(v344.size()));
-    auto i344 = 0u;
-    for (const auto &e344 : v344) {
-      sv344.set(i344, es.PseudoId(e344));
-      ++i344;
+    auto v349 = e.TemplateInstantiationArguments();
+    auto sv349 = b.initVal349(static_cast<unsigned>(v349.size()));
+    auto i349 = 0u;
+    for (const auto &e349 : v349) {
+      sv349.set(i349, es.PseudoId(e349));
+      ++i349;
     }
   } while (false);
-  auto t131 = e.TemplateKeywordToken();
-  b.setVal131(es.EntityId(t131));
-  auto v132 = e.TypeAsWritten();
-  if (v132) {
-    auto id132 = es.EntityId(v132.value());    b.setVal132(id132);
-    b.setVal345(id132 != mx::kInvalidEntityId);
+  auto t136 = e.TemplateKeywordToken();
+  b.setVal136(es.EntityId(t136));
+  auto v137 = e.TypeAsWritten();
+  if (v137) {
+    auto id137 = es.EntityId(v137.value());
+    b.setVal137(id137);
+    b.setVal350(id137 != mx::kInvalidEntityId);
   } else {
-    b.setVal132(mx::kInvalidEntityId);
-    b.setVal345(false);
+    b.setVal137(mx::kInvalidEntityId);
+    b.setVal350(false);
   }
-  b.setVal346(e.IsClassScopeExplicitSpecialization());
-  b.setVal347(e.IsExplicitInstantiationOrSpecialization());
-  b.setVal348(e.IsExplicitSpecialization());
+  b.setVal351(e.IsClassScopeExplicitSpecialization());
+  b.setVal352(e.IsExplicitInstantiationOrSpecialization());
+  b.setVal353(e.IsExplicitSpecialization());
 }
 
 void SerializeClassTemplatePartialSpecializationDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ClassTemplatePartialSpecializationDecl &e) {
@@ -6876,61 +10883,64 @@ void SerializeEnumDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::
   (void) e;
   SerializeTagDecl(es, b, e);
   do {
-    auto v46 = e.Enumerators();
-    auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-    auto i46 = 0u;
-    for (const auto &e46 : v46) {
-      sv46.set(i46, es.EntityId(e46));
-      ++i46;
+    auto v51 = e.Enumerators();
+    auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+    auto i51 = 0u;
+    for (const auto &e51 : v51) {
+      sv51.set(i51, es.EntityId(e51));
+      ++i51;
     }
   } while (false);
-  auto v71 = e.InstantiatedFromMemberEnum();
-  if (v71) {
-    auto id71 = es.EntityId(v71.value());    b.setVal71(id71);
-    b.setVal98(id71 != mx::kInvalidEntityId);
+  auto v76 = e.InstantiatedFromMemberEnum();
+  if (v76) {
+    auto id76 = es.EntityId(v76.value());
+    b.setVal76(id76);
+    b.setVal103(id76 != mx::kInvalidEntityId);
   } else {
-    b.setVal71(mx::kInvalidEntityId);
-    b.setVal98(false);
+    b.setVal76(mx::kInvalidEntityId);
+    b.setVal103(false);
   }
-  auto v74 = e.IntegerType();
-  if (v74) {
-    auto id74 = es.EntityId(v74.value());    b.setVal74(id74);
-    b.setVal99(id74 != mx::kInvalidEntityId);
+  auto v79 = e.IntegerType();
+  if (v79) {
+    auto id79 = es.EntityId(v79.value());
+    b.setVal79(id79);
+    b.setVal104(id79 != mx::kInvalidEntityId);
   } else {
-    b.setVal74(mx::kInvalidEntityId);
-    b.setVal99(false);
+    b.setVal79(mx::kInvalidEntityId);
+    b.setVal104(false);
   }
-  if (auto r76 = e.IntegerTypeRange(); auto rs76 = r76.Size()) {
-    b.setVal76(es.EntityId(r76[0]));
-    b.setVal78(es.EntityId(r76[rs76 - 1u]));
+  if (auto r81 = e.IntegerTypeRange(); auto rs81 = r81.Size()) {
+    b.setVal81(es.EntityId(r81[0]));
+    b.setVal83(es.EntityId(r81[rs81 - 1u]));
   } else {
-    b.setVal76(0);
-    b.setVal78(0);
+    b.setVal81(0);
+    b.setVal83(0);
   }
-  auto v143 = e.ODRHash();
-  if (v143) {
-    b.setVal143(static_cast<unsigned>(v143.value()));
-    b.setVal100(true);
+  auto v148 = e.ODRHash();
+  if (v148) {
+    b.setVal148(static_cast<unsigned>(v148.value()));
+    b.setVal105(true);
   } else {
-    b.setVal100(false);
+    b.setVal105(false);
   }
-  b.setVal81(es.EntityId(e.PromotionType()));
-  auto v86 = e.TemplateInstantiationPattern();
-  if (v86) {
-    auto id86 = es.EntityId(v86.value());    b.setVal86(id86);
-    b.setVal101(id86 != mx::kInvalidEntityId);
+  b.setVal86(es.EntityId(e.PromotionType()));
+  auto v91 = e.TemplateInstantiationPattern();
+  if (v91) {
+    auto id91 = es.EntityId(v91.value());
+    b.setVal91(id91);
+    b.setVal106(id91 != mx::kInvalidEntityId);
   } else {
-    b.setVal86(mx::kInvalidEntityId);
-    b.setVal101(false);
+    b.setVal91(mx::kInvalidEntityId);
+    b.setVal106(false);
   }
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
-  b.setVal102(e.IsClosed());
-  b.setVal103(e.IsClosedFlag());
-  b.setVal104(e.IsClosedNonFlag());
-  b.setVal105(e.IsComplete());
-  b.setVal106(e.IsFixed());
-  b.setVal107(e.IsScoped());
-  b.setVal108(e.IsScopedUsingClassTag());
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
+  b.setVal107(e.IsClosed());
+  b.setVal108(e.IsClosedFlag());
+  b.setVal109(e.IsClosedNonFlag());
+  b.setVal110(e.IsComplete());
+  b.setVal111(e.IsFixed());
+  b.setVal112(e.IsScoped());
+  b.setVal113(e.IsScopedUsingClassTag());
 }
 
 void SerializeUnresolvedUsingTypenameDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingTypenameDecl &e) {
@@ -6938,13 +10948,13 @@ void SerializeUnresolvedUsingTypenameDecl(EntityMapper &es, mx::ast::Decl::Build
   (void) b;
   (void) e;
   SerializeTypeDecl(es, b, e);
-  auto t52 = e.EllipsisToken();
-  b.setVal52(es.EntityId(t52));
-  auto t53 = e.TypenameToken();
-  b.setVal53(es.EntityId(t53));
-  auto t61 = e.UsingToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal69(e.IsPackExpansion());
+  auto t57 = e.EllipsisToken();
+  b.setVal57(es.EntityId(t57));
+  auto t58 = e.TypenameToken();
+  b.setVal58(es.EntityId(t58));
+  auto t66 = e.UsingToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal74(e.IsPackExpansion());
 }
 
 void SerializeTypedefNameDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypedefNameDecl &e) {
@@ -6952,17 +10962,18 @@ void SerializeTypedefNameDecl(EntityMapper &es, mx::ast::Decl::Builder b, const 
   (void) b;
   (void) e;
   SerializeTypeDecl(es, b, e);
-  auto v52 = e.AnonymousDeclarationWithTypedefName();
-  if (v52) {
-    auto id52 = es.EntityId(v52.value());    b.setVal52(id52);
-    b.setVal69(id52 != mx::kInvalidEntityId);
+  auto v57 = e.AnonymousDeclarationWithTypedefName();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+    b.setVal74(id57 != mx::kInvalidEntityId);
   } else {
-    b.setVal52(mx::kInvalidEntityId);
-    b.setVal69(false);
+    b.setVal57(mx::kInvalidEntityId);
+    b.setVal74(false);
   }
-  b.setVal53(es.EntityId(e.UnderlyingType()));
-  b.setVal70(e.IsModed());
-  b.setVal75(e.IsTransparentTag());
+  b.setVal58(es.EntityId(e.UnderlyingType()));
+  b.setVal75(e.IsModed());
+  b.setVal80(e.IsTransparentTag());
 }
 
 void SerializeTypedefDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TypedefDecl &e) {
@@ -6977,13 +10988,14 @@ void SerializeTypeAliasDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pa
   (void) b;
   (void) e;
   SerializeTypedefNameDecl(es, b, e);
-  auto v61 = e.DescribedAliasTemplate();
-  if (v61) {
-    auto id61 = es.EntityId(v61.value());    b.setVal61(id61);
-    b.setVal77(id61 != mx::kInvalidEntityId);
+  auto v66 = e.DescribedAliasTemplate();
+  if (v66) {
+    auto id66 = es.EntityId(v66.value());
+    b.setVal66(id66);
+    b.setVal82(id66 != mx::kInvalidEntityId);
   } else {
-    b.setVal61(mx::kInvalidEntityId);
-    b.setVal77(false);
+    b.setVal66(mx::kInvalidEntityId);
+    b.setVal82(false);
   }
 }
 
@@ -6992,12 +11004,12 @@ void SerializeObjCTypeParamDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) b;
   (void) e;
   SerializeTypedefNameDecl(es, b, e);
-  auto t61 = e.ColonToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.Variance())));
-  auto t62 = e.VarianceToken();
-  b.setVal62(es.EntityId(t62));
-  b.setVal77(e.HasExplicitBound());
+  auto t66 = e.ColonToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.Variance())));
+  auto t67 = e.VarianceToken();
+  b.setVal67(es.EntityId(t67));
+  b.setVal82(e.HasExplicitBound());
 }
 
 void SerializeTemplateDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::TemplateDecl &e) {
@@ -7035,15 +11047,16 @@ void SerializeTypeAliasTemplateDecl(EntityMapper &es, mx::ast::Decl::Builder b, 
   (void) b;
   (void) e;
   SerializeRedeclarableTemplateDecl(es, b, e);
-  auto v51 = e.InstantiatedFromMemberTemplate();
-  if (v51) {
-    auto id51 = es.EntityId(v51.value());    b.setVal51(id51);
-    b.setVal68(id51 != mx::kInvalidEntityId);
+  auto v56 = e.InstantiatedFromMemberTemplate();
+  if (v56) {
+    auto id56 = es.EntityId(v56.value());
+    b.setVal56(id56);
+    b.setVal73(id56 != mx::kInvalidEntityId);
   } else {
-    b.setVal51(mx::kInvalidEntityId);
-    b.setVal68(false);
+    b.setVal56(mx::kInvalidEntityId);
+    b.setVal73(false);
   }
-  b.setVal52(es.EntityId(e.TemplatedDeclaration()));
+  b.setVal57(es.EntityId(e.TemplatedDeclaration()));
 }
 
 void SerializeConceptDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ConceptDecl &e) {
@@ -7051,8 +11064,8 @@ void SerializeConceptDecl(EntityMapper &es, mx::ast::Decl::Builder b, const past
   (void) b;
   (void) e;
   SerializeTemplateDecl(es, b, e);
-  b.setVal51(es.EntityId(e.ConstraintExpression()));
-  b.setVal68(e.IsTypeConcept());
+  b.setVal56(es.EntityId(e.ConstraintExpression()));
+  b.setVal73(e.IsTypeConcept());
 }
 
 void SerializeBuiltinTemplateDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::BuiltinTemplateDecl &e) {
@@ -7072,28 +11085,28 @@ void SerializeObjCPropertyDecl(EntityMapper &es, mx::ast::Decl::Builder b, const
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  auto t51 = e.AtToken();
-  b.setVal51(es.EntityId(t51));
-  b.setVal52(es.EntityId(e.GetterMethodDeclaration()));
-  auto t53 = e.GetterNameToken();
-  b.setVal53(es.EntityId(t53));
-  auto t61 = e.LParenToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
-  b.setVal62(es.EntityId(e.PropertyInstanceVariableDeclaration()));
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.QueryKind())));
-  b.setVal82(static_cast<unsigned char>(mx::FromPasta(e.SetterKind())));
-  b.setVal63(es.EntityId(e.SetterMethodDeclaration()));
-  auto t71 = e.SetterNameToken();
-  b.setVal71(es.EntityId(t71));
-  b.setVal74(es.EntityId(e.Type()));
-  b.setVal68(e.IsAtomic());
-  b.setVal69(e.IsClassProperty());
-  b.setVal70(e.IsDirectProperty());
-  b.setVal75(e.IsInstanceProperty());
-  b.setVal77(e.IsOptional());
-  b.setVal79(e.IsReadOnly());
-  b.setVal87(e.IsRetaining());
+  auto t56 = e.AtToken();
+  b.setVal56(es.EntityId(t56));
+  b.setVal57(es.EntityId(e.GetterMethodDeclaration()));
+  auto t58 = e.GetterNameToken();
+  b.setVal58(es.EntityId(t58));
+  auto t66 = e.LParenToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.PropertyImplementation())));
+  b.setVal67(es.EntityId(e.PropertyInstanceVariableDeclaration()));
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.QueryKind())));
+  b.setVal87(static_cast<unsigned char>(mx::FromPasta(e.SetterKind())));
+  b.setVal68(es.EntityId(e.SetterMethodDeclaration()));
+  auto t76 = e.SetterNameToken();
+  b.setVal76(es.EntityId(t76));
+  b.setVal79(es.EntityId(e.Type()));
+  b.setVal73(e.IsAtomic());
+  b.setVal74(e.IsClassProperty());
+  b.setVal75(e.IsDirectProperty());
+  b.setVal80(e.IsInstanceProperty());
+  b.setVal82(e.IsOptional());
+  b.setVal84(e.IsReadOnly());
+  b.setVal92(e.IsRetaining());
 }
 
 void SerializeObjCMethodDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCMethodDecl &e) {
@@ -7101,67 +11114,67 @@ void SerializeObjCMethodDecl(EntityMapper &es, mx::ast::Decl::Builder b, const p
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  b.setVal68(e.DefinedInNSObject());
-  b.setVal51(es.EntityId(e.FindPropertyDeclaration()));
-  b.setVal52(es.EntityId(e.ClassInterface()));
-  b.setVal53(es.EntityId(e.CommandDeclaration()));
-  auto t61 = e.DeclaratorEndToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal72(static_cast<unsigned char>(mx::FromPasta(e.ImplementationControl())));
-  b.setVal80(static_cast<unsigned char>(mx::FromPasta(e.MethodFamily())));
-  b.setVal82(static_cast<unsigned char>(mx::FromPasta(e.ObjCDeclQualifier())));
-  b.setVal62(es.EntityId(e.ReturnType()));
-  if (auto r63 = e.ReturnTypeSourceRange(); auto rs63 = r63.Size()) {
-    b.setVal63(es.EntityId(r63[0]));
-    b.setVal71(es.EntityId(r63[rs63 - 1u]));
+  b.setVal73(e.DefinedInNSObject());
+  b.setVal56(es.EntityId(e.FindPropertyDeclaration()));
+  b.setVal57(es.EntityId(e.ClassInterface()));
+  b.setVal58(es.EntityId(e.CommandDeclaration()));
+  auto t66 = e.DeclaratorEndToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal77(static_cast<unsigned char>(mx::FromPasta(e.ImplementationControl())));
+  b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.MethodFamily())));
+  b.setVal87(static_cast<unsigned char>(mx::FromPasta(e.ObjCDeclQualifier())));
+  b.setVal67(es.EntityId(e.ReturnType()));
+  if (auto r68 = e.ReturnTypeSourceRange(); auto rs68 = r68.Size()) {
+    b.setVal68(es.EntityId(r68[0]));
+    b.setVal76(es.EntityId(r68[rs68 - 1u]));
   } else {
-    b.setVal63(0);
-    b.setVal71(0);
+    b.setVal68(0);
+    b.setVal76(0);
   }
-  auto t74 = e.SelectorStartToken();
-  b.setVal74(es.EntityId(t74));
-  b.setVal76(es.EntityId(e.SelfDeclaration()));
-  b.setVal69(e.HasParameterDestroyedInCallee());
-  b.setVal70(e.HasRedeclaration());
-  b.setVal75(e.HasRelatedResultType());
-  b.setVal77(e.HasSkippedBody());
-  b.setVal79(e.IsClassMethod());
-  b.setVal87(e.IsDefined());
-  b.setVal90(e.IsDesignatedInitializerForTheInterface());
-  b.setVal91(e.IsDirectMethod());
-  b.setVal92(e.IsInstanceMethod());
-  b.setVal93(e.IsOptional());
-  b.setVal94(e.IsOverriding());
-  b.setVal95(e.IsPropertyAccessor());
-  b.setVal96(e.IsRedeclaration());
-  b.setVal97(e.IsSynthesizedAccessorStub());
-  b.setVal98(e.IsThisDeclarationADesignatedInitializer());
-  b.setVal99(e.IsVariadic());
+  auto t79 = e.SelectorStartToken();
+  b.setVal79(es.EntityId(t79));
+  b.setVal81(es.EntityId(e.SelfDeclaration()));
+  b.setVal74(e.HasParameterDestroyedInCallee());
+  b.setVal75(e.HasRedeclaration());
+  b.setVal80(e.HasRelatedResultType());
+  b.setVal82(e.HasSkippedBody());
+  b.setVal84(e.IsClassMethod());
+  b.setVal92(e.IsDefined());
+  b.setVal95(e.IsDesignatedInitializerForTheInterface());
+  b.setVal96(e.IsDirectMethod());
+  b.setVal97(e.IsInstanceMethod());
+  b.setVal98(e.IsOptional());
+  b.setVal99(e.IsOverriding());
+  b.setVal100(e.IsPropertyAccessor());
+  b.setVal101(e.IsRedeclaration());
+  b.setVal102(e.IsSynthesizedAccessorStub());
+  b.setVal103(e.IsThisDeclarationADesignatedInitializer());
+  b.setVal104(e.IsVariadic());
   do {
-    auto v45 = e.Parameters();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.Parameters();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
   do {
-    auto v46 = e.SelectorTokens();
-    auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-    auto i46 = 0u;
-    for (const auto &e46 : v46) {
-      sv46.set(i46, es.EntityId(e46));
-      ++i46;
+    auto v51 = e.SelectorTokens();
+    auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+    auto i51 = 0u;
+    for (const auto &e51 : v51) {
+      sv51.set(i51, es.EntityId(e51));
+      ++i51;
     }
   } while (false);
-  pasta::DeclContext dc57(e);
-  auto v57 = dc57.AlreadyLoadedDeclarations();
-  auto sv57 = b.initVal57(static_cast<unsigned>(v57.size()));
-  auto i57 = 0u;
-  for (const pasta::Decl &e57 : v57) {
-    sv57.set(i57, es.EntityId(e57));
-    ++i57;
+  pasta::DeclContext dc62(e);
+  auto v62 = dc62.AlreadyLoadedDeclarations();
+  auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
+  auto i62 = 0u;
+  for (const pasta::Decl &e62 : v62) {
+    sv62.set(i62, es.EntityId(e62));
+    ++i62;
   }
 }
 
@@ -7171,75 +11184,75 @@ void SerializeObjCContainerDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) e;
   SerializeNamedDecl(es, b, e);
   do {
-    auto v45 = e.ClassMethods();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.ClassMethods();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
   do {
-    auto v46 = e.ClassProperties();
-    auto sv46 = b.initVal46(static_cast<unsigned>(v46.size()));
-    auto i46 = 0u;
-    for (const auto &e46 : v46) {
-      sv46.set(i46, es.EntityId(e46));
-      ++i46;
+    auto v51 = e.ClassProperties();
+    auto sv51 = b.initVal51(static_cast<unsigned>(v51.size()));
+    auto i51 = 0u;
+    for (const auto &e51 : v51) {
+      sv51.set(i51, es.EntityId(e51));
+      ++i51;
     }
   } while (false);
-  if (auto r51 = e.AtEndRange(); auto rs51 = r51.Size()) {
-    b.setVal51(es.EntityId(r51[0]));
-    b.setVal52(es.EntityId(r51[rs51 - 1u]));
+  if (auto r56 = e.AtEndRange(); auto rs56 = r56.Size()) {
+    b.setVal56(es.EntityId(r56[0]));
+    b.setVal57(es.EntityId(r56[rs56 - 1u]));
   } else {
-    b.setVal51(0);
-    b.setVal52(0);
+    b.setVal56(0);
+    b.setVal57(0);
   }
-  auto t53 = e.AtStartToken();
-  b.setVal53(es.EntityId(t53));
+  auto t58 = e.AtStartToken();
+  b.setVal58(es.EntityId(t58));
   do {
-    auto v57 = e.InstanceMethods();
-    auto sv57 = b.initVal57(static_cast<unsigned>(v57.size()));
-    auto i57 = 0u;
-    for (const auto &e57 : v57) {
-      sv57.set(i57, es.EntityId(e57));
-      ++i57;
+    auto v62 = e.InstanceMethods();
+    auto sv62 = b.initVal62(static_cast<unsigned>(v62.size()));
+    auto i62 = 0u;
+    for (const auto &e62 : v62) {
+      sv62.set(i62, es.EntityId(e62));
+      ++i62;
     }
   } while (false);
   do {
-    auto v171 = e.InstanceProperties();
-    auto sv171 = b.initVal171(static_cast<unsigned>(v171.size()));
-    auto i171 = 0u;
-    for (const auto &e171 : v171) {
-      sv171.set(i171, es.EntityId(e171));
-      ++i171;
+    auto v176 = e.InstanceProperties();
+    auto sv176 = b.initVal176(static_cast<unsigned>(v176.size()));
+    auto i176 = 0u;
+    for (const auto &e176 : v176) {
+      sv176.set(i176, es.EntityId(e176));
+      ++i176;
     }
   } while (false);
   do {
-    auto v180 = e.Methods();
-    auto sv180 = b.initVal180(static_cast<unsigned>(v180.size()));
-    auto i180 = 0u;
-    for (const auto &e180 : v180) {
-      sv180.set(i180, es.EntityId(e180));
-      ++i180;
+    auto v185 = e.Methods();
+    auto sv185 = b.initVal185(static_cast<unsigned>(v185.size()));
+    auto i185 = 0u;
+    for (const auto &e185 : v185) {
+      sv185.set(i185, es.EntityId(e185));
+      ++i185;
     }
   } while (false);
   do {
-    auto v316 = e.Properties();
-    auto sv316 = b.initVal316(static_cast<unsigned>(v316.size()));
-    auto i316 = 0u;
-    for (const auto &e316 : v316) {
-      sv316.set(i316, es.EntityId(e316));
-      ++i316;
+    auto v321 = e.Properties();
+    auto sv321 = b.initVal321(static_cast<unsigned>(v321.size()));
+    auto i321 = 0u;
+    for (const auto &e321 : v321) {
+      sv321.set(i321, es.EntityId(e321));
+      ++i321;
     }
   } while (false);
-  pasta::DeclContext dc349(e);
-  auto v349 = dc349.AlreadyLoadedDeclarations();
-  auto sv349 = b.initVal349(static_cast<unsigned>(v349.size()));
-  auto i349 = 0u;
-  for (const pasta::Decl &e349 : v349) {
-    sv349.set(i349, es.EntityId(e349));
-    ++i349;
+  pasta::DeclContext dc354(e);
+  auto v354 = dc354.AlreadyLoadedDeclarations();
+  auto sv354 = b.initVal354(static_cast<unsigned>(v354.size()));
+  auto i354 = 0u;
+  for (const pasta::Decl &e354 : v354) {
+    sv354.set(i354, es.EntityId(e354));
+    ++i354;
   }
 }
 
@@ -7248,41 +11261,41 @@ void SerializeObjCCategoryDecl(EntityMapper &es, mx::ast::Decl::Builder b, const
   (void) b;
   (void) e;
   SerializeObjCContainerDecl(es, b, e);
-  b.setVal68(e.IsClassExtension());
-  auto t61 = e.CategoryNameToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal62(es.EntityId(e.ClassInterface()));
-  b.setVal63(es.EntityId(e.Implementation()));
-  auto t71 = e.InstanceVariableLBraceToken();
-  b.setVal71(es.EntityId(t71));
-  auto t74 = e.InstanceVariableRBraceToken();
-  b.setVal74(es.EntityId(t74));
-  b.setVal76(es.EntityId(e.NextClassCategory()));
+  b.setVal73(e.IsClassExtension());
+  auto t66 = e.CategoryNameToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal67(es.EntityId(e.ClassInterface()));
+  b.setVal68(es.EntityId(e.Implementation()));
+  auto t76 = e.InstanceVariableLBraceToken();
+  b.setVal76(es.EntityId(t76));
+  auto t79 = e.InstanceVariableRBraceToken();
+  b.setVal79(es.EntityId(t79));
+  b.setVal81(es.EntityId(e.NextClassCategory()));
   do {
-    auto v350 = e.InstanceVariables();
-    auto sv350 = b.initVal350(static_cast<unsigned>(v350.size()));
-    auto i350 = 0u;
-    for (const auto &e350 : v350) {
-      sv350.set(i350, es.EntityId(e350));
-      ++i350;
+    auto v355 = e.InstanceVariables();
+    auto sv355 = b.initVal355(static_cast<unsigned>(v355.size()));
+    auto i355 = 0u;
+    for (const auto &e355 : v355) {
+      sv355.set(i355, es.EntityId(e355));
+      ++i355;
     }
   } while (false);
   do {
-    auto v351 = e.ProtocolTokens();
-    auto sv351 = b.initVal351(static_cast<unsigned>(v351.size()));
-    auto i351 = 0u;
-    for (const auto &e351 : v351) {
-      sv351.set(i351, es.EntityId(e351));
-      ++i351;
+    auto v356 = e.ProtocolTokens();
+    auto sv356 = b.initVal356(static_cast<unsigned>(v356.size()));
+    auto i356 = 0u;
+    for (const auto &e356 : v356) {
+      sv356.set(i356, es.EntityId(e356));
+      ++i356;
     }
   } while (false);
   do {
-    auto v352 = e.Protocols();
-    auto sv352 = b.initVal352(static_cast<unsigned>(v352.size()));
-    auto i352 = 0u;
-    for (const auto &e352 : v352) {
-      sv352.set(i352, es.EntityId(e352));
-      ++i352;
+    auto v357 = e.Protocols();
+    auto sv357 = b.initVal357(static_cast<unsigned>(v357.size()));
+    auto i357 = 0u;
+    for (const auto &e357 : v357) {
+      sv357.set(i357, es.EntityId(e357));
+      ++i357;
     }
   } while (false);
 }
@@ -7292,27 +11305,27 @@ void SerializeObjCProtocolDecl(EntityMapper &es, mx::ast::Decl::Builder b, const
   (void) b;
   (void) e;
   SerializeObjCContainerDecl(es, b, e);
-  auto v67 = e.ObjCRuntimeNameAsString();
-  std::string s67(v67.data(), v67.size());
-  b.setVal67(s67);
-  b.setVal68(e.HasDefinition());
-  b.setVal69(e.IsNonRuntimeProtocol());
+  auto v72 = e.ObjCRuntimeNameAsString();
+  std::string s72(v72.data(), v72.size());
+  b.setVal72(s72);
+  b.setVal73(e.HasDefinition());
+  b.setVal74(e.IsNonRuntimeProtocol());
   do {
-    auto v350 = e.ProtocolTokens();
-    auto sv350 = b.initVal350(static_cast<unsigned>(v350.size()));
-    auto i350 = 0u;
-    for (const auto &e350 : v350) {
-      sv350.set(i350, es.EntityId(e350));
-      ++i350;
+    auto v355 = e.ProtocolTokens();
+    auto sv355 = b.initVal355(static_cast<unsigned>(v355.size()));
+    auto i355 = 0u;
+    for (const auto &e355 : v355) {
+      sv355.set(i355, es.EntityId(e355));
+      ++i355;
     }
   } while (false);
   do {
-    auto v351 = e.Protocols();
-    auto sv351 = b.initVal351(static_cast<unsigned>(v351.size()));
-    auto i351 = 0u;
-    for (const auto &e351 : v351) {
-      sv351.set(i351, es.EntityId(e351));
-      ++i351;
+    auto v356 = e.Protocols();
+    auto sv356 = b.initVal356(static_cast<unsigned>(v356.size()));
+    auto i356 = 0u;
+    for (const auto &e356 : v356) {
+      sv356.set(i356, es.EntityId(e356));
+      ++i356;
     }
   } while (false);
 }
@@ -7323,83 +11336,7 @@ void SerializeObjCInterfaceDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
   (void) e;
   SerializeObjCContainerDecl(es, b, e);
   do {
-    auto v350 = e.AllReferencedProtocols();
-    auto sv350 = b.initVal350(static_cast<unsigned>(v350.size()));
-    auto i350 = 0u;
-    for (const auto &e350 : v350) {
-      sv350.set(i350, es.EntityId(e350));
-      ++i350;
-    }
-  } while (false);
-  b.setVal68(e.DeclaresOrInheritsDesignatedInitializers());
-  auto t61 = e.EndOfDefinitionToken();
-  b.setVal61(es.EntityId(t61));
-  b.setVal62(es.EntityId(e.Implementation()));
-  auto v67 = e.ObjCRuntimeNameAsString();
-  std::string s67(v67.data(), v67.size());
-  b.setVal67(s67);
-  auto v63 = e.SuperClass();
-  if (v63) {
-    auto id63 = es.EntityId(v63.value());    b.setVal63(id63);
-    b.setVal69(id63 != mx::kInvalidEntityId);
-  } else {
-    b.setVal63(mx::kInvalidEntityId);
-    b.setVal69(false);
-  }
-  auto t71 = e.SuperClassToken();
-  b.setVal71(es.EntityId(t71));
-  auto v74 = e.SuperClassTypeInfo();
-  if (v74) {
-    auto id74 = es.EntityId(v74.value());    b.setVal74(id74);
-    b.setVal70(id74 != mx::kInvalidEntityId);
-  } else {
-    b.setVal74(mx::kInvalidEntityId);
-    b.setVal70(false);
-  }
-  b.setVal76(es.EntityId(e.TypeForDeclaration()));
-  b.setVal75(e.HasDefinition());
-  b.setVal77(e.HasDesignatedInitializers());
-  b.setVal79(e.IsArcWeakrefUnavailable());
-  b.setVal87(e.IsImplicitInterfaceDeclaration());
-  b.setVal78(es.EntityId(e.IsObjCRequiresPropertyDefinitions()));
-  do {
-    auto v351 = e.InstanceVariables();
-    auto sv351 = b.initVal351(static_cast<unsigned>(v351.size()));
-    auto i351 = 0u;
-    for (const auto &e351 : v351) {
-      sv351.set(i351, es.EntityId(e351));
-      ++i351;
-    }
-  } while (false);
-  do {
-    auto v352 = e.KnownCategories();
-    auto sv352 = b.initVal352(static_cast<unsigned>(v352.size()));
-    auto i352 = 0u;
-    for (const auto &e352 : v352) {
-      sv352.set(i352, es.EntityId(e352));
-      ++i352;
-    }
-  } while (false);
-  do {
-    auto v353 = e.KnownExtensions();
-    auto sv353 = b.initVal353(static_cast<unsigned>(v353.size()));
-    auto i353 = 0u;
-    for (const auto &e353 : v353) {
-      sv353.set(i353, es.EntityId(e353));
-      ++i353;
-    }
-  } while (false);
-  do {
-    auto v354 = e.ProtocolTokens();
-    auto sv354 = b.initVal354(static_cast<unsigned>(v354.size()));
-    auto i354 = 0u;
-    for (const auto &e354 : v354) {
-      sv354.set(i354, es.EntityId(e354));
-      ++i354;
-    }
-  } while (false);
-  do {
-    auto v355 = e.Protocols();
+    auto v355 = e.AllReferencedProtocols();
     auto sv355 = b.initVal355(static_cast<unsigned>(v355.size()));
     auto i355 = 0u;
     for (const auto &e355 : v355) {
@@ -7407,8 +11344,41 @@ void SerializeObjCInterfaceDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
       ++i355;
     }
   } while (false);
+  b.setVal73(e.DeclaresOrInheritsDesignatedInitializers());
+  auto t66 = e.EndOfDefinitionToken();
+  b.setVal66(es.EntityId(t66));
+  b.setVal67(es.EntityId(e.Implementation()));
+  auto v72 = e.ObjCRuntimeNameAsString();
+  std::string s72(v72.data(), v72.size());
+  b.setVal72(s72);
+  auto v68 = e.SuperClass();
+  if (v68) {
+    auto id68 = es.EntityId(v68.value());
+    b.setVal68(id68);
+    b.setVal74(id68 != mx::kInvalidEntityId);
+  } else {
+    b.setVal68(mx::kInvalidEntityId);
+    b.setVal74(false);
+  }
+  auto t76 = e.SuperClassToken();
+  b.setVal76(es.EntityId(t76));
+  auto v79 = e.SuperClassTypeInfo();
+  if (v79) {
+    auto id79 = es.EntityId(v79.value());
+    b.setVal79(id79);
+    b.setVal75(id79 != mx::kInvalidEntityId);
+  } else {
+    b.setVal79(mx::kInvalidEntityId);
+    b.setVal75(false);
+  }
+  b.setVal81(es.EntityId(e.TypeForDeclaration()));
+  b.setVal80(e.HasDefinition());
+  b.setVal82(e.HasDesignatedInitializers());
+  b.setVal84(e.IsArcWeakrefUnavailable());
+  b.setVal92(e.IsImplicitInterfaceDeclaration());
+  b.setVal83(es.EntityId(e.IsObjCRequiresPropertyDefinitions()));
   do {
-    auto v356 = e.VisibleCategories();
+    auto v356 = e.InstanceVariables();
     auto sv356 = b.initVal356(static_cast<unsigned>(v356.size()));
     auto i356 = 0u;
     for (const auto &e356 : v356) {
@@ -7417,12 +11387,57 @@ void SerializeObjCInterfaceDecl(EntityMapper &es, mx::ast::Decl::Builder b, cons
     }
   } while (false);
   do {
-    auto v357 = e.VisibleExtensions();
+    auto v357 = e.KnownCategories();
     auto sv357 = b.initVal357(static_cast<unsigned>(v357.size()));
     auto i357 = 0u;
     for (const auto &e357 : v357) {
       sv357.set(i357, es.EntityId(e357));
       ++i357;
+    }
+  } while (false);
+  do {
+    auto v358 = e.KnownExtensions();
+    auto sv358 = b.initVal358(static_cast<unsigned>(v358.size()));
+    auto i358 = 0u;
+    for (const auto &e358 : v358) {
+      sv358.set(i358, es.EntityId(e358));
+      ++i358;
+    }
+  } while (false);
+  do {
+    auto v359 = e.ProtocolTokens();
+    auto sv359 = b.initVal359(static_cast<unsigned>(v359.size()));
+    auto i359 = 0u;
+    for (const auto &e359 : v359) {
+      sv359.set(i359, es.EntityId(e359));
+      ++i359;
+    }
+  } while (false);
+  do {
+    auto v360 = e.Protocols();
+    auto sv360 = b.initVal360(static_cast<unsigned>(v360.size()));
+    auto i360 = 0u;
+    for (const auto &e360 : v360) {
+      sv360.set(i360, es.EntityId(e360));
+      ++i360;
+    }
+  } while (false);
+  do {
+    auto v361 = e.VisibleCategories();
+    auto sv361 = b.initVal361(static_cast<unsigned>(v361.size()));
+    auto i361 = 0u;
+    for (const auto &e361 : v361) {
+      sv361.set(i361, es.EntityId(e361));
+      ++i361;
+    }
+  } while (false);
+  do {
+    auto v362 = e.VisibleExtensions();
+    auto sv362 = b.initVal362(static_cast<unsigned>(v362.size()));
+    auto i362 = 0u;
+    for (const auto &e362 : v362) {
+      sv362.set(i362, es.EntityId(e362));
+      ++i362;
     }
   } while (false);
 }
@@ -7432,14 +11447,14 @@ void SerializeObjCImplDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pas
   (void) b;
   (void) e;
   SerializeObjCContainerDecl(es, b, e);
-  b.setVal61(es.EntityId(e.ClassInterface()));
+  b.setVal66(es.EntityId(e.ClassInterface()));
   do {
-    auto v350 = e.PropertyImplementations();
-    auto sv350 = b.initVal350(static_cast<unsigned>(v350.size()));
-    auto i350 = 0u;
-    for (const auto &e350 : v350) {
-      sv350.set(i350, es.EntityId(e350));
-      ++i350;
+    auto v355 = e.PropertyImplementations();
+    auto sv355 = b.initVal355(static_cast<unsigned>(v355.size()));
+    auto i355 = 0u;
+    for (const auto &e355 : v355) {
+      sv355.set(i355, es.EntityId(e355));
+      ++i355;
     }
   } while (false);
 }
@@ -7449,9 +11464,9 @@ void SerializeObjCCategoryImplDecl(EntityMapper &es, mx::ast::Decl::Builder b, c
   (void) b;
   (void) e;
   SerializeObjCImplDecl(es, b, e);
-  b.setVal62(es.EntityId(e.CategoryDeclaration()));
-  auto t63 = e.CategoryNameToken();
-  b.setVal63(es.EntityId(t63));
+  b.setVal67(es.EntityId(e.CategoryDeclaration()));
+  auto t68 = e.CategoryNameToken();
+  b.setVal68(es.EntityId(t68));
 }
 
 void SerializeObjCImplementationDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ObjCImplementationDecl &e) {
@@ -7459,25 +11474,25 @@ void SerializeObjCImplementationDecl(EntityMapper &es, mx::ast::Decl::Builder b,
   (void) b;
   (void) e;
   SerializeObjCImplDecl(es, b, e);
-  auto t62 = e.InstanceVariableLBraceToken();
-  b.setVal62(es.EntityId(t62));
-  auto t63 = e.InstanceVariableRBraceToken();
-  b.setVal63(es.EntityId(t63));
-  auto v67 = e.ObjCRuntimeNameAsString();
-  std::string s67(v67.data(), v67.size());
-  b.setVal67(s67);
-  b.setVal71(es.EntityId(e.SuperClass()));
-  auto t74 = e.SuperClassToken();
-  b.setVal74(es.EntityId(t74));
-  b.setVal68(e.HasDestructors());
-  b.setVal69(e.HasNonZeroConstructors());
+  auto t67 = e.InstanceVariableLBraceToken();
+  b.setVal67(es.EntityId(t67));
+  auto t68 = e.InstanceVariableRBraceToken();
+  b.setVal68(es.EntityId(t68));
+  auto v72 = e.ObjCRuntimeNameAsString();
+  std::string s72(v72.data(), v72.size());
+  b.setVal72(s72);
+  b.setVal76(es.EntityId(e.SuperClass()));
+  auto t79 = e.SuperClassToken();
+  b.setVal79(es.EntityId(t79));
+  b.setVal73(e.HasDestructors());
+  b.setVal74(e.HasNonZeroConstructors());
   do {
-    auto v351 = e.InstanceVariables();
-    auto sv351 = b.initVal351(static_cast<unsigned>(v351.size()));
-    auto i351 = 0u;
-    for (const auto &e351 : v351) {
-      sv351.set(i351, es.EntityId(e351));
-      ++i351;
+    auto v356 = e.InstanceVariables();
+    auto sv356 = b.initVal356(static_cast<unsigned>(v356.size()));
+    auto i356 = 0u;
+    for (const auto &e356 : v356) {
+      sv356.set(i356, es.EntityId(e356));
+      ++i356;
     }
   } while (false);
 }
@@ -7487,20 +11502,20 @@ void SerializeObjCCompatibleAliasDecl(EntityMapper &es, mx::ast::Decl::Builder b
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  b.setVal51(es.EntityId(e.ClassInterface()));
+  b.setVal56(es.EntityId(e.ClassInterface()));
 }
 
 void SerializeNamespaceDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::NamespaceDecl &e) {
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -7509,26 +11524,26 @@ void SerializeNamespaceAliasDecl(EntityMapper &es, mx::ast::Decl::Builder b, con
   (void) b;
   (void) e;
   SerializeNamedDecl(es, b, e);
-  auto t51 = e.AliasToken();
-  b.setVal51(es.EntityId(t51));
-  b.setVal52(es.EntityId(e.AliasedNamespace()));
-  auto t53 = e.NamespaceToken();
-  b.setVal53(es.EntityId(t53));
-  auto t61 = e.TargetNameToken();
-  b.setVal61(es.EntityId(t61));
+  auto t56 = e.AliasToken();
+  b.setVal56(es.EntityId(t56));
+  b.setVal57(es.EntityId(e.AliasedNamespace()));
+  auto t58 = e.NamespaceToken();
+  b.setVal58(es.EntityId(t58));
+  auto t66 = e.TargetNameToken();
+  b.setVal66(es.EntityId(t66));
 }
 
 void SerializeLinkageSpecDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::LinkageSpecDecl &e) {
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -7538,17 +11553,17 @@ void SerializeLifetimeExtendedTemporaryDecl(EntityMapper &es, mx::ast::Decl::Bui
   (void) e;
   SerializeDecl(es, b, e);
   do {
-    auto v45 = e.ChildrenExpression();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.ChildrenExpression();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
-  b.setVal43(es.EntityId(e.ExtendingDeclaration()));
-  b.setVal60(static_cast<unsigned char>(mx::FromPasta(e.StorageDuration())));
-  b.setVal51(es.EntityId(e.TemporaryExpression()));
+  b.setVal48(es.EntityId(e.ExtendingDeclaration()));
+  b.setVal65(static_cast<unsigned char>(mx::FromPasta(e.StorageDuration())));
+  b.setVal56(es.EntityId(e.TemporaryExpression()));
 }
 
 void SerializeImportDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ImportDecl &e) {
@@ -7557,12 +11572,12 @@ void SerializeImportDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta
   (void) e;
   SerializeDecl(es, b, e);
   do {
-    auto v45 = e.IdentifierTokens();
-    auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-    auto i45 = 0u;
-    for (const auto &e45 : v45) {
-      sv45.set(i45, es.EntityId(e45));
-      ++i45;
+    auto v50 = e.IdentifierTokens();
+    auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+    auto i50 = 0u;
+    for (const auto &e50 : v50) {
+      sv50.set(i50, es.EntityId(e50));
+      ++i50;
     }
   } while (false);
 }
@@ -7578,32 +11593,34 @@ void SerializeFriendDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  auto v43 = e.FriendDeclaration();
-  if (v43) {
-    auto id43 = es.EntityId(v43.value());    b.setVal43(id43);
-    b.setVal44(id43 != mx::kInvalidEntityId);
+  auto v48 = e.FriendDeclaration();
+  if (v48) {
+    auto id48 = es.EntityId(v48.value());
+    b.setVal48(id48);
+    b.setVal49(id48 != mx::kInvalidEntityId);
   } else {
-    b.setVal43(mx::kInvalidEntityId);
-    b.setVal44(false);
+    b.setVal48(mx::kInvalidEntityId);
+    b.setVal49(false);
   }
-  auto t51 = e.FriendToken();
-  b.setVal51(es.EntityId(t51));
-  auto v52 = e.FriendType();
-  if (v52) {
-    auto id52 = es.EntityId(v52.value());    b.setVal52(id52);
-    b.setVal47(id52 != mx::kInvalidEntityId);
+  auto t56 = e.FriendToken();
+  b.setVal56(es.EntityId(t56));
+  auto v57 = e.FriendType();
+  if (v57) {
+    auto id57 = es.EntityId(v57.value());
+    b.setVal57(id57);
+    b.setVal52(id57 != mx::kInvalidEntityId);
   } else {
-    b.setVal52(mx::kInvalidEntityId);
-    b.setVal47(false);
+    b.setVal57(mx::kInvalidEntityId);
+    b.setVal52(false);
   }
-  b.setVal48(e.IsUnsupportedFriend());
+  b.setVal53(e.IsUnsupportedFriend());
   do {
-    auto v73 = e.FriendTypeTemplateParameterLists();
-    auto sv73 = b.initVal73(static_cast<unsigned>(v73.size()));
-    auto i73 = 0u;
-    for (const auto &e73 : v73) {
-      sv73.set(i73, es.PseudoId(e73));
-      ++i73;
+    auto v78 = e.FriendTypeTemplateParameterLists();
+    auto sv78 = b.initVal78(static_cast<unsigned>(v78.size()));
+    auto i78 = 0u;
+    for (const auto &e78 : v78) {
+      sv78.set(i78, es.PseudoId(e78));
+      ++i78;
     }
   } while (false);
 }
@@ -7613,24 +11630,24 @@ void SerializeFileScopeAsmDecl(EntityMapper &es, mx::ast::Decl::Builder b, const
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  auto t43 = e.AssemblyToken();
-  b.setVal43(es.EntityId(t43));
-  b.setVal51(es.EntityId(e.AssemblyString()));
-  auto t52 = e.RParenToken();
-  b.setVal52(es.EntityId(t52));
+  auto t48 = e.AssemblyToken();
+  b.setVal48(es.EntityId(t48));
+  b.setVal56(es.EntityId(e.AssemblyString()));
+  auto t57 = e.RParenToken();
+  b.setVal57(es.EntityId(t57));
 }
 
 void SerializeExternCContextDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::ExternCContextDecl &e) {
   (void) es;
   (void) b;
   (void) e;
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 
@@ -7639,18 +11656,18 @@ void SerializeExportDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta
   (void) b;
   (void) e;
   SerializeDecl(es, b, e);
-  auto t43 = e.ExportToken();
-  b.setVal43(es.EntityId(t43));
-  auto t51 = e.RBraceToken();
-  b.setVal51(es.EntityId(t51));
-  b.setVal44(e.HasBraces());
-  pasta::DeclContext dc45(e);
-  auto v45 = dc45.AlreadyLoadedDeclarations();
-  auto sv45 = b.initVal45(static_cast<unsigned>(v45.size()));
-  auto i45 = 0u;
-  for (const pasta::Decl &e45 : v45) {
-    sv45.set(i45, es.EntityId(e45));
-    ++i45;
+  auto t48 = e.ExportToken();
+  b.setVal48(es.EntityId(t48));
+  auto t56 = e.RBraceToken();
+  b.setVal56(es.EntityId(t56));
+  b.setVal49(e.HasBraces());
+  pasta::DeclContext dc50(e);
+  auto v50 = dc50.AlreadyLoadedDeclarations();
+  auto sv50 = b.initVal50(static_cast<unsigned>(v50.size()));
+  auto i50 = 0u;
+  for (const pasta::Decl &e50 : v50) {
+    sv50.set(i50, es.EntityId(e50));
+    ++i50;
   }
 }
 

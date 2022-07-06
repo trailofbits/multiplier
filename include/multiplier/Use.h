@@ -13,6 +13,7 @@
 
 namespace mx {
 
+class Attr;
 class CXXBaseSpecifier;
 class Decl;
 class EntityProvider;
@@ -32,7 +33,8 @@ enum class UseKind : unsigned char {
   CXX_BASE_SPECIFIER,
   TEMPLATE_ARGUMENT,
   TEMPLATE_PARAMETER_LIST,
-  DESIGNATOR
+  DESIGNATOR,
+  ATTRIBUTE
 };
 
 inline static const char *EnumerationName(UseKind) {
@@ -65,8 +67,9 @@ class UseBase {
   UseBase(void) = default;
 
   UseBase(Decl decl, UseSelectorSet selectors_);
-  UseBase(Stmt decl, UseSelectorSet selectors_);
-  UseBase(Type decl, UseSelectorSet selectors_);
+  UseBase(Stmt stmt, UseSelectorSet selectors_);
+  UseBase(Type type, UseSelectorSet selectors_);
+  UseBase(Attr attr, UseSelectorSet selectors_);
   UseBase(CXXBaseSpecifier decl, UseSelectorSet selectors_);
   UseBase(TemplateArgument decl, UseSelectorSet selectors_);
   UseBase(TemplateParameterList decl, UseSelectorSet selectors_);
@@ -76,12 +79,14 @@ class UseBase {
   std::optional<Decl> as_declaration(void) const;
   std::optional<Stmt> as_statement(void) const;
   std::optional<Type> as_type(void) const;
+  std::optional<Attr> as_attribute(void) const;
   std::optional<CXXBaseSpecifier> as_cxx_base_specifier(void) const;
   std::optional<TemplateArgument> as_template_argument(void) const;
   std::optional<TemplateParameterList> as_template_parameter_list(void) const;
   std::optional<Designator> as_designator(void) const;
 };
 
+enum class AttrUseSelector : unsigned short;
 enum class DeclUseSelector : unsigned short;
 enum class StmtUseSelector : unsigned short;
 enum class TypeUseSelector : unsigned short;
@@ -91,6 +96,7 @@ enum class TokenUseSelector : unsigned short;
 template <typename Selector>
 class Use : public UseBase {
  private:
+  friend class Attr;
   friend class Decl;
   friend class Fragment;
   friend class FragmentImpl;
@@ -183,6 +189,7 @@ class UseIterator : public UseIteratorBase {
 template <typename Selector>
 class UseRange {
  private:
+  friend class Attr;
   friend class Decl;
   friend class Stmt;
   friend class Type;

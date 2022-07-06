@@ -117,6 +117,9 @@
 #ifndef MX_BEGIN_VISIT_TYPE
 #  define MX_BEGIN_VISIT_TYPE(...)
 #endif
+#ifndef MX_BEGIN_VISIT_ATTR
+#  define MX_BEGIN_VISIT_ATTR(...)
+#endif
 #ifndef MX_BEGIN_VISIT_ABSTRACT_DECL
 #  define MX_BEGIN_VISIT_ABSTRACT_DECL MX_BEGIN_VISIT_DECL
 #endif
@@ -125,6 +128,9 @@
 #endif
 #ifndef MX_BEGIN_VISIT_ABSTRACT_TYPE
 #  define MX_BEGIN_VISIT_ABSTRACT_TYPE MX_BEGIN_VISIT_TYPE
+#endif
+#ifndef MX_BEGIN_VISIT_ABSTRACT_ATTR
+#  define MX_BEGIN_VISIT_ABSTRACT_ATTR MX_BEGIN_VISIT_ATTR
 #endif
 #ifndef MX_BEGIN_VISIT_PSEUDO
 #  define MX_BEGIN_VISIT_PSEUDO(...)
@@ -137,6 +143,9 @@
 #endif
 #ifndef MX_END_VISIT_TYPE
 #  define MX_END_VISIT_TYPE(...)
+#endif
+#ifndef MX_END_VISIT_ATTR
+#  define MX_END_VISIT_ATTR(...)
 #endif
 #ifndef MX_END_VISIT_PSEUDO
 #  define MX_END_VISIT_PSEUDO(...)
@@ -251,11 +260,591 @@ MX_BEGIN_ENUM_CLASS(DeclKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(DeclKind, VAR_TEMPLATE_SPECIALIZATION, unsigned char)
 MX_END_ENUM_CLASS(DeclKind)
 
+MX_BEGIN_ENUM_CLASS(AttrKind, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, A_ARCH64_VECTOR_PCS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AMDGPU_FLAT_WORK_GROUP_SIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AMDGPU_NUM_SGPR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AMDGPU_NUM_VGPR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AMDGPU_WAVES_PER_EU, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ARM_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AVR_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AVR_SIGNAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ABI_TAG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ACQUIRE_CAPABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ACQUIRE_HANDLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ACQUIRED_AFTER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ACQUIRED_BEFORE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALIAS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALIGN_MAC68K, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALIGN_NATURAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALIGN_VALUE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALIGNED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALLOC_ALIGN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALLOC_SIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALWAYS_DESTROY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ALWAYS_INLINE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ANALYZER_NO_RETURN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ANNOTATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ANY_X86_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ANY_X86_NO_CALLER_SAVED_REGISTERS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ANY_X86_NO_CF_CHECK, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ARC_WEAKREF_UNAVAILABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ARGUMENT_WITH_TYPE_TAG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ARM_BUILTIN_ALIAS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ARM_MVE_STRICT_POLYMORPHISM, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ARTIFICIAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ASM_LABEL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ASSERT_CAPABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ASSERT_EXCLUSIVE_LOCK, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ASSERT_SHARED_LOCK, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ASSUME_ALIGNED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ASSUMPTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, AVAILABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, BPF_PRESERVE_ACCESS_INDEX, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, BTF_DECL_TAG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, BTF_TYPE_TAG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, BLOCKS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, BUILTIN_ALIAS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, BUILTIN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, C11_NO_RETURN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, C_DECL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CF_AUDITED_TRANSFER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CF_CONSUMED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CF_GUARD, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CFI_CANONICAL_JUMP_TABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CF_RETURNS_NOT_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CF_RETURNS_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CF_UNKNOWN_TRANSFER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CPU_DISPATCH, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CPU_SPECIFIC, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_CONSTANT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_DEVICE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_DEVICE_BUILTIN_SURFACE_TYPE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_DEVICE_BUILTIN_TEXTURE_TYPE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_GLOBAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_HOST, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_INVALID_TARGET, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_LAUNCH_BOUNDS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CUDA_SHARED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CXX11_NO_RETURN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CALLABLE_WHEN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CALLBACK, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CALLED_ONCE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CAPABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CAPTURED_RECORD, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CARRIES_DEPENDENCY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CLEANUP, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CMSE_NS_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CMSE_NS_ENTRY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CODE_SEG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, COLD, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, COMMON, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONST, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONST_INIT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONSTRUCTOR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONSUMABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONSUMABLE_AUTO_CAST, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONSUMABLE_SET_ON_READ, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, CONVERGENT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DLL_EXPORT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DLL_EXPORT_STATIC_LOCAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DLL_IMPORT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DLL_IMPORT_STATIC_LOCAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DEPRECATED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DESTRUCTOR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DIAGNOSE_AS_BUILTIN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DIAGNOSE_IF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DISABLE_SANITIZER_INSTRUMENTATION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, DISABLE_TAIL_CALLS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, EMPTY_BASES, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ENABLE_IF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ENFORCE_TCB, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ENFORCE_TCB_LEAF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ENUM_EXTENSIBILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, ERROR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, EXCLUDE_FROM_EXPLICIT_INSTANTIATION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, EXCLUSIVE_TRYLOCK_FUNCTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, EXTERNAL_SOURCE_SYMBOL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FALL_THROUGH, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FAST_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FINAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FLAG_ENUM, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FLATTEN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FORMAT_ARG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, FORMAT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, GNU_INLINE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, GUARDED_BY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, GUARDED_VAR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, HIP_MANAGED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, HOT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, IB_ACTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, IB_OUTLET, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, IB_OUTLET_COLLECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, I_FUNC, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, INIT_PRIORITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, INIT_SEG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, INTEL_OCL_BICC, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, INTERNAL_LINKAGE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LTO_VISIBILITY_PUBLIC, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LAYOUT_VERSION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LEAF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LIFETIME_BOUND, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LIKELY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LOADER_UNINITIALIZED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LOCK_RETURNED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LOCKS_EXCLUDED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, LOOP_HINT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, M68K_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIG_SERVER_ROUTINE_, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MSABI, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MS_ALLOCATOR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MS_INHERITANCE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MS_NO_V_TABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MSP430_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MS_STRUCT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MS_VTOR_DISP, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MAX_FIELD_ALIGNMENT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MAY_ALIAS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MICRO_MIPS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIN_SIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIN_VECTOR_WIDTH, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIPS16, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIPS_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIPS_LONG_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MIPS_SHORT_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MODE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, MUST_TAIL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NS_CONSUMED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NS_CONSUMES_SELF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NS_ERROR_DOMAIN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NS_RETURNS_AUTORELEASED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NS_RETURNS_NOT_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NS_RETURNS_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NAKED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_ALIAS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_BUILTIN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_COMMON, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_DEBUG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_DEREF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_DESTROY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_DUPLICATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_ESCAPE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_INLINE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_INSTRUMENT_FUNCTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_MERGE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_MICRO_MIPS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_MIPS16, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_PROFILE_FUNCTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_RETURN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_SANITIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_SPECULATIVE_LOAD_HARDENING, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_SPLIT_STACK, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_STACK_PROTECTOR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_THREAD_SAFETY_ANALYSIS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_THROW, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NO_UNIQUE_ADDRESS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NON_NULL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, NOT_TAIL_CALLED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_ALLOCATE_DECL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_CAPTURE_KIND, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_CAPTURE_NO_INIT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_DECLARE_SIMD_DECL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_DECLARE_TARGET_DECL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_DECLARE_VARIANT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_REFERENCED_VAR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OMP_THREAD_PRIVATE_DECL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OS_CONSUMED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OS_CONSUMES_THIS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OS_RETURNS_NOT_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OS_RETURNS_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OS_RETURNS_RETAINED_ON_NON_ZERO, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OS_RETURNS_RETAINED_ON_ZERO, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_BOXABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_BRIDGE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_BRIDGE_MUTABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_BRIDGE_RELATED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_CLASS_STUB, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_DESIGNATED_INITIALIZER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_DIRECT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_DIRECT_MEMBERS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_EXCEPTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_EXPLICIT_PROTOCOL_IMPL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_EXTERNALLY_RETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_CGC, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_INDEPENDENT_CLASS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_INERT_UNSAFE_UNRETAINED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_KIND_OF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_METHOD_FAMILY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_CNS_OBJECT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_NON_LAZY_CLASS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_NON_RUNTIME_PROTOCOL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_OWNERSHIP, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_PRECISE_LIFETIME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_REQUIRES_PROPERTY_DEFS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_REQUIRES_SUPER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_RETURNS_INNER_POINTER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_ROOT_CLASS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_RUNTIME_NAME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_RUNTIME_VISIBLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OBJ_C_SUBCLASSING_RESTRICTED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_ACCESS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_CONSTANT_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_GENERIC_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_GLOBAL_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_KERNEL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_LOCAL_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_PRIVATE_ADDRESS_SPACE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPEN_CL_UNROLL_HINT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OPTIMIZE_NONE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OVERLOADABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OVERRIDE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OWNER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, OWNERSHIP, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PACKED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PARAM_TYPESTATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PASCAL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PASS_OBJECT_SIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PATCHABLE_FUNCTION_ENTRY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PCS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, POINTER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRAGMA_CLANG_BSS_SECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRAGMA_CLANG_DATA_SECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRAGMA_CLANG_RELRO_SECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRAGMA_CLANG_RODATA_SECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRAGMA_CLANG_TEXT_SECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PREFERRED_NAME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRESERVE_ALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PRESERVE_MOST, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PT_GUARDED_BY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PT_GUARDED_VAR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PTR32, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PTR64, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, PURE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RISCV_INTERRUPT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, REG_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, REINITIALIZES, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RELEASE_CAPABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RELEASE_HANDLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RENDER_SCRIPT_KERNEL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, REQD_WORK_GROUP_SIZE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, REQUIRES_CAPABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RESTRICT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RETAIN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RETURN_TYPESTATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RETURNS_NON_NULL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, RETURNS_TWICE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, S_PTR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SYCL_KERNEL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SYCL_SPECIAL_CLASS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SCOPED_LOCKABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SECTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SELECT_ANY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SENTINEL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SET_TYPESTATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SHARED_TRYLOCK_FUNCTION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SPECULATIVE_LOAD_HARDENING, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, STANDALONE_DEBUG, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, STD_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, STRICT_FP, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SUPPRESS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ASYNC, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ASYNC_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ASYNC_CONTEXT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ASYNC_ERROR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ASYNC_NAME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ATTR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_BRIDGE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_BRIDGED_TYPEDEF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_CONTEXT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ERROR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_ERROR_RESULT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_INDIRECT_RESULT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_NAME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_NEW_TYPE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_OBJ_C_MEMBERS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SWIFT_PRIVATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, SYS_VABI, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TLS_MODEL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TARGET, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TARGET_CLONES, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TEST_TYPESTATE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, THIS_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, THREAD, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TRANSPARENT_UNION, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TRIVIAL_ABI, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TRY_ACQUIRE_CAPABILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TYPE_NON_NULL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TYPE_NULL_UNSPECIFIED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TYPE_NULLABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TYPE_NULLABLE_RESULT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TYPE_TAG_FOR_DATATYPE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, TYPE_VISIBILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, U_PTR, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, UNAVAILABLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, UNINITIALIZED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, UNLIKELY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, UNUSED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, USE_HANDLE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, USED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, USING_IF_EXISTS, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, UUID, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, VEC_RETURN, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, VEC_TYPE_HINT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, VECTOR_CALL, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, VISIBILITY, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WARN_UNUSED, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WARN_UNUSED_RESULT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WEAK, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WEAK_IMPORT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WEAK_REF, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WEB_ASSEMBLY_EXPORT_NAME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WEB_ASSEMBLY_IMPORT_MODULE, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WEB_ASSEMBLY_IMPORT_NAME, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, WORK_GROUP_SIZE_HINT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, X86_FORCE_ALIGN_ARG_POINTER, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, X_RAY_INSTRUMENT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(AttrKind, X_RAY_LOG_ARGS, unsigned short)
+MX_END_ENUM_CLASS(AttrKind)
+
+MX_BEGIN_ENUM_CLASS(AArch64VectorPcsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AArch64VectorPcsAttrSpelling, GNU_AARCH64_VECTOR_PCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AArch64VectorPcsAttrSpelling, CXX11_CLANG_AARCH64_VECTOR_PCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AArch64VectorPcsAttrSpelling, C2X_CLANG_AARCH64_VECTOR_PCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AArch64VectorPcsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AArch64VectorPcsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AMDGPUFlatWorkGroupSizeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUFlatWorkGroupSizeAttrSpelling, GNU_AMDGPU_FLAT_WORK_GROUP_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUFlatWorkGroupSizeAttrSpelling, CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUFlatWorkGroupSizeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AMDGPUFlatWorkGroupSizeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AMDGPUNumSGPRAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUNumSGPRAttrSpelling, GNU_AMDGPU_NUM_SGPR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUNumSGPRAttrSpelling, CXX11_CLANG_AMDGPU_NUM_SGPR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUNumSGPRAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AMDGPUNumSGPRAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AMDGPUNumVGPRAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUNumVGPRAttrSpelling, GNU_AMDGPU_NUM_VGPR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUNumVGPRAttrSpelling, CXX11_CLANG_AMDGPU_NUM_VGPR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUNumVGPRAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AMDGPUNumVGPRAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AMDGPUWavesPerEUAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUWavesPerEUAttrSpelling, GNU_AMDGPU_WAVES_PER_EU, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUWavesPerEUAttrSpelling, CXX11_CLANG_AMDGPU_WAVES_PER_EU, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AMDGPUWavesPerEUAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AMDGPUWavesPerEUAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ARMInterruptAttrInterruptType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrInterruptType, IRQ, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrInterruptType, FIQ, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrInterruptType, SWI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrInterruptType, ABORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrInterruptType, UNDEF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrInterruptType, GENERIC, unsigned char)
+MX_END_ENUM_CLASS(ARMInterruptAttrInterruptType)
+
+MX_BEGIN_ENUM_CLASS(ARMInterruptAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrSpelling, GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrSpelling, CXX11_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrSpelling, C2X_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ARMInterruptAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ARMInterruptAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AVRInterruptAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRInterruptAttrSpelling, GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRInterruptAttrSpelling, CXX11_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRInterruptAttrSpelling, C2X_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRInterruptAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AVRInterruptAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AVRSignalAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRSignalAttrSpelling, GNU_SIGNAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRSignalAttrSpelling, CXX11_GNU_SIGNAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRSignalAttrSpelling, C2X_GNU_SIGNAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AVRSignalAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AVRSignalAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AbiTagAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AbiTagAttrSpelling, GNU_ABI_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AbiTagAttrSpelling, CXX11_GNU_ABI_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AbiTagAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AbiTagAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AcquireCapabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, GNU_ACQUIRE_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, CXX11_CLANG_ACQUIRE_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, GNU_ACQUIRE_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, GNU_EXCLUSIVE_LOCK_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, GNU_SHARED_LOCK_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireCapabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AcquireCapabilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AcquireHandleAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireHandleAttrSpelling, GNU_ACQUIRE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireHandleAttrSpelling, CXX11_CLANG_ACQUIRE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireHandleAttrSpelling, C2X_CLANG_ACQUIRE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AcquireHandleAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AcquireHandleAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AddressSpaceAttrSpelling, GNU_ADDRESS_SPACE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AddressSpaceAttrSpelling, CXX11_CLANG_ADDRESS_SPACE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AddressSpaceAttrSpelling, C2X_CLANG_ADDRESS_SPACE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AliasAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AliasAttrSpelling, GNU_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AliasAttrSpelling, CXX11_GNU_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AliasAttrSpelling, C2X_GNU_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AliasAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AliasAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AlignedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, GNU_ALIGNED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, CXX11_GNU_ALIGNED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, C2X_GNU_ALIGNED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, DECLSPEC_ALIGN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, KEYWORD_ALIGNAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, KEYWORD__ALIGNAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlignedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AlignedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AllocAlignAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocAlignAttrSpelling, GNU_ALLOC_ALIGN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocAlignAttrSpelling, CXX11_GNU_ALLOC_ALIGN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocAlignAttrSpelling, C2X_GNU_ALLOC_ALIGN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocAlignAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AllocAlignAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AllocSizeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocSizeAttrSpelling, GNU_ALLOC_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocSizeAttrSpelling, CXX11_GNU_ALLOC_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocSizeAttrSpelling, C2X_GNU_ALLOC_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AllocSizeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AllocSizeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AlwaysDestroyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysDestroyAttrSpelling, GNU_ALWAYS_DESTROY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysDestroyAttrSpelling, CXX11_CLANG_ALWAYS_DESTROY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysDestroyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AlwaysDestroyAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AlwaysInlineAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysInlineAttrSpelling, GNU_ALWAYS_INLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysInlineAttrSpelling, CXX11_GNU_ALWAYS_INLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysInlineAttrSpelling, C2X_GNU_ALWAYS_INLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysInlineAttrSpelling, KEYWORD_FORCEINLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AlwaysInlineAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AlwaysInlineAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AnnotateAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnnotateAttrSpelling, GNU_ANNOTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnnotateAttrSpelling, CXX11_CLANG_ANNOTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnnotateAttrSpelling, C2X_CLANG_ANNOTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnnotateAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AnnotateAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AnyX86InterruptAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86InterruptAttrSpelling, GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86InterruptAttrSpelling, CXX11_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86InterruptAttrSpelling, C2X_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86InterruptAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AnyX86InterruptAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AnyX86NoCallerSavedRegistersAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCallerSavedRegistersAttrSpelling, GNU_NO_CALLER_SAVED_REGISTERS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCallerSavedRegistersAttrSpelling, CXX11_GNU_NO_CALLER_SAVED_REGISTERS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCallerSavedRegistersAttrSpelling, C2X_GNU_NO_CALLER_SAVED_REGISTERS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCallerSavedRegistersAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AnyX86NoCallerSavedRegistersAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AnyX86NoCfCheckAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCfCheckAttrSpelling, GNU_NOCF_CHECK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCfCheckAttrSpelling, CXX11_GNU_NOCF_CHECK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCfCheckAttrSpelling, C2X_GNU_NOCF_CHECK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AnyX86NoCfCheckAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AnyX86NoCfCheckAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ArcWeakrefUnavailableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArcWeakrefUnavailableAttrSpelling, GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArcWeakrefUnavailableAttrSpelling, CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArcWeakrefUnavailableAttrSpelling, C2X_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArcWeakrefUnavailableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ArcWeakrefUnavailableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ArgumentWithTypeTagAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, GNU_ARGUMENT_WITH_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, C2X_CLANG_ARGUMENT_WITH_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, GNU_POINTER_WITH_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, CXX11_CLANG_POINTER_WITH_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, C2X_CLANG_POINTER_WITH_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArgumentWithTypeTagAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ArgumentWithTypeTagAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ArmBuiltinAliasAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmBuiltinAliasAttrSpelling, GNU_CLANG_ARM_BUILTIN_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmBuiltinAliasAttrSpelling, CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmBuiltinAliasAttrSpelling, C2X_CLANG_CLANG_ARM_BUILTIN_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmBuiltinAliasAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ArmBuiltinAliasAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ArmMveStrictPolymorphismAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmMveStrictPolymorphismAttrSpelling, GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmMveStrictPolymorphismAttrSpelling, CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmMveStrictPolymorphismAttrSpelling, C2X_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArmMveStrictPolymorphismAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ArmMveStrictPolymorphismAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(ArrayTypeArraySizeModifier, unsigned char)
   MX_ENUM_CLASS_ENTRY(ArrayTypeArraySizeModifier, NORMAL, unsigned char)
   MX_ENUM_CLASS_ENTRY(ArrayTypeArraySizeModifier, STATIC, unsigned char)
   MX_ENUM_CLASS_ENTRY(ArrayTypeArraySizeModifier, STAR, unsigned char)
 MX_END_ENUM_CLASS(ArrayTypeArraySizeModifier)
+
+MX_BEGIN_ENUM_CLASS(ArtificialAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArtificialAttrSpelling, GNU_ARTIFICIAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArtificialAttrSpelling, CXX11_GNU_ARTIFICIAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArtificialAttrSpelling, C2X_GNU_ARTIFICIAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ArtificialAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ArtificialAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AsmLabelAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AsmLabelAttrSpelling, KEYWORD_ASSEMBLY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AsmLabelAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AsmLabelAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AssertCapabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssertCapabilityAttrSpelling, GNU_ASSERT_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssertCapabilityAttrSpelling, CXX11_CLANG_ASSERT_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssertCapabilityAttrSpelling, GNU_ASSERT_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssertCapabilityAttrSpelling, CXX11_CLANG_ASSERT_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssertCapabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AssertCapabilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AssumeAlignedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumeAlignedAttrSpelling, GNU_ASSUME_ALIGNED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumeAlignedAttrSpelling, CXX11_GNU_ASSUME_ALIGNED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumeAlignedAttrSpelling, C2X_GNU_ASSUME_ALIGNED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumeAlignedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AssumeAlignedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(AssumptionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumptionAttrSpelling, GNU_ASSUME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumptionAttrSpelling, CXX11_CLANG_ASSUME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumptionAttrSpelling, C2X_CLANG_ASSUME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AssumptionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AssumptionAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(AtomicExprAtomicOp, unsigned char)
   MX_ENUM_CLASS_ENTRY(AtomicExprAtomicOp, C11_ATOMIC_INITIALIZER, unsigned char)
@@ -322,43 +911,89 @@ MX_BEGIN_ENUM_CLASS(AtomicExprAtomicOp, unsigned char)
   MX_ENUM_CLASS_ENTRY(AtomicExprAtomicOp, HIP_ATOMIC_FETCH_MAX, unsigned char)
 MX_END_ENUM_CLASS(AtomicExprAtomicOp)
 
+MX_BEGIN_ENUM_CLASS(AvailabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AvailabilityAttrSpelling, GNU_AVAILABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AvailabilityAttrSpelling, CXX11_CLANG_AVAILABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AvailabilityAttrSpelling, C2X_CLANG_AVAILABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AvailabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(AvailabilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(BPFPreserveAccessIndexAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BPFPreserveAccessIndexAttrSpelling, GNU_PRESERVE_ACCESS_INDEX, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BPFPreserveAccessIndexAttrSpelling, CXX11_CLANG_PRESERVE_ACCESS_INDEX, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BPFPreserveAccessIndexAttrSpelling, C2X_CLANG_PRESERVE_ACCESS_INDEX, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BPFPreserveAccessIndexAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(BPFPreserveAccessIndexAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(BTFDeclTagAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFDeclTagAttrSpelling, GNU_BTF_DECLARATION_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFDeclTagAttrSpelling, CXX11_CLANG_BTF_DECLARATION_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFDeclTagAttrSpelling, C2X_CLANG_BTF_DECLARATION_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFDeclTagAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(BTFDeclTagAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(BTFTypeTagAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFTypeTagAttrSpelling, GNU_BTF_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFTypeTagAttrSpelling, CXX11_CLANG_BTF_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFTypeTagAttrSpelling, C2X_CLANG_BTF_TYPE_TAG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BTFTypeTagAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(BTFTypeTagAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(BlocksAttrBlockType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BlocksAttrBlockType, BY_REFERENCE, unsigned char)
+MX_END_ENUM_CLASS(BlocksAttrBlockType)
+
+MX_BEGIN_ENUM_CLASS(BlocksAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BlocksAttrSpelling, GNU_BLOCKS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BlocksAttrSpelling, CXX11_CLANG_BLOCKS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BlocksAttrSpelling, C2X_CLANG_BLOCKS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BlocksAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(BlocksAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(BuiltinAliasAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinAliasAttrSpelling, CXX11_CLANG_BUILTIN_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinAliasAttrSpelling, C2X_CLANG_BUILTIN_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinAliasAttrSpelling, GNU_CLANG_BUILTIN_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinAliasAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(BuiltinAliasAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(BuiltinTypeKind, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DRO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DARRAY_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DBUFFER_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DRO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DDEPTH_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_DEPTH_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DMSAARO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_MSAARO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DMSAA_DEPTH_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_MSAA_DEPTH_RO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE3_DRO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DWO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DARRAY_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DBUFFER_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DWO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DDEPTH_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_DEPTH_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DMSAAWO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_MSAAWO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DMSAA_DEPTH_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_MSAA_DEPTH_WO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE3_DWO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DRW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DARRAY_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE1_DBUFFER_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DRW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DDEPTH_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_DEPTH_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DMSAARW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_MSAARW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DMSAA_DEPTH_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE2_DARRAY_MSAA_DEPTH_RW, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE3_DRW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_ARRAY_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_BUFFER_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_DEPTH_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_DEPTH_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_MSAARO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_MSAARO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_MSAA_DEPTH_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_3D_RO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_ARRAY_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_BUFFER_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_DEPTH_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_DEPTH_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_MSAAWO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_MSAAWO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_MSAA_DEPTH_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_3D_WO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_ARRAY_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_1D_BUFFER_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_DEPTH_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_DEPTH_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_MSAARW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_MSAARW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_MSAA_DEPTH_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_RW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_IMAGE_3D_RW, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_INTEL_SUBGROUP_AVC_MCE_PAYLOAD, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_INTEL_SUBGROUP_AVC_IME_PAYLOAD, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OCL_INTEL_SUBGROUP_AVC_REF_PAYLOAD, unsigned char)
@@ -383,104 +1018,104 @@ MX_BEGIN_ENUM_CLASS(BuiltinTypeKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT8_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT16_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT32_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT64_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT8_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT16_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT32_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT64_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT16_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16_X2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT8_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT16_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT32_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT64_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT8_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT16_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT32_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT64_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT16_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16_X3, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT8_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT16_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT32_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT64_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT8_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT16_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT32_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT64_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT16_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64_X4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16_X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT8X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT16X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT32X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT64X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT8X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT16X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT32X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT64X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT16X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16X2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT8X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT16X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT32X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT64X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT8X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT16X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT32X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT64X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT16X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16X3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT8X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT16X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT32X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_INT64X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT8X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT16X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT32X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_UINT64X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT16X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT32X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_FLOAT64X4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_B_FLOAT16X4, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, SVE_BOOLEAN, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, VECTOR_QUAD, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, VECTOR_PAIR, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_MF8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_MF4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_MF8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_MF4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16_MF4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16_MF4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16_MF4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32_MF2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32_M8, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64_M1, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64_M2, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64_M4, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64_M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8MF8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8MF4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT8M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8MF8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8MF4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT8M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16MF4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT16M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16MF4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT16M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT32M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT32M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_INT64M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_UINT64M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16MF4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT16M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32MF2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT32M8, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64M1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64M2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64M4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_FLOAT64M8, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_BOOL1, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_BOOL2, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, RVV_BOOL4, unsigned char)
@@ -563,6 +1198,124 @@ MX_BEGIN_ENUM_CLASS(BuiltinTypeKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(BuiltinTypeKind, OMP_ITERATOR, unsigned char)
 MX_END_ENUM_CLASS(BuiltinTypeKind)
 
+MX_BEGIN_ENUM_CLASS(CDeclAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CDeclAttrSpelling, GNU_CDECL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CDeclAttrSpelling, CXX11_GNU_CDECL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CDeclAttrSpelling, C2X_GNU_CDECL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CDeclAttrSpelling, KEYWORD_CDECL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CDeclAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CDeclAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CFAuditedTransferAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFAuditedTransferAttrSpelling, GNU_CF_AUDITED_TRANSFER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFAuditedTransferAttrSpelling, CXX11_CLANG_CF_AUDITED_TRANSFER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFAuditedTransferAttrSpelling, C2X_CLANG_CF_AUDITED_TRANSFER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFAuditedTransferAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CFAuditedTransferAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CFConsumedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFConsumedAttrSpelling, GNU_CF_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFConsumedAttrSpelling, CXX11_CLANG_CF_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFConsumedAttrSpelling, C2X_CLANG_CF_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFConsumedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CFConsumedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CFGuardAttrGuardArg, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFGuardAttrGuardArg, NOCF, unsigned char)
+MX_END_ENUM_CLASS(CFGuardAttrGuardArg)
+
+MX_BEGIN_ENUM_CLASS(CFICanonicalJumpTableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFICanonicalJumpTableAttrSpelling, GNU_CFI_CANONICAL_JUMP_TABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFICanonicalJumpTableAttrSpelling, CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFICanonicalJumpTableAttrSpelling, C2X_CLANG_CFI_CANONICAL_JUMP_TABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFICanonicalJumpTableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CFICanonicalJumpTableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CFReturnsNotRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsNotRetainedAttrSpelling, GNU_CF_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsNotRetainedAttrSpelling, CXX11_CLANG_CF_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsNotRetainedAttrSpelling, C2X_CLANG_CF_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsNotRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CFReturnsNotRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CFReturnsRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsRetainedAttrSpelling, GNU_CF_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsRetainedAttrSpelling, CXX11_CLANG_CF_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsRetainedAttrSpelling, C2X_CLANG_CF_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFReturnsRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CFReturnsRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CFUnknownTransferAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFUnknownTransferAttrSpelling, GNU_CF_UNKNOWN_TRANSFER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFUnknownTransferAttrSpelling, CXX11_CLANG_CF_UNKNOWN_TRANSFER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFUnknownTransferAttrSpelling, C2X_CLANG_CF_UNKNOWN_TRANSFER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CFUnknownTransferAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CFUnknownTransferAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CPUDispatchAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUDispatchAttrSpelling, GNU_CPU_DISPATCH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUDispatchAttrSpelling, CXX11_CLANG_CPU_DISPATCH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUDispatchAttrSpelling, C2X_CLANG_CPU_DISPATCH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUDispatchAttrSpelling, DECLSPEC_CPU_DISPATCH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUDispatchAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CPUDispatchAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CPUSpecificAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUSpecificAttrSpelling, GNU_CPU_SPECIFIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUSpecificAttrSpelling, CXX11_CLANG_CPU_SPECIFIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUSpecificAttrSpelling, C2X_CLANG_CPU_SPECIFIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUSpecificAttrSpelling, DECLSPEC_CPU_SPECIFIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CPUSpecificAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CPUSpecificAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDAConstantAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAConstantAttrSpelling, GNU_CONSTANT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAConstantAttrSpelling, DECLSPEC_CONSTANT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAConstantAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDAConstantAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDADeviceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceAttrSpelling, GNU_DEVICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceAttrSpelling, DECLSPEC_DEVICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDADeviceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDADeviceBuiltinSurfaceTypeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceBuiltinSurfaceTypeAttrSpelling, GNU_DEVICE_BUILTIN_SURFACE_TYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceBuiltinSurfaceTypeAttrSpelling, DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceBuiltinSurfaceTypeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDADeviceBuiltinSurfaceTypeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDADeviceBuiltinTextureTypeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceBuiltinTextureTypeAttrSpelling, GNU_DEVICE_BUILTIN_TEXTURE_TYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceBuiltinTextureTypeAttrSpelling, DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDADeviceBuiltinTextureTypeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDADeviceBuiltinTextureTypeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDAGlobalAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAGlobalAttrSpelling, GNU_GLOBAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAGlobalAttrSpelling, DECLSPEC_GLOBAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAGlobalAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDAGlobalAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDAHostAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAHostAttrSpelling, GNU_HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAHostAttrSpelling, DECLSPEC_HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDAHostAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDAHostAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDALaunchBoundsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDALaunchBoundsAttrSpelling, GNU_LAUNCH_BOUNDS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDALaunchBoundsAttrSpelling, DECLSPEC_LAUNCH_BOUNDS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDALaunchBoundsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDALaunchBoundsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CUDASharedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDASharedAttrSpelling, GNU_SHARED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDASharedAttrSpelling, DECLSPEC_SHARED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CUDASharedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CUDASharedAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(CXXConstructExprConstructionKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(CXXConstructExprConstructionKind, COMPLETE, unsigned char)
   MX_ENUM_CLASS_ENTRY(CXXConstructExprConstructionKind, NON_VIRTUAL_BASE, unsigned char)
@@ -581,12 +1334,52 @@ MX_BEGIN_ENUM_CLASS(CallExprADLCallKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(CallExprADLCallKind, USES_ADL, unsigned char)
 MX_END_ENUM_CLASS(CallExprADLCallKind)
 
+MX_BEGIN_ENUM_CLASS(CallableWhenAttrConsumedState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallableWhenAttrConsumedState, UNKNOWN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallableWhenAttrConsumedState, CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallableWhenAttrConsumedState, UNCONSUMED, unsigned char)
+MX_END_ENUM_CLASS(CallableWhenAttrConsumedState)
+
+MX_BEGIN_ENUM_CLASS(CallableWhenAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallableWhenAttrSpelling, GNU_CALLABLE_WHEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallableWhenAttrSpelling, CXX11_CLANG_CALLABLE_WHEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallableWhenAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CallableWhenAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CallbackAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallbackAttrSpelling, GNU_CALLBACK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallbackAttrSpelling, CXX11_CLANG_CALLBACK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallbackAttrSpelling, C2X_CLANG_CALLBACK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CallbackAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CallbackAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CalledOnceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CalledOnceAttrSpelling, GNU_CALLED_ONCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CalledOnceAttrSpelling, CXX11_CLANG_CALLED_ONCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CalledOnceAttrSpelling, C2X_CLANG_CALLED_ONCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CalledOnceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CalledOnceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CapabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CapabilityAttrSpelling, GNU_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CapabilityAttrSpelling, CXX11_CLANG_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CapabilityAttrSpelling, GNU_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CapabilityAttrSpelling, CXX11_CLANG_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CapabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CapabilityAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(CapturedStmtVariableCaptureKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(CapturedStmtVariableCaptureKind, THIS, unsigned char)
   MX_ENUM_CLASS_ENTRY(CapturedStmtVariableCaptureKind, BY_REFERENCE, unsigned char)
   MX_ENUM_CLASS_ENTRY(CapturedStmtVariableCaptureKind, BY_COPY, unsigned char)
   MX_ENUM_CLASS_ENTRY(CapturedStmtVariableCaptureKind, VLA_TYPE, unsigned char)
 MX_END_ENUM_CLASS(CapturedStmtVariableCaptureKind)
+
+MX_BEGIN_ENUM_CLASS(CarriesDependencyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CarriesDependencyAttrSpelling, GNU_CARRIES_DEPENDENCY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CarriesDependencyAttrSpelling, CXX11_CARRIES_DEPENDENCY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CarriesDependencyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CarriesDependencyAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(CharacterLiteralCharacterKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(CharacterLiteralCharacterKind, ASCII, unsigned char)
@@ -596,11 +1389,100 @@ MX_BEGIN_ENUM_CLASS(CharacterLiteralCharacterKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(CharacterLiteralCharacterKind, UTF32, unsigned char)
 MX_END_ENUM_CLASS(CharacterLiteralCharacterKind)
 
+MX_BEGIN_ENUM_CLASS(CleanupAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CleanupAttrSpelling, GNU_CLEANUP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CleanupAttrSpelling, CXX11_GNU_CLEANUP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CleanupAttrSpelling, C2X_GNU_CLEANUP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CleanupAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CleanupAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ColdAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ColdAttrSpelling, GNU_COLD, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ColdAttrSpelling, CXX11_GNU_COLD, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ColdAttrSpelling, C2X_GNU_COLD, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ColdAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ColdAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(CommonAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CommonAttrSpelling, GNU_COMMON, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CommonAttrSpelling, CXX11_GNU_COMMON, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CommonAttrSpelling, C2X_GNU_COMMON, unsigned char)
+  MX_ENUM_CLASS_ENTRY(CommonAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(CommonAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ConstAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstAttrSpelling, GNU_CONST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstAttrSpelling, CXX11_GNU_CONST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstAttrSpelling, C2X_GNU_CONST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConstAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ConstInitAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstInitAttrSpelling, KEYWORD_CONSTINIT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstInitAttrSpelling, GNU_REQUIRE_CONSTANT_INITIALIZATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstInitAttrSpelling, CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstInitAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConstInitAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(ConstantExprResultStorageKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(ConstantExprResultStorageKind, NONE, unsigned char)
   MX_ENUM_CLASS_ENTRY(ConstantExprResultStorageKind, INT64, unsigned char)
   MX_ENUM_CLASS_ENTRY(ConstantExprResultStorageKind, AP_VALUE, unsigned char)
 MX_END_ENUM_CLASS(ConstantExprResultStorageKind)
+
+MX_BEGIN_ENUM_CLASS(ConstructorAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstructorAttrSpelling, GNU_CONSTRUCTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstructorAttrSpelling, CXX11_GNU_CONSTRUCTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstructorAttrSpelling, C2X_GNU_CONSTRUCTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConstructorAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConstructorAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ConsumableAttrConsumedState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAttrConsumedState, UNKNOWN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAttrConsumedState, CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAttrConsumedState, UNCONSUMED, unsigned char)
+MX_END_ENUM_CLASS(ConsumableAttrConsumedState)
+
+MX_BEGIN_ENUM_CLASS(ConsumableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAttrSpelling, GNU_CONSUMABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAttrSpelling, CXX11_CLANG_CONSUMABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConsumableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ConsumableAutoCastAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAutoCastAttrSpelling, GNU_CONSUMABLE_AUTO_CAST_STATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAutoCastAttrSpelling, CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableAutoCastAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConsumableAutoCastAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ConsumableSetOnReadAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableSetOnReadAttrSpelling, GNU_CONSUMABLE_STATE_ON_READ, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableSetOnReadAttrSpelling, CXX11_CLANG_CONSUMABLE_STATE_ON_READ, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConsumableSetOnReadAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConsumableSetOnReadAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ConvergentAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConvergentAttrSpelling, GNU_CONVERGENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConvergentAttrSpelling, CXX11_CLANG_CONVERGENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConvergentAttrSpelling, C2X_CLANG_CONVERGENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ConvergentAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ConvergentAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(DLLExportAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLExportAttrSpelling, DECLSPEC_DLLEXPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLExportAttrSpelling, GNU_DLLEXPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLExportAttrSpelling, CXX11_GNU_DLLEXPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLExportAttrSpelling, C2X_GNU_DLLEXPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLExportAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DLLExportAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(DLLImportAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLImportAttrSpelling, DECLSPEC_DLLIMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLImportAttrSpelling, GNU_DLLIMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLImportAttrSpelling, CXX11_GNU_DLLIMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLImportAttrSpelling, C2X_GNU_DLLIMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DLLImportAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DLLImportAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(DeclFriendObjectKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(DeclFriendObjectKind, NONE, unsigned char)
@@ -642,6 +1524,92 @@ MX_BEGIN_ENUM_CLASS(DeclObjCDeclQualifier, unsigned char)
   MX_ENUM_CLASS_ENTRY(DeclObjCDeclQualifier, ONEWAY, unsigned char)
   MX_ENUM_CLASS_ENTRY(DeclObjCDeclQualifier, CS_NULLABILITY, unsigned char)
 MX_END_ENUM_CLASS(DeclObjCDeclQualifier)
+
+MX_BEGIN_ENUM_CLASS(DeprecatedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, GNU_DEPRECATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, CXX11_GNU_DEPRECATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, C2X_GNU_DEPRECATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, DECLSPEC_DEPRECATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, CXX11_DEPRECATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, C2X_DEPRECATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DeprecatedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DeprecatedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(DestructorAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DestructorAttrSpelling, GNU_DESTRUCTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DestructorAttrSpelling, CXX11_GNU_DESTRUCTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DestructorAttrSpelling, C2X_GNU_DESTRUCTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DestructorAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DestructorAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(DiagnoseAsBuiltinAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DiagnoseAsBuiltinAttrSpelling, GNU_DIAGNOSE_AS_BUILTIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DiagnoseAsBuiltinAttrSpelling, CXX11_CLANG_DIAGNOSE_AS_BUILTIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DiagnoseAsBuiltinAttrSpelling, C2X_CLANG_DIAGNOSE_AS_BUILTIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DiagnoseAsBuiltinAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DiagnoseAsBuiltinAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(DiagnoseIfAttrDiagnosticType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DiagnoseIfAttrDiagnosticType, ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DiagnoseIfAttrDiagnosticType, WARNING, unsigned char)
+MX_END_ENUM_CLASS(DiagnoseIfAttrDiagnosticType)
+
+MX_BEGIN_ENUM_CLASS(DisableSanitizerInstrumentationAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableSanitizerInstrumentationAttrSpelling, GNU_DISABLE_SANITIZER_INSTRUMENTATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableSanitizerInstrumentationAttrSpelling, CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableSanitizerInstrumentationAttrSpelling, C2X_CLANG_DISABLE_SANITIZER_INSTRUMENTATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableSanitizerInstrumentationAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DisableSanitizerInstrumentationAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(DisableTailCallsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableTailCallsAttrSpelling, GNU_DISABLE_TAIL_CALLS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableTailCallsAttrSpelling, CXX11_CLANG_DISABLE_TAIL_CALLS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableTailCallsAttrSpelling, C2X_CLANG_DISABLE_TAIL_CALLS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(DisableTailCallsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(DisableTailCallsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(EnforceTCBAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBAttrSpelling, GNU_ENFORCE_TCB, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBAttrSpelling, CXX11_CLANG_ENFORCE_TCB, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBAttrSpelling, C2X_CLANG_ENFORCE_TCB, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(EnforceTCBAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(EnforceTCBLeafAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBLeafAttrSpelling, GNU_ENFORCE_TCB_LEAF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBLeafAttrSpelling, CXX11_CLANG_ENFORCE_TCB_LEAF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBLeafAttrSpelling, C2X_CLANG_ENFORCE_TCB_LEAF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnforceTCBLeafAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(EnforceTCBLeafAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(EnumExtensibilityAttrKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnumExtensibilityAttrKind, CLOSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnumExtensibilityAttrKind, OPEN, unsigned char)
+MX_END_ENUM_CLASS(EnumExtensibilityAttrKind)
+
+MX_BEGIN_ENUM_CLASS(EnumExtensibilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnumExtensibilityAttrSpelling, GNU_ENUM_EXTENSIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnumExtensibilityAttrSpelling, CXX11_CLANG_ENUM_EXTENSIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnumExtensibilityAttrSpelling, C2X_CLANG_ENUM_EXTENSIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(EnumExtensibilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(EnumExtensibilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ErrorAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, GNU_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, CXX11_GNU_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, C2X_GNU_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, GNU_WARNING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, CXX11_GNU_WARNING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, C2X_GNU_WARNING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ErrorAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ErrorAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ExcludeFromExplicitInstantiationAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExcludeFromExplicitInstantiationAttrSpelling, GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExcludeFromExplicitInstantiationAttrSpelling, CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExcludeFromExplicitInstantiationAttrSpelling, C2X_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExcludeFromExplicitInstantiationAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ExcludeFromExplicitInstantiationAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(ExprConstantExprKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(ExprConstantExprKind, NORMAL, unsigned char)
@@ -703,6 +1671,65 @@ MX_BEGIN_ENUM_CLASS(ExprisModifiableLvalueResult, unsigned char)
   MX_ENUM_CLASS_ENTRY(ExprisModifiableLvalueResult, ARRAY_TEMPORARY, unsigned char)
 MX_END_ENUM_CLASS(ExprisModifiableLvalueResult)
 
+MX_BEGIN_ENUM_CLASS(ExternalSourceSymbolAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExternalSourceSymbolAttrSpelling, GNU_EXTERNAL_SOURCE_SYMBOL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExternalSourceSymbolAttrSpelling, CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExternalSourceSymbolAttrSpelling, C2X_CLANG_EXTERNAL_SOURCE_SYMBOL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ExternalSourceSymbolAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ExternalSourceSymbolAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FallThroughAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, CXX11_FALLTHROUGH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, C2X_FALLTHROUGH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, CXX11_CLANG_FALLTHROUGH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, GNU_FALLTHROUGH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, CXX11_GNU_FALLTHROUGH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, C2X_GNU_FALLTHROUGH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FallThroughAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FallThroughAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FastCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FastCallAttrSpelling, GNU_FASTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FastCallAttrSpelling, CXX11_GNU_FASTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FastCallAttrSpelling, C2X_GNU_FASTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FastCallAttrSpelling, KEYWORD_FASTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FastCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FastCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FinalAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FinalAttrSpelling, KEYWORD_FINAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FinalAttrSpelling, KEYWORD_SEALED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FinalAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FinalAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FlagEnumAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlagEnumAttrSpelling, GNU_FLAG_ENUM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlagEnumAttrSpelling, CXX11_CLANG_FLAG_ENUM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlagEnumAttrSpelling, C2X_CLANG_FLAG_ENUM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlagEnumAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FlagEnumAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FlattenAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlattenAttrSpelling, GNU_FLATTEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlattenAttrSpelling, CXX11_GNU_FLATTEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlattenAttrSpelling, C2X_GNU_FLATTEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FlattenAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FlattenAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FormatArgAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatArgAttrSpelling, GNU_FORMAT_ARGUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatArgAttrSpelling, CXX11_GNU_FORMAT_ARGUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatArgAttrSpelling, C2X_GNU_FORMAT_ARGUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatArgAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FormatArgAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(FormatAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatAttrSpelling, GNU_FORMAT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatAttrSpelling, CXX11_GNU_FORMAT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatAttrSpelling, C2X_GNU_FORMAT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(FormatAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(FormatAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(FunctionDeclTemplatedKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(FunctionDeclTemplatedKind, NON_TEMPLATE, unsigned char)
   MX_ENUM_CLASS_ENTRY(FunctionDeclTemplatedKind, FUNCTION_TEMPLATE, unsigned char)
@@ -710,6 +1737,60 @@ MX_BEGIN_ENUM_CLASS(FunctionDeclTemplatedKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(FunctionDeclTemplatedKind, FUNCTION_TEMPLATE_SPECIALIZATION, unsigned char)
   MX_ENUM_CLASS_ENTRY(FunctionDeclTemplatedKind, DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION, unsigned char)
 MX_END_ENUM_CLASS(FunctionDeclTemplatedKind)
+
+MX_BEGIN_ENUM_CLASS(GNUInlineAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GNUInlineAttrSpelling, GNU_GNU_INLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GNUInlineAttrSpelling, CXX11_GNU_GNU_INLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GNUInlineAttrSpelling, C2X_GNU_GNU_INLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GNUInlineAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(GNUInlineAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(GuardedVarAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GuardedVarAttrSpelling, GNU_GUARDED_VARIABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GuardedVarAttrSpelling, CXX11_CLANG_GUARDED_VARIABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(GuardedVarAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(GuardedVarAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(HIPManagedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HIPManagedAttrSpelling, GNU_MANAGED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HIPManagedAttrSpelling, DECLSPEC_MANAGED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HIPManagedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(HIPManagedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(HotAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HotAttrSpelling, GNU_HOT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HotAttrSpelling, CXX11_GNU_HOT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HotAttrSpelling, C2X_GNU_HOT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(HotAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(HotAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(IBActionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBActionAttrSpelling, GNU_IBACTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBActionAttrSpelling, CXX11_CLANG_IBACTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBActionAttrSpelling, C2X_CLANG_IBACTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBActionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(IBActionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(IBOutletAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletAttrSpelling, GNU_IBOUTLET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletAttrSpelling, CXX11_CLANG_IBOUTLET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletAttrSpelling, C2X_CLANG_IBOUTLET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(IBOutletAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(IBOutletCollectionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletCollectionAttrSpelling, GNU_IBOUTLETCOLLECTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletCollectionAttrSpelling, CXX11_CLANG_IBOUTLETCOLLECTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletCollectionAttrSpelling, C2X_CLANG_IBOUTLETCOLLECTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IBOutletCollectionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(IBOutletCollectionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(IFuncAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IFuncAttrSpelling, GNU_IFUNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IFuncAttrSpelling, CXX11_GNU_IFUNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IFuncAttrSpelling, C2X_GNU_IFUNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IFuncAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(IFuncAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(ImplicitCastExprOnStack, unsigned char)
   MX_ENUM_CLASS_ENTRY(ImplicitCastExprOnStack, ON_STACK, unsigned char)
@@ -724,21 +1805,599 @@ MX_BEGIN_ENUM_CLASS(ImplicitParamDeclImplicitParamKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(ImplicitParamDeclImplicitParamKind, OTHER, unsigned char)
 MX_END_ENUM_CLASS(ImplicitParamDeclImplicitParamKind)
 
+MX_BEGIN_ENUM_CLASS(InitPriorityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InitPriorityAttrSpelling, GNU_INITIALIZER_PRIORITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InitPriorityAttrSpelling, CXX11_GNU_INITIALIZER_PRIORITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InitPriorityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(InitPriorityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(IntelOclBiccAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IntelOclBiccAttrSpelling, GNU_INTEL_OCL_BICC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IntelOclBiccAttrSpelling, CXX11_CLANG_INTEL_OCL_BICC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(IntelOclBiccAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(IntelOclBiccAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(InternalLinkageAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InternalLinkageAttrSpelling, GNU_INTERNAL_LINKAGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InternalLinkageAttrSpelling, CXX11_CLANG_INTERNAL_LINKAGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InternalLinkageAttrSpelling, C2X_CLANG_INTERNAL_LINKAGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(InternalLinkageAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(InternalLinkageAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(LTOVisibilityPublicAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LTOVisibilityPublicAttrSpelling, GNU_LTO_VISIBILITY_PUBLIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LTOVisibilityPublicAttrSpelling, CXX11_CLANG_LTO_VISIBILITY_PUBLIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LTOVisibilityPublicAttrSpelling, C2X_CLANG_LTO_VISIBILITY_PUBLIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LTOVisibilityPublicAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(LTOVisibilityPublicAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(LeafAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LeafAttrSpelling, GNU_LEAF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LeafAttrSpelling, CXX11_GNU_LEAF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LeafAttrSpelling, C2X_GNU_LEAF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LeafAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(LeafAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(LifetimeBoundAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LifetimeBoundAttrSpelling, GNU_LIFETIMEBOUND, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LifetimeBoundAttrSpelling, CXX11_CLANG_LIFETIMEBOUND, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LifetimeBoundAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(LifetimeBoundAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(LikelyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LikelyAttrSpelling, CXX11_LIKELY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LikelyAttrSpelling, C2X_CLANG_LIKELY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LikelyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(LikelyAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(LinkageSpecDeclLanguageIDs, unsigned char)
   MX_ENUM_CLASS_ENTRY(LinkageSpecDeclLanguageIDs, C, unsigned char)
   MX_ENUM_CLASS_ENTRY(LinkageSpecDeclLanguageIDs, CXX, unsigned char)
 MX_END_ENUM_CLASS(LinkageSpecDeclLanguageIDs)
+
+MX_BEGIN_ENUM_CLASS(LoaderUninitializedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoaderUninitializedAttrSpelling, GNU_LOADER_UNINITIALIZED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoaderUninitializedAttrSpelling, CXX11_CLANG_LOADER_UNINITIALIZED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoaderUninitializedAttrSpelling, C2X_CLANG_LOADER_UNINITIALIZED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoaderUninitializedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(LoaderUninitializedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(LoopHintAttrLoopHintState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, ENABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, DISABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, NUMERIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, FIXED_WIDTH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, SCALABLE_WIDTH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, ASSUME_SAFETY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrLoopHintState, FULL, unsigned char)
+MX_END_ENUM_CLASS(LoopHintAttrLoopHintState)
+
+MX_BEGIN_ENUM_CLASS(LoopHintAttrOptionType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, VECTORIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, VECTORIZE_WIDTH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, INTERLEAVE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, INTERLEAVE_COUNT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, UNROLL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, UNROLL_COUNT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, UNROLL_AND_JAM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, UNROLL_AND_JAM_COUNT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, PIPELINE_DISABLED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, PIPELINE_INITIATION_INTERVAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, DISTRIBUTE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrOptionType, VECTORIZE_PREDICATE, unsigned char)
+MX_END_ENUM_CLASS(LoopHintAttrOptionType)
+
+MX_BEGIN_ENUM_CLASS(LoopHintAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrSpelling, PRAGMA_CLANG_LOOP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrSpelling, PRAGMA_UNROLL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrSpelling, PRAGMA_NOUNROLL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrSpelling, PRAGMA_UNROLL_AND_JAM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrSpelling, PRAGMA_NOUNROLL_AND_JAM, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LoopHintAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(LoopHintAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MIGServerRoutineAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MIGServerRoutineAttrSpelling, GNU_MIG_SERVER_ROUTINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MIGServerRoutineAttrSpelling, CXX11_CLANG_MIG_SERVER_ROUTINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MIGServerRoutineAttrSpelling, C2X_CLANG_MIG_SERVER_ROUTINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MIGServerRoutineAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MIGServerRoutineAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MSABIAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSABIAttrSpelling, GNU_MS_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSABIAttrSpelling, CXX11_GNU_MS_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSABIAttrSpelling, C2X_GNU_MS_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSABIAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MSABIAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MSInheritanceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSInheritanceAttrSpelling, KEYWORD_SINGLE_INHERITANCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSInheritanceAttrSpelling, KEYWORD_MULTIPLE_INHERITANCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSInheritanceAttrSpelling, KEYWORD_VIRTUAL_INHERITANCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSInheritanceAttrSpelling, KEYWORD_UNSPECIFIED_INHERITANCE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSInheritanceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MSInheritanceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MSP430InterruptAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSP430InterruptAttrSpelling, GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSP430InterruptAttrSpelling, CXX11_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSP430InterruptAttrSpelling, C2X_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSP430InterruptAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MSP430InterruptAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MSStructAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSStructAttrSpelling, GNU_MS_STRUCT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSStructAttrSpelling, CXX11_GNU_MS_STRUCT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSStructAttrSpelling, C2X_GNU_MS_STRUCT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MSStructAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MSStructAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MayAliasAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MayAliasAttrSpelling, GNU_MAY_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MayAliasAttrSpelling, CXX11_GNU_MAY_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MayAliasAttrSpelling, C2X_GNU_MAY_ALIAS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MayAliasAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MayAliasAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MicroMipsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MicroMipsAttrSpelling, GNU_MICROMIPS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MicroMipsAttrSpelling, CXX11_GNU_MICROMIPS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MicroMipsAttrSpelling, C2X_GNU_MICROMIPS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MicroMipsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MicroMipsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MinSizeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinSizeAttrSpelling, GNU_MINSIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinSizeAttrSpelling, CXX11_CLANG_MINSIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinSizeAttrSpelling, C2X_CLANG_MINSIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinSizeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MinSizeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MinVectorWidthAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinVectorWidthAttrSpelling, GNU_MIN_VECTOR_WIDTH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinVectorWidthAttrSpelling, CXX11_CLANG_MIN_VECTOR_WIDTH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinVectorWidthAttrSpelling, C2X_CLANG_MIN_VECTOR_WIDTH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MinVectorWidthAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MinVectorWidthAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(Mips16AttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(Mips16AttrSpelling, GNU_MIPS16, unsigned char)
+  MX_ENUM_CLASS_ENTRY(Mips16AttrSpelling, CXX11_GNU_MIPS16, unsigned char)
+  MX_ENUM_CLASS_ENTRY(Mips16AttrSpelling, C2X_GNU_MIPS16, unsigned char)
+  MX_ENUM_CLASS_ENTRY(Mips16AttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(Mips16AttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MipsInterruptAttrInterruptType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, SW0, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, SW1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, HW0, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, HW1, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, HW2, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, HW3, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, HW4, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, HW5, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrInterruptType, EIC, unsigned char)
+MX_END_ENUM_CLASS(MipsInterruptAttrInterruptType)
+
+MX_BEGIN_ENUM_CLASS(MipsInterruptAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrSpelling, GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrSpelling, CXX11_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrSpelling, C2X_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsInterruptAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MipsInterruptAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MipsLongCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, GNU_LONG_CALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, CXX11_GNU_LONG_CALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, C2X_GNU_LONG_CALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, GNU_FAR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, CXX11_GNU_FAR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, C2X_GNU_FAR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsLongCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MipsLongCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MipsShortCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, GNU_SHORT_CALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, CXX11_GNU_SHORT_CALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, C2X_GNU_SHORT_CALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, GNU_NEAR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, CXX11_GNU_NEAR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, C2X_GNU_NEAR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MipsShortCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MipsShortCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ModeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ModeAttrSpelling, GNU_MODE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ModeAttrSpelling, CXX11_GNU_MODE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ModeAttrSpelling, C2X_GNU_MODE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ModeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ModeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(MustTailAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MustTailAttrSpelling, GNU_MUSTTAIL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MustTailAttrSpelling, CXX11_CLANG_MUSTTAIL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MustTailAttrSpelling, C2X_CLANG_MUSTTAIL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(MustTailAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(MustTailAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NSConsumedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumedAttrSpelling, GNU_NS_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumedAttrSpelling, CXX11_CLANG_NS_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumedAttrSpelling, C2X_CLANG_NS_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NSConsumedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NSConsumesSelfAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumesSelfAttrSpelling, GNU_NS_CONSUMES_SELF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumesSelfAttrSpelling, CXX11_CLANG_NS_CONSUMES_SELF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumesSelfAttrSpelling, C2X_CLANG_NS_CONSUMES_SELF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSConsumesSelfAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NSConsumesSelfAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NSReturnsAutoreleasedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsAutoreleasedAttrSpelling, GNU_NS_RETURNS_AUTORELEASED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsAutoreleasedAttrSpelling, CXX11_CLANG_NS_RETURNS_AUTORELEASED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsAutoreleasedAttrSpelling, C2X_CLANG_NS_RETURNS_AUTORELEASED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsAutoreleasedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NSReturnsAutoreleasedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NSReturnsNotRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsNotRetainedAttrSpelling, GNU_NS_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsNotRetainedAttrSpelling, CXX11_CLANG_NS_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsNotRetainedAttrSpelling, C2X_CLANG_NS_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsNotRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NSReturnsNotRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NSReturnsRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsRetainedAttrSpelling, GNU_NS_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsRetainedAttrSpelling, CXX11_CLANG_NS_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsRetainedAttrSpelling, C2X_CLANG_NS_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NSReturnsRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NSReturnsRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NakedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NakedAttrSpelling, GNU_NAKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NakedAttrSpelling, CXX11_GNU_NAKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NakedAttrSpelling, C2X_GNU_NAKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NakedAttrSpelling, DECLSPEC_NAKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NakedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NakedAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(NamedDeclExplicitVisibilityKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(NamedDeclExplicitVisibilityKind, VISIBILITY_FOR_TYPE, unsigned char)
   MX_ENUM_CLASS_ENTRY(NamedDeclExplicitVisibilityKind, VISIBILITY_FOR_VALUE, unsigned char)
 MX_END_ENUM_CLASS(NamedDeclExplicitVisibilityKind)
 
+MX_BEGIN_ENUM_CLASS(NoBuiltinAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoBuiltinAttrSpelling, GNU_NO_BUILTIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoBuiltinAttrSpelling, CXX11_CLANG_NO_BUILTIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoBuiltinAttrSpelling, C2X_CLANG_NO_BUILTIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoBuiltinAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoBuiltinAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoCommonAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoCommonAttrSpelling, GNU_NOCOMMON, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoCommonAttrSpelling, CXX11_GNU_NOCOMMON, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoCommonAttrSpelling, C2X_GNU_NOCOMMON, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoCommonAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoCommonAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoDebugAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDebugAttrSpelling, GNU_NODEBUG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDebugAttrSpelling, CXX11_GNU_NODEBUG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDebugAttrSpelling, C2X_GNU_NODEBUG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDebugAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoDebugAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoDerefAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDerefAttrSpelling, GNU_NODEREF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDerefAttrSpelling, CXX11_CLANG_NODEREF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDerefAttrSpelling, C2X_CLANG_NODEREF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDerefAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoDerefAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoDestroyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDestroyAttrSpelling, GNU_NO_DESTROY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDestroyAttrSpelling, CXX11_CLANG_NO_DESTROY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDestroyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoDestroyAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoDuplicateAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDuplicateAttrSpelling, GNU_NODUPLICATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDuplicateAttrSpelling, CXX11_CLANG_NODUPLICATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDuplicateAttrSpelling, C2X_CLANG_NODUPLICATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoDuplicateAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoDuplicateAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoEscapeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoEscapeAttrSpelling, GNU_NOESCAPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoEscapeAttrSpelling, CXX11_CLANG_NOESCAPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoEscapeAttrSpelling, C2X_CLANG_NOESCAPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoEscapeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoEscapeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoInlineAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInlineAttrSpelling, GNU_NOINLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInlineAttrSpelling, CXX11_GNU_NOINLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInlineAttrSpelling, C2X_GNU_NOINLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInlineAttrSpelling, DECLSPEC_NOINLINE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInlineAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoInlineAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoInstrumentFunctionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInstrumentFunctionAttrSpelling, GNU_NO_INSTRUMENT_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInstrumentFunctionAttrSpelling, CXX11_GNU_NO_INSTRUMENT_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInstrumentFunctionAttrSpelling, C2X_GNU_NO_INSTRUMENT_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoInstrumentFunctionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoInstrumentFunctionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoMergeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMergeAttrSpelling, GNU_NOMERGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMergeAttrSpelling, CXX11_CLANG_NOMERGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMergeAttrSpelling, C2X_CLANG_NOMERGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMergeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoMergeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoMicroMipsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMicroMipsAttrSpelling, GNU_NOMICROMIPS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMicroMipsAttrSpelling, CXX11_GNU_NOMICROMIPS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMicroMipsAttrSpelling, C2X_GNU_NOMICROMIPS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMicroMipsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoMicroMipsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoMips16AttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMips16AttrSpelling, GNU_NOMIPS16, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMips16AttrSpelling, CXX11_GNU_NOMIPS16, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMips16AttrSpelling, C2X_GNU_NOMIPS16, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoMips16AttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoMips16AttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoProfileFunctionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoProfileFunctionAttrSpelling, GNU_NO_PROFILE_INSTRUMENT_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoProfileFunctionAttrSpelling, CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoProfileFunctionAttrSpelling, C2X_GNU_NO_PROFILE_INSTRUMENT_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoProfileFunctionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoProfileFunctionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoReturnAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoReturnAttrSpelling, GNU_NORETURN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoReturnAttrSpelling, CXX11_GNU_NORETURN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoReturnAttrSpelling, C2X_GNU_NORETURN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoReturnAttrSpelling, DECLSPEC_NORETURN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoReturnAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoReturnAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoSanitizeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSanitizeAttrSpelling, GNU_NO_SANITIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSanitizeAttrSpelling, CXX11_CLANG_NO_SANITIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSanitizeAttrSpelling, C2X_CLANG_NO_SANITIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSanitizeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoSanitizeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoSpeculativeLoadHardeningAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSpeculativeLoadHardeningAttrSpelling, GNU_NO_SPECULATIVE_LOAD_HARDENING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSpeculativeLoadHardeningAttrSpelling, CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSpeculativeLoadHardeningAttrSpelling, C2X_CLANG_NO_SPECULATIVE_LOAD_HARDENING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSpeculativeLoadHardeningAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoSpeculativeLoadHardeningAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoSplitStackAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSplitStackAttrSpelling, GNU_NO_SPLIT_STACK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSplitStackAttrSpelling, CXX11_GNU_NO_SPLIT_STACK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSplitStackAttrSpelling, C2X_GNU_NO_SPLIT_STACK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoSplitStackAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoSplitStackAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoStackProtectorAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoStackProtectorAttrSpelling, GNU_NO_STACK_PROTECTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoStackProtectorAttrSpelling, CXX11_CLANG_NO_STACK_PROTECTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoStackProtectorAttrSpelling, C2X_CLANG_NO_STACK_PROTECTOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoStackProtectorAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoStackProtectorAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoThreadSafetyAnalysisAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThreadSafetyAnalysisAttrSpelling, GNU_NO_THREAD_SAFETY_ANALYSIS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThreadSafetyAnalysisAttrSpelling, CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThreadSafetyAnalysisAttrSpelling, C2X_CLANG_NO_THREAD_SAFETY_ANALYSIS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThreadSafetyAnalysisAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoThreadSafetyAnalysisAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NoThrowAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThrowAttrSpelling, GNU_NOTHROW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThrowAttrSpelling, CXX11_GNU_NOTHROW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThrowAttrSpelling, C2X_GNU_NOTHROW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThrowAttrSpelling, DECLSPEC_NOTHROW, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NoThrowAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NoThrowAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NonNullAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NonNullAttrSpelling, GNU_NONNULL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NonNullAttrSpelling, CXX11_GNU_NONNULL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NonNullAttrSpelling, C2X_GNU_NONNULL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NonNullAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NonNullAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(NotTailCalledAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NotTailCalledAttrSpelling, GNU_NOT_TAIL_CALLED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NotTailCalledAttrSpelling, CXX11_CLANG_NOT_TAIL_CALLED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NotTailCalledAttrSpelling, C2X_CLANG_NOT_TAIL_CALLED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(NotTailCalledAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(NotTailCalledAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OMPAllocateDeclAttrAllocatorTypeTy, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_NULL_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_DEFAULT_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_LARGE_CAP_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_CONST_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_HIGH_BW_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_LOW_LAT_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMPC_GROUP_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMPP_TEAM_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_THREAD_MEMORY_ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPAllocateDeclAttrAllocatorTypeTy, OMP_USER_DEFINED_MEMORY_ALLOC, unsigned char)
+MX_END_ENUM_CLASS(OMPAllocateDeclAttrAllocatorTypeTy)
+
 MX_BEGIN_ENUM_CLASS(OMPDeclareReductionDeclInitKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(OMPDeclareReductionDeclInitKind, CALL_INITIALIZER, unsigned char)
   MX_ENUM_CLASS_ENTRY(OMPDeclareReductionDeclInitKind, DIRECT_INITIALIZER, unsigned char)
   MX_ENUM_CLASS_ENTRY(OMPDeclareReductionDeclInitKind, COPY_INITIALIZER, unsigned char)
 MX_END_ENUM_CLASS(OMPDeclareReductionDeclInitKind)
+
+MX_BEGIN_ENUM_CLASS(OMPDeclareSimdDeclAttrBranchStateTy, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareSimdDeclAttrBranchStateTy, UNDEFINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareSimdDeclAttrBranchStateTy, INBRANCH, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareSimdDeclAttrBranchStateTy, NOTINBRANCH, unsigned char)
+MX_END_ENUM_CLASS(OMPDeclareSimdDeclAttrBranchStateTy)
+
+MX_BEGIN_ENUM_CLASS(OMPDeclareTargetDeclAttrDevTypeTy, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareTargetDeclAttrDevTypeTy, HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareTargetDeclAttrDevTypeTy, NO_HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareTargetDeclAttrDevTypeTy, ANY, unsigned char)
+MX_END_ENUM_CLASS(OMPDeclareTargetDeclAttrDevTypeTy)
+
+MX_BEGIN_ENUM_CLASS(OMPDeclareTargetDeclAttrMapTypeTy, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareTargetDeclAttrMapTypeTy, TO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareTargetDeclAttrMapTypeTy, LINK, unsigned char)
+MX_END_ENUM_CLASS(OMPDeclareTargetDeclAttrMapTypeTy)
+
+MX_BEGIN_ENUM_CLASS(OMPDeclareVariantAttrInteropType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareVariantAttrInteropType, TARGET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareVariantAttrInteropType, TARGET_SYNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OMPDeclareVariantAttrInteropType, TARGET_TARGET_SYNC, unsigned char)
+MX_END_ENUM_CLASS(OMPDeclareVariantAttrInteropType)
+
+MX_BEGIN_ENUM_CLASS(OSConsumedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumedAttrSpelling, GNU_OS_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumedAttrSpelling, CXX11_CLANG_OS_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumedAttrSpelling, C2X_CLANG_OS_CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OSConsumedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OSConsumesThisAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumesThisAttrSpelling, GNU_OS_CONSUMES_THIS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumesThisAttrSpelling, CXX11_CLANG_OS_CONSUMES_THIS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumesThisAttrSpelling, C2X_CLANG_OS_CONSUMES_THIS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSConsumesThisAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OSConsumesThisAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OSReturnsNotRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsNotRetainedAttrSpelling, GNU_OS_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsNotRetainedAttrSpelling, CXX11_CLANG_OS_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsNotRetainedAttrSpelling, C2X_CLANG_OS_RETURNS_NOT_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsNotRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OSReturnsNotRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OSReturnsRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedAttrSpelling, GNU_OS_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedAttrSpelling, CXX11_CLANG_OS_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedAttrSpelling, C2X_CLANG_OS_RETURNS_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OSReturnsRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OSReturnsRetainedOnNonZeroAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnNonZeroAttrSpelling, GNU_OS_RETURNS_RETAINED_ON_NON_ZERO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnNonZeroAttrSpelling, CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnNonZeroAttrSpelling, C2X_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnNonZeroAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OSReturnsRetainedOnNonZeroAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OSReturnsRetainedOnZeroAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnZeroAttrSpelling, GNU_OS_RETURNS_RETAINED_ON_ZERO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnZeroAttrSpelling, CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnZeroAttrSpelling, C2X_CLANG_OS_RETURNS_RETAINED_ON_ZERO, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OSReturnsRetainedOnZeroAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OSReturnsRetainedOnZeroAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCBoxableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBoxableAttrSpelling, GNU_OBJC_BOXABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBoxableAttrSpelling, CXX11_CLANG_OBJC_BOXABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBoxableAttrSpelling, C2X_CLANG_OBJC_BOXABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBoxableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCBoxableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCBridgeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeAttrSpelling, GNU_OBJC_BRIDGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeAttrSpelling, CXX11_CLANG_OBJC_BRIDGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeAttrSpelling, C2X_CLANG_OBJC_BRIDGE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCBridgeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCBridgeMutableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeMutableAttrSpelling, GNU_OBJC_BRIDGE_MUTABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeMutableAttrSpelling, CXX11_CLANG_OBJC_BRIDGE_MUTABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeMutableAttrSpelling, C2X_CLANG_OBJC_BRIDGE_MUTABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeMutableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCBridgeMutableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCBridgeRelatedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeRelatedAttrSpelling, GNU_OBJC_BRIDGE_RELATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeRelatedAttrSpelling, CXX11_CLANG_OBJC_BRIDGE_RELATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeRelatedAttrSpelling, C2X_CLANG_OBJC_BRIDGE_RELATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCBridgeRelatedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCBridgeRelatedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCClassStubAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCClassStubAttrSpelling, GNU_OBJC_CLASS_STUB, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCClassStubAttrSpelling, CXX11_CLANG_OBJC_CLASS_STUB, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCClassStubAttrSpelling, C2X_CLANG_OBJC_CLASS_STUB, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCClassStubAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCClassStubAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCDesignatedInitializerAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDesignatedInitializerAttrSpelling, GNU_OBJC_DESIGNATED_INITIALIZER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDesignatedInitializerAttrSpelling, CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDesignatedInitializerAttrSpelling, C2X_CLANG_OBJC_DESIGNATED_INITIALIZER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDesignatedInitializerAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCDesignatedInitializerAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCDirectAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectAttrSpelling, GNU_OBJC_DIRECT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectAttrSpelling, CXX11_CLANG_OBJC_DIRECT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectAttrSpelling, C2X_CLANG_OBJC_DIRECT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCDirectAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCDirectMembersAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectMembersAttrSpelling, GNU_OBJC_DIRECT_MEMBERS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectMembersAttrSpelling, CXX11_CLANG_OBJC_DIRECT_MEMBERS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectMembersAttrSpelling, C2X_CLANG_OBJC_DIRECT_MEMBERS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCDirectMembersAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCDirectMembersAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCExceptionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExceptionAttrSpelling, GNU_OBJC_EXCEPTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExceptionAttrSpelling, CXX11_CLANG_OBJC_EXCEPTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExceptionAttrSpelling, C2X_CLANG_OBJC_EXCEPTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExceptionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCExceptionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCExplicitProtocolImplAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExplicitProtocolImplAttrSpelling, GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExplicitProtocolImplAttrSpelling, CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExplicitProtocolImplAttrSpelling, C2X_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExplicitProtocolImplAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCExplicitProtocolImplAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCExternallyRetainedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExternallyRetainedAttrSpelling, GNU_OBJC_EXTERNALLY_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExternallyRetainedAttrSpelling, CXX11_CLANG_OBJC_EXTERNALLY_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExternallyRetainedAttrSpelling, C2X_CLANG_OBJC_EXTERNALLY_RETAINED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCExternallyRetainedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCExternallyRetainedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCGCAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCGCAttrSpelling, GNU_OBJC_GC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCGCAttrSpelling, CXX11_CLANG_OBJC_GC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCGCAttrSpelling, C2X_CLANG_OBJC_GC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCGCAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCGCAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCIndependentClassAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCIndependentClassAttrSpelling, GNU_OBJC_INDEPENDENT_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCIndependentClassAttrSpelling, CXX11_CLANG_OBJC_INDEPENDENT_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCIndependentClassAttrSpelling, C2X_CLANG_OBJC_INDEPENDENT_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCIndependentClassAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCIndependentClassAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(ObjCIvarDeclAccessControl, unsigned char)
   MX_ENUM_CLASS_ENTRY(ObjCIvarDeclAccessControl, NONE, unsigned char)
@@ -761,6 +2420,57 @@ MX_BEGIN_ENUM_CLASS(ObjCMethodDeclImplementationControl, unsigned char)
   MX_ENUM_CLASS_ENTRY(ObjCMethodDeclImplementationControl, OPTIONAL, unsigned char)
 MX_END_ENUM_CLASS(ObjCMethodDeclImplementationControl)
 
+MX_BEGIN_ENUM_CLASS(ObjCMethodFamilyAttrFamilyKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrFamilyKind, NONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrFamilyKind, ALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrFamilyKind, COPY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrFamilyKind, INITIALIZER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrFamilyKind, MUTABLE_COPY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrFamilyKind, NEW, unsigned char)
+MX_END_ENUM_CLASS(ObjCMethodFamilyAttrFamilyKind)
+
+MX_BEGIN_ENUM_CLASS(ObjCMethodFamilyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrSpelling, GNU_OBJC_METHOD_FAMILY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrSpelling, CXX11_CLANG_OBJC_METHOD_FAMILY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrSpelling, C2X_CLANG_OBJC_METHOD_FAMILY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCMethodFamilyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCMethodFamilyAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCNSObjectAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNSObjectAttrSpelling, GNUNS_OBJECT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNSObjectAttrSpelling, CXX11_CLANG_NS_OBJECT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNSObjectAttrSpelling, C2X_CLANG_NS_OBJECT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNSObjectAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCNSObjectAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCNonLazyClassAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonLazyClassAttrSpelling, GNU_OBJC_NONLAZY_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonLazyClassAttrSpelling, CXX11_CLANG_OBJC_NONLAZY_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonLazyClassAttrSpelling, C2X_CLANG_OBJC_NONLAZY_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonLazyClassAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCNonLazyClassAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCNonRuntimeProtocolAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonRuntimeProtocolAttrSpelling, GNU_OBJC_NON_RUNTIME_PROTOCOL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonRuntimeProtocolAttrSpelling, CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonRuntimeProtocolAttrSpelling, C2X_CLANG_OBJC_NON_RUNTIME_PROTOCOL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCNonRuntimeProtocolAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCNonRuntimeProtocolAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCOwnershipAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCOwnershipAttrSpelling, GNU_OBJC_OWNERSHIP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCOwnershipAttrSpelling, CXX11_CLANG_OBJC_OWNERSHIP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCOwnershipAttrSpelling, C2X_CLANG_OBJC_OWNERSHIP, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCOwnershipAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCOwnershipAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCPreciseLifetimeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCPreciseLifetimeAttrSpelling, GNU_OBJC_PRECISE_LIFETIME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCPreciseLifetimeAttrSpelling, CXX11_CLANG_OBJC_PRECISE_LIFETIME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCPreciseLifetimeAttrSpelling, C2X_CLANG_OBJC_PRECISE_LIFETIME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCPreciseLifetimeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCPreciseLifetimeAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(ObjCPropertyDeclPropertyControl, unsigned char)
   MX_ENUM_CLASS_ENTRY(ObjCPropertyDeclPropertyControl, NONE, unsigned char)
   MX_ENUM_CLASS_ENTRY(ObjCPropertyDeclPropertyControl, REQUIRED, unsigned char)
@@ -779,6 +2489,210 @@ MX_BEGIN_ENUM_CLASS(ObjCPropertyImplDeclKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(ObjCPropertyImplDeclKind, DYNAMIC, unsigned char)
 MX_END_ENUM_CLASS(ObjCPropertyImplDeclKind)
 
+MX_BEGIN_ENUM_CLASS(ObjCRequiresPropertyDefsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresPropertyDefsAttrSpelling, GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresPropertyDefsAttrSpelling, CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresPropertyDefsAttrSpelling, C2X_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresPropertyDefsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCRequiresPropertyDefsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCRequiresSuperAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresSuperAttrSpelling, GNU_OBJC_REQUIRES_SUPER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresSuperAttrSpelling, CXX11_CLANG_OBJC_REQUIRES_SUPER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresSuperAttrSpelling, C2X_CLANG_OBJC_REQUIRES_SUPER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRequiresSuperAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCRequiresSuperAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCReturnsInnerPointerAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCReturnsInnerPointerAttrSpelling, GNU_OBJC_RETURNS_INNER_POINTER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCReturnsInnerPointerAttrSpelling, CXX11_CLANG_OBJC_RETURNS_INNER_POINTER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCReturnsInnerPointerAttrSpelling, C2X_CLANG_OBJC_RETURNS_INNER_POINTER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCReturnsInnerPointerAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCReturnsInnerPointerAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCRootClassAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRootClassAttrSpelling, GNU_OBJC_ROOT_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRootClassAttrSpelling, CXX11_CLANG_OBJC_ROOT_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRootClassAttrSpelling, C2X_CLANG_OBJC_ROOT_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRootClassAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCRootClassAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCRuntimeNameAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeNameAttrSpelling, GNU_OBJC_RUNTIME_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeNameAttrSpelling, CXX11_CLANG_OBJC_RUNTIME_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeNameAttrSpelling, C2X_CLANG_OBJC_RUNTIME_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeNameAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCRuntimeNameAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCRuntimeVisibleAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeVisibleAttrSpelling, GNU_OBJC_RUNTIME_VISIBLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeVisibleAttrSpelling, CXX11_CLANG_OBJC_RUNTIME_VISIBLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeVisibleAttrSpelling, C2X_CLANG_OBJC_RUNTIME_VISIBLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCRuntimeVisibleAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCRuntimeVisibleAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ObjCSubclassingRestrictedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCSubclassingRestrictedAttrSpelling, GNU_OBJC_SUBCLASSING_RESTRICTED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCSubclassingRestrictedAttrSpelling, CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCSubclassingRestrictedAttrSpelling, C2X_CLANG_OBJC_SUBCLASSING_RESTRICTED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ObjCSubclassingRestrictedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ObjCSubclassingRestrictedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLAccessAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLAccessAttrSpelling, KEYWORD_READ_ONLY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLAccessAttrSpelling, KEYWORD_WRITE_ONLY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLAccessAttrSpelling, KEYWORD_READ_WRITE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLAccessAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLAccessAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLConstantAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLConstantAddressSpaceAttrSpelling, KEYWORD_CONSTANT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLConstantAddressSpaceAttrSpelling, GNU_OPENCL_CONSTANT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLConstantAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_CONSTANT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLConstantAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_CONSTANT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLConstantAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLConstantAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLGenericAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGenericAddressSpaceAttrSpelling, KEYWORD_GENERIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGenericAddressSpaceAttrSpelling, GNU_OPENCL_GENERIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGenericAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_GENERIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGenericAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_GENERIC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGenericAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLGenericAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLGlobalAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalAddressSpaceAttrSpelling, KEYWORD_GLOBAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalAddressSpaceAttrSpelling, GNU_OPENCL_GLOBAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_GLOBAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_GLOBAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLGlobalAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLGlobalDeviceAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalDeviceAddressSpaceAttrSpelling, GNU_OPENCL_GLOBAL_DEVICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalDeviceAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_GLOBAL_DEVICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalDeviceAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_GLOBAL_DEVICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalDeviceAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLGlobalDeviceAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLGlobalHostAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalHostAddressSpaceAttrSpelling, GNU_OPENCL_GLOBAL_HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalHostAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_GLOBAL_HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalHostAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_GLOBAL_HOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLGlobalHostAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLGlobalHostAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLKernelAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLKernelAttrSpelling, KEYWORD_KERNEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLKernelAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLKernelAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLLocalAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLLocalAddressSpaceAttrSpelling, KEYWORD_LOCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLLocalAddressSpaceAttrSpelling, GNU_OPENCL_LOCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLLocalAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_LOCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLLocalAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_LOCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLLocalAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLLocalAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OpenCLPrivateAddressSpaceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLPrivateAddressSpaceAttrSpelling, KEYWORD_PRIVATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLPrivateAddressSpaceAttrSpelling, GNU_OPENCL_PRIVATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLPrivateAddressSpaceAttrSpelling, CXX11_CLANG_OPENCL_PRIVATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLPrivateAddressSpaceAttrSpelling, C2X_CLANG_OPENCL_PRIVATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OpenCLPrivateAddressSpaceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OpenCLPrivateAddressSpaceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OptimizeNoneAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OptimizeNoneAttrSpelling, GNU_OPTNONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OptimizeNoneAttrSpelling, CXX11_CLANG_OPTNONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OptimizeNoneAttrSpelling, C2X_CLANG_OPTNONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OptimizeNoneAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OptimizeNoneAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OverloadableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OverloadableAttrSpelling, GNU_OVERLOADABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OverloadableAttrSpelling, CXX11_CLANG_OVERLOADABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OverloadableAttrSpelling, C2X_CLANG_OVERLOADABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OverloadableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OverloadableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(OwnershipAttrOwnershipKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrOwnershipKind, HOLDS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrOwnershipKind, RETURNS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrOwnershipKind, TAKES, unsigned char)
+MX_END_ENUM_CLASS(OwnershipAttrOwnershipKind)
+
+MX_BEGIN_ENUM_CLASS(OwnershipAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, GNU_OWNERSHIP_HOLDS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, CXX11_CLANG_OWNERSHIP_HOLDS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, C2X_CLANG_OWNERSHIP_HOLDS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, GNU_OWNERSHIP_RETURNS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, CXX11_CLANG_OWNERSHIP_RETURNS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, C2X_CLANG_OWNERSHIP_RETURNS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, GNU_OWNERSHIP_TAKES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, CXX11_CLANG_OWNERSHIP_TAKES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, C2X_CLANG_OWNERSHIP_TAKES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(OwnershipAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(OwnershipAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PackedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PackedAttrSpelling, GNU_PACKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PackedAttrSpelling, CXX11_GNU_PACKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PackedAttrSpelling, C2X_GNU_PACKED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PackedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PackedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ParamTypestateAttrConsumedState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ParamTypestateAttrConsumedState, UNKNOWN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ParamTypestateAttrConsumedState, CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ParamTypestateAttrConsumedState, UNCONSUMED, unsigned char)
+MX_END_ENUM_CLASS(ParamTypestateAttrConsumedState)
+
+MX_BEGIN_ENUM_CLASS(ParamTypestateAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ParamTypestateAttrSpelling, GNU_PARAMETER_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ParamTypestateAttrSpelling, CXX11_CLANG_PARAMETER_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ParamTypestateAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ParamTypestateAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PascalAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PascalAttrSpelling, GNU_PASCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PascalAttrSpelling, CXX11_CLANG_PASCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PascalAttrSpelling, C2X_CLANG_PASCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PascalAttrSpelling, KEYWORD_PASCAL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PascalAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PascalAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PassObjectSizeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, GNU_PASS_OBJECT_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, CXX11_CLANG_PASS_OBJECT_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, C2X_CLANG_PASS_OBJECT_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, GNU_PASS_DYNAMIC_OBJECT_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, C2X_CLANG_PASS_DYNAMIC_OBJECT_SIZE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PassObjectSizeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PassObjectSizeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PatchableFunctionEntryAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PatchableFunctionEntryAttrSpelling, GNU_PATCHABLE_FUNCTION_ENTRY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PatchableFunctionEntryAttrSpelling, CXX11_GNU_PATCHABLE_FUNCTION_ENTRY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PatchableFunctionEntryAttrSpelling, C2X_GNU_PATCHABLE_FUNCTION_ENTRY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PatchableFunctionEntryAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PatchableFunctionEntryAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PcsAttrPCSType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PcsAttrPCSType, AAPCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PcsAttrPCSType, VFP, unsigned char)
+MX_END_ENUM_CLASS(PcsAttrPCSType)
+
+MX_BEGIN_ENUM_CLASS(PcsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PcsAttrSpelling, GNU_PCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PcsAttrSpelling, CXX11_GNU_PCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PcsAttrSpelling, C2X_GNU_PCS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PcsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PcsAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(PredefinedExprIdentKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(PredefinedExprIdentKind, FUNC, unsigned char)
   MX_ENUM_CLASS_ENTRY(PredefinedExprIdentKind, FUNCTION, unsigned char)
@@ -789,6 +2703,39 @@ MX_BEGIN_ENUM_CLASS(PredefinedExprIdentKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(PredefinedExprIdentKind, PRETTY_FUNCTION, unsigned char)
   MX_ENUM_CLASS_ENTRY(PredefinedExprIdentKind, PRETTY_FUNCTION_NO_VIRTUAL, unsigned char)
 MX_END_ENUM_CLASS(PredefinedExprIdentKind)
+
+MX_BEGIN_ENUM_CLASS(PreferredNameAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreferredNameAttrSpelling, GNU_PREFERRED_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreferredNameAttrSpelling, CXX11_CLANG_PREFERRED_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreferredNameAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PreferredNameAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PreserveAllAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveAllAttrSpelling, GNU_PRESERVE_ALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveAllAttrSpelling, CXX11_CLANG_PRESERVE_ALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveAllAttrSpelling, C2X_CLANG_PRESERVE_ALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveAllAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PreserveAllAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PreserveMostAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveMostAttrSpelling, GNU_PRESERVE_MOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveMostAttrSpelling, CXX11_CLANG_PRESERVE_MOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveMostAttrSpelling, C2X_CLANG_PRESERVE_MOST, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PreserveMostAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PreserveMostAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PtGuardedVarAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PtGuardedVarAttrSpelling, GNU_PT_GUARDED_VARIABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PtGuardedVarAttrSpelling, CXX11_CLANG_PT_GUARDED_VARIABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PtGuardedVarAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PtGuardedVarAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(PureAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PureAttrSpelling, GNU_PURE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PureAttrSpelling, CXX11_GNU_PURE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PureAttrSpelling, C2X_GNU_PURE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(PureAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(PureAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(QualTypeDestructionKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(QualTypeDestructionKind, NONE, unsigned char)
@@ -813,11 +2760,165 @@ MX_BEGIN_ENUM_CLASS(QualTypePrimitiveDefaultInitializeKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(QualTypePrimitiveDefaultInitializeKind, STRUCT, unsigned char)
 MX_END_ENUM_CLASS(QualTypePrimitiveDefaultInitializeKind)
 
+MX_BEGIN_ENUM_CLASS(RISCVInterruptAttrInterruptType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrInterruptType, USER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrInterruptType, SUPERVISOR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrInterruptType, MACHINE, unsigned char)
+MX_END_ENUM_CLASS(RISCVInterruptAttrInterruptType)
+
+MX_BEGIN_ENUM_CLASS(RISCVInterruptAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrSpelling, GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrSpelling, CXX11_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrSpelling, C2X_GNU_INTERRUPT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RISCVInterruptAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(RISCVInterruptAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(RecordDeclArgPassingKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(RecordDeclArgPassingKind, CAN_PASS_IN_REGS, unsigned char)
   MX_ENUM_CLASS_ENTRY(RecordDeclArgPassingKind, CANNOT_PASS_IN_REGS, unsigned char)
   MX_ENUM_CLASS_ENTRY(RecordDeclArgPassingKind, CAN_NEVER_PASS_IN_REGS, unsigned char)
 MX_END_ENUM_CLASS(RecordDeclArgPassingKind)
+
+MX_BEGIN_ENUM_CLASS(RegCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RegCallAttrSpelling, GNU_REGCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RegCallAttrSpelling, CXX11_GNU_REGCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RegCallAttrSpelling, C2X_GNU_REGCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RegCallAttrSpelling, KEYWORD_REGCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RegCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(RegCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ReinitializesAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReinitializesAttrSpelling, GNU_REINITIALIZES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReinitializesAttrSpelling, CXX11_CLANG_REINITIALIZES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReinitializesAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ReinitializesAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ReleaseCapabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, GNU_RELEASE_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, CXX11_CLANG_RELEASE_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, GNU_RELEASE_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, CXX11_CLANG_RELEASE_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, GNU_RELEASE_GENERIC_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, CXX11_CLANG_RELEASE_GENERIC_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, GNU_UNLOCK_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, CXX11_CLANG_UNLOCK_FUNCTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseCapabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ReleaseCapabilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ReleaseHandleAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseHandleAttrSpelling, GNU_RELEASE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseHandleAttrSpelling, CXX11_CLANG_RELEASE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseHandleAttrSpelling, C2X_CLANG_RELEASE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReleaseHandleAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ReleaseHandleAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(RequiresCapabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, GNU_REQUIRES_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, CXX11_CLANG_REQUIRES_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, GNU_EXCLUSIVE_LOCKS_REQUIRED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, GNU_REQUIRES_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, CXX11_CLANG_REQUIRES_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, GNU_SHARED_LOCKS_REQUIRED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, CXX11_CLANG_SHARED_LOCKS_REQUIRED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RequiresCapabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(RequiresCapabilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(RestrictAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RestrictAttrSpelling, DECLSPEC_RESTRICT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RestrictAttrSpelling, GNU_MALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RestrictAttrSpelling, CXX11_GNU_MALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RestrictAttrSpelling, C2X_GNU_MALLOC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RestrictAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(RestrictAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(RetainAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RetainAttrSpelling, GNU_RETAIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RetainAttrSpelling, CXX11_GNU_RETAIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RetainAttrSpelling, C2X_GNU_RETAIN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(RetainAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(RetainAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ReturnTypestateAttrConsumedState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnTypestateAttrConsumedState, UNKNOWN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnTypestateAttrConsumedState, CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnTypestateAttrConsumedState, UNCONSUMED, unsigned char)
+MX_END_ENUM_CLASS(ReturnTypestateAttrConsumedState)
+
+MX_BEGIN_ENUM_CLASS(ReturnTypestateAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnTypestateAttrSpelling, GNU_RETURN_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnTypestateAttrSpelling, CXX11_CLANG_RETURN_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnTypestateAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ReturnTypestateAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ReturnsNonNullAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsNonNullAttrSpelling, GNU_RETURNS_NONNULL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsNonNullAttrSpelling, CXX11_GNU_RETURNS_NONNULL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsNonNullAttrSpelling, C2X_GNU_RETURNS_NONNULL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsNonNullAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ReturnsNonNullAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ReturnsTwiceAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsTwiceAttrSpelling, GNU_RETURNS_TWICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsTwiceAttrSpelling, CXX11_GNU_RETURNS_TWICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsTwiceAttrSpelling, C2X_GNU_RETURNS_TWICE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ReturnsTwiceAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ReturnsTwiceAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SYCLKernelAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLKernelAttrSpelling, GNU_SYCL_KERNEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLKernelAttrSpelling, CXX11_CLANG_SYCL_KERNEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLKernelAttrSpelling, C2X_CLANG_SYCL_KERNEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLKernelAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SYCLKernelAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SYCLSpecialClassAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLSpecialClassAttrSpelling, GNU_SYCL_SPECIAL_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLSpecialClassAttrSpelling, CXX11_CLANG_SYCL_SPECIAL_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLSpecialClassAttrSpelling, C2X_CLANG_SYCL_SPECIAL_CLASS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SYCLSpecialClassAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SYCLSpecialClassAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ScopedLockableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ScopedLockableAttrSpelling, GNU_SCOPED_LOCKABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ScopedLockableAttrSpelling, CXX11_CLANG_SCOPED_LOCKABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ScopedLockableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ScopedLockableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SectionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SectionAttrSpelling, GNU_SECTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SectionAttrSpelling, CXX11_GNU_SECTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SectionAttrSpelling, C2X_GNU_SECTION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SectionAttrSpelling, DECLSPEC_ALLOCATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SectionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SectionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SelectAnyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SelectAnyAttrSpelling, DECLSPEC_SELECTANY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SelectAnyAttrSpelling, GNU_SELECTANY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SelectAnyAttrSpelling, CXX11_GNU_SELECTANY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SelectAnyAttrSpelling, C2X_GNU_SELECTANY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SelectAnyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SelectAnyAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SentinelAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SentinelAttrSpelling, GNU_SENTINEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SentinelAttrSpelling, CXX11_GNU_SENTINEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SentinelAttrSpelling, C2X_GNU_SENTINEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SentinelAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SentinelAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SetTypestateAttrConsumedState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SetTypestateAttrConsumedState, UNKNOWN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SetTypestateAttrConsumedState, CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SetTypestateAttrConsumedState, UNCONSUMED, unsigned char)
+MX_END_ENUM_CLASS(SetTypestateAttrConsumedState)
+
+MX_BEGIN_ENUM_CLASS(SetTypestateAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SetTypestateAttrSpelling, GNU_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SetTypestateAttrSpelling, CXX11_CLANG_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SetTypestateAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SetTypestateAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(SourceLocExprIdentKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(SourceLocExprIdentKind, FUNCTION, unsigned char)
@@ -825,6 +2926,27 @@ MX_BEGIN_ENUM_CLASS(SourceLocExprIdentKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(SourceLocExprIdentKind, LINE, unsigned char)
   MX_ENUM_CLASS_ENTRY(SourceLocExprIdentKind, COLUMN, unsigned char)
 MX_END_ENUM_CLASS(SourceLocExprIdentKind)
+
+MX_BEGIN_ENUM_CLASS(SpeculativeLoadHardeningAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SpeculativeLoadHardeningAttrSpelling, GNU_SPECULATIVE_LOAD_HARDENING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SpeculativeLoadHardeningAttrSpelling, CXX11_CLANG_SPECULATIVE_LOAD_HARDENING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SpeculativeLoadHardeningAttrSpelling, C2X_CLANG_SPECULATIVE_LOAD_HARDENING, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SpeculativeLoadHardeningAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SpeculativeLoadHardeningAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(StandaloneDebugAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StandaloneDebugAttrSpelling, GNU_STANDALONE_DEBUG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StandaloneDebugAttrSpelling, CXX11_CLANG_STANDALONE_DEBUG, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StandaloneDebugAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(StandaloneDebugAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(StdCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StdCallAttrSpelling, GNU_STDCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StdCallAttrSpelling, CXX11_GNU_STDCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StdCallAttrSpelling, C2X_GNU_STDCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StdCallAttrSpelling, KEYWORD_STDCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(StdCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(StdCallAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(StmtLikelihood, unsigned char)
   MX_ENUM_CLASS_ENTRY(StmtLikelihood, UNLIKELY, unsigned char)
@@ -1065,6 +3187,122 @@ MX_BEGIN_ENUM_CLASS(StringLiteralStringKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(StringLiteralStringKind, UTF32, unsigned char)
 MX_END_ENUM_CLASS(StringLiteralStringKind)
 
+MX_BEGIN_ENUM_CLASS(SwiftAsyncAttrKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrKind, NONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrKind, SWIFT_PRIVATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrKind, NOT_SWIFT_PRIVATE, unsigned char)
+MX_END_ENUM_CLASS(SwiftAsyncAttrKind)
+
+MX_BEGIN_ENUM_CLASS(SwiftAsyncAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrSpelling, GNU_SWIFT_ASYNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrSpelling, CXX11_CLANG_SWIFT_ASYNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrSpelling, C2X_CLANG_SWIFT_ASYNC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftAsyncAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftAsyncCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncCallAttrSpelling, GNU_SWIFTASYNCCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncCallAttrSpelling, CXX11_CLANG_SWIFTASYNCCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncCallAttrSpelling, C2X_CLANG_SWIFTASYNCCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftAsyncCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftAsyncContextAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncContextAttrSpelling, GNU_SWIFT_ASYNC_CONTEXT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncContextAttrSpelling, CXX11_CLANG_SWIFT_ASYNC_CONTEXT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncContextAttrSpelling, C2X_CLANG_SWIFT_ASYNC_CONTEXT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncContextAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftAsyncContextAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftAsyncErrorAttrConventionKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrConventionKind, NONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrConventionKind, NON_NULL_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrConventionKind, ZERO_ARGUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrConventionKind, NON_ZERO_ARGUMENT, unsigned char)
+MX_END_ENUM_CLASS(SwiftAsyncErrorAttrConventionKind)
+
+MX_BEGIN_ENUM_CLASS(SwiftAsyncErrorAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrSpelling, GNU_SWIFT_ASYNC_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrSpelling, CXX11_CLANG_SWIFT_ASYNC_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrSpelling, C2X_CLANG_SWIFT_ASYNC_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftAsyncErrorAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftAsyncErrorAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftCallAttrSpelling, GNU_SWIFTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftCallAttrSpelling, CXX11_CLANG_SWIFTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftCallAttrSpelling, C2X_CLANG_SWIFTCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftContextAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftContextAttrSpelling, GNU_SWIFT_CONTEXT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftContextAttrSpelling, CXX11_CLANG_SWIFT_CONTEXT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftContextAttrSpelling, C2X_CLANG_SWIFT_CONTEXT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftContextAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftContextAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftErrorAttrConventionKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorAttrConventionKind, NONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorAttrConventionKind, NON_NULL_ERROR, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorAttrConventionKind, NULL_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorAttrConventionKind, ZERO_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorAttrConventionKind, NON_ZERO_RESULT, unsigned char)
+MX_END_ENUM_CLASS(SwiftErrorAttrConventionKind)
+
+MX_BEGIN_ENUM_CLASS(SwiftErrorResultAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorResultAttrSpelling, GNU_SWIFT_ERROR_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorResultAttrSpelling, CXX11_CLANG_SWIFT_ERROR_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorResultAttrSpelling, C2X_CLANG_SWIFT_ERROR_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftErrorResultAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftErrorResultAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftIndirectResultAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftIndirectResultAttrSpelling, GNU_SWIFT_INDIRECT_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftIndirectResultAttrSpelling, CXX11_CLANG_SWIFT_INDIRECT_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftIndirectResultAttrSpelling, C2X_CLANG_SWIFT_INDIRECT_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftIndirectResultAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftIndirectResultAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SwiftNewTypeAttrNewtypeKind, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftNewTypeAttrNewtypeKind, STRUCT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftNewTypeAttrNewtypeKind, ENUM, unsigned char)
+MX_END_ENUM_CLASS(SwiftNewTypeAttrNewtypeKind)
+
+MX_BEGIN_ENUM_CLASS(SwiftNewTypeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftNewTypeAttrSpelling, GNU_SWIFT_NEWTYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftNewTypeAttrSpelling, GNU_SWIFT_WRAPPER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SwiftNewTypeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SwiftNewTypeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(SysVABIAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SysVABIAttrSpelling, GNU_SYSV_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SysVABIAttrSpelling, CXX11_GNU_SYSV_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SysVABIAttrSpelling, C2X_GNU_SYSV_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SysVABIAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(SysVABIAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TLSModelAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TLSModelAttrSpelling, GNU_TLS_MODEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TLSModelAttrSpelling, CXX11_GNU_TLS_MODEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TLSModelAttrSpelling, C2X_GNU_TLS_MODEL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TLSModelAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TLSModelAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TargetAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetAttrSpelling, GNU_TARGET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetAttrSpelling, CXX11_GNU_TARGET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetAttrSpelling, C2X_GNU_TARGET, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TargetAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TargetClonesAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetClonesAttrSpelling, GNU_TARGET_CLONES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetClonesAttrSpelling, CXX11_GNU_TARGET_CLONES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetClonesAttrSpelling, C2X_GNU_TARGET_CLONES, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TargetClonesAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TargetClonesAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(TemplateArgumentKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(TemplateArgumentKind, EMPTY, unsigned char)
   MX_ENUM_CLASS_ENTRY(TemplateArgumentKind, TYPE, unsigned char)
@@ -1076,6 +3314,46 @@ MX_BEGIN_ENUM_CLASS(TemplateArgumentKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(TemplateArgumentKind, EXPRESSION, unsigned char)
   MX_ENUM_CLASS_ENTRY(TemplateArgumentKind, PACK, unsigned char)
 MX_END_ENUM_CLASS(TemplateArgumentKind)
+
+MX_BEGIN_ENUM_CLASS(TestTypestateAttrConsumedState, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TestTypestateAttrConsumedState, CONSUMED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TestTypestateAttrConsumedState, UNCONSUMED, unsigned char)
+MX_END_ENUM_CLASS(TestTypestateAttrConsumedState)
+
+MX_BEGIN_ENUM_CLASS(TestTypestateAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TestTypestateAttrSpelling, GNU_TEST_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TestTypestateAttrSpelling, CXX11_CLANG_TEST_TYPESTATE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TestTypestateAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TestTypestateAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(ThisCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ThisCallAttrSpelling, GNU_THISCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ThisCallAttrSpelling, CXX11_GNU_THISCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ThisCallAttrSpelling, C2X_GNU_THISCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ThisCallAttrSpelling, KEYWORD_THISCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(ThisCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(ThisCallAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TransparentUnionAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TransparentUnionAttrSpelling, GNU_TRANSPARENT_UNION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TransparentUnionAttrSpelling, CXX11_GNU_TRANSPARENT_UNION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TransparentUnionAttrSpelling, C2X_GNU_TRANSPARENT_UNION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TransparentUnionAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TransparentUnionAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TrivialABIAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TrivialABIAttrSpelling, GNU_TRIVIAL_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TrivialABIAttrSpelling, CXX11_CLANG_TRIVIAL_ABI, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TrivialABIAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TrivialABIAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TryAcquireCapabilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TryAcquireCapabilityAttrSpelling, GNU_TRY_ACQUIRE_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TryAcquireCapabilityAttrSpelling, CXX11_CLANG_TRY_ACQUIRE_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TryAcquireCapabilityAttrSpelling, GNU_TRY_ACQUIRE_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TryAcquireCapabilityAttrSpelling, CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TryAcquireCapabilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TryAcquireCapabilityAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(TypeScalarTypeKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(TypeScalarTypeKind, C_POINTER, unsigned char)
@@ -1146,9 +3424,80 @@ MX_BEGIN_ENUM_CLASS(TypeKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(TypeKind, EXT_VECTOR, unsigned char)
 MX_END_ENUM_CLASS(TypeKind)
 
+MX_BEGIN_ENUM_CLASS(TypeTagForDatatypeAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeTagForDatatypeAttrSpelling, GNU_TYPE_TAG_FOR_DATATYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeTagForDatatypeAttrSpelling, CXX11_CLANG_TYPE_TAG_FOR_DATATYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeTagForDatatypeAttrSpelling, C2X_CLANG_TYPE_TAG_FOR_DATATYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeTagForDatatypeAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TypeTagForDatatypeAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TypeVisibilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrSpelling, GNU_TYPE_VISIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrSpelling, CXX11_CLANG_TYPE_VISIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrSpelling, C2X_CLANG_TYPE_VISIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(TypeVisibilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(TypeVisibilityAttrVisibilityType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrVisibilityType, DEFAULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrVisibilityType, HIDDEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeVisibilityAttrVisibilityType, PROTECTED, unsigned char)
+MX_END_ENUM_CLASS(TypeVisibilityAttrVisibilityType)
+
 MX_BEGIN_ENUM_CLASS(UnaryTransformTypeUTTKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(UnaryTransformTypeUTTKind, ENUM_UNDERLYING_TYPE, unsigned char)
 MX_END_ENUM_CLASS(UnaryTransformTypeUTTKind)
+
+MX_BEGIN_ENUM_CLASS(UnavailableAttrImplicitReason, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrImplicitReason, NONE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrImplicitReason, ARC_FORBIDDEN_TYPE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrImplicitReason, FORBIDDEN_WEAK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrImplicitReason, ARC_FORBIDDEN_CONVERSION, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrImplicitReason, ARC_INIT_RETURNS_UNRELATED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrImplicitReason, ARC_FIELD_WITH_OWNERSHIP, unsigned char)
+MX_END_ENUM_CLASS(UnavailableAttrImplicitReason)
+
+MX_BEGIN_ENUM_CLASS(UnavailableAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrSpelling, GNU_UNAVAILABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrSpelling, CXX11_CLANG_UNAVAILABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrSpelling, C2X_CLANG_UNAVAILABLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnavailableAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UnavailableAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(UninitializedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UninitializedAttrSpelling, GNU_UNINITIALIZED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UninitializedAttrSpelling, CXX11_CLANG_UNINITIALIZED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UninitializedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UninitializedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(UnlikelyAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnlikelyAttrSpelling, CXX11_UNLIKELY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnlikelyAttrSpelling, C2X_CLANG_UNLIKELY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnlikelyAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UnlikelyAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(UnusedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnusedAttrSpelling, CXX11_MAYBE_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnusedAttrSpelling, GNU_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnusedAttrSpelling, CXX11_GNU_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnusedAttrSpelling, C2X_GNU_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnusedAttrSpelling, C2X_MAYBE_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UnusedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UnusedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(UseHandleAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UseHandleAttrSpelling, GNU_USE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UseHandleAttrSpelling, CXX11_CLANG_USE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UseHandleAttrSpelling, C2X_CLANG_USE_HANDLE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UseHandleAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UseHandleAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(UsedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsedAttrSpelling, GNU_USED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsedAttrSpelling, CXX11_GNU_USED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsedAttrSpelling, C2X_GNU_USED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UsedAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(UserDefinedLiteralLiteralOperatorKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(UserDefinedLiteralLiteralOperatorKind, RAW, unsigned char)
@@ -1158,6 +3507,18 @@ MX_BEGIN_ENUM_CLASS(UserDefinedLiteralLiteralOperatorKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(UserDefinedLiteralLiteralOperatorKind, STRING, unsigned char)
   MX_ENUM_CLASS_ENTRY(UserDefinedLiteralLiteralOperatorKind, CHARACTER, unsigned char)
 MX_END_ENUM_CLASS(UserDefinedLiteralLiteralOperatorKind)
+
+MX_BEGIN_ENUM_CLASS(UsingIfExistsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsingIfExistsAttrSpelling, GNU_USING_IF_EXISTS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsingIfExistsAttrSpelling, CXX11_CLANG_USING_IF_EXISTS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UsingIfExistsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UsingIfExistsAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(UuidAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UuidAttrSpelling, DECLSPEC_UUID, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UuidAttrSpelling, MICROSOFT_UUID, unsigned char)
+  MX_ENUM_CLASS_ENTRY(UuidAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(UuidAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(VarDeclDefinitionKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(VarDeclDefinitionKind, DECLARATION_ONLY, unsigned char)
@@ -1177,6 +3538,20 @@ MX_BEGIN_ENUM_CLASS(VarDeclTLSKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(VarDeclTLSKind, DYNAMIC, unsigned char)
 MX_END_ENUM_CLASS(VarDeclTLSKind)
 
+MX_BEGIN_ENUM_CLASS(VecReturnAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VecReturnAttrSpelling, GNU_VECRETURN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VecReturnAttrSpelling, CXX11_CLANG_VECRETURN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VecReturnAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(VecReturnAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(VectorCallAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VectorCallAttrSpelling, GNU_VECTORCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VectorCallAttrSpelling, CXX11_CLANG_VECTORCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VectorCallAttrSpelling, C2X_CLANG_VECTORCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VectorCallAttrSpelling, KEYWORD_VECTORCALL, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VectorCallAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(VectorCallAttrSpelling)
+
 MX_BEGIN_ENUM_CLASS(VectorTypeVectorKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(VectorTypeVectorKind, GENERIC_VECTOR, unsigned char)
   MX_ENUM_CLASS_ENTRY(VectorTypeVectorKind, ALTI_VEC_VECTOR, unsigned char)
@@ -1187,6 +3562,102 @@ MX_BEGIN_ENUM_CLASS(VectorTypeVectorKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(VectorTypeVectorKind, SVE_FIXED_LENGTH_DATA_VECTOR, unsigned char)
   MX_ENUM_CLASS_ENTRY(VectorTypeVectorKind, SVE_FIXED_LENGTH_PREDICATE_VECTOR, unsigned char)
 MX_END_ENUM_CLASS(VectorTypeVectorKind)
+
+MX_BEGIN_ENUM_CLASS(VisibilityAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrSpelling, GNU_VISIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrSpelling, CXX11_GNU_VISIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrSpelling, C2X_GNU_VISIBILITY, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(VisibilityAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(VisibilityAttrVisibilityType, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrVisibilityType, DEFAULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrVisibilityType, HIDDEN, unsigned char)
+  MX_ENUM_CLASS_ENTRY(VisibilityAttrVisibilityType, PROTECTED, unsigned char)
+MX_END_ENUM_CLASS(VisibilityAttrVisibilityType)
+
+MX_BEGIN_ENUM_CLASS(WarnUnusedAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedAttrSpelling, GNU_WARN_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedAttrSpelling, CXX11_GNU_WARN_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedAttrSpelling, C2X_GNU_WARN_UNUSED, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WarnUnusedAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WarnUnusedResultAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, CXX11_NODISCARD, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, C2X_NODISCARD, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, CXX11_CLANG_WARN_UNUSED_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, GNU_WARN_UNUSED_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, CXX11_GNU_WARN_UNUSED_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, C2X_GNU_WARN_UNUSED_RESULT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WarnUnusedResultAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WarnUnusedResultAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WeakAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakAttrSpelling, GNU_WEAK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakAttrSpelling, CXX11_GNU_WEAK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakAttrSpelling, C2X_GNU_WEAK, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WeakAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WeakImportAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakImportAttrSpelling, GNU_WEAK_IMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakImportAttrSpelling, CXX11_CLANG_WEAK_IMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakImportAttrSpelling, C2X_CLANG_WEAK_IMPORT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakImportAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WeakImportAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WeakRefAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakRefAttrSpelling, GNU_WEAKREF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakRefAttrSpelling, CXX11_GNU_WEAKREF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakRefAttrSpelling, C2X_GNU_WEAKREF, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WeakRefAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WeakRefAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WebAssemblyExportNameAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyExportNameAttrSpelling, GNU_EXPORT_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyExportNameAttrSpelling, CXX11_CLANG_EXPORT_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyExportNameAttrSpelling, C2X_CLANG_EXPORT_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyExportNameAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WebAssemblyExportNameAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WebAssemblyImportModuleAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportModuleAttrSpelling, GNU_IMPORT_MODULE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportModuleAttrSpelling, CXX11_CLANG_IMPORT_MODULE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportModuleAttrSpelling, C2X_CLANG_IMPORT_MODULE, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportModuleAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WebAssemblyImportModuleAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(WebAssemblyImportNameAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportNameAttrSpelling, GNU_IMPORT_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportNameAttrSpelling, CXX11_CLANG_IMPORT_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportNameAttrSpelling, C2X_CLANG_IMPORT_NAME, unsigned char)
+  MX_ENUM_CLASS_ENTRY(WebAssemblyImportNameAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(WebAssemblyImportNameAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(X86ForceAlignArgPointerAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(X86ForceAlignArgPointerAttrSpelling, GNU_FORCE_ALIGN_ARGUMENT_POINTER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(X86ForceAlignArgPointerAttrSpelling, CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(X86ForceAlignArgPointerAttrSpelling, C2X_GNU_FORCE_ALIGN_ARGUMENT_POINTER, unsigned char)
+  MX_ENUM_CLASS_ENTRY(X86ForceAlignArgPointerAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(X86ForceAlignArgPointerAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(XRayInstrumentAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, GNU_XRAY_ALWAYS_INSTRUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, C2X_CLANG_XRAY_ALWAYS_INSTRUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, GNU_XRAY_NEVER_INSTRUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, CXX11_CLANG_XRAY_NEVER_INSTRUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, C2X_CLANG_XRAY_NEVER_INSTRUMENT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayInstrumentAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(XRayInstrumentAttrSpelling)
+
+MX_BEGIN_ENUM_CLASS(XRayLogArgsAttrSpelling, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayLogArgsAttrSpelling, GNU_XRAY_LOG_ARGUMENTS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayLogArgsAttrSpelling, CXX11_CLANG_XRAY_LOG_ARGUMENTS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayLogArgsAttrSpelling, C2X_CLANG_XRAY_LOG_ARGUMENTS, unsigned char)
+  MX_ENUM_CLASS_ENTRY(XRayLogArgsAttrSpelling, SPELLING_NOT_CALCULATED, unsigned char)
+MX_END_ENUM_CLASS(XRayLogArgsAttrSpelling)
 
 MX_BEGIN_ENUM_CLASS(ASTDumpOutputFormat, unsigned char)
   MX_ENUM_CLASS_ENTRY(ASTDumpOutputFormat, DEFAULT, unsigned char)
@@ -1212,19 +3683,6 @@ MX_BEGIN_ENUM_CLASS(AlignRequirementKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(AlignRequirementKind, REQUIRED_BY_RECORD, unsigned char)
   MX_ENUM_CLASS_ENTRY(AlignRequirementKind, REQUIRED_BY_ENUM, unsigned char)
 MX_END_ENUM_CLASS(AlignRequirementKind)
-
-MX_BEGIN_ENUM_CLASS(AllocatorTypeTy, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_NULL_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_DEFAULT_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_LARGE_CAP_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_CONST_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_HIGH_BW_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_LOW_LAT_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMPC_GROUP_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMPP_TEAM_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_THREAD_MEMORY_ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(AllocatorTypeTy, OMP_USER_DEFINED_MEMORY_ALLOC, unsigned char)
-MX_END_ENUM_CLASS(AllocatorTypeTy)
 
 MX_BEGIN_ENUM_CLASS(AltivecSrcCompatKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(AltivecSrcCompatKind, MIXED, unsigned char)
@@ -1260,357 +3718,6 @@ MX_BEGIN_ENUM_CLASS(AtomicScopeModelKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(AtomicScopeModelKind, OPEN_CL, unsigned char)
   MX_ENUM_CLASS_ENTRY(AtomicScopeModelKind, HIP, unsigned char)
 MX_END_ENUM_CLASS(AtomicScopeModelKind)
-
-MX_BEGIN_ENUM_CLASS(AttributeKind, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ARM_MVE_STRICT_POLYMORPHISM, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, BTF_TYPE_TAG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CMSE_NS_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_DEREF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_CGC, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_INERT_UNSAFE_UNRETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_KIND_OF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_CONSTANT_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_GENERIC_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_GLOBAL_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_LOCAL_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_PRIVATE_ADDRESS_SPACE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PTR32, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PTR64, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, S_PTR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TYPE_NON_NULL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TYPE_NULL_UNSPECIFIED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TYPE_NULLABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TYPE_NULLABLE_RESULT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, U_PTR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FALL_THROUGH, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LIKELY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MUST_TAIL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_UNROLL_HINT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SUPPRESS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, UNLIKELY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_MERGE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, A_ARCH64_VECTOR_PCS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ACQUIRE_HANDLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ANY_X86_NO_CF_CHECK, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, C_DECL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FAST_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, INTEL_OCL_BICC, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LIFETIME_BOUND, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MSABI, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NS_RETURNS_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_OWNERSHIP, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PASCAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PCS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRESERVE_ALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRESERVE_MOST, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, REG_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, STD_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ASYNC_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SYS_VABI, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, THIS_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, VECTOR_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ASYNC_CONTEXT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_CONTEXT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ERROR_RESULT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_INDIRECT_RESULT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ANNOTATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CF_CONSUMED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CARRIES_DEPENDENCY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NS_CONSUMED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NON_NULL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OS_CONSUMED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PASS_OBJECT_SIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RELEASE_HANDLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, USE_HANDLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AMDGPU_FLAT_WORK_GROUP_SIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AMDGPU_NUM_SGPR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AMDGPU_NUM_VGPR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AMDGPU_WAVES_PER_EU, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ARM_INTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AVR_INTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AVR_SIGNAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ACQUIRE_CAPABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ACQUIRED_AFTER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ACQUIRED_BEFORE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALIGN_MAC68_K, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALIGN_NATURAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALIGNED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALLOC_ALIGN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALLOC_SIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALWAYS_DESTROY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALWAYS_INLINE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ANALYZER_NO_RETURN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ANY_X86_INTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ANY_X86_NO_CALLER_SAVED_REGISTERS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ARC_WEAKREF_UNAVAILABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ARGUMENT_WITH_TYPE_TAG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ARM_BUILTIN_ALIAS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ARTIFICIAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ASSEMBLY_LABEL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ASSERT_CAPABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ASSERT_EXCLUSIVE_LOCK, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ASSERT_SHARED_LOCK, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ASSUME_ALIGNED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ASSUMPTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, AVAILABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, BPF_PRESERVE_ACCESS_INDEX, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, BTF_DECL_TAG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, BLOCKS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, BUILTIN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, C11_NO_RETURN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CF_AUDITED_TRANSFER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CF_GUARD, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CFI_CANONICAL_JUMP_TABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CF_RETURNS_NOT_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CF_RETURNS_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CF_UNKNOWN_TRANSFER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CPU_DISPATCH, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CPU_SPECIFIC, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_CONSTANT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_DEVICE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_DEVICE_BUILTIN_SURFACE_TYPE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_DEVICE_BUILTIN_TEXTURE_TYPE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_GLOBAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_HOST, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_INVALID_TARGET, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_LAUNCH_BOUNDS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CUDA_SHARED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CXX11_NO_RETURN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CALLABLE_WHEN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CALLBACK, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CAPABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CAPTURED_RECORD, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CLEANUP, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CMSE_NS_ENTRY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CODE_SEG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, COLD, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, COMMON, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONST, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONST_INITIALIZER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONSTRUCTOR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONSUMABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONSUMABLE_AUTO_CAST, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONSUMABLE_SET_ON_READ, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CONVERGENT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DLL_EXPORT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DLL_EXPORT_STATIC_LOCAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DLL_IMPORT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DLL_IMPORT_STATIC_LOCAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DEPRECATED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DESTRUCTOR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DIAGNOSE_AS_BUILTIN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DIAGNOSE_IF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DISABLE_SANITIZER_INSTRUMENTATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, DISABLE_TAIL_CALLS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, EMPTY_BASES, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ENABLE_IF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ENFORCE_TCB, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ENFORCE_TCB_LEAF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ENUM_EXTENSIBILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ERROR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, EXCLUDE_FROM_EXPLICIT_INSTANTIATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, EXCLUSIVE_TRYLOCK_FUNCTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, EXTERNAL_SOURCE_SYMBOL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FINAL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FLAG_ENUM, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FLATTEN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FORMAT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, FORMAT_ARGUMENT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, GNU_INLINE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, GUARDED_BY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, GUARDED_VARIABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, HIP_MANAGED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, HOT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, IB_ACTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, IB_OUTLET, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, IB_OUTLET_COLLECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, INITIALIZER_PRIORITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, INTERNAL_LINKAGE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LTO_VISIBILITY_PUBLIC, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LAYOUT_VERSION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LEAF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LOCK_RETURNED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LOCKS_EXCLUDED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, M68_KINTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIG_SERVER_ROUTINE__, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MS_ALLOCATOR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MS_INHERITANCE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MS_NO_V_TABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MSP430_INTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MS_STRUCT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MS_VTOR_DISP, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MAX_FIELD_ALIGNMENT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MAY_ALIAS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MICRO_MIPS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIN_SIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIN_VECTOR_WIDTH, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIPS16, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIPS_INTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIPS_LONG_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MIPS_SHORT_CALL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NS_CONSUMES_SELF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NS_ERROR_DOMAIN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NS_RETURNS_AUTORELEASED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NS_RETURNS_NOT_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NAKED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_ALIAS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_COMMON, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_DEBUG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_DESTROY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_DUPLICATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_INLINE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_INSTRUMENT_FUNCTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_MICRO_MIPS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_MIPS16, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_PROFILE_FUNCTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_RETURN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_SANITIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_SPECULATIVE_LOAD_HARDENING, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_SPLIT_STACK, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_STACK_PROTECTOR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_THREAD_SAFETY_ANALYSIS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_THROW, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_UNIQUE_ADDRESS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NOT_TAIL_CALLED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_ALLOCATE_DECLARATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_CAPTURE_NO_INITIALIZER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_DECLARE_TARGET_DECLARATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_DECLARE_VARIANT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_THREAD_PRIVATE_DECLARATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OS_CONSUMES_THIS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OS_RETURNS_NOT_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OS_RETURNS_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OS_RETURNS_RETAINED_ON_NON_ZERO, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OS_RETURNS_RETAINED_ON_ZERO, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_BRIDGE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_BRIDGE_MUTABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_BRIDGE_RELATED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_EXCEPTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_EXTERNALLY_RETAINED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_INDEPENDENT_CLASS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_METHOD_FAMILY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_CNS_OBJECT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_PRECISE_LIFETIME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_REQUIRES_PROPERTY_DEFINITIONS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_REQUIRES_SUPER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_RETURNS_INNER_POINTER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_ROOT_CLASS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_SUBCLASSING_RESTRICTED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_KERNEL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPTIMIZE_NONE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OVERRIDE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OWNER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OWNERSHIP, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PACKED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PARAMETER_TYPESTATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PATCHABLE_FUNCTION_ENTRY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, POINTER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRAGMA_CLANG_BSS_SECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRAGMA_CLANG_DATA_SECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRAGMA_CLANG_RELRO_SECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRAGMA_CLANG_RODATA_SECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PRAGMA_CLANG_TEXT_SECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PREFERRED_NAME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PT_GUARDED_BY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PT_GUARDED_VARIABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, PURE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RISCV_INTERRUPT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, REINITIALIZES, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RELEASE_CAPABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, REQD_WORK_GROUP_SIZE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, REQUIRES_CAPABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RESTRICT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RETAIN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RETURN_TYPESTATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RETURNS_NON_NULL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RETURNS_TWICE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SYCL_KERNEL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SYCL_SPECIAL_CLASS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SCOPED_LOCKABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SECTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SELECT_ANY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SENTINEL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SET_TYPESTATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SHARED_TRYLOCK_FUNCTION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SPECULATIVE_LOAD_HARDENING, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, STANDALONE_DEBUG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, STRICT_FP, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ASYNC, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ASYNC_ERROR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ASYNC_NAME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ATTRIBUTE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_BRIDGE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_BRIDGED_TYPEDEF, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_ERROR, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_NAME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_NEW_TYPE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_PRIVATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TLS_MODEL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TARGET, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TARGET_CLONES, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TEST_TYPESTATE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TRANSPARENT_UNION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TRIVIAL_ABI, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TRY_ACQUIRE_CAPABILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TYPE_TAG_FOR_DATATYPE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, TYPE_VISIBILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, UNAVAILABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, UNINITIALIZED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, UNUSED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, USED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, USING_IF_EXISTS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, UUID, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, VEC_RETURN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, VEC_TYPE_HINT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, VISIBILITY, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WARN_UNUSED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WARN_UNUSED_RESULT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WEAK, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WEAK_IMPORT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WEAK_REFERENCE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WEB_ASSEMBLY_EXPORT_NAME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WEB_ASSEMBLY_IMPORT_MODULE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WEB_ASSEMBLY_IMPORT_NAME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, WORK_GROUP_SIZE_HINT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, X86_FORCE_ALIGN_ARGUMENT_POINTER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, X_RAY_INSTRUMENT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, X_RAY_LOG_ARGUMENTS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ABI_TAG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALIAS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, ALIGN_VALUE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, BUILTIN_ALIAS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, CALLED_ONCE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, I_FUNC, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, INITIALIZER_SEG, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LOADER_UNINITIALIZED, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, LOOP_HINT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, MODE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_BUILTIN, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, NO_ESCAPE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_CAPTURE_KIND, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_DECLARE_SIMD_DECLARATION, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OMP_REFERENCED_VARIABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_BOXABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_CLASS_STUB, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_DESIGNATED_INITIALIZER, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_DIRECT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_DIRECT_MEMBERS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_NON_LAZY_CLASS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_NON_RUNTIME_PROTOCOL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_RUNTIME_NAME, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OBJ_C_RUNTIME_VISIBLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OPEN_CL_ACCESS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, OVERLOADABLE, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, RENDER_SCRIPT_KERNEL, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, SWIFT_OBJ_C_MEMBERS, unsigned short)
-  MX_ENUM_CLASS_ENTRY(AttributeKind, THREAD, unsigned short)
-MX_END_ENUM_CLASS(AttributeKind)
 
 MX_BEGIN_ENUM_CLASS(AutoTypeKeyword, unsigned char)
   MX_ENUM_CLASS_ENTRY(AutoTypeKeyword, AUTO, unsigned char)
@@ -1672,16 +3779,6 @@ MX_BEGIN_ENUM_CLASS(Bits, unsigned char)
   MX_ENUM_CLASS_ENTRY(Bits, VARIABLY_MODIFIED, unsigned char)
   MX_ENUM_CLASS_ENTRY(Bits, SYNTACTIC, unsigned char)
 MX_END_ENUM_CLASS(Bits)
-
-MX_BEGIN_ENUM_CLASS(BlockType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BlockType, BY_REFERENCE, unsigned char)
-MX_END_ENUM_CLASS(BlockType)
-
-MX_BEGIN_ENUM_CLASS(BranchStateTy, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BranchStateTy, UNDEFINED, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BranchStateTy, INBRANCH, unsigned char)
-  MX_ENUM_CLASS_ENTRY(BranchStateTy, NOTINBRANCH, unsigned char)
-MX_END_ENUM_CLASS(BranchStateTy)
 
 MX_BEGIN_ENUM_CLASS(CallingConv, unsigned char)
   MX_ENUM_CLASS_ENTRY(CallingConv, C, unsigned char)
@@ -1835,19 +3932,6 @@ MX_BEGIN_ENUM_CLASS(ConstexprSpecKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(ConstexprSpecKind, CONSTINIT, unsigned char)
 MX_END_ENUM_CLASS(ConstexprSpecKind)
 
-MX_BEGIN_ENUM_CLASS(ConsumedState, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConsumedState, UNKNOWN, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConsumedState, CONSUMED, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConsumedState, UNCONSUMED, unsigned char)
-MX_END_ENUM_CLASS(ConsumedState)
-
-MX_BEGIN_ENUM_CLASS(ConventionKind, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConventionKind, NONE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConventionKind, NON_NULL_ERROR, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConventionKind, ZERO_ARGUMENT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ConventionKind, NON_ZERO_ARGUMENT, unsigned char)
-MX_END_ENUM_CLASS(ConventionKind)
-
 MX_BEGIN_ENUM_CLASS(CoreFoundationABI, unsigned char)
   MX_ENUM_CLASS_ENTRY(CoreFoundationABI, UNSPECIFIED, unsigned char)
   MX_ENUM_CLASS_ENTRY(CoreFoundationABI, STANDALONE, unsigned char)
@@ -1881,12 +3965,6 @@ MX_BEGIN_ENUM_CLASS(DefaultCallingConvention, unsigned char)
   MX_ENUM_CLASS_ENTRY(DefaultCallingConvention, REG_CALL, unsigned char)
 MX_END_ENUM_CLASS(DefaultCallingConvention)
 
-MX_BEGIN_ENUM_CLASS(DevTypeTy, unsigned char)
-  MX_ENUM_CLASS_ENTRY(DevTypeTy, HOST, unsigned char)
-  MX_ENUM_CLASS_ENTRY(DevTypeTy, NO_HOST, unsigned char)
-  MX_ENUM_CLASS_ENTRY(DevTypeTy, ANY, unsigned char)
-MX_END_ENUM_CLASS(DevTypeTy)
-
 MX_BEGIN_ENUM_CLASS(DiagnosticLevelMask, unsigned char)
   MX_ENUM_CLASS_ENTRY(DiagnosticLevelMask, NONE, unsigned char)
   MX_ENUM_CLASS_ENTRY(DiagnosticLevelMask, NOTE, unsigned char)
@@ -1895,11 +3973,6 @@ MX_BEGIN_ENUM_CLASS(DiagnosticLevelMask, unsigned char)
   MX_ENUM_CLASS_ENTRY(DiagnosticLevelMask, ERROR, unsigned char)
   MX_ENUM_CLASS_ENTRY(DiagnosticLevelMask, ALL, unsigned char)
 MX_END_ENUM_CLASS(DiagnosticLevelMask)
-
-MX_BEGIN_ENUM_CLASS(DiagnosticType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(DiagnosticType, ERROR, unsigned char)
-  MX_ENUM_CLASS_ENTRY(DiagnosticType, WARNING, unsigned char)
-MX_END_ENUM_CLASS(DiagnosticType)
 
 MX_BEGIN_ENUM_CLASS(ElaboratedTypeKeyword, unsigned char)
   MX_ENUM_CLASS_ENTRY(ElaboratedTypeKeyword, STRUCT, unsigned char)
@@ -2012,15 +4085,6 @@ MX_BEGIN_ENUM_CLASS(FPModeKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(FPModeKind, FAST_HONOR_PRAGMAS, unsigned char)
 MX_END_ENUM_CLASS(FPModeKind)
 
-MX_BEGIN_ENUM_CLASS(FamilyKind, unsigned char)
-  MX_ENUM_CLASS_ENTRY(FamilyKind, NONE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(FamilyKind, ALLOC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(FamilyKind, COPY, unsigned char)
-  MX_ENUM_CLASS_ENTRY(FamilyKind, INITIALIZER, unsigned char)
-  MX_ENUM_CLASS_ENTRY(FamilyKind, MUTABLE_COPY, unsigned char)
-  MX_ENUM_CLASS_ENTRY(FamilyKind, NEW, unsigned char)
-MX_END_ENUM_CLASS(FamilyKind)
-
 MX_BEGIN_ENUM_CLASS(FiniteLoopsKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(FiniteLoopsKind, LANGUAGE, unsigned char)
   MX_ENUM_CLASS_ENTRY(FiniteLoopsKind, ALWAYS, unsigned char)
@@ -2061,10 +4125,6 @@ MX_BEGIN_ENUM_CLASS(GetBuiltinTypeError, unsigned char)
   MX_ENUM_CLASS_ENTRY(GetBuiltinTypeError, MISSING_UCONTEXT, unsigned char)
 MX_END_ENUM_CLASS(GetBuiltinTypeError)
 
-MX_BEGIN_ENUM_CLASS(GuardArg, unsigned char)
-  MX_ENUM_CLASS_ENTRY(GuardArg, NOCF, unsigned char)
-MX_END_ENUM_CLASS(GuardArg)
-
 MX_BEGIN_ENUM_CLASS(ID, unsigned char)
   MX_ENUM_CLASS_ENTRY(ID, WORK_GROUP, unsigned char)
   MX_ENUM_CLASS_ENTRY(ID, DEVICE, unsigned char)
@@ -2091,15 +4151,6 @@ MX_BEGIN_ENUM_CLASS(ImbueAttribute, unsigned char)
   MX_ENUM_CLASS_ENTRY(ImbueAttribute, NEVER, unsigned char)
   MX_ENUM_CLASS_ENTRY(ImbueAttribute, ALWAYSARG1, unsigned char)
 MX_END_ENUM_CLASS(ImbueAttribute)
-
-MX_BEGIN_ENUM_CLASS(ImplicitReason, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ImplicitReason, NONE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ImplicitReason, ARC_FORBIDDEN_TYPE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ImplicitReason, FORBIDDEN_WEAK, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ImplicitReason, ARC_FORBIDDEN_CONVERSION, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ImplicitReason, ARC_INIT_RETURNS_UNRELATED, unsigned char)
-  MX_ENUM_CLASS_ENTRY(ImplicitReason, ARC_FIELD_WITH_OWNERSHIP, unsigned char)
-MX_END_ENUM_CLASS(ImplicitReason)
 
 MX_BEGIN_ENUM_CLASS(InClassInitStyle, unsigned char)
   MX_ENUM_CLASS_ENTRY(InClassInitStyle, NO_INITIALIZER, unsigned char)
@@ -2137,21 +4188,6 @@ MX_BEGIN_ENUM_CLASS(InliningMethod, unsigned char)
   MX_ENUM_CLASS_ENTRY(InliningMethod, ONLY_HINT_INLINING, unsigned char)
   MX_ENUM_CLASS_ENTRY(InliningMethod, ONLY_ALWAYS_INLINING, unsigned char)
 MX_END_ENUM_CLASS(InliningMethod)
-
-MX_BEGIN_ENUM_CLASS(InteropType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InteropType, TARGET, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InteropType, TARGET_SYNC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InteropType, TARGET_TARGET_SYNC, unsigned char)
-MX_END_ENUM_CLASS(InteropType)
-
-MX_BEGIN_ENUM_CLASS(InterruptType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InterruptType, IRQ, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InterruptType, FIQ, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InterruptType, SWI, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InterruptType, ABORT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InterruptType, UNDEF, unsigned char)
-  MX_ENUM_CLASS_ENTRY(InterruptType, GENERIC, unsigned char)
-MX_END_ENUM_CLASS(InterruptType)
 
 MX_BEGIN_ENUM_CLASS(Kinds, unsigned char)
   MX_ENUM_CLASS_ENTRY(Kinds, L_VALUE, unsigned char)
@@ -2209,13 +4245,13 @@ MX_BEGIN_ENUM_CLASS(LangFeatures, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C99, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C11, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C17, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LangFeatures, C2_X, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LangFeatures, C2X, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS11, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS14, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS17, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS20, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS2_B, unsigned char)
+  MX_ENUM_CLASS_ENTRY(LangFeatures, C_PLUS_PLUS2B, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, DIGRAPHS, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, GNU_MODE, unsigned char)
   MX_ENUM_CLASS_ENTRY(LangFeatures, HEX_FLOAT, unsigned char)
@@ -2269,16 +4305,6 @@ MX_BEGIN_ENUM_CLASS(Linkage, unsigned char)
   MX_ENUM_CLASS_ENTRY(Linkage, EXTERNAL_LINKAGE, unsigned char)
 MX_END_ENUM_CLASS(Linkage)
 
-MX_BEGIN_ENUM_CLASS(LoopHintState, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, ENABLE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, DISABLE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, NUMERIC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, FIXED_WIDTH, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, SCALABLE_WIDTH, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, ASSUME_SAFETY, unsigned char)
-  MX_ENUM_CLASS_ENTRY(LoopHintState, FULL, unsigned char)
-MX_END_ENUM_CLASS(LoopHintState)
-
 MX_BEGIN_ENUM_CLASS(MSInheritanceModel, unsigned char)
   MX_ENUM_CLASS_ENTRY(MSInheritanceModel, SINGLE, unsigned char)
   MX_ENUM_CLASS_ENTRY(MSInheritanceModel, MULTIPLE, unsigned char)
@@ -2304,11 +4330,6 @@ MX_BEGIN_ENUM_CLASS(MSVtorDispMode, unsigned char)
   MX_ENUM_CLASS_ENTRY(MSVtorDispMode, FOR_VIRTUAL_BASE_OVERRIDE, unsigned char)
   MX_ENUM_CLASS_ENTRY(MSVtorDispMode, FOR_VF_TABLE, unsigned char)
 MX_END_ENUM_CLASS(MSVtorDispMode)
-
-MX_BEGIN_ENUM_CLASS(MapTypeTy, unsigned char)
-  MX_ENUM_CLASS_ENTRY(MapTypeTy, TO, unsigned char)
-  MX_ENUM_CLASS_ENTRY(MapTypeTy, LINK, unsigned char)
-MX_END_ENUM_CLASS(MapTypeTy)
 
 MX_BEGIN_ENUM_CLASS(MethodRefFlags, unsigned char)
   MX_ENUM_CLASS_ENTRY(MethodRefFlags, METHOD_REFERENCE_NONE, unsigned char)
@@ -2361,11 +4382,6 @@ MX_BEGIN_ENUM_CLASS(NestedNameSpecifierDependence, unsigned char)
   MX_ENUM_CLASS_ENTRY(NestedNameSpecifierDependence, DEPENDENT_INSTANTIATION, unsigned char)
   MX_ENUM_CLASS_ENTRY(NestedNameSpecifierDependence, ALL, unsigned char)
 MX_END_ENUM_CLASS(NestedNameSpecifierDependence)
-
-MX_BEGIN_ENUM_CLASS(NewtypeKind, unsigned char)
-  MX_ENUM_CLASS_ENTRY(NewtypeKind, STRUCT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(NewtypeKind, ENUM, unsigned char)
-MX_END_ENUM_CLASS(NewtypeKind)
 
 MX_BEGIN_ENUM_CLASS(NonOdrUseReason, unsigned char)
   MX_ENUM_CLASS_ENTRY(NonOdrUseReason, NONE, unsigned char)
@@ -2600,21 +4616,6 @@ MX_BEGIN_ENUM_CLASS(OpenMPScheduleClauseModifier, unsigned char)
   MX_ENUM_CLASS_ENTRY(OpenMPScheduleClauseModifier, SIMD, unsigned char)
 MX_END_ENUM_CLASS(OpenMPScheduleClauseModifier)
 
-MX_BEGIN_ENUM_CLASS(OptionType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, VECTORIZE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, VECTORIZE_WIDTH, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, INTERLEAVE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, INTERLEAVE_COUNT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, UNROLL, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, UNROLL_COUNT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, UNROLL_AND_JAM, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, UNROLL_AND_JAM_COUNT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, PIPELINE_DISABLED, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, PIPELINE_INITIATION_INTERVAL, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, DISTRIBUTE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OptionType, VECTORIZE_PREDICATE, unsigned char)
-MX_END_ENUM_CLASS(OptionType)
-
 MX_BEGIN_ENUM_CLASS(OverloadedOperatorKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(OverloadedOperatorKind, NONE, unsigned char)
   MX_ENUM_CLASS_ENTRY(OverloadedOperatorKind, NEW, unsigned char)
@@ -2668,17 +4669,6 @@ MX_BEGIN_ENUM_CLASS(OverloadsShown, unsigned char)
   MX_ENUM_CLASS_ENTRY(OverloadsShown, ALL, unsigned char)
   MX_ENUM_CLASS_ENTRY(OverloadsShown, BEST, unsigned char)
 MX_END_ENUM_CLASS(OverloadsShown)
-
-MX_BEGIN_ENUM_CLASS(OwnershipKind, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OwnershipKind, HOLDS, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OwnershipKind, RETURNS, unsigned char)
-  MX_ENUM_CLASS_ENTRY(OwnershipKind, TAKES, unsigned char)
-MX_END_ENUM_CLASS(OwnershipKind)
-
-MX_BEGIN_ENUM_CLASS(PCSType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(PCSType, AAPCS, unsigned char)
-  MX_ENUM_CLASS_ENTRY(PCSType, VFP, unsigned char)
-MX_END_ENUM_CLASS(PCSType)
 
 MX_BEGIN_ENUM_CLASS(ParameterABI, unsigned char)
   MX_ENUM_CLASS_ENTRY(ParameterABI, ORDINARY, unsigned char)
@@ -2822,7 +4812,7 @@ MX_BEGIN_ENUM_CLASS(SanitizerOrdinal, unsigned char)
   MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, FUNCTION, unsigned char)
   MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, INTEGER_DIVIDE_BY_ZERO, unsigned char)
   MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, NONNULL_ATTRIBUTE, unsigned char)
-  MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, NULL__, unsigned char)
+  MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, NULL_, unsigned char)
   MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, NULLABILITY_ARGUMENT, unsigned char)
   MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, NULLABILITY_ASSIGN, unsigned char)
   MX_ENUM_CLASS_ENTRY(SanitizerOrdinal, NULLABILITY_RETURN, unsigned char)
@@ -2910,13 +4900,6 @@ MX_BEGIN_ENUM_CLASS(SpecifierKind, unsigned char)
   MX_ENUM_CLASS_ENTRY(SpecifierKind, GLOBAL, unsigned char)
   MX_ENUM_CLASS_ENTRY(SpecifierKind, SUPER, unsigned char)
 MX_END_ENUM_CLASS(SpecifierKind)
-
-MX_BEGIN_ENUM_CLASS(Spelling, unsigned char)
-  MX_ENUM_CLASS_ENTRY(Spelling, GNU_AARCH64_VECTOR_PCS, unsigned char)
-  MX_ENUM_CLASS_ENTRY(Spelling, CXX11_CLANG_AARCH64_VECTOR_PCS, unsigned char)
-  MX_ENUM_CLASS_ENTRY(Spelling, C2_XCLANG_AARCH64_VECTOR_PCS, unsigned char)
-  MX_ENUM_CLASS_ENTRY(Spelling, SPELLING_NOT_CALCULATED, unsigned char)
-MX_END_ENUM_CLASS(Spelling)
 
 MX_BEGIN_ENUM_CLASS(StackProtectorMode, unsigned char)
   MX_ENUM_CLASS_ENTRY(StackProtectorMode, OFF, unsigned char)
@@ -3010,7 +4993,7 @@ MX_END_ENUM_CLASS(SyncScope)
 MX_BEGIN_ENUM_CLASS(Syntax, unsigned char)
   MX_ENUM_CLASS_ENTRY(Syntax, GNU, unsigned char)
   MX_ENUM_CLASS_ENTRY(Syntax, CXX11, unsigned char)
-  MX_ENUM_CLASS_ENTRY(Syntax, C2_X, unsigned char)
+  MX_ENUM_CLASS_ENTRY(Syntax, C2X, unsigned char)
   MX_ENUM_CLASS_ENTRY(Syntax, DECLSPEC, unsigned char)
   MX_ENUM_CLASS_ENTRY(Syntax, MICROSOFT, unsigned char)
   MX_ENUM_CLASS_ENTRY(Syntax, KEYWORD, unsigned char)
@@ -3393,18 +5376,18 @@ MX_BEGIN_ENUM_CLASS(TokenKind, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD___READ_WRITE, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD___BUILTIN_ASTYPE, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_VEC_STEP, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE1_DT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE1_DARRAY_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE1_DBUFFER_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DT, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DARRAY_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DDEPTH_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DARRAY_DEPTH_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DMSAA_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DARRAY_MSAA_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DMSAA_DEPTH_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE2_DARRAY_MSAA_DEPTH_T, unsigned short)
-  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE3_DT, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_1D_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_1D_ARRAY_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_1D_BUFFER_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_ARRAY_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_DEPTH_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_ARRAY_DEPTH_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_MSAA_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_ARRAY_MSAA_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_MSAA_DEPTH_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_2D_ARRAY_MSAA_DEPTH_T, unsigned short)
+  MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_IMAGE_3D_T, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_PIPE, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD_ADDRSPACE_CAST, unsigned short)
   MX_ENUM_CLASS_ENTRY(TokenKind, KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN, unsigned short)
@@ -3673,18 +5656,18 @@ MX_BEGIN_ENUM_CLASS(TypeSpecifierType, unsigned char)
   MX_ENUM_CLASS_ENTRY(TypeSpecifierType, AUTO_TYPE, unsigned char)
   MX_ENUM_CLASS_ENTRY(TypeSpecifierType, UNKNOWN_ANYTYPE, unsigned char)
   MX_ENUM_CLASS_ENTRY(TypeSpecifierType, ATOMIC, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE1_DT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE1_DARRAY_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE1_DBUFFER_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DARRAY_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DDEPTH_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DARRAY_DEPTH_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DMSAA_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DARRAY_MSAA_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DMSAA_DEPTH_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE2_DARRAY_MSAA_DEPTH_T, unsigned char)
-  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE3_DT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_1D_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_1D_ARRAY_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_1D_BUFFER_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_ARRAY_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_DEPTH_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_ARRAY_DEPTH_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_MSAA_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_ARRAY_MSAA_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_MSAA_DEPTH_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_2D_ARRAY_MSAA_DEPTH_T, unsigned char)
+  MX_ENUM_CLASS_ENTRY(TypeSpecifierType, IMAGE_3D_T, unsigned char)
   MX_ENUM_CLASS_ENTRY(TypeSpecifierType, ERROR, unsigned char)
 MX_END_ENUM_CLASS(TypeSpecifierType)
 
@@ -3824,11 +5807,16 @@ MX_BEGIN_ENUM_CLASS(Visibility, unsigned char)
   MX_ENUM_CLASS_ENTRY(Visibility, DEFAULT_VISIBILITY, unsigned char)
 MX_END_ENUM_CLASS(Visibility)
 
-MX_BEGIN_ENUM_CLASS(VisibilityType, unsigned char)
-  MX_ENUM_CLASS_ENTRY(VisibilityType, DEFAULT, unsigned char)
-  MX_ENUM_CLASS_ENTRY(VisibilityType, HIDDEN, unsigned char)
-  MX_ENUM_CLASS_ENTRY(VisibilityType, PROTECTED, unsigned char)
-MX_END_ENUM_CLASS(VisibilityType)
+MX_BEGIN_ENUM_CLASS(AttributeSyntax, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, GNU, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, CXX11, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, C2X, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, DECLSPEC, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, MICROSOFT, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, KEYWORD, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, PRAGMA, unsigned char)
+  MX_ENUM_CLASS_ENTRY(AttributeSyntax, CONTEXT_SENSITIVE_KEYWORD, unsigned char)
+MX_END_ENUM_CLASS(AttributeSyntax)
 
 MX_BEGIN_ENUM_CLASS(DeclCategory, unsigned char)
   MX_ENUM_CLASS_ENTRY(DeclCategory, UNKNOWN, unsigned char)
@@ -3989,6 +5977,5166 @@ MX_BEGIN_VISIT_PSEUDO(CXXBaseSpecifier)
   MX_EXIT_VISIT_CXXBaseSpecifier
 MX_END_VISIT_PSEUDO(CXXBaseSpecifier)
 
+#ifndef MX_ENTER_VISIT_Attr
+#  define MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_Attr
+#  define MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(Attr)
+  MX_ENTER_VISIT_Attr
+  MX_VISIT_ENTITY(Attr, token, 0, MX_APPLY_METHOD, Token, Token, NthAttr, TokenUseSelector::TOKEN)
+  MX_VISIT_BOOL(Attr, is_implicit, 1, MX_APPLY_METHOD, IsImplicit, bool, NthAttr)
+  MX_VISIT_BOOL(Attr, is_inherited, 2, MX_APPLY_METHOD, IsInherited, bool, NthAttr)
+  MX_VISIT_BOOL(Attr, is_late_parsed, 3, MX_APPLY_METHOD, IsLateParsed, bool, NthAttr)
+  MX_VISIT_BOOL(Attr, is_pack_expansion, 4, MX_APPLY_METHOD, IsPackExpansion, bool, NthAttr)
+  MX_VISIT_ENUM(Attr, kind, 5, MX_APPLY_METHOD, Kind, AttrKind, NthAttr)
+  MX_EXIT_VISIT_Attr
+MX_END_VISIT_ATTR(Attr)
+
+#ifndef MX_ENTER_VISIT_AlignValueAttr
+#  define MX_ENTER_VISIT_AlignValueAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_AlignValueAttr
+#  define MX_EXIT_VISIT_AlignValueAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AlignValueAttr)
+  MX_ENTER_VISIT_AlignValueAttr
+  MX_VISIT_BASE(AlignValueAttr, Attr)
+  MX_VISIT_ENTITY(AlignValueAttr, alignment, 8, MX_APPLY_METHOD, Alignment, Expr, NthAttr, StmtUseSelector::ALIGNMENT)
+  MX_VISIT_TEXT(AlignValueAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AlignValueAttr
+MX_END_VISIT_ATTR(AlignValueAttr)
+
+#ifndef MX_ENTER_VISIT_AliasAttr
+#  define MX_ENTER_VISIT_AliasAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_AliasAttr
+#  define MX_EXIT_VISIT_AliasAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AliasAttr)
+  MX_ENTER_VISIT_AliasAttr
+  MX_VISIT_BASE(AliasAttr, Attr)
+  MX_VISIT_TEXT(AliasAttr, aliasee, 9, MX_APPLY_METHOD, Aliasee, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AliasAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AliasAttr
+MX_END_VISIT_ATTR(AliasAttr)
+
+#ifndef MX_ENTER_VISIT_AbiTagAttr
+#  define MX_ENTER_VISIT_AbiTagAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_AbiTagAttr
+#  define MX_EXIT_VISIT_AbiTagAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AbiTagAttr)
+  MX_ENTER_VISIT_AbiTagAttr
+  MX_VISIT_BASE(AbiTagAttr, Attr)
+  MX_VISIT_TEXT(AbiTagAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AbiTagAttr
+MX_END_VISIT_ATTR(AbiTagAttr)
+
+#ifndef MX_ENTER_VISIT_TypeAttr
+#  define MX_ENTER_VISIT_TypeAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_TypeAttr
+#  define MX_EXIT_VISIT_TypeAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(TypeAttr)
+  MX_ENTER_VISIT_TypeAttr
+  MX_VISIT_BASE(TypeAttr, Attr)
+  MX_EXIT_VISIT_TypeAttr
+MX_END_VISIT_ATTR(TypeAttr)
+
+#ifndef MX_ENTER_VISIT_SPtrAttr
+#  define MX_ENTER_VISIT_SPtrAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_SPtrAttr
+#  define MX_EXIT_VISIT_SPtrAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SPtrAttr)
+  MX_ENTER_VISIT_SPtrAttr
+  MX_VISIT_BASE(SPtrAttr, TypeAttr)
+  MX_VISIT_TEXT(SPtrAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SPtrAttr
+MX_END_VISIT_ATTR(SPtrAttr)
+
+#ifndef MX_ENTER_VISIT_Ptr64Attr
+#  define MX_ENTER_VISIT_Ptr64Attr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_Ptr64Attr
+#  define MX_EXIT_VISIT_Ptr64Attr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(Ptr64Attr)
+  MX_ENTER_VISIT_Ptr64Attr
+  MX_VISIT_BASE(Ptr64Attr, TypeAttr)
+  MX_VISIT_TEXT(Ptr64Attr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_Ptr64Attr
+MX_END_VISIT_ATTR(Ptr64Attr)
+
+#ifndef MX_ENTER_VISIT_Ptr32Attr
+#  define MX_ENTER_VISIT_Ptr32Attr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_Ptr32Attr
+#  define MX_EXIT_VISIT_Ptr32Attr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(Ptr32Attr)
+  MX_ENTER_VISIT_Ptr32Attr
+  MX_VISIT_BASE(Ptr32Attr, TypeAttr)
+  MX_VISIT_TEXT(Ptr32Attr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_Ptr32Attr
+MX_END_VISIT_ATTR(Ptr32Attr)
+
+#ifndef MX_ENTER_VISIT_OpenCLPrivateAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLPrivateAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLPrivateAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLPrivateAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLPrivateAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLPrivateAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLPrivateAddressSpaceAttr, TypeAttr)
+  MX_VISIT_ENUM(OpenCLPrivateAddressSpaceAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, OpenCLPrivateAddressSpaceAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OpenCLPrivateAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLPrivateAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLPrivateAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLLocalAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLLocalAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLLocalAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLLocalAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLLocalAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLLocalAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLLocalAddressSpaceAttr, TypeAttr)
+  MX_VISIT_ENUM(OpenCLLocalAddressSpaceAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, OpenCLLocalAddressSpaceAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OpenCLLocalAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLLocalAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLLocalAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLGlobalHostAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLGlobalHostAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLGlobalHostAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLGlobalHostAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLGlobalHostAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLGlobalHostAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLGlobalHostAddressSpaceAttr, TypeAttr)
+  MX_VISIT_TEXT(OpenCLGlobalHostAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLGlobalHostAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLGlobalHostAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLGlobalDeviceAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLGlobalDeviceAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLGlobalDeviceAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLGlobalDeviceAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLGlobalDeviceAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLGlobalDeviceAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLGlobalDeviceAddressSpaceAttr, TypeAttr)
+  MX_VISIT_TEXT(OpenCLGlobalDeviceAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLGlobalDeviceAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLGlobalDeviceAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLGlobalAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLGlobalAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLGlobalAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLGlobalAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLGlobalAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLGlobalAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLGlobalAddressSpaceAttr, TypeAttr)
+  MX_VISIT_ENUM(OpenCLGlobalAddressSpaceAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, OpenCLGlobalAddressSpaceAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OpenCLGlobalAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLGlobalAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLGlobalAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLGenericAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLGenericAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLGenericAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLGenericAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLGenericAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLGenericAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLGenericAddressSpaceAttr, TypeAttr)
+  MX_VISIT_ENUM(OpenCLGenericAddressSpaceAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, OpenCLGenericAddressSpaceAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OpenCLGenericAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLGenericAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLGenericAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLConstantAddressSpaceAttr
+#  define MX_ENTER_VISIT_OpenCLConstantAddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLConstantAddressSpaceAttr
+#  define MX_EXIT_VISIT_OpenCLConstantAddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLConstantAddressSpaceAttr)
+  MX_ENTER_VISIT_OpenCLConstantAddressSpaceAttr
+  MX_VISIT_BASE(OpenCLConstantAddressSpaceAttr, TypeAttr)
+  MX_VISIT_ENUM(OpenCLConstantAddressSpaceAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, OpenCLConstantAddressSpaceAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OpenCLConstantAddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLConstantAddressSpaceAttr
+MX_END_VISIT_ATTR(OpenCLConstantAddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCKindOfAttr
+#  define MX_ENTER_VISIT_ObjCKindOfAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCKindOfAttr
+#  define MX_EXIT_VISIT_ObjCKindOfAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCKindOfAttr)
+  MX_ENTER_VISIT_ObjCKindOfAttr
+  MX_VISIT_BASE(ObjCKindOfAttr, TypeAttr)
+  MX_VISIT_TEXT(ObjCKindOfAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCKindOfAttr
+MX_END_VISIT_ATTR(ObjCKindOfAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCInertUnsafeUnretainedAttr
+#  define MX_ENTER_VISIT_ObjCInertUnsafeUnretainedAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCInertUnsafeUnretainedAttr
+#  define MX_EXIT_VISIT_ObjCInertUnsafeUnretainedAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCInertUnsafeUnretainedAttr)
+  MX_ENTER_VISIT_ObjCInertUnsafeUnretainedAttr
+  MX_VISIT_BASE(ObjCInertUnsafeUnretainedAttr, TypeAttr)
+  MX_VISIT_TEXT(ObjCInertUnsafeUnretainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCInertUnsafeUnretainedAttr
+MX_END_VISIT_ATTR(ObjCInertUnsafeUnretainedAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCGCAttr
+#  define MX_ENTER_VISIT_ObjCGCAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCGCAttr
+#  define MX_EXIT_VISIT_ObjCGCAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCGCAttr)
+  MX_ENTER_VISIT_ObjCGCAttr
+  MX_VISIT_BASE(ObjCGCAttr, TypeAttr)
+  MX_VISIT_TEXT(ObjCGCAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCGCAttr
+MX_END_VISIT_ATTR(ObjCGCAttr)
+
+#ifndef MX_ENTER_VISIT_NoDerefAttr
+#  define MX_ENTER_VISIT_NoDerefAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoDerefAttr
+#  define MX_EXIT_VISIT_NoDerefAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoDerefAttr)
+  MX_ENTER_VISIT_NoDerefAttr
+  MX_VISIT_BASE(NoDerefAttr, TypeAttr)
+  MX_VISIT_TEXT(NoDerefAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoDerefAttr
+MX_END_VISIT_ATTR(NoDerefAttr)
+
+#ifndef MX_ENTER_VISIT_CmseNSCallAttr
+#  define MX_ENTER_VISIT_CmseNSCallAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_CmseNSCallAttr
+#  define MX_EXIT_VISIT_CmseNSCallAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CmseNSCallAttr)
+  MX_ENTER_VISIT_CmseNSCallAttr
+  MX_VISIT_BASE(CmseNSCallAttr, TypeAttr)
+  MX_VISIT_TEXT(CmseNSCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CmseNSCallAttr
+MX_END_VISIT_ATTR(CmseNSCallAttr)
+
+#ifndef MX_ENTER_VISIT_BTFTypeTagAttr
+#  define MX_ENTER_VISIT_BTFTypeTagAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_BTFTypeTagAttr
+#  define MX_EXIT_VISIT_BTFTypeTagAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(BTFTypeTagAttr)
+  MX_ENTER_VISIT_BTFTypeTagAttr
+  MX_VISIT_BASE(BTFTypeTagAttr, TypeAttr)
+  MX_VISIT_TEXT(BTFTypeTagAttr, btf_type_tag, 9, MX_APPLY_METHOD, BTFTypeTag, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(BTFTypeTagAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_BTFTypeTagAttr
+MX_END_VISIT_ATTR(BTFTypeTagAttr)
+
+#ifndef MX_ENTER_VISIT_ArmMveStrictPolymorphismAttr
+#  define MX_ENTER_VISIT_ArmMveStrictPolymorphismAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_ArmMveStrictPolymorphismAttr
+#  define MX_EXIT_VISIT_ArmMveStrictPolymorphismAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ArmMveStrictPolymorphismAttr)
+  MX_ENTER_VISIT_ArmMveStrictPolymorphismAttr
+  MX_VISIT_BASE(ArmMveStrictPolymorphismAttr, TypeAttr)
+  MX_VISIT_TEXT(ArmMveStrictPolymorphismAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ArmMveStrictPolymorphismAttr
+MX_END_VISIT_ATTR(ArmMveStrictPolymorphismAttr)
+
+#ifndef MX_ENTER_VISIT_AddressSpaceAttr
+#  define MX_ENTER_VISIT_AddressSpaceAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_AddressSpaceAttr
+#  define MX_EXIT_VISIT_AddressSpaceAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AddressSpaceAttr)
+  MX_ENTER_VISIT_AddressSpaceAttr
+  MX_VISIT_BASE(AddressSpaceAttr, TypeAttr)
+  MX_VISIT_TEXT(AddressSpaceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AddressSpaceAttr
+MX_END_VISIT_ATTR(AddressSpaceAttr)
+
+#ifndef MX_ENTER_VISIT_UPtrAttr
+#  define MX_ENTER_VISIT_UPtrAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_UPtrAttr
+#  define MX_EXIT_VISIT_UPtrAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UPtrAttr)
+  MX_ENTER_VISIT_UPtrAttr
+  MX_VISIT_BASE(UPtrAttr, TypeAttr)
+  MX_VISIT_TEXT(UPtrAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UPtrAttr
+MX_END_VISIT_ATTR(UPtrAttr)
+
+#ifndef MX_ENTER_VISIT_TypeNullableResultAttr
+#  define MX_ENTER_VISIT_TypeNullableResultAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_TypeNullableResultAttr
+#  define MX_EXIT_VISIT_TypeNullableResultAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TypeNullableResultAttr)
+  MX_ENTER_VISIT_TypeNullableResultAttr
+  MX_VISIT_BASE(TypeNullableResultAttr, TypeAttr)
+  MX_VISIT_TEXT(TypeNullableResultAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TypeNullableResultAttr
+MX_END_VISIT_ATTR(TypeNullableResultAttr)
+
+#ifndef MX_ENTER_VISIT_TypeNullableAttr
+#  define MX_ENTER_VISIT_TypeNullableAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_TypeNullableAttr
+#  define MX_EXIT_VISIT_TypeNullableAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TypeNullableAttr)
+  MX_ENTER_VISIT_TypeNullableAttr
+  MX_VISIT_BASE(TypeNullableAttr, TypeAttr)
+  MX_VISIT_TEXT(TypeNullableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TypeNullableAttr
+MX_END_VISIT_ATTR(TypeNullableAttr)
+
+#ifndef MX_ENTER_VISIT_TypeNullUnspecifiedAttr
+#  define MX_ENTER_VISIT_TypeNullUnspecifiedAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_TypeNullUnspecifiedAttr
+#  define MX_EXIT_VISIT_TypeNullUnspecifiedAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TypeNullUnspecifiedAttr)
+  MX_ENTER_VISIT_TypeNullUnspecifiedAttr
+  MX_VISIT_BASE(TypeNullUnspecifiedAttr, TypeAttr)
+  MX_VISIT_TEXT(TypeNullUnspecifiedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TypeNullUnspecifiedAttr
+MX_END_VISIT_ATTR(TypeNullUnspecifiedAttr)
+
+#ifndef MX_ENTER_VISIT_TypeNonNullAttr
+#  define MX_ENTER_VISIT_TypeNonNullAttr MX_ENTER_VISIT_TypeAttr
+#endif
+#ifndef MX_EXIT_VISIT_TypeNonNullAttr
+#  define MX_EXIT_VISIT_TypeNonNullAttr MX_EXIT_VISIT_TypeAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TypeNonNullAttr)
+  MX_ENTER_VISIT_TypeNonNullAttr
+  MX_VISIT_BASE(TypeNonNullAttr, TypeAttr)
+  MX_VISIT_TEXT(TypeNonNullAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TypeNonNullAttr
+MX_END_VISIT_ATTR(TypeNonNullAttr)
+
+#ifndef MX_ENTER_VISIT_ThreadAttr
+#  define MX_ENTER_VISIT_ThreadAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ThreadAttr
+#  define MX_EXIT_VISIT_ThreadAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ThreadAttr)
+  MX_ENTER_VISIT_ThreadAttr
+  MX_VISIT_BASE(ThreadAttr, Attr)
+  MX_VISIT_TEXT(ThreadAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ThreadAttr
+MX_END_VISIT_ATTR(ThreadAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftObjCMembersAttr
+#  define MX_ENTER_VISIT_SwiftObjCMembersAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftObjCMembersAttr
+#  define MX_EXIT_VISIT_SwiftObjCMembersAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftObjCMembersAttr)
+  MX_ENTER_VISIT_SwiftObjCMembersAttr
+  MX_VISIT_BASE(SwiftObjCMembersAttr, Attr)
+  MX_VISIT_TEXT(SwiftObjCMembersAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftObjCMembersAttr
+MX_END_VISIT_ATTR(SwiftObjCMembersAttr)
+
+#ifndef MX_ENTER_VISIT_StmtAttr
+#  define MX_ENTER_VISIT_StmtAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_StmtAttr
+#  define MX_EXIT_VISIT_StmtAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(StmtAttr)
+  MX_ENTER_VISIT_StmtAttr
+  MX_VISIT_BASE(StmtAttr, Attr)
+  MX_EXIT_VISIT_StmtAttr
+MX_END_VISIT_ATTR(StmtAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLUnrollHintAttr
+#  define MX_ENTER_VISIT_OpenCLUnrollHintAttr MX_ENTER_VISIT_StmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLUnrollHintAttr
+#  define MX_EXIT_VISIT_OpenCLUnrollHintAttr MX_EXIT_VISIT_StmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLUnrollHintAttr)
+  MX_ENTER_VISIT_OpenCLUnrollHintAttr
+  MX_VISIT_BASE(OpenCLUnrollHintAttr, StmtAttr)
+  MX_VISIT_TEXT(OpenCLUnrollHintAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLUnrollHintAttr
+MX_END_VISIT_ATTR(OpenCLUnrollHintAttr)
+
+#ifndef MX_ENTER_VISIT_MustTailAttr
+#  define MX_ENTER_VISIT_MustTailAttr MX_ENTER_VISIT_StmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_MustTailAttr
+#  define MX_EXIT_VISIT_MustTailAttr MX_EXIT_VISIT_StmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MustTailAttr)
+  MX_ENTER_VISIT_MustTailAttr
+  MX_VISIT_BASE(MustTailAttr, StmtAttr)
+  MX_VISIT_TEXT(MustTailAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MustTailAttr
+MX_END_VISIT_ATTR(MustTailAttr)
+
+#ifndef MX_ENTER_VISIT_LikelyAttr
+#  define MX_ENTER_VISIT_LikelyAttr MX_ENTER_VISIT_StmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_LikelyAttr
+#  define MX_EXIT_VISIT_LikelyAttr MX_EXIT_VISIT_StmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LikelyAttr)
+  MX_ENTER_VISIT_LikelyAttr
+  MX_VISIT_BASE(LikelyAttr, StmtAttr)
+  MX_VISIT_TEXT(LikelyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LikelyAttr
+MX_END_VISIT_ATTR(LikelyAttr)
+
+#ifndef MX_ENTER_VISIT_FallThroughAttr
+#  define MX_ENTER_VISIT_FallThroughAttr MX_ENTER_VISIT_StmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_FallThroughAttr
+#  define MX_EXIT_VISIT_FallThroughAttr MX_EXIT_VISIT_StmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FallThroughAttr)
+  MX_ENTER_VISIT_FallThroughAttr
+  MX_VISIT_BASE(FallThroughAttr, StmtAttr)
+  MX_VISIT_TEXT(FallThroughAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_FallThroughAttr
+MX_END_VISIT_ATTR(FallThroughAttr)
+
+#ifndef MX_ENTER_VISIT_UnlikelyAttr
+#  define MX_ENTER_VISIT_UnlikelyAttr MX_ENTER_VISIT_StmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_UnlikelyAttr
+#  define MX_EXIT_VISIT_UnlikelyAttr MX_EXIT_VISIT_StmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UnlikelyAttr)
+  MX_ENTER_VISIT_UnlikelyAttr
+  MX_VISIT_BASE(UnlikelyAttr, StmtAttr)
+  MX_VISIT_TEXT(UnlikelyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UnlikelyAttr
+MX_END_VISIT_ATTR(UnlikelyAttr)
+
+#ifndef MX_ENTER_VISIT_SuppressAttr
+#  define MX_ENTER_VISIT_SuppressAttr MX_ENTER_VISIT_StmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_SuppressAttr
+#  define MX_EXIT_VISIT_SuppressAttr MX_EXIT_VISIT_StmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SuppressAttr)
+  MX_ENTER_VISIT_SuppressAttr
+  MX_VISIT_BASE(SuppressAttr, StmtAttr)
+  MX_VISIT_TEXT(SuppressAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SuppressAttr
+MX_END_VISIT_ATTR(SuppressAttr)
+
+#ifndef MX_ENTER_VISIT_RenderScriptKernelAttr
+#  define MX_ENTER_VISIT_RenderScriptKernelAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_RenderScriptKernelAttr
+#  define MX_EXIT_VISIT_RenderScriptKernelAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(RenderScriptKernelAttr)
+  MX_ENTER_VISIT_RenderScriptKernelAttr
+  MX_VISIT_BASE(RenderScriptKernelAttr, Attr)
+  MX_VISIT_TEXT(RenderScriptKernelAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_RenderScriptKernelAttr
+MX_END_VISIT_ATTR(RenderScriptKernelAttr)
+
+#ifndef MX_ENTER_VISIT_OverloadableAttr
+#  define MX_ENTER_VISIT_OverloadableAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_OverloadableAttr
+#  define MX_EXIT_VISIT_OverloadableAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OverloadableAttr)
+  MX_ENTER_VISIT_OverloadableAttr
+  MX_VISIT_BASE(OverloadableAttr, Attr)
+  MX_VISIT_TEXT(OverloadableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OverloadableAttr
+MX_END_VISIT_ATTR(OverloadableAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLAccessAttr
+#  define MX_ENTER_VISIT_OpenCLAccessAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLAccessAttr
+#  define MX_EXIT_VISIT_OpenCLAccessAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLAccessAttr)
+  MX_ENTER_VISIT_OpenCLAccessAttr
+  MX_VISIT_BASE(OpenCLAccessAttr, Attr)
+  MX_VISIT_ENUM(OpenCLAccessAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, OpenCLAccessAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OpenCLAccessAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(OpenCLAccessAttr, is_read_only, 12, MX_APPLY_METHOD, IsReadOnly, bool, NthAttr)
+  MX_VISIT_BOOL(OpenCLAccessAttr, is_read_write, 13, MX_APPLY_METHOD, IsReadWrite, bool, NthAttr)
+  MX_VISIT_BOOL(OpenCLAccessAttr, is_write_only, 14, MX_APPLY_METHOD, IsWriteOnly, bool, NthAttr)
+  MX_EXIT_VISIT_OpenCLAccessAttr
+MX_END_VISIT_ATTR(OpenCLAccessAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCRuntimeVisibleAttr
+#  define MX_ENTER_VISIT_ObjCRuntimeVisibleAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCRuntimeVisibleAttr
+#  define MX_EXIT_VISIT_ObjCRuntimeVisibleAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCRuntimeVisibleAttr)
+  MX_ENTER_VISIT_ObjCRuntimeVisibleAttr
+  MX_VISIT_BASE(ObjCRuntimeVisibleAttr, Attr)
+  MX_VISIT_TEXT(ObjCRuntimeVisibleAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCRuntimeVisibleAttr
+MX_END_VISIT_ATTR(ObjCRuntimeVisibleAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCRuntimeNameAttr
+#  define MX_ENTER_VISIT_ObjCRuntimeNameAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCRuntimeNameAttr
+#  define MX_EXIT_VISIT_ObjCRuntimeNameAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCRuntimeNameAttr)
+  MX_ENTER_VISIT_ObjCRuntimeNameAttr
+  MX_VISIT_BASE(ObjCRuntimeNameAttr, Attr)
+  MX_VISIT_TEXT(ObjCRuntimeNameAttr, metadata_name, 9, MX_APPLY_METHOD, MetadataName, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(ObjCRuntimeNameAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCRuntimeNameAttr
+MX_END_VISIT_ATTR(ObjCRuntimeNameAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCNonRuntimeProtocolAttr
+#  define MX_ENTER_VISIT_ObjCNonRuntimeProtocolAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCNonRuntimeProtocolAttr
+#  define MX_EXIT_VISIT_ObjCNonRuntimeProtocolAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCNonRuntimeProtocolAttr)
+  MX_ENTER_VISIT_ObjCNonRuntimeProtocolAttr
+  MX_VISIT_BASE(ObjCNonRuntimeProtocolAttr, Attr)
+  MX_VISIT_TEXT(ObjCNonRuntimeProtocolAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCNonRuntimeProtocolAttr
+MX_END_VISIT_ATTR(ObjCNonRuntimeProtocolAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCNonLazyClassAttr
+#  define MX_ENTER_VISIT_ObjCNonLazyClassAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCNonLazyClassAttr
+#  define MX_EXIT_VISIT_ObjCNonLazyClassAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCNonLazyClassAttr)
+  MX_ENTER_VISIT_ObjCNonLazyClassAttr
+  MX_VISIT_BASE(ObjCNonLazyClassAttr, Attr)
+  MX_VISIT_TEXT(ObjCNonLazyClassAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCNonLazyClassAttr
+MX_END_VISIT_ATTR(ObjCNonLazyClassAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCDirectMembersAttr
+#  define MX_ENTER_VISIT_ObjCDirectMembersAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCDirectMembersAttr
+#  define MX_EXIT_VISIT_ObjCDirectMembersAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCDirectMembersAttr)
+  MX_ENTER_VISIT_ObjCDirectMembersAttr
+  MX_VISIT_BASE(ObjCDirectMembersAttr, Attr)
+  MX_VISIT_TEXT(ObjCDirectMembersAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCDirectMembersAttr
+MX_END_VISIT_ATTR(ObjCDirectMembersAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCDirectAttr
+#  define MX_ENTER_VISIT_ObjCDirectAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCDirectAttr
+#  define MX_EXIT_VISIT_ObjCDirectAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCDirectAttr)
+  MX_ENTER_VISIT_ObjCDirectAttr
+  MX_VISIT_BASE(ObjCDirectAttr, Attr)
+  MX_VISIT_TEXT(ObjCDirectAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCDirectAttr
+MX_END_VISIT_ATTR(ObjCDirectAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCDesignatedInitializerAttr
+#  define MX_ENTER_VISIT_ObjCDesignatedInitializerAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCDesignatedInitializerAttr
+#  define MX_EXIT_VISIT_ObjCDesignatedInitializerAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCDesignatedInitializerAttr)
+  MX_ENTER_VISIT_ObjCDesignatedInitializerAttr
+  MX_VISIT_BASE(ObjCDesignatedInitializerAttr, Attr)
+  MX_VISIT_TEXT(ObjCDesignatedInitializerAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCDesignatedInitializerAttr
+MX_END_VISIT_ATTR(ObjCDesignatedInitializerAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCClassStubAttr
+#  define MX_ENTER_VISIT_ObjCClassStubAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCClassStubAttr
+#  define MX_EXIT_VISIT_ObjCClassStubAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCClassStubAttr)
+  MX_ENTER_VISIT_ObjCClassStubAttr
+  MX_VISIT_BASE(ObjCClassStubAttr, Attr)
+  MX_VISIT_TEXT(ObjCClassStubAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCClassStubAttr
+MX_END_VISIT_ATTR(ObjCClassStubAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCBoxableAttr
+#  define MX_ENTER_VISIT_ObjCBoxableAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCBoxableAttr
+#  define MX_EXIT_VISIT_ObjCBoxableAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCBoxableAttr)
+  MX_ENTER_VISIT_ObjCBoxableAttr
+  MX_VISIT_BASE(ObjCBoxableAttr, Attr)
+  MX_VISIT_TEXT(ObjCBoxableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCBoxableAttr
+MX_END_VISIT_ATTR(ObjCBoxableAttr)
+
+#ifndef MX_ENTER_VISIT_OMPReferencedVarAttr
+#  define MX_ENTER_VISIT_OMPReferencedVarAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_OMPReferencedVarAttr
+#  define MX_EXIT_VISIT_OMPReferencedVarAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPReferencedVarAttr)
+  MX_ENTER_VISIT_OMPReferencedVarAttr
+  MX_VISIT_BASE(OMPReferencedVarAttr, Attr)
+  MX_VISIT_ENTITY(OMPReferencedVarAttr, reference, 8, MX_APPLY_METHOD, Reference, Expr, NthAttr, StmtUseSelector::REFERENCE)
+  MX_VISIT_TEXT(OMPReferencedVarAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPReferencedVarAttr
+MX_END_VISIT_ATTR(OMPReferencedVarAttr)
+
+#ifndef MX_ENTER_VISIT_OMPDeclareSimdDeclAttr
+#  define MX_ENTER_VISIT_OMPDeclareSimdDeclAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_OMPDeclareSimdDeclAttr
+#  define MX_EXIT_VISIT_OMPDeclareSimdDeclAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPDeclareSimdDeclAttr)
+  MX_ENTER_VISIT_OMPDeclareSimdDeclAttr
+  MX_VISIT_BASE(OMPDeclareSimdDeclAttr, Attr)
+  MX_VISIT_ENUM(OMPDeclareSimdDeclAttr, branch_state, 11, MX_APPLY_METHOD, BranchState, OMPDeclareSimdDeclAttrBranchStateTy, NthAttr)
+  MX_VISIT_ENTITY(OMPDeclareSimdDeclAttr, simdlen, 8, MX_APPLY_METHOD, Simdlen, Expr, NthAttr, StmtUseSelector::SIMDLEN)
+  MX_VISIT_TEXT(OMPDeclareSimdDeclAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPDeclareSimdDeclAttr
+MX_END_VISIT_ATTR(OMPDeclareSimdDeclAttr)
+
+#ifndef MX_ENTER_VISIT_OMPCaptureKindAttr
+#  define MX_ENTER_VISIT_OMPCaptureKindAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_OMPCaptureKindAttr
+#  define MX_EXIT_VISIT_OMPCaptureKindAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPCaptureKindAttr)
+  MX_ENTER_VISIT_OMPCaptureKindAttr
+  MX_VISIT_BASE(OMPCaptureKindAttr, Attr)
+  MX_VISIT_TEXT(OMPCaptureKindAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPCaptureKindAttr
+MX_END_VISIT_ATTR(OMPCaptureKindAttr)
+
+#ifndef MX_ENTER_VISIT_NoEscapeAttr
+#  define MX_ENTER_VISIT_NoEscapeAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_NoEscapeAttr
+#  define MX_EXIT_VISIT_NoEscapeAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoEscapeAttr)
+  MX_ENTER_VISIT_NoEscapeAttr
+  MX_VISIT_BASE(NoEscapeAttr, Attr)
+  MX_VISIT_TEXT(NoEscapeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoEscapeAttr
+MX_END_VISIT_ATTR(NoEscapeAttr)
+
+#ifndef MX_ENTER_VISIT_NoBuiltinAttr
+#  define MX_ENTER_VISIT_NoBuiltinAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_NoBuiltinAttr
+#  define MX_EXIT_VISIT_NoBuiltinAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoBuiltinAttr)
+  MX_ENTER_VISIT_NoBuiltinAttr
+  MX_VISIT_BASE(NoBuiltinAttr, Attr)
+  MX_VISIT_TEXT(NoBuiltinAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoBuiltinAttr
+MX_END_VISIT_ATTR(NoBuiltinAttr)
+
+#ifndef MX_ENTER_VISIT_ModeAttr
+#  define MX_ENTER_VISIT_ModeAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_ModeAttr
+#  define MX_EXIT_VISIT_ModeAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ModeAttr)
+  MX_ENTER_VISIT_ModeAttr
+  MX_VISIT_BASE(ModeAttr, Attr)
+  MX_VISIT_TEXT(ModeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ModeAttr
+MX_END_VISIT_ATTR(ModeAttr)
+
+#ifndef MX_ENTER_VISIT_LoopHintAttr
+#  define MX_ENTER_VISIT_LoopHintAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_LoopHintAttr
+#  define MX_EXIT_VISIT_LoopHintAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LoopHintAttr)
+  MX_ENTER_VISIT_LoopHintAttr
+  MX_VISIT_BASE(LoopHintAttr, Attr)
+  MX_VISIT_ENUM(LoopHintAttr, option, 11, MX_APPLY_METHOD, Option, LoopHintAttrOptionType, NthAttr)
+  MX_VISIT_ENUM(LoopHintAttr, semantic_spelling, 15, MX_APPLY_METHOD, SemanticSpelling, LoopHintAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(LoopHintAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(LoopHintAttr, state, 16, MX_APPLY_METHOD, State, LoopHintAttrLoopHintState, NthAttr)
+  MX_VISIT_ENTITY(LoopHintAttr, value, 8, MX_APPLY_METHOD, Value, Expr, NthAttr, StmtUseSelector::VALUE)
+  MX_EXIT_VISIT_LoopHintAttr
+MX_END_VISIT_ATTR(LoopHintAttr)
+
+#ifndef MX_ENTER_VISIT_LoaderUninitializedAttr
+#  define MX_ENTER_VISIT_LoaderUninitializedAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_LoaderUninitializedAttr
+#  define MX_EXIT_VISIT_LoaderUninitializedAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LoaderUninitializedAttr)
+  MX_ENTER_VISIT_LoaderUninitializedAttr
+  MX_VISIT_BASE(LoaderUninitializedAttr, Attr)
+  MX_VISIT_TEXT(LoaderUninitializedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LoaderUninitializedAttr
+MX_END_VISIT_ATTR(LoaderUninitializedAttr)
+
+#ifndef MX_ENTER_VISIT_InitSegAttr
+#  define MX_ENTER_VISIT_InitSegAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_InitSegAttr
+#  define MX_EXIT_VISIT_InitSegAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(InitSegAttr)
+  MX_ENTER_VISIT_InitSegAttr
+  MX_VISIT_BASE(InitSegAttr, Attr)
+  MX_VISIT_TEXT(InitSegAttr, section, 9, MX_APPLY_METHOD, Section, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(InitSegAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_InitSegAttr
+MX_END_VISIT_ATTR(InitSegAttr)
+
+#ifndef MX_ENTER_VISIT_InheritableAttr
+#  define MX_ENTER_VISIT_InheritableAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_InheritableAttr
+#  define MX_EXIT_VISIT_InheritableAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(InheritableAttr)
+  MX_ENTER_VISIT_InheritableAttr
+  MX_VISIT_BASE(InheritableAttr, Attr)
+  MX_VISIT_BOOL(InheritableAttr, should_inherit_even_if_already_present, 12, MX_APPLY_METHOD, ShouldInheritEvenIfAlreadyPresent, bool, NthAttr)
+  MX_EXIT_VISIT_InheritableAttr
+MX_END_VISIT_ATTR(InheritableAttr)
+
+#ifndef MX_ENTER_VISIT_IBOutletCollectionAttr
+#  define MX_ENTER_VISIT_IBOutletCollectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_IBOutletCollectionAttr
+#  define MX_EXIT_VISIT_IBOutletCollectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(IBOutletCollectionAttr)
+  MX_ENTER_VISIT_IBOutletCollectionAttr
+  MX_VISIT_BASE(IBOutletCollectionAttr, InheritableAttr)
+  MX_VISIT_ENTITY(IBOutletCollectionAttr, interface, 8, MX_APPLY_METHOD, Interface, Type, NthAttr, TypeUseSelector::INTERFACE)
+  MX_VISIT_ENTITY(IBOutletCollectionAttr, interface_token, 17, MX_APPLY_METHOD, InterfaceToken, Type, NthAttr, TypeUseSelector::INTERFACE_TOKEN)
+  MX_VISIT_TEXT(IBOutletCollectionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_IBOutletCollectionAttr
+MX_END_VISIT_ATTR(IBOutletCollectionAttr)
+
+#ifndef MX_ENTER_VISIT_IBOutletAttr
+#  define MX_ENTER_VISIT_IBOutletAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_IBOutletAttr
+#  define MX_EXIT_VISIT_IBOutletAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(IBOutletAttr)
+  MX_ENTER_VISIT_IBOutletAttr
+  MX_VISIT_BASE(IBOutletAttr, InheritableAttr)
+  MX_VISIT_TEXT(IBOutletAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_IBOutletAttr
+MX_END_VISIT_ATTR(IBOutletAttr)
+
+#ifndef MX_ENTER_VISIT_IBActionAttr
+#  define MX_ENTER_VISIT_IBActionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_IBActionAttr
+#  define MX_EXIT_VISIT_IBActionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(IBActionAttr)
+  MX_ENTER_VISIT_IBActionAttr
+  MX_VISIT_BASE(IBActionAttr, InheritableAttr)
+  MX_VISIT_TEXT(IBActionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_IBActionAttr
+MX_END_VISIT_ATTR(IBActionAttr)
+
+#ifndef MX_ENTER_VISIT_HotAttr
+#  define MX_ENTER_VISIT_HotAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_HotAttr
+#  define MX_EXIT_VISIT_HotAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(HotAttr)
+  MX_ENTER_VISIT_HotAttr
+  MX_VISIT_BASE(HotAttr, InheritableAttr)
+  MX_VISIT_TEXT(HotAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_HotAttr
+MX_END_VISIT_ATTR(HotAttr)
+
+#ifndef MX_ENTER_VISIT_HIPManagedAttr
+#  define MX_ENTER_VISIT_HIPManagedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_HIPManagedAttr
+#  define MX_EXIT_VISIT_HIPManagedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(HIPManagedAttr)
+  MX_ENTER_VISIT_HIPManagedAttr
+  MX_VISIT_BASE(HIPManagedAttr, InheritableAttr)
+  MX_VISIT_TEXT(HIPManagedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_HIPManagedAttr
+MX_END_VISIT_ATTR(HIPManagedAttr)
+
+#ifndef MX_ENTER_VISIT_GuardedVarAttr
+#  define MX_ENTER_VISIT_GuardedVarAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_GuardedVarAttr
+#  define MX_EXIT_VISIT_GuardedVarAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(GuardedVarAttr)
+  MX_ENTER_VISIT_GuardedVarAttr
+  MX_VISIT_BASE(GuardedVarAttr, InheritableAttr)
+  MX_VISIT_TEXT(GuardedVarAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_GuardedVarAttr
+MX_END_VISIT_ATTR(GuardedVarAttr)
+
+#ifndef MX_ENTER_VISIT_GuardedByAttr
+#  define MX_ENTER_VISIT_GuardedByAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_GuardedByAttr
+#  define MX_EXIT_VISIT_GuardedByAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(GuardedByAttr)
+  MX_ENTER_VISIT_GuardedByAttr
+  MX_VISIT_BASE(GuardedByAttr, InheritableAttr)
+  MX_VISIT_ENTITY(GuardedByAttr, argument, 8, MX_APPLY_METHOD, Argument, Expr, NthAttr, StmtUseSelector::ARGUMENT)
+  MX_VISIT_TEXT(GuardedByAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_GuardedByAttr
+MX_END_VISIT_ATTR(GuardedByAttr)
+
+#ifndef MX_ENTER_VISIT_GNUInlineAttr
+#  define MX_ENTER_VISIT_GNUInlineAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_GNUInlineAttr
+#  define MX_EXIT_VISIT_GNUInlineAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(GNUInlineAttr)
+  MX_ENTER_VISIT_GNUInlineAttr
+  MX_VISIT_BASE(GNUInlineAttr, InheritableAttr)
+  MX_VISIT_TEXT(GNUInlineAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_GNUInlineAttr
+MX_END_VISIT_ATTR(GNUInlineAttr)
+
+#ifndef MX_ENTER_VISIT_FormatAttr
+#  define MX_ENTER_VISIT_FormatAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_FormatAttr
+#  define MX_EXIT_VISIT_FormatAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FormatAttr)
+  MX_ENTER_VISIT_FormatAttr
+  MX_VISIT_BASE(FormatAttr, InheritableAttr)
+  MX_VISIT_TEXT(FormatAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_FormatAttr
+MX_END_VISIT_ATTR(FormatAttr)
+
+#ifndef MX_ENTER_VISIT_FormatArgAttr
+#  define MX_ENTER_VISIT_FormatArgAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_FormatArgAttr
+#  define MX_EXIT_VISIT_FormatArgAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FormatArgAttr)
+  MX_ENTER_VISIT_FormatArgAttr
+  MX_VISIT_BASE(FormatArgAttr, InheritableAttr)
+  MX_VISIT_TEXT(FormatArgAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_FormatArgAttr
+MX_END_VISIT_ATTR(FormatArgAttr)
+
+#ifndef MX_ENTER_VISIT_FlattenAttr
+#  define MX_ENTER_VISIT_FlattenAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_FlattenAttr
+#  define MX_EXIT_VISIT_FlattenAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FlattenAttr)
+  MX_ENTER_VISIT_FlattenAttr
+  MX_VISIT_BASE(FlattenAttr, InheritableAttr)
+  MX_VISIT_TEXT(FlattenAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_FlattenAttr
+MX_END_VISIT_ATTR(FlattenAttr)
+
+#ifndef MX_ENTER_VISIT_FlagEnumAttr
+#  define MX_ENTER_VISIT_FlagEnumAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_FlagEnumAttr
+#  define MX_EXIT_VISIT_FlagEnumAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FlagEnumAttr)
+  MX_ENTER_VISIT_FlagEnumAttr
+  MX_VISIT_BASE(FlagEnumAttr, InheritableAttr)
+  MX_VISIT_TEXT(FlagEnumAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_FlagEnumAttr
+MX_END_VISIT_ATTR(FlagEnumAttr)
+
+#ifndef MX_ENTER_VISIT_FinalAttr
+#  define MX_ENTER_VISIT_FinalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_FinalAttr
+#  define MX_EXIT_VISIT_FinalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FinalAttr)
+  MX_ENTER_VISIT_FinalAttr
+  MX_VISIT_BASE(FinalAttr, InheritableAttr)
+  MX_VISIT_ENUM(FinalAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, FinalAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(FinalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(FinalAttr, is_spelled_as_sealed, 13, MX_APPLY_METHOD, IsSpelledAsSealed, bool, NthAttr)
+  MX_EXIT_VISIT_FinalAttr
+MX_END_VISIT_ATTR(FinalAttr)
+
+#ifndef MX_ENTER_VISIT_FastCallAttr
+#  define MX_ENTER_VISIT_FastCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_FastCallAttr
+#  define MX_EXIT_VISIT_FastCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(FastCallAttr)
+  MX_ENTER_VISIT_FastCallAttr
+  MX_VISIT_BASE(FastCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(FastCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_FastCallAttr
+MX_END_VISIT_ATTR(FastCallAttr)
+
+#ifndef MX_ENTER_VISIT_ExternalSourceSymbolAttr
+#  define MX_ENTER_VISIT_ExternalSourceSymbolAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ExternalSourceSymbolAttr
+#  define MX_EXIT_VISIT_ExternalSourceSymbolAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ExternalSourceSymbolAttr)
+  MX_ENTER_VISIT_ExternalSourceSymbolAttr
+  MX_VISIT_BASE(ExternalSourceSymbolAttr, InheritableAttr)
+  MX_VISIT_TEXT(ExternalSourceSymbolAttr, defined_in, 9, MX_APPLY_METHOD, DefinedIn, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(ExternalSourceSymbolAttr, generated_declaration, 13, MX_APPLY_METHOD, GeneratedDeclaration, bool, NthAttr)
+  MX_VISIT_TEXT(ExternalSourceSymbolAttr, language, 10, MX_APPLY_METHOD, Language, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(ExternalSourceSymbolAttr, spelling, 18, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ExternalSourceSymbolAttr
+MX_END_VISIT_ATTR(ExternalSourceSymbolAttr)
+
+#ifndef MX_ENTER_VISIT_ExclusiveTrylockFunctionAttr
+#  define MX_ENTER_VISIT_ExclusiveTrylockFunctionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ExclusiveTrylockFunctionAttr
+#  define MX_EXIT_VISIT_ExclusiveTrylockFunctionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ExclusiveTrylockFunctionAttr)
+  MX_ENTER_VISIT_ExclusiveTrylockFunctionAttr
+  MX_VISIT_BASE(ExclusiveTrylockFunctionAttr, InheritableAttr)
+  MX_VISIT_TEXT(ExclusiveTrylockFunctionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(ExclusiveTrylockFunctionAttr, success_value, 8, MX_APPLY_METHOD, SuccessValue, Expr, NthAttr, StmtUseSelector::SUCCESS_VALUE)
+  MX_EXIT_VISIT_ExclusiveTrylockFunctionAttr
+MX_END_VISIT_ATTR(ExclusiveTrylockFunctionAttr)
+
+#ifndef MX_ENTER_VISIT_ExcludeFromExplicitInstantiationAttr
+#  define MX_ENTER_VISIT_ExcludeFromExplicitInstantiationAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ExcludeFromExplicitInstantiationAttr
+#  define MX_EXIT_VISIT_ExcludeFromExplicitInstantiationAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ExcludeFromExplicitInstantiationAttr)
+  MX_ENTER_VISIT_ExcludeFromExplicitInstantiationAttr
+  MX_VISIT_BASE(ExcludeFromExplicitInstantiationAttr, InheritableAttr)
+  MX_VISIT_TEXT(ExcludeFromExplicitInstantiationAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ExcludeFromExplicitInstantiationAttr
+MX_END_VISIT_ATTR(ExcludeFromExplicitInstantiationAttr)
+
+#ifndef MX_ENTER_VISIT_ErrorAttr
+#  define MX_ENTER_VISIT_ErrorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ErrorAttr
+#  define MX_EXIT_VISIT_ErrorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ErrorAttr)
+  MX_ENTER_VISIT_ErrorAttr
+  MX_VISIT_BASE(ErrorAttr, InheritableAttr)
+  MX_VISIT_ENUM(ErrorAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, ErrorAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(ErrorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(ErrorAttr, user_diagnostic, 10, MX_APPLY_METHOD, UserDiagnostic, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(ErrorAttr, is_error, 13, MX_APPLY_METHOD, IsError, bool, NthAttr)
+  MX_VISIT_BOOL(ErrorAttr, is_warning, 14, MX_APPLY_METHOD, IsWarning, bool, NthAttr)
+  MX_EXIT_VISIT_ErrorAttr
+MX_END_VISIT_ATTR(ErrorAttr)
+
+#ifndef MX_ENTER_VISIT_EnumExtensibilityAttr
+#  define MX_ENTER_VISIT_EnumExtensibilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_EnumExtensibilityAttr
+#  define MX_EXIT_VISIT_EnumExtensibilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(EnumExtensibilityAttr)
+  MX_ENTER_VISIT_EnumExtensibilityAttr
+  MX_VISIT_BASE(EnumExtensibilityAttr, InheritableAttr)
+  MX_VISIT_ENUM(EnumExtensibilityAttr, extensibility, 11, MX_APPLY_METHOD, Extensibility, EnumExtensibilityAttrKind, NthAttr)
+  MX_VISIT_TEXT(EnumExtensibilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_EnumExtensibilityAttr
+MX_END_VISIT_ATTR(EnumExtensibilityAttr)
+
+#ifndef MX_ENTER_VISIT_EnforceTCBLeafAttr
+#  define MX_ENTER_VISIT_EnforceTCBLeafAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_EnforceTCBLeafAttr
+#  define MX_EXIT_VISIT_EnforceTCBLeafAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(EnforceTCBLeafAttr)
+  MX_ENTER_VISIT_EnforceTCBLeafAttr
+  MX_VISIT_BASE(EnforceTCBLeafAttr, InheritableAttr)
+  MX_VISIT_TEXT(EnforceTCBLeafAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(EnforceTCBLeafAttr, tcb_name, 10, MX_APPLY_METHOD, TCBName, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_EnforceTCBLeafAttr
+MX_END_VISIT_ATTR(EnforceTCBLeafAttr)
+
+#ifndef MX_ENTER_VISIT_EnforceTCBAttr
+#  define MX_ENTER_VISIT_EnforceTCBAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_EnforceTCBAttr
+#  define MX_EXIT_VISIT_EnforceTCBAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(EnforceTCBAttr)
+  MX_ENTER_VISIT_EnforceTCBAttr
+  MX_VISIT_BASE(EnforceTCBAttr, InheritableAttr)
+  MX_VISIT_TEXT(EnforceTCBAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(EnforceTCBAttr, tcb_name, 10, MX_APPLY_METHOD, TCBName, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_EnforceTCBAttr
+MX_END_VISIT_ATTR(EnforceTCBAttr)
+
+#ifndef MX_ENTER_VISIT_EnableIfAttr
+#  define MX_ENTER_VISIT_EnableIfAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_EnableIfAttr
+#  define MX_EXIT_VISIT_EnableIfAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(EnableIfAttr)
+  MX_ENTER_VISIT_EnableIfAttr
+  MX_VISIT_BASE(EnableIfAttr, InheritableAttr)
+  MX_VISIT_ENTITY(EnableIfAttr, condition, 8, MX_APPLY_METHOD, Condition, Expr, NthAttr, StmtUseSelector::CONDITION)
+  MX_VISIT_TEXT(EnableIfAttr, message, 9, MX_APPLY_METHOD, Message, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(EnableIfAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_EnableIfAttr
+MX_END_VISIT_ATTR(EnableIfAttr)
+
+#ifndef MX_ENTER_VISIT_EmptyBasesAttr
+#  define MX_ENTER_VISIT_EmptyBasesAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_EmptyBasesAttr
+#  define MX_EXIT_VISIT_EmptyBasesAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(EmptyBasesAttr)
+  MX_ENTER_VISIT_EmptyBasesAttr
+  MX_VISIT_BASE(EmptyBasesAttr, InheritableAttr)
+  MX_VISIT_TEXT(EmptyBasesAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_EmptyBasesAttr
+MX_END_VISIT_ATTR(EmptyBasesAttr)
+
+#ifndef MX_ENTER_VISIT_DisableTailCallsAttr
+#  define MX_ENTER_VISIT_DisableTailCallsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DisableTailCallsAttr
+#  define MX_EXIT_VISIT_DisableTailCallsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DisableTailCallsAttr)
+  MX_ENTER_VISIT_DisableTailCallsAttr
+  MX_VISIT_BASE(DisableTailCallsAttr, InheritableAttr)
+  MX_VISIT_TEXT(DisableTailCallsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DisableTailCallsAttr
+MX_END_VISIT_ATTR(DisableTailCallsAttr)
+
+#ifndef MX_ENTER_VISIT_DisableSanitizerInstrumentationAttr
+#  define MX_ENTER_VISIT_DisableSanitizerInstrumentationAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DisableSanitizerInstrumentationAttr
+#  define MX_EXIT_VISIT_DisableSanitizerInstrumentationAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DisableSanitizerInstrumentationAttr)
+  MX_ENTER_VISIT_DisableSanitizerInstrumentationAttr
+  MX_VISIT_BASE(DisableSanitizerInstrumentationAttr, InheritableAttr)
+  MX_VISIT_TEXT(DisableSanitizerInstrumentationAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DisableSanitizerInstrumentationAttr
+MX_END_VISIT_ATTR(DisableSanitizerInstrumentationAttr)
+
+#ifndef MX_ENTER_VISIT_DiagnoseIfAttr
+#  define MX_ENTER_VISIT_DiagnoseIfAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DiagnoseIfAttr
+#  define MX_EXIT_VISIT_DiagnoseIfAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DiagnoseIfAttr)
+  MX_ENTER_VISIT_DiagnoseIfAttr
+  MX_VISIT_BASE(DiagnoseIfAttr, InheritableAttr)
+  MX_VISIT_BOOL(DiagnoseIfAttr, argument_dependent, 13, MX_APPLY_METHOD, ArgumentDependent, bool, NthAttr)
+  MX_VISIT_ENTITY(DiagnoseIfAttr, condition, 8, MX_APPLY_METHOD, Condition, Expr, NthAttr, StmtUseSelector::CONDITION)
+  MX_VISIT_ENUM(DiagnoseIfAttr, diagnostic_type, 11, MX_APPLY_METHOD, DiagnosticType, DiagnoseIfAttrDiagnosticType, NthAttr)
+  MX_VISIT_TEXT(DiagnoseIfAttr, message, 9, MX_APPLY_METHOD, Message, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(DiagnoseIfAttr, parent, 17, MX_APPLY_METHOD, Parent, NamedDecl, NthAttr, DeclUseSelector::PARENT)
+  MX_VISIT_TEXT(DiagnoseIfAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(DiagnoseIfAttr, is_error, 14, MX_APPLY_METHOD, IsError, bool, NthAttr)
+  MX_VISIT_BOOL(DiagnoseIfAttr, is_warning, 19, MX_APPLY_METHOD, IsWarning, bool, NthAttr)
+  MX_EXIT_VISIT_DiagnoseIfAttr
+MX_END_VISIT_ATTR(DiagnoseIfAttr)
+
+#ifndef MX_ENTER_VISIT_DiagnoseAsBuiltinAttr
+#  define MX_ENTER_VISIT_DiagnoseAsBuiltinAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DiagnoseAsBuiltinAttr
+#  define MX_EXIT_VISIT_DiagnoseAsBuiltinAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DiagnoseAsBuiltinAttr)
+  MX_ENTER_VISIT_DiagnoseAsBuiltinAttr
+  MX_VISIT_BASE(DiagnoseAsBuiltinAttr, InheritableAttr)
+  MX_VISIT_ENTITY(DiagnoseAsBuiltinAttr, function, 8, MX_APPLY_METHOD, Function, FunctionDecl, NthAttr, DeclUseSelector::FUNCTION)
+  MX_VISIT_TEXT(DiagnoseAsBuiltinAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DiagnoseAsBuiltinAttr
+MX_END_VISIT_ATTR(DiagnoseAsBuiltinAttr)
+
+#ifndef MX_ENTER_VISIT_DestructorAttr
+#  define MX_ENTER_VISIT_DestructorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DestructorAttr
+#  define MX_EXIT_VISIT_DestructorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DestructorAttr)
+  MX_ENTER_VISIT_DestructorAttr
+  MX_VISIT_BASE(DestructorAttr, InheritableAttr)
+  MX_VISIT_TEXT(DestructorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DestructorAttr
+MX_END_VISIT_ATTR(DestructorAttr)
+
+#ifndef MX_ENTER_VISIT_DeprecatedAttr
+#  define MX_ENTER_VISIT_DeprecatedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DeprecatedAttr
+#  define MX_EXIT_VISIT_DeprecatedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DeprecatedAttr)
+  MX_ENTER_VISIT_DeprecatedAttr
+  MX_VISIT_BASE(DeprecatedAttr, InheritableAttr)
+  MX_VISIT_TEXT(DeprecatedAttr, message, 9, MX_APPLY_METHOD, Message, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(DeprecatedAttr, replacement, 10, MX_APPLY_METHOD, Replacement, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(DeprecatedAttr, spelling, 18, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DeprecatedAttr
+MX_END_VISIT_ATTR(DeprecatedAttr)
+
+#ifndef MX_ENTER_VISIT_DeclOrStmtAttr
+#  define MX_ENTER_VISIT_DeclOrStmtAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DeclOrStmtAttr
+#  define MX_EXIT_VISIT_DeclOrStmtAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(DeclOrStmtAttr)
+  MX_ENTER_VISIT_DeclOrStmtAttr
+  MX_VISIT_BASE(DeclOrStmtAttr, InheritableAttr)
+  MX_EXIT_VISIT_DeclOrStmtAttr
+MX_END_VISIT_ATTR(DeclOrStmtAttr)
+
+#ifndef MX_ENTER_VISIT_NoMergeAttr
+#  define MX_ENTER_VISIT_NoMergeAttr MX_ENTER_VISIT_DeclOrStmtAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoMergeAttr
+#  define MX_EXIT_VISIT_NoMergeAttr MX_EXIT_VISIT_DeclOrStmtAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoMergeAttr)
+  MX_ENTER_VISIT_NoMergeAttr
+  MX_VISIT_BASE(NoMergeAttr, DeclOrStmtAttr)
+  MX_VISIT_TEXT(NoMergeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoMergeAttr
+MX_END_VISIT_ATTR(NoMergeAttr)
+
+#ifndef MX_ENTER_VISIT_DLLImportStaticLocalAttr
+#  define MX_ENTER_VISIT_DLLImportStaticLocalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DLLImportStaticLocalAttr
+#  define MX_EXIT_VISIT_DLLImportStaticLocalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DLLImportStaticLocalAttr)
+  MX_ENTER_VISIT_DLLImportStaticLocalAttr
+  MX_VISIT_BASE(DLLImportStaticLocalAttr, InheritableAttr)
+  MX_VISIT_TEXT(DLLImportStaticLocalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DLLImportStaticLocalAttr
+MX_END_VISIT_ATTR(DLLImportStaticLocalAttr)
+
+#ifndef MX_ENTER_VISIT_DLLImportAttr
+#  define MX_ENTER_VISIT_DLLImportAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DLLImportAttr
+#  define MX_EXIT_VISIT_DLLImportAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DLLImportAttr)
+  MX_ENTER_VISIT_DLLImportAttr
+  MX_VISIT_BASE(DLLImportAttr, InheritableAttr)
+  MX_VISIT_TEXT(DLLImportAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DLLImportAttr
+MX_END_VISIT_ATTR(DLLImportAttr)
+
+#ifndef MX_ENTER_VISIT_DLLExportStaticLocalAttr
+#  define MX_ENTER_VISIT_DLLExportStaticLocalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DLLExportStaticLocalAttr
+#  define MX_EXIT_VISIT_DLLExportStaticLocalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DLLExportStaticLocalAttr)
+  MX_ENTER_VISIT_DLLExportStaticLocalAttr
+  MX_VISIT_BASE(DLLExportStaticLocalAttr, InheritableAttr)
+  MX_VISIT_TEXT(DLLExportStaticLocalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DLLExportStaticLocalAttr
+MX_END_VISIT_ATTR(DLLExportStaticLocalAttr)
+
+#ifndef MX_ENTER_VISIT_DLLExportAttr
+#  define MX_ENTER_VISIT_DLLExportAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_DLLExportAttr
+#  define MX_EXIT_VISIT_DLLExportAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(DLLExportAttr)
+  MX_ENTER_VISIT_DLLExportAttr
+  MX_VISIT_BASE(DLLExportAttr, InheritableAttr)
+  MX_VISIT_TEXT(DLLExportAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_DLLExportAttr
+MX_END_VISIT_ATTR(DLLExportAttr)
+
+#ifndef MX_ENTER_VISIT_ConvergentAttr
+#  define MX_ENTER_VISIT_ConvergentAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConvergentAttr
+#  define MX_EXIT_VISIT_ConvergentAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConvergentAttr)
+  MX_ENTER_VISIT_ConvergentAttr
+  MX_VISIT_BASE(ConvergentAttr, InheritableAttr)
+  MX_VISIT_TEXT(ConvergentAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ConvergentAttr
+MX_END_VISIT_ATTR(ConvergentAttr)
+
+#ifndef MX_ENTER_VISIT_ConsumableSetOnReadAttr
+#  define MX_ENTER_VISIT_ConsumableSetOnReadAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConsumableSetOnReadAttr
+#  define MX_EXIT_VISIT_ConsumableSetOnReadAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConsumableSetOnReadAttr)
+  MX_ENTER_VISIT_ConsumableSetOnReadAttr
+  MX_VISIT_BASE(ConsumableSetOnReadAttr, InheritableAttr)
+  MX_VISIT_TEXT(ConsumableSetOnReadAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ConsumableSetOnReadAttr
+MX_END_VISIT_ATTR(ConsumableSetOnReadAttr)
+
+#ifndef MX_ENTER_VISIT_ConsumableAutoCastAttr
+#  define MX_ENTER_VISIT_ConsumableAutoCastAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConsumableAutoCastAttr
+#  define MX_EXIT_VISIT_ConsumableAutoCastAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConsumableAutoCastAttr)
+  MX_ENTER_VISIT_ConsumableAutoCastAttr
+  MX_VISIT_BASE(ConsumableAutoCastAttr, InheritableAttr)
+  MX_VISIT_TEXT(ConsumableAutoCastAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ConsumableAutoCastAttr
+MX_END_VISIT_ATTR(ConsumableAutoCastAttr)
+
+#ifndef MX_ENTER_VISIT_ConsumableAttr
+#  define MX_ENTER_VISIT_ConsumableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConsumableAttr
+#  define MX_EXIT_VISIT_ConsumableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConsumableAttr)
+  MX_ENTER_VISIT_ConsumableAttr
+  MX_VISIT_BASE(ConsumableAttr, InheritableAttr)
+  MX_VISIT_ENUM(ConsumableAttr, default_state, 11, MX_APPLY_METHOD, DefaultState, ConsumableAttrConsumedState, NthAttr)
+  MX_VISIT_TEXT(ConsumableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ConsumableAttr
+MX_END_VISIT_ATTR(ConsumableAttr)
+
+#ifndef MX_ENTER_VISIT_ConstructorAttr
+#  define MX_ENTER_VISIT_ConstructorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConstructorAttr
+#  define MX_EXIT_VISIT_ConstructorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConstructorAttr)
+  MX_ENTER_VISIT_ConstructorAttr
+  MX_VISIT_BASE(ConstructorAttr, InheritableAttr)
+  MX_VISIT_TEXT(ConstructorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ConstructorAttr
+MX_END_VISIT_ATTR(ConstructorAttr)
+
+#ifndef MX_ENTER_VISIT_ConstInitAttr
+#  define MX_ENTER_VISIT_ConstInitAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConstInitAttr
+#  define MX_EXIT_VISIT_ConstInitAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConstInitAttr)
+  MX_ENTER_VISIT_ConstInitAttr
+  MX_VISIT_BASE(ConstInitAttr, InheritableAttr)
+  MX_VISIT_ENUM(ConstInitAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, ConstInitAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(ConstInitAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(ConstInitAttr, is_constinit, 13, MX_APPLY_METHOD, IsConstinit, bool, NthAttr)
+  MX_EXIT_VISIT_ConstInitAttr
+MX_END_VISIT_ATTR(ConstInitAttr)
+
+#ifndef MX_ENTER_VISIT_ConstAttr
+#  define MX_ENTER_VISIT_ConstAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ConstAttr
+#  define MX_EXIT_VISIT_ConstAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ConstAttr)
+  MX_ENTER_VISIT_ConstAttr
+  MX_VISIT_BASE(ConstAttr, InheritableAttr)
+  MX_VISIT_TEXT(ConstAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ConstAttr
+MX_END_VISIT_ATTR(ConstAttr)
+
+#ifndef MX_ENTER_VISIT_CommonAttr
+#  define MX_ENTER_VISIT_CommonAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CommonAttr
+#  define MX_EXIT_VISIT_CommonAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CommonAttr)
+  MX_ENTER_VISIT_CommonAttr
+  MX_VISIT_BASE(CommonAttr, InheritableAttr)
+  MX_VISIT_TEXT(CommonAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CommonAttr
+MX_END_VISIT_ATTR(CommonAttr)
+
+#ifndef MX_ENTER_VISIT_ColdAttr
+#  define MX_ENTER_VISIT_ColdAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ColdAttr
+#  define MX_EXIT_VISIT_ColdAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ColdAttr)
+  MX_ENTER_VISIT_ColdAttr
+  MX_VISIT_BASE(ColdAttr, InheritableAttr)
+  MX_VISIT_TEXT(ColdAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ColdAttr
+MX_END_VISIT_ATTR(ColdAttr)
+
+#ifndef MX_ENTER_VISIT_CodeSegAttr
+#  define MX_ENTER_VISIT_CodeSegAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CodeSegAttr
+#  define MX_EXIT_VISIT_CodeSegAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CodeSegAttr)
+  MX_ENTER_VISIT_CodeSegAttr
+  MX_VISIT_BASE(CodeSegAttr, InheritableAttr)
+  MX_VISIT_TEXT(CodeSegAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(CodeSegAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CodeSegAttr
+MX_END_VISIT_ATTR(CodeSegAttr)
+
+#ifndef MX_ENTER_VISIT_CmseNSEntryAttr
+#  define MX_ENTER_VISIT_CmseNSEntryAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CmseNSEntryAttr
+#  define MX_EXIT_VISIT_CmseNSEntryAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CmseNSEntryAttr)
+  MX_ENTER_VISIT_CmseNSEntryAttr
+  MX_VISIT_BASE(CmseNSEntryAttr, InheritableAttr)
+  MX_VISIT_TEXT(CmseNSEntryAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CmseNSEntryAttr
+MX_END_VISIT_ATTR(CmseNSEntryAttr)
+
+#ifndef MX_ENTER_VISIT_CleanupAttr
+#  define MX_ENTER_VISIT_CleanupAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CleanupAttr
+#  define MX_EXIT_VISIT_CleanupAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CleanupAttr)
+  MX_ENTER_VISIT_CleanupAttr
+  MX_VISIT_BASE(CleanupAttr, InheritableAttr)
+  MX_VISIT_ENTITY(CleanupAttr, function_declaration, 8, MX_APPLY_METHOD, FunctionDeclaration, FunctionDecl, NthAttr, DeclUseSelector::FUNCTION_DECLARATION)
+  MX_VISIT_TEXT(CleanupAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CleanupAttr
+MX_END_VISIT_ATTR(CleanupAttr)
+
+#ifndef MX_ENTER_VISIT_CapturedRecordAttr
+#  define MX_ENTER_VISIT_CapturedRecordAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CapturedRecordAttr
+#  define MX_EXIT_VISIT_CapturedRecordAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CapturedRecordAttr)
+  MX_ENTER_VISIT_CapturedRecordAttr
+  MX_VISIT_BASE(CapturedRecordAttr, InheritableAttr)
+  MX_VISIT_TEXT(CapturedRecordAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CapturedRecordAttr
+MX_END_VISIT_ATTR(CapturedRecordAttr)
+
+#ifndef MX_ENTER_VISIT_CapabilityAttr
+#  define MX_ENTER_VISIT_CapabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CapabilityAttr
+#  define MX_EXIT_VISIT_CapabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CapabilityAttr)
+  MX_ENTER_VISIT_CapabilityAttr
+  MX_VISIT_BASE(CapabilityAttr, InheritableAttr)
+  MX_VISIT_TEXT(CapabilityAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(CapabilityAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, CapabilityAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(CapabilityAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(CapabilityAttr, is_shared, 13, MX_APPLY_METHOD, IsShared, bool, NthAttr)
+  MX_EXIT_VISIT_CapabilityAttr
+MX_END_VISIT_ATTR(CapabilityAttr)
+
+#ifndef MX_ENTER_VISIT_CallbackAttr
+#  define MX_ENTER_VISIT_CallbackAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CallbackAttr
+#  define MX_EXIT_VISIT_CallbackAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CallbackAttr)
+  MX_ENTER_VISIT_CallbackAttr
+  MX_VISIT_BASE(CallbackAttr, InheritableAttr)
+  MX_VISIT_TEXT(CallbackAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CallbackAttr
+MX_END_VISIT_ATTR(CallbackAttr)
+
+#ifndef MX_ENTER_VISIT_CallableWhenAttr
+#  define MX_ENTER_VISIT_CallableWhenAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CallableWhenAttr
+#  define MX_EXIT_VISIT_CallableWhenAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CallableWhenAttr)
+  MX_ENTER_VISIT_CallableWhenAttr
+  MX_VISIT_BASE(CallableWhenAttr, InheritableAttr)
+  MX_VISIT_TEXT(CallableWhenAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CallableWhenAttr
+MX_END_VISIT_ATTR(CallableWhenAttr)
+
+#ifndef MX_ENTER_VISIT_CXX11NoReturnAttr
+#  define MX_ENTER_VISIT_CXX11NoReturnAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CXX11NoReturnAttr
+#  define MX_EXIT_VISIT_CXX11NoReturnAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CXX11NoReturnAttr)
+  MX_ENTER_VISIT_CXX11NoReturnAttr
+  MX_VISIT_BASE(CXX11NoReturnAttr, InheritableAttr)
+  MX_VISIT_TEXT(CXX11NoReturnAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CXX11NoReturnAttr
+MX_END_VISIT_ATTR(CXX11NoReturnAttr)
+
+#ifndef MX_ENTER_VISIT_CUDASharedAttr
+#  define MX_ENTER_VISIT_CUDASharedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDASharedAttr
+#  define MX_EXIT_VISIT_CUDASharedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDASharedAttr)
+  MX_ENTER_VISIT_CUDASharedAttr
+  MX_VISIT_BASE(CUDASharedAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDASharedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDASharedAttr
+MX_END_VISIT_ATTR(CUDASharedAttr)
+
+#ifndef MX_ENTER_VISIT_CUDALaunchBoundsAttr
+#  define MX_ENTER_VISIT_CUDALaunchBoundsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDALaunchBoundsAttr
+#  define MX_EXIT_VISIT_CUDALaunchBoundsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDALaunchBoundsAttr)
+  MX_ENTER_VISIT_CUDALaunchBoundsAttr
+  MX_VISIT_BASE(CUDALaunchBoundsAttr, InheritableAttr)
+  MX_VISIT_ENTITY(CUDALaunchBoundsAttr, max_threads, 8, MX_APPLY_METHOD, MaxThreads, Expr, NthAttr, StmtUseSelector::MAX_THREADS)
+  MX_VISIT_ENTITY(CUDALaunchBoundsAttr, min_blocks, 17, MX_APPLY_METHOD, MinBlocks, Expr, NthAttr, StmtUseSelector::MIN_BLOCKS)
+  MX_VISIT_TEXT(CUDALaunchBoundsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDALaunchBoundsAttr
+MX_END_VISIT_ATTR(CUDALaunchBoundsAttr)
+
+#ifndef MX_ENTER_VISIT_CUDAInvalidTargetAttr
+#  define MX_ENTER_VISIT_CUDAInvalidTargetAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDAInvalidTargetAttr
+#  define MX_EXIT_VISIT_CUDAInvalidTargetAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDAInvalidTargetAttr)
+  MX_ENTER_VISIT_CUDAInvalidTargetAttr
+  MX_VISIT_BASE(CUDAInvalidTargetAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDAInvalidTargetAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDAInvalidTargetAttr
+MX_END_VISIT_ATTR(CUDAInvalidTargetAttr)
+
+#ifndef MX_ENTER_VISIT_CUDAHostAttr
+#  define MX_ENTER_VISIT_CUDAHostAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDAHostAttr
+#  define MX_EXIT_VISIT_CUDAHostAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDAHostAttr)
+  MX_ENTER_VISIT_CUDAHostAttr
+  MX_VISIT_BASE(CUDAHostAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDAHostAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDAHostAttr
+MX_END_VISIT_ATTR(CUDAHostAttr)
+
+#ifndef MX_ENTER_VISIT_CUDAGlobalAttr
+#  define MX_ENTER_VISIT_CUDAGlobalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDAGlobalAttr
+#  define MX_EXIT_VISIT_CUDAGlobalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDAGlobalAttr)
+  MX_ENTER_VISIT_CUDAGlobalAttr
+  MX_VISIT_BASE(CUDAGlobalAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDAGlobalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDAGlobalAttr
+MX_END_VISIT_ATTR(CUDAGlobalAttr)
+
+#ifndef MX_ENTER_VISIT_CUDADeviceBuiltinTextureTypeAttr
+#  define MX_ENTER_VISIT_CUDADeviceBuiltinTextureTypeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDADeviceBuiltinTextureTypeAttr
+#  define MX_EXIT_VISIT_CUDADeviceBuiltinTextureTypeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDADeviceBuiltinTextureTypeAttr)
+  MX_ENTER_VISIT_CUDADeviceBuiltinTextureTypeAttr
+  MX_VISIT_BASE(CUDADeviceBuiltinTextureTypeAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDADeviceBuiltinTextureTypeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDADeviceBuiltinTextureTypeAttr
+MX_END_VISIT_ATTR(CUDADeviceBuiltinTextureTypeAttr)
+
+#ifndef MX_ENTER_VISIT_CUDADeviceBuiltinSurfaceTypeAttr
+#  define MX_ENTER_VISIT_CUDADeviceBuiltinSurfaceTypeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDADeviceBuiltinSurfaceTypeAttr
+#  define MX_EXIT_VISIT_CUDADeviceBuiltinSurfaceTypeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDADeviceBuiltinSurfaceTypeAttr)
+  MX_ENTER_VISIT_CUDADeviceBuiltinSurfaceTypeAttr
+  MX_VISIT_BASE(CUDADeviceBuiltinSurfaceTypeAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDADeviceBuiltinSurfaceTypeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDADeviceBuiltinSurfaceTypeAttr
+MX_END_VISIT_ATTR(CUDADeviceBuiltinSurfaceTypeAttr)
+
+#ifndef MX_ENTER_VISIT_CUDADeviceAttr
+#  define MX_ENTER_VISIT_CUDADeviceAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDADeviceAttr
+#  define MX_EXIT_VISIT_CUDADeviceAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDADeviceAttr)
+  MX_ENTER_VISIT_CUDADeviceAttr
+  MX_VISIT_BASE(CUDADeviceAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDADeviceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDADeviceAttr
+MX_END_VISIT_ATTR(CUDADeviceAttr)
+
+#ifndef MX_ENTER_VISIT_CUDAConstantAttr
+#  define MX_ENTER_VISIT_CUDAConstantAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CUDAConstantAttr
+#  define MX_EXIT_VISIT_CUDAConstantAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CUDAConstantAttr)
+  MX_ENTER_VISIT_CUDAConstantAttr
+  MX_VISIT_BASE(CUDAConstantAttr, InheritableAttr)
+  MX_VISIT_TEXT(CUDAConstantAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CUDAConstantAttr
+MX_END_VISIT_ATTR(CUDAConstantAttr)
+
+#ifndef MX_ENTER_VISIT_CPUSpecificAttr
+#  define MX_ENTER_VISIT_CPUSpecificAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CPUSpecificAttr
+#  define MX_EXIT_VISIT_CPUSpecificAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CPUSpecificAttr)
+  MX_ENTER_VISIT_CPUSpecificAttr
+  MX_VISIT_BASE(CPUSpecificAttr, InheritableAttr)
+  MX_VISIT_TEXT(CPUSpecificAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CPUSpecificAttr
+MX_END_VISIT_ATTR(CPUSpecificAttr)
+
+#ifndef MX_ENTER_VISIT_CPUDispatchAttr
+#  define MX_ENTER_VISIT_CPUDispatchAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CPUDispatchAttr
+#  define MX_EXIT_VISIT_CPUDispatchAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CPUDispatchAttr)
+  MX_ENTER_VISIT_CPUDispatchAttr
+  MX_VISIT_BASE(CPUDispatchAttr, InheritableAttr)
+  MX_VISIT_TEXT(CPUDispatchAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CPUDispatchAttr
+MX_END_VISIT_ATTR(CPUDispatchAttr)
+
+#ifndef MX_ENTER_VISIT_CFUnknownTransferAttr
+#  define MX_ENTER_VISIT_CFUnknownTransferAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFUnknownTransferAttr
+#  define MX_EXIT_VISIT_CFUnknownTransferAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFUnknownTransferAttr)
+  MX_ENTER_VISIT_CFUnknownTransferAttr
+  MX_VISIT_BASE(CFUnknownTransferAttr, InheritableAttr)
+  MX_VISIT_TEXT(CFUnknownTransferAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFUnknownTransferAttr
+MX_END_VISIT_ATTR(CFUnknownTransferAttr)
+
+#ifndef MX_ENTER_VISIT_CFReturnsRetainedAttr
+#  define MX_ENTER_VISIT_CFReturnsRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFReturnsRetainedAttr
+#  define MX_EXIT_VISIT_CFReturnsRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFReturnsRetainedAttr)
+  MX_ENTER_VISIT_CFReturnsRetainedAttr
+  MX_VISIT_BASE(CFReturnsRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(CFReturnsRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFReturnsRetainedAttr
+MX_END_VISIT_ATTR(CFReturnsRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_CFReturnsNotRetainedAttr
+#  define MX_ENTER_VISIT_CFReturnsNotRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFReturnsNotRetainedAttr
+#  define MX_EXIT_VISIT_CFReturnsNotRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFReturnsNotRetainedAttr)
+  MX_ENTER_VISIT_CFReturnsNotRetainedAttr
+  MX_VISIT_BASE(CFReturnsNotRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(CFReturnsNotRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFReturnsNotRetainedAttr
+MX_END_VISIT_ATTR(CFReturnsNotRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_CFICanonicalJumpTableAttr
+#  define MX_ENTER_VISIT_CFICanonicalJumpTableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFICanonicalJumpTableAttr
+#  define MX_EXIT_VISIT_CFICanonicalJumpTableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFICanonicalJumpTableAttr)
+  MX_ENTER_VISIT_CFICanonicalJumpTableAttr
+  MX_VISIT_BASE(CFICanonicalJumpTableAttr, InheritableAttr)
+  MX_VISIT_TEXT(CFICanonicalJumpTableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFICanonicalJumpTableAttr
+MX_END_VISIT_ATTR(CFICanonicalJumpTableAttr)
+
+#ifndef MX_ENTER_VISIT_CFGuardAttr
+#  define MX_ENTER_VISIT_CFGuardAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFGuardAttr
+#  define MX_EXIT_VISIT_CFGuardAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFGuardAttr)
+  MX_ENTER_VISIT_CFGuardAttr
+  MX_VISIT_BASE(CFGuardAttr, InheritableAttr)
+  MX_VISIT_ENUM(CFGuardAttr, guard, 11, MX_APPLY_METHOD, Guard, CFGuardAttrGuardArg, NthAttr)
+  MX_VISIT_TEXT(CFGuardAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFGuardAttr
+MX_END_VISIT_ATTR(CFGuardAttr)
+
+#ifndef MX_ENTER_VISIT_CFAuditedTransferAttr
+#  define MX_ENTER_VISIT_CFAuditedTransferAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFAuditedTransferAttr
+#  define MX_EXIT_VISIT_CFAuditedTransferAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFAuditedTransferAttr)
+  MX_ENTER_VISIT_CFAuditedTransferAttr
+  MX_VISIT_BASE(CFAuditedTransferAttr, InheritableAttr)
+  MX_VISIT_TEXT(CFAuditedTransferAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFAuditedTransferAttr
+MX_END_VISIT_ATTR(CFAuditedTransferAttr)
+
+#ifndef MX_ENTER_VISIT_CDeclAttr
+#  define MX_ENTER_VISIT_CDeclAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_CDeclAttr
+#  define MX_EXIT_VISIT_CDeclAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CDeclAttr)
+  MX_ENTER_VISIT_CDeclAttr
+  MX_VISIT_BASE(CDeclAttr, InheritableAttr)
+  MX_VISIT_TEXT(CDeclAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CDeclAttr
+MX_END_VISIT_ATTR(CDeclAttr)
+
+#ifndef MX_ENTER_VISIT_C11NoReturnAttr
+#  define MX_ENTER_VISIT_C11NoReturnAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_C11NoReturnAttr
+#  define MX_EXIT_VISIT_C11NoReturnAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(C11NoReturnAttr)
+  MX_ENTER_VISIT_C11NoReturnAttr
+  MX_VISIT_BASE(C11NoReturnAttr, InheritableAttr)
+  MX_VISIT_TEXT(C11NoReturnAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_C11NoReturnAttr
+MX_END_VISIT_ATTR(C11NoReturnAttr)
+
+#ifndef MX_ENTER_VISIT_BuiltinAttr
+#  define MX_ENTER_VISIT_BuiltinAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_BuiltinAttr
+#  define MX_EXIT_VISIT_BuiltinAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(BuiltinAttr)
+  MX_ENTER_VISIT_BuiltinAttr
+  MX_VISIT_BASE(BuiltinAttr, InheritableAttr)
+  MX_VISIT_TEXT(BuiltinAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_BuiltinAttr
+MX_END_VISIT_ATTR(BuiltinAttr)
+
+#ifndef MX_ENTER_VISIT_BlocksAttr
+#  define MX_ENTER_VISIT_BlocksAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_BlocksAttr
+#  define MX_EXIT_VISIT_BlocksAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(BlocksAttr)
+  MX_ENTER_VISIT_BlocksAttr
+  MX_VISIT_BASE(BlocksAttr, InheritableAttr)
+  MX_VISIT_TEXT(BlocksAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(BlocksAttr, type, 11, MX_APPLY_METHOD, Type, BlocksAttrBlockType, NthAttr)
+  MX_EXIT_VISIT_BlocksAttr
+MX_END_VISIT_ATTR(BlocksAttr)
+
+#ifndef MX_ENTER_VISIT_BTFDeclTagAttr
+#  define MX_ENTER_VISIT_BTFDeclTagAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_BTFDeclTagAttr
+#  define MX_EXIT_VISIT_BTFDeclTagAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(BTFDeclTagAttr)
+  MX_ENTER_VISIT_BTFDeclTagAttr
+  MX_VISIT_BASE(BTFDeclTagAttr, InheritableAttr)
+  MX_VISIT_TEXT(BTFDeclTagAttr, btf_decl_tag, 9, MX_APPLY_METHOD, BTFDeclTag, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(BTFDeclTagAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_BTFDeclTagAttr
+MX_END_VISIT_ATTR(BTFDeclTagAttr)
+
+#ifndef MX_ENTER_VISIT_BPFPreserveAccessIndexAttr
+#  define MX_ENTER_VISIT_BPFPreserveAccessIndexAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_BPFPreserveAccessIndexAttr
+#  define MX_EXIT_VISIT_BPFPreserveAccessIndexAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(BPFPreserveAccessIndexAttr)
+  MX_ENTER_VISIT_BPFPreserveAccessIndexAttr
+  MX_VISIT_BASE(BPFPreserveAccessIndexAttr, InheritableAttr)
+  MX_VISIT_TEXT(BPFPreserveAccessIndexAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_BPFPreserveAccessIndexAttr
+MX_END_VISIT_ATTR(BPFPreserveAccessIndexAttr)
+
+#ifndef MX_ENTER_VISIT_AvailabilityAttr
+#  define MX_ENTER_VISIT_AvailabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AvailabilityAttr
+#  define MX_EXIT_VISIT_AvailabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AvailabilityAttr)
+  MX_ENTER_VISIT_AvailabilityAttr
+  MX_VISIT_BASE(AvailabilityAttr, InheritableAttr)
+  MX_VISIT_TEXT(AvailabilityAttr, message, 9, MX_APPLY_METHOD, Message, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AvailabilityAttr, replacement, 10, MX_APPLY_METHOD, Replacement, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AvailabilityAttr, spelling, 18, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(AvailabilityAttr, strict, 13, MX_APPLY_METHOD, Strict, bool, NthAttr)
+  MX_VISIT_BOOL(AvailabilityAttr, unavailable, 14, MX_APPLY_METHOD, Unavailable, bool, NthAttr)
+  MX_EXIT_VISIT_AvailabilityAttr
+MX_END_VISIT_ATTR(AvailabilityAttr)
+
+#ifndef MX_ENTER_VISIT_AssumptionAttr
+#  define MX_ENTER_VISIT_AssumptionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AssumptionAttr
+#  define MX_EXIT_VISIT_AssumptionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AssumptionAttr)
+  MX_ENTER_VISIT_AssumptionAttr
+  MX_VISIT_BASE(AssumptionAttr, InheritableAttr)
+  MX_VISIT_TEXT(AssumptionAttr, assumption, 9, MX_APPLY_METHOD, Assumption, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AssumptionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AssumptionAttr
+MX_END_VISIT_ATTR(AssumptionAttr)
+
+#ifndef MX_ENTER_VISIT_AssumeAlignedAttr
+#  define MX_ENTER_VISIT_AssumeAlignedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AssumeAlignedAttr
+#  define MX_EXIT_VISIT_AssumeAlignedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AssumeAlignedAttr)
+  MX_ENTER_VISIT_AssumeAlignedAttr
+  MX_VISIT_BASE(AssumeAlignedAttr, InheritableAttr)
+  MX_VISIT_ENTITY(AssumeAlignedAttr, alignment, 8, MX_APPLY_METHOD, Alignment, Expr, NthAttr, StmtUseSelector::ALIGNMENT)
+  MX_VISIT_ENTITY(AssumeAlignedAttr, offset, 17, MX_APPLY_METHOD, Offset, Expr, NthAttr, StmtUseSelector::OFFSET)
+  MX_VISIT_TEXT(AssumeAlignedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AssumeAlignedAttr
+MX_END_VISIT_ATTR(AssumeAlignedAttr)
+
+#ifndef MX_ENTER_VISIT_AssertSharedLockAttr
+#  define MX_ENTER_VISIT_AssertSharedLockAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AssertSharedLockAttr
+#  define MX_EXIT_VISIT_AssertSharedLockAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AssertSharedLockAttr)
+  MX_ENTER_VISIT_AssertSharedLockAttr
+  MX_VISIT_BASE(AssertSharedLockAttr, InheritableAttr)
+  MX_VISIT_TEXT(AssertSharedLockAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AssertSharedLockAttr
+MX_END_VISIT_ATTR(AssertSharedLockAttr)
+
+#ifndef MX_ENTER_VISIT_AssertExclusiveLockAttr
+#  define MX_ENTER_VISIT_AssertExclusiveLockAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AssertExclusiveLockAttr
+#  define MX_EXIT_VISIT_AssertExclusiveLockAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AssertExclusiveLockAttr)
+  MX_ENTER_VISIT_AssertExclusiveLockAttr
+  MX_VISIT_BASE(AssertExclusiveLockAttr, InheritableAttr)
+  MX_VISIT_TEXT(AssertExclusiveLockAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AssertExclusiveLockAttr
+MX_END_VISIT_ATTR(AssertExclusiveLockAttr)
+
+#ifndef MX_ENTER_VISIT_AssertCapabilityAttr
+#  define MX_ENTER_VISIT_AssertCapabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AssertCapabilityAttr
+#  define MX_EXIT_VISIT_AssertCapabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AssertCapabilityAttr)
+  MX_ENTER_VISIT_AssertCapabilityAttr
+  MX_VISIT_BASE(AssertCapabilityAttr, InheritableAttr)
+  MX_VISIT_ENUM(AssertCapabilityAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, AssertCapabilityAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(AssertCapabilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(AssertCapabilityAttr, is_shared, 13, MX_APPLY_METHOD, IsShared, bool, NthAttr)
+  MX_EXIT_VISIT_AssertCapabilityAttr
+MX_END_VISIT_ATTR(AssertCapabilityAttr)
+
+#ifndef MX_ENTER_VISIT_AsmLabelAttr
+#  define MX_ENTER_VISIT_AsmLabelAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AsmLabelAttr
+#  define MX_EXIT_VISIT_AsmLabelAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AsmLabelAttr)
+  MX_ENTER_VISIT_AsmLabelAttr
+  MX_VISIT_BASE(AsmLabelAttr, InheritableAttr)
+  MX_VISIT_BOOL(AsmLabelAttr, is_literal_label, 13, MX_APPLY_METHOD, IsLiteralLabel, bool, NthAttr)
+  MX_VISIT_TEXT(AsmLabelAttr, label, 9, MX_APPLY_METHOD, Label, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AsmLabelAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AsmLabelAttr
+MX_END_VISIT_ATTR(AsmLabelAttr)
+
+#ifndef MX_ENTER_VISIT_ArtificialAttr
+#  define MX_ENTER_VISIT_ArtificialAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ArtificialAttr
+#  define MX_EXIT_VISIT_ArtificialAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ArtificialAttr)
+  MX_ENTER_VISIT_ArtificialAttr
+  MX_VISIT_BASE(ArtificialAttr, InheritableAttr)
+  MX_VISIT_TEXT(ArtificialAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ArtificialAttr
+MX_END_VISIT_ATTR(ArtificialAttr)
+
+#ifndef MX_ENTER_VISIT_ArmBuiltinAliasAttr
+#  define MX_ENTER_VISIT_ArmBuiltinAliasAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ArmBuiltinAliasAttr
+#  define MX_EXIT_VISIT_ArmBuiltinAliasAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ArmBuiltinAliasAttr)
+  MX_ENTER_VISIT_ArmBuiltinAliasAttr
+  MX_VISIT_BASE(ArmBuiltinAliasAttr, InheritableAttr)
+  MX_VISIT_TEXT(ArmBuiltinAliasAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ArmBuiltinAliasAttr
+MX_END_VISIT_ATTR(ArmBuiltinAliasAttr)
+
+#ifndef MX_ENTER_VISIT_ArgumentWithTypeTagAttr
+#  define MX_ENTER_VISIT_ArgumentWithTypeTagAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ArgumentWithTypeTagAttr
+#  define MX_EXIT_VISIT_ArgumentWithTypeTagAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ArgumentWithTypeTagAttr)
+  MX_ENTER_VISIT_ArgumentWithTypeTagAttr
+  MX_VISIT_BASE(ArgumentWithTypeTagAttr, InheritableAttr)
+  MX_VISIT_BOOL(ArgumentWithTypeTagAttr, is_pointer, 13, MX_APPLY_METHOD, IsPointer, bool, NthAttr)
+  MX_VISIT_ENUM(ArgumentWithTypeTagAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, ArgumentWithTypeTagAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(ArgumentWithTypeTagAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ArgumentWithTypeTagAttr
+MX_END_VISIT_ATTR(ArgumentWithTypeTagAttr)
+
+#ifndef MX_ENTER_VISIT_ArcWeakrefUnavailableAttr
+#  define MX_ENTER_VISIT_ArcWeakrefUnavailableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ArcWeakrefUnavailableAttr
+#  define MX_EXIT_VISIT_ArcWeakrefUnavailableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ArcWeakrefUnavailableAttr)
+  MX_ENTER_VISIT_ArcWeakrefUnavailableAttr
+  MX_VISIT_BASE(ArcWeakrefUnavailableAttr, InheritableAttr)
+  MX_VISIT_TEXT(ArcWeakrefUnavailableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ArcWeakrefUnavailableAttr
+MX_END_VISIT_ATTR(ArcWeakrefUnavailableAttr)
+
+#ifndef MX_ENTER_VISIT_AnyX86NoCfCheckAttr
+#  define MX_ENTER_VISIT_AnyX86NoCfCheckAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AnyX86NoCfCheckAttr
+#  define MX_EXIT_VISIT_AnyX86NoCfCheckAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AnyX86NoCfCheckAttr)
+  MX_ENTER_VISIT_AnyX86NoCfCheckAttr
+  MX_VISIT_BASE(AnyX86NoCfCheckAttr, InheritableAttr)
+  MX_VISIT_TEXT(AnyX86NoCfCheckAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AnyX86NoCfCheckAttr
+MX_END_VISIT_ATTR(AnyX86NoCfCheckAttr)
+
+#ifndef MX_ENTER_VISIT_AnyX86NoCallerSavedRegistersAttr
+#  define MX_ENTER_VISIT_AnyX86NoCallerSavedRegistersAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AnyX86NoCallerSavedRegistersAttr
+#  define MX_EXIT_VISIT_AnyX86NoCallerSavedRegistersAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AnyX86NoCallerSavedRegistersAttr)
+  MX_ENTER_VISIT_AnyX86NoCallerSavedRegistersAttr
+  MX_VISIT_BASE(AnyX86NoCallerSavedRegistersAttr, InheritableAttr)
+  MX_VISIT_TEXT(AnyX86NoCallerSavedRegistersAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AnyX86NoCallerSavedRegistersAttr
+MX_END_VISIT_ATTR(AnyX86NoCallerSavedRegistersAttr)
+
+#ifndef MX_ENTER_VISIT_AnyX86InterruptAttr
+#  define MX_ENTER_VISIT_AnyX86InterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AnyX86InterruptAttr
+#  define MX_EXIT_VISIT_AnyX86InterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AnyX86InterruptAttr)
+  MX_ENTER_VISIT_AnyX86InterruptAttr
+  MX_VISIT_BASE(AnyX86InterruptAttr, InheritableAttr)
+  MX_VISIT_TEXT(AnyX86InterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AnyX86InterruptAttr
+MX_END_VISIT_ATTR(AnyX86InterruptAttr)
+
+#ifndef MX_ENTER_VISIT_AnalyzerNoReturnAttr
+#  define MX_ENTER_VISIT_AnalyzerNoReturnAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AnalyzerNoReturnAttr
+#  define MX_EXIT_VISIT_AnalyzerNoReturnAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AnalyzerNoReturnAttr)
+  MX_ENTER_VISIT_AnalyzerNoReturnAttr
+  MX_VISIT_BASE(AnalyzerNoReturnAttr, InheritableAttr)
+  MX_VISIT_TEXT(AnalyzerNoReturnAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AnalyzerNoReturnAttr
+MX_END_VISIT_ATTR(AnalyzerNoReturnAttr)
+
+#ifndef MX_ENTER_VISIT_AlwaysInlineAttr
+#  define MX_ENTER_VISIT_AlwaysInlineAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AlwaysInlineAttr
+#  define MX_EXIT_VISIT_AlwaysInlineAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AlwaysInlineAttr)
+  MX_ENTER_VISIT_AlwaysInlineAttr
+  MX_VISIT_BASE(AlwaysInlineAttr, InheritableAttr)
+  MX_VISIT_ENUM(AlwaysInlineAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, AlwaysInlineAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(AlwaysInlineAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AlwaysInlineAttr
+MX_END_VISIT_ATTR(AlwaysInlineAttr)
+
+#ifndef MX_ENTER_VISIT_AlwaysDestroyAttr
+#  define MX_ENTER_VISIT_AlwaysDestroyAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AlwaysDestroyAttr
+#  define MX_EXIT_VISIT_AlwaysDestroyAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AlwaysDestroyAttr)
+  MX_ENTER_VISIT_AlwaysDestroyAttr
+  MX_VISIT_BASE(AlwaysDestroyAttr, InheritableAttr)
+  MX_VISIT_TEXT(AlwaysDestroyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AlwaysDestroyAttr
+MX_END_VISIT_ATTR(AlwaysDestroyAttr)
+
+#ifndef MX_ENTER_VISIT_AllocSizeAttr
+#  define MX_ENTER_VISIT_AllocSizeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AllocSizeAttr
+#  define MX_EXIT_VISIT_AllocSizeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AllocSizeAttr)
+  MX_ENTER_VISIT_AllocSizeAttr
+  MX_VISIT_BASE(AllocSizeAttr, InheritableAttr)
+  MX_VISIT_TEXT(AllocSizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AllocSizeAttr
+MX_END_VISIT_ATTR(AllocSizeAttr)
+
+#ifndef MX_ENTER_VISIT_AllocAlignAttr
+#  define MX_ENTER_VISIT_AllocAlignAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AllocAlignAttr
+#  define MX_EXIT_VISIT_AllocAlignAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AllocAlignAttr)
+  MX_ENTER_VISIT_AllocAlignAttr
+  MX_VISIT_BASE(AllocAlignAttr, InheritableAttr)
+  MX_VISIT_TEXT(AllocAlignAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AllocAlignAttr
+MX_END_VISIT_ATTR(AllocAlignAttr)
+
+#ifndef MX_ENTER_VISIT_AlignedAttr
+#  define MX_ENTER_VISIT_AlignedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AlignedAttr
+#  define MX_EXIT_VISIT_AlignedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AlignedAttr)
+  MX_ENTER_VISIT_AlignedAttr
+  MX_VISIT_BASE(AlignedAttr, InheritableAttr)
+  MX_VISIT_ENTITY(AlignedAttr, alignment_expression, 8, MX_APPLY_METHOD, AlignmentExpression, Expr, NthAttr, StmtUseSelector::ALIGNMENT_EXPRESSION)
+  MX_VISIT_ENTITY(AlignedAttr, alignment_type, 17, MX_APPLY_METHOD, AlignmentType, Type, NthAttr, TypeUseSelector::ALIGNMENT_TYPE)
+  MX_VISIT_ENUM(AlignedAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, AlignedAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(AlignedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignas, 13, MX_APPLY_METHOD, IsAlignas, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignment_dependent, 14, MX_APPLY_METHOD, IsAlignmentDependent, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignment_error_dependent, 19, MX_APPLY_METHOD, IsAlignmentErrorDependent, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_alignment_expression, 20, MX_APPLY_METHOD, IsAlignmentExpression, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_c11, 21, MX_APPLY_METHOD, IsC11, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_declspec, 22, MX_APPLY_METHOD, IsDeclspec, bool, NthAttr)
+  MX_VISIT_BOOL(AlignedAttr, is_gnu, 23, MX_APPLY_METHOD, IsGNU, bool, NthAttr)
+  MX_EXIT_VISIT_AlignedAttr
+MX_END_VISIT_ATTR(AlignedAttr)
+
+#ifndef MX_ENTER_VISIT_AlignNaturalAttr
+#  define MX_ENTER_VISIT_AlignNaturalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AlignNaturalAttr
+#  define MX_EXIT_VISIT_AlignNaturalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AlignNaturalAttr)
+  MX_ENTER_VISIT_AlignNaturalAttr
+  MX_VISIT_BASE(AlignNaturalAttr, InheritableAttr)
+  MX_VISIT_TEXT(AlignNaturalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AlignNaturalAttr
+MX_END_VISIT_ATTR(AlignNaturalAttr)
+
+#ifndef MX_ENTER_VISIT_AlignMac68kAttr
+#  define MX_ENTER_VISIT_AlignMac68kAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AlignMac68kAttr
+#  define MX_EXIT_VISIT_AlignMac68kAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AlignMac68kAttr)
+  MX_ENTER_VISIT_AlignMac68kAttr
+  MX_VISIT_BASE(AlignMac68kAttr, InheritableAttr)
+  MX_VISIT_TEXT(AlignMac68kAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AlignMac68kAttr
+MX_END_VISIT_ATTR(AlignMac68kAttr)
+
+#ifndef MX_ENTER_VISIT_AcquiredBeforeAttr
+#  define MX_ENTER_VISIT_AcquiredBeforeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AcquiredBeforeAttr
+#  define MX_EXIT_VISIT_AcquiredBeforeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AcquiredBeforeAttr)
+  MX_ENTER_VISIT_AcquiredBeforeAttr
+  MX_VISIT_BASE(AcquiredBeforeAttr, InheritableAttr)
+  MX_VISIT_TEXT(AcquiredBeforeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AcquiredBeforeAttr
+MX_END_VISIT_ATTR(AcquiredBeforeAttr)
+
+#ifndef MX_ENTER_VISIT_AcquiredAfterAttr
+#  define MX_ENTER_VISIT_AcquiredAfterAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AcquiredAfterAttr
+#  define MX_EXIT_VISIT_AcquiredAfterAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AcquiredAfterAttr)
+  MX_ENTER_VISIT_AcquiredAfterAttr
+  MX_VISIT_BASE(AcquiredAfterAttr, InheritableAttr)
+  MX_VISIT_TEXT(AcquiredAfterAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AcquiredAfterAttr
+MX_END_VISIT_ATTR(AcquiredAfterAttr)
+
+#ifndef MX_ENTER_VISIT_AcquireHandleAttr
+#  define MX_ENTER_VISIT_AcquireHandleAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AcquireHandleAttr
+#  define MX_EXIT_VISIT_AcquireHandleAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AcquireHandleAttr)
+  MX_ENTER_VISIT_AcquireHandleAttr
+  MX_VISIT_BASE(AcquireHandleAttr, InheritableAttr)
+  MX_VISIT_TEXT(AcquireHandleAttr, handle_type, 9, MX_APPLY_METHOD, HandleType, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AcquireHandleAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AcquireHandleAttr
+MX_END_VISIT_ATTR(AcquireHandleAttr)
+
+#ifndef MX_ENTER_VISIT_AcquireCapabilityAttr
+#  define MX_ENTER_VISIT_AcquireCapabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AcquireCapabilityAttr
+#  define MX_EXIT_VISIT_AcquireCapabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AcquireCapabilityAttr)
+  MX_ENTER_VISIT_AcquireCapabilityAttr
+  MX_VISIT_BASE(AcquireCapabilityAttr, InheritableAttr)
+  MX_VISIT_ENUM(AcquireCapabilityAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, AcquireCapabilityAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(AcquireCapabilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(AcquireCapabilityAttr, is_shared, 13, MX_APPLY_METHOD, IsShared, bool, NthAttr)
+  MX_EXIT_VISIT_AcquireCapabilityAttr
+MX_END_VISIT_ATTR(AcquireCapabilityAttr)
+
+#ifndef MX_ENTER_VISIT_AVRSignalAttr
+#  define MX_ENTER_VISIT_AVRSignalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AVRSignalAttr
+#  define MX_EXIT_VISIT_AVRSignalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AVRSignalAttr)
+  MX_ENTER_VISIT_AVRSignalAttr
+  MX_VISIT_BASE(AVRSignalAttr, InheritableAttr)
+  MX_VISIT_TEXT(AVRSignalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AVRSignalAttr
+MX_END_VISIT_ATTR(AVRSignalAttr)
+
+#ifndef MX_ENTER_VISIT_AVRInterruptAttr
+#  define MX_ENTER_VISIT_AVRInterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AVRInterruptAttr
+#  define MX_EXIT_VISIT_AVRInterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AVRInterruptAttr)
+  MX_ENTER_VISIT_AVRInterruptAttr
+  MX_VISIT_BASE(AVRInterruptAttr, InheritableAttr)
+  MX_VISIT_TEXT(AVRInterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AVRInterruptAttr
+MX_END_VISIT_ATTR(AVRInterruptAttr)
+
+#ifndef MX_ENTER_VISIT_ARMInterruptAttr
+#  define MX_ENTER_VISIT_ARMInterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ARMInterruptAttr
+#  define MX_EXIT_VISIT_ARMInterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ARMInterruptAttr)
+  MX_ENTER_VISIT_ARMInterruptAttr
+  MX_VISIT_BASE(ARMInterruptAttr, InheritableAttr)
+  MX_VISIT_ENUM(ARMInterruptAttr, interrupt, 11, MX_APPLY_METHOD, Interrupt, ARMInterruptAttrInterruptType, NthAttr)
+  MX_VISIT_TEXT(ARMInterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ARMInterruptAttr
+MX_END_VISIT_ATTR(ARMInterruptAttr)
+
+#ifndef MX_ENTER_VISIT_AMDGPUWavesPerEUAttr
+#  define MX_ENTER_VISIT_AMDGPUWavesPerEUAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AMDGPUWavesPerEUAttr
+#  define MX_EXIT_VISIT_AMDGPUWavesPerEUAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AMDGPUWavesPerEUAttr)
+  MX_ENTER_VISIT_AMDGPUWavesPerEUAttr
+  MX_VISIT_BASE(AMDGPUWavesPerEUAttr, InheritableAttr)
+  MX_VISIT_ENTITY(AMDGPUWavesPerEUAttr, max, 8, MX_APPLY_METHOD, Max, Expr, NthAttr, StmtUseSelector::MAX)
+  MX_VISIT_ENTITY(AMDGPUWavesPerEUAttr, min, 17, MX_APPLY_METHOD, Min, Expr, NthAttr, StmtUseSelector::MIN)
+  MX_VISIT_TEXT(AMDGPUWavesPerEUAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AMDGPUWavesPerEUAttr
+MX_END_VISIT_ATTR(AMDGPUWavesPerEUAttr)
+
+#ifndef MX_ENTER_VISIT_AMDGPUNumVGPRAttr
+#  define MX_ENTER_VISIT_AMDGPUNumVGPRAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AMDGPUNumVGPRAttr
+#  define MX_EXIT_VISIT_AMDGPUNumVGPRAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AMDGPUNumVGPRAttr)
+  MX_ENTER_VISIT_AMDGPUNumVGPRAttr
+  MX_VISIT_BASE(AMDGPUNumVGPRAttr, InheritableAttr)
+  MX_VISIT_TEXT(AMDGPUNumVGPRAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AMDGPUNumVGPRAttr
+MX_END_VISIT_ATTR(AMDGPUNumVGPRAttr)
+
+#ifndef MX_ENTER_VISIT_AMDGPUNumSGPRAttr
+#  define MX_ENTER_VISIT_AMDGPUNumSGPRAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AMDGPUNumSGPRAttr
+#  define MX_EXIT_VISIT_AMDGPUNumSGPRAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AMDGPUNumSGPRAttr)
+  MX_ENTER_VISIT_AMDGPUNumSGPRAttr
+  MX_VISIT_BASE(AMDGPUNumSGPRAttr, InheritableAttr)
+  MX_VISIT_TEXT(AMDGPUNumSGPRAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AMDGPUNumSGPRAttr
+MX_END_VISIT_ATTR(AMDGPUNumSGPRAttr)
+
+#ifndef MX_ENTER_VISIT_AMDGPUFlatWorkGroupSizeAttr
+#  define MX_ENTER_VISIT_AMDGPUFlatWorkGroupSizeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AMDGPUFlatWorkGroupSizeAttr
+#  define MX_EXIT_VISIT_AMDGPUFlatWorkGroupSizeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AMDGPUFlatWorkGroupSizeAttr)
+  MX_ENTER_VISIT_AMDGPUFlatWorkGroupSizeAttr
+  MX_VISIT_BASE(AMDGPUFlatWorkGroupSizeAttr, InheritableAttr)
+  MX_VISIT_ENTITY(AMDGPUFlatWorkGroupSizeAttr, max, 8, MX_APPLY_METHOD, Max, Expr, NthAttr, StmtUseSelector::MAX)
+  MX_VISIT_ENTITY(AMDGPUFlatWorkGroupSizeAttr, min, 17, MX_APPLY_METHOD, Min, Expr, NthAttr, StmtUseSelector::MIN)
+  MX_VISIT_TEXT(AMDGPUFlatWorkGroupSizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AMDGPUFlatWorkGroupSizeAttr
+MX_END_VISIT_ATTR(AMDGPUFlatWorkGroupSizeAttr)
+
+#ifndef MX_ENTER_VISIT_AArch64VectorPcsAttr
+#  define MX_ENTER_VISIT_AArch64VectorPcsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_AArch64VectorPcsAttr
+#  define MX_EXIT_VISIT_AArch64VectorPcsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AArch64VectorPcsAttr)
+  MX_ENTER_VISIT_AArch64VectorPcsAttr
+  MX_VISIT_BASE(AArch64VectorPcsAttr, InheritableAttr)
+  MX_VISIT_TEXT(AArch64VectorPcsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AArch64VectorPcsAttr
+MX_END_VISIT_ATTR(AArch64VectorPcsAttr)
+
+#ifndef MX_ENTER_VISIT_XRayLogArgsAttr
+#  define MX_ENTER_VISIT_XRayLogArgsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_XRayLogArgsAttr
+#  define MX_EXIT_VISIT_XRayLogArgsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(XRayLogArgsAttr)
+  MX_ENTER_VISIT_XRayLogArgsAttr
+  MX_VISIT_BASE(XRayLogArgsAttr, InheritableAttr)
+  MX_VISIT_TEXT(XRayLogArgsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_XRayLogArgsAttr
+MX_END_VISIT_ATTR(XRayLogArgsAttr)
+
+#ifndef MX_ENTER_VISIT_XRayInstrumentAttr
+#  define MX_ENTER_VISIT_XRayInstrumentAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_XRayInstrumentAttr
+#  define MX_EXIT_VISIT_XRayInstrumentAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(XRayInstrumentAttr)
+  MX_ENTER_VISIT_XRayInstrumentAttr
+  MX_VISIT_BASE(XRayInstrumentAttr, InheritableAttr)
+  MX_VISIT_BOOL(XRayInstrumentAttr, always_x_ray_instrument, 13, MX_APPLY_METHOD, AlwaysXRayInstrument, bool, NthAttr)
+  MX_VISIT_ENUM(XRayInstrumentAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, XRayInstrumentAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(XRayInstrumentAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(XRayInstrumentAttr, never_x_ray_instrument, 14, MX_APPLY_METHOD, NeverXRayInstrument, bool, NthAttr)
+  MX_EXIT_VISIT_XRayInstrumentAttr
+MX_END_VISIT_ATTR(XRayInstrumentAttr)
+
+#ifndef MX_ENTER_VISIT_X86ForceAlignArgPointerAttr
+#  define MX_ENTER_VISIT_X86ForceAlignArgPointerAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_X86ForceAlignArgPointerAttr
+#  define MX_EXIT_VISIT_X86ForceAlignArgPointerAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(X86ForceAlignArgPointerAttr)
+  MX_ENTER_VISIT_X86ForceAlignArgPointerAttr
+  MX_VISIT_BASE(X86ForceAlignArgPointerAttr, InheritableAttr)
+  MX_VISIT_TEXT(X86ForceAlignArgPointerAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_X86ForceAlignArgPointerAttr
+MX_END_VISIT_ATTR(X86ForceAlignArgPointerAttr)
+
+#ifndef MX_ENTER_VISIT_WorkGroupSizeHintAttr
+#  define MX_ENTER_VISIT_WorkGroupSizeHintAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WorkGroupSizeHintAttr
+#  define MX_EXIT_VISIT_WorkGroupSizeHintAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WorkGroupSizeHintAttr)
+  MX_ENTER_VISIT_WorkGroupSizeHintAttr
+  MX_VISIT_BASE(WorkGroupSizeHintAttr, InheritableAttr)
+  MX_VISIT_TEXT(WorkGroupSizeHintAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WorkGroupSizeHintAttr
+MX_END_VISIT_ATTR(WorkGroupSizeHintAttr)
+
+#ifndef MX_ENTER_VISIT_WebAssemblyImportNameAttr
+#  define MX_ENTER_VISIT_WebAssemblyImportNameAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WebAssemblyImportNameAttr
+#  define MX_EXIT_VISIT_WebAssemblyImportNameAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WebAssemblyImportNameAttr)
+  MX_ENTER_VISIT_WebAssemblyImportNameAttr
+  MX_VISIT_BASE(WebAssemblyImportNameAttr, InheritableAttr)
+  MX_VISIT_TEXT(WebAssemblyImportNameAttr, import_name, 9, MX_APPLY_METHOD, ImportName, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(WebAssemblyImportNameAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WebAssemblyImportNameAttr
+MX_END_VISIT_ATTR(WebAssemblyImportNameAttr)
+
+#ifndef MX_ENTER_VISIT_WebAssemblyImportModuleAttr
+#  define MX_ENTER_VISIT_WebAssemblyImportModuleAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WebAssemblyImportModuleAttr
+#  define MX_EXIT_VISIT_WebAssemblyImportModuleAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WebAssemblyImportModuleAttr)
+  MX_ENTER_VISIT_WebAssemblyImportModuleAttr
+  MX_VISIT_BASE(WebAssemblyImportModuleAttr, InheritableAttr)
+  MX_VISIT_TEXT(WebAssemblyImportModuleAttr, import_module, 9, MX_APPLY_METHOD, ImportModule, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(WebAssemblyImportModuleAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WebAssemblyImportModuleAttr
+MX_END_VISIT_ATTR(WebAssemblyImportModuleAttr)
+
+#ifndef MX_ENTER_VISIT_WebAssemblyExportNameAttr
+#  define MX_ENTER_VISIT_WebAssemblyExportNameAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WebAssemblyExportNameAttr
+#  define MX_EXIT_VISIT_WebAssemblyExportNameAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WebAssemblyExportNameAttr)
+  MX_ENTER_VISIT_WebAssemblyExportNameAttr
+  MX_VISIT_BASE(WebAssemblyExportNameAttr, InheritableAttr)
+  MX_VISIT_TEXT(WebAssemblyExportNameAttr, export_name, 9, MX_APPLY_METHOD, ExportName, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(WebAssemblyExportNameAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WebAssemblyExportNameAttr
+MX_END_VISIT_ATTR(WebAssemblyExportNameAttr)
+
+#ifndef MX_ENTER_VISIT_WeakRefAttr
+#  define MX_ENTER_VISIT_WeakRefAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WeakRefAttr
+#  define MX_EXIT_VISIT_WeakRefAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WeakRefAttr)
+  MX_ENTER_VISIT_WeakRefAttr
+  MX_VISIT_BASE(WeakRefAttr, InheritableAttr)
+  MX_VISIT_TEXT(WeakRefAttr, aliasee, 9, MX_APPLY_METHOD, Aliasee, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(WeakRefAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WeakRefAttr
+MX_END_VISIT_ATTR(WeakRefAttr)
+
+#ifndef MX_ENTER_VISIT_WeakImportAttr
+#  define MX_ENTER_VISIT_WeakImportAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WeakImportAttr
+#  define MX_EXIT_VISIT_WeakImportAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WeakImportAttr)
+  MX_ENTER_VISIT_WeakImportAttr
+  MX_VISIT_BASE(WeakImportAttr, InheritableAttr)
+  MX_VISIT_TEXT(WeakImportAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WeakImportAttr
+MX_END_VISIT_ATTR(WeakImportAttr)
+
+#ifndef MX_ENTER_VISIT_WeakAttr
+#  define MX_ENTER_VISIT_WeakAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WeakAttr
+#  define MX_EXIT_VISIT_WeakAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WeakAttr)
+  MX_ENTER_VISIT_WeakAttr
+  MX_VISIT_BASE(WeakAttr, InheritableAttr)
+  MX_VISIT_TEXT(WeakAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WeakAttr
+MX_END_VISIT_ATTR(WeakAttr)
+
+#ifndef MX_ENTER_VISIT_WarnUnusedResultAttr
+#  define MX_ENTER_VISIT_WarnUnusedResultAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WarnUnusedResultAttr
+#  define MX_EXIT_VISIT_WarnUnusedResultAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WarnUnusedResultAttr)
+  MX_ENTER_VISIT_WarnUnusedResultAttr
+  MX_VISIT_BASE(WarnUnusedResultAttr, InheritableAttr)
+  MX_VISIT_BOOL(WarnUnusedResultAttr, is_cxx11_no_discard, 13, MX_APPLY_METHOD, IsCXX11NoDiscard, bool, NthAttr)
+  MX_VISIT_TEXT(WarnUnusedResultAttr, message, 9, MX_APPLY_METHOD, Message, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(WarnUnusedResultAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, WarnUnusedResultAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(WarnUnusedResultAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WarnUnusedResultAttr
+MX_END_VISIT_ATTR(WarnUnusedResultAttr)
+
+#ifndef MX_ENTER_VISIT_WarnUnusedAttr
+#  define MX_ENTER_VISIT_WarnUnusedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_WarnUnusedAttr
+#  define MX_EXIT_VISIT_WarnUnusedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(WarnUnusedAttr)
+  MX_ENTER_VISIT_WarnUnusedAttr
+  MX_VISIT_BASE(WarnUnusedAttr, InheritableAttr)
+  MX_VISIT_TEXT(WarnUnusedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_WarnUnusedAttr
+MX_END_VISIT_ATTR(WarnUnusedAttr)
+
+#ifndef MX_ENTER_VISIT_VisibilityAttr
+#  define MX_ENTER_VISIT_VisibilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_VisibilityAttr
+#  define MX_EXIT_VISIT_VisibilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(VisibilityAttr)
+  MX_ENTER_VISIT_VisibilityAttr
+  MX_VISIT_BASE(VisibilityAttr, InheritableAttr)
+  MX_VISIT_TEXT(VisibilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(VisibilityAttr, visibility, 11, MX_APPLY_METHOD, Visibility, VisibilityAttrVisibilityType, NthAttr)
+  MX_EXIT_VISIT_VisibilityAttr
+MX_END_VISIT_ATTR(VisibilityAttr)
+
+#ifndef MX_ENTER_VISIT_VectorCallAttr
+#  define MX_ENTER_VISIT_VectorCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_VectorCallAttr
+#  define MX_EXIT_VISIT_VectorCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(VectorCallAttr)
+  MX_ENTER_VISIT_VectorCallAttr
+  MX_VISIT_BASE(VectorCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(VectorCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_VectorCallAttr
+MX_END_VISIT_ATTR(VectorCallAttr)
+
+#ifndef MX_ENTER_VISIT_VecTypeHintAttr
+#  define MX_ENTER_VISIT_VecTypeHintAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_VecTypeHintAttr
+#  define MX_EXIT_VISIT_VecTypeHintAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(VecTypeHintAttr)
+  MX_ENTER_VISIT_VecTypeHintAttr
+  MX_VISIT_BASE(VecTypeHintAttr, InheritableAttr)
+  MX_VISIT_TEXT(VecTypeHintAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(VecTypeHintAttr, type_hint, 8, MX_APPLY_METHOD, TypeHint, Type, NthAttr, TypeUseSelector::TYPE_HINT)
+  MX_VISIT_ENTITY(VecTypeHintAttr, type_hint_token, 17, MX_APPLY_METHOD, TypeHintToken, Type, NthAttr, TypeUseSelector::TYPE_HINT_TOKEN)
+  MX_EXIT_VISIT_VecTypeHintAttr
+MX_END_VISIT_ATTR(VecTypeHintAttr)
+
+#ifndef MX_ENTER_VISIT_VecReturnAttr
+#  define MX_ENTER_VISIT_VecReturnAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_VecReturnAttr
+#  define MX_EXIT_VISIT_VecReturnAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(VecReturnAttr)
+  MX_ENTER_VISIT_VecReturnAttr
+  MX_VISIT_BASE(VecReturnAttr, InheritableAttr)
+  MX_VISIT_TEXT(VecReturnAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_VecReturnAttr
+MX_END_VISIT_ATTR(VecReturnAttr)
+
+#ifndef MX_ENTER_VISIT_UuidAttr
+#  define MX_ENTER_VISIT_UuidAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_UuidAttr
+#  define MX_EXIT_VISIT_UuidAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UuidAttr)
+  MX_ENTER_VISIT_UuidAttr
+  MX_VISIT_BASE(UuidAttr, InheritableAttr)
+  MX_VISIT_TEXT(UuidAttr, guid, 9, MX_APPLY_METHOD, Guid, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(UuidAttr, guid_declaration, 8, MX_APPLY_METHOD, GuidDeclaration, MSGuidDecl, NthAttr, DeclUseSelector::GUID_DECLARATION)
+  MX_VISIT_TEXT(UuidAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UuidAttr
+MX_END_VISIT_ATTR(UuidAttr)
+
+#ifndef MX_ENTER_VISIT_UsingIfExistsAttr
+#  define MX_ENTER_VISIT_UsingIfExistsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_UsingIfExistsAttr
+#  define MX_EXIT_VISIT_UsingIfExistsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UsingIfExistsAttr)
+  MX_ENTER_VISIT_UsingIfExistsAttr
+  MX_VISIT_BASE(UsingIfExistsAttr, InheritableAttr)
+  MX_VISIT_TEXT(UsingIfExistsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UsingIfExistsAttr
+MX_END_VISIT_ATTR(UsingIfExistsAttr)
+
+#ifndef MX_ENTER_VISIT_UsedAttr
+#  define MX_ENTER_VISIT_UsedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_UsedAttr
+#  define MX_EXIT_VISIT_UsedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UsedAttr)
+  MX_ENTER_VISIT_UsedAttr
+  MX_VISIT_BASE(UsedAttr, InheritableAttr)
+  MX_VISIT_TEXT(UsedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UsedAttr
+MX_END_VISIT_ATTR(UsedAttr)
+
+#ifndef MX_ENTER_VISIT_UnusedAttr
+#  define MX_ENTER_VISIT_UnusedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_UnusedAttr
+#  define MX_EXIT_VISIT_UnusedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UnusedAttr)
+  MX_ENTER_VISIT_UnusedAttr
+  MX_VISIT_BASE(UnusedAttr, InheritableAttr)
+  MX_VISIT_ENUM(UnusedAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, UnusedAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(UnusedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UnusedAttr
+MX_END_VISIT_ATTR(UnusedAttr)
+
+#ifndef MX_ENTER_VISIT_UninitializedAttr
+#  define MX_ENTER_VISIT_UninitializedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_UninitializedAttr
+#  define MX_EXIT_VISIT_UninitializedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UninitializedAttr)
+  MX_ENTER_VISIT_UninitializedAttr
+  MX_VISIT_BASE(UninitializedAttr, InheritableAttr)
+  MX_VISIT_TEXT(UninitializedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UninitializedAttr
+MX_END_VISIT_ATTR(UninitializedAttr)
+
+#ifndef MX_ENTER_VISIT_UnavailableAttr
+#  define MX_ENTER_VISIT_UnavailableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_UnavailableAttr
+#  define MX_EXIT_VISIT_UnavailableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UnavailableAttr)
+  MX_ENTER_VISIT_UnavailableAttr
+  MX_VISIT_BASE(UnavailableAttr, InheritableAttr)
+  MX_VISIT_ENUM(UnavailableAttr, implicit_reason, 11, MX_APPLY_METHOD, ImplicitReason, UnavailableAttrImplicitReason, NthAttr)
+  MX_VISIT_TEXT(UnavailableAttr, message, 9, MX_APPLY_METHOD, Message, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(UnavailableAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UnavailableAttr
+MX_END_VISIT_ATTR(UnavailableAttr)
+
+#ifndef MX_ENTER_VISIT_TypeVisibilityAttr
+#  define MX_ENTER_VISIT_TypeVisibilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TypeVisibilityAttr
+#  define MX_EXIT_VISIT_TypeVisibilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TypeVisibilityAttr)
+  MX_ENTER_VISIT_TypeVisibilityAttr
+  MX_VISIT_BASE(TypeVisibilityAttr, InheritableAttr)
+  MX_VISIT_TEXT(TypeVisibilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(TypeVisibilityAttr, visibility, 11, MX_APPLY_METHOD, Visibility, TypeVisibilityAttrVisibilityType, NthAttr)
+  MX_EXIT_VISIT_TypeVisibilityAttr
+MX_END_VISIT_ATTR(TypeVisibilityAttr)
+
+#ifndef MX_ENTER_VISIT_TypeTagForDatatypeAttr
+#  define MX_ENTER_VISIT_TypeTagForDatatypeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TypeTagForDatatypeAttr
+#  define MX_EXIT_VISIT_TypeTagForDatatypeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TypeTagForDatatypeAttr)
+  MX_ENTER_VISIT_TypeTagForDatatypeAttr
+  MX_VISIT_BASE(TypeTagForDatatypeAttr, InheritableAttr)
+  MX_VISIT_BOOL(TypeTagForDatatypeAttr, layout_compatible, 13, MX_APPLY_METHOD, LayoutCompatible, bool, NthAttr)
+  MX_VISIT_ENTITY(TypeTagForDatatypeAttr, matching_c_type, 8, MX_APPLY_METHOD, MatchingCType, Type, NthAttr, TypeUseSelector::MATCHING_C_TYPE)
+  MX_VISIT_ENTITY(TypeTagForDatatypeAttr, matching_c_type_token, 17, MX_APPLY_METHOD, MatchingCTypeToken, Type, NthAttr, TypeUseSelector::MATCHING_C_TYPE_TOKEN)
+  MX_VISIT_BOOL(TypeTagForDatatypeAttr, must_be_null, 14, MX_APPLY_METHOD, MustBeNull, bool, NthAttr)
+  MX_VISIT_TEXT(TypeTagForDatatypeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TypeTagForDatatypeAttr
+MX_END_VISIT_ATTR(TypeTagForDatatypeAttr)
+
+#ifndef MX_ENTER_VISIT_TryAcquireCapabilityAttr
+#  define MX_ENTER_VISIT_TryAcquireCapabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TryAcquireCapabilityAttr
+#  define MX_EXIT_VISIT_TryAcquireCapabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TryAcquireCapabilityAttr)
+  MX_ENTER_VISIT_TryAcquireCapabilityAttr
+  MX_VISIT_BASE(TryAcquireCapabilityAttr, InheritableAttr)
+  MX_VISIT_ENUM(TryAcquireCapabilityAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, TryAcquireCapabilityAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(TryAcquireCapabilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(TryAcquireCapabilityAttr, success_value, 8, MX_APPLY_METHOD, SuccessValue, Expr, NthAttr, StmtUseSelector::SUCCESS_VALUE)
+  MX_VISIT_BOOL(TryAcquireCapabilityAttr, is_shared, 13, MX_APPLY_METHOD, IsShared, bool, NthAttr)
+  MX_EXIT_VISIT_TryAcquireCapabilityAttr
+MX_END_VISIT_ATTR(TryAcquireCapabilityAttr)
+
+#ifndef MX_ENTER_VISIT_TrivialABIAttr
+#  define MX_ENTER_VISIT_TrivialABIAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TrivialABIAttr
+#  define MX_EXIT_VISIT_TrivialABIAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TrivialABIAttr)
+  MX_ENTER_VISIT_TrivialABIAttr
+  MX_VISIT_BASE(TrivialABIAttr, InheritableAttr)
+  MX_VISIT_TEXT(TrivialABIAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TrivialABIAttr
+MX_END_VISIT_ATTR(TrivialABIAttr)
+
+#ifndef MX_ENTER_VISIT_TransparentUnionAttr
+#  define MX_ENTER_VISIT_TransparentUnionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TransparentUnionAttr
+#  define MX_EXIT_VISIT_TransparentUnionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TransparentUnionAttr)
+  MX_ENTER_VISIT_TransparentUnionAttr
+  MX_VISIT_BASE(TransparentUnionAttr, InheritableAttr)
+  MX_VISIT_TEXT(TransparentUnionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TransparentUnionAttr
+MX_END_VISIT_ATTR(TransparentUnionAttr)
+
+#ifndef MX_ENTER_VISIT_ThisCallAttr
+#  define MX_ENTER_VISIT_ThisCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ThisCallAttr
+#  define MX_EXIT_VISIT_ThisCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ThisCallAttr)
+  MX_ENTER_VISIT_ThisCallAttr
+  MX_VISIT_BASE(ThisCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(ThisCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ThisCallAttr
+MX_END_VISIT_ATTR(ThisCallAttr)
+
+#ifndef MX_ENTER_VISIT_TestTypestateAttr
+#  define MX_ENTER_VISIT_TestTypestateAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TestTypestateAttr
+#  define MX_EXIT_VISIT_TestTypestateAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TestTypestateAttr)
+  MX_ENTER_VISIT_TestTypestateAttr
+  MX_VISIT_BASE(TestTypestateAttr, InheritableAttr)
+  MX_VISIT_TEXT(TestTypestateAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(TestTypestateAttr, test_state, 11, MX_APPLY_METHOD, TestState, TestTypestateAttrConsumedState, NthAttr)
+  MX_EXIT_VISIT_TestTypestateAttr
+MX_END_VISIT_ATTR(TestTypestateAttr)
+
+#ifndef MX_ENTER_VISIT_TargetClonesAttr
+#  define MX_ENTER_VISIT_TargetClonesAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TargetClonesAttr
+#  define MX_EXIT_VISIT_TargetClonesAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TargetClonesAttr)
+  MX_ENTER_VISIT_TargetClonesAttr
+  MX_VISIT_BASE(TargetClonesAttr, InheritableAttr)
+  MX_VISIT_TEXT(TargetClonesAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TargetClonesAttr
+MX_END_VISIT_ATTR(TargetClonesAttr)
+
+#ifndef MX_ENTER_VISIT_TargetAttr
+#  define MX_ENTER_VISIT_TargetAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TargetAttr
+#  define MX_EXIT_VISIT_TargetAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TargetAttr)
+  MX_ENTER_VISIT_TargetAttr
+  MX_VISIT_BASE(TargetAttr, InheritableAttr)
+  MX_VISIT_TEXT(TargetAttr, architecture, 9, MX_APPLY_METHOD, Architecture, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(TargetAttr, features_string, 10, MX_APPLY_METHOD, FeaturesString, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(TargetAttr, spelling, 18, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(TargetAttr, is_default_version, 13, MX_APPLY_METHOD, IsDefaultVersion, bool, NthAttr)
+  MX_EXIT_VISIT_TargetAttr
+MX_END_VISIT_ATTR(TargetAttr)
+
+#ifndef MX_ENTER_VISIT_TLSModelAttr
+#  define MX_ENTER_VISIT_TLSModelAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_TLSModelAttr
+#  define MX_EXIT_VISIT_TLSModelAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(TLSModelAttr)
+  MX_ENTER_VISIT_TLSModelAttr
+  MX_VISIT_BASE(TLSModelAttr, InheritableAttr)
+  MX_VISIT_TEXT(TLSModelAttr, model, 9, MX_APPLY_METHOD, Model, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(TLSModelAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_TLSModelAttr
+MX_END_VISIT_ATTR(TLSModelAttr)
+
+#ifndef MX_ENTER_VISIT_SysVABIAttr
+#  define MX_ENTER_VISIT_SysVABIAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SysVABIAttr
+#  define MX_EXIT_VISIT_SysVABIAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SysVABIAttr)
+  MX_ENTER_VISIT_SysVABIAttr
+  MX_VISIT_BASE(SysVABIAttr, InheritableAttr)
+  MX_VISIT_TEXT(SysVABIAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SysVABIAttr
+MX_END_VISIT_ATTR(SysVABIAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftPrivateAttr
+#  define MX_ENTER_VISIT_SwiftPrivateAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftPrivateAttr
+#  define MX_EXIT_VISIT_SwiftPrivateAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftPrivateAttr)
+  MX_ENTER_VISIT_SwiftPrivateAttr
+  MX_VISIT_BASE(SwiftPrivateAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftPrivateAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftPrivateAttr
+MX_END_VISIT_ATTR(SwiftPrivateAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftNewTypeAttr
+#  define MX_ENTER_VISIT_SwiftNewTypeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftNewTypeAttr
+#  define MX_EXIT_VISIT_SwiftNewTypeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftNewTypeAttr)
+  MX_ENTER_VISIT_SwiftNewTypeAttr
+  MX_VISIT_BASE(SwiftNewTypeAttr, InheritableAttr)
+  MX_VISIT_ENUM(SwiftNewTypeAttr, newtype_kind, 11, MX_APPLY_METHOD, NewtypeKind, SwiftNewTypeAttrNewtypeKind, NthAttr)
+  MX_VISIT_ENUM(SwiftNewTypeAttr, semantic_spelling, 15, MX_APPLY_METHOD, SemanticSpelling, SwiftNewTypeAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(SwiftNewTypeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftNewTypeAttr
+MX_END_VISIT_ATTR(SwiftNewTypeAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftNameAttr
+#  define MX_ENTER_VISIT_SwiftNameAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftNameAttr
+#  define MX_EXIT_VISIT_SwiftNameAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftNameAttr)
+  MX_ENTER_VISIT_SwiftNameAttr
+  MX_VISIT_BASE(SwiftNameAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftNameAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(SwiftNameAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftNameAttr
+MX_END_VISIT_ATTR(SwiftNameAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftErrorAttr
+#  define MX_ENTER_VISIT_SwiftErrorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftErrorAttr
+#  define MX_EXIT_VISIT_SwiftErrorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftErrorAttr)
+  MX_ENTER_VISIT_SwiftErrorAttr
+  MX_VISIT_BASE(SwiftErrorAttr, InheritableAttr)
+  MX_VISIT_ENUM(SwiftErrorAttr, convention, 11, MX_APPLY_METHOD, Convention, SwiftErrorAttrConventionKind, NthAttr)
+  MX_VISIT_TEXT(SwiftErrorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftErrorAttr
+MX_END_VISIT_ATTR(SwiftErrorAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftCallAttr
+#  define MX_ENTER_VISIT_SwiftCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftCallAttr
+#  define MX_EXIT_VISIT_SwiftCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftCallAttr)
+  MX_ENTER_VISIT_SwiftCallAttr
+  MX_VISIT_BASE(SwiftCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftCallAttr
+MX_END_VISIT_ATTR(SwiftCallAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftBridgedTypedefAttr
+#  define MX_ENTER_VISIT_SwiftBridgedTypedefAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftBridgedTypedefAttr
+#  define MX_EXIT_VISIT_SwiftBridgedTypedefAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftBridgedTypedefAttr)
+  MX_ENTER_VISIT_SwiftBridgedTypedefAttr
+  MX_VISIT_BASE(SwiftBridgedTypedefAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftBridgedTypedefAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftBridgedTypedefAttr
+MX_END_VISIT_ATTR(SwiftBridgedTypedefAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftBridgeAttr
+#  define MX_ENTER_VISIT_SwiftBridgeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftBridgeAttr
+#  define MX_EXIT_VISIT_SwiftBridgeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftBridgeAttr)
+  MX_ENTER_VISIT_SwiftBridgeAttr
+  MX_VISIT_BASE(SwiftBridgeAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftBridgeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(SwiftBridgeAttr, swift_type, 10, MX_APPLY_METHOD, SwiftType, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftBridgeAttr
+MX_END_VISIT_ATTR(SwiftBridgeAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftAttrAttr
+#  define MX_ENTER_VISIT_SwiftAttrAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftAttrAttr
+#  define MX_EXIT_VISIT_SwiftAttrAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftAttrAttr)
+  MX_ENTER_VISIT_SwiftAttrAttr
+  MX_VISIT_BASE(SwiftAttrAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftAttrAttr, attribute, 9, MX_APPLY_METHOD, Attribute, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(SwiftAttrAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftAttrAttr
+MX_END_VISIT_ATTR(SwiftAttrAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftAsyncNameAttr
+#  define MX_ENTER_VISIT_SwiftAsyncNameAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftAsyncNameAttr
+#  define MX_EXIT_VISIT_SwiftAsyncNameAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftAsyncNameAttr)
+  MX_ENTER_VISIT_SwiftAsyncNameAttr
+  MX_VISIT_BASE(SwiftAsyncNameAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftAsyncNameAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(SwiftAsyncNameAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftAsyncNameAttr
+MX_END_VISIT_ATTR(SwiftAsyncNameAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftAsyncErrorAttr
+#  define MX_ENTER_VISIT_SwiftAsyncErrorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftAsyncErrorAttr
+#  define MX_EXIT_VISIT_SwiftAsyncErrorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftAsyncErrorAttr)
+  MX_ENTER_VISIT_SwiftAsyncErrorAttr
+  MX_VISIT_BASE(SwiftAsyncErrorAttr, InheritableAttr)
+  MX_VISIT_ENUM(SwiftAsyncErrorAttr, convention, 11, MX_APPLY_METHOD, Convention, SwiftAsyncErrorAttrConventionKind, NthAttr)
+  MX_VISIT_TEXT(SwiftAsyncErrorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftAsyncErrorAttr
+MX_END_VISIT_ATTR(SwiftAsyncErrorAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftAsyncCallAttr
+#  define MX_ENTER_VISIT_SwiftAsyncCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftAsyncCallAttr
+#  define MX_EXIT_VISIT_SwiftAsyncCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftAsyncCallAttr)
+  MX_ENTER_VISIT_SwiftAsyncCallAttr
+  MX_VISIT_BASE(SwiftAsyncCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftAsyncCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftAsyncCallAttr
+MX_END_VISIT_ATTR(SwiftAsyncCallAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftAsyncAttr
+#  define MX_ENTER_VISIT_SwiftAsyncAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftAsyncAttr
+#  define MX_EXIT_VISIT_SwiftAsyncAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftAsyncAttr)
+  MX_ENTER_VISIT_SwiftAsyncAttr
+  MX_VISIT_BASE(SwiftAsyncAttr, InheritableAttr)
+  MX_VISIT_TEXT(SwiftAsyncAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftAsyncAttr
+MX_END_VISIT_ATTR(SwiftAsyncAttr)
+
+#ifndef MX_ENTER_VISIT_StrictFPAttr
+#  define MX_ENTER_VISIT_StrictFPAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_StrictFPAttr
+#  define MX_EXIT_VISIT_StrictFPAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(StrictFPAttr)
+  MX_ENTER_VISIT_StrictFPAttr
+  MX_VISIT_BASE(StrictFPAttr, InheritableAttr)
+  MX_VISIT_TEXT(StrictFPAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_StrictFPAttr
+MX_END_VISIT_ATTR(StrictFPAttr)
+
+#ifndef MX_ENTER_VISIT_StdCallAttr
+#  define MX_ENTER_VISIT_StdCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_StdCallAttr
+#  define MX_EXIT_VISIT_StdCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(StdCallAttr)
+  MX_ENTER_VISIT_StdCallAttr
+  MX_VISIT_BASE(StdCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(StdCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_StdCallAttr
+MX_END_VISIT_ATTR(StdCallAttr)
+
+#ifndef MX_ENTER_VISIT_StandaloneDebugAttr
+#  define MX_ENTER_VISIT_StandaloneDebugAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_StandaloneDebugAttr
+#  define MX_EXIT_VISIT_StandaloneDebugAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(StandaloneDebugAttr)
+  MX_ENTER_VISIT_StandaloneDebugAttr
+  MX_VISIT_BASE(StandaloneDebugAttr, InheritableAttr)
+  MX_VISIT_TEXT(StandaloneDebugAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_StandaloneDebugAttr
+MX_END_VISIT_ATTR(StandaloneDebugAttr)
+
+#ifndef MX_ENTER_VISIT_SpeculativeLoadHardeningAttr
+#  define MX_ENTER_VISIT_SpeculativeLoadHardeningAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SpeculativeLoadHardeningAttr
+#  define MX_EXIT_VISIT_SpeculativeLoadHardeningAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SpeculativeLoadHardeningAttr)
+  MX_ENTER_VISIT_SpeculativeLoadHardeningAttr
+  MX_VISIT_BASE(SpeculativeLoadHardeningAttr, InheritableAttr)
+  MX_VISIT_TEXT(SpeculativeLoadHardeningAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SpeculativeLoadHardeningAttr
+MX_END_VISIT_ATTR(SpeculativeLoadHardeningAttr)
+
+#ifndef MX_ENTER_VISIT_SharedTrylockFunctionAttr
+#  define MX_ENTER_VISIT_SharedTrylockFunctionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SharedTrylockFunctionAttr
+#  define MX_EXIT_VISIT_SharedTrylockFunctionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SharedTrylockFunctionAttr)
+  MX_ENTER_VISIT_SharedTrylockFunctionAttr
+  MX_VISIT_BASE(SharedTrylockFunctionAttr, InheritableAttr)
+  MX_VISIT_TEXT(SharedTrylockFunctionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(SharedTrylockFunctionAttr, success_value, 8, MX_APPLY_METHOD, SuccessValue, Expr, NthAttr, StmtUseSelector::SUCCESS_VALUE)
+  MX_EXIT_VISIT_SharedTrylockFunctionAttr
+MX_END_VISIT_ATTR(SharedTrylockFunctionAttr)
+
+#ifndef MX_ENTER_VISIT_SetTypestateAttr
+#  define MX_ENTER_VISIT_SetTypestateAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SetTypestateAttr
+#  define MX_EXIT_VISIT_SetTypestateAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SetTypestateAttr)
+  MX_ENTER_VISIT_SetTypestateAttr
+  MX_VISIT_BASE(SetTypestateAttr, InheritableAttr)
+  MX_VISIT_ENUM(SetTypestateAttr, new_state, 11, MX_APPLY_METHOD, NewState, SetTypestateAttrConsumedState, NthAttr)
+  MX_VISIT_TEXT(SetTypestateAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SetTypestateAttr
+MX_END_VISIT_ATTR(SetTypestateAttr)
+
+#ifndef MX_ENTER_VISIT_SentinelAttr
+#  define MX_ENTER_VISIT_SentinelAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SentinelAttr
+#  define MX_EXIT_VISIT_SentinelAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SentinelAttr)
+  MX_ENTER_VISIT_SentinelAttr
+  MX_VISIT_BASE(SentinelAttr, InheritableAttr)
+  MX_VISIT_TEXT(SentinelAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SentinelAttr
+MX_END_VISIT_ATTR(SentinelAttr)
+
+#ifndef MX_ENTER_VISIT_SelectAnyAttr
+#  define MX_ENTER_VISIT_SelectAnyAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SelectAnyAttr
+#  define MX_EXIT_VISIT_SelectAnyAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SelectAnyAttr)
+  MX_ENTER_VISIT_SelectAnyAttr
+  MX_VISIT_BASE(SelectAnyAttr, InheritableAttr)
+  MX_VISIT_TEXT(SelectAnyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SelectAnyAttr
+MX_END_VISIT_ATTR(SelectAnyAttr)
+
+#ifndef MX_ENTER_VISIT_SectionAttr
+#  define MX_ENTER_VISIT_SectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SectionAttr
+#  define MX_EXIT_VISIT_SectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SectionAttr)
+  MX_ENTER_VISIT_SectionAttr
+  MX_VISIT_BASE(SectionAttr, InheritableAttr)
+  MX_VISIT_TEXT(SectionAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(SectionAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, SectionAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(SectionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SectionAttr
+MX_END_VISIT_ATTR(SectionAttr)
+
+#ifndef MX_ENTER_VISIT_ScopedLockableAttr
+#  define MX_ENTER_VISIT_ScopedLockableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ScopedLockableAttr
+#  define MX_EXIT_VISIT_ScopedLockableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ScopedLockableAttr)
+  MX_ENTER_VISIT_ScopedLockableAttr
+  MX_VISIT_BASE(ScopedLockableAttr, InheritableAttr)
+  MX_VISIT_TEXT(ScopedLockableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ScopedLockableAttr
+MX_END_VISIT_ATTR(ScopedLockableAttr)
+
+#ifndef MX_ENTER_VISIT_SYCLSpecialClassAttr
+#  define MX_ENTER_VISIT_SYCLSpecialClassAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SYCLSpecialClassAttr
+#  define MX_EXIT_VISIT_SYCLSpecialClassAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SYCLSpecialClassAttr)
+  MX_ENTER_VISIT_SYCLSpecialClassAttr
+  MX_VISIT_BASE(SYCLSpecialClassAttr, InheritableAttr)
+  MX_VISIT_TEXT(SYCLSpecialClassAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SYCLSpecialClassAttr
+MX_END_VISIT_ATTR(SYCLSpecialClassAttr)
+
+#ifndef MX_ENTER_VISIT_SYCLKernelAttr
+#  define MX_ENTER_VISIT_SYCLKernelAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_SYCLKernelAttr
+#  define MX_EXIT_VISIT_SYCLKernelAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SYCLKernelAttr)
+  MX_ENTER_VISIT_SYCLKernelAttr
+  MX_VISIT_BASE(SYCLKernelAttr, InheritableAttr)
+  MX_VISIT_TEXT(SYCLKernelAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SYCLKernelAttr
+MX_END_VISIT_ATTR(SYCLKernelAttr)
+
+#ifndef MX_ENTER_VISIT_ReturnsTwiceAttr
+#  define MX_ENTER_VISIT_ReturnsTwiceAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReturnsTwiceAttr
+#  define MX_EXIT_VISIT_ReturnsTwiceAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReturnsTwiceAttr)
+  MX_ENTER_VISIT_ReturnsTwiceAttr
+  MX_VISIT_BASE(ReturnsTwiceAttr, InheritableAttr)
+  MX_VISIT_TEXT(ReturnsTwiceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ReturnsTwiceAttr
+MX_END_VISIT_ATTR(ReturnsTwiceAttr)
+
+#ifndef MX_ENTER_VISIT_ReturnsNonNullAttr
+#  define MX_ENTER_VISIT_ReturnsNonNullAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReturnsNonNullAttr
+#  define MX_EXIT_VISIT_ReturnsNonNullAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReturnsNonNullAttr)
+  MX_ENTER_VISIT_ReturnsNonNullAttr
+  MX_VISIT_BASE(ReturnsNonNullAttr, InheritableAttr)
+  MX_VISIT_TEXT(ReturnsNonNullAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ReturnsNonNullAttr
+MX_END_VISIT_ATTR(ReturnsNonNullAttr)
+
+#ifndef MX_ENTER_VISIT_ReturnTypestateAttr
+#  define MX_ENTER_VISIT_ReturnTypestateAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReturnTypestateAttr
+#  define MX_EXIT_VISIT_ReturnTypestateAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReturnTypestateAttr)
+  MX_ENTER_VISIT_ReturnTypestateAttr
+  MX_VISIT_BASE(ReturnTypestateAttr, InheritableAttr)
+  MX_VISIT_TEXT(ReturnTypestateAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(ReturnTypestateAttr, state, 11, MX_APPLY_METHOD, State, ReturnTypestateAttrConsumedState, NthAttr)
+  MX_EXIT_VISIT_ReturnTypestateAttr
+MX_END_VISIT_ATTR(ReturnTypestateAttr)
+
+#ifndef MX_ENTER_VISIT_RetainAttr
+#  define MX_ENTER_VISIT_RetainAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_RetainAttr
+#  define MX_EXIT_VISIT_RetainAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(RetainAttr)
+  MX_ENTER_VISIT_RetainAttr
+  MX_VISIT_BASE(RetainAttr, InheritableAttr)
+  MX_VISIT_TEXT(RetainAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_RetainAttr
+MX_END_VISIT_ATTR(RetainAttr)
+
+#ifndef MX_ENTER_VISIT_RestrictAttr
+#  define MX_ENTER_VISIT_RestrictAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_RestrictAttr
+#  define MX_EXIT_VISIT_RestrictAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(RestrictAttr)
+  MX_ENTER_VISIT_RestrictAttr
+  MX_VISIT_BASE(RestrictAttr, InheritableAttr)
+  MX_VISIT_ENUM(RestrictAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, RestrictAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(RestrictAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_RestrictAttr
+MX_END_VISIT_ATTR(RestrictAttr)
+
+#ifndef MX_ENTER_VISIT_RequiresCapabilityAttr
+#  define MX_ENTER_VISIT_RequiresCapabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_RequiresCapabilityAttr
+#  define MX_EXIT_VISIT_RequiresCapabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(RequiresCapabilityAttr)
+  MX_ENTER_VISIT_RequiresCapabilityAttr
+  MX_VISIT_BASE(RequiresCapabilityAttr, InheritableAttr)
+  MX_VISIT_ENUM(RequiresCapabilityAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, RequiresCapabilityAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(RequiresCapabilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(RequiresCapabilityAttr, is_shared, 13, MX_APPLY_METHOD, IsShared, bool, NthAttr)
+  MX_EXIT_VISIT_RequiresCapabilityAttr
+MX_END_VISIT_ATTR(RequiresCapabilityAttr)
+
+#ifndef MX_ENTER_VISIT_ReqdWorkGroupSizeAttr
+#  define MX_ENTER_VISIT_ReqdWorkGroupSizeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReqdWorkGroupSizeAttr
+#  define MX_EXIT_VISIT_ReqdWorkGroupSizeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReqdWorkGroupSizeAttr)
+  MX_ENTER_VISIT_ReqdWorkGroupSizeAttr
+  MX_VISIT_BASE(ReqdWorkGroupSizeAttr, InheritableAttr)
+  MX_VISIT_TEXT(ReqdWorkGroupSizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ReqdWorkGroupSizeAttr
+MX_END_VISIT_ATTR(ReqdWorkGroupSizeAttr)
+
+#ifndef MX_ENTER_VISIT_ReleaseCapabilityAttr
+#  define MX_ENTER_VISIT_ReleaseCapabilityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReleaseCapabilityAttr
+#  define MX_EXIT_VISIT_ReleaseCapabilityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReleaseCapabilityAttr)
+  MX_ENTER_VISIT_ReleaseCapabilityAttr
+  MX_VISIT_BASE(ReleaseCapabilityAttr, InheritableAttr)
+  MX_VISIT_ENUM(ReleaseCapabilityAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, ReleaseCapabilityAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(ReleaseCapabilityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(ReleaseCapabilityAttr, is_generic, 13, MX_APPLY_METHOD, IsGeneric, bool, NthAttr)
+  MX_VISIT_BOOL(ReleaseCapabilityAttr, is_shared, 14, MX_APPLY_METHOD, IsShared, bool, NthAttr)
+  MX_EXIT_VISIT_ReleaseCapabilityAttr
+MX_END_VISIT_ATTR(ReleaseCapabilityAttr)
+
+#ifndef MX_ENTER_VISIT_ReinitializesAttr
+#  define MX_ENTER_VISIT_ReinitializesAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReinitializesAttr
+#  define MX_EXIT_VISIT_ReinitializesAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReinitializesAttr)
+  MX_ENTER_VISIT_ReinitializesAttr
+  MX_VISIT_BASE(ReinitializesAttr, InheritableAttr)
+  MX_VISIT_TEXT(ReinitializesAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ReinitializesAttr
+MX_END_VISIT_ATTR(ReinitializesAttr)
+
+#ifndef MX_ENTER_VISIT_RegCallAttr
+#  define MX_ENTER_VISIT_RegCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_RegCallAttr
+#  define MX_EXIT_VISIT_RegCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(RegCallAttr)
+  MX_ENTER_VISIT_RegCallAttr
+  MX_VISIT_BASE(RegCallAttr, InheritableAttr)
+  MX_VISIT_TEXT(RegCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_RegCallAttr
+MX_END_VISIT_ATTR(RegCallAttr)
+
+#ifndef MX_ENTER_VISIT_RISCVInterruptAttr
+#  define MX_ENTER_VISIT_RISCVInterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_RISCVInterruptAttr
+#  define MX_EXIT_VISIT_RISCVInterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(RISCVInterruptAttr)
+  MX_ENTER_VISIT_RISCVInterruptAttr
+  MX_VISIT_BASE(RISCVInterruptAttr, InheritableAttr)
+  MX_VISIT_ENUM(RISCVInterruptAttr, interrupt, 11, MX_APPLY_METHOD, Interrupt, RISCVInterruptAttrInterruptType, NthAttr)
+  MX_VISIT_TEXT(RISCVInterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_RISCVInterruptAttr
+MX_END_VISIT_ATTR(RISCVInterruptAttr)
+
+#ifndef MX_ENTER_VISIT_PureAttr
+#  define MX_ENTER_VISIT_PureAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PureAttr
+#  define MX_EXIT_VISIT_PureAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PureAttr)
+  MX_ENTER_VISIT_PureAttr
+  MX_VISIT_BASE(PureAttr, InheritableAttr)
+  MX_VISIT_TEXT(PureAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PureAttr
+MX_END_VISIT_ATTR(PureAttr)
+
+#ifndef MX_ENTER_VISIT_PtGuardedVarAttr
+#  define MX_ENTER_VISIT_PtGuardedVarAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PtGuardedVarAttr
+#  define MX_EXIT_VISIT_PtGuardedVarAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PtGuardedVarAttr)
+  MX_ENTER_VISIT_PtGuardedVarAttr
+  MX_VISIT_BASE(PtGuardedVarAttr, InheritableAttr)
+  MX_VISIT_TEXT(PtGuardedVarAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PtGuardedVarAttr
+MX_END_VISIT_ATTR(PtGuardedVarAttr)
+
+#ifndef MX_ENTER_VISIT_PtGuardedByAttr
+#  define MX_ENTER_VISIT_PtGuardedByAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PtGuardedByAttr
+#  define MX_EXIT_VISIT_PtGuardedByAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PtGuardedByAttr)
+  MX_ENTER_VISIT_PtGuardedByAttr
+  MX_VISIT_BASE(PtGuardedByAttr, InheritableAttr)
+  MX_VISIT_ENTITY(PtGuardedByAttr, argument, 8, MX_APPLY_METHOD, Argument, Expr, NthAttr, StmtUseSelector::ARGUMENT)
+  MX_VISIT_TEXT(PtGuardedByAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PtGuardedByAttr
+MX_END_VISIT_ATTR(PtGuardedByAttr)
+
+#ifndef MX_ENTER_VISIT_PreserveMostAttr
+#  define MX_ENTER_VISIT_PreserveMostAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PreserveMostAttr
+#  define MX_EXIT_VISIT_PreserveMostAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PreserveMostAttr)
+  MX_ENTER_VISIT_PreserveMostAttr
+  MX_VISIT_BASE(PreserveMostAttr, InheritableAttr)
+  MX_VISIT_TEXT(PreserveMostAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PreserveMostAttr
+MX_END_VISIT_ATTR(PreserveMostAttr)
+
+#ifndef MX_ENTER_VISIT_PreserveAllAttr
+#  define MX_ENTER_VISIT_PreserveAllAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PreserveAllAttr
+#  define MX_EXIT_VISIT_PreserveAllAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PreserveAllAttr)
+  MX_ENTER_VISIT_PreserveAllAttr
+  MX_VISIT_BASE(PreserveAllAttr, InheritableAttr)
+  MX_VISIT_TEXT(PreserveAllAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PreserveAllAttr
+MX_END_VISIT_ATTR(PreserveAllAttr)
+
+#ifndef MX_ENTER_VISIT_PreferredNameAttr
+#  define MX_ENTER_VISIT_PreferredNameAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PreferredNameAttr
+#  define MX_EXIT_VISIT_PreferredNameAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PreferredNameAttr)
+  MX_ENTER_VISIT_PreferredNameAttr
+  MX_VISIT_BASE(PreferredNameAttr, InheritableAttr)
+  MX_VISIT_TEXT(PreferredNameAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(PreferredNameAttr, typedef_type, 8, MX_APPLY_METHOD, TypedefType, Type, NthAttr, TypeUseSelector::TYPEDEF_TYPE)
+  MX_VISIT_ENTITY(PreferredNameAttr, typedef_type_token, 17, MX_APPLY_METHOD, TypedefTypeToken, Type, NthAttr, TypeUseSelector::TYPEDEF_TYPE_TOKEN)
+  MX_EXIT_VISIT_PreferredNameAttr
+MX_END_VISIT_ATTR(PreferredNameAttr)
+
+#ifndef MX_ENTER_VISIT_PragmaClangTextSectionAttr
+#  define MX_ENTER_VISIT_PragmaClangTextSectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PragmaClangTextSectionAttr
+#  define MX_EXIT_VISIT_PragmaClangTextSectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PragmaClangTextSectionAttr)
+  MX_ENTER_VISIT_PragmaClangTextSectionAttr
+  MX_VISIT_BASE(PragmaClangTextSectionAttr, InheritableAttr)
+  MX_VISIT_TEXT(PragmaClangTextSectionAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(PragmaClangTextSectionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PragmaClangTextSectionAttr
+MX_END_VISIT_ATTR(PragmaClangTextSectionAttr)
+
+#ifndef MX_ENTER_VISIT_PragmaClangRodataSectionAttr
+#  define MX_ENTER_VISIT_PragmaClangRodataSectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PragmaClangRodataSectionAttr
+#  define MX_EXIT_VISIT_PragmaClangRodataSectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PragmaClangRodataSectionAttr)
+  MX_ENTER_VISIT_PragmaClangRodataSectionAttr
+  MX_VISIT_BASE(PragmaClangRodataSectionAttr, InheritableAttr)
+  MX_VISIT_TEXT(PragmaClangRodataSectionAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(PragmaClangRodataSectionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PragmaClangRodataSectionAttr
+MX_END_VISIT_ATTR(PragmaClangRodataSectionAttr)
+
+#ifndef MX_ENTER_VISIT_PragmaClangRelroSectionAttr
+#  define MX_ENTER_VISIT_PragmaClangRelroSectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PragmaClangRelroSectionAttr
+#  define MX_EXIT_VISIT_PragmaClangRelroSectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PragmaClangRelroSectionAttr)
+  MX_ENTER_VISIT_PragmaClangRelroSectionAttr
+  MX_VISIT_BASE(PragmaClangRelroSectionAttr, InheritableAttr)
+  MX_VISIT_TEXT(PragmaClangRelroSectionAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(PragmaClangRelroSectionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PragmaClangRelroSectionAttr
+MX_END_VISIT_ATTR(PragmaClangRelroSectionAttr)
+
+#ifndef MX_ENTER_VISIT_PragmaClangDataSectionAttr
+#  define MX_ENTER_VISIT_PragmaClangDataSectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PragmaClangDataSectionAttr
+#  define MX_EXIT_VISIT_PragmaClangDataSectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PragmaClangDataSectionAttr)
+  MX_ENTER_VISIT_PragmaClangDataSectionAttr
+  MX_VISIT_BASE(PragmaClangDataSectionAttr, InheritableAttr)
+  MX_VISIT_TEXT(PragmaClangDataSectionAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(PragmaClangDataSectionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PragmaClangDataSectionAttr
+MX_END_VISIT_ATTR(PragmaClangDataSectionAttr)
+
+#ifndef MX_ENTER_VISIT_PragmaClangBSSSectionAttr
+#  define MX_ENTER_VISIT_PragmaClangBSSSectionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PragmaClangBSSSectionAttr
+#  define MX_EXIT_VISIT_PragmaClangBSSSectionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PragmaClangBSSSectionAttr)
+  MX_ENTER_VISIT_PragmaClangBSSSectionAttr
+  MX_VISIT_BASE(PragmaClangBSSSectionAttr, InheritableAttr)
+  MX_VISIT_TEXT(PragmaClangBSSSectionAttr, name, 9, MX_APPLY_METHOD, Name, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(PragmaClangBSSSectionAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PragmaClangBSSSectionAttr
+MX_END_VISIT_ATTR(PragmaClangBSSSectionAttr)
+
+#ifndef MX_ENTER_VISIT_PointerAttr
+#  define MX_ENTER_VISIT_PointerAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PointerAttr
+#  define MX_EXIT_VISIT_PointerAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PointerAttr)
+  MX_ENTER_VISIT_PointerAttr
+  MX_VISIT_BASE(PointerAttr, InheritableAttr)
+  MX_VISIT_ENTITY(PointerAttr, deref_type, 8, MX_APPLY_METHOD, DerefType, Type, NthAttr, TypeUseSelector::DEREF_TYPE)
+  MX_VISIT_ENTITY(PointerAttr, deref_type_token, 17, MX_APPLY_METHOD, DerefTypeToken, Type, NthAttr, TypeUseSelector::DEREF_TYPE_TOKEN)
+  MX_VISIT_TEXT(PointerAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PointerAttr
+MX_END_VISIT_ATTR(PointerAttr)
+
+#ifndef MX_ENTER_VISIT_PcsAttr
+#  define MX_ENTER_VISIT_PcsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PcsAttr
+#  define MX_EXIT_VISIT_PcsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PcsAttr)
+  MX_ENTER_VISIT_PcsAttr
+  MX_VISIT_BASE(PcsAttr, InheritableAttr)
+  MX_VISIT_ENUM(PcsAttr, pcs, 11, MX_APPLY_METHOD, PCS, PcsAttrPCSType, NthAttr)
+  MX_VISIT_TEXT(PcsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PcsAttr
+MX_END_VISIT_ATTR(PcsAttr)
+
+#ifndef MX_ENTER_VISIT_PatchableFunctionEntryAttr
+#  define MX_ENTER_VISIT_PatchableFunctionEntryAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PatchableFunctionEntryAttr
+#  define MX_EXIT_VISIT_PatchableFunctionEntryAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PatchableFunctionEntryAttr)
+  MX_ENTER_VISIT_PatchableFunctionEntryAttr
+  MX_VISIT_BASE(PatchableFunctionEntryAttr, InheritableAttr)
+  MX_VISIT_TEXT(PatchableFunctionEntryAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PatchableFunctionEntryAttr
+MX_END_VISIT_ATTR(PatchableFunctionEntryAttr)
+
+#ifndef MX_ENTER_VISIT_PascalAttr
+#  define MX_ENTER_VISIT_PascalAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PascalAttr
+#  define MX_EXIT_VISIT_PascalAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PascalAttr)
+  MX_ENTER_VISIT_PascalAttr
+  MX_VISIT_BASE(PascalAttr, InheritableAttr)
+  MX_VISIT_TEXT(PascalAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PascalAttr
+MX_END_VISIT_ATTR(PascalAttr)
+
+#ifndef MX_ENTER_VISIT_ParamTypestateAttr
+#  define MX_ENTER_VISIT_ParamTypestateAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ParamTypestateAttr
+#  define MX_EXIT_VISIT_ParamTypestateAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ParamTypestateAttr)
+  MX_ENTER_VISIT_ParamTypestateAttr
+  MX_VISIT_BASE(ParamTypestateAttr, InheritableAttr)
+  MX_VISIT_ENUM(ParamTypestateAttr, parameter_state, 11, MX_APPLY_METHOD, ParameterState, ParamTypestateAttrConsumedState, NthAttr)
+  MX_VISIT_TEXT(ParamTypestateAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ParamTypestateAttr
+MX_END_VISIT_ATTR(ParamTypestateAttr)
+
+#ifndef MX_ENTER_VISIT_PackedAttr
+#  define MX_ENTER_VISIT_PackedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_PackedAttr
+#  define MX_EXIT_VISIT_PackedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PackedAttr)
+  MX_ENTER_VISIT_PackedAttr
+  MX_VISIT_BASE(PackedAttr, InheritableAttr)
+  MX_VISIT_TEXT(PackedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_PackedAttr
+MX_END_VISIT_ATTR(PackedAttr)
+
+#ifndef MX_ENTER_VISIT_OwnershipAttr
+#  define MX_ENTER_VISIT_OwnershipAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OwnershipAttr
+#  define MX_EXIT_VISIT_OwnershipAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OwnershipAttr)
+  MX_ENTER_VISIT_OwnershipAttr
+  MX_VISIT_BASE(OwnershipAttr, InheritableAttr)
+  MX_VISIT_ENUM(OwnershipAttr, own_kind, 11, MX_APPLY_METHOD, OwnKind, OwnershipAttrOwnershipKind, NthAttr)
+  MX_VISIT_ENUM(OwnershipAttr, semantic_spelling, 15, MX_APPLY_METHOD, SemanticSpelling, OwnershipAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(OwnershipAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(OwnershipAttr, is_holds, 13, MX_APPLY_METHOD, IsHolds, bool, NthAttr)
+  MX_VISIT_BOOL(OwnershipAttr, is_returns, 14, MX_APPLY_METHOD, IsReturns, bool, NthAttr)
+  MX_VISIT_BOOL(OwnershipAttr, is_takes, 19, MX_APPLY_METHOD, IsTakes, bool, NthAttr)
+  MX_EXIT_VISIT_OwnershipAttr
+MX_END_VISIT_ATTR(OwnershipAttr)
+
+#ifndef MX_ENTER_VISIT_OwnerAttr
+#  define MX_ENTER_VISIT_OwnerAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OwnerAttr
+#  define MX_EXIT_VISIT_OwnerAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OwnerAttr)
+  MX_ENTER_VISIT_OwnerAttr
+  MX_VISIT_BASE(OwnerAttr, InheritableAttr)
+  MX_VISIT_ENTITY(OwnerAttr, deref_type, 8, MX_APPLY_METHOD, DerefType, Type, NthAttr, TypeUseSelector::DEREF_TYPE)
+  MX_VISIT_ENTITY(OwnerAttr, deref_type_token, 17, MX_APPLY_METHOD, DerefTypeToken, Type, NthAttr, TypeUseSelector::DEREF_TYPE_TOKEN)
+  MX_VISIT_TEXT(OwnerAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OwnerAttr
+MX_END_VISIT_ATTR(OwnerAttr)
+
+#ifndef MX_ENTER_VISIT_OverrideAttr
+#  define MX_ENTER_VISIT_OverrideAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OverrideAttr
+#  define MX_EXIT_VISIT_OverrideAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OverrideAttr)
+  MX_ENTER_VISIT_OverrideAttr
+  MX_VISIT_BASE(OverrideAttr, InheritableAttr)
+  MX_VISIT_TEXT(OverrideAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OverrideAttr
+MX_END_VISIT_ATTR(OverrideAttr)
+
+#ifndef MX_ENTER_VISIT_OptimizeNoneAttr
+#  define MX_ENTER_VISIT_OptimizeNoneAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OptimizeNoneAttr
+#  define MX_EXIT_VISIT_OptimizeNoneAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OptimizeNoneAttr)
+  MX_ENTER_VISIT_OptimizeNoneAttr
+  MX_VISIT_BASE(OptimizeNoneAttr, InheritableAttr)
+  MX_VISIT_TEXT(OptimizeNoneAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OptimizeNoneAttr
+MX_END_VISIT_ATTR(OptimizeNoneAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLKernelAttr
+#  define MX_ENTER_VISIT_OpenCLKernelAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLKernelAttr
+#  define MX_EXIT_VISIT_OpenCLKernelAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLKernelAttr)
+  MX_ENTER_VISIT_OpenCLKernelAttr
+  MX_VISIT_BASE(OpenCLKernelAttr, InheritableAttr)
+  MX_VISIT_TEXT(OpenCLKernelAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLKernelAttr
+MX_END_VISIT_ATTR(OpenCLKernelAttr)
+
+#ifndef MX_ENTER_VISIT_OpenCLIntelReqdSubGroupSizeAttr
+#  define MX_ENTER_VISIT_OpenCLIntelReqdSubGroupSizeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OpenCLIntelReqdSubGroupSizeAttr
+#  define MX_EXIT_VISIT_OpenCLIntelReqdSubGroupSizeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OpenCLIntelReqdSubGroupSizeAttr)
+  MX_ENTER_VISIT_OpenCLIntelReqdSubGroupSizeAttr
+  MX_VISIT_BASE(OpenCLIntelReqdSubGroupSizeAttr, InheritableAttr)
+  MX_VISIT_TEXT(OpenCLIntelReqdSubGroupSizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OpenCLIntelReqdSubGroupSizeAttr
+MX_END_VISIT_ATTR(OpenCLIntelReqdSubGroupSizeAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCSubclassingRestrictedAttr
+#  define MX_ENTER_VISIT_ObjCSubclassingRestrictedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCSubclassingRestrictedAttr
+#  define MX_EXIT_VISIT_ObjCSubclassingRestrictedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCSubclassingRestrictedAttr)
+  MX_ENTER_VISIT_ObjCSubclassingRestrictedAttr
+  MX_VISIT_BASE(ObjCSubclassingRestrictedAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCSubclassingRestrictedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCSubclassingRestrictedAttr
+MX_END_VISIT_ATTR(ObjCSubclassingRestrictedAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCRootClassAttr
+#  define MX_ENTER_VISIT_ObjCRootClassAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCRootClassAttr
+#  define MX_EXIT_VISIT_ObjCRootClassAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCRootClassAttr)
+  MX_ENTER_VISIT_ObjCRootClassAttr
+  MX_VISIT_BASE(ObjCRootClassAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCRootClassAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCRootClassAttr
+MX_END_VISIT_ATTR(ObjCRootClassAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCReturnsInnerPointerAttr
+#  define MX_ENTER_VISIT_ObjCReturnsInnerPointerAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCReturnsInnerPointerAttr
+#  define MX_EXIT_VISIT_ObjCReturnsInnerPointerAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCReturnsInnerPointerAttr)
+  MX_ENTER_VISIT_ObjCReturnsInnerPointerAttr
+  MX_VISIT_BASE(ObjCReturnsInnerPointerAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCReturnsInnerPointerAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCReturnsInnerPointerAttr
+MX_END_VISIT_ATTR(ObjCReturnsInnerPointerAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCRequiresSuperAttr
+#  define MX_ENTER_VISIT_ObjCRequiresSuperAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCRequiresSuperAttr
+#  define MX_EXIT_VISIT_ObjCRequiresSuperAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCRequiresSuperAttr)
+  MX_ENTER_VISIT_ObjCRequiresSuperAttr
+  MX_VISIT_BASE(ObjCRequiresSuperAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCRequiresSuperAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCRequiresSuperAttr
+MX_END_VISIT_ATTR(ObjCRequiresSuperAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCRequiresPropertyDefsAttr
+#  define MX_ENTER_VISIT_ObjCRequiresPropertyDefsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCRequiresPropertyDefsAttr
+#  define MX_EXIT_VISIT_ObjCRequiresPropertyDefsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCRequiresPropertyDefsAttr)
+  MX_ENTER_VISIT_ObjCRequiresPropertyDefsAttr
+  MX_VISIT_BASE(ObjCRequiresPropertyDefsAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCRequiresPropertyDefsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCRequiresPropertyDefsAttr
+MX_END_VISIT_ATTR(ObjCRequiresPropertyDefsAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCPreciseLifetimeAttr
+#  define MX_ENTER_VISIT_ObjCPreciseLifetimeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCPreciseLifetimeAttr
+#  define MX_EXIT_VISIT_ObjCPreciseLifetimeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCPreciseLifetimeAttr)
+  MX_ENTER_VISIT_ObjCPreciseLifetimeAttr
+  MX_VISIT_BASE(ObjCPreciseLifetimeAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCPreciseLifetimeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCPreciseLifetimeAttr
+MX_END_VISIT_ATTR(ObjCPreciseLifetimeAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCOwnershipAttr
+#  define MX_ENTER_VISIT_ObjCOwnershipAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCOwnershipAttr
+#  define MX_EXIT_VISIT_ObjCOwnershipAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCOwnershipAttr)
+  MX_ENTER_VISIT_ObjCOwnershipAttr
+  MX_VISIT_BASE(ObjCOwnershipAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCOwnershipAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCOwnershipAttr
+MX_END_VISIT_ATTR(ObjCOwnershipAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCNSObjectAttr
+#  define MX_ENTER_VISIT_ObjCNSObjectAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCNSObjectAttr
+#  define MX_EXIT_VISIT_ObjCNSObjectAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCNSObjectAttr)
+  MX_ENTER_VISIT_ObjCNSObjectAttr
+  MX_VISIT_BASE(ObjCNSObjectAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCNSObjectAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCNSObjectAttr
+MX_END_VISIT_ATTR(ObjCNSObjectAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCMethodFamilyAttr
+#  define MX_ENTER_VISIT_ObjCMethodFamilyAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCMethodFamilyAttr
+#  define MX_EXIT_VISIT_ObjCMethodFamilyAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCMethodFamilyAttr)
+  MX_ENTER_VISIT_ObjCMethodFamilyAttr
+  MX_VISIT_BASE(ObjCMethodFamilyAttr, InheritableAttr)
+  MX_VISIT_ENUM(ObjCMethodFamilyAttr, family, 11, MX_APPLY_METHOD, Family, ObjCMethodFamilyAttrFamilyKind, NthAttr)
+  MX_VISIT_TEXT(ObjCMethodFamilyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCMethodFamilyAttr
+MX_END_VISIT_ATTR(ObjCMethodFamilyAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCIndependentClassAttr
+#  define MX_ENTER_VISIT_ObjCIndependentClassAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCIndependentClassAttr
+#  define MX_EXIT_VISIT_ObjCIndependentClassAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCIndependentClassAttr)
+  MX_ENTER_VISIT_ObjCIndependentClassAttr
+  MX_VISIT_BASE(ObjCIndependentClassAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCIndependentClassAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCIndependentClassAttr
+MX_END_VISIT_ATTR(ObjCIndependentClassAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCExternallyRetainedAttr
+#  define MX_ENTER_VISIT_ObjCExternallyRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCExternallyRetainedAttr
+#  define MX_EXIT_VISIT_ObjCExternallyRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCExternallyRetainedAttr)
+  MX_ENTER_VISIT_ObjCExternallyRetainedAttr
+  MX_VISIT_BASE(ObjCExternallyRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCExternallyRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCExternallyRetainedAttr
+MX_END_VISIT_ATTR(ObjCExternallyRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCExplicitProtocolImplAttr
+#  define MX_ENTER_VISIT_ObjCExplicitProtocolImplAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCExplicitProtocolImplAttr
+#  define MX_EXIT_VISIT_ObjCExplicitProtocolImplAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCExplicitProtocolImplAttr)
+  MX_ENTER_VISIT_ObjCExplicitProtocolImplAttr
+  MX_VISIT_BASE(ObjCExplicitProtocolImplAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCExplicitProtocolImplAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCExplicitProtocolImplAttr
+MX_END_VISIT_ATTR(ObjCExplicitProtocolImplAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCExceptionAttr
+#  define MX_ENTER_VISIT_ObjCExceptionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCExceptionAttr
+#  define MX_EXIT_VISIT_ObjCExceptionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCExceptionAttr)
+  MX_ENTER_VISIT_ObjCExceptionAttr
+  MX_VISIT_BASE(ObjCExceptionAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCExceptionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCExceptionAttr
+MX_END_VISIT_ATTR(ObjCExceptionAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCBridgeRelatedAttr
+#  define MX_ENTER_VISIT_ObjCBridgeRelatedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCBridgeRelatedAttr
+#  define MX_EXIT_VISIT_ObjCBridgeRelatedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCBridgeRelatedAttr)
+  MX_ENTER_VISIT_ObjCBridgeRelatedAttr
+  MX_VISIT_BASE(ObjCBridgeRelatedAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCBridgeRelatedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCBridgeRelatedAttr
+MX_END_VISIT_ATTR(ObjCBridgeRelatedAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCBridgeMutableAttr
+#  define MX_ENTER_VISIT_ObjCBridgeMutableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCBridgeMutableAttr
+#  define MX_EXIT_VISIT_ObjCBridgeMutableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCBridgeMutableAttr)
+  MX_ENTER_VISIT_ObjCBridgeMutableAttr
+  MX_VISIT_BASE(ObjCBridgeMutableAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCBridgeMutableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCBridgeMutableAttr
+MX_END_VISIT_ATTR(ObjCBridgeMutableAttr)
+
+#ifndef MX_ENTER_VISIT_ObjCBridgeAttr
+#  define MX_ENTER_VISIT_ObjCBridgeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_ObjCBridgeAttr
+#  define MX_EXIT_VISIT_ObjCBridgeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ObjCBridgeAttr)
+  MX_ENTER_VISIT_ObjCBridgeAttr
+  MX_VISIT_BASE(ObjCBridgeAttr, InheritableAttr)
+  MX_VISIT_TEXT(ObjCBridgeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ObjCBridgeAttr
+MX_END_VISIT_ATTR(ObjCBridgeAttr)
+
+#ifndef MX_ENTER_VISIT_OSReturnsRetainedOnZeroAttr
+#  define MX_ENTER_VISIT_OSReturnsRetainedOnZeroAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OSReturnsRetainedOnZeroAttr
+#  define MX_EXIT_VISIT_OSReturnsRetainedOnZeroAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OSReturnsRetainedOnZeroAttr)
+  MX_ENTER_VISIT_OSReturnsRetainedOnZeroAttr
+  MX_VISIT_BASE(OSReturnsRetainedOnZeroAttr, InheritableAttr)
+  MX_VISIT_TEXT(OSReturnsRetainedOnZeroAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OSReturnsRetainedOnZeroAttr
+MX_END_VISIT_ATTR(OSReturnsRetainedOnZeroAttr)
+
+#ifndef MX_ENTER_VISIT_OSReturnsRetainedOnNonZeroAttr
+#  define MX_ENTER_VISIT_OSReturnsRetainedOnNonZeroAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OSReturnsRetainedOnNonZeroAttr
+#  define MX_EXIT_VISIT_OSReturnsRetainedOnNonZeroAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OSReturnsRetainedOnNonZeroAttr)
+  MX_ENTER_VISIT_OSReturnsRetainedOnNonZeroAttr
+  MX_VISIT_BASE(OSReturnsRetainedOnNonZeroAttr, InheritableAttr)
+  MX_VISIT_TEXT(OSReturnsRetainedOnNonZeroAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OSReturnsRetainedOnNonZeroAttr
+MX_END_VISIT_ATTR(OSReturnsRetainedOnNonZeroAttr)
+
+#ifndef MX_ENTER_VISIT_OSReturnsRetainedAttr
+#  define MX_ENTER_VISIT_OSReturnsRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OSReturnsRetainedAttr
+#  define MX_EXIT_VISIT_OSReturnsRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OSReturnsRetainedAttr)
+  MX_ENTER_VISIT_OSReturnsRetainedAttr
+  MX_VISIT_BASE(OSReturnsRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(OSReturnsRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OSReturnsRetainedAttr
+MX_END_VISIT_ATTR(OSReturnsRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_OSReturnsNotRetainedAttr
+#  define MX_ENTER_VISIT_OSReturnsNotRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OSReturnsNotRetainedAttr
+#  define MX_EXIT_VISIT_OSReturnsNotRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OSReturnsNotRetainedAttr)
+  MX_ENTER_VISIT_OSReturnsNotRetainedAttr
+  MX_VISIT_BASE(OSReturnsNotRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(OSReturnsNotRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OSReturnsNotRetainedAttr
+MX_END_VISIT_ATTR(OSReturnsNotRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_OSConsumesThisAttr
+#  define MX_ENTER_VISIT_OSConsumesThisAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OSConsumesThisAttr
+#  define MX_EXIT_VISIT_OSConsumesThisAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OSConsumesThisAttr)
+  MX_ENTER_VISIT_OSConsumesThisAttr
+  MX_VISIT_BASE(OSConsumesThisAttr, InheritableAttr)
+  MX_VISIT_TEXT(OSConsumesThisAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OSConsumesThisAttr
+MX_END_VISIT_ATTR(OSConsumesThisAttr)
+
+#ifndef MX_ENTER_VISIT_OMPThreadPrivateDeclAttr
+#  define MX_ENTER_VISIT_OMPThreadPrivateDeclAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OMPThreadPrivateDeclAttr
+#  define MX_EXIT_VISIT_OMPThreadPrivateDeclAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPThreadPrivateDeclAttr)
+  MX_ENTER_VISIT_OMPThreadPrivateDeclAttr
+  MX_VISIT_BASE(OMPThreadPrivateDeclAttr, InheritableAttr)
+  MX_VISIT_TEXT(OMPThreadPrivateDeclAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPThreadPrivateDeclAttr
+MX_END_VISIT_ATTR(OMPThreadPrivateDeclAttr)
+
+#ifndef MX_ENTER_VISIT_OMPDeclareVariantAttr
+#  define MX_ENTER_VISIT_OMPDeclareVariantAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OMPDeclareVariantAttr
+#  define MX_EXIT_VISIT_OMPDeclareVariantAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPDeclareVariantAttr)
+  MX_ENTER_VISIT_OMPDeclareVariantAttr
+  MX_VISIT_BASE(OMPDeclareVariantAttr, InheritableAttr)
+  MX_VISIT_TEXT(OMPDeclareVariantAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENTITY(OMPDeclareVariantAttr, variant_func_reference, 8, MX_APPLY_METHOD, VariantFuncReference, Expr, NthAttr, StmtUseSelector::VARIANT_FUNC_REFERENCE)
+  MX_EXIT_VISIT_OMPDeclareVariantAttr
+MX_END_VISIT_ATTR(OMPDeclareVariantAttr)
+
+#ifndef MX_ENTER_VISIT_OMPDeclareTargetDeclAttr
+#  define MX_ENTER_VISIT_OMPDeclareTargetDeclAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OMPDeclareTargetDeclAttr
+#  define MX_EXIT_VISIT_OMPDeclareTargetDeclAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPDeclareTargetDeclAttr)
+  MX_ENTER_VISIT_OMPDeclareTargetDeclAttr
+  MX_VISIT_BASE(OMPDeclareTargetDeclAttr, InheritableAttr)
+  MX_VISIT_ENUM(OMPDeclareTargetDeclAttr, dev_type, 11, MX_APPLY_METHOD, DevType, OMPDeclareTargetDeclAttrDevTypeTy, NthAttr)
+  MX_VISIT_BOOL(OMPDeclareTargetDeclAttr, indirect, 13, MX_APPLY_METHOD, Indirect, bool, NthAttr)
+  MX_VISIT_ENTITY(OMPDeclareTargetDeclAttr, indirect_expression, 8, MX_APPLY_METHOD, IndirectExpression, Expr, NthAttr, StmtUseSelector::INDIRECT_EXPRESSION)
+  MX_VISIT_ENUM(OMPDeclareTargetDeclAttr, map_type, 15, MX_APPLY_METHOD, MapType, OMPDeclareTargetDeclAttrMapTypeTy, NthAttr)
+  MX_VISIT_TEXT(OMPDeclareTargetDeclAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPDeclareTargetDeclAttr
+MX_END_VISIT_ATTR(OMPDeclareTargetDeclAttr)
+
+#ifndef MX_ENTER_VISIT_OMPCaptureNoInitAttr
+#  define MX_ENTER_VISIT_OMPCaptureNoInitAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OMPCaptureNoInitAttr
+#  define MX_EXIT_VISIT_OMPCaptureNoInitAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPCaptureNoInitAttr)
+  MX_ENTER_VISIT_OMPCaptureNoInitAttr
+  MX_VISIT_BASE(OMPCaptureNoInitAttr, InheritableAttr)
+  MX_VISIT_TEXT(OMPCaptureNoInitAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPCaptureNoInitAttr
+MX_END_VISIT_ATTR(OMPCaptureNoInitAttr)
+
+#ifndef MX_ENTER_VISIT_OMPAllocateDeclAttr
+#  define MX_ENTER_VISIT_OMPAllocateDeclAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_OMPAllocateDeclAttr
+#  define MX_EXIT_VISIT_OMPAllocateDeclAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OMPAllocateDeclAttr)
+  MX_ENTER_VISIT_OMPAllocateDeclAttr
+  MX_VISIT_BASE(OMPAllocateDeclAttr, InheritableAttr)
+  MX_VISIT_ENTITY(OMPAllocateDeclAttr, alignment, 8, MX_APPLY_METHOD, Alignment, Expr, NthAttr, StmtUseSelector::ALIGNMENT)
+  MX_VISIT_ENTITY(OMPAllocateDeclAttr, allocator, 17, MX_APPLY_METHOD, Allocator, Expr, NthAttr, StmtUseSelector::ALLOCATOR)
+  MX_VISIT_ENUM(OMPAllocateDeclAttr, allocator_type, 11, MX_APPLY_METHOD, AllocatorType, OMPAllocateDeclAttrAllocatorTypeTy, NthAttr)
+  MX_VISIT_TEXT(OMPAllocateDeclAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OMPAllocateDeclAttr
+MX_END_VISIT_ATTR(OMPAllocateDeclAttr)
+
+#ifndef MX_ENTER_VISIT_NotTailCalledAttr
+#  define MX_ENTER_VISIT_NotTailCalledAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NotTailCalledAttr
+#  define MX_EXIT_VISIT_NotTailCalledAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NotTailCalledAttr)
+  MX_ENTER_VISIT_NotTailCalledAttr
+  MX_VISIT_BASE(NotTailCalledAttr, InheritableAttr)
+  MX_VISIT_TEXT(NotTailCalledAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NotTailCalledAttr
+MX_END_VISIT_ATTR(NotTailCalledAttr)
+
+#ifndef MX_ENTER_VISIT_NoUniqueAddressAttr
+#  define MX_ENTER_VISIT_NoUniqueAddressAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoUniqueAddressAttr
+#  define MX_EXIT_VISIT_NoUniqueAddressAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoUniqueAddressAttr)
+  MX_ENTER_VISIT_NoUniqueAddressAttr
+  MX_VISIT_BASE(NoUniqueAddressAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoUniqueAddressAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoUniqueAddressAttr
+MX_END_VISIT_ATTR(NoUniqueAddressAttr)
+
+#ifndef MX_ENTER_VISIT_NoThrowAttr
+#  define MX_ENTER_VISIT_NoThrowAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoThrowAttr
+#  define MX_EXIT_VISIT_NoThrowAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoThrowAttr)
+  MX_ENTER_VISIT_NoThrowAttr
+  MX_VISIT_BASE(NoThrowAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoThrowAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoThrowAttr
+MX_END_VISIT_ATTR(NoThrowAttr)
+
+#ifndef MX_ENTER_VISIT_NoThreadSafetyAnalysisAttr
+#  define MX_ENTER_VISIT_NoThreadSafetyAnalysisAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoThreadSafetyAnalysisAttr
+#  define MX_EXIT_VISIT_NoThreadSafetyAnalysisAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoThreadSafetyAnalysisAttr)
+  MX_ENTER_VISIT_NoThreadSafetyAnalysisAttr
+  MX_VISIT_BASE(NoThreadSafetyAnalysisAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoThreadSafetyAnalysisAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoThreadSafetyAnalysisAttr
+MX_END_VISIT_ATTR(NoThreadSafetyAnalysisAttr)
+
+#ifndef MX_ENTER_VISIT_NoStackProtectorAttr
+#  define MX_ENTER_VISIT_NoStackProtectorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoStackProtectorAttr
+#  define MX_EXIT_VISIT_NoStackProtectorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoStackProtectorAttr)
+  MX_ENTER_VISIT_NoStackProtectorAttr
+  MX_VISIT_BASE(NoStackProtectorAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoStackProtectorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoStackProtectorAttr
+MX_END_VISIT_ATTR(NoStackProtectorAttr)
+
+#ifndef MX_ENTER_VISIT_NoSplitStackAttr
+#  define MX_ENTER_VISIT_NoSplitStackAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoSplitStackAttr
+#  define MX_EXIT_VISIT_NoSplitStackAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoSplitStackAttr)
+  MX_ENTER_VISIT_NoSplitStackAttr
+  MX_VISIT_BASE(NoSplitStackAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoSplitStackAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoSplitStackAttr
+MX_END_VISIT_ATTR(NoSplitStackAttr)
+
+#ifndef MX_ENTER_VISIT_NoSpeculativeLoadHardeningAttr
+#  define MX_ENTER_VISIT_NoSpeculativeLoadHardeningAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoSpeculativeLoadHardeningAttr
+#  define MX_EXIT_VISIT_NoSpeculativeLoadHardeningAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoSpeculativeLoadHardeningAttr)
+  MX_ENTER_VISIT_NoSpeculativeLoadHardeningAttr
+  MX_VISIT_BASE(NoSpeculativeLoadHardeningAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoSpeculativeLoadHardeningAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoSpeculativeLoadHardeningAttr
+MX_END_VISIT_ATTR(NoSpeculativeLoadHardeningAttr)
+
+#ifndef MX_ENTER_VISIT_NoSanitizeAttr
+#  define MX_ENTER_VISIT_NoSanitizeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoSanitizeAttr
+#  define MX_EXIT_VISIT_NoSanitizeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoSanitizeAttr)
+  MX_ENTER_VISIT_NoSanitizeAttr
+  MX_VISIT_BASE(NoSanitizeAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoSanitizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(NoSanitizeAttr, has_coverage, 13, MX_APPLY_METHOD, HasCoverage, bool, NthAttr)
+  MX_EXIT_VISIT_NoSanitizeAttr
+MX_END_VISIT_ATTR(NoSanitizeAttr)
+
+#ifndef MX_ENTER_VISIT_NoReturnAttr
+#  define MX_ENTER_VISIT_NoReturnAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoReturnAttr
+#  define MX_EXIT_VISIT_NoReturnAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoReturnAttr)
+  MX_ENTER_VISIT_NoReturnAttr
+  MX_VISIT_BASE(NoReturnAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoReturnAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoReturnAttr
+MX_END_VISIT_ATTR(NoReturnAttr)
+
+#ifndef MX_ENTER_VISIT_NoProfileFunctionAttr
+#  define MX_ENTER_VISIT_NoProfileFunctionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoProfileFunctionAttr
+#  define MX_EXIT_VISIT_NoProfileFunctionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoProfileFunctionAttr)
+  MX_ENTER_VISIT_NoProfileFunctionAttr
+  MX_VISIT_BASE(NoProfileFunctionAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoProfileFunctionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoProfileFunctionAttr
+MX_END_VISIT_ATTR(NoProfileFunctionAttr)
+
+#ifndef MX_ENTER_VISIT_NoMips16Attr
+#  define MX_ENTER_VISIT_NoMips16Attr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoMips16Attr
+#  define MX_EXIT_VISIT_NoMips16Attr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoMips16Attr)
+  MX_ENTER_VISIT_NoMips16Attr
+  MX_VISIT_BASE(NoMips16Attr, InheritableAttr)
+  MX_VISIT_TEXT(NoMips16Attr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoMips16Attr
+MX_END_VISIT_ATTR(NoMips16Attr)
+
+#ifndef MX_ENTER_VISIT_NoMicroMipsAttr
+#  define MX_ENTER_VISIT_NoMicroMipsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoMicroMipsAttr
+#  define MX_EXIT_VISIT_NoMicroMipsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoMicroMipsAttr)
+  MX_ENTER_VISIT_NoMicroMipsAttr
+  MX_VISIT_BASE(NoMicroMipsAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoMicroMipsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoMicroMipsAttr
+MX_END_VISIT_ATTR(NoMicroMipsAttr)
+
+#ifndef MX_ENTER_VISIT_NoInstrumentFunctionAttr
+#  define MX_ENTER_VISIT_NoInstrumentFunctionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoInstrumentFunctionAttr
+#  define MX_EXIT_VISIT_NoInstrumentFunctionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoInstrumentFunctionAttr)
+  MX_ENTER_VISIT_NoInstrumentFunctionAttr
+  MX_VISIT_BASE(NoInstrumentFunctionAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoInstrumentFunctionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoInstrumentFunctionAttr
+MX_END_VISIT_ATTR(NoInstrumentFunctionAttr)
+
+#ifndef MX_ENTER_VISIT_NoInlineAttr
+#  define MX_ENTER_VISIT_NoInlineAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoInlineAttr
+#  define MX_EXIT_VISIT_NoInlineAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoInlineAttr)
+  MX_ENTER_VISIT_NoInlineAttr
+  MX_VISIT_BASE(NoInlineAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoInlineAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoInlineAttr
+MX_END_VISIT_ATTR(NoInlineAttr)
+
+#ifndef MX_ENTER_VISIT_NoDuplicateAttr
+#  define MX_ENTER_VISIT_NoDuplicateAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoDuplicateAttr
+#  define MX_EXIT_VISIT_NoDuplicateAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoDuplicateAttr)
+  MX_ENTER_VISIT_NoDuplicateAttr
+  MX_VISIT_BASE(NoDuplicateAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoDuplicateAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoDuplicateAttr
+MX_END_VISIT_ATTR(NoDuplicateAttr)
+
+#ifndef MX_ENTER_VISIT_NoDestroyAttr
+#  define MX_ENTER_VISIT_NoDestroyAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoDestroyAttr
+#  define MX_EXIT_VISIT_NoDestroyAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoDestroyAttr)
+  MX_ENTER_VISIT_NoDestroyAttr
+  MX_VISIT_BASE(NoDestroyAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoDestroyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoDestroyAttr
+MX_END_VISIT_ATTR(NoDestroyAttr)
+
+#ifndef MX_ENTER_VISIT_NoDebugAttr
+#  define MX_ENTER_VISIT_NoDebugAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoDebugAttr
+#  define MX_EXIT_VISIT_NoDebugAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoDebugAttr)
+  MX_ENTER_VISIT_NoDebugAttr
+  MX_VISIT_BASE(NoDebugAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoDebugAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoDebugAttr
+MX_END_VISIT_ATTR(NoDebugAttr)
+
+#ifndef MX_ENTER_VISIT_NoCommonAttr
+#  define MX_ENTER_VISIT_NoCommonAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoCommonAttr
+#  define MX_EXIT_VISIT_NoCommonAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoCommonAttr)
+  MX_ENTER_VISIT_NoCommonAttr
+  MX_VISIT_BASE(NoCommonAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoCommonAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoCommonAttr
+MX_END_VISIT_ATTR(NoCommonAttr)
+
+#ifndef MX_ENTER_VISIT_NoAliasAttr
+#  define MX_ENTER_VISIT_NoAliasAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NoAliasAttr
+#  define MX_EXIT_VISIT_NoAliasAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NoAliasAttr)
+  MX_ENTER_VISIT_NoAliasAttr
+  MX_VISIT_BASE(NoAliasAttr, InheritableAttr)
+  MX_VISIT_TEXT(NoAliasAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NoAliasAttr
+MX_END_VISIT_ATTR(NoAliasAttr)
+
+#ifndef MX_ENTER_VISIT_NakedAttr
+#  define MX_ENTER_VISIT_NakedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NakedAttr
+#  define MX_EXIT_VISIT_NakedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NakedAttr)
+  MX_ENTER_VISIT_NakedAttr
+  MX_VISIT_BASE(NakedAttr, InheritableAttr)
+  MX_VISIT_TEXT(NakedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NakedAttr
+MX_END_VISIT_ATTR(NakedAttr)
+
+#ifndef MX_ENTER_VISIT_NSReturnsRetainedAttr
+#  define MX_ENTER_VISIT_NSReturnsRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NSReturnsRetainedAttr
+#  define MX_EXIT_VISIT_NSReturnsRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NSReturnsRetainedAttr)
+  MX_ENTER_VISIT_NSReturnsRetainedAttr
+  MX_VISIT_BASE(NSReturnsRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(NSReturnsRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NSReturnsRetainedAttr
+MX_END_VISIT_ATTR(NSReturnsRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_NSReturnsNotRetainedAttr
+#  define MX_ENTER_VISIT_NSReturnsNotRetainedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NSReturnsNotRetainedAttr
+#  define MX_EXIT_VISIT_NSReturnsNotRetainedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NSReturnsNotRetainedAttr)
+  MX_ENTER_VISIT_NSReturnsNotRetainedAttr
+  MX_VISIT_BASE(NSReturnsNotRetainedAttr, InheritableAttr)
+  MX_VISIT_TEXT(NSReturnsNotRetainedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NSReturnsNotRetainedAttr
+MX_END_VISIT_ATTR(NSReturnsNotRetainedAttr)
+
+#ifndef MX_ENTER_VISIT_NSReturnsAutoreleasedAttr
+#  define MX_ENTER_VISIT_NSReturnsAutoreleasedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NSReturnsAutoreleasedAttr
+#  define MX_EXIT_VISIT_NSReturnsAutoreleasedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NSReturnsAutoreleasedAttr)
+  MX_ENTER_VISIT_NSReturnsAutoreleasedAttr
+  MX_VISIT_BASE(NSReturnsAutoreleasedAttr, InheritableAttr)
+  MX_VISIT_TEXT(NSReturnsAutoreleasedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NSReturnsAutoreleasedAttr
+MX_END_VISIT_ATTR(NSReturnsAutoreleasedAttr)
+
+#ifndef MX_ENTER_VISIT_NSErrorDomainAttr
+#  define MX_ENTER_VISIT_NSErrorDomainAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NSErrorDomainAttr
+#  define MX_EXIT_VISIT_NSErrorDomainAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NSErrorDomainAttr)
+  MX_ENTER_VISIT_NSErrorDomainAttr
+  MX_VISIT_BASE(NSErrorDomainAttr, InheritableAttr)
+  MX_VISIT_ENTITY(NSErrorDomainAttr, error_domain, 8, MX_APPLY_METHOD, ErrorDomain, VarDecl, NthAttr, DeclUseSelector::ERROR_DOMAIN)
+  MX_VISIT_TEXT(NSErrorDomainAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NSErrorDomainAttr
+MX_END_VISIT_ATTR(NSErrorDomainAttr)
+
+#ifndef MX_ENTER_VISIT_NSConsumesSelfAttr
+#  define MX_ENTER_VISIT_NSConsumesSelfAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_NSConsumesSelfAttr
+#  define MX_EXIT_VISIT_NSConsumesSelfAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NSConsumesSelfAttr)
+  MX_ENTER_VISIT_NSConsumesSelfAttr
+  MX_VISIT_BASE(NSConsumesSelfAttr, InheritableAttr)
+  MX_VISIT_TEXT(NSConsumesSelfAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NSConsumesSelfAttr
+MX_END_VISIT_ATTR(NSConsumesSelfAttr)
+
+#ifndef MX_ENTER_VISIT_MipsShortCallAttr
+#  define MX_ENTER_VISIT_MipsShortCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MipsShortCallAttr
+#  define MX_EXIT_VISIT_MipsShortCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MipsShortCallAttr)
+  MX_ENTER_VISIT_MipsShortCallAttr
+  MX_VISIT_BASE(MipsShortCallAttr, InheritableAttr)
+  MX_VISIT_ENUM(MipsShortCallAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, MipsShortCallAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(MipsShortCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MipsShortCallAttr
+MX_END_VISIT_ATTR(MipsShortCallAttr)
+
+#ifndef MX_ENTER_VISIT_MipsLongCallAttr
+#  define MX_ENTER_VISIT_MipsLongCallAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MipsLongCallAttr
+#  define MX_EXIT_VISIT_MipsLongCallAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MipsLongCallAttr)
+  MX_ENTER_VISIT_MipsLongCallAttr
+  MX_VISIT_BASE(MipsLongCallAttr, InheritableAttr)
+  MX_VISIT_ENUM(MipsLongCallAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, MipsLongCallAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(MipsLongCallAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MipsLongCallAttr
+MX_END_VISIT_ATTR(MipsLongCallAttr)
+
+#ifndef MX_ENTER_VISIT_MipsInterruptAttr
+#  define MX_ENTER_VISIT_MipsInterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MipsInterruptAttr
+#  define MX_EXIT_VISIT_MipsInterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MipsInterruptAttr)
+  MX_ENTER_VISIT_MipsInterruptAttr
+  MX_VISIT_BASE(MipsInterruptAttr, InheritableAttr)
+  MX_VISIT_ENUM(MipsInterruptAttr, interrupt, 11, MX_APPLY_METHOD, Interrupt, MipsInterruptAttrInterruptType, NthAttr)
+  MX_VISIT_TEXT(MipsInterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MipsInterruptAttr
+MX_END_VISIT_ATTR(MipsInterruptAttr)
+
+#ifndef MX_ENTER_VISIT_Mips16Attr
+#  define MX_ENTER_VISIT_Mips16Attr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_Mips16Attr
+#  define MX_EXIT_VISIT_Mips16Attr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(Mips16Attr)
+  MX_ENTER_VISIT_Mips16Attr
+  MX_VISIT_BASE(Mips16Attr, InheritableAttr)
+  MX_VISIT_TEXT(Mips16Attr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_Mips16Attr
+MX_END_VISIT_ATTR(Mips16Attr)
+
+#ifndef MX_ENTER_VISIT_MinVectorWidthAttr
+#  define MX_ENTER_VISIT_MinVectorWidthAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MinVectorWidthAttr
+#  define MX_EXIT_VISIT_MinVectorWidthAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MinVectorWidthAttr)
+  MX_ENTER_VISIT_MinVectorWidthAttr
+  MX_VISIT_BASE(MinVectorWidthAttr, InheritableAttr)
+  MX_VISIT_TEXT(MinVectorWidthAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MinVectorWidthAttr
+MX_END_VISIT_ATTR(MinVectorWidthAttr)
+
+#ifndef MX_ENTER_VISIT_MinSizeAttr
+#  define MX_ENTER_VISIT_MinSizeAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MinSizeAttr
+#  define MX_EXIT_VISIT_MinSizeAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MinSizeAttr)
+  MX_ENTER_VISIT_MinSizeAttr
+  MX_VISIT_BASE(MinSizeAttr, InheritableAttr)
+  MX_VISIT_TEXT(MinSizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MinSizeAttr
+MX_END_VISIT_ATTR(MinSizeAttr)
+
+#ifndef MX_ENTER_VISIT_MicroMipsAttr
+#  define MX_ENTER_VISIT_MicroMipsAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MicroMipsAttr
+#  define MX_EXIT_VISIT_MicroMipsAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MicroMipsAttr)
+  MX_ENTER_VISIT_MicroMipsAttr
+  MX_VISIT_BASE(MicroMipsAttr, InheritableAttr)
+  MX_VISIT_TEXT(MicroMipsAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MicroMipsAttr
+MX_END_VISIT_ATTR(MicroMipsAttr)
+
+#ifndef MX_ENTER_VISIT_MayAliasAttr
+#  define MX_ENTER_VISIT_MayAliasAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MayAliasAttr
+#  define MX_EXIT_VISIT_MayAliasAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MayAliasAttr)
+  MX_ENTER_VISIT_MayAliasAttr
+  MX_VISIT_BASE(MayAliasAttr, InheritableAttr)
+  MX_VISIT_TEXT(MayAliasAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MayAliasAttr
+MX_END_VISIT_ATTR(MayAliasAttr)
+
+#ifndef MX_ENTER_VISIT_MaxFieldAlignmentAttr
+#  define MX_ENTER_VISIT_MaxFieldAlignmentAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MaxFieldAlignmentAttr
+#  define MX_EXIT_VISIT_MaxFieldAlignmentAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MaxFieldAlignmentAttr)
+  MX_ENTER_VISIT_MaxFieldAlignmentAttr
+  MX_VISIT_BASE(MaxFieldAlignmentAttr, InheritableAttr)
+  MX_VISIT_TEXT(MaxFieldAlignmentAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MaxFieldAlignmentAttr
+MX_END_VISIT_ATTR(MaxFieldAlignmentAttr)
+
+#ifndef MX_ENTER_VISIT_MSVtorDispAttr
+#  define MX_ENTER_VISIT_MSVtorDispAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSVtorDispAttr
+#  define MX_EXIT_VISIT_MSVtorDispAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSVtorDispAttr)
+  MX_ENTER_VISIT_MSVtorDispAttr
+  MX_VISIT_BASE(MSVtorDispAttr, InheritableAttr)
+  MX_VISIT_TEXT(MSVtorDispAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_ENUM(MSVtorDispAttr, vtor_disp_mode, 11, MX_APPLY_METHOD, VtorDispMode, MSVtorDispMode, NthAttr)
+  MX_EXIT_VISIT_MSVtorDispAttr
+MX_END_VISIT_ATTR(MSVtorDispAttr)
+
+#ifndef MX_ENTER_VISIT_MSStructAttr
+#  define MX_ENTER_VISIT_MSStructAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSStructAttr
+#  define MX_EXIT_VISIT_MSStructAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSStructAttr)
+  MX_ENTER_VISIT_MSStructAttr
+  MX_VISIT_BASE(MSStructAttr, InheritableAttr)
+  MX_VISIT_TEXT(MSStructAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MSStructAttr
+MX_END_VISIT_ATTR(MSStructAttr)
+
+#ifndef MX_ENTER_VISIT_MSP430InterruptAttr
+#  define MX_ENTER_VISIT_MSP430InterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSP430InterruptAttr
+#  define MX_EXIT_VISIT_MSP430InterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSP430InterruptAttr)
+  MX_ENTER_VISIT_MSP430InterruptAttr
+  MX_VISIT_BASE(MSP430InterruptAttr, InheritableAttr)
+  MX_VISIT_TEXT(MSP430InterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MSP430InterruptAttr
+MX_END_VISIT_ATTR(MSP430InterruptAttr)
+
+#ifndef MX_ENTER_VISIT_MSNoVTableAttr
+#  define MX_ENTER_VISIT_MSNoVTableAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSNoVTableAttr
+#  define MX_EXIT_VISIT_MSNoVTableAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSNoVTableAttr)
+  MX_ENTER_VISIT_MSNoVTableAttr
+  MX_VISIT_BASE(MSNoVTableAttr, InheritableAttr)
+  MX_VISIT_TEXT(MSNoVTableAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MSNoVTableAttr
+MX_END_VISIT_ATTR(MSNoVTableAttr)
+
+#ifndef MX_ENTER_VISIT_MSInheritanceAttr
+#  define MX_ENTER_VISIT_MSInheritanceAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSInheritanceAttr
+#  define MX_EXIT_VISIT_MSInheritanceAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSInheritanceAttr)
+  MX_ENTER_VISIT_MSInheritanceAttr
+  MX_VISIT_BASE(MSInheritanceAttr, InheritableAttr)
+  MX_VISIT_BOOL(MSInheritanceAttr, best_case, 13, MX_APPLY_METHOD, BestCase, bool, NthAttr)
+  MX_VISIT_ENUM(MSInheritanceAttr, inheritance_model, 11, MX_APPLY_METHOD, InheritanceModel, MSInheritanceModel, NthAttr)
+  MX_VISIT_ENUM(MSInheritanceAttr, semantic_spelling, 15, MX_APPLY_METHOD, SemanticSpelling, MSInheritanceAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(MSInheritanceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MSInheritanceAttr
+MX_END_VISIT_ATTR(MSInheritanceAttr)
+
+#ifndef MX_ENTER_VISIT_MSAllocatorAttr
+#  define MX_ENTER_VISIT_MSAllocatorAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSAllocatorAttr
+#  define MX_EXIT_VISIT_MSAllocatorAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSAllocatorAttr)
+  MX_ENTER_VISIT_MSAllocatorAttr
+  MX_VISIT_BASE(MSAllocatorAttr, InheritableAttr)
+  MX_VISIT_TEXT(MSAllocatorAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MSAllocatorAttr
+MX_END_VISIT_ATTR(MSAllocatorAttr)
+
+#ifndef MX_ENTER_VISIT_MSABIAttr
+#  define MX_ENTER_VISIT_MSABIAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MSABIAttr
+#  define MX_EXIT_VISIT_MSABIAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MSABIAttr)
+  MX_ENTER_VISIT_MSABIAttr
+  MX_VISIT_BASE(MSABIAttr, InheritableAttr)
+  MX_VISIT_TEXT(MSABIAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MSABIAttr
+MX_END_VISIT_ATTR(MSABIAttr)
+
+#ifndef MX_ENTER_VISIT_MIGServerRoutineAttr
+#  define MX_ENTER_VISIT_MIGServerRoutineAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_MIGServerRoutineAttr
+#  define MX_EXIT_VISIT_MIGServerRoutineAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(MIGServerRoutineAttr)
+  MX_ENTER_VISIT_MIGServerRoutineAttr
+  MX_VISIT_BASE(MIGServerRoutineAttr, InheritableAttr)
+  MX_VISIT_TEXT(MIGServerRoutineAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_MIGServerRoutineAttr
+MX_END_VISIT_ATTR(MIGServerRoutineAttr)
+
+#ifndef MX_ENTER_VISIT_M68kInterruptAttr
+#  define MX_ENTER_VISIT_M68kInterruptAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_M68kInterruptAttr
+#  define MX_EXIT_VISIT_M68kInterruptAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(M68kInterruptAttr)
+  MX_ENTER_VISIT_M68kInterruptAttr
+  MX_VISIT_BASE(M68kInterruptAttr, InheritableAttr)
+  MX_VISIT_TEXT(M68kInterruptAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_M68kInterruptAttr
+MX_END_VISIT_ATTR(M68kInterruptAttr)
+
+#ifndef MX_ENTER_VISIT_LocksExcludedAttr
+#  define MX_ENTER_VISIT_LocksExcludedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_LocksExcludedAttr
+#  define MX_EXIT_VISIT_LocksExcludedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LocksExcludedAttr)
+  MX_ENTER_VISIT_LocksExcludedAttr
+  MX_VISIT_BASE(LocksExcludedAttr, InheritableAttr)
+  MX_VISIT_TEXT(LocksExcludedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LocksExcludedAttr
+MX_END_VISIT_ATTR(LocksExcludedAttr)
+
+#ifndef MX_ENTER_VISIT_LockReturnedAttr
+#  define MX_ENTER_VISIT_LockReturnedAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_LockReturnedAttr
+#  define MX_EXIT_VISIT_LockReturnedAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LockReturnedAttr)
+  MX_ENTER_VISIT_LockReturnedAttr
+  MX_VISIT_BASE(LockReturnedAttr, InheritableAttr)
+  MX_VISIT_ENTITY(LockReturnedAttr, argument, 8, MX_APPLY_METHOD, Argument, Expr, NthAttr, StmtUseSelector::ARGUMENT)
+  MX_VISIT_TEXT(LockReturnedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LockReturnedAttr
+MX_END_VISIT_ATTR(LockReturnedAttr)
+
+#ifndef MX_ENTER_VISIT_LifetimeBoundAttr
+#  define MX_ENTER_VISIT_LifetimeBoundAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_LifetimeBoundAttr
+#  define MX_EXIT_VISIT_LifetimeBoundAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LifetimeBoundAttr)
+  MX_ENTER_VISIT_LifetimeBoundAttr
+  MX_VISIT_BASE(LifetimeBoundAttr, InheritableAttr)
+  MX_VISIT_TEXT(LifetimeBoundAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LifetimeBoundAttr
+MX_END_VISIT_ATTR(LifetimeBoundAttr)
+
+#ifndef MX_ENTER_VISIT_LeafAttr
+#  define MX_ENTER_VISIT_LeafAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_LeafAttr
+#  define MX_EXIT_VISIT_LeafAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LeafAttr)
+  MX_ENTER_VISIT_LeafAttr
+  MX_VISIT_BASE(LeafAttr, InheritableAttr)
+  MX_VISIT_TEXT(LeafAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LeafAttr
+MX_END_VISIT_ATTR(LeafAttr)
+
+#ifndef MX_ENTER_VISIT_LayoutVersionAttr
+#  define MX_ENTER_VISIT_LayoutVersionAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_LayoutVersionAttr
+#  define MX_EXIT_VISIT_LayoutVersionAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LayoutVersionAttr)
+  MX_ENTER_VISIT_LayoutVersionAttr
+  MX_VISIT_BASE(LayoutVersionAttr, InheritableAttr)
+  MX_VISIT_TEXT(LayoutVersionAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LayoutVersionAttr
+MX_END_VISIT_ATTR(LayoutVersionAttr)
+
+#ifndef MX_ENTER_VISIT_LTOVisibilityPublicAttr
+#  define MX_ENTER_VISIT_LTOVisibilityPublicAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_LTOVisibilityPublicAttr
+#  define MX_EXIT_VISIT_LTOVisibilityPublicAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(LTOVisibilityPublicAttr)
+  MX_ENTER_VISIT_LTOVisibilityPublicAttr
+  MX_VISIT_BASE(LTOVisibilityPublicAttr, InheritableAttr)
+  MX_VISIT_TEXT(LTOVisibilityPublicAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_LTOVisibilityPublicAttr
+MX_END_VISIT_ATTR(LTOVisibilityPublicAttr)
+
+#ifndef MX_ENTER_VISIT_InternalLinkageAttr
+#  define MX_ENTER_VISIT_InternalLinkageAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_InternalLinkageAttr
+#  define MX_EXIT_VISIT_InternalLinkageAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(InternalLinkageAttr)
+  MX_ENTER_VISIT_InternalLinkageAttr
+  MX_VISIT_BASE(InternalLinkageAttr, InheritableAttr)
+  MX_VISIT_TEXT(InternalLinkageAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_InternalLinkageAttr
+MX_END_VISIT_ATTR(InternalLinkageAttr)
+
+#ifndef MX_ENTER_VISIT_IntelOclBiccAttr
+#  define MX_ENTER_VISIT_IntelOclBiccAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_IntelOclBiccAttr
+#  define MX_EXIT_VISIT_IntelOclBiccAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(IntelOclBiccAttr)
+  MX_ENTER_VISIT_IntelOclBiccAttr
+  MX_VISIT_BASE(IntelOclBiccAttr, InheritableAttr)
+  MX_VISIT_TEXT(IntelOclBiccAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_IntelOclBiccAttr
+MX_END_VISIT_ATTR(IntelOclBiccAttr)
+
+#ifndef MX_ENTER_VISIT_InitPriorityAttr
+#  define MX_ENTER_VISIT_InitPriorityAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_InitPriorityAttr
+#  define MX_EXIT_VISIT_InitPriorityAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(InitPriorityAttr)
+  MX_ENTER_VISIT_InitPriorityAttr
+  MX_VISIT_BASE(InitPriorityAttr, InheritableAttr)
+  MX_VISIT_TEXT(InitPriorityAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_InitPriorityAttr
+MX_END_VISIT_ATTR(InitPriorityAttr)
+
+#ifndef MX_ENTER_VISIT_InheritableParamAttr
+#  define MX_ENTER_VISIT_InheritableParamAttr MX_ENTER_VISIT_InheritableAttr
+#endif
+#ifndef MX_EXIT_VISIT_InheritableParamAttr
+#  define MX_EXIT_VISIT_InheritableParamAttr MX_EXIT_VISIT_InheritableAttr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(InheritableParamAttr)
+  MX_ENTER_VISIT_InheritableParamAttr
+  MX_VISIT_BASE(InheritableParamAttr, InheritableAttr)
+  MX_EXIT_VISIT_InheritableParamAttr
+MX_END_VISIT_ATTR(InheritableParamAttr)
+
+#ifndef MX_ENTER_VISIT_CarriesDependencyAttr
+#  define MX_ENTER_VISIT_CarriesDependencyAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_CarriesDependencyAttr
+#  define MX_EXIT_VISIT_CarriesDependencyAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CarriesDependencyAttr)
+  MX_ENTER_VISIT_CarriesDependencyAttr
+  MX_VISIT_BASE(CarriesDependencyAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(CarriesDependencyAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CarriesDependencyAttr
+MX_END_VISIT_ATTR(CarriesDependencyAttr)
+
+#ifndef MX_ENTER_VISIT_CFConsumedAttr
+#  define MX_ENTER_VISIT_CFConsumedAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_CFConsumedAttr
+#  define MX_EXIT_VISIT_CFConsumedAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CFConsumedAttr)
+  MX_ENTER_VISIT_CFConsumedAttr
+  MX_VISIT_BASE(CFConsumedAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(CFConsumedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CFConsumedAttr
+MX_END_VISIT_ATTR(CFConsumedAttr)
+
+#ifndef MX_ENTER_VISIT_AnnotateAttr
+#  define MX_ENTER_VISIT_AnnotateAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_AnnotateAttr
+#  define MX_EXIT_VISIT_AnnotateAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(AnnotateAttr)
+  MX_ENTER_VISIT_AnnotateAttr
+  MX_VISIT_BASE(AnnotateAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(AnnotateAttr, annotation, 9, MX_APPLY_METHOD, Annotation, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(AnnotateAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_AnnotateAttr
+MX_END_VISIT_ATTR(AnnotateAttr)
+
+#ifndef MX_ENTER_VISIT_UseHandleAttr
+#  define MX_ENTER_VISIT_UseHandleAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_UseHandleAttr
+#  define MX_EXIT_VISIT_UseHandleAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(UseHandleAttr)
+  MX_ENTER_VISIT_UseHandleAttr
+  MX_VISIT_BASE(UseHandleAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(UseHandleAttr, handle_type, 9, MX_APPLY_METHOD, HandleType, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(UseHandleAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_UseHandleAttr
+MX_END_VISIT_ATTR(UseHandleAttr)
+
+#ifndef MX_ENTER_VISIT_ReleaseHandleAttr
+#  define MX_ENTER_VISIT_ReleaseHandleAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_ReleaseHandleAttr
+#  define MX_EXIT_VISIT_ReleaseHandleAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(ReleaseHandleAttr)
+  MX_ENTER_VISIT_ReleaseHandleAttr
+  MX_VISIT_BASE(ReleaseHandleAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(ReleaseHandleAttr, handle_type, 9, MX_APPLY_METHOD, HandleType, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(ReleaseHandleAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_ReleaseHandleAttr
+MX_END_VISIT_ATTR(ReleaseHandleAttr)
+
+#ifndef MX_ENTER_VISIT_PassObjectSizeAttr
+#  define MX_ENTER_VISIT_PassObjectSizeAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_PassObjectSizeAttr
+#  define MX_EXIT_VISIT_PassObjectSizeAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(PassObjectSizeAttr)
+  MX_ENTER_VISIT_PassObjectSizeAttr
+  MX_VISIT_BASE(PassObjectSizeAttr, InheritableParamAttr)
+  MX_VISIT_ENUM(PassObjectSizeAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, PassObjectSizeAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(PassObjectSizeAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_VISIT_BOOL(PassObjectSizeAttr, is_dynamic, 13, MX_APPLY_METHOD, IsDynamic, bool, NthAttr)
+  MX_EXIT_VISIT_PassObjectSizeAttr
+MX_END_VISIT_ATTR(PassObjectSizeAttr)
+
+#ifndef MX_ENTER_VISIT_ParameterABIAttr
+#  define MX_ENTER_VISIT_ParameterABIAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_ParameterABIAttr
+#  define MX_EXIT_VISIT_ParameterABIAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ABSTRACT_ATTR(ParameterABIAttr)
+  MX_ENTER_VISIT_ParameterABIAttr
+  MX_VISIT_BASE(ParameterABIAttr, InheritableParamAttr)
+  MX_VISIT_ENUM(ParameterABIAttr, abi, 11, MX_APPLY_METHOD, ABI, ParameterABI, NthAttr)
+  MX_EXIT_VISIT_ParameterABIAttr
+MX_END_VISIT_ATTR(ParameterABIAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftIndirectResultAttr
+#  define MX_ENTER_VISIT_SwiftIndirectResultAttr MX_ENTER_VISIT_ParameterABIAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftIndirectResultAttr
+#  define MX_EXIT_VISIT_SwiftIndirectResultAttr MX_EXIT_VISIT_ParameterABIAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftIndirectResultAttr)
+  MX_ENTER_VISIT_SwiftIndirectResultAttr
+  MX_VISIT_BASE(SwiftIndirectResultAttr, ParameterABIAttr)
+  MX_VISIT_TEXT(SwiftIndirectResultAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftIndirectResultAttr
+MX_END_VISIT_ATTR(SwiftIndirectResultAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftErrorResultAttr
+#  define MX_ENTER_VISIT_SwiftErrorResultAttr MX_ENTER_VISIT_ParameterABIAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftErrorResultAttr
+#  define MX_EXIT_VISIT_SwiftErrorResultAttr MX_EXIT_VISIT_ParameterABIAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftErrorResultAttr)
+  MX_ENTER_VISIT_SwiftErrorResultAttr
+  MX_VISIT_BASE(SwiftErrorResultAttr, ParameterABIAttr)
+  MX_VISIT_TEXT(SwiftErrorResultAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftErrorResultAttr
+MX_END_VISIT_ATTR(SwiftErrorResultAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftContextAttr
+#  define MX_ENTER_VISIT_SwiftContextAttr MX_ENTER_VISIT_ParameterABIAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftContextAttr
+#  define MX_EXIT_VISIT_SwiftContextAttr MX_EXIT_VISIT_ParameterABIAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftContextAttr)
+  MX_ENTER_VISIT_SwiftContextAttr
+  MX_VISIT_BASE(SwiftContextAttr, ParameterABIAttr)
+  MX_VISIT_TEXT(SwiftContextAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftContextAttr
+MX_END_VISIT_ATTR(SwiftContextAttr)
+
+#ifndef MX_ENTER_VISIT_SwiftAsyncContextAttr
+#  define MX_ENTER_VISIT_SwiftAsyncContextAttr MX_ENTER_VISIT_ParameterABIAttr
+#endif
+#ifndef MX_EXIT_VISIT_SwiftAsyncContextAttr
+#  define MX_EXIT_VISIT_SwiftAsyncContextAttr MX_EXIT_VISIT_ParameterABIAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(SwiftAsyncContextAttr)
+  MX_ENTER_VISIT_SwiftAsyncContextAttr
+  MX_VISIT_BASE(SwiftAsyncContextAttr, ParameterABIAttr)
+  MX_VISIT_TEXT(SwiftAsyncContextAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_SwiftAsyncContextAttr
+MX_END_VISIT_ATTR(SwiftAsyncContextAttr)
+
+#ifndef MX_ENTER_VISIT_OSConsumedAttr
+#  define MX_ENTER_VISIT_OSConsumedAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_OSConsumedAttr
+#  define MX_EXIT_VISIT_OSConsumedAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(OSConsumedAttr)
+  MX_ENTER_VISIT_OSConsumedAttr
+  MX_VISIT_BASE(OSConsumedAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(OSConsumedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_OSConsumedAttr
+MX_END_VISIT_ATTR(OSConsumedAttr)
+
+#ifndef MX_ENTER_VISIT_NonNullAttr
+#  define MX_ENTER_VISIT_NonNullAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_NonNullAttr
+#  define MX_EXIT_VISIT_NonNullAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NonNullAttr)
+  MX_ENTER_VISIT_NonNullAttr
+  MX_VISIT_BASE(NonNullAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(NonNullAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NonNullAttr
+MX_END_VISIT_ATTR(NonNullAttr)
+
+#ifndef MX_ENTER_VISIT_NSConsumedAttr
+#  define MX_ENTER_VISIT_NSConsumedAttr MX_ENTER_VISIT_InheritableParamAttr
+#endif
+#ifndef MX_EXIT_VISIT_NSConsumedAttr
+#  define MX_EXIT_VISIT_NSConsumedAttr MX_EXIT_VISIT_InheritableParamAttr
+#endif
+
+MX_BEGIN_VISIT_ATTR(NSConsumedAttr)
+  MX_ENTER_VISIT_NSConsumedAttr
+  MX_VISIT_BASE(NSConsumedAttr, InheritableParamAttr)
+  MX_VISIT_TEXT(NSConsumedAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_NSConsumedAttr
+MX_END_VISIT_ATTR(NSConsumedAttr)
+
+#ifndef MX_ENTER_VISIT_IFuncAttr
+#  define MX_ENTER_VISIT_IFuncAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_IFuncAttr
+#  define MX_EXIT_VISIT_IFuncAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(IFuncAttr)
+  MX_ENTER_VISIT_IFuncAttr
+  MX_VISIT_BASE(IFuncAttr, Attr)
+  MX_VISIT_TEXT(IFuncAttr, resolver, 9, MX_APPLY_METHOD, Resolver, basic_string_view, NthAttr)
+  MX_VISIT_TEXT(IFuncAttr, spelling, 10, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_IFuncAttr
+MX_END_VISIT_ATTR(IFuncAttr)
+
+#ifndef MX_ENTER_VISIT_CalledOnceAttr
+#  define MX_ENTER_VISIT_CalledOnceAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_CalledOnceAttr
+#  define MX_EXIT_VISIT_CalledOnceAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(CalledOnceAttr)
+  MX_ENTER_VISIT_CalledOnceAttr
+  MX_VISIT_BASE(CalledOnceAttr, Attr)
+  MX_VISIT_TEXT(CalledOnceAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_CalledOnceAttr
+MX_END_VISIT_ATTR(CalledOnceAttr)
+
+#ifndef MX_ENTER_VISIT_BuiltinAliasAttr
+#  define MX_ENTER_VISIT_BuiltinAliasAttr MX_ENTER_VISIT_Attr
+#endif
+#ifndef MX_EXIT_VISIT_BuiltinAliasAttr
+#  define MX_EXIT_VISIT_BuiltinAliasAttr MX_EXIT_VISIT_Attr
+#endif
+
+MX_BEGIN_VISIT_ATTR(BuiltinAliasAttr)
+  MX_ENTER_VISIT_BuiltinAliasAttr
+  MX_VISIT_BASE(BuiltinAliasAttr, Attr)
+  MX_VISIT_ENUM(BuiltinAliasAttr, semantic_spelling, 11, MX_APPLY_METHOD, SemanticSpelling, BuiltinAliasAttrSpelling, NthAttr)
+  MX_VISIT_TEXT(BuiltinAliasAttr, spelling, 9, MX_APPLY_METHOD, Spelling, basic_string_view, NthAttr)
+  MX_EXIT_VISIT_BuiltinAliasAttr
+MX_END_VISIT_ATTR(BuiltinAliasAttr)
+
 #ifndef MX_ENTER_VISIT_Type
 #  define MX_ENTER_VISIT_Type
 #endif
@@ -4113,42 +11261,42 @@ MX_BEGIN_VISIT_ABSTRACT_TYPE(Type)
   MX_VISIT_BOOL(Type, is_nothrow_t, 136, MX_APPLY_METHOD, IsNothrowT, bool, NthType)
   MX_VISIT_BOOL(Type, is_null_pointer_type, 137, MX_APPLY_METHOD, IsNullPointerType, bool, NthType)
   MX_VISIT_BOOL(Type, is_ocl_ext_opaque_type, 138, MX_APPLY_METHOD, IsOCLExtOpaqueType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_darray_ro_type, 139, MX_APPLY_METHOD, IsOCLImage1dArrayROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_darray_rw_type, 140, MX_APPLY_METHOD, IsOCLImage1dArrayRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_darray_wo_type, 141, MX_APPLY_METHOD, IsOCLImage1dArrayWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_dbuffer_ro_type, 142, MX_APPLY_METHOD, IsOCLImage1dBufferROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_dbuffer_rw_type, 143, MX_APPLY_METHOD, IsOCLImage1dBufferRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_dbuffer_wo_type, 144, MX_APPLY_METHOD, IsOCLImage1dBufferWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_dro_type, 145, MX_APPLY_METHOD, IsOCLImage1dROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_drw_type, 146, MX_APPLY_METHOD, IsOCLImage1dRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image1_dwo_type, 147, MX_APPLY_METHOD, IsOCLImage1dWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_depth_ro_type, 148, MX_APPLY_METHOD, IsOCLImage2dArrayDepthROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_depth_rw_type, 149, MX_APPLY_METHOD, IsOCLImage2dArrayDepthRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_depth_wo_type, 150, MX_APPLY_METHOD, IsOCLImage2dArrayDepthWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_msaa_depth_ro_type, 151, MX_APPLY_METHOD, IsOCLImage2dArrayMSAADepthROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_msaa_depth_rw_type, 152, MX_APPLY_METHOD, IsOCLImage2dArrayMSAADepthRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_msaa_depth_wo_type, 153, MX_APPLY_METHOD, IsOCLImage2dArrayMSAADepthWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_msaaro_type, 154, MX_APPLY_METHOD, IsOCLImage2dArrayMSAAROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_msaarw_type, 155, MX_APPLY_METHOD, IsOCLImage2dArrayMSAARWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_msaawo_type, 156, MX_APPLY_METHOD, IsOCLImage2dArrayMSAAWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_ro_type, 157, MX_APPLY_METHOD, IsOCLImage2dArrayROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_rw_type, 158, MX_APPLY_METHOD, IsOCLImage2dArrayRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_darray_wo_type, 159, MX_APPLY_METHOD, IsOCLImage2dArrayWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_ddepth_ro_type, 160, MX_APPLY_METHOD, IsOCLImage2dDepthROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_ddepth_rw_type, 161, MX_APPLY_METHOD, IsOCLImage2dDepthRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_ddepth_wo_type, 162, MX_APPLY_METHOD, IsOCLImage2dDepthWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dmsaa_depth_ro_type, 163, MX_APPLY_METHOD, IsOCLImage2dMSAADepthROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dmsaa_depth_rw_type, 164, MX_APPLY_METHOD, IsOCLImage2dMSAADepthRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dmsaa_depth_wo_type, 165, MX_APPLY_METHOD, IsOCLImage2dMSAADepthWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dmsaaro_type, 166, MX_APPLY_METHOD, IsOCLImage2dMSAAROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dmsaarw_type, 167, MX_APPLY_METHOD, IsOCLImage2dMSAARWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dmsaawo_type, 168, MX_APPLY_METHOD, IsOCLImage2dMSAAWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dro_type, 169, MX_APPLY_METHOD, IsOCLImage2dROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_drw_type, 170, MX_APPLY_METHOD, IsOCLImage2dRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image2_dwo_type, 171, MX_APPLY_METHOD, IsOCLImage2dWOType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image3_dro_type, 172, MX_APPLY_METHOD, IsOCLImage3dROType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image3_drw_type, 173, MX_APPLY_METHOD, IsOCLImage3dRWType, bool, NthType)
-  MX_VISIT_BOOL(Type, is_ocl_image3_dwo_type, 174, MX_APPLY_METHOD, IsOCLImage3dWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_array_ro_type, 139, MX_APPLY_METHOD, IsOCLImage1dArrayROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_array_rw_type, 140, MX_APPLY_METHOD, IsOCLImage1dArrayRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_array_wo_type, 141, MX_APPLY_METHOD, IsOCLImage1dArrayWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_buffer_ro_type, 142, MX_APPLY_METHOD, IsOCLImage1dBufferROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_buffer_rw_type, 143, MX_APPLY_METHOD, IsOCLImage1dBufferRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_buffer_wo_type, 144, MX_APPLY_METHOD, IsOCLImage1dBufferWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_ro_type, 145, MX_APPLY_METHOD, IsOCLImage1dROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_rw_type, 146, MX_APPLY_METHOD, IsOCLImage1dRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_1d_wo_type, 147, MX_APPLY_METHOD, IsOCLImage1dWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_depth_ro_type, 148, MX_APPLY_METHOD, IsOCLImage2dArrayDepthROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_depth_rw_type, 149, MX_APPLY_METHOD, IsOCLImage2dArrayDepthRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_depth_wo_type, 150, MX_APPLY_METHOD, IsOCLImage2dArrayDepthWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_msaa_depth_ro_type, 151, MX_APPLY_METHOD, IsOCLImage2dArrayMSAADepthROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_msaa_depth_rw_type, 152, MX_APPLY_METHOD, IsOCLImage2dArrayMSAADepthRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_msaa_depth_wo_type, 153, MX_APPLY_METHOD, IsOCLImage2dArrayMSAADepthWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_msaaro_type, 154, MX_APPLY_METHOD, IsOCLImage2dArrayMSAAROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_msaarw_type, 155, MX_APPLY_METHOD, IsOCLImage2dArrayMSAARWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_msaawo_type, 156, MX_APPLY_METHOD, IsOCLImage2dArrayMSAAWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_ro_type, 157, MX_APPLY_METHOD, IsOCLImage2dArrayROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_rw_type, 158, MX_APPLY_METHOD, IsOCLImage2dArrayRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_array_wo_type, 159, MX_APPLY_METHOD, IsOCLImage2dArrayWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_depth_ro_type, 160, MX_APPLY_METHOD, IsOCLImage2dDepthROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_depth_rw_type, 161, MX_APPLY_METHOD, IsOCLImage2dDepthRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_depth_wo_type, 162, MX_APPLY_METHOD, IsOCLImage2dDepthWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_msaa_depth_ro_type, 163, MX_APPLY_METHOD, IsOCLImage2dMSAADepthROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_msaa_depth_rw_type, 164, MX_APPLY_METHOD, IsOCLImage2dMSAADepthRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_msaa_depth_wo_type, 165, MX_APPLY_METHOD, IsOCLImage2dMSAADepthWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_msaaro_type, 166, MX_APPLY_METHOD, IsOCLImage2dMSAAROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_msaarw_type, 167, MX_APPLY_METHOD, IsOCLImage2dMSAARWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_msaawo_type, 168, MX_APPLY_METHOD, IsOCLImage2dMSAAWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_ro_type, 169, MX_APPLY_METHOD, IsOCLImage2dROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_rw_type, 170, MX_APPLY_METHOD, IsOCLImage2dRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_2d_wo_type, 171, MX_APPLY_METHOD, IsOCLImage2dWOType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_3d_ro_type, 172, MX_APPLY_METHOD, IsOCLImage3dROType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_3d_rw_type, 173, MX_APPLY_METHOD, IsOCLImage3dRWType, bool, NthType)
+  MX_VISIT_BOOL(Type, is_ocl_image_3d_wo_type, 174, MX_APPLY_METHOD, IsOCLImage3dWOType, bool, NthType)
   MX_VISIT_BOOL(Type, is_ocl_intel_subgroup_avc_ime_dual_reference_streamin_type, 175, MX_APPLY_METHOD, IsOCLIntelSubgroupAVCImeDualReferenceStreaminType, bool, NthType)
   MX_VISIT_BOOL(Type, is_ocl_intel_subgroup_avc_ime_payload_type, 176, MX_APPLY_METHOD, IsOCLIntelSubgroupAVCImePayloadType, bool, NthType)
   MX_VISIT_BOOL(Type, is_ocl_intel_subgroup_avc_ime_result_dual_reference_streamout_type, 177, MX_APPLY_METHOD, IsOCLIntelSubgroupAVCImeResultDualReferenceStreamoutType, bool, NthType)
@@ -4989,7 +12137,7 @@ MX_BEGIN_VISIT_TYPE(AttributedType)
   MX_ENTER_VISIT_AttributedType
   MX_VISIT_BASE(AttributedType, Type)
   MX_VISIT_ENTITY(AttributedType, desugar, 308, MX_APPLY_METHOD, Desugar, Type, NthType, TypeUseSelector::DESUGAR)
-  MX_VISIT_ENUM(AttributedType, attribute_kind, 347, MX_APPLY_METHOD, AttributeKind, AttributeKind, NthType)
+  MX_VISIT_ENUM(AttributedType, attribute_kind, 347, MX_APPLY_METHOD, AttributeKind, AttrKind, NthType)
   MX_VISIT_ENTITY(AttributedType, equivalent_type, 309, MX_APPLY_METHOD, EquivalentType, Type, NthType, TypeUseSelector::EQUIVALENT_TYPE)
   MX_VISIT_OPTIONAL_ENUM(AttributedType, immediate_nullability, 335, MX_APPLY_METHOD, ImmediateNullability, NullabilityKind, NthType)
   MX_VISIT_ENTITY(AttributedType, modified_type, 315, MX_APPLY_METHOD, ModifiedType, Type, NthType, TypeUseSelector::MODIFIED_TYPE)
@@ -7402,12 +14550,13 @@ MX_BEGIN_VISIT_STMT(CallExpr)
   MX_VISIT_OPTIONAL_ENTITY(CallExpr, callee_declaration, 39, MX_APPLY_METHOD, CalleeDeclaration, Decl, NthStmt, DeclUseSelector::CALLEE_DECLARATION)
   MX_VISIT_OPTIONAL_ENTITY(CallExpr, direct_callee, 40, MX_APPLY_METHOD, DirectCallee, FunctionDecl, NthStmt, DeclUseSelector::DIRECT_CALLEE)
   MX_VISIT_ENTITY(CallExpr, r_paren_token, 41, MX_APPLY_METHOD, RParenToken, Token, NthStmt, TokenUseSelector::R_PAREN_TOKEN)
-  MX_VISIT_BOOL(CallExpr, has_stored_fp_features, 97, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, has_unused_result_attribute, 98, MX_APPLY_METHOD, HasUnusedResultAttribute, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, is_builtin_assume_false, 99, MX_APPLY_METHOD, IsBuiltinAssumeFalse, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, is_call_to_std_move, 101, MX_APPLY_METHOD, IsCallToStdMove, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, is_unevaluated_builtin_call, 103, MX_APPLY_METHOD, IsUnevaluatedBuiltinCall, bool, NthStmt)
-  MX_VISIT_BOOL(CallExpr, uses_adl, 104, MX_APPLY_METHOD, UsesADL, bool, NthStmt)
+  MX_VISIT_OPTIONAL_ENTITY(CallExpr, unused_result_attribute, 42, MX_APPLY_METHOD, UnusedResultAttribute, Attr, NthStmt, AttrUseSelector::UNUSED_RESULT_ATTRIBUTE)
+  MX_VISIT_BOOL(CallExpr, has_stored_fp_features, 98, MX_APPLY_METHOD, HasStoredFPFeatures, bool, NthStmt)
+  MX_VISIT_BOOL(CallExpr, has_unused_result_attribute, 99, MX_APPLY_METHOD, HasUnusedResultAttribute, bool, NthStmt)
+  MX_VISIT_BOOL(CallExpr, is_builtin_assume_false, 101, MX_APPLY_METHOD, IsBuiltinAssumeFalse, bool, NthStmt)
+  MX_VISIT_BOOL(CallExpr, is_call_to_std_move, 103, MX_APPLY_METHOD, IsCallToStdMove, bool, NthStmt)
+  MX_VISIT_BOOL(CallExpr, is_unevaluated_builtin_call, 104, MX_APPLY_METHOD, IsUnevaluatedBuiltinCall, bool, NthStmt)
+  MX_VISIT_BOOL(CallExpr, uses_adl, 105, MX_APPLY_METHOD, UsesADL, bool, NthStmt)
   MX_EXIT_VISIT_CallExpr
 MX_END_VISIT_STMT(CallExpr)
 
@@ -7422,10 +14571,10 @@ MX_BEGIN_VISIT_STMT(CXXOperatorCallExpr)
   MX_ENTER_VISIT_CXXOperatorCallExpr
   MX_VISIT_BASE(CXXOperatorCallExpr, CallExpr)
   MX_VISIT_ENUM(CXXOperatorCallExpr, operator_, 102, MX_APPLY_METHOD, Operator, OverloadedOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(CXXOperatorCallExpr, operator_token, 42, MX_APPLY_METHOD, OperatorToken, Token, NthStmt, TokenUseSelector::OPERATOR_TOKEN)
-  MX_VISIT_BOOL(CXXOperatorCallExpr, is_assignment_operation, 105, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
-  MX_VISIT_BOOL(CXXOperatorCallExpr, is_comparison_operation, 106, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
-  MX_VISIT_BOOL(CXXOperatorCallExpr, is_infix_binary_operation, 107, MX_APPLY_METHOD, IsInfixBinaryOperation, bool, NthStmt)
+  MX_VISIT_ENTITY(CXXOperatorCallExpr, operator_token, 43, MX_APPLY_METHOD, OperatorToken, Token, NthStmt, TokenUseSelector::OPERATOR_TOKEN)
+  MX_VISIT_BOOL(CXXOperatorCallExpr, is_assignment_operation, 106, MX_APPLY_METHOD, IsAssignmentOperation, bool, NthStmt)
+  MX_VISIT_BOOL(CXXOperatorCallExpr, is_comparison_operation, 107, MX_APPLY_METHOD, IsComparisonOperation, bool, NthStmt)
+  MX_VISIT_BOOL(CXXOperatorCallExpr, is_infix_binary_operation, 108, MX_APPLY_METHOD, IsInfixBinaryOperation, bool, NthStmt)
   MX_EXIT_VISIT_CXXOperatorCallExpr
 MX_END_VISIT_STMT(CXXOperatorCallExpr)
 
@@ -7439,10 +14588,10 @@ MX_END_VISIT_STMT(CXXOperatorCallExpr)
 MX_BEGIN_VISIT_STMT(CXXMemberCallExpr)
   MX_ENTER_VISIT_CXXMemberCallExpr
   MX_VISIT_BASE(CXXMemberCallExpr, CallExpr)
-  MX_VISIT_ENTITY(CXXMemberCallExpr, implicit_object_argument, 42, MX_APPLY_METHOD, ImplicitObjectArgument, Expr, NthStmt, StmtUseSelector::IMPLICIT_OBJECT_ARGUMENT)
-  MX_VISIT_OPTIONAL_ENTITY(CXXMemberCallExpr, method_declaration, 43, MX_APPLY_METHOD, MethodDeclaration, CXXMethodDecl, NthStmt, DeclUseSelector::METHOD_DECLARATION)
-  MX_VISIT_ENTITY(CXXMemberCallExpr, object_type, 44, MX_APPLY_METHOD, ObjectType, Type, NthStmt, TypeUseSelector::OBJECT_TYPE)
-  MX_VISIT_ENTITY(CXXMemberCallExpr, record_declaration, 45, MX_APPLY_METHOD, RecordDeclaration, CXXRecordDecl, NthStmt, DeclUseSelector::RECORD_DECLARATION)
+  MX_VISIT_ENTITY(CXXMemberCallExpr, implicit_object_argument, 43, MX_APPLY_METHOD, ImplicitObjectArgument, Expr, NthStmt, StmtUseSelector::IMPLICIT_OBJECT_ARGUMENT)
+  MX_VISIT_OPTIONAL_ENTITY(CXXMemberCallExpr, method_declaration, 44, MX_APPLY_METHOD, MethodDeclaration, CXXMethodDecl, NthStmt, DeclUseSelector::METHOD_DECLARATION)
+  MX_VISIT_ENTITY(CXXMemberCallExpr, object_type, 45, MX_APPLY_METHOD, ObjectType, Type, NthStmt, TypeUseSelector::OBJECT_TYPE)
+  MX_VISIT_ENTITY(CXXMemberCallExpr, record_declaration, 46, MX_APPLY_METHOD, RecordDeclaration, CXXRecordDecl, NthStmt, DeclUseSelector::RECORD_DECLARATION)
   MX_EXIT_VISIT_CXXMemberCallExpr
 MX_END_VISIT_STMT(CXXMemberCallExpr)
 
@@ -7456,7 +14605,7 @@ MX_END_VISIT_STMT(CXXMemberCallExpr)
 MX_BEGIN_VISIT_STMT(CUDAKernelCallExpr)
   MX_ENTER_VISIT_CUDAKernelCallExpr
   MX_VISIT_BASE(CUDAKernelCallExpr, CallExpr)
-  MX_VISIT_ENTITY(CUDAKernelCallExpr, config, 42, MX_APPLY_METHOD, Config, CallExpr, NthStmt, StmtUseSelector::CONFIG)
+  MX_VISIT_ENTITY(CUDAKernelCallExpr, config, 43, MX_APPLY_METHOD, Config, CallExpr, NthStmt, StmtUseSelector::CONFIG)
   MX_EXIT_VISIT_CUDAKernelCallExpr
 MX_END_VISIT_STMT(CUDAKernelCallExpr)
 
@@ -7470,9 +14619,9 @@ MX_END_VISIT_STMT(CUDAKernelCallExpr)
 MX_BEGIN_VISIT_STMT(UserDefinedLiteral)
   MX_ENTER_VISIT_UserDefinedLiteral
   MX_VISIT_BASE(UserDefinedLiteral, CallExpr)
-  MX_VISIT_ENTITY(UserDefinedLiteral, cooked_literal, 42, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt, StmtUseSelector::COOKED_LITERAL)
+  MX_VISIT_ENTITY(UserDefinedLiteral, cooked_literal, 43, MX_APPLY_METHOD, CookedLiteral, Expr, NthStmt, StmtUseSelector::COOKED_LITERAL)
   MX_VISIT_ENUM(UserDefinedLiteral, literal_operator_kind, 102, MX_APPLY_METHOD, LiteralOperatorKind, UserDefinedLiteralLiteralOperatorKind, NthStmt)
-  MX_VISIT_ENTITY(UserDefinedLiteral, ud_suffix_token, 43, MX_APPLY_METHOD, UDSuffixToken, Token, NthStmt, TokenUseSelector::UD_SUFFIX_TOKEN)
+  MX_VISIT_ENTITY(UserDefinedLiteral, ud_suffix_token, 44, MX_APPLY_METHOD, UDSuffixToken, Token, NthStmt, TokenUseSelector::UD_SUFFIX_TOKEN)
   MX_EXIT_VISIT_UserDefinedLiteral
 MX_END_VISIT_STMT(UserDefinedLiteral)
 
@@ -7725,7 +14874,7 @@ MX_BEGIN_VISIT_STMT(CXXFoldExpr)
   MX_VISIT_ENTITY(CXXFoldExpr, initializer, 39, MX_APPLY_METHOD, Initializer, Expr, NthStmt, StmtUseSelector::INITIALIZER)
   MX_VISIT_ENTITY(CXXFoldExpr, lhs, 40, MX_APPLY_METHOD, LHS, Expr, NthStmt, StmtUseSelector::LHS)
   MX_VISIT_ENTITY(CXXFoldExpr, l_paren_token, 41, MX_APPLY_METHOD, LParenToken, Token, NthStmt, TokenUseSelector::L_PAREN_TOKEN)
-  MX_VISIT_OPTIONAL_INT(CXXFoldExpr, num_expansions, 108, MX_APPLY_METHOD, NumExpansions, unsigned, NthStmt)
+  MX_VISIT_OPTIONAL_INT(CXXFoldExpr, num_expansions, 109, MX_APPLY_METHOD, NumExpansions, unsigned, NthStmt)
   MX_VISIT_ENUM(CXXFoldExpr, operator_, 100, MX_APPLY_METHOD, Operator, BinaryOperatorKind, NthStmt)
   MX_VISIT_ENTITY(CXXFoldExpr, pattern, 42, MX_APPLY_METHOD, Pattern, Expr, NthStmt, StmtUseSelector::PATTERN)
   MX_VISIT_ENTITY(CXXFoldExpr, rhs, 43, MX_APPLY_METHOD, RHS, Expr, NthStmt, StmtUseSelector::RHS)
@@ -7919,7 +15068,7 @@ MX_BEGIN_VISIT_STMT(BinaryOperator)
   MX_VISIT_BOOL(BinaryOperator, is_logical_operation, 105, MX_APPLY_METHOD, IsLogicalOperation, bool, NthStmt)
   MX_VISIT_BOOL(BinaryOperator, is_multiplicative_operation, 106, MX_APPLY_METHOD, IsMultiplicativeOperation, bool, NthStmt)
   MX_VISIT_BOOL(BinaryOperator, is_pointer_memory_operation, 107, MX_APPLY_METHOD, IsPointerMemoryOperation, bool, NthStmt)
-  MX_VISIT_BOOL(BinaryOperator, is_relational_operation, 109, MX_APPLY_METHOD, IsRelationalOperation, bool, NthStmt)
+  MX_VISIT_BOOL(BinaryOperator, is_relational_operation, 108, MX_APPLY_METHOD, IsRelationalOperation, bool, NthStmt)
   MX_VISIT_BOOL(BinaryOperator, is_shift_assign_operation, 110, MX_APPLY_METHOD, IsShiftAssignOperation, bool, NthStmt)
   MX_VISIT_BOOL(BinaryOperator, is_shift_operation, 111, MX_APPLY_METHOD, IsShiftOperation, bool, NthStmt)
   MX_EXIT_VISIT_BinaryOperator
@@ -8304,7 +15453,7 @@ MX_BEGIN_VISIT_STMT(SizeOfPackExpr)
   MX_VISIT_BASE(SizeOfPackExpr, Expr)
   MX_VISIT_ENTITY(SizeOfPackExpr, operator_token, 37, MX_APPLY_METHOD, OperatorToken, Token, NthStmt, TokenUseSelector::OPERATOR_TOKEN)
   MX_VISIT_ENTITY(SizeOfPackExpr, pack, 38, MX_APPLY_METHOD, Pack, NamedDecl, NthStmt, DeclUseSelector::PACK)
-  MX_VISIT_OPTIONAL_INT(SizeOfPackExpr, pack_length, 108, MX_APPLY_METHOD, PackLength, unsigned, NthStmt)
+  MX_VISIT_OPTIONAL_INT(SizeOfPackExpr, pack_length, 109, MX_APPLY_METHOD, PackLength, unsigned, NthStmt)
   MX_VISIT_ENTITY(SizeOfPackExpr, pack_token, 39, MX_APPLY_METHOD, PackToken, Token, NthStmt, TokenUseSelector::PACK_TOKEN)
   MX_VISIT_OPTIONAL_PSEUDO_LIST(SizeOfPackExpr, partial_arguments, 94, MX_APPLY_METHOD, PartialArguments, TemplateArgument, NthStmt)
   MX_VISIT_ENTITY(SizeOfPackExpr, r_paren_token, 40, MX_APPLY_METHOD, RParenToken, Token, NthStmt, TokenUseSelector::R_PAREN_TOKEN)
@@ -8453,7 +15602,7 @@ MX_BEGIN_VISIT_STMT(PackExpansionExpr)
   MX_ENTER_VISIT_PackExpansionExpr
   MX_VISIT_BASE(PackExpansionExpr, Expr)
   MX_VISIT_ENTITY(PackExpansionExpr, ellipsis_token, 37, MX_APPLY_METHOD, EllipsisToken, Token, NthStmt, TokenUseSelector::ELLIPSIS_TOKEN)
-  MX_VISIT_OPTIONAL_INT(PackExpansionExpr, num_expansions, 108, MX_APPLY_METHOD, NumExpansions, unsigned, NthStmt)
+  MX_VISIT_OPTIONAL_INT(PackExpansionExpr, num_expansions, 109, MX_APPLY_METHOD, NumExpansions, unsigned, NthStmt)
   MX_VISIT_ENTITY(PackExpansionExpr, pattern, 38, MX_APPLY_METHOD, Pattern, Expr, NthStmt, StmtUseSelector::PATTERN)
   MX_EXIT_VISIT_PackExpansionExpr
 MX_END_VISIT_STMT(PackExpansionExpr)
@@ -8995,7 +16144,7 @@ MX_BEGIN_VISIT_STMT(LambdaExpr)
   MX_VISIT_ENTITY(LambdaExpr, compound_statement_body, 40, MX_APPLY_METHOD, CompoundStatementBody, CompoundStmt, NthStmt, StmtUseSelector::COMPOUND_STATEMENT_BODY)
   MX_VISIT_ENTITY_LIST(LambdaExpr, explicit_template_parameters, 16, MX_APPLY_METHOD, ExplicitTemplateParameters, NamedDecl, NthStmt)
   MX_VISIT_ENTITY(LambdaExpr, lambda_class, 43, MX_APPLY_METHOD, LambdaClass, CXXRecordDecl, NthStmt, DeclUseSelector::LAMBDA_CLASS)
-  MX_VISIT_OPTIONAL_PSEUDO(LambdaExpr, template_parameter_list, 108, MX_APPLY_METHOD, TemplateParameterList, TemplateParameterList, NthStmt)
+  MX_VISIT_OPTIONAL_PSEUDO(LambdaExpr, template_parameter_list, 109, MX_APPLY_METHOD, TemplateParameterList, TemplateParameterList, NthStmt)
   MX_VISIT_OPTIONAL_ENTITY(LambdaExpr, trailing_requires_clause, 44, MX_APPLY_METHOD, TrailingRequiresClause, Expr, NthStmt, StmtUseSelector::TRAILING_REQUIRES_CLAUSE)
   MX_VISIT_BOOL(LambdaExpr, has_explicit_parameters, 97, MX_APPLY_METHOD, HasExplicitParameters, bool, NthStmt)
   MX_VISIT_BOOL(LambdaExpr, has_explicit_result_type, 98, MX_APPLY_METHOD, HasExplicitResultType, bool, NthStmt)
@@ -9239,6 +16388,7 @@ MX_BEGIN_VISIT_STMT(AttributedStmt)
   MX_ENTER_VISIT_AttributedStmt
   MX_VISIT_BASE(AttributedStmt, ValueStmt)
   MX_VISIT_ENTITY(AttributedStmt, attribute_token, 10, MX_APPLY_METHOD, AttributeToken, Token, NthStmt, TokenUseSelector::ATTRIBUTE_TOKEN)
+  MX_VISIT_ENTITY_LIST(AttributedStmt, attributes, 16, MX_APPLY_METHOD, Attributes, Attr, NthStmt)
   MX_VISIT_ENTITY(AttributedStmt, sub_statement, 11, MX_APPLY_METHOD, SubStatement, Stmt, NthStmt, StmtUseSelector::SUB_STATEMENT)
   MX_EXIT_VISIT_AttributedStmt
 MX_END_VISIT_STMT(AttributedStmt)
@@ -9329,41 +16479,44 @@ MX_BEGIN_VISIT_ABSTRACT_DECL(Decl)
   MX_VISIT_DECL_LINK(Decl, parent_declaration, 0)
   MX_VISIT_STMT_LINK(Decl, parent_statement, 1)
   MX_VISIT_BOOL(Decl, is_definition, 2, MX_APPLY_FUNC, IsDefinition, bool, NthDecl)
-  MX_VISIT_ENUM(Decl, access, 3, MX_APPLY_METHOD, Access, AccessSpecifier, NthDecl)
-  MX_VISIT_ENUM(Decl, availability, 4, MX_APPLY_METHOD, Availability, AvailabilityResult, NthDecl)
-  MX_VISIT_OPTIONAL_PSEUDO(Decl, described_template_parameters, 5, MX_APPLY_METHOD, DescribedTemplateParameters, TemplateParameterList, NthDecl)
-  MX_VISIT_ENUM(Decl, friend_object_kind, 7, MX_APPLY_METHOD, FriendObjectKind, DeclFriendObjectKind, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(Decl, function_type, 8, MX_APPLY_METHOD, FunctionType, FunctionType, NthDecl, TypeUseSelector::FUNCTION_TYPE)
-  MX_VISIT_ENUM(Decl, module_ownership_kind, 10, MX_APPLY_METHOD, ModuleOwnershipKind, DeclModuleOwnershipKind, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(Decl, non_closure_context, 11, MX_APPLY_METHOD, NonClosureContext, Decl, NthDecl, DeclUseSelector::NON_CLOSURE_CONTEXT)
-  MX_VISIT_BOOL(Decl, has_attributes, 13, MX_APPLY_METHOD, HasAttributes, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, has_defining_attribute, 14, MX_APPLY_METHOD, HasDefiningAttribute, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, has_owning_module, 15, MX_APPLY_METHOD, HasOwningModule, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, has_tag_identifier_namespace, 16, MX_APPLY_METHOD, HasTagIdentifierNamespace, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_defined_outside_function_or_method, 17, MX_APPLY_METHOD, IsDefinedOutsideFunctionOrMethod, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_deprecated, 18, MX_APPLY_METHOD, IsDeprecated, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_function_or_function_template, 19, MX_APPLY_METHOD, IsFunctionOrFunctionTemplate, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_implicit, 20, MX_APPLY_METHOD, IsImplicit, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_in_anonymous_namespace, 21, MX_APPLY_METHOD, IsInAnonymousNamespace, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_in_export_declaration_context, 22, MX_APPLY_METHOD, IsInExportDeclarationContext, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_in_local_scope_for_instantiation, 23, MX_APPLY_METHOD, IsInLocalScopeForInstantiation, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_in_std_namespace, 24, MX_APPLY_METHOD, IsInStdNamespace, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_invalid_declaration, 25, MX_APPLY_METHOD, IsInvalidDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_module_private, 26, MX_APPLY_METHOD, IsModulePrivate, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_out_of_line, 27, MX_APPLY_METHOD, IsOutOfLine, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_parameter_pack, 28, MX_APPLY_METHOD, IsParameterPack, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_template_declaration, 29, MX_APPLY_METHOD, IsTemplateDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_template_parameter, 30, MX_APPLY_METHOD, IsTemplateParameter, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_template_parameter_pack, 31, MX_APPLY_METHOD, IsTemplateParameterPack, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_templated, 32, MX_APPLY_METHOD, IsTemplated, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_top_level_declaration_in_obj_c_container, 33, MX_APPLY_METHOD, IsTopLevelDeclarationInObjCContainer, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_unavailable, 34, MX_APPLY_METHOD, IsUnavailable, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_unconditionally_visible, 35, MX_APPLY_METHOD, IsUnconditionallyVisible, bool, NthDecl)
-  MX_VISIT_BOOL(Decl, is_weak_imported, 36, MX_APPLY_METHOD, IsWeakImported, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(Decl, redeclarations_visible_in_translation_unit, 37, MX_APPLY_METHOD, Redeclarations, Decl, NthDecl)
-  MX_VISIT_ENUM(Decl, kind, 38, MX_APPLY_METHOD, Kind, DeclKind, NthDecl)
-  MX_VISIT_ENUM(Decl, category, 39, MX_APPLY_METHOD, Category, DeclCategory, NthDecl)
-  MX_VISIT_ENTITY(Decl, token, 40, MX_APPLY_METHOD, Token, Token, NthDecl, TokenUseSelector::TOKEN)
+  MX_VISIT_ENTITY_LIST(Decl, attributes, 3, MX_APPLY_METHOD, Attributes, Attr, NthDecl)
+  MX_VISIT_ENUM(Decl, access, 4, MX_APPLY_METHOD, Access, AccessSpecifier, NthDecl)
+  MX_VISIT_ENUM(Decl, availability, 5, MX_APPLY_METHOD, Availability, AvailabilityResult, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(Decl, defining_attribute, 6, MX_APPLY_METHOD, DefiningAttribute, Attr, NthDecl, AttrUseSelector::DEFINING_ATTRIBUTE)
+  MX_VISIT_OPTIONAL_PSEUDO(Decl, described_template_parameters, 8, MX_APPLY_METHOD, DescribedTemplateParameters, TemplateParameterList, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(Decl, external_source_symbol_attribute, 10, MX_APPLY_METHOD, ExternalSourceSymbolAttribute, ExternalSourceSymbolAttr, NthDecl, AttrUseSelector::EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE)
+  MX_VISIT_ENUM(Decl, friend_object_kind, 12, MX_APPLY_METHOD, FriendObjectKind, DeclFriendObjectKind, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(Decl, function_type, 13, MX_APPLY_METHOD, FunctionType, FunctionType, NthDecl, TypeUseSelector::FUNCTION_TYPE)
+  MX_VISIT_ENUM(Decl, module_ownership_kind, 15, MX_APPLY_METHOD, ModuleOwnershipKind, DeclModuleOwnershipKind, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(Decl, non_closure_context, 16, MX_APPLY_METHOD, NonClosureContext, Decl, NthDecl, DeclUseSelector::NON_CLOSURE_CONTEXT)
+  MX_VISIT_BOOL(Decl, has_attributes, 18, MX_APPLY_METHOD, HasAttributes, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, has_defining_attribute, 19, MX_APPLY_METHOD, HasDefiningAttribute, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, has_owning_module, 20, MX_APPLY_METHOD, HasOwningModule, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, has_tag_identifier_namespace, 21, MX_APPLY_METHOD, HasTagIdentifierNamespace, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_defined_outside_function_or_method, 22, MX_APPLY_METHOD, IsDefinedOutsideFunctionOrMethod, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_deprecated, 23, MX_APPLY_METHOD, IsDeprecated, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_function_or_function_template, 24, MX_APPLY_METHOD, IsFunctionOrFunctionTemplate, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_implicit, 25, MX_APPLY_METHOD, IsImplicit, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_in_anonymous_namespace, 26, MX_APPLY_METHOD, IsInAnonymousNamespace, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_in_export_declaration_context, 27, MX_APPLY_METHOD, IsInExportDeclarationContext, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_in_local_scope_for_instantiation, 28, MX_APPLY_METHOD, IsInLocalScopeForInstantiation, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_in_std_namespace, 29, MX_APPLY_METHOD, IsInStdNamespace, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_invalid_declaration, 30, MX_APPLY_METHOD, IsInvalidDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_module_private, 31, MX_APPLY_METHOD, IsModulePrivate, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_out_of_line, 32, MX_APPLY_METHOD, IsOutOfLine, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_parameter_pack, 33, MX_APPLY_METHOD, IsParameterPack, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_template_declaration, 34, MX_APPLY_METHOD, IsTemplateDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_template_parameter, 35, MX_APPLY_METHOD, IsTemplateParameter, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_template_parameter_pack, 36, MX_APPLY_METHOD, IsTemplateParameterPack, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_templated, 37, MX_APPLY_METHOD, IsTemplated, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_top_level_declaration_in_obj_c_container, 38, MX_APPLY_METHOD, IsTopLevelDeclarationInObjCContainer, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_unavailable, 39, MX_APPLY_METHOD, IsUnavailable, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_unconditionally_visible, 40, MX_APPLY_METHOD, IsUnconditionallyVisible, bool, NthDecl)
+  MX_VISIT_BOOL(Decl, is_weak_imported, 41, MX_APPLY_METHOD, IsWeakImported, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(Decl, redeclarations_visible_in_translation_unit, 42, MX_APPLY_METHOD, Redeclarations, Decl, NthDecl)
+  MX_VISIT_ENUM(Decl, kind, 43, MX_APPLY_METHOD, Kind, DeclKind, NthDecl)
+  MX_VISIT_ENUM(Decl, category, 44, MX_APPLY_METHOD, Category, DeclCategory, NthDecl)
+  MX_VISIT_ENTITY(Decl, token, 45, MX_APPLY_METHOD, Token, Token, NthDecl, TokenUseSelector::TOKEN)
   MX_EXIT_VISIT_Decl
 MX_END_VISIT_DECL(Decl)
 
@@ -9377,8 +16530,8 @@ MX_END_VISIT_DECL(Decl)
 MX_BEGIN_VISIT_DECL(ClassScopeFunctionSpecializationDecl)
   MX_ENTER_VISIT_ClassScopeFunctionSpecializationDecl
   MX_VISIT_BASE(ClassScopeFunctionSpecializationDecl, Decl)
-  MX_VISIT_ENTITY(ClassScopeFunctionSpecializationDecl, specialization, 43, MX_APPLY_METHOD, Specialization, CXXMethodDecl, NthDecl, DeclUseSelector::SPECIALIZATION)
-  MX_VISIT_BOOL(ClassScopeFunctionSpecializationDecl, has_explicit_template_arguments, 44, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthDecl)
+  MX_VISIT_ENTITY(ClassScopeFunctionSpecializationDecl, specialization, 48, MX_APPLY_METHOD, Specialization, CXXMethodDecl, NthDecl, DeclUseSelector::SPECIALIZATION)
+  MX_VISIT_BOOL(ClassScopeFunctionSpecializationDecl, has_explicit_template_arguments, 49, MX_APPLY_METHOD, HasExplicitTemplateArguments, bool, NthDecl)
   MX_EXIT_VISIT_ClassScopeFunctionSpecializationDecl
 MX_END_VISIT_DECL(ClassScopeFunctionSpecializationDecl)
 
@@ -9392,10 +16545,10 @@ MX_END_VISIT_DECL(ClassScopeFunctionSpecializationDecl)
 MX_BEGIN_VISIT_DECL(CapturedDecl)
   MX_ENTER_VISIT_CapturedDecl
   MX_VISIT_BASE(CapturedDecl, Decl)
-  MX_VISIT_ENTITY(CapturedDecl, context_parameter, 43, MX_APPLY_METHOD, ContextParameter, ImplicitParamDecl, NthDecl, DeclUseSelector::CONTEXT_PARAMETER)
-  MX_VISIT_BOOL(CapturedDecl, is_nothrow, 44, MX_APPLY_METHOD, IsNothrow, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(CapturedDecl, parameters, 45, MX_APPLY_METHOD, Parameters, ImplicitParamDecl, NthDecl)
-  MX_VISIT_DECL_CONTEXT(CapturedDecl, declarations_in_context, 46, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_ENTITY(CapturedDecl, context_parameter, 48, MX_APPLY_METHOD, ContextParameter, ImplicitParamDecl, NthDecl, DeclUseSelector::CONTEXT_PARAMETER)
+  MX_VISIT_BOOL(CapturedDecl, is_nothrow, 49, MX_APPLY_METHOD, IsNothrow, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(CapturedDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ImplicitParamDecl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(CapturedDecl, declarations_in_context, 51, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_CapturedDecl
 MX_END_VISIT_DECL(CapturedDecl)
 
@@ -9409,20 +16562,20 @@ MX_END_VISIT_DECL(CapturedDecl)
 MX_BEGIN_VISIT_DECL(BlockDecl)
   MX_ENTER_VISIT_BlockDecl
   MX_VISIT_BASE(BlockDecl, Decl)
-  MX_VISIT_BOOL(BlockDecl, block_missing_return_type, 44, MX_APPLY_METHOD, BlockMissingReturnType, bool, NthDecl)
-  MX_VISIT_BOOL(BlockDecl, can_avoid_copy_to_heap, 47, MX_APPLY_METHOD, CanAvoidCopyToHeap, bool, NthDecl)
-  MX_VISIT_BOOL(BlockDecl, captures_cxx_this, 48, MX_APPLY_METHOD, CapturesCXXThis, bool, NthDecl)
-  MX_VISIT_BOOL(BlockDecl, does_not_escape, 49, MX_APPLY_METHOD, DoesNotEscape, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(BlockDecl, block_mangling_context_declaration, 43, MX_APPLY_METHOD, BlockManglingContextDeclaration, Decl, NthDecl, DeclUseSelector::BLOCK_MANGLING_CONTEXT_DECLARATION)
-  MX_VISIT_ENTITY(BlockDecl, caret_token, 51, MX_APPLY_METHOD, CaretToken, Token, NthDecl, TokenUseSelector::CARET_TOKEN)
-  MX_VISIT_ENTITY(BlockDecl, compound_body, 52, MX_APPLY_METHOD, CompoundBody, CompoundStmt, NthDecl, StmtUseSelector::COMPOUND_BODY)
-  MX_VISIT_ENTITY(BlockDecl, signature_as_written, 53, MX_APPLY_METHOD, SignatureAsWritten, Type, NthDecl, TypeUseSelector::SIGNATURE_AS_WRITTEN)
-  MX_VISIT_BOOL(BlockDecl, has_captures, 54, MX_APPLY_METHOD, HasCaptures, bool, NthDecl)
-  MX_VISIT_BOOL(BlockDecl, is_conversion_from_lambda, 55, MX_APPLY_METHOD, IsConversionFromLambda, bool, NthDecl)
-  MX_VISIT_BOOL(BlockDecl, is_variadic, 56, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(BlockDecl, parameters, 45, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(BlockDecl, parameter_declarations, 46, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
-  MX_VISIT_DECL_CONTEXT(BlockDecl, declarations_in_context, 57, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_BOOL(BlockDecl, block_missing_return_type, 49, MX_APPLY_METHOD, BlockMissingReturnType, bool, NthDecl)
+  MX_VISIT_BOOL(BlockDecl, can_avoid_copy_to_heap, 52, MX_APPLY_METHOD, CanAvoidCopyToHeap, bool, NthDecl)
+  MX_VISIT_BOOL(BlockDecl, captures_cxx_this, 53, MX_APPLY_METHOD, CapturesCXXThis, bool, NthDecl)
+  MX_VISIT_BOOL(BlockDecl, does_not_escape, 54, MX_APPLY_METHOD, DoesNotEscape, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(BlockDecl, block_mangling_context_declaration, 48, MX_APPLY_METHOD, BlockManglingContextDeclaration, Decl, NthDecl, DeclUseSelector::BLOCK_MANGLING_CONTEXT_DECLARATION)
+  MX_VISIT_ENTITY(BlockDecl, caret_token, 56, MX_APPLY_METHOD, CaretToken, Token, NthDecl, TokenUseSelector::CARET_TOKEN)
+  MX_VISIT_ENTITY(BlockDecl, compound_body, 57, MX_APPLY_METHOD, CompoundBody, CompoundStmt, NthDecl, StmtUseSelector::COMPOUND_BODY)
+  MX_VISIT_ENTITY(BlockDecl, signature_as_written, 58, MX_APPLY_METHOD, SignatureAsWritten, Type, NthDecl, TypeUseSelector::SIGNATURE_AS_WRITTEN)
+  MX_VISIT_BOOL(BlockDecl, has_captures, 59, MX_APPLY_METHOD, HasCaptures, bool, NthDecl)
+  MX_VISIT_BOOL(BlockDecl, is_conversion_from_lambda, 60, MX_APPLY_METHOD, IsConversionFromLambda, bool, NthDecl)
+  MX_VISIT_BOOL(BlockDecl, is_variadic, 61, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(BlockDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(BlockDecl, parameter_declarations, 51, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(BlockDecl, declarations_in_context, 62, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_BlockDecl
 MX_END_VISIT_DECL(BlockDecl)
 
@@ -9436,8 +16589,8 @@ MX_END_VISIT_DECL(BlockDecl)
 MX_BEGIN_VISIT_DECL(AccessSpecDecl)
   MX_ENTER_VISIT_AccessSpecDecl
   MX_VISIT_BASE(AccessSpecDecl, Decl)
-  MX_VISIT_ENTITY(AccessSpecDecl, access_specifier_token, 43, MX_APPLY_METHOD, AccessSpecifierToken, Token, NthDecl, TokenUseSelector::ACCESS_SPECIFIER_TOKEN)
-  MX_VISIT_ENTITY(AccessSpecDecl, colon_token, 51, MX_APPLY_METHOD, ColonToken, Token, NthDecl, TokenUseSelector::COLON_TOKEN)
+  MX_VISIT_ENTITY(AccessSpecDecl, access_specifier_token, 48, MX_APPLY_METHOD, AccessSpecifierToken, Token, NthDecl, TokenUseSelector::ACCESS_SPECIFIER_TOKEN)
+  MX_VISIT_ENTITY(AccessSpecDecl, colon_token, 56, MX_APPLY_METHOD, ColonToken, Token, NthDecl, TokenUseSelector::COLON_TOKEN)
   MX_EXIT_VISIT_AccessSpecDecl
 MX_END_VISIT_DECL(AccessSpecDecl)
 
@@ -9464,7 +16617,7 @@ MX_END_VISIT_DECL(OMPDeclarativeDirectiveDecl)
 MX_BEGIN_VISIT_DECL(OMPThreadPrivateDecl)
   MX_ENTER_VISIT_OMPThreadPrivateDecl
   MX_VISIT_BASE(OMPThreadPrivateDecl, OMPDeclarativeDirectiveDecl)
-  MX_VISIT_ENTITY_LIST(OMPThreadPrivateDecl, varlists, 45, MX_APPLY_METHOD, Varlists, Expr, NthDecl)
+  MX_VISIT_ENTITY_LIST(OMPThreadPrivateDecl, varlists, 50, MX_APPLY_METHOD, Varlists, Expr, NthDecl)
   MX_EXIT_VISIT_OMPThreadPrivateDecl
 MX_END_VISIT_DECL(OMPThreadPrivateDecl)
 
@@ -9491,7 +16644,7 @@ MX_END_VISIT_DECL(OMPRequiresDecl)
 MX_BEGIN_VISIT_DECL(OMPAllocateDecl)
   MX_ENTER_VISIT_OMPAllocateDecl
   MX_VISIT_BASE(OMPAllocateDecl, OMPDeclarativeDirectiveDecl)
-  MX_VISIT_ENTITY_LIST(OMPAllocateDecl, varlists, 45, MX_APPLY_METHOD, Varlists, Expr, NthDecl)
+  MX_VISIT_ENTITY_LIST(OMPAllocateDecl, varlists, 50, MX_APPLY_METHOD, Varlists, Expr, NthDecl)
   MX_EXIT_VISIT_OMPAllocateDecl
 MX_END_VISIT_DECL(OMPAllocateDecl)
 
@@ -9504,7 +16657,7 @@ MX_END_VISIT_DECL(OMPAllocateDecl)
 
 MX_BEGIN_VISIT_DECL(TranslationUnitDecl)
   MX_ENTER_VISIT_TranslationUnitDecl
-  MX_VISIT_DECL_CONTEXT(TranslationUnitDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(TranslationUnitDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_TranslationUnitDecl
 MX_END_VISIT_DECL(TranslationUnitDecl)
 
@@ -9518,10 +16671,10 @@ MX_END_VISIT_DECL(TranslationUnitDecl)
 MX_BEGIN_VISIT_DECL(StaticAssertDecl)
   MX_ENTER_VISIT_StaticAssertDecl
   MX_VISIT_BASE(StaticAssertDecl, Decl)
-  MX_VISIT_ENTITY(StaticAssertDecl, assert_expression, 43, MX_APPLY_METHOD, AssertExpression, Expr, NthDecl, StmtUseSelector::ASSERT_EXPRESSION)
-  MX_VISIT_ENTITY(StaticAssertDecl, message, 51, MX_APPLY_METHOD, Message, StringLiteral, NthDecl, StmtUseSelector::MESSAGE)
-  MX_VISIT_ENTITY(StaticAssertDecl, r_paren_token, 52, MX_APPLY_METHOD, RParenToken, Token, NthDecl, TokenUseSelector::R_PAREN_TOKEN)
-  MX_VISIT_BOOL(StaticAssertDecl, is_failed, 44, MX_APPLY_METHOD, IsFailed, bool, NthDecl)
+  MX_VISIT_ENTITY(StaticAssertDecl, assert_expression, 48, MX_APPLY_METHOD, AssertExpression, Expr, NthDecl, StmtUseSelector::ASSERT_EXPRESSION)
+  MX_VISIT_ENTITY(StaticAssertDecl, message, 56, MX_APPLY_METHOD, Message, StringLiteral, NthDecl, StmtUseSelector::MESSAGE)
+  MX_VISIT_ENTITY(StaticAssertDecl, r_paren_token, 57, MX_APPLY_METHOD, RParenToken, Token, NthDecl, TokenUseSelector::R_PAREN_TOKEN)
+  MX_VISIT_BOOL(StaticAssertDecl, is_failed, 49, MX_APPLY_METHOD, IsFailed, bool, NthDecl)
   MX_EXIT_VISIT_StaticAssertDecl
 MX_END_VISIT_DECL(StaticAssertDecl)
 
@@ -9535,7 +16688,7 @@ MX_END_VISIT_DECL(StaticAssertDecl)
 MX_BEGIN_VISIT_DECL(RequiresExprBodyDecl)
   MX_ENTER_VISIT_RequiresExprBodyDecl
   MX_VISIT_BASE(RequiresExprBodyDecl, Decl)
-  MX_VISIT_DECL_CONTEXT(RequiresExprBodyDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(RequiresExprBodyDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_RequiresExprBodyDecl
 MX_END_VISIT_DECL(RequiresExprBodyDecl)
 
@@ -9549,8 +16702,8 @@ MX_END_VISIT_DECL(RequiresExprBodyDecl)
 MX_BEGIN_VISIT_DECL(PragmaDetectMismatchDecl)
   MX_ENTER_VISIT_PragmaDetectMismatchDecl
   MX_VISIT_BASE(PragmaDetectMismatchDecl, Decl)
-  MX_VISIT_TEXT(PragmaDetectMismatchDecl, name, 58, MX_APPLY_METHOD, Name, basic_string_view, NthDecl)
-  MX_VISIT_TEXT(PragmaDetectMismatchDecl, value, 59, MX_APPLY_METHOD, Value, basic_string_view, NthDecl)
+  MX_VISIT_TEXT(PragmaDetectMismatchDecl, name, 63, MX_APPLY_METHOD, Name, basic_string_view, NthDecl)
+  MX_VISIT_TEXT(PragmaDetectMismatchDecl, value, 64, MX_APPLY_METHOD, Value, basic_string_view, NthDecl)
   MX_EXIT_VISIT_PragmaDetectMismatchDecl
 MX_END_VISIT_DECL(PragmaDetectMismatchDecl)
 
@@ -9564,8 +16717,8 @@ MX_END_VISIT_DECL(PragmaDetectMismatchDecl)
 MX_BEGIN_VISIT_DECL(PragmaCommentDecl)
   MX_ENTER_VISIT_PragmaCommentDecl
   MX_VISIT_BASE(PragmaCommentDecl, Decl)
-  MX_VISIT_TEXT(PragmaCommentDecl, argument, 58, MX_APPLY_METHOD, Argument, basic_string_view, NthDecl)
-  MX_VISIT_ENUM(PragmaCommentDecl, comment_kind, 60, MX_APPLY_METHOD, CommentKind, PragmaMSCommentKind, NthDecl)
+  MX_VISIT_TEXT(PragmaCommentDecl, argument, 63, MX_APPLY_METHOD, Argument, basic_string_view, NthDecl)
+  MX_VISIT_ENUM(PragmaCommentDecl, comment_kind, 65, MX_APPLY_METHOD, CommentKind, PragmaMSCommentKind, NthDecl)
   MX_EXIT_VISIT_PragmaCommentDecl
 MX_END_VISIT_DECL(PragmaCommentDecl)
 
@@ -9579,15 +16732,15 @@ MX_END_VISIT_DECL(PragmaCommentDecl)
 MX_BEGIN_VISIT_DECL(ObjCPropertyImplDecl)
   MX_ENTER_VISIT_ObjCPropertyImplDecl
   MX_VISIT_BASE(ObjCPropertyImplDecl, Decl)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, getter_cxx_constructor, 43, MX_APPLY_METHOD, GetterCXXConstructor, Expr, NthDecl, StmtUseSelector::GETTER_CXX_CONSTRUCTOR)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, getter_method_declaration, 51, MX_APPLY_METHOD, GetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::GETTER_METHOD_DECLARATION)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, property_declaration, 52, MX_APPLY_METHOD, PropertyDeclaration, ObjCPropertyDecl, NthDecl, DeclUseSelector::PROPERTY_DECLARATION)
-  MX_VISIT_ENUM(ObjCPropertyImplDecl, property_implementation, 60, MX_APPLY_METHOD, PropertyImplementation, ObjCPropertyImplDeclKind, NthDecl)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, property_instance_variable_declaration, 53, MX_APPLY_METHOD, PropertyInstanceVariableDeclaration, ObjCIvarDecl, NthDecl, DeclUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, property_instance_variable_declaration_token, 61, MX_APPLY_METHOD, PropertyInstanceVariableDeclarationToken, Token, NthDecl, TokenUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION_TOKEN)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, setter_cxx_assignment, 62, MX_APPLY_METHOD, SetterCXXAssignment, Expr, NthDecl, StmtUseSelector::SETTER_CXX_ASSIGNMENT)
-  MX_VISIT_ENTITY(ObjCPropertyImplDecl, setter_method_declaration, 63, MX_APPLY_METHOD, SetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::SETTER_METHOD_DECLARATION)
-  MX_VISIT_BOOL(ObjCPropertyImplDecl, is_instance_variable_name_specified, 44, MX_APPLY_METHOD, IsInstanceVariableNameSpecified, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, getter_cxx_constructor, 48, MX_APPLY_METHOD, GetterCXXConstructor, Expr, NthDecl, StmtUseSelector::GETTER_CXX_CONSTRUCTOR)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, getter_method_declaration, 56, MX_APPLY_METHOD, GetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::GETTER_METHOD_DECLARATION)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, property_declaration, 57, MX_APPLY_METHOD, PropertyDeclaration, ObjCPropertyDecl, NthDecl, DeclUseSelector::PROPERTY_DECLARATION)
+  MX_VISIT_ENUM(ObjCPropertyImplDecl, property_implementation, 65, MX_APPLY_METHOD, PropertyImplementation, ObjCPropertyImplDeclKind, NthDecl)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, property_instance_variable_declaration, 58, MX_APPLY_METHOD, PropertyInstanceVariableDeclaration, ObjCIvarDecl, NthDecl, DeclUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, property_instance_variable_declaration_token, 66, MX_APPLY_METHOD, PropertyInstanceVariableDeclarationToken, Token, NthDecl, TokenUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION_TOKEN)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, setter_cxx_assignment, 67, MX_APPLY_METHOD, SetterCXXAssignment, Expr, NthDecl, StmtUseSelector::SETTER_CXX_ASSIGNMENT)
+  MX_VISIT_ENTITY(ObjCPropertyImplDecl, setter_method_declaration, 68, MX_APPLY_METHOD, SetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::SETTER_METHOD_DECLARATION)
+  MX_VISIT_BOOL(ObjCPropertyImplDecl, is_instance_variable_name_specified, 49, MX_APPLY_METHOD, IsInstanceVariableNameSpecified, bool, NthDecl)
   MX_EXIT_VISIT_ObjCPropertyImplDecl
 MX_END_VISIT_DECL(ObjCPropertyImplDecl)
 
@@ -9601,20 +16754,20 @@ MX_END_VISIT_DECL(ObjCPropertyImplDecl)
 MX_BEGIN_VISIT_DECL(NamedDecl)
   MX_ENTER_VISIT_NamedDecl
   MX_VISIT_BASE(NamedDecl, Decl)
-  MX_VISIT_ENUM(NamedDecl, formal_linkage, 60, MX_APPLY_METHOD, FormalLinkage, Linkage, NthDecl)
-  MX_VISIT_TEXT(NamedDecl, name, 58, MX_APPLY_METHOD, Name, basic_string, NthDecl)
-  MX_VISIT_OPTIONAL_ENUM(NamedDecl, obj_cf_string_formatting_family, 64, MX_APPLY_METHOD, ObjCFStringFormattingFamily, ObjCStringFormatFamily, NthDecl)
-  MX_VISIT_TEXT(NamedDecl, qualified_name_as_string, 59, MX_APPLY_METHOD, QualifiedNameAsString, basic_string, NthDecl)
-  MX_VISIT_ENTITY(NamedDecl, underlying_declaration, 43, MX_APPLY_METHOD, UnderlyingDeclaration, NamedDecl, NthDecl, DeclUseSelector::UNDERLYING_DECLARATION)
-  MX_VISIT_ENUM(NamedDecl, visibility, 65, MX_APPLY_METHOD, Visibility, Visibility, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, has_external_formal_linkage, 47, MX_APPLY_METHOD, HasExternalFormalLinkage, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, has_linkage, 48, MX_APPLY_METHOD, HasLinkage, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, has_linkage_been_computed, 49, MX_APPLY_METHOD, HasLinkageBeenComputed, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, is_cxx_class_member, 50, MX_APPLY_METHOD, IsCXXClassMember, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, is_cxx_instance_member, 54, MX_APPLY_METHOD, IsCXXInstanceMember, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, is_externally_declarable, 55, MX_APPLY_METHOD, IsExternallyDeclarable, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, is_externally_visible, 56, MX_APPLY_METHOD, IsExternallyVisible, bool, NthDecl)
-  MX_VISIT_BOOL(NamedDecl, is_linkage_valid, 66, MX_APPLY_METHOD, IsLinkageValid, bool, NthDecl)
+  MX_VISIT_ENUM(NamedDecl, formal_linkage, 65, MX_APPLY_METHOD, FormalLinkage, Linkage, NthDecl)
+  MX_VISIT_TEXT(NamedDecl, name, 63, MX_APPLY_METHOD, Name, basic_string, NthDecl)
+  MX_VISIT_OPTIONAL_ENUM(NamedDecl, obj_cf_string_formatting_family, 69, MX_APPLY_METHOD, ObjCFStringFormattingFamily, ObjCStringFormatFamily, NthDecl)
+  MX_VISIT_TEXT(NamedDecl, qualified_name_as_string, 64, MX_APPLY_METHOD, QualifiedNameAsString, basic_string, NthDecl)
+  MX_VISIT_ENTITY(NamedDecl, underlying_declaration, 48, MX_APPLY_METHOD, UnderlyingDeclaration, NamedDecl, NthDecl, DeclUseSelector::UNDERLYING_DECLARATION)
+  MX_VISIT_ENUM(NamedDecl, visibility, 70, MX_APPLY_METHOD, Visibility, Visibility, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, has_external_formal_linkage, 52, MX_APPLY_METHOD, HasExternalFormalLinkage, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, has_linkage, 53, MX_APPLY_METHOD, HasLinkage, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, has_linkage_been_computed, 54, MX_APPLY_METHOD, HasLinkageBeenComputed, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, is_cxx_class_member, 55, MX_APPLY_METHOD, IsCXXClassMember, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, is_cxx_instance_member, 59, MX_APPLY_METHOD, IsCXXInstanceMember, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, is_externally_declarable, 60, MX_APPLY_METHOD, IsExternallyDeclarable, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, is_externally_visible, 61, MX_APPLY_METHOD, IsExternallyVisible, bool, NthDecl)
+  MX_VISIT_BOOL(NamedDecl, is_linkage_valid, 71, MX_APPLY_METHOD, IsLinkageValid, bool, NthDecl)
   MX_EXIT_VISIT_NamedDecl
 MX_END_VISIT_DECL(NamedDecl)
 
@@ -9628,11 +16781,11 @@ MX_END_VISIT_DECL(NamedDecl)
 MX_BEGIN_VISIT_DECL(LabelDecl)
   MX_ENTER_VISIT_LabelDecl
   MX_VISIT_BASE(LabelDecl, NamedDecl)
-  MX_VISIT_TEXT(LabelDecl, ms_assembly_label, 67, MX_APPLY_METHOD, MSAssemblyLabel, basic_string_view, NthDecl)
-  MX_VISIT_ENTITY(LabelDecl, statement, 51, MX_APPLY_METHOD, Statement, LabelStmt, NthDecl, StmtUseSelector::STATEMENT)
-  MX_VISIT_BOOL(LabelDecl, is_gnu_local, 68, MX_APPLY_METHOD, IsGnuLocal, bool, NthDecl)
-  MX_VISIT_BOOL(LabelDecl, is_ms_assembly_label, 69, MX_APPLY_METHOD, IsMSAssemblyLabel, bool, NthDecl)
-  MX_VISIT_BOOL(LabelDecl, is_resolved_ms_assembly_label, 70, MX_APPLY_METHOD, IsResolvedMSAssemblyLabel, bool, NthDecl)
+  MX_VISIT_TEXT(LabelDecl, ms_assembly_label, 72, MX_APPLY_METHOD, MSAssemblyLabel, basic_string_view, NthDecl)
+  MX_VISIT_ENTITY(LabelDecl, statement, 56, MX_APPLY_METHOD, Statement, LabelStmt, NthDecl, StmtUseSelector::STATEMENT)
+  MX_VISIT_BOOL(LabelDecl, is_gnu_local, 73, MX_APPLY_METHOD, IsGnuLocal, bool, NthDecl)
+  MX_VISIT_BOOL(LabelDecl, is_ms_assembly_label, 74, MX_APPLY_METHOD, IsMSAssemblyLabel, bool, NthDecl)
+  MX_VISIT_BOOL(LabelDecl, is_resolved_ms_assembly_label, 75, MX_APPLY_METHOD, IsResolvedMSAssemblyLabel, bool, NthDecl)
   MX_EXIT_VISIT_LabelDecl
 MX_END_VISIT_DECL(LabelDecl)
 
@@ -9646,7 +16799,7 @@ MX_END_VISIT_DECL(LabelDecl)
 MX_BEGIN_VISIT_DECL(BaseUsingDecl)
   MX_ENTER_VISIT_BaseUsingDecl
   MX_VISIT_BASE(BaseUsingDecl, NamedDecl)
-  MX_VISIT_ENTITY_LIST(BaseUsingDecl, shadows, 45, MX_APPLY_METHOD, Shadows, UsingShadowDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(BaseUsingDecl, shadows, 50, MX_APPLY_METHOD, Shadows, UsingShadowDecl, NthDecl)
   MX_EXIT_VISIT_BaseUsingDecl
 MX_END_VISIT_DECL(BaseUsingDecl)
 
@@ -9660,9 +16813,9 @@ MX_END_VISIT_DECL(BaseUsingDecl)
 MX_BEGIN_VISIT_DECL(UsingEnumDecl)
   MX_ENTER_VISIT_UsingEnumDecl
   MX_VISIT_BASE(UsingEnumDecl, BaseUsingDecl)
-  MX_VISIT_ENTITY(UsingEnumDecl, enum_declaration, 51, MX_APPLY_METHOD, EnumDeclaration, EnumDecl, NthDecl, DeclUseSelector::ENUM_DECLARATION)
-  MX_VISIT_ENTITY(UsingEnumDecl, enum_token, 52, MX_APPLY_METHOD, EnumToken, Token, NthDecl, TokenUseSelector::ENUM_TOKEN)
-  MX_VISIT_ENTITY(UsingEnumDecl, using_token, 53, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
+  MX_VISIT_ENTITY(UsingEnumDecl, enum_declaration, 56, MX_APPLY_METHOD, EnumDeclaration, EnumDecl, NthDecl, DeclUseSelector::ENUM_DECLARATION)
+  MX_VISIT_ENTITY(UsingEnumDecl, enum_token, 57, MX_APPLY_METHOD, EnumToken, Token, NthDecl, TokenUseSelector::ENUM_TOKEN)
+  MX_VISIT_ENTITY(UsingEnumDecl, using_token, 58, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
   MX_EXIT_VISIT_UsingEnumDecl
 MX_END_VISIT_DECL(UsingEnumDecl)
 
@@ -9676,9 +16829,9 @@ MX_END_VISIT_DECL(UsingEnumDecl)
 MX_BEGIN_VISIT_DECL(UsingDecl)
   MX_ENTER_VISIT_UsingDecl
   MX_VISIT_BASE(UsingDecl, BaseUsingDecl)
-  MX_VISIT_ENTITY(UsingDecl, using_token, 51, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
-  MX_VISIT_BOOL(UsingDecl, has_typename, 68, MX_APPLY_METHOD, HasTypename, bool, NthDecl)
-  MX_VISIT_BOOL(UsingDecl, is_access_declaration, 69, MX_APPLY_METHOD, IsAccessDeclaration, bool, NthDecl)
+  MX_VISIT_ENTITY(UsingDecl, using_token, 56, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
+  MX_VISIT_BOOL(UsingDecl, has_typename, 73, MX_APPLY_METHOD, HasTypename, bool, NthDecl)
+  MX_VISIT_BOOL(UsingDecl, is_access_declaration, 74, MX_APPLY_METHOD, IsAccessDeclaration, bool, NthDecl)
   MX_EXIT_VISIT_UsingDecl
 MX_END_VISIT_DECL(UsingDecl)
 
@@ -9692,8 +16845,8 @@ MX_END_VISIT_DECL(UsingDecl)
 MX_BEGIN_VISIT_DECL(ValueDecl)
   MX_ENTER_VISIT_ValueDecl
   MX_VISIT_BASE(ValueDecl, NamedDecl)
-  MX_VISIT_ENTITY(ValueDecl, type, 51, MX_APPLY_METHOD, Type, Type, NthDecl, TypeUseSelector::TYPE)
-  MX_VISIT_BOOL(ValueDecl, is_weak, 68, MX_APPLY_METHOD, IsWeak, bool, NthDecl)
+  MX_VISIT_ENTITY(ValueDecl, type, 56, MX_APPLY_METHOD, Type, Type, NthDecl, TypeUseSelector::TYPE)
+  MX_VISIT_BOOL(ValueDecl, is_weak, 73, MX_APPLY_METHOD, IsWeak, bool, NthDecl)
   MX_EXIT_VISIT_ValueDecl
 MX_END_VISIT_DECL(ValueDecl)
 
@@ -9707,10 +16860,10 @@ MX_END_VISIT_DECL(ValueDecl)
 MX_BEGIN_VISIT_DECL(UnresolvedUsingValueDecl)
   MX_ENTER_VISIT_UnresolvedUsingValueDecl
   MX_VISIT_BASE(UnresolvedUsingValueDecl, ValueDecl)
-  MX_VISIT_ENTITY(UnresolvedUsingValueDecl, ellipsis_token, 52, MX_APPLY_METHOD, EllipsisToken, Token, NthDecl, TokenUseSelector::ELLIPSIS_TOKEN)
-  MX_VISIT_ENTITY(UnresolvedUsingValueDecl, using_token, 53, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
-  MX_VISIT_BOOL(UnresolvedUsingValueDecl, is_access_declaration, 69, MX_APPLY_METHOD, IsAccessDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(UnresolvedUsingValueDecl, is_pack_expansion, 70, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
+  MX_VISIT_ENTITY(UnresolvedUsingValueDecl, ellipsis_token, 57, MX_APPLY_METHOD, EllipsisToken, Token, NthDecl, TokenUseSelector::ELLIPSIS_TOKEN)
+  MX_VISIT_ENTITY(UnresolvedUsingValueDecl, using_token, 58, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
+  MX_VISIT_BOOL(UnresolvedUsingValueDecl, is_access_declaration, 74, MX_APPLY_METHOD, IsAccessDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(UnresolvedUsingValueDecl, is_pack_expansion, 75, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
   MX_EXIT_VISIT_UnresolvedUsingValueDecl
 MX_END_VISIT_DECL(UnresolvedUsingValueDecl)
 
@@ -9737,14 +16890,14 @@ MX_END_VISIT_DECL(TemplateParamObjectDecl)
 MX_BEGIN_VISIT_DECL(OMPDeclareReductionDecl)
   MX_ENTER_VISIT_OMPDeclareReductionDecl
   MX_VISIT_BASE(OMPDeclareReductionDecl, ValueDecl)
-  MX_VISIT_ENTITY(OMPDeclareReductionDecl, combiner, 52, MX_APPLY_METHOD, Combiner, Expr, NthDecl, StmtUseSelector::COMBINER)
-  MX_VISIT_ENTITY(OMPDeclareReductionDecl, combiner_in, 53, MX_APPLY_METHOD, CombinerIn, Expr, NthDecl, StmtUseSelector::COMBINER_IN)
-  MX_VISIT_ENTITY(OMPDeclareReductionDecl, combiner_out, 61, MX_APPLY_METHOD, CombinerOut, Expr, NthDecl, StmtUseSelector::COMBINER_OUT)
-  MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer_original, 62, MX_APPLY_METHOD, InitializerOriginal, Expr, NthDecl, StmtUseSelector::INITIALIZER_ORIGINAL)
-  MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer_private, 63, MX_APPLY_METHOD, InitializerPrivate, Expr, NthDecl, StmtUseSelector::INITIALIZER_PRIVATE)
-  MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer, 71, MX_APPLY_METHOD, Initializer, Expr, NthDecl, StmtUseSelector::INITIALIZER)
-  MX_VISIT_ENUM(OMPDeclareReductionDecl, initializer_kind, 72, MX_APPLY_METHOD, InitializerKind, OMPDeclareReductionDeclInitKind, NthDecl)
-  MX_VISIT_DECL_CONTEXT(OMPDeclareReductionDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_ENTITY(OMPDeclareReductionDecl, combiner, 57, MX_APPLY_METHOD, Combiner, Expr, NthDecl, StmtUseSelector::COMBINER)
+  MX_VISIT_ENTITY(OMPDeclareReductionDecl, combiner_in, 58, MX_APPLY_METHOD, CombinerIn, Expr, NthDecl, StmtUseSelector::COMBINER_IN)
+  MX_VISIT_ENTITY(OMPDeclareReductionDecl, combiner_out, 66, MX_APPLY_METHOD, CombinerOut, Expr, NthDecl, StmtUseSelector::COMBINER_OUT)
+  MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer_original, 67, MX_APPLY_METHOD, InitializerOriginal, Expr, NthDecl, StmtUseSelector::INITIALIZER_ORIGINAL)
+  MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer_private, 68, MX_APPLY_METHOD, InitializerPrivate, Expr, NthDecl, StmtUseSelector::INITIALIZER_PRIVATE)
+  MX_VISIT_ENTITY(OMPDeclareReductionDecl, initializer, 76, MX_APPLY_METHOD, Initializer, Expr, NthDecl, StmtUseSelector::INITIALIZER)
+  MX_VISIT_ENUM(OMPDeclareReductionDecl, initializer_kind, 77, MX_APPLY_METHOD, InitializerKind, OMPDeclareReductionDeclInitKind, NthDecl)
+  MX_VISIT_DECL_CONTEXT(OMPDeclareReductionDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_OMPDeclareReductionDecl
 MX_END_VISIT_DECL(OMPDeclareReductionDecl)
 
@@ -9771,9 +16924,9 @@ MX_END_VISIT_DECL(MSGuidDecl)
 MX_BEGIN_VISIT_DECL(IndirectFieldDecl)
   MX_ENTER_VISIT_IndirectFieldDecl
   MX_VISIT_BASE(IndirectFieldDecl, ValueDecl)
-  MX_VISIT_ENTITY_LIST(IndirectFieldDecl, chain, 45, MX_APPLY_METHOD, Chain, NamedDecl, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(IndirectFieldDecl, anonymous_field, 52, MX_APPLY_METHOD, AnonymousField, FieldDecl, NthDecl, DeclUseSelector::ANONYMOUS_FIELD)
-  MX_VISIT_OPTIONAL_ENTITY(IndirectFieldDecl, variable_declaration, 53, MX_APPLY_METHOD, VariableDeclaration, VarDecl, NthDecl, DeclUseSelector::VARIABLE_DECLARATION)
+  MX_VISIT_ENTITY_LIST(IndirectFieldDecl, chain, 50, MX_APPLY_METHOD, Chain, NamedDecl, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(IndirectFieldDecl, anonymous_field, 57, MX_APPLY_METHOD, AnonymousField, FieldDecl, NthDecl, DeclUseSelector::ANONYMOUS_FIELD)
+  MX_VISIT_OPTIONAL_ENTITY(IndirectFieldDecl, variable_declaration, 58, MX_APPLY_METHOD, VariableDeclaration, VarDecl, NthDecl, DeclUseSelector::VARIABLE_DECLARATION)
   MX_EXIT_VISIT_IndirectFieldDecl
 MX_END_VISIT_DECL(IndirectFieldDecl)
 
@@ -9787,7 +16940,7 @@ MX_END_VISIT_DECL(IndirectFieldDecl)
 MX_BEGIN_VISIT_DECL(EnumConstantDecl)
   MX_ENTER_VISIT_EnumConstantDecl
   MX_VISIT_BASE(EnumConstantDecl, ValueDecl)
-  MX_VISIT_OPTIONAL_ENTITY(EnumConstantDecl, initializer_expression, 52, MX_APPLY_METHOD, InitializerExpression, Expr, NthDecl, StmtUseSelector::INITIALIZER_EXPRESSION)
+  MX_VISIT_OPTIONAL_ENTITY(EnumConstantDecl, initializer_expression, 57, MX_APPLY_METHOD, InitializerExpression, Expr, NthDecl, StmtUseSelector::INITIALIZER_EXPRESSION)
   MX_EXIT_VISIT_EnumConstantDecl
 MX_END_VISIT_DECL(EnumConstantDecl)
 
@@ -9801,12 +16954,12 @@ MX_END_VISIT_DECL(EnumConstantDecl)
 MX_BEGIN_VISIT_DECL(DeclaratorDecl)
   MX_ENTER_VISIT_DeclaratorDecl
   MX_VISIT_BASE(DeclaratorDecl, ValueDecl)
-  MX_VISIT_ENTITY(DeclaratorDecl, first_inner_token, 52, MX_APPLY_METHOD, FirstInnerToken, Token, NthDecl, TokenUseSelector::FIRST_INNER_TOKEN)
-  MX_VISIT_ENTITY(DeclaratorDecl, first_outer_token, 53, MX_APPLY_METHOD, FirstOuterToken, Token, NthDecl, TokenUseSelector::FIRST_OUTER_TOKEN)
-  MX_VISIT_OPTIONAL_ENTITY(DeclaratorDecl, trailing_requires_clause, 61, MX_APPLY_METHOD, TrailingRequiresClause, Expr, NthDecl, StmtUseSelector::TRAILING_REQUIRES_CLAUSE)
-  MX_VISIT_ENTITY(DeclaratorDecl, type_spec_end_token, 62, MX_APPLY_METHOD, TypeSpecEndToken, Token, NthDecl, TokenUseSelector::TYPE_SPEC_END_TOKEN)
-  MX_VISIT_ENTITY(DeclaratorDecl, type_spec_start_token, 63, MX_APPLY_METHOD, TypeSpecStartToken, Token, NthDecl, TokenUseSelector::TYPE_SPEC_START_TOKEN)
-  MX_VISIT_PSEUDO_LIST(DeclaratorDecl, template_parameter_lists, 73, MX_APPLY_METHOD, TemplateParameterLists, TemplateParameterList, NthDecl)
+  MX_VISIT_ENTITY(DeclaratorDecl, first_inner_token, 57, MX_APPLY_METHOD, FirstInnerToken, Token, NthDecl, TokenUseSelector::FIRST_INNER_TOKEN)
+  MX_VISIT_ENTITY(DeclaratorDecl, first_outer_token, 58, MX_APPLY_METHOD, FirstOuterToken, Token, NthDecl, TokenUseSelector::FIRST_OUTER_TOKEN)
+  MX_VISIT_OPTIONAL_ENTITY(DeclaratorDecl, trailing_requires_clause, 66, MX_APPLY_METHOD, TrailingRequiresClause, Expr, NthDecl, StmtUseSelector::TRAILING_REQUIRES_CLAUSE)
+  MX_VISIT_ENTITY(DeclaratorDecl, type_spec_end_token, 67, MX_APPLY_METHOD, TypeSpecEndToken, Token, NthDecl, TokenUseSelector::TYPE_SPEC_END_TOKEN)
+  MX_VISIT_ENTITY(DeclaratorDecl, type_spec_start_token, 68, MX_APPLY_METHOD, TypeSpecStartToken, Token, NthDecl, TokenUseSelector::TYPE_SPEC_START_TOKEN)
+  MX_VISIT_PSEUDO_LIST(DeclaratorDecl, template_parameter_lists, 78, MX_APPLY_METHOD, TemplateParameterLists, TemplateParameterList, NthDecl)
   MX_EXIT_VISIT_DeclaratorDecl
 MX_END_VISIT_DECL(DeclaratorDecl)
 
@@ -9820,55 +16973,55 @@ MX_END_VISIT_DECL(DeclaratorDecl)
 MX_BEGIN_VISIT_DECL(VarDecl)
   MX_ENTER_VISIT_VarDecl
   MX_VISIT_BASE(VarDecl, DeclaratorDecl)
-  MX_VISIT_OPTIONAL_ENTITY(VarDecl, acting_definition, 71, MX_APPLY_METHOD, ActingDefinition, VarDecl, NthDecl, DeclUseSelector::ACTING_DEFINITION)
-  MX_VISIT_OPTIONAL_ENTITY(VarDecl, initializer, 74, MX_APPLY_METHOD, Initializer, Expr, NthDecl, StmtUseSelector::INITIALIZER)
-  MX_VISIT_ENUM(VarDecl, initializer_style, 72, MX_APPLY_METHOD, InitializerStyle, VarDeclInitializationStyle, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(VarDecl, initializing_declaration, 76, MX_APPLY_METHOD, InitializingDeclaration, VarDecl, NthDecl, DeclUseSelector::INITIALIZING_DECLARATION)
-  MX_VISIT_OPTIONAL_ENTITY(VarDecl, instantiated_from_static_data_member, 78, MX_APPLY_METHOD, InstantiatedFromStaticDataMember, VarDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_STATIC_DATA_MEMBER)
-  MX_VISIT_ENUM(VarDecl, language_linkage, 80, MX_APPLY_METHOD, LanguageLinkage, LanguageLinkage, NthDecl)
-  MX_VISIT_ENTITY(VarDecl, point_of_instantiation, 81, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl, TokenUseSelector::POINT_OF_INSTANTIATION)
-  MX_VISIT_ENUM(VarDecl, storage_class, 82, MX_APPLY_METHOD, StorageClass, StorageClass, NthDecl)
-  MX_VISIT_ENUM(VarDecl, storage_duration, 83, MX_APPLY_METHOD, StorageDuration, StorageDuration, NthDecl)
-  MX_VISIT_ENUM(VarDecl, tls_kind, 84, MX_APPLY_METHOD, TLSKind, VarDeclTLSKind, NthDecl)
-  MX_VISIT_ENUM(VarDecl, tsc_spec, 85, MX_APPLY_METHOD, TSCSpec, ThreadStorageClassSpecifier, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(VarDecl, template_instantiation_pattern, 86, MX_APPLY_METHOD, TemplateInstantiationPattern, VarDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
-  MX_VISIT_ENUM(VarDecl, template_specialization_kind, 88, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_ENUM(VarDecl, template_specialization_kind_for_instantiation, 89, MX_APPLY_METHOD, TemplateSpecializationKindForInstantiation, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_BOOL(VarDecl, has_constant_initialization, 90, MX_APPLY_METHOD, HasConstantInitialization, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, has_dependent_alignment, 91, MX_APPLY_METHOD, HasDependentAlignment, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, has_external_storage, 92, MX_APPLY_METHOD, HasExternalStorage, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, has_global_storage, 93, MX_APPLY_METHOD, HasGlobalStorage, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(VarDecl, has_ice_initializer, 94, MX_APPLY_METHOD, HasICEInitializer, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, has_initializer, 96, MX_APPLY_METHOD, HasInitializer, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, has_local_storage, 97, MX_APPLY_METHOD, HasLocalStorage, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_arc_pseudo_strong, 98, MX_APPLY_METHOD, IsARCPseudoStrong, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_cxx_for_range_declaration, 99, MX_APPLY_METHOD, IsCXXForRangeDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_constexpr, 100, MX_APPLY_METHOD, IsConstexpr, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_direct_initializer, 101, MX_APPLY_METHOD, IsDirectInitializer, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_escaping_byref, 102, MX_APPLY_METHOD, IsEscapingByref, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_exception_variable, 103, MX_APPLY_METHOD, IsExceptionVariable, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_extern_c, 104, MX_APPLY_METHOD, IsExternC, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_file_variable_declaration, 105, MX_APPLY_METHOD, IsFileVariableDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_function_or_method_variable_declaration, 106, MX_APPLY_METHOD, IsFunctionOrMethodVariableDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_in_extern_c_context, 107, MX_APPLY_METHOD, IsInExternCContext, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_in_extern_cxx_context, 108, MX_APPLY_METHOD, IsInExternCXXContext, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_initializer_capture, 109, MX_APPLY_METHOD, IsInitializerCapture, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_inline, 110, MX_APPLY_METHOD, IsInline, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_inline_specified, 111, MX_APPLY_METHOD, IsInlineSpecified, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_known_to_be_defined, 112, MX_APPLY_METHOD, IsKnownToBeDefined, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_local_variable_declaration, 113, MX_APPLY_METHOD, IsLocalVariableDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_local_variable_declaration_or_parm, 114, MX_APPLY_METHOD, IsLocalVariableDeclarationOrParm, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_nrvo_variable, 115, MX_APPLY_METHOD, IsNRVOVariable, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_no_destroy, 116, MX_APPLY_METHOD, IsNoDestroy, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_non_escaping_byref, 117, MX_APPLY_METHOD, IsNonEscapingByref, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_obj_c_for_declaration, 118, MX_APPLY_METHOD, IsObjCForDeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_previous_declaration_in_same_block_scope, 119, MX_APPLY_METHOD, IsPreviousDeclarationInSameBlockScope, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_static_data_member, 120, MX_APPLY_METHOD, IsStaticDataMember, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_static_local, 121, MX_APPLY_METHOD, IsStaticLocal, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_demoted_definition, 122, MX_APPLY_METHOD, IsThisDeclarationADemotedDefinition, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, is_usable_in_constant_expressions, 123, MX_APPLY_METHOD, IsUsableInConstantExpressions, bool, NthDecl)
-  MX_VISIT_BOOL(VarDecl, might_be_usable_in_constant_expressions, 124, MX_APPLY_METHOD, MightBeUsableInConstantExpressions, bool, NthDecl)
-  MX_VISIT_ENUM(VarDecl, needs_destruction, 125, MX_APPLY_METHOD, NeedsDestruction, QualTypeDestructionKind, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(VarDecl, acting_definition, 76, MX_APPLY_METHOD, ActingDefinition, VarDecl, NthDecl, DeclUseSelector::ACTING_DEFINITION)
+  MX_VISIT_OPTIONAL_ENTITY(VarDecl, initializer, 79, MX_APPLY_METHOD, Initializer, Expr, NthDecl, StmtUseSelector::INITIALIZER)
+  MX_VISIT_ENUM(VarDecl, initializer_style, 77, MX_APPLY_METHOD, InitializerStyle, VarDeclInitializationStyle, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(VarDecl, initializing_declaration, 81, MX_APPLY_METHOD, InitializingDeclaration, VarDecl, NthDecl, DeclUseSelector::INITIALIZING_DECLARATION)
+  MX_VISIT_OPTIONAL_ENTITY(VarDecl, instantiated_from_static_data_member, 83, MX_APPLY_METHOD, InstantiatedFromStaticDataMember, VarDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_STATIC_DATA_MEMBER)
+  MX_VISIT_ENUM(VarDecl, language_linkage, 85, MX_APPLY_METHOD, LanguageLinkage, LanguageLinkage, NthDecl)
+  MX_VISIT_ENTITY(VarDecl, point_of_instantiation, 86, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl, TokenUseSelector::POINT_OF_INSTANTIATION)
+  MX_VISIT_ENUM(VarDecl, storage_class, 87, MX_APPLY_METHOD, StorageClass, StorageClass, NthDecl)
+  MX_VISIT_ENUM(VarDecl, storage_duration, 88, MX_APPLY_METHOD, StorageDuration, StorageDuration, NthDecl)
+  MX_VISIT_ENUM(VarDecl, tls_kind, 89, MX_APPLY_METHOD, TLSKind, VarDeclTLSKind, NthDecl)
+  MX_VISIT_ENUM(VarDecl, tsc_spec, 90, MX_APPLY_METHOD, TSCSpec, ThreadStorageClassSpecifier, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(VarDecl, template_instantiation_pattern, 91, MX_APPLY_METHOD, TemplateInstantiationPattern, VarDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
+  MX_VISIT_ENUM(VarDecl, template_specialization_kind, 93, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_ENUM(VarDecl, template_specialization_kind_for_instantiation, 94, MX_APPLY_METHOD, TemplateSpecializationKindForInstantiation, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_BOOL(VarDecl, has_constant_initialization, 95, MX_APPLY_METHOD, HasConstantInitialization, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, has_dependent_alignment, 96, MX_APPLY_METHOD, HasDependentAlignment, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, has_external_storage, 97, MX_APPLY_METHOD, HasExternalStorage, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, has_global_storage, 98, MX_APPLY_METHOD, HasGlobalStorage, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(VarDecl, has_ice_initializer, 99, MX_APPLY_METHOD, HasICEInitializer, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, has_initializer, 101, MX_APPLY_METHOD, HasInitializer, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, has_local_storage, 102, MX_APPLY_METHOD, HasLocalStorage, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_arc_pseudo_strong, 103, MX_APPLY_METHOD, IsARCPseudoStrong, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_cxx_for_range_declaration, 104, MX_APPLY_METHOD, IsCXXForRangeDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_constexpr, 105, MX_APPLY_METHOD, IsConstexpr, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_direct_initializer, 106, MX_APPLY_METHOD, IsDirectInitializer, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_escaping_byref, 107, MX_APPLY_METHOD, IsEscapingByref, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_exception_variable, 108, MX_APPLY_METHOD, IsExceptionVariable, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_extern_c, 109, MX_APPLY_METHOD, IsExternC, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_file_variable_declaration, 110, MX_APPLY_METHOD, IsFileVariableDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_function_or_method_variable_declaration, 111, MX_APPLY_METHOD, IsFunctionOrMethodVariableDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_in_extern_c_context, 112, MX_APPLY_METHOD, IsInExternCContext, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_in_extern_cxx_context, 113, MX_APPLY_METHOD, IsInExternCXXContext, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_initializer_capture, 114, MX_APPLY_METHOD, IsInitializerCapture, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_inline, 115, MX_APPLY_METHOD, IsInline, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_inline_specified, 116, MX_APPLY_METHOD, IsInlineSpecified, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_known_to_be_defined, 117, MX_APPLY_METHOD, IsKnownToBeDefined, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_local_variable_declaration, 118, MX_APPLY_METHOD, IsLocalVariableDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_local_variable_declaration_or_parm, 119, MX_APPLY_METHOD, IsLocalVariableDeclarationOrParm, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_nrvo_variable, 120, MX_APPLY_METHOD, IsNRVOVariable, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_no_destroy, 121, MX_APPLY_METHOD, IsNoDestroy, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_non_escaping_byref, 122, MX_APPLY_METHOD, IsNonEscapingByref, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_obj_c_for_declaration, 123, MX_APPLY_METHOD, IsObjCForDeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_previous_declaration_in_same_block_scope, 124, MX_APPLY_METHOD, IsPreviousDeclarationInSameBlockScope, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_static_data_member, 125, MX_APPLY_METHOD, IsStaticDataMember, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_static_local, 126, MX_APPLY_METHOD, IsStaticLocal, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_demoted_definition, 127, MX_APPLY_METHOD, IsThisDeclarationADemotedDefinition, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, is_usable_in_constant_expressions, 128, MX_APPLY_METHOD, IsUsableInConstantExpressions, bool, NthDecl)
+  MX_VISIT_BOOL(VarDecl, might_be_usable_in_constant_expressions, 129, MX_APPLY_METHOD, MightBeUsableInConstantExpressions, bool, NthDecl)
+  MX_VISIT_ENUM(VarDecl, needs_destruction, 130, MX_APPLY_METHOD, NeedsDestruction, QualTypeDestructionKind, NthDecl)
   MX_EXIT_VISIT_VarDecl
 MX_END_VISIT_DECL(VarDecl)
 
@@ -9882,17 +17035,17 @@ MX_END_VISIT_DECL(VarDecl)
 MX_BEGIN_VISIT_DECL(ParmVarDecl)
   MX_ENTER_VISIT_ParmVarDecl
   MX_VISIT_BASE(ParmVarDecl, VarDecl)
-  MX_VISIT_OPTIONAL_ENTITY(ParmVarDecl, default_argument, 126, MX_APPLY_METHOD, DefaultArgument, Expr, NthDecl, StmtUseSelector::DEFAULT_ARGUMENT)
-  MX_VISIT_ENUM(ParmVarDecl, obj_c_decl_qualifier, 130, MX_APPLY_METHOD, ObjCDeclQualifier, DeclObjCDeclQualifier, NthDecl)
-  MX_VISIT_ENTITY(ParmVarDecl, original_type, 131, MX_APPLY_METHOD, OriginalType, Type, NthDecl, TypeUseSelector::ORIGINAL_TYPE)
-  MX_VISIT_OPTIONAL_ENTITY(ParmVarDecl, uninstantiated_default_argument, 132, MX_APPLY_METHOD, UninstantiatedDefaultArgument, Expr, NthDecl, StmtUseSelector::UNINSTANTIATED_DEFAULT_ARGUMENT)
-  MX_VISIT_BOOL(ParmVarDecl, has_default_argument, 134, MX_APPLY_METHOD, HasDefaultArgument, bool, NthDecl)
-  MX_VISIT_BOOL(ParmVarDecl, has_inherited_default_argument, 135, MX_APPLY_METHOD, HasInheritedDefaultArgument, bool, NthDecl)
-  MX_VISIT_BOOL(ParmVarDecl, has_uninstantiated_default_argument, 136, MX_APPLY_METHOD, HasUninstantiatedDefaultArgument, bool, NthDecl)
-  MX_VISIT_BOOL(ParmVarDecl, has_unparsed_default_argument, 137, MX_APPLY_METHOD, HasUnparsedDefaultArgument, bool, NthDecl)
-  MX_VISIT_BOOL(ParmVarDecl, is_destroyed_in_callee, 138, MX_APPLY_METHOD, IsDestroyedInCallee, bool, NthDecl)
-  MX_VISIT_BOOL(ParmVarDecl, is_knr_promoted, 139, MX_APPLY_METHOD, IsKNRPromoted, bool, NthDecl)
-  MX_VISIT_BOOL(ParmVarDecl, is_obj_c_method_parameter, 140, MX_APPLY_METHOD, IsObjCMethodParameter, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(ParmVarDecl, default_argument, 131, MX_APPLY_METHOD, DefaultArgument, Expr, NthDecl, StmtUseSelector::DEFAULT_ARGUMENT)
+  MX_VISIT_ENUM(ParmVarDecl, obj_c_decl_qualifier, 135, MX_APPLY_METHOD, ObjCDeclQualifier, DeclObjCDeclQualifier, NthDecl)
+  MX_VISIT_ENTITY(ParmVarDecl, original_type, 136, MX_APPLY_METHOD, OriginalType, Type, NthDecl, TypeUseSelector::ORIGINAL_TYPE)
+  MX_VISIT_OPTIONAL_ENTITY(ParmVarDecl, uninstantiated_default_argument, 137, MX_APPLY_METHOD, UninstantiatedDefaultArgument, Expr, NthDecl, StmtUseSelector::UNINSTANTIATED_DEFAULT_ARGUMENT)
+  MX_VISIT_BOOL(ParmVarDecl, has_default_argument, 139, MX_APPLY_METHOD, HasDefaultArgument, bool, NthDecl)
+  MX_VISIT_BOOL(ParmVarDecl, has_inherited_default_argument, 140, MX_APPLY_METHOD, HasInheritedDefaultArgument, bool, NthDecl)
+  MX_VISIT_BOOL(ParmVarDecl, has_uninstantiated_default_argument, 141, MX_APPLY_METHOD, HasUninstantiatedDefaultArgument, bool, NthDecl)
+  MX_VISIT_BOOL(ParmVarDecl, has_unparsed_default_argument, 142, MX_APPLY_METHOD, HasUnparsedDefaultArgument, bool, NthDecl)
+  MX_VISIT_BOOL(ParmVarDecl, is_destroyed_in_callee, 143, MX_APPLY_METHOD, IsDestroyedInCallee, bool, NthDecl)
+  MX_VISIT_BOOL(ParmVarDecl, is_knr_promoted, 144, MX_APPLY_METHOD, IsKNRPromoted, bool, NthDecl)
+  MX_VISIT_BOOL(ParmVarDecl, is_obj_c_method_parameter, 145, MX_APPLY_METHOD, IsObjCMethodParameter, bool, NthDecl)
   MX_EXIT_VISIT_ParmVarDecl
 MX_END_VISIT_DECL(ParmVarDecl)
 
@@ -9919,7 +17072,7 @@ MX_END_VISIT_DECL(OMPCapturedExprDecl)
 MX_BEGIN_VISIT_DECL(ImplicitParamDecl)
   MX_ENTER_VISIT_ImplicitParamDecl
   MX_VISIT_BASE(ImplicitParamDecl, VarDecl)
-  MX_VISIT_ENUM(ImplicitParamDecl, parameter_kind, 130, MX_APPLY_METHOD, ParameterKind, ImplicitParamDeclImplicitParamKind, NthDecl)
+  MX_VISIT_ENUM(ImplicitParamDecl, parameter_kind, 135, MX_APPLY_METHOD, ParameterKind, ImplicitParamDeclImplicitParamKind, NthDecl)
   MX_EXIT_VISIT_ImplicitParamDecl
 MX_END_VISIT_DECL(ImplicitParamDecl)
 
@@ -9933,7 +17086,7 @@ MX_END_VISIT_DECL(ImplicitParamDecl)
 MX_BEGIN_VISIT_DECL(DecompositionDecl)
   MX_ENTER_VISIT_DecompositionDecl
   MX_VISIT_BASE(DecompositionDecl, VarDecl)
-  MX_VISIT_ENTITY_LIST(DecompositionDecl, bindings, 45, MX_APPLY_METHOD, Bindings, BindingDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(DecompositionDecl, bindings, 50, MX_APPLY_METHOD, Bindings, BindingDecl, NthDecl)
   MX_EXIT_VISIT_DecompositionDecl
 MX_END_VISIT_DECL(DecompositionDecl)
 
@@ -9947,15 +17100,15 @@ MX_END_VISIT_DECL(DecompositionDecl)
 MX_BEGIN_VISIT_DECL(VarTemplateSpecializationDecl)
   MX_ENTER_VISIT_VarTemplateSpecializationDecl
   MX_VISIT_BASE(VarTemplateSpecializationDecl, VarDecl)
-  MX_VISIT_ENTITY(VarTemplateSpecializationDecl, extern_token, 126, MX_APPLY_METHOD, ExternToken, Token, NthDecl, TokenUseSelector::EXTERN_TOKEN)
-  MX_VISIT_ENUM(VarTemplateSpecializationDecl, specialization_kind, 130, MX_APPLY_METHOD, SpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_PSEUDO_LIST(VarTemplateSpecializationDecl, template_arguments, 141, MX_APPLY_METHOD, TemplateArguments, TemplateArgument, NthDecl)
-  MX_VISIT_PSEUDO_LIST(VarTemplateSpecializationDecl, template_instantiation_arguments, 142, MX_APPLY_METHOD, TemplateInstantiationArguments, TemplateArgument, NthDecl)
-  MX_VISIT_ENTITY(VarTemplateSpecializationDecl, template_keyword_token, 128, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthDecl, TokenUseSelector::TEMPLATE_KEYWORD_TOKEN)
-  MX_VISIT_ENTITY(VarTemplateSpecializationDecl, type_as_written, 129, MX_APPLY_METHOD, TypeAsWritten, Type, NthDecl, TypeUseSelector::TYPE_AS_WRITTEN)
-  MX_VISIT_BOOL(VarTemplateSpecializationDecl, is_class_scope_explicit_specialization, 127, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(VarTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 133, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(VarTemplateSpecializationDecl, is_explicit_specialization, 134, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
+  MX_VISIT_ENTITY(VarTemplateSpecializationDecl, extern_token, 131, MX_APPLY_METHOD, ExternToken, Token, NthDecl, TokenUseSelector::EXTERN_TOKEN)
+  MX_VISIT_ENUM(VarTemplateSpecializationDecl, specialization_kind, 135, MX_APPLY_METHOD, SpecializationKind, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_PSEUDO_LIST(VarTemplateSpecializationDecl, template_arguments, 146, MX_APPLY_METHOD, TemplateArguments, TemplateArgument, NthDecl)
+  MX_VISIT_PSEUDO_LIST(VarTemplateSpecializationDecl, template_instantiation_arguments, 147, MX_APPLY_METHOD, TemplateInstantiationArguments, TemplateArgument, NthDecl)
+  MX_VISIT_ENTITY(VarTemplateSpecializationDecl, template_keyword_token, 133, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthDecl, TokenUseSelector::TEMPLATE_KEYWORD_TOKEN)
+  MX_VISIT_ENTITY(VarTemplateSpecializationDecl, type_as_written, 134, MX_APPLY_METHOD, TypeAsWritten, Type, NthDecl, TypeUseSelector::TYPE_AS_WRITTEN)
+  MX_VISIT_BOOL(VarTemplateSpecializationDecl, is_class_scope_explicit_specialization, 132, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
+  MX_VISIT_BOOL(VarTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 138, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
+  MX_VISIT_BOOL(VarTemplateSpecializationDecl, is_explicit_specialization, 139, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
   MX_EXIT_VISIT_VarTemplateSpecializationDecl
 MX_END_VISIT_DECL(VarTemplateSpecializationDecl)
 
@@ -9981,16 +17134,16 @@ MX_END_VISIT_DECL(VarTemplatePartialSpecializationDecl)
 MX_BEGIN_VISIT_DECL(NonTypeTemplateParmDecl)
   MX_ENTER_VISIT_NonTypeTemplateParmDecl
   MX_VISIT_BASE(NonTypeTemplateParmDecl, DeclaratorDecl)
-  MX_VISIT_BOOL(NonTypeTemplateParmDecl, default_argument_was_inherited, 70, MX_APPLY_METHOD, DefaultArgumentWasInherited, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(NonTypeTemplateParmDecl, default_argument, 71, MX_APPLY_METHOD, DefaultArgument, Expr, NthDecl, StmtUseSelector::DEFAULT_ARGUMENT)
-  MX_VISIT_ENTITY(NonTypeTemplateParmDecl, default_argument_token, 74, MX_APPLY_METHOD, DefaultArgumentToken, Token, NthDecl, TokenUseSelector::DEFAULT_ARGUMENT_TOKEN)
-  MX_VISIT_OPTIONAL_INT(NonTypeTemplateParmDecl, num_expansion_types, 143, MX_APPLY_METHOD, NumExpansionTypes, unsigned, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(NonTypeTemplateParmDecl, placeholder_type_constraint, 76, MX_APPLY_METHOD, PlaceholderTypeConstraint, Expr, NthDecl, StmtUseSelector::PLACEHOLDER_TYPE_CONSTRAINT)
-  MX_VISIT_BOOL(NonTypeTemplateParmDecl, has_default_argument, 87, MX_APPLY_METHOD, HasDefaultArgument, bool, NthDecl)
-  MX_VISIT_BOOL(NonTypeTemplateParmDecl, has_placeholder_type_constraint, 90, MX_APPLY_METHOD, HasPlaceholderTypeConstraint, bool, NthDecl)
-  MX_VISIT_BOOL(NonTypeTemplateParmDecl, is_expanded_parameter_pack, 91, MX_APPLY_METHOD, IsExpandedParameterPack, bool, NthDecl)
-  MX_VISIT_BOOL(NonTypeTemplateParmDecl, is_pack_expansion, 92, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(NonTypeTemplateParmDecl, expansion_types, 45, MX_APPLY_METHOD, ExpansionTypes, Type, NthDecl)
+  MX_VISIT_BOOL(NonTypeTemplateParmDecl, default_argument_was_inherited, 75, MX_APPLY_METHOD, DefaultArgumentWasInherited, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(NonTypeTemplateParmDecl, default_argument, 76, MX_APPLY_METHOD, DefaultArgument, Expr, NthDecl, StmtUseSelector::DEFAULT_ARGUMENT)
+  MX_VISIT_ENTITY(NonTypeTemplateParmDecl, default_argument_token, 79, MX_APPLY_METHOD, DefaultArgumentToken, Token, NthDecl, TokenUseSelector::DEFAULT_ARGUMENT_TOKEN)
+  MX_VISIT_OPTIONAL_INT(NonTypeTemplateParmDecl, num_expansion_types, 148, MX_APPLY_METHOD, NumExpansionTypes, unsigned, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(NonTypeTemplateParmDecl, placeholder_type_constraint, 81, MX_APPLY_METHOD, PlaceholderTypeConstraint, Expr, NthDecl, StmtUseSelector::PLACEHOLDER_TYPE_CONSTRAINT)
+  MX_VISIT_BOOL(NonTypeTemplateParmDecl, has_default_argument, 92, MX_APPLY_METHOD, HasDefaultArgument, bool, NthDecl)
+  MX_VISIT_BOOL(NonTypeTemplateParmDecl, has_placeholder_type_constraint, 95, MX_APPLY_METHOD, HasPlaceholderTypeConstraint, bool, NthDecl)
+  MX_VISIT_BOOL(NonTypeTemplateParmDecl, is_expanded_parameter_pack, 96, MX_APPLY_METHOD, IsExpandedParameterPack, bool, NthDecl)
+  MX_VISIT_BOOL(NonTypeTemplateParmDecl, is_pack_expansion, 97, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(NonTypeTemplateParmDecl, expansion_types, 50, MX_APPLY_METHOD, ExpansionTypes, Type, NthDecl)
   MX_EXIT_VISIT_NonTypeTemplateParmDecl
 MX_END_VISIT_DECL(NonTypeTemplateParmDecl)
 
@@ -10004,8 +17157,8 @@ MX_END_VISIT_DECL(NonTypeTemplateParmDecl)
 MX_BEGIN_VISIT_DECL(MSPropertyDecl)
   MX_ENTER_VISIT_MSPropertyDecl
   MX_VISIT_BASE(MSPropertyDecl, DeclaratorDecl)
-  MX_VISIT_BOOL(MSPropertyDecl, has_getter, 70, MX_APPLY_METHOD, HasGetter, bool, NthDecl)
-  MX_VISIT_BOOL(MSPropertyDecl, has_setter, 75, MX_APPLY_METHOD, HasSetter, bool, NthDecl)
+  MX_VISIT_BOOL(MSPropertyDecl, has_getter, 75, MX_APPLY_METHOD, HasGetter, bool, NthDecl)
+  MX_VISIT_BOOL(MSPropertyDecl, has_setter, 80, MX_APPLY_METHOD, HasSetter, bool, NthDecl)
   MX_EXIT_VISIT_MSPropertyDecl
 MX_END_VISIT_DECL(MSPropertyDecl)
 
@@ -10019,79 +17172,79 @@ MX_END_VISIT_DECL(MSPropertyDecl)
 MX_BEGIN_VISIT_DECL(FunctionDecl)
   MX_ENTER_VISIT_FunctionDecl
   MX_VISIT_BASE(FunctionDecl, DeclaratorDecl)
-  MX_VISIT_BOOL(FunctionDecl, uses_fp_intrin, 70, MX_APPLY_METHOD, UsesFPIntrin, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, does_declaration_force_externally_visible_definition, 75, MX_APPLY_METHOD, DoesDeclarationForceExternallyVisibleDefinition, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, does_this_declaration_have_a_body, 79, MX_APPLY_METHOD, DoesThisDeclarationHaveABody, bool, NthDecl)
-  MX_VISIT_ENTITY(FunctionDecl, call_result_type, 71, MX_APPLY_METHOD, CallResultType, Type, NthDecl, TypeUseSelector::CALL_RESULT_TYPE)
-  MX_VISIT_ENUM(FunctionDecl, constexpr_kind, 72, MX_APPLY_METHOD, ConstexprKind, ConstexprSpecKind, NthDecl)
-  MX_VISIT_ENTITY(FunctionDecl, declared_return_type, 74, MX_APPLY_METHOD, DeclaredReturnType, Type, NthDecl, TypeUseSelector::DECLARED_RETURN_TYPE)
-  MX_VISIT_ENTITY(FunctionDecl, ellipsis_token, 76, MX_APPLY_METHOD, EllipsisToken, Token, NthDecl, TokenUseSelector::ELLIPSIS_TOKEN)
-  MX_VISIT_ENUM(FunctionDecl, exception_spec_type, 80, MX_APPLY_METHOD, ExceptionSpecType, ExceptionSpecificationType, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, instantiated_from_member_function, 86, MX_APPLY_METHOD, InstantiatedFromMemberFunction, FunctionDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_FUNCTION)
-  MX_VISIT_ENUM(FunctionDecl, language_linkage, 82, MX_APPLY_METHOD, LanguageLinkage, LanguageLinkage, NthDecl)
-  MX_VISIT_ENUM(FunctionDecl, multi_version_kind, 83, MX_APPLY_METHOD, MultiVersionKind, MultiVersionKind, NthDecl)
-  MX_VISIT_OPTIONAL_INT(FunctionDecl, odr_hash, 143, MX_APPLY_METHOD, ODRHash, unsigned, NthDecl)
-  MX_VISIT_ENUM(FunctionDecl, overloaded_operator, 84, MX_APPLY_METHOD, OverloadedOperator, OverloadedOperatorKind, NthDecl)
-  MX_VISIT_ENTITY(FunctionDecl, point_of_instantiation, 129, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl, TokenUseSelector::POINT_OF_INSTANTIATION)
-  MX_VISIT_ENTITY(FunctionDecl, return_type, 131, MX_APPLY_METHOD, ReturnType, Type, NthDecl, TypeUseSelector::RETURN_TYPE)
-  MX_VISIT_ENUM(FunctionDecl, storage_class, 85, MX_APPLY_METHOD, StorageClass, StorageClass, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, template_instantiation_pattern, 145, MX_APPLY_METHOD, TemplateInstantiationPattern, FunctionDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
-  MX_VISIT_ENUM(FunctionDecl, template_specialization_kind, 88, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_ENUM(FunctionDecl, template_specialization_kind_for_instantiation, 89, MX_APPLY_METHOD, TemplateSpecializationKindForInstantiation, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_ENUM(FunctionDecl, templated_kind, 125, MX_APPLY_METHOD, TemplatedKind, FunctionDeclTemplatedKind, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_implicit_return_zero, 92, MX_APPLY_METHOD, HasImplicitReturnZero, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_inherited_prototype, 93, MX_APPLY_METHOD, HasInheritedPrototype, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_one_parameter_or_default_arguments, 94, MX_APPLY_METHOD, HasOneParameterOrDefaultArguments, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_prototype, 95, MX_APPLY_METHOD, HasPrototype, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_skipped_body, 96, MX_APPLY_METHOD, HasSkippedBody, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_trivial_body, 97, MX_APPLY_METHOD, HasTrivialBody, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, has_written_prototype, 98, MX_APPLY_METHOD, HasWrittenPrototype, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, instantiation_is_pending, 99, MX_APPLY_METHOD, InstantiationIsPending, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_cpu_dispatch_multi_version, 100, MX_APPLY_METHOD, IsCPUDispatchMultiVersion, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_cpu_specific_multi_version, 101, MX_APPLY_METHOD, IsCPUSpecificMultiVersion, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_consteval, 102, MX_APPLY_METHOD, IsConsteval, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_constexpr, 103, MX_APPLY_METHOD, IsConstexpr, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_constexpr_specified, 104, MX_APPLY_METHOD, IsConstexprSpecified, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_defaulted, 105, MX_APPLY_METHOD, IsDefaulted, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_deleted, 106, MX_APPLY_METHOD, IsDeleted, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_deleted_as_written, 107, MX_APPLY_METHOD, IsDeletedAsWritten, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_destroying_operator_delete, 108, MX_APPLY_METHOD, IsDestroyingOperatorDelete, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_explicitly_defaulted, 109, MX_APPLY_METHOD, IsExplicitlyDefaulted, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_extern_c, 110, MX_APPLY_METHOD, IsExternC, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_function_template_specialization, 111, MX_APPLY_METHOD, IsFunctionTemplateSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_global, 112, MX_APPLY_METHOD, IsGlobal, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_implicitly_instantiable, 113, MX_APPLY_METHOD, IsImplicitlyInstantiable, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_in_extern_c_context, 114, MX_APPLY_METHOD, IsInExternCContext, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_in_extern_cxx_context, 115, MX_APPLY_METHOD, IsInExternCXXContext, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_inline_builtin_declaration, 116, MX_APPLY_METHOD, IsInlineBuiltinDeclaration, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, is_inline_definition_externally_visible, 117, MX_APPLY_METHOD, IsInlineDefinitionExternallyVisible, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_inline_specified, 119, MX_APPLY_METHOD, IsInlineSpecified, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_inlined, 120, MX_APPLY_METHOD, IsInlined, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_late_template_parsed, 121, MX_APPLY_METHOD, IsLateTemplateParsed, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, is_ms_extern_inline, 122, MX_APPLY_METHOD, IsMSExternInline, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_msvcrt_entry_point, 124, MX_APPLY_METHOD, IsMSVCRTEntryPoint, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_main, 127, MX_APPLY_METHOD, IsMain, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_multi_version, 133, MX_APPLY_METHOD, IsMultiVersion, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_no_return, 134, MX_APPLY_METHOD, IsNoReturn, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_overloaded_operator, 135, MX_APPLY_METHOD, IsOverloadedOperator, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_pure, 136, MX_APPLY_METHOD, IsPure, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_replaceable_global_allocation_function, 137, MX_APPLY_METHOD, IsReplaceableGlobalAllocationFunction, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, is_reserved_global_placement_operator, 138, MX_APPLY_METHOD, IsReservedGlobalPlacementOperator, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_static, 140, MX_APPLY_METHOD, IsStatic, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_target_clones_multi_version, 146, MX_APPLY_METHOD, IsTargetClonesMultiVersion, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_target_multi_version, 147, MX_APPLY_METHOD, IsTargetMultiVersion, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_template_instantiation, 148, MX_APPLY_METHOD, IsTemplateInstantiation, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_this_declaration_instantiated_from_a_friend_definition, 149, MX_APPLY_METHOD, IsThisDeclarationInstantiatedFromAFriendDefinition, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_trivial, 150, MX_APPLY_METHOD, IsTrivial, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_trivial_for_call, 151, MX_APPLY_METHOD, IsTrivialForCall, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_user_provided, 152, MX_APPLY_METHOD, IsUserProvided, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_variadic, 153, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, is_virtual_as_written, 154, MX_APPLY_METHOD, IsVirtualAsWritten, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(FunctionDecl, parameters, 45, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, uses_seh_try, 155, MX_APPLY_METHOD, UsesSEHTry, bool, NthDecl)
-  MX_VISIT_BOOL(FunctionDecl, will_have_body, 156, MX_APPLY_METHOD, WillHaveBody, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, body, 157, MX_APPLY_METHOD, Body, Stmt, NthDecl, StmtUseSelector::BODY)
-  MX_VISIT_DECL_CONTEXT(FunctionDecl, declarations_in_context, 46, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, uses_fp_intrin, 75, MX_APPLY_METHOD, UsesFPIntrin, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, does_declaration_force_externally_visible_definition, 80, MX_APPLY_METHOD, DoesDeclarationForceExternallyVisibleDefinition, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, does_this_declaration_have_a_body, 84, MX_APPLY_METHOD, DoesThisDeclarationHaveABody, bool, NthDecl)
+  MX_VISIT_ENTITY(FunctionDecl, call_result_type, 76, MX_APPLY_METHOD, CallResultType, Type, NthDecl, TypeUseSelector::CALL_RESULT_TYPE)
+  MX_VISIT_ENUM(FunctionDecl, constexpr_kind, 77, MX_APPLY_METHOD, ConstexprKind, ConstexprSpecKind, NthDecl)
+  MX_VISIT_ENTITY(FunctionDecl, declared_return_type, 79, MX_APPLY_METHOD, DeclaredReturnType, Type, NthDecl, TypeUseSelector::DECLARED_RETURN_TYPE)
+  MX_VISIT_ENTITY(FunctionDecl, ellipsis_token, 81, MX_APPLY_METHOD, EllipsisToken, Token, NthDecl, TokenUseSelector::ELLIPSIS_TOKEN)
+  MX_VISIT_ENUM(FunctionDecl, exception_spec_type, 85, MX_APPLY_METHOD, ExceptionSpecType, ExceptionSpecificationType, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, instantiated_from_member_function, 91, MX_APPLY_METHOD, InstantiatedFromMemberFunction, FunctionDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_FUNCTION)
+  MX_VISIT_ENUM(FunctionDecl, language_linkage, 87, MX_APPLY_METHOD, LanguageLinkage, LanguageLinkage, NthDecl)
+  MX_VISIT_ENUM(FunctionDecl, multi_version_kind, 88, MX_APPLY_METHOD, MultiVersionKind, MultiVersionKind, NthDecl)
+  MX_VISIT_OPTIONAL_INT(FunctionDecl, odr_hash, 148, MX_APPLY_METHOD, ODRHash, unsigned, NthDecl)
+  MX_VISIT_ENUM(FunctionDecl, overloaded_operator, 89, MX_APPLY_METHOD, OverloadedOperator, OverloadedOperatorKind, NthDecl)
+  MX_VISIT_ENTITY(FunctionDecl, point_of_instantiation, 134, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl, TokenUseSelector::POINT_OF_INSTANTIATION)
+  MX_VISIT_ENTITY(FunctionDecl, return_type, 136, MX_APPLY_METHOD, ReturnType, Type, NthDecl, TypeUseSelector::RETURN_TYPE)
+  MX_VISIT_ENUM(FunctionDecl, storage_class, 90, MX_APPLY_METHOD, StorageClass, StorageClass, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, template_instantiation_pattern, 150, MX_APPLY_METHOD, TemplateInstantiationPattern, FunctionDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
+  MX_VISIT_ENUM(FunctionDecl, template_specialization_kind, 93, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_ENUM(FunctionDecl, template_specialization_kind_for_instantiation, 94, MX_APPLY_METHOD, TemplateSpecializationKindForInstantiation, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_ENUM(FunctionDecl, templated_kind, 130, MX_APPLY_METHOD, TemplatedKind, FunctionDeclTemplatedKind, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_implicit_return_zero, 97, MX_APPLY_METHOD, HasImplicitReturnZero, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_inherited_prototype, 98, MX_APPLY_METHOD, HasInheritedPrototype, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_one_parameter_or_default_arguments, 99, MX_APPLY_METHOD, HasOneParameterOrDefaultArguments, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_prototype, 100, MX_APPLY_METHOD, HasPrototype, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_skipped_body, 101, MX_APPLY_METHOD, HasSkippedBody, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_trivial_body, 102, MX_APPLY_METHOD, HasTrivialBody, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, has_written_prototype, 103, MX_APPLY_METHOD, HasWrittenPrototype, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, instantiation_is_pending, 104, MX_APPLY_METHOD, InstantiationIsPending, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_cpu_dispatch_multi_version, 105, MX_APPLY_METHOD, IsCPUDispatchMultiVersion, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_cpu_specific_multi_version, 106, MX_APPLY_METHOD, IsCPUSpecificMultiVersion, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_consteval, 107, MX_APPLY_METHOD, IsConsteval, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_constexpr, 108, MX_APPLY_METHOD, IsConstexpr, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_constexpr_specified, 109, MX_APPLY_METHOD, IsConstexprSpecified, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_defaulted, 110, MX_APPLY_METHOD, IsDefaulted, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_deleted, 111, MX_APPLY_METHOD, IsDeleted, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_deleted_as_written, 112, MX_APPLY_METHOD, IsDeletedAsWritten, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_destroying_operator_delete, 113, MX_APPLY_METHOD, IsDestroyingOperatorDelete, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_explicitly_defaulted, 114, MX_APPLY_METHOD, IsExplicitlyDefaulted, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_extern_c, 115, MX_APPLY_METHOD, IsExternC, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_function_template_specialization, 116, MX_APPLY_METHOD, IsFunctionTemplateSpecialization, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_global, 117, MX_APPLY_METHOD, IsGlobal, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_implicitly_instantiable, 118, MX_APPLY_METHOD, IsImplicitlyInstantiable, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_in_extern_c_context, 119, MX_APPLY_METHOD, IsInExternCContext, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_in_extern_cxx_context, 120, MX_APPLY_METHOD, IsInExternCXXContext, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_inline_builtin_declaration, 121, MX_APPLY_METHOD, IsInlineBuiltinDeclaration, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, is_inline_definition_externally_visible, 122, MX_APPLY_METHOD, IsInlineDefinitionExternallyVisible, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_inline_specified, 124, MX_APPLY_METHOD, IsInlineSpecified, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_inlined, 125, MX_APPLY_METHOD, IsInlined, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_late_template_parsed, 126, MX_APPLY_METHOD, IsLateTemplateParsed, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, is_ms_extern_inline, 127, MX_APPLY_METHOD, IsMSExternInline, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_msvcrt_entry_point, 129, MX_APPLY_METHOD, IsMSVCRTEntryPoint, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_main, 132, MX_APPLY_METHOD, IsMain, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_multi_version, 138, MX_APPLY_METHOD, IsMultiVersion, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_no_return, 139, MX_APPLY_METHOD, IsNoReturn, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_overloaded_operator, 140, MX_APPLY_METHOD, IsOverloadedOperator, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_pure, 141, MX_APPLY_METHOD, IsPure, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_replaceable_global_allocation_function, 142, MX_APPLY_METHOD, IsReplaceableGlobalAllocationFunction, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(FunctionDecl, is_reserved_global_placement_operator, 143, MX_APPLY_METHOD, IsReservedGlobalPlacementOperator, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_static, 145, MX_APPLY_METHOD, IsStatic, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_target_clones_multi_version, 151, MX_APPLY_METHOD, IsTargetClonesMultiVersion, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_target_multi_version, 152, MX_APPLY_METHOD, IsTargetMultiVersion, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_template_instantiation, 153, MX_APPLY_METHOD, IsTemplateInstantiation, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_this_declaration_instantiated_from_a_friend_definition, 154, MX_APPLY_METHOD, IsThisDeclarationInstantiatedFromAFriendDefinition, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_trivial, 155, MX_APPLY_METHOD, IsTrivial, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_trivial_for_call, 156, MX_APPLY_METHOD, IsTrivialForCall, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_user_provided, 157, MX_APPLY_METHOD, IsUserProvided, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_variadic, 158, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, is_virtual_as_written, 159, MX_APPLY_METHOD, IsVirtualAsWritten, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(FunctionDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, uses_seh_try, 160, MX_APPLY_METHOD, UsesSEHTry, bool, NthDecl)
+  MX_VISIT_BOOL(FunctionDecl, will_have_body, 161, MX_APPLY_METHOD, WillHaveBody, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(FunctionDecl, body, 162, MX_APPLY_METHOD, Body, Stmt, NthDecl, StmtUseSelector::BODY)
+  MX_VISIT_DECL_CONTEXT(FunctionDecl, declarations_in_context, 51, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_FunctionDecl
 MX_END_VISIT_DECL(FunctionDecl)
 
@@ -10105,19 +17258,19 @@ MX_END_VISIT_DECL(FunctionDecl)
 MX_BEGIN_VISIT_DECL(CXXMethodDecl)
   MX_ENTER_VISIT_CXXMethodDecl
   MX_VISIT_BASE(CXXMethodDecl, FunctionDecl)
-  MX_VISIT_ENUM(CXXMethodDecl, reference_qualifier, 130, MX_APPLY_METHOD, ReferenceQualifier, RefQualifierKind, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXMethodDecl, this_object_type, 159, MX_APPLY_METHOD, ThisObjectType, Type, NthDecl, TypeUseSelector::THIS_OBJECT_TYPE)
-  MX_VISIT_OPTIONAL_ENTITY(CXXMethodDecl, this_type, 161, MX_APPLY_METHOD, ThisType, Type, NthDecl, TypeUseSelector::THIS_TYPE)
-  MX_VISIT_BOOL(CXXMethodDecl, has_inline_body, 163, MX_APPLY_METHOD, HasInlineBody, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_const, 164, MX_APPLY_METHOD, IsConst, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_copy_assignment_operator, 165, MX_APPLY_METHOD, IsCopyAssignmentOperator, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_instance, 166, MX_APPLY_METHOD, IsInstance, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_lambda_static_invoker, 167, MX_APPLY_METHOD, IsLambdaStaticInvoker, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_move_assignment_operator, 168, MX_APPLY_METHOD, IsMoveAssignmentOperator, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_virtual, 169, MX_APPLY_METHOD, IsVirtual, bool, NthDecl)
-  MX_VISIT_BOOL(CXXMethodDecl, is_volatile, 170, MX_APPLY_METHOD, IsVolatile, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(CXXMethodDecl, overridden_methods, 57, MX_APPLY_METHOD, OverriddenMethods, CXXMethodDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(CXXMethodDecl, parameter_declarations, 171, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
+  MX_VISIT_ENUM(CXXMethodDecl, reference_qualifier, 135, MX_APPLY_METHOD, ReferenceQualifier, RefQualifierKind, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXMethodDecl, this_object_type, 164, MX_APPLY_METHOD, ThisObjectType, Type, NthDecl, TypeUseSelector::THIS_OBJECT_TYPE)
+  MX_VISIT_OPTIONAL_ENTITY(CXXMethodDecl, this_type, 166, MX_APPLY_METHOD, ThisType, Type, NthDecl, TypeUseSelector::THIS_TYPE)
+  MX_VISIT_BOOL(CXXMethodDecl, has_inline_body, 168, MX_APPLY_METHOD, HasInlineBody, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_const, 169, MX_APPLY_METHOD, IsConst, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_copy_assignment_operator, 170, MX_APPLY_METHOD, IsCopyAssignmentOperator, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_instance, 171, MX_APPLY_METHOD, IsInstance, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_lambda_static_invoker, 172, MX_APPLY_METHOD, IsLambdaStaticInvoker, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_move_assignment_operator, 173, MX_APPLY_METHOD, IsMoveAssignmentOperator, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_virtual, 174, MX_APPLY_METHOD, IsVirtual, bool, NthDecl)
+  MX_VISIT_BOOL(CXXMethodDecl, is_volatile, 175, MX_APPLY_METHOD, IsVolatile, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(CXXMethodDecl, overridden_methods, 62, MX_APPLY_METHOD, OverriddenMethods, CXXMethodDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(CXXMethodDecl, parameter_declarations, 176, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
   MX_EXIT_VISIT_CXXMethodDecl
 MX_END_VISIT_DECL(CXXMethodDecl)
 
@@ -10131,8 +17284,8 @@ MX_END_VISIT_DECL(CXXMethodDecl)
 MX_BEGIN_VISIT_DECL(CXXDestructorDecl)
   MX_ENTER_VISIT_CXXDestructorDecl
   MX_VISIT_BASE(CXXDestructorDecl, CXXMethodDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXDestructorDecl, operator_delete, 172, MX_APPLY_METHOD, OperatorDelete, FunctionDecl, NthDecl, DeclUseSelector::OPERATOR_DELETE)
-  MX_VISIT_OPTIONAL_ENTITY(CXXDestructorDecl, operator_delete_this_argument, 174, MX_APPLY_METHOD, OperatorDeleteThisArgument, Expr, NthDecl, StmtUseSelector::OPERATOR_DELETE_THIS_ARGUMENT)
+  MX_VISIT_OPTIONAL_ENTITY(CXXDestructorDecl, operator_delete, 177, MX_APPLY_METHOD, OperatorDelete, FunctionDecl, NthDecl, DeclUseSelector::OPERATOR_DELETE)
+  MX_VISIT_OPTIONAL_ENTITY(CXXDestructorDecl, operator_delete_this_argument, 179, MX_APPLY_METHOD, OperatorDeleteThisArgument, Expr, NthDecl, StmtUseSelector::OPERATOR_DELETE_THIS_ARGUMENT)
   MX_EXIT_VISIT_CXXDestructorDecl
 MX_END_VISIT_DECL(CXXDestructorDecl)
 
@@ -10146,9 +17299,9 @@ MX_END_VISIT_DECL(CXXDestructorDecl)
 MX_BEGIN_VISIT_DECL(CXXConversionDecl)
   MX_ENTER_VISIT_CXXConversionDecl
   MX_VISIT_BASE(CXXConversionDecl, CXXMethodDecl)
-  MX_VISIT_ENTITY(CXXConversionDecl, conversion_type, 172, MX_APPLY_METHOD, ConversionType, Type, NthDecl, TypeUseSelector::CONVERSION_TYPE)
-  MX_VISIT_BOOL(CXXConversionDecl, is_explicit, 173, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConversionDecl, is_lambda_to_block_pointer_conversion, 175, MX_APPLY_METHOD, IsLambdaToBlockPointerConversion, bool, NthDecl)
+  MX_VISIT_ENTITY(CXXConversionDecl, conversion_type, 177, MX_APPLY_METHOD, ConversionType, Type, NthDecl, TypeUseSelector::CONVERSION_TYPE)
+  MX_VISIT_BOOL(CXXConversionDecl, is_explicit, 178, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConversionDecl, is_lambda_to_block_pointer_conversion, 180, MX_APPLY_METHOD, IsLambdaToBlockPointerConversion, bool, NthDecl)
   MX_EXIT_VISIT_CXXConversionDecl
 MX_END_VISIT_DECL(CXXConversionDecl)
 
@@ -10162,12 +17315,12 @@ MX_END_VISIT_DECL(CXXConversionDecl)
 MX_BEGIN_VISIT_DECL(CXXConstructorDecl)
   MX_ENTER_VISIT_CXXConstructorDecl
   MX_VISIT_BASE(CXXConstructorDecl, CXXMethodDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXConstructorDecl, target_constructor, 172, MX_APPLY_METHOD, TargetConstructor, CXXConstructorDecl, NthDecl, DeclUseSelector::TARGET_CONSTRUCTOR)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_default_constructor, 175, MX_APPLY_METHOD, IsDefaultConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_delegating_constructor, 176, MX_APPLY_METHOD, IsDelegatingConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_explicit, 177, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_inheriting_constructor, 178, MX_APPLY_METHOD, IsInheritingConstructor, bool, NthDecl)
-  MX_VISIT_BOOL(CXXConstructorDecl, is_specialization_copying_object, 179, MX_APPLY_METHOD, IsSpecializationCopyingObject, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXConstructorDecl, target_constructor, 177, MX_APPLY_METHOD, TargetConstructor, CXXConstructorDecl, NthDecl, DeclUseSelector::TARGET_CONSTRUCTOR)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_default_constructor, 180, MX_APPLY_METHOD, IsDefaultConstructor, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_delegating_constructor, 181, MX_APPLY_METHOD, IsDelegatingConstructor, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_explicit, 182, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_inheriting_constructor, 183, MX_APPLY_METHOD, IsInheritingConstructor, bool, NthDecl)
+  MX_VISIT_BOOL(CXXConstructorDecl, is_specialization_copying_object, 184, MX_APPLY_METHOD, IsSpecializationCopyingObject, bool, NthDecl)
   MX_EXIT_VISIT_CXXConstructorDecl
 MX_END_VISIT_DECL(CXXConstructorDecl)
 
@@ -10181,10 +17334,10 @@ MX_END_VISIT_DECL(CXXConstructorDecl)
 MX_BEGIN_VISIT_DECL(CXXDeductionGuideDecl)
   MX_ENTER_VISIT_CXXDeductionGuideDecl
   MX_VISIT_BASE(CXXDeductionGuideDecl, FunctionDecl)
-  MX_VISIT_ENTITY(CXXDeductionGuideDecl, corresponding_constructor, 159, MX_APPLY_METHOD, CorrespondingConstructor, CXXConstructorDecl, NthDecl, DeclUseSelector::CORRESPONDING_CONSTRUCTOR)
-  MX_VISIT_BOOL(CXXDeductionGuideDecl, is_copy_deduction_candidate, 160, MX_APPLY_METHOD, IsCopyDeductionCandidate, bool, NthDecl)
-  MX_VISIT_BOOL(CXXDeductionGuideDecl, is_explicit, 162, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(CXXDeductionGuideDecl, parameter_declarations, 57, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
+  MX_VISIT_ENTITY(CXXDeductionGuideDecl, corresponding_constructor, 164, MX_APPLY_METHOD, CorrespondingConstructor, CXXConstructorDecl, NthDecl, DeclUseSelector::CORRESPONDING_CONSTRUCTOR)
+  MX_VISIT_BOOL(CXXDeductionGuideDecl, is_copy_deduction_candidate, 165, MX_APPLY_METHOD, IsCopyDeductionCandidate, bool, NthDecl)
+  MX_VISIT_BOOL(CXXDeductionGuideDecl, is_explicit, 167, MX_APPLY_METHOD, IsExplicit, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(CXXDeductionGuideDecl, parameter_declarations, 62, MX_APPLY_METHOD, ParameterDeclarations, ParmVarDecl, NthDecl)
   MX_EXIT_VISIT_CXXDeductionGuideDecl
 MX_END_VISIT_DECL(CXXDeductionGuideDecl)
 
@@ -10198,18 +17351,18 @@ MX_END_VISIT_DECL(CXXDeductionGuideDecl)
 MX_BEGIN_VISIT_DECL(FieldDecl)
   MX_ENTER_VISIT_FieldDecl
   MX_VISIT_BASE(FieldDecl, DeclaratorDecl)
-  MX_VISIT_OPTIONAL_ENTITY(FieldDecl, bit_width, 71, MX_APPLY_METHOD, BitWidth, Expr, NthDecl, StmtUseSelector::BIT_WIDTH)
-  MX_VISIT_OPTIONAL_ENTITY(FieldDecl, captured_vla_type, 74, MX_APPLY_METHOD, CapturedVLAType, VariableArrayType, NthDecl, TypeUseSelector::CAPTURED_VLA_TYPE)
-  MX_VISIT_ENUM(FieldDecl, in_class_initializer_style, 72, MX_APPLY_METHOD, InClassInitializerStyle, InClassInitStyle, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(FieldDecl, in_class_initializer, 76, MX_APPLY_METHOD, InClassInitializer, Expr, NthDecl, StmtUseSelector::IN_CLASS_INITIALIZER)
-  MX_VISIT_BOOL(FieldDecl, has_captured_vla_type, 79, MX_APPLY_METHOD, HasCapturedVLAType, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, has_in_class_initializer, 87, MX_APPLY_METHOD, HasInClassInitializer, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, is_anonymous_struct_or_union, 90, MX_APPLY_METHOD, IsAnonymousStructOrUnion, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, is_bit_field, 91, MX_APPLY_METHOD, IsBitField, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, is_mutable, 92, MX_APPLY_METHOD, IsMutable, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, is_unnamed_bitfield, 93, MX_APPLY_METHOD, IsUnnamedBitfield, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, is_zero_length_bit_field, 94, MX_APPLY_METHOD, IsZeroLengthBitField, bool, NthDecl)
-  MX_VISIT_BOOL(FieldDecl, is_zero_size, 95, MX_APPLY_METHOD, IsZeroSize, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(FieldDecl, bit_width, 76, MX_APPLY_METHOD, BitWidth, Expr, NthDecl, StmtUseSelector::BIT_WIDTH)
+  MX_VISIT_OPTIONAL_ENTITY(FieldDecl, captured_vla_type, 79, MX_APPLY_METHOD, CapturedVLAType, VariableArrayType, NthDecl, TypeUseSelector::CAPTURED_VLA_TYPE)
+  MX_VISIT_ENUM(FieldDecl, in_class_initializer_style, 77, MX_APPLY_METHOD, InClassInitializerStyle, InClassInitStyle, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(FieldDecl, in_class_initializer, 81, MX_APPLY_METHOD, InClassInitializer, Expr, NthDecl, StmtUseSelector::IN_CLASS_INITIALIZER)
+  MX_VISIT_BOOL(FieldDecl, has_captured_vla_type, 84, MX_APPLY_METHOD, HasCapturedVLAType, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, has_in_class_initializer, 92, MX_APPLY_METHOD, HasInClassInitializer, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, is_anonymous_struct_or_union, 95, MX_APPLY_METHOD, IsAnonymousStructOrUnion, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, is_bit_field, 96, MX_APPLY_METHOD, IsBitField, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, is_mutable, 97, MX_APPLY_METHOD, IsMutable, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, is_unnamed_bitfield, 98, MX_APPLY_METHOD, IsUnnamedBitfield, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, is_zero_length_bit_field, 99, MX_APPLY_METHOD, IsZeroLengthBitField, bool, NthDecl)
+  MX_VISIT_BOOL(FieldDecl, is_zero_size, 100, MX_APPLY_METHOD, IsZeroSize, bool, NthDecl)
   MX_EXIT_VISIT_FieldDecl
 MX_END_VISIT_DECL(FieldDecl)
 
@@ -10223,11 +17376,11 @@ MX_END_VISIT_DECL(FieldDecl)
 MX_BEGIN_VISIT_DECL(ObjCIvarDecl)
   MX_ENTER_VISIT_ObjCIvarDecl
   MX_VISIT_BASE(ObjCIvarDecl, FieldDecl)
-  MX_VISIT_ENUM(ObjCIvarDecl, access_control, 80, MX_APPLY_METHOD, AccessControl, ObjCIvarDeclAccessControl, NthDecl)
-  MX_VISIT_ENUM(ObjCIvarDecl, canonical_access_control, 82, MX_APPLY_METHOD, CanonicalAccessControl, ObjCIvarDeclAccessControl, NthDecl)
-  MX_VISIT_ENTITY(ObjCIvarDecl, containing_interface, 78, MX_APPLY_METHOD, ContainingInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CONTAINING_INTERFACE)
-  MX_VISIT_ENTITY(ObjCIvarDecl, next_instance_variable, 81, MX_APPLY_METHOD, NextInstanceVariable, ObjCIvarDecl, NthDecl, DeclUseSelector::NEXT_INSTANCE_VARIABLE)
-  MX_VISIT_BOOL(ObjCIvarDecl, synthesize, 96, MX_APPLY_METHOD, Synthesize, bool, NthDecl)
+  MX_VISIT_ENUM(ObjCIvarDecl, access_control, 85, MX_APPLY_METHOD, AccessControl, ObjCIvarDeclAccessControl, NthDecl)
+  MX_VISIT_ENUM(ObjCIvarDecl, canonical_access_control, 87, MX_APPLY_METHOD, CanonicalAccessControl, ObjCIvarDeclAccessControl, NthDecl)
+  MX_VISIT_ENTITY(ObjCIvarDecl, containing_interface, 83, MX_APPLY_METHOD, ContainingInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CONTAINING_INTERFACE)
+  MX_VISIT_ENTITY(ObjCIvarDecl, next_instance_variable, 86, MX_APPLY_METHOD, NextInstanceVariable, ObjCIvarDecl, NthDecl, DeclUseSelector::NEXT_INSTANCE_VARIABLE)
+  MX_VISIT_BOOL(ObjCIvarDecl, synthesize, 101, MX_APPLY_METHOD, Synthesize, bool, NthDecl)
   MX_EXIT_VISIT_ObjCIvarDecl
 MX_END_VISIT_DECL(ObjCIvarDecl)
 
@@ -10254,9 +17407,9 @@ MX_END_VISIT_DECL(ObjCAtDefsFieldDecl)
 MX_BEGIN_VISIT_DECL(BindingDecl)
   MX_ENTER_VISIT_BindingDecl
   MX_VISIT_BASE(BindingDecl, ValueDecl)
-  MX_VISIT_ENTITY(BindingDecl, binding, 52, MX_APPLY_METHOD, Binding, Expr, NthDecl, StmtUseSelector::BINDING)
-  MX_VISIT_ENTITY(BindingDecl, decomposed_declaration, 53, MX_APPLY_METHOD, DecomposedDeclaration, ValueDecl, NthDecl, DeclUseSelector::DECOMPOSED_DECLARATION)
-  MX_VISIT_ENTITY(BindingDecl, holding_variable, 61, MX_APPLY_METHOD, HoldingVariable, VarDecl, NthDecl, DeclUseSelector::HOLDING_VARIABLE)
+  MX_VISIT_ENTITY(BindingDecl, binding, 57, MX_APPLY_METHOD, Binding, Expr, NthDecl, StmtUseSelector::BINDING)
+  MX_VISIT_ENTITY(BindingDecl, decomposed_declaration, 58, MX_APPLY_METHOD, DecomposedDeclaration, ValueDecl, NthDecl, DeclUseSelector::DECOMPOSED_DECLARATION)
+  MX_VISIT_ENTITY(BindingDecl, holding_variable, 66, MX_APPLY_METHOD, HoldingVariable, VarDecl, NthDecl, DeclUseSelector::HOLDING_VARIABLE)
   MX_EXIT_VISIT_BindingDecl
 MX_END_VISIT_DECL(BindingDecl)
 
@@ -10283,8 +17436,8 @@ MX_END_VISIT_DECL(OMPDeclarativeDirectiveValueDecl)
 MX_BEGIN_VISIT_DECL(OMPDeclareMapperDecl)
   MX_ENTER_VISIT_OMPDeclareMapperDecl
   MX_VISIT_BASE(OMPDeclareMapperDecl, OMPDeclarativeDirectiveValueDecl)
-  MX_VISIT_ENTITY(OMPDeclareMapperDecl, mapper_variable_reference, 52, MX_APPLY_METHOD, MapperVariableReference, Expr, NthDecl, StmtUseSelector::MAPPER_VARIABLE_REFERENCE)
-  MX_VISIT_DECL_CONTEXT(OMPDeclareMapperDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_ENTITY(OMPDeclareMapperDecl, mapper_variable_reference, 57, MX_APPLY_METHOD, MapperVariableReference, Expr, NthDecl, StmtUseSelector::MAPPER_VARIABLE_REFERENCE)
+  MX_VISIT_DECL_CONTEXT(OMPDeclareMapperDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_OMPDeclareMapperDecl
 MX_END_VISIT_DECL(OMPDeclareMapperDecl)
 
@@ -10298,9 +17451,9 @@ MX_END_VISIT_DECL(OMPDeclareMapperDecl)
 MX_BEGIN_VISIT_DECL(UsingShadowDecl)
   MX_ENTER_VISIT_UsingShadowDecl
   MX_VISIT_BASE(UsingShadowDecl, NamedDecl)
-  MX_VISIT_ENTITY(UsingShadowDecl, introducer, 51, MX_APPLY_METHOD, Introducer, BaseUsingDecl, NthDecl, DeclUseSelector::INTRODUCER)
-  MX_VISIT_OPTIONAL_ENTITY(UsingShadowDecl, next_using_shadow_declaration, 52, MX_APPLY_METHOD, NextUsingShadowDeclaration, UsingShadowDecl, NthDecl, DeclUseSelector::NEXT_USING_SHADOW_DECLARATION)
-  MX_VISIT_ENTITY(UsingShadowDecl, target_declaration, 53, MX_APPLY_METHOD, TargetDeclaration, NamedDecl, NthDecl, DeclUseSelector::TARGET_DECLARATION)
+  MX_VISIT_ENTITY(UsingShadowDecl, introducer, 56, MX_APPLY_METHOD, Introducer, BaseUsingDecl, NthDecl, DeclUseSelector::INTRODUCER)
+  MX_VISIT_OPTIONAL_ENTITY(UsingShadowDecl, next_using_shadow_declaration, 57, MX_APPLY_METHOD, NextUsingShadowDeclaration, UsingShadowDecl, NthDecl, DeclUseSelector::NEXT_USING_SHADOW_DECLARATION)
+  MX_VISIT_ENTITY(UsingShadowDecl, target_declaration, 58, MX_APPLY_METHOD, TargetDeclaration, NamedDecl, NthDecl, DeclUseSelector::TARGET_DECLARATION)
   MX_EXIT_VISIT_UsingShadowDecl
 MX_END_VISIT_DECL(UsingShadowDecl)
 
@@ -10314,11 +17467,11 @@ MX_END_VISIT_DECL(UsingShadowDecl)
 MX_BEGIN_VISIT_DECL(ConstructorUsingShadowDecl)
   MX_ENTER_VISIT_ConstructorUsingShadowDecl
   MX_VISIT_BASE(ConstructorUsingShadowDecl, UsingShadowDecl)
-  MX_VISIT_BOOL(ConstructorUsingShadowDecl, constructs_virtual_base, 69, MX_APPLY_METHOD, ConstructsVirtualBase, bool, NthDecl)
-  MX_VISIT_ENTITY(ConstructorUsingShadowDecl, constructed_base_class, 61, MX_APPLY_METHOD, ConstructedBaseClass, CXXRecordDecl, NthDecl, DeclUseSelector::CONSTRUCTED_BASE_CLASS)
-  MX_VISIT_OPTIONAL_ENTITY(ConstructorUsingShadowDecl, constructed_base_class_shadow_declaration, 62, MX_APPLY_METHOD, ConstructedBaseClassShadowDeclaration, ConstructorUsingShadowDecl, NthDecl, DeclUseSelector::CONSTRUCTED_BASE_CLASS_SHADOW_DECLARATION)
-  MX_VISIT_ENTITY(ConstructorUsingShadowDecl, nominated_base_class, 63, MX_APPLY_METHOD, NominatedBaseClass, CXXRecordDecl, NthDecl, DeclUseSelector::NOMINATED_BASE_CLASS)
-  MX_VISIT_OPTIONAL_ENTITY(ConstructorUsingShadowDecl, nominated_base_class_shadow_declaration, 71, MX_APPLY_METHOD, NominatedBaseClassShadowDeclaration, ConstructorUsingShadowDecl, NthDecl, DeclUseSelector::NOMINATED_BASE_CLASS_SHADOW_DECLARATION)
+  MX_VISIT_BOOL(ConstructorUsingShadowDecl, constructs_virtual_base, 74, MX_APPLY_METHOD, ConstructsVirtualBase, bool, NthDecl)
+  MX_VISIT_ENTITY(ConstructorUsingShadowDecl, constructed_base_class, 66, MX_APPLY_METHOD, ConstructedBaseClass, CXXRecordDecl, NthDecl, DeclUseSelector::CONSTRUCTED_BASE_CLASS)
+  MX_VISIT_OPTIONAL_ENTITY(ConstructorUsingShadowDecl, constructed_base_class_shadow_declaration, 67, MX_APPLY_METHOD, ConstructedBaseClassShadowDeclaration, ConstructorUsingShadowDecl, NthDecl, DeclUseSelector::CONSTRUCTED_BASE_CLASS_SHADOW_DECLARATION)
+  MX_VISIT_ENTITY(ConstructorUsingShadowDecl, nominated_base_class, 68, MX_APPLY_METHOD, NominatedBaseClass, CXXRecordDecl, NthDecl, DeclUseSelector::NOMINATED_BASE_CLASS)
+  MX_VISIT_OPTIONAL_ENTITY(ConstructorUsingShadowDecl, nominated_base_class_shadow_declaration, 76, MX_APPLY_METHOD, NominatedBaseClassShadowDeclaration, ConstructorUsingShadowDecl, NthDecl, DeclUseSelector::NOMINATED_BASE_CLASS_SHADOW_DECLARATION)
   MX_EXIT_VISIT_ConstructorUsingShadowDecl
 MX_END_VISIT_DECL(ConstructorUsingShadowDecl)
 
@@ -10332,8 +17485,8 @@ MX_END_VISIT_DECL(ConstructorUsingShadowDecl)
 MX_BEGIN_VISIT_DECL(UsingPackDecl)
   MX_ENTER_VISIT_UsingPackDecl
   MX_VISIT_BASE(UsingPackDecl, NamedDecl)
-  MX_VISIT_ENTITY_LIST(UsingPackDecl, expansions, 45, MX_APPLY_METHOD, Expansions, NamedDecl, NthDecl)
-  MX_VISIT_ENTITY(UsingPackDecl, instantiated_from_using_declaration, 51, MX_APPLY_METHOD, InstantiatedFromUsingDeclaration, NamedDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_USING_DECLARATION)
+  MX_VISIT_ENTITY_LIST(UsingPackDecl, expansions, 50, MX_APPLY_METHOD, Expansions, NamedDecl, NthDecl)
+  MX_VISIT_ENTITY(UsingPackDecl, instantiated_from_using_declaration, 56, MX_APPLY_METHOD, InstantiatedFromUsingDeclaration, NamedDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_USING_DECLARATION)
   MX_EXIT_VISIT_UsingPackDecl
 MX_END_VISIT_DECL(UsingPackDecl)
 
@@ -10347,10 +17500,10 @@ MX_END_VISIT_DECL(UsingPackDecl)
 MX_BEGIN_VISIT_DECL(UsingDirectiveDecl)
   MX_ENTER_VISIT_UsingDirectiveDecl
   MX_VISIT_BASE(UsingDirectiveDecl, NamedDecl)
-  MX_VISIT_ENTITY(UsingDirectiveDecl, identifier_token, 51, MX_APPLY_METHOD, IdentifierToken, Token, NthDecl, TokenUseSelector::IDENTIFIER_TOKEN)
-  MX_VISIT_ENTITY(UsingDirectiveDecl, namespace_key_token, 52, MX_APPLY_METHOD, NamespaceKeyToken, Token, NthDecl, TokenUseSelector::NAMESPACE_KEY_TOKEN)
-  MX_VISIT_ENTITY(UsingDirectiveDecl, nominated_namespace_as_written, 53, MX_APPLY_METHOD, NominatedNamespaceAsWritten, NamedDecl, NthDecl, DeclUseSelector::NOMINATED_NAMESPACE_AS_WRITTEN)
-  MX_VISIT_ENTITY(UsingDirectiveDecl, using_token, 61, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, identifier_token, 56, MX_APPLY_METHOD, IdentifierToken, Token, NthDecl, TokenUseSelector::IDENTIFIER_TOKEN)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, namespace_key_token, 57, MX_APPLY_METHOD, NamespaceKeyToken, Token, NthDecl, TokenUseSelector::NAMESPACE_KEY_TOKEN)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, nominated_namespace_as_written, 58, MX_APPLY_METHOD, NominatedNamespaceAsWritten, NamedDecl, NthDecl, DeclUseSelector::NOMINATED_NAMESPACE_AS_WRITTEN)
+  MX_VISIT_ENTITY(UsingDirectiveDecl, using_token, 66, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
   MX_EXIT_VISIT_UsingDirectiveDecl
 MX_END_VISIT_DECL(UsingDirectiveDecl)
 
@@ -10377,7 +17530,7 @@ MX_END_VISIT_DECL(UnresolvedUsingIfExistsDecl)
 MX_BEGIN_VISIT_DECL(TypeDecl)
   MX_ENTER_VISIT_TypeDecl
   MX_VISIT_BASE(TypeDecl, NamedDecl)
-  MX_VISIT_OPTIONAL_ENTITY(TypeDecl, type_for_declaration, 51, MX_APPLY_METHOD, TypeForDeclaration, Type, NthDecl, TypeUseSelector::TYPE_FOR_DECLARATION)
+  MX_VISIT_OPTIONAL_ENTITY(TypeDecl, type_for_declaration, 56, MX_APPLY_METHOD, TypeForDeclaration, Type, NthDecl, TypeUseSelector::TYPE_FOR_DECLARATION)
   MX_EXIT_VISIT_TypeDecl
 MX_END_VISIT_DECL(TypeDecl)
 
@@ -10391,15 +17544,15 @@ MX_END_VISIT_DECL(TypeDecl)
 MX_BEGIN_VISIT_DECL(TemplateTypeParmDecl)
   MX_ENTER_VISIT_TemplateTypeParmDecl
   MX_VISIT_BASE(TemplateTypeParmDecl, TypeDecl)
-  MX_VISIT_BOOL(TemplateTypeParmDecl, default_argument_was_inherited, 69, MX_APPLY_METHOD, DefaultArgumentWasInherited, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(TemplateTypeParmDecl, default_argument, 52, MX_APPLY_METHOD, DefaultArgument, Type, NthDecl, TypeUseSelector::DEFAULT_ARGUMENT)
-  MX_VISIT_OPTIONAL_ENTITY(TemplateTypeParmDecl, default_argument_info, 53, MX_APPLY_METHOD, DefaultArgumentInfo, Type, NthDecl, TypeUseSelector::DEFAULT_ARGUMENT_INFO)
-  MX_VISIT_ENTITY(TemplateTypeParmDecl, default_argument_token, 61, MX_APPLY_METHOD, DefaultArgumentToken, Token, NthDecl, TokenUseSelector::DEFAULT_ARGUMENT_TOKEN)
-  MX_VISIT_BOOL(TemplateTypeParmDecl, has_default_argument, 77, MX_APPLY_METHOD, HasDefaultArgument, bool, NthDecl)
-  MX_VISIT_BOOL(TemplateTypeParmDecl, has_type_constraint, 79, MX_APPLY_METHOD, HasTypeConstraint, bool, NthDecl)
-  MX_VISIT_BOOL(TemplateTypeParmDecl, is_expanded_parameter_pack, 87, MX_APPLY_METHOD, IsExpandedParameterPack, bool, NthDecl)
-  MX_VISIT_BOOL(TemplateTypeParmDecl, is_pack_expansion, 90, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
-  MX_VISIT_BOOL(TemplateTypeParmDecl, was_declared_with_typename, 91, MX_APPLY_METHOD, WasDeclaredWithTypename, bool, NthDecl)
+  MX_VISIT_BOOL(TemplateTypeParmDecl, default_argument_was_inherited, 74, MX_APPLY_METHOD, DefaultArgumentWasInherited, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(TemplateTypeParmDecl, default_argument, 57, MX_APPLY_METHOD, DefaultArgument, Type, NthDecl, TypeUseSelector::DEFAULT_ARGUMENT)
+  MX_VISIT_OPTIONAL_ENTITY(TemplateTypeParmDecl, default_argument_info, 58, MX_APPLY_METHOD, DefaultArgumentInfo, Type, NthDecl, TypeUseSelector::DEFAULT_ARGUMENT_INFO)
+  MX_VISIT_ENTITY(TemplateTypeParmDecl, default_argument_token, 66, MX_APPLY_METHOD, DefaultArgumentToken, Token, NthDecl, TokenUseSelector::DEFAULT_ARGUMENT_TOKEN)
+  MX_VISIT_BOOL(TemplateTypeParmDecl, has_default_argument, 82, MX_APPLY_METHOD, HasDefaultArgument, bool, NthDecl)
+  MX_VISIT_BOOL(TemplateTypeParmDecl, has_type_constraint, 84, MX_APPLY_METHOD, HasTypeConstraint, bool, NthDecl)
+  MX_VISIT_BOOL(TemplateTypeParmDecl, is_expanded_parameter_pack, 92, MX_APPLY_METHOD, IsExpandedParameterPack, bool, NthDecl)
+  MX_VISIT_BOOL(TemplateTypeParmDecl, is_pack_expansion, 95, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
+  MX_VISIT_BOOL(TemplateTypeParmDecl, was_declared_with_typename, 96, MX_APPLY_METHOD, WasDeclaredWithTypename, bool, NthDecl)
   MX_EXIT_VISIT_TemplateTypeParmDecl
 MX_END_VISIT_DECL(TemplateTypeParmDecl)
 
@@ -10413,25 +17566,25 @@ MX_END_VISIT_DECL(TemplateTypeParmDecl)
 MX_BEGIN_VISIT_DECL(TagDecl)
   MX_ENTER_VISIT_TagDecl
   MX_VISIT_BASE(TagDecl, TypeDecl)
-  MX_VISIT_ENTITY(TagDecl, first_inner_token, 61, MX_APPLY_METHOD, FirstInnerToken, Token, NthDecl, TokenUseSelector::FIRST_INNER_TOKEN)
-  MX_VISIT_ENTITY(TagDecl, first_outer_token, 62, MX_APPLY_METHOD, FirstOuterToken, Token, NthDecl, TokenUseSelector::FIRST_OUTER_TOKEN)
-  MX_VISIT_ENUM(TagDecl, tag_kind, 72, MX_APPLY_METHOD, TagKind, TagTypeKind, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(TagDecl, typedef_name_for_anonymous_declaration, 63, MX_APPLY_METHOD, TypedefNameForAnonymousDeclaration, TypedefNameDecl, NthDecl, DeclUseSelector::TYPEDEF_NAME_FOR_ANONYMOUS_DECLARATION)
-  MX_VISIT_BOOL(TagDecl, has_name_for_linkage, 70, MX_APPLY_METHOD, HasNameForLinkage, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_being_defined, 75, MX_APPLY_METHOD, IsBeingDefined, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_class, 77, MX_APPLY_METHOD, IsClass, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_complete_definition, 79, MX_APPLY_METHOD, IsCompleteDefinition, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_complete_definition_required, 87, MX_APPLY_METHOD, IsCompleteDefinitionRequired, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_dependent_type, 90, MX_APPLY_METHOD, IsDependentType, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_embedded_in_declarator, 91, MX_APPLY_METHOD, IsEmbeddedInDeclarator, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_enum, 92, MX_APPLY_METHOD, IsEnum, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_free_standing, 93, MX_APPLY_METHOD, IsFreeStanding, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_interface, 94, MX_APPLY_METHOD, IsInterface, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_struct, 95, MX_APPLY_METHOD, IsStruct, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, is_union, 96, MX_APPLY_METHOD, IsUnion, bool, NthDecl)
-  MX_VISIT_BOOL(TagDecl, may_have_out_of_date_definition, 97, MX_APPLY_METHOD, MayHaveOutOfDateDefinition, bool, NthDecl)
-  MX_VISIT_PSEUDO_LIST(TagDecl, template_parameter_lists, 73, MX_APPLY_METHOD, TemplateParameterLists, TemplateParameterList, NthDecl)
-  MX_VISIT_DECL_CONTEXT(TagDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_ENTITY(TagDecl, first_inner_token, 66, MX_APPLY_METHOD, FirstInnerToken, Token, NthDecl, TokenUseSelector::FIRST_INNER_TOKEN)
+  MX_VISIT_ENTITY(TagDecl, first_outer_token, 67, MX_APPLY_METHOD, FirstOuterToken, Token, NthDecl, TokenUseSelector::FIRST_OUTER_TOKEN)
+  MX_VISIT_ENUM(TagDecl, tag_kind, 77, MX_APPLY_METHOD, TagKind, TagTypeKind, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(TagDecl, typedef_name_for_anonymous_declaration, 68, MX_APPLY_METHOD, TypedefNameForAnonymousDeclaration, TypedefNameDecl, NthDecl, DeclUseSelector::TYPEDEF_NAME_FOR_ANONYMOUS_DECLARATION)
+  MX_VISIT_BOOL(TagDecl, has_name_for_linkage, 75, MX_APPLY_METHOD, HasNameForLinkage, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_being_defined, 80, MX_APPLY_METHOD, IsBeingDefined, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_class, 82, MX_APPLY_METHOD, IsClass, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_complete_definition, 84, MX_APPLY_METHOD, IsCompleteDefinition, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_complete_definition_required, 92, MX_APPLY_METHOD, IsCompleteDefinitionRequired, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_dependent_type, 95, MX_APPLY_METHOD, IsDependentType, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_embedded_in_declarator, 96, MX_APPLY_METHOD, IsEmbeddedInDeclarator, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_enum, 97, MX_APPLY_METHOD, IsEnum, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_free_standing, 98, MX_APPLY_METHOD, IsFreeStanding, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_interface, 99, MX_APPLY_METHOD, IsInterface, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_struct, 100, MX_APPLY_METHOD, IsStruct, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, is_union, 101, MX_APPLY_METHOD, IsUnion, bool, NthDecl)
+  MX_VISIT_BOOL(TagDecl, may_have_out_of_date_definition, 102, MX_APPLY_METHOD, MayHaveOutOfDateDefinition, bool, NthDecl)
+  MX_VISIT_PSEUDO_LIST(TagDecl, template_parameter_lists, 78, MX_APPLY_METHOD, TemplateParameterLists, TemplateParameterList, NthDecl)
+  MX_VISIT_DECL_CONTEXT(TagDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_TagDecl
 MX_END_VISIT_DECL(TagDecl)
 
@@ -10445,27 +17598,27 @@ MX_END_VISIT_DECL(TagDecl)
 MX_BEGIN_VISIT_DECL(RecordDecl)
   MX_ENTER_VISIT_RecordDecl
   MX_VISIT_BASE(RecordDecl, TagDecl)
-  MX_VISIT_BOOL(RecordDecl, can_pass_in_registers, 98, MX_APPLY_METHOD, CanPassInRegisters, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(RecordDecl, fields, 46, MX_APPLY_METHOD, Fields, FieldDecl, NthDecl)
-  MX_VISIT_ENUM(RecordDecl, argument_passing_restrictions, 80, MX_APPLY_METHOD, ArgumentPassingRestrictions, RecordDeclArgPassingKind, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_flexible_array_member, 99, MX_APPLY_METHOD, HasFlexibleArrayMember, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_loaded_fields_from_external_storage, 100, MX_APPLY_METHOD, HasLoadedFieldsFromExternalStorage, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_non_trivial_to_primitive_copy_c_union, 101, MX_APPLY_METHOD, HasNonTrivialToPrimitiveCopyCUnion, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_non_trivial_to_primitive_default_initialize_c_union, 102, MX_APPLY_METHOD, HasNonTrivialToPrimitiveDefaultInitializeCUnion, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_non_trivial_to_primitive_destruct_c_union, 103, MX_APPLY_METHOD, HasNonTrivialToPrimitiveDestructCUnion, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_object_member, 104, MX_APPLY_METHOD, HasObjectMember, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, has_volatile_member, 105, MX_APPLY_METHOD, HasVolatileMember, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_anonymous_struct_or_union, 106, MX_APPLY_METHOD, IsAnonymousStructOrUnion, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_captured_record, 107, MX_APPLY_METHOD, IsCapturedRecord, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_injected_class_name, 108, MX_APPLY_METHOD, IsInjectedClassName, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_lambda, 109, MX_APPLY_METHOD, IsLambda, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_ms_struct, 110, MX_APPLY_METHOD, IsMsStruct, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_non_trivial_to_primitive_copy, 111, MX_APPLY_METHOD, IsNonTrivialToPrimitiveCopy, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_non_trivial_to_primitive_default_initialize, 112, MX_APPLY_METHOD, IsNonTrivialToPrimitiveDefaultInitialize, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_non_trivial_to_primitive_destroy, 113, MX_APPLY_METHOD, IsNonTrivialToPrimitiveDestroy, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_or_contains_union, 114, MX_APPLY_METHOD, IsOrContainsUnion, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, is_parameter_destroyed_in_callee, 115, MX_APPLY_METHOD, IsParameterDestroyedInCallee, bool, NthDecl)
-  MX_VISIT_BOOL(RecordDecl, may_insert_extra_padding, 116, MX_APPLY_METHOD, MayInsertExtraPadding, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, can_pass_in_registers, 103, MX_APPLY_METHOD, CanPassInRegisters, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(RecordDecl, fields, 51, MX_APPLY_METHOD, Fields, FieldDecl, NthDecl)
+  MX_VISIT_ENUM(RecordDecl, argument_passing_restrictions, 85, MX_APPLY_METHOD, ArgumentPassingRestrictions, RecordDeclArgPassingKind, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_flexible_array_member, 104, MX_APPLY_METHOD, HasFlexibleArrayMember, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_loaded_fields_from_external_storage, 105, MX_APPLY_METHOD, HasLoadedFieldsFromExternalStorage, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_non_trivial_to_primitive_copy_c_union, 106, MX_APPLY_METHOD, HasNonTrivialToPrimitiveCopyCUnion, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_non_trivial_to_primitive_default_initialize_c_union, 107, MX_APPLY_METHOD, HasNonTrivialToPrimitiveDefaultInitializeCUnion, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_non_trivial_to_primitive_destruct_c_union, 108, MX_APPLY_METHOD, HasNonTrivialToPrimitiveDestructCUnion, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_object_member, 109, MX_APPLY_METHOD, HasObjectMember, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, has_volatile_member, 110, MX_APPLY_METHOD, HasVolatileMember, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_anonymous_struct_or_union, 111, MX_APPLY_METHOD, IsAnonymousStructOrUnion, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_captured_record, 112, MX_APPLY_METHOD, IsCapturedRecord, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_injected_class_name, 113, MX_APPLY_METHOD, IsInjectedClassName, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_lambda, 114, MX_APPLY_METHOD, IsLambda, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_ms_struct, 115, MX_APPLY_METHOD, IsMsStruct, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_non_trivial_to_primitive_copy, 116, MX_APPLY_METHOD, IsNonTrivialToPrimitiveCopy, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_non_trivial_to_primitive_default_initialize, 117, MX_APPLY_METHOD, IsNonTrivialToPrimitiveDefaultInitialize, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_non_trivial_to_primitive_destroy, 118, MX_APPLY_METHOD, IsNonTrivialToPrimitiveDestroy, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_or_contains_union, 119, MX_APPLY_METHOD, IsOrContainsUnion, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, is_parameter_destroyed_in_callee, 120, MX_APPLY_METHOD, IsParameterDestroyedInCallee, bool, NthDecl)
+  MX_VISIT_BOOL(RecordDecl, may_insert_extra_padding, 121, MX_APPLY_METHOD, MayInsertExtraPadding, bool, NthDecl)
   MX_EXIT_VISIT_RecordDecl
 MX_END_VISIT_DECL(RecordDecl)
 
@@ -10479,121 +17632,121 @@ MX_END_VISIT_DECL(RecordDecl)
 MX_BEGIN_VISIT_DECL(CXXRecordDecl)
   MX_ENTER_VISIT_CXXRecordDecl
   MX_VISIT_BASE(CXXRecordDecl, RecordDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, allow_const_default_initializer, 117, MX_APPLY_METHOD, AllowConstDefaultInitializer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_PSEUDO_LIST(CXXRecordDecl, bases, 141, MX_APPLY_METHOD, Bases, CXXBaseSpecifier, NthDecl)
-  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, calculate_inheritance_model, 82, MX_APPLY_METHOD, CalculateInheritanceModel, MSInheritanceModel, NthDecl)
-  MX_VISIT_ENTITY_LIST(CXXRecordDecl, constructors, 57, MX_APPLY_METHOD, Constructors, CXXConstructorDecl, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, friends, 171, MX_APPLY_METHOD, Friends, FriendDecl, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, destructor, 71, MX_APPLY_METHOD, Destructor, CXXDestructorDecl, NthDecl, DeclUseSelector::DESTRUCTOR)
-  MX_VISIT_OPTIONAL_PSEUDO(CXXRecordDecl, generic_lambda_template_parameter_list, 143, MX_APPLY_METHOD, GenericLambdaTemplateParameterList, TemplateParameterList, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, instantiated_from_member_class, 74, MX_APPLY_METHOD, InstantiatedFromMemberClass, CXXRecordDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_CLASS)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_call_operator, 76, MX_APPLY_METHOD, LambdaCallOperator, CXXMethodDecl, NthDecl, DeclUseSelector::LAMBDA_CALL_OPERATOR)
-  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, lambda_capture_default, 83, MX_APPLY_METHOD, LambdaCaptureDefault, LambdaCaptureDefault, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_context_declaration, 78, MX_APPLY_METHOD, LambdaContextDeclaration, Decl, NthDecl, DeclUseSelector::LAMBDA_CONTEXT_DECLARATION)
-  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, lambda_explicit_template_parameters, 180, MX_APPLY_METHOD, LambdaExplicitTemplateParameters, NamedDecl, NthDecl)
-  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, lambda_mangling_number, 181, MX_APPLY_METHOD, LambdaManglingNumber, unsigned, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_type, 81, MX_APPLY_METHOD, LambdaType, Type, NthDecl, TypeUseSelector::LAMBDA_TYPE)
-  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, ms_inheritance_model, 84, MX_APPLY_METHOD, MSInheritanceModel, MSInheritanceModel, NthDecl)
-  MX_VISIT_ENUM(CXXRecordDecl, ms_vtor_disp_mode, 85, MX_APPLY_METHOD, MSVtorDispMode, MSVtorDispMode, NthDecl)
-  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, num_bases, 182, MX_APPLY_METHOD, NumBases, unsigned, NthDecl)
-  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, num_virtual_bases, 183, MX_APPLY_METHOD, NumVirtualBases, unsigned, NthDecl)
-  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, odr_hash, 184, MX_APPLY_METHOD, ODRHash, unsigned, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, template_instantiation_pattern, 86, MX_APPLY_METHOD, TemplateInstantiationPattern, CXXRecordDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
-  MX_VISIT_ENUM(CXXRecordDecl, template_specialization_kind, 88, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_any_dependent_bases, 148, MX_APPLY_METHOD, HasAnyDependentBases, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_default_constructor, 150, MX_APPLY_METHOD, HasConstexprDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_destructor, 152, MX_APPLY_METHOD, HasConstexprDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_non_copy_move_constructor, 154, MX_APPLY_METHOD, HasConstexprNonCopyMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_copy_assignment_with_const_parameter, 156, MX_APPLY_METHOD, HasCopyAssignmentWithConstParameter, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_copy_constructor_with_const_parameter, 160, MX_APPLY_METHOD, HasCopyConstructorWithConstParameter, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_default_constructor, 163, MX_APPLY_METHOD, HasDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_definition, 165, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_direct_fields, 167, MX_APPLY_METHOD, HasDirectFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_friends, 169, MX_APPLY_METHOD, HasFriends, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_in_class_initializer, 173, MX_APPLY_METHOD, HasInClassInitializer, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_inherited_assignment, 176, MX_APPLY_METHOD, HasInheritedAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_inherited_constructor, 178, MX_APPLY_METHOD, HasInheritedConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_initializer_method, 185, MX_APPLY_METHOD, HasInitializerMethod, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_irrelevant_destructor, 187, MX_APPLY_METHOD, HasIrrelevantDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_known_lambda_internal_linkage, 189, MX_APPLY_METHOD, HasKnownLambdaInternalLinkage, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_assignment, 191, MX_APPLY_METHOD, HasMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_constructor, 193, MX_APPLY_METHOD, HasMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_mutable_fields, 195, MX_APPLY_METHOD, HasMutableFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_literal_type_fields_or_bases, 197, MX_APPLY_METHOD, HasNonLiteralTypeFieldsOrBases, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_assignment, 199, MX_APPLY_METHOD, HasNonTrivialCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_constructor, 201, MX_APPLY_METHOD, HasNonTrivialCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_constructor_for_call, 203, MX_APPLY_METHOD, HasNonTrivialCopyConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_default_constructor, 205, MX_APPLY_METHOD, HasNonTrivialDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_destructor, 207, MX_APPLY_METHOD, HasNonTrivialDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_destructor_for_call, 209, MX_APPLY_METHOD, HasNonTrivialDestructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_assignment, 211, MX_APPLY_METHOD, HasNonTrivialMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_constructor, 213, MX_APPLY_METHOD, HasNonTrivialMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_constructor_for_call, 215, MX_APPLY_METHOD, HasNonTrivialMoveConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_private_fields, 217, MX_APPLY_METHOD, HasPrivateFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_protected_fields, 219, MX_APPLY_METHOD, HasProtectedFields, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_copy_assignment, 221, MX_APPLY_METHOD, HasSimpleCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_copy_constructor, 223, MX_APPLY_METHOD, HasSimpleCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_destructor, 225, MX_APPLY_METHOD, HasSimpleDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_move_assignment, 227, MX_APPLY_METHOD, HasSimpleMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_move_constructor, 229, MX_APPLY_METHOD, HasSimpleMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_assignment, 231, MX_APPLY_METHOD, HasTrivialCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_constructor, 233, MX_APPLY_METHOD, HasTrivialCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_constructor_for_call, 235, MX_APPLY_METHOD, HasTrivialCopyConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_default_constructor, 237, MX_APPLY_METHOD, HasTrivialDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_destructor, 239, MX_APPLY_METHOD, HasTrivialDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_destructor_for_call, 241, MX_APPLY_METHOD, HasTrivialDestructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_assignment, 243, MX_APPLY_METHOD, HasTrivialMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_constructor, 245, MX_APPLY_METHOD, HasTrivialMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_constructor_for_call, 247, MX_APPLY_METHOD, HasTrivialMoveConstructorForCall, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_uninitialized_reference_member, 249, MX_APPLY_METHOD, HasUninitializedReferenceMember, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_constructor, 251, MX_APPLY_METHOD, HasUserDeclaredConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_copy_assignment, 253, MX_APPLY_METHOD, HasUserDeclaredCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_copy_constructor, 255, MX_APPLY_METHOD, HasUserDeclaredCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_destructor, 257, MX_APPLY_METHOD, HasUserDeclaredDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_assignment, 259, MX_APPLY_METHOD, HasUserDeclaredMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_constructor, 261, MX_APPLY_METHOD, HasUserDeclaredMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_operation, 263, MX_APPLY_METHOD, HasUserDeclaredMoveOperation, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_provided_default_constructor, 265, MX_APPLY_METHOD, HasUserProvidedDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_variant_members, 267, MX_APPLY_METHOD, HasVariantMembers, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, implicit_copy_assignment_has_const_parameter, 269, MX_APPLY_METHOD, ImplicitCopyAssignmentHasConstParameter, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, implicit_copy_constructor_has_const_parameter, 271, MX_APPLY_METHOD, ImplicitCopyConstructorHasConstParameter, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_abstract, 273, MX_APPLY_METHOD, IsAbstract, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_aggregate, 275, MX_APPLY_METHOD, IsAggregate, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_any_destructor_no_return, 277, MX_APPLY_METHOD, IsAnyDestructorNoReturn, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_c_like, 279, MX_APPLY_METHOD, IsCLike, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_cxx11_standard_layout, 281, MX_APPLY_METHOD, IsCXX11StandardLayout, bool, NthDecl)
-  MX_VISIT_BOOL(CXXRecordDecl, is_dependent_lambda, 283, MX_APPLY_METHOD, IsDependentLambda, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_dynamic_class, 284, MX_APPLY_METHOD, IsDynamicClass, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_effectively_final, 286, MX_APPLY_METHOD, IsEffectivelyFinal, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_empty, 288, MX_APPLY_METHOD, IsEmpty, bool, NthDecl)
-  MX_VISIT_BOOL(CXXRecordDecl, is_generic_lambda, 290, MX_APPLY_METHOD, IsGenericLambda, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_interface_like, 291, MX_APPLY_METHOD, IsInterfaceLike, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_literal, 293, MX_APPLY_METHOD, IsLiteral, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, is_local_class, 126, MX_APPLY_METHOD, IsLocalClass, FunctionDecl, NthDecl, DeclUseSelector::IS_LOCAL_CLASS)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_pod, 296, MX_APPLY_METHOD, IsPOD, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_polymorphic, 298, MX_APPLY_METHOD, IsPolymorphic, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_standard_layout, 300, MX_APPLY_METHOD, IsStandardLayout, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_structural, 302, MX_APPLY_METHOD, IsStructural, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_trivial, 304, MX_APPLY_METHOD, IsTrivial, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_trivially_copyable, 306, MX_APPLY_METHOD, IsTriviallyCopyable, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, lambda_is_default_constructible_and_assignable, 308, MX_APPLY_METHOD, LambdaIsDefaultConstructibleAndAssignable, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_abstract, 310, MX_APPLY_METHOD, MayBeAbstract, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_dynamic_class, 312, MX_APPLY_METHOD, MayBeDynamicClass, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_non_dynamic_class, 314, MX_APPLY_METHOD, MayBeNonDynamicClass, bool, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, methods, 316, MX_APPLY_METHOD, Methods, CXXMethodDecl, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_copy_assignment, 318, MX_APPLY_METHOD, NeedsImplicitCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_copy_constructor, 320, MX_APPLY_METHOD, NeedsImplicitCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_default_constructor, 322, MX_APPLY_METHOD, NeedsImplicitDefaultConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_destructor, 324, MX_APPLY_METHOD, NeedsImplicitDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_move_assignment, 326, MX_APPLY_METHOD, NeedsImplicitMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_move_constructor, 328, MX_APPLY_METHOD, NeedsImplicitMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_copy_assignment, 330, MX_APPLY_METHOD, NeedsOverloadResolutionForCopyAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_copy_constructor, 332, MX_APPLY_METHOD, NeedsOverloadResolutionForCopyConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_destructor, 334, MX_APPLY_METHOD, NeedsOverloadResolutionForDestructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_move_assignment, 336, MX_APPLY_METHOD, NeedsOverloadResolutionForMoveAssignment, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_move_constructor, 338, MX_APPLY_METHOD, NeedsOverloadResolutionForMoveConstructor, bool, NthDecl)
-  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, null_field_offset_is_zero, 340, MX_APPLY_METHOD, NullFieldOffsetIsZero, bool, NthDecl)
-  MX_VISIT_OPTIONAL_PSEUDO_LIST(CXXRecordDecl, virtual_bases, 142, MX_APPLY_METHOD, VirtualBases, CXXBaseSpecifier, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, allow_const_default_initializer, 122, MX_APPLY_METHOD, AllowConstDefaultInitializer, bool, NthDecl)
+  MX_VISIT_OPTIONAL_PSEUDO_LIST(CXXRecordDecl, bases, 146, MX_APPLY_METHOD, Bases, CXXBaseSpecifier, NthDecl)
+  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, calculate_inheritance_model, 87, MX_APPLY_METHOD, CalculateInheritanceModel, MSInheritanceModel, NthDecl)
+  MX_VISIT_ENTITY_LIST(CXXRecordDecl, constructors, 62, MX_APPLY_METHOD, Constructors, CXXConstructorDecl, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, friends, 176, MX_APPLY_METHOD, Friends, FriendDecl, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, destructor, 76, MX_APPLY_METHOD, Destructor, CXXDestructorDecl, NthDecl, DeclUseSelector::DESTRUCTOR)
+  MX_VISIT_OPTIONAL_PSEUDO(CXXRecordDecl, generic_lambda_template_parameter_list, 148, MX_APPLY_METHOD, GenericLambdaTemplateParameterList, TemplateParameterList, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, instantiated_from_member_class, 79, MX_APPLY_METHOD, InstantiatedFromMemberClass, CXXRecordDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_CLASS)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_call_operator, 81, MX_APPLY_METHOD, LambdaCallOperator, CXXMethodDecl, NthDecl, DeclUseSelector::LAMBDA_CALL_OPERATOR)
+  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, lambda_capture_default, 88, MX_APPLY_METHOD, LambdaCaptureDefault, LambdaCaptureDefault, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_context_declaration, 83, MX_APPLY_METHOD, LambdaContextDeclaration, Decl, NthDecl, DeclUseSelector::LAMBDA_CONTEXT_DECLARATION)
+  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, lambda_explicit_template_parameters, 185, MX_APPLY_METHOD, LambdaExplicitTemplateParameters, NamedDecl, NthDecl)
+  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, lambda_mangling_number, 186, MX_APPLY_METHOD, LambdaManglingNumber, unsigned, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, lambda_type, 86, MX_APPLY_METHOD, LambdaType, Type, NthDecl, TypeUseSelector::LAMBDA_TYPE)
+  MX_VISIT_OPTIONAL_ENUM(CXXRecordDecl, ms_inheritance_model, 89, MX_APPLY_METHOD, MSInheritanceModel, MSInheritanceModel, NthDecl)
+  MX_VISIT_ENUM(CXXRecordDecl, ms_vtor_disp_mode, 90, MX_APPLY_METHOD, MSVtorDispMode, MSVtorDispMode, NthDecl)
+  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, num_bases, 187, MX_APPLY_METHOD, NumBases, unsigned, NthDecl)
+  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, num_virtual_bases, 188, MX_APPLY_METHOD, NumVirtualBases, unsigned, NthDecl)
+  MX_VISIT_OPTIONAL_INT(CXXRecordDecl, odr_hash, 189, MX_APPLY_METHOD, ODRHash, unsigned, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, template_instantiation_pattern, 91, MX_APPLY_METHOD, TemplateInstantiationPattern, CXXRecordDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
+  MX_VISIT_ENUM(CXXRecordDecl, template_specialization_kind, 93, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_any_dependent_bases, 153, MX_APPLY_METHOD, HasAnyDependentBases, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_default_constructor, 155, MX_APPLY_METHOD, HasConstexprDefaultConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_destructor, 157, MX_APPLY_METHOD, HasConstexprDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_constexpr_non_copy_move_constructor, 159, MX_APPLY_METHOD, HasConstexprNonCopyMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_copy_assignment_with_const_parameter, 161, MX_APPLY_METHOD, HasCopyAssignmentWithConstParameter, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_copy_constructor_with_const_parameter, 165, MX_APPLY_METHOD, HasCopyConstructorWithConstParameter, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_default_constructor, 168, MX_APPLY_METHOD, HasDefaultConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_definition, 170, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_direct_fields, 172, MX_APPLY_METHOD, HasDirectFields, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_friends, 174, MX_APPLY_METHOD, HasFriends, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_in_class_initializer, 178, MX_APPLY_METHOD, HasInClassInitializer, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_inherited_assignment, 181, MX_APPLY_METHOD, HasInheritedAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_inherited_constructor, 183, MX_APPLY_METHOD, HasInheritedConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_initializer_method, 190, MX_APPLY_METHOD, HasInitializerMethod, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_irrelevant_destructor, 192, MX_APPLY_METHOD, HasIrrelevantDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_known_lambda_internal_linkage, 194, MX_APPLY_METHOD, HasKnownLambdaInternalLinkage, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_assignment, 196, MX_APPLY_METHOD, HasMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_move_constructor, 198, MX_APPLY_METHOD, HasMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_mutable_fields, 200, MX_APPLY_METHOD, HasMutableFields, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_literal_type_fields_or_bases, 202, MX_APPLY_METHOD, HasNonLiteralTypeFieldsOrBases, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_assignment, 204, MX_APPLY_METHOD, HasNonTrivialCopyAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_constructor, 206, MX_APPLY_METHOD, HasNonTrivialCopyConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_copy_constructor_for_call, 208, MX_APPLY_METHOD, HasNonTrivialCopyConstructorForCall, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_default_constructor, 210, MX_APPLY_METHOD, HasNonTrivialDefaultConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_destructor, 212, MX_APPLY_METHOD, HasNonTrivialDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_destructor_for_call, 214, MX_APPLY_METHOD, HasNonTrivialDestructorForCall, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_assignment, 216, MX_APPLY_METHOD, HasNonTrivialMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_constructor, 218, MX_APPLY_METHOD, HasNonTrivialMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_non_trivial_move_constructor_for_call, 220, MX_APPLY_METHOD, HasNonTrivialMoveConstructorForCall, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_private_fields, 222, MX_APPLY_METHOD, HasPrivateFields, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_protected_fields, 224, MX_APPLY_METHOD, HasProtectedFields, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_copy_assignment, 226, MX_APPLY_METHOD, HasSimpleCopyAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_copy_constructor, 228, MX_APPLY_METHOD, HasSimpleCopyConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_destructor, 230, MX_APPLY_METHOD, HasSimpleDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_move_assignment, 232, MX_APPLY_METHOD, HasSimpleMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_simple_move_constructor, 234, MX_APPLY_METHOD, HasSimpleMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_assignment, 236, MX_APPLY_METHOD, HasTrivialCopyAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_constructor, 238, MX_APPLY_METHOD, HasTrivialCopyConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_copy_constructor_for_call, 240, MX_APPLY_METHOD, HasTrivialCopyConstructorForCall, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_default_constructor, 242, MX_APPLY_METHOD, HasTrivialDefaultConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_destructor, 244, MX_APPLY_METHOD, HasTrivialDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_destructor_for_call, 246, MX_APPLY_METHOD, HasTrivialDestructorForCall, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_assignment, 248, MX_APPLY_METHOD, HasTrivialMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_constructor, 250, MX_APPLY_METHOD, HasTrivialMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_trivial_move_constructor_for_call, 252, MX_APPLY_METHOD, HasTrivialMoveConstructorForCall, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_uninitialized_reference_member, 254, MX_APPLY_METHOD, HasUninitializedReferenceMember, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_constructor, 256, MX_APPLY_METHOD, HasUserDeclaredConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_copy_assignment, 258, MX_APPLY_METHOD, HasUserDeclaredCopyAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_copy_constructor, 260, MX_APPLY_METHOD, HasUserDeclaredCopyConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_destructor, 262, MX_APPLY_METHOD, HasUserDeclaredDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_assignment, 264, MX_APPLY_METHOD, HasUserDeclaredMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_constructor, 266, MX_APPLY_METHOD, HasUserDeclaredMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_declared_move_operation, 268, MX_APPLY_METHOD, HasUserDeclaredMoveOperation, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_user_provided_default_constructor, 270, MX_APPLY_METHOD, HasUserProvidedDefaultConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, has_variant_members, 272, MX_APPLY_METHOD, HasVariantMembers, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, implicit_copy_assignment_has_const_parameter, 274, MX_APPLY_METHOD, ImplicitCopyAssignmentHasConstParameter, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, implicit_copy_constructor_has_const_parameter, 276, MX_APPLY_METHOD, ImplicitCopyConstructorHasConstParameter, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_abstract, 278, MX_APPLY_METHOD, IsAbstract, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_aggregate, 280, MX_APPLY_METHOD, IsAggregate, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_any_destructor_no_return, 282, MX_APPLY_METHOD, IsAnyDestructorNoReturn, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_c_like, 284, MX_APPLY_METHOD, IsCLike, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_cxx11_standard_layout, 286, MX_APPLY_METHOD, IsCXX11StandardLayout, bool, NthDecl)
+  MX_VISIT_BOOL(CXXRecordDecl, is_dependent_lambda, 288, MX_APPLY_METHOD, IsDependentLambda, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_dynamic_class, 289, MX_APPLY_METHOD, IsDynamicClass, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_effectively_final, 291, MX_APPLY_METHOD, IsEffectivelyFinal, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_empty, 293, MX_APPLY_METHOD, IsEmpty, bool, NthDecl)
+  MX_VISIT_BOOL(CXXRecordDecl, is_generic_lambda, 295, MX_APPLY_METHOD, IsGenericLambda, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_interface_like, 296, MX_APPLY_METHOD, IsInterfaceLike, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_literal, 298, MX_APPLY_METHOD, IsLiteral, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(CXXRecordDecl, is_local_class, 131, MX_APPLY_METHOD, IsLocalClass, FunctionDecl, NthDecl, DeclUseSelector::IS_LOCAL_CLASS)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_pod, 301, MX_APPLY_METHOD, IsPOD, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_polymorphic, 303, MX_APPLY_METHOD, IsPolymorphic, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_standard_layout, 305, MX_APPLY_METHOD, IsStandardLayout, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_structural, 307, MX_APPLY_METHOD, IsStructural, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_trivial, 309, MX_APPLY_METHOD, IsTrivial, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, is_trivially_copyable, 311, MX_APPLY_METHOD, IsTriviallyCopyable, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, lambda_is_default_constructible_and_assignable, 313, MX_APPLY_METHOD, LambdaIsDefaultConstructibleAndAssignable, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_abstract, 315, MX_APPLY_METHOD, MayBeAbstract, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_dynamic_class, 317, MX_APPLY_METHOD, MayBeDynamicClass, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, may_be_non_dynamic_class, 319, MX_APPLY_METHOD, MayBeNonDynamicClass, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY_LIST(CXXRecordDecl, methods, 321, MX_APPLY_METHOD, Methods, CXXMethodDecl, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_copy_assignment, 323, MX_APPLY_METHOD, NeedsImplicitCopyAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_copy_constructor, 325, MX_APPLY_METHOD, NeedsImplicitCopyConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_default_constructor, 327, MX_APPLY_METHOD, NeedsImplicitDefaultConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_destructor, 329, MX_APPLY_METHOD, NeedsImplicitDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_move_assignment, 331, MX_APPLY_METHOD, NeedsImplicitMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_implicit_move_constructor, 333, MX_APPLY_METHOD, NeedsImplicitMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_copy_assignment, 335, MX_APPLY_METHOD, NeedsOverloadResolutionForCopyAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_copy_constructor, 337, MX_APPLY_METHOD, NeedsOverloadResolutionForCopyConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_destructor, 339, MX_APPLY_METHOD, NeedsOverloadResolutionForDestructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_move_assignment, 341, MX_APPLY_METHOD, NeedsOverloadResolutionForMoveAssignment, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, needs_overload_resolution_for_move_constructor, 343, MX_APPLY_METHOD, NeedsOverloadResolutionForMoveConstructor, bool, NthDecl)
+  MX_VISIT_OPTIONAL_BOOL(CXXRecordDecl, null_field_offset_is_zero, 345, MX_APPLY_METHOD, NullFieldOffsetIsZero, bool, NthDecl)
+  MX_VISIT_OPTIONAL_PSEUDO_LIST(CXXRecordDecl, virtual_bases, 147, MX_APPLY_METHOD, VirtualBases, CXXBaseSpecifier, NthDecl)
   MX_EXIT_VISIT_CXXRecordDecl
 MX_END_VISIT_DECL(CXXRecordDecl)
 
@@ -10607,16 +17760,16 @@ MX_END_VISIT_DECL(CXXRecordDecl)
 MX_BEGIN_VISIT_DECL(ClassTemplateSpecializationDecl)
   MX_ENTER_VISIT_ClassTemplateSpecializationDecl
   MX_VISIT_BASE(ClassTemplateSpecializationDecl, CXXRecordDecl)
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, extern_token, 128, MX_APPLY_METHOD, ExternToken, Token, NthDecl, TokenUseSelector::EXTERN_TOKEN)
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, point_of_instantiation, 129, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl, TokenUseSelector::POINT_OF_INSTANTIATION)
-  MX_VISIT_ENUM(ClassTemplateSpecializationDecl, specialization_kind, 89, MX_APPLY_METHOD, SpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_PSEUDO_LIST(ClassTemplateSpecializationDecl, template_arguments, 343, MX_APPLY_METHOD, TemplateArguments, TemplateArgument, NthDecl)
-  MX_VISIT_PSEUDO_LIST(ClassTemplateSpecializationDecl, template_instantiation_arguments, 344, MX_APPLY_METHOD, TemplateInstantiationArguments, TemplateArgument, NthDecl)
-  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, template_keyword_token, 131, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthDecl, TokenUseSelector::TEMPLATE_KEYWORD_TOKEN)
-  MX_VISIT_OPTIONAL_ENTITY(ClassTemplateSpecializationDecl, type_as_written, 132, MX_APPLY_METHOD, TypeAsWritten, Type, NthDecl, TypeUseSelector::TYPE_AS_WRITTEN)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_class_scope_explicit_specialization, 346, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 347, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
-  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_specialization, 348, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
+  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, extern_token, 133, MX_APPLY_METHOD, ExternToken, Token, NthDecl, TokenUseSelector::EXTERN_TOKEN)
+  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, point_of_instantiation, 134, MX_APPLY_METHOD, PointOfInstantiation, Token, NthDecl, TokenUseSelector::POINT_OF_INSTANTIATION)
+  MX_VISIT_ENUM(ClassTemplateSpecializationDecl, specialization_kind, 94, MX_APPLY_METHOD, SpecializationKind, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_PSEUDO_LIST(ClassTemplateSpecializationDecl, template_arguments, 348, MX_APPLY_METHOD, TemplateArguments, TemplateArgument, NthDecl)
+  MX_VISIT_PSEUDO_LIST(ClassTemplateSpecializationDecl, template_instantiation_arguments, 349, MX_APPLY_METHOD, TemplateInstantiationArguments, TemplateArgument, NthDecl)
+  MX_VISIT_ENTITY(ClassTemplateSpecializationDecl, template_keyword_token, 136, MX_APPLY_METHOD, TemplateKeywordToken, Token, NthDecl, TokenUseSelector::TEMPLATE_KEYWORD_TOKEN)
+  MX_VISIT_OPTIONAL_ENTITY(ClassTemplateSpecializationDecl, type_as_written, 137, MX_APPLY_METHOD, TypeAsWritten, Type, NthDecl, TypeUseSelector::TYPE_AS_WRITTEN)
+  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_class_scope_explicit_specialization, 351, MX_APPLY_METHOD, IsClassScopeExplicitSpecialization, bool, NthDecl)
+  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_instantiation_or_specialization, 352, MX_APPLY_METHOD, IsExplicitInstantiationOrSpecialization, bool, NthDecl)
+  MX_VISIT_BOOL(ClassTemplateSpecializationDecl, is_explicit_specialization, 353, MX_APPLY_METHOD, IsExplicitSpecialization, bool, NthDecl)
   MX_EXIT_VISIT_ClassTemplateSpecializationDecl
 MX_END_VISIT_DECL(ClassTemplateSpecializationDecl)
 
@@ -10642,20 +17795,20 @@ MX_END_VISIT_DECL(ClassTemplatePartialSpecializationDecl)
 MX_BEGIN_VISIT_DECL(EnumDecl)
   MX_ENTER_VISIT_EnumDecl
   MX_VISIT_BASE(EnumDecl, TagDecl)
-  MX_VISIT_ENTITY_LIST(EnumDecl, enumerators, 46, MX_APPLY_METHOD, Enumerators, EnumConstantDecl, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(EnumDecl, instantiated_from_member_enum, 71, MX_APPLY_METHOD, InstantiatedFromMemberEnum, EnumDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_ENUM)
-  MX_VISIT_OPTIONAL_ENTITY(EnumDecl, integer_type, 74, MX_APPLY_METHOD, IntegerType, Type, NthDecl, TypeUseSelector::INTEGER_TYPE)
-  MX_VISIT_OPTIONAL_INT(EnumDecl, odr_hash, 143, MX_APPLY_METHOD, ODRHash, unsigned, NthDecl)
-  MX_VISIT_ENTITY(EnumDecl, promotion_type, 81, MX_APPLY_METHOD, PromotionType, Type, NthDecl, TypeUseSelector::PROMOTION_TYPE)
-  MX_VISIT_OPTIONAL_ENTITY(EnumDecl, template_instantiation_pattern, 86, MX_APPLY_METHOD, TemplateInstantiationPattern, EnumDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
-  MX_VISIT_ENUM(EnumDecl, template_specialization_kind, 80, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_closed, 102, MX_APPLY_METHOD, IsClosed, bool, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_closed_flag, 103, MX_APPLY_METHOD, IsClosedFlag, bool, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_closed_non_flag, 104, MX_APPLY_METHOD, IsClosedNonFlag, bool, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_complete, 105, MX_APPLY_METHOD, IsComplete, bool, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_fixed, 106, MX_APPLY_METHOD, IsFixed, bool, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_scoped, 107, MX_APPLY_METHOD, IsScoped, bool, NthDecl)
-  MX_VISIT_BOOL(EnumDecl, is_scoped_using_class_tag, 108, MX_APPLY_METHOD, IsScopedUsingClassTag, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(EnumDecl, enumerators, 51, MX_APPLY_METHOD, Enumerators, EnumConstantDecl, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(EnumDecl, instantiated_from_member_enum, 76, MX_APPLY_METHOD, InstantiatedFromMemberEnum, EnumDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_ENUM)
+  MX_VISIT_OPTIONAL_ENTITY(EnumDecl, integer_type, 79, MX_APPLY_METHOD, IntegerType, Type, NthDecl, TypeUseSelector::INTEGER_TYPE)
+  MX_VISIT_OPTIONAL_INT(EnumDecl, odr_hash, 148, MX_APPLY_METHOD, ODRHash, unsigned, NthDecl)
+  MX_VISIT_ENTITY(EnumDecl, promotion_type, 86, MX_APPLY_METHOD, PromotionType, Type, NthDecl, TypeUseSelector::PROMOTION_TYPE)
+  MX_VISIT_OPTIONAL_ENTITY(EnumDecl, template_instantiation_pattern, 91, MX_APPLY_METHOD, TemplateInstantiationPattern, EnumDecl, NthDecl, DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN)
+  MX_VISIT_ENUM(EnumDecl, template_specialization_kind, 85, MX_APPLY_METHOD, TemplateSpecializationKind, TemplateSpecializationKind, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_closed, 107, MX_APPLY_METHOD, IsClosed, bool, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_closed_flag, 108, MX_APPLY_METHOD, IsClosedFlag, bool, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_closed_non_flag, 109, MX_APPLY_METHOD, IsClosedNonFlag, bool, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_complete, 110, MX_APPLY_METHOD, IsComplete, bool, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_fixed, 111, MX_APPLY_METHOD, IsFixed, bool, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_scoped, 112, MX_APPLY_METHOD, IsScoped, bool, NthDecl)
+  MX_VISIT_BOOL(EnumDecl, is_scoped_using_class_tag, 113, MX_APPLY_METHOD, IsScopedUsingClassTag, bool, NthDecl)
   MX_EXIT_VISIT_EnumDecl
 MX_END_VISIT_DECL(EnumDecl)
 
@@ -10669,10 +17822,10 @@ MX_END_VISIT_DECL(EnumDecl)
 MX_BEGIN_VISIT_DECL(UnresolvedUsingTypenameDecl)
   MX_ENTER_VISIT_UnresolvedUsingTypenameDecl
   MX_VISIT_BASE(UnresolvedUsingTypenameDecl, TypeDecl)
-  MX_VISIT_ENTITY(UnresolvedUsingTypenameDecl, ellipsis_token, 52, MX_APPLY_METHOD, EllipsisToken, Token, NthDecl, TokenUseSelector::ELLIPSIS_TOKEN)
-  MX_VISIT_ENTITY(UnresolvedUsingTypenameDecl, typename_token, 53, MX_APPLY_METHOD, TypenameToken, Token, NthDecl, TokenUseSelector::TYPENAME_TOKEN)
-  MX_VISIT_ENTITY(UnresolvedUsingTypenameDecl, using_token, 61, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
-  MX_VISIT_BOOL(UnresolvedUsingTypenameDecl, is_pack_expansion, 69, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
+  MX_VISIT_ENTITY(UnresolvedUsingTypenameDecl, ellipsis_token, 57, MX_APPLY_METHOD, EllipsisToken, Token, NthDecl, TokenUseSelector::ELLIPSIS_TOKEN)
+  MX_VISIT_ENTITY(UnresolvedUsingTypenameDecl, typename_token, 58, MX_APPLY_METHOD, TypenameToken, Token, NthDecl, TokenUseSelector::TYPENAME_TOKEN)
+  MX_VISIT_ENTITY(UnresolvedUsingTypenameDecl, using_token, 66, MX_APPLY_METHOD, UsingToken, Token, NthDecl, TokenUseSelector::USING_TOKEN)
+  MX_VISIT_BOOL(UnresolvedUsingTypenameDecl, is_pack_expansion, 74, MX_APPLY_METHOD, IsPackExpansion, bool, NthDecl)
   MX_EXIT_VISIT_UnresolvedUsingTypenameDecl
 MX_END_VISIT_DECL(UnresolvedUsingTypenameDecl)
 
@@ -10686,10 +17839,10 @@ MX_END_VISIT_DECL(UnresolvedUsingTypenameDecl)
 MX_BEGIN_VISIT_DECL(TypedefNameDecl)
   MX_ENTER_VISIT_TypedefNameDecl
   MX_VISIT_BASE(TypedefNameDecl, TypeDecl)
-  MX_VISIT_OPTIONAL_ENTITY(TypedefNameDecl, anonymous_declaration_with_typedef_name, 52, MX_APPLY_METHOD, AnonymousDeclarationWithTypedefName, TagDecl, NthDecl, DeclUseSelector::ANONYMOUS_DECLARATION_WITH_TYPEDEF_NAME)
-  MX_VISIT_ENTITY(TypedefNameDecl, underlying_type, 53, MX_APPLY_METHOD, UnderlyingType, Type, NthDecl, TypeUseSelector::UNDERLYING_TYPE)
-  MX_VISIT_BOOL(TypedefNameDecl, is_moded, 70, MX_APPLY_METHOD, IsModed, bool, NthDecl)
-  MX_VISIT_BOOL(TypedefNameDecl, is_transparent_tag, 75, MX_APPLY_METHOD, IsTransparentTag, bool, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(TypedefNameDecl, anonymous_declaration_with_typedef_name, 57, MX_APPLY_METHOD, AnonymousDeclarationWithTypedefName, TagDecl, NthDecl, DeclUseSelector::ANONYMOUS_DECLARATION_WITH_TYPEDEF_NAME)
+  MX_VISIT_ENTITY(TypedefNameDecl, underlying_type, 58, MX_APPLY_METHOD, UnderlyingType, Type, NthDecl, TypeUseSelector::UNDERLYING_TYPE)
+  MX_VISIT_BOOL(TypedefNameDecl, is_moded, 75, MX_APPLY_METHOD, IsModed, bool, NthDecl)
+  MX_VISIT_BOOL(TypedefNameDecl, is_transparent_tag, 80, MX_APPLY_METHOD, IsTransparentTag, bool, NthDecl)
   MX_EXIT_VISIT_TypedefNameDecl
 MX_END_VISIT_DECL(TypedefNameDecl)
 
@@ -10716,7 +17869,7 @@ MX_END_VISIT_DECL(TypedefDecl)
 MX_BEGIN_VISIT_DECL(TypeAliasDecl)
   MX_ENTER_VISIT_TypeAliasDecl
   MX_VISIT_BASE(TypeAliasDecl, TypedefNameDecl)
-  MX_VISIT_OPTIONAL_ENTITY(TypeAliasDecl, described_alias_template, 61, MX_APPLY_METHOD, DescribedAliasTemplate, TypeAliasTemplateDecl, NthDecl, DeclUseSelector::DESCRIBED_ALIAS_TEMPLATE)
+  MX_VISIT_OPTIONAL_ENTITY(TypeAliasDecl, described_alias_template, 66, MX_APPLY_METHOD, DescribedAliasTemplate, TypeAliasTemplateDecl, NthDecl, DeclUseSelector::DESCRIBED_ALIAS_TEMPLATE)
   MX_EXIT_VISIT_TypeAliasDecl
 MX_END_VISIT_DECL(TypeAliasDecl)
 
@@ -10730,10 +17883,10 @@ MX_END_VISIT_DECL(TypeAliasDecl)
 MX_BEGIN_VISIT_DECL(ObjCTypeParamDecl)
   MX_ENTER_VISIT_ObjCTypeParamDecl
   MX_VISIT_BASE(ObjCTypeParamDecl, TypedefNameDecl)
-  MX_VISIT_ENTITY(ObjCTypeParamDecl, colon_token, 61, MX_APPLY_METHOD, ColonToken, Token, NthDecl, TokenUseSelector::COLON_TOKEN)
-  MX_VISIT_ENUM(ObjCTypeParamDecl, variance, 72, MX_APPLY_METHOD, Variance, ObjCTypeParamVariance, NthDecl)
-  MX_VISIT_ENTITY(ObjCTypeParamDecl, variance_token, 62, MX_APPLY_METHOD, VarianceToken, Token, NthDecl, TokenUseSelector::VARIANCE_TOKEN)
-  MX_VISIT_BOOL(ObjCTypeParamDecl, has_explicit_bound, 77, MX_APPLY_METHOD, HasExplicitBound, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCTypeParamDecl, colon_token, 66, MX_APPLY_METHOD, ColonToken, Token, NthDecl, TokenUseSelector::COLON_TOKEN)
+  MX_VISIT_ENUM(ObjCTypeParamDecl, variance, 77, MX_APPLY_METHOD, Variance, ObjCTypeParamVariance, NthDecl)
+  MX_VISIT_ENTITY(ObjCTypeParamDecl, variance_token, 67, MX_APPLY_METHOD, VarianceToken, Token, NthDecl, TokenUseSelector::VARIANCE_TOKEN)
+  MX_VISIT_BOOL(ObjCTypeParamDecl, has_explicit_bound, 82, MX_APPLY_METHOD, HasExplicitBound, bool, NthDecl)
   MX_EXIT_VISIT_ObjCTypeParamDecl
 MX_END_VISIT_DECL(ObjCTypeParamDecl)
 
@@ -10807,8 +17960,8 @@ MX_END_VISIT_DECL(VarTemplateDecl)
 MX_BEGIN_VISIT_DECL(TypeAliasTemplateDecl)
   MX_ENTER_VISIT_TypeAliasTemplateDecl
   MX_VISIT_BASE(TypeAliasTemplateDecl, RedeclarableTemplateDecl)
-  MX_VISIT_OPTIONAL_ENTITY(TypeAliasTemplateDecl, instantiated_from_member_template, 51, MX_APPLY_METHOD, InstantiatedFromMemberTemplate, TypeAliasTemplateDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_TEMPLATE)
-  MX_VISIT_ENTITY(TypeAliasTemplateDecl, templated_declaration, 52, MX_APPLY_METHOD, TemplatedDeclaration, TypeAliasDecl, NthDecl, DeclUseSelector::TEMPLATED_DECLARATION)
+  MX_VISIT_OPTIONAL_ENTITY(TypeAliasTemplateDecl, instantiated_from_member_template, 56, MX_APPLY_METHOD, InstantiatedFromMemberTemplate, TypeAliasTemplateDecl, NthDecl, DeclUseSelector::INSTANTIATED_FROM_MEMBER_TEMPLATE)
+  MX_VISIT_ENTITY(TypeAliasTemplateDecl, templated_declaration, 57, MX_APPLY_METHOD, TemplatedDeclaration, TypeAliasDecl, NthDecl, DeclUseSelector::TEMPLATED_DECLARATION)
   MX_EXIT_VISIT_TypeAliasTemplateDecl
 MX_END_VISIT_DECL(TypeAliasTemplateDecl)
 
@@ -10822,8 +17975,8 @@ MX_END_VISIT_DECL(TypeAliasTemplateDecl)
 MX_BEGIN_VISIT_DECL(ConceptDecl)
   MX_ENTER_VISIT_ConceptDecl
   MX_VISIT_BASE(ConceptDecl, TemplateDecl)
-  MX_VISIT_ENTITY(ConceptDecl, constraint_expression, 51, MX_APPLY_METHOD, ConstraintExpression, Expr, NthDecl, StmtUseSelector::CONSTRAINT_EXPRESSION)
-  MX_VISIT_BOOL(ConceptDecl, is_type_concept, 68, MX_APPLY_METHOD, IsTypeConcept, bool, NthDecl)
+  MX_VISIT_ENTITY(ConceptDecl, constraint_expression, 56, MX_APPLY_METHOD, ConstraintExpression, Expr, NthDecl, StmtUseSelector::CONSTRAINT_EXPRESSION)
+  MX_VISIT_BOOL(ConceptDecl, is_type_concept, 73, MX_APPLY_METHOD, IsTypeConcept, bool, NthDecl)
   MX_EXIT_VISIT_ConceptDecl
 MX_END_VISIT_DECL(ConceptDecl)
 
@@ -10861,24 +18014,24 @@ MX_END_VISIT_DECL(TemplateTemplateParmDecl)
 MX_BEGIN_VISIT_DECL(ObjCPropertyDecl)
   MX_ENTER_VISIT_ObjCPropertyDecl
   MX_VISIT_BASE(ObjCPropertyDecl, NamedDecl)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, at_token, 51, MX_APPLY_METHOD, AtToken, Token, NthDecl, TokenUseSelector::AT_TOKEN)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, getter_method_declaration, 52, MX_APPLY_METHOD, GetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::GETTER_METHOD_DECLARATION)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, getter_name_token, 53, MX_APPLY_METHOD, GetterNameToken, Token, NthDecl, TokenUseSelector::GETTER_NAME_TOKEN)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, l_paren_token, 61, MX_APPLY_METHOD, LParenToken, Token, NthDecl, TokenUseSelector::L_PAREN_TOKEN)
-  MX_VISIT_ENUM(ObjCPropertyDecl, property_implementation, 72, MX_APPLY_METHOD, PropertyImplementation, ObjCPropertyDeclPropertyControl, NthDecl)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, property_instance_variable_declaration, 62, MX_APPLY_METHOD, PropertyInstanceVariableDeclaration, ObjCIvarDecl, NthDecl, DeclUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION)
-  MX_VISIT_ENUM(ObjCPropertyDecl, query_kind, 80, MX_APPLY_METHOD, QueryKind, ObjCPropertyQueryKind, NthDecl)
-  MX_VISIT_ENUM(ObjCPropertyDecl, setter_kind, 82, MX_APPLY_METHOD, SetterKind, ObjCPropertyDeclSetterKind, NthDecl)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, setter_method_declaration, 63, MX_APPLY_METHOD, SetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::SETTER_METHOD_DECLARATION)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, setter_name_token, 71, MX_APPLY_METHOD, SetterNameToken, Token, NthDecl, TokenUseSelector::SETTER_NAME_TOKEN)
-  MX_VISIT_ENTITY(ObjCPropertyDecl, type, 74, MX_APPLY_METHOD, Type, Type, NthDecl, TypeUseSelector::TYPE)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_atomic, 68, MX_APPLY_METHOD, IsAtomic, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_class_property, 69, MX_APPLY_METHOD, IsClassProperty, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_direct_property, 70, MX_APPLY_METHOD, IsDirectProperty, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_instance_property, 75, MX_APPLY_METHOD, IsInstanceProperty, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_optional, 77, MX_APPLY_METHOD, IsOptional, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_read_only, 79, MX_APPLY_METHOD, IsReadOnly, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCPropertyDecl, is_retaining, 87, MX_APPLY_METHOD, IsRetaining, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, at_token, 56, MX_APPLY_METHOD, AtToken, Token, NthDecl, TokenUseSelector::AT_TOKEN)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, getter_method_declaration, 57, MX_APPLY_METHOD, GetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::GETTER_METHOD_DECLARATION)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, getter_name_token, 58, MX_APPLY_METHOD, GetterNameToken, Token, NthDecl, TokenUseSelector::GETTER_NAME_TOKEN)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, l_paren_token, 66, MX_APPLY_METHOD, LParenToken, Token, NthDecl, TokenUseSelector::L_PAREN_TOKEN)
+  MX_VISIT_ENUM(ObjCPropertyDecl, property_implementation, 77, MX_APPLY_METHOD, PropertyImplementation, ObjCPropertyDeclPropertyControl, NthDecl)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, property_instance_variable_declaration, 67, MX_APPLY_METHOD, PropertyInstanceVariableDeclaration, ObjCIvarDecl, NthDecl, DeclUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION)
+  MX_VISIT_ENUM(ObjCPropertyDecl, query_kind, 85, MX_APPLY_METHOD, QueryKind, ObjCPropertyQueryKind, NthDecl)
+  MX_VISIT_ENUM(ObjCPropertyDecl, setter_kind, 87, MX_APPLY_METHOD, SetterKind, ObjCPropertyDeclSetterKind, NthDecl)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, setter_method_declaration, 68, MX_APPLY_METHOD, SetterMethodDeclaration, ObjCMethodDecl, NthDecl, DeclUseSelector::SETTER_METHOD_DECLARATION)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, setter_name_token, 76, MX_APPLY_METHOD, SetterNameToken, Token, NthDecl, TokenUseSelector::SETTER_NAME_TOKEN)
+  MX_VISIT_ENTITY(ObjCPropertyDecl, type, 79, MX_APPLY_METHOD, Type, Type, NthDecl, TypeUseSelector::TYPE)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_atomic, 73, MX_APPLY_METHOD, IsAtomic, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_class_property, 74, MX_APPLY_METHOD, IsClassProperty, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_direct_property, 75, MX_APPLY_METHOD, IsDirectProperty, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_instance_property, 80, MX_APPLY_METHOD, IsInstanceProperty, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_optional, 82, MX_APPLY_METHOD, IsOptional, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_read_only, 84, MX_APPLY_METHOD, IsReadOnly, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCPropertyDecl, is_retaining, 92, MX_APPLY_METHOD, IsRetaining, bool, NthDecl)
   MX_EXIT_VISIT_ObjCPropertyDecl
 MX_END_VISIT_DECL(ObjCPropertyDecl)
 
@@ -10892,36 +18045,36 @@ MX_END_VISIT_DECL(ObjCPropertyDecl)
 MX_BEGIN_VISIT_DECL(ObjCMethodDecl)
   MX_ENTER_VISIT_ObjCMethodDecl
   MX_VISIT_BASE(ObjCMethodDecl, NamedDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, defined_in_ns_object, 68, MX_APPLY_METHOD, DefinedInNSObject, bool, NthDecl)
-  MX_VISIT_ENTITY(ObjCMethodDecl, find_property_declaration, 51, MX_APPLY_METHOD, FindPropertyDeclaration, ObjCPropertyDecl, NthDecl, DeclUseSelector::FIND_PROPERTY_DECLARATION)
-  MX_VISIT_ENTITY(ObjCMethodDecl, class_interface, 52, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
-  MX_VISIT_ENTITY(ObjCMethodDecl, command_declaration, 53, MX_APPLY_METHOD, CommandDeclaration, ImplicitParamDecl, NthDecl, DeclUseSelector::COMMAND_DECLARATION)
-  MX_VISIT_ENTITY(ObjCMethodDecl, declarator_end_token, 61, MX_APPLY_METHOD, DeclaratorEndToken, Token, NthDecl, TokenUseSelector::DECLARATOR_END_TOKEN)
-  MX_VISIT_ENUM(ObjCMethodDecl, implementation_control, 72, MX_APPLY_METHOD, ImplementationControl, ObjCMethodDeclImplementationControl, NthDecl)
-  MX_VISIT_ENUM(ObjCMethodDecl, method_family, 80, MX_APPLY_METHOD, MethodFamily, ObjCMethodFamily, NthDecl)
-  MX_VISIT_ENUM(ObjCMethodDecl, obj_c_decl_qualifier, 82, MX_APPLY_METHOD, ObjCDeclQualifier, DeclObjCDeclQualifier, NthDecl)
-  MX_VISIT_ENTITY(ObjCMethodDecl, return_type, 62, MX_APPLY_METHOD, ReturnType, Type, NthDecl, TypeUseSelector::RETURN_TYPE)
-  MX_VISIT_ENTITY(ObjCMethodDecl, selector_start_token, 74, MX_APPLY_METHOD, SelectorStartToken, Token, NthDecl, TokenUseSelector::SELECTOR_START_TOKEN)
-  MX_VISIT_ENTITY(ObjCMethodDecl, self_declaration, 76, MX_APPLY_METHOD, SelfDeclaration, ImplicitParamDecl, NthDecl, DeclUseSelector::SELF_DECLARATION)
-  MX_VISIT_BOOL(ObjCMethodDecl, has_parameter_destroyed_in_callee, 69, MX_APPLY_METHOD, HasParameterDestroyedInCallee, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, has_redeclaration, 70, MX_APPLY_METHOD, HasRedeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, has_related_result_type, 75, MX_APPLY_METHOD, HasRelatedResultType, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, has_skipped_body, 77, MX_APPLY_METHOD, HasSkippedBody, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_class_method, 79, MX_APPLY_METHOD, IsClassMethod, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_defined, 87, MX_APPLY_METHOD, IsDefined, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_designated_initializer_for_the_interface, 90, MX_APPLY_METHOD, IsDesignatedInitializerForTheInterface, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_direct_method, 91, MX_APPLY_METHOD, IsDirectMethod, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_instance_method, 92, MX_APPLY_METHOD, IsInstanceMethod, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_optional, 93, MX_APPLY_METHOD, IsOptional, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_overriding, 94, MX_APPLY_METHOD, IsOverriding, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_property_accessor, 95, MX_APPLY_METHOD, IsPropertyAccessor, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_redeclaration, 96, MX_APPLY_METHOD, IsRedeclaration, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_synthesized_accessor_stub, 97, MX_APPLY_METHOD, IsSynthesizedAccessorStub, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_this_declaration_a_designated_initializer, 98, MX_APPLY_METHOD, IsThisDeclarationADesignatedInitializer, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCMethodDecl, is_variadic, 99, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCMethodDecl, parameters, 45, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCMethodDecl, selector_tokens, 46, MX_APPLY_METHOD, SelectorTokens, Token, NthDecl)
-  MX_VISIT_DECL_CONTEXT(ObjCMethodDecl, declarations_in_context, 57, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, defined_in_ns_object, 73, MX_APPLY_METHOD, DefinedInNSObject, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCMethodDecl, find_property_declaration, 56, MX_APPLY_METHOD, FindPropertyDeclaration, ObjCPropertyDecl, NthDecl, DeclUseSelector::FIND_PROPERTY_DECLARATION)
+  MX_VISIT_ENTITY(ObjCMethodDecl, class_interface, 57, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
+  MX_VISIT_ENTITY(ObjCMethodDecl, command_declaration, 58, MX_APPLY_METHOD, CommandDeclaration, ImplicitParamDecl, NthDecl, DeclUseSelector::COMMAND_DECLARATION)
+  MX_VISIT_ENTITY(ObjCMethodDecl, declarator_end_token, 66, MX_APPLY_METHOD, DeclaratorEndToken, Token, NthDecl, TokenUseSelector::DECLARATOR_END_TOKEN)
+  MX_VISIT_ENUM(ObjCMethodDecl, implementation_control, 77, MX_APPLY_METHOD, ImplementationControl, ObjCMethodDeclImplementationControl, NthDecl)
+  MX_VISIT_ENUM(ObjCMethodDecl, method_family, 85, MX_APPLY_METHOD, MethodFamily, ObjCMethodFamily, NthDecl)
+  MX_VISIT_ENUM(ObjCMethodDecl, obj_c_decl_qualifier, 87, MX_APPLY_METHOD, ObjCDeclQualifier, DeclObjCDeclQualifier, NthDecl)
+  MX_VISIT_ENTITY(ObjCMethodDecl, return_type, 67, MX_APPLY_METHOD, ReturnType, Type, NthDecl, TypeUseSelector::RETURN_TYPE)
+  MX_VISIT_ENTITY(ObjCMethodDecl, selector_start_token, 79, MX_APPLY_METHOD, SelectorStartToken, Token, NthDecl, TokenUseSelector::SELECTOR_START_TOKEN)
+  MX_VISIT_ENTITY(ObjCMethodDecl, self_declaration, 81, MX_APPLY_METHOD, SelfDeclaration, ImplicitParamDecl, NthDecl, DeclUseSelector::SELF_DECLARATION)
+  MX_VISIT_BOOL(ObjCMethodDecl, has_parameter_destroyed_in_callee, 74, MX_APPLY_METHOD, HasParameterDestroyedInCallee, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, has_redeclaration, 75, MX_APPLY_METHOD, HasRedeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, has_related_result_type, 80, MX_APPLY_METHOD, HasRelatedResultType, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, has_skipped_body, 82, MX_APPLY_METHOD, HasSkippedBody, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_class_method, 84, MX_APPLY_METHOD, IsClassMethod, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_defined, 92, MX_APPLY_METHOD, IsDefined, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_designated_initializer_for_the_interface, 95, MX_APPLY_METHOD, IsDesignatedInitializerForTheInterface, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_direct_method, 96, MX_APPLY_METHOD, IsDirectMethod, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_instance_method, 97, MX_APPLY_METHOD, IsInstanceMethod, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_optional, 98, MX_APPLY_METHOD, IsOptional, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_overriding, 99, MX_APPLY_METHOD, IsOverriding, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_property_accessor, 100, MX_APPLY_METHOD, IsPropertyAccessor, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_redeclaration, 101, MX_APPLY_METHOD, IsRedeclaration, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_synthesized_accessor_stub, 102, MX_APPLY_METHOD, IsSynthesizedAccessorStub, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_this_declaration_a_designated_initializer, 103, MX_APPLY_METHOD, IsThisDeclarationADesignatedInitializer, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCMethodDecl, is_variadic, 104, MX_APPLY_METHOD, IsVariadic, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCMethodDecl, parameters, 50, MX_APPLY_METHOD, Parameters, ParmVarDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCMethodDecl, selector_tokens, 51, MX_APPLY_METHOD, SelectorTokens, Token, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ObjCMethodDecl, declarations_in_context, 62, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_ObjCMethodDecl
 MX_END_VISIT_DECL(ObjCMethodDecl)
 
@@ -10935,14 +18088,14 @@ MX_END_VISIT_DECL(ObjCMethodDecl)
 MX_BEGIN_VISIT_DECL(ObjCContainerDecl)
   MX_ENTER_VISIT_ObjCContainerDecl
   MX_VISIT_BASE(ObjCContainerDecl, NamedDecl)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, class_methods, 45, MX_APPLY_METHOD, ClassMethods, ObjCMethodDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, class_properties, 46, MX_APPLY_METHOD, ClassProperties, ObjCPropertyDecl, NthDecl)
-  MX_VISIT_ENTITY(ObjCContainerDecl, at_start_token, 53, MX_APPLY_METHOD, AtStartToken, Token, NthDecl, TokenUseSelector::AT_START_TOKEN)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_methods, 57, MX_APPLY_METHOD, InstanceMethods, ObjCMethodDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_properties, 171, MX_APPLY_METHOD, InstanceProperties, ObjCPropertyDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 180, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, properties, 316, MX_APPLY_METHOD, Properties, ObjCPropertyDecl, NthDecl)
-  MX_VISIT_DECL_CONTEXT(ObjCContainerDecl, declarations_in_context, 349, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, class_methods, 50, MX_APPLY_METHOD, ClassMethods, ObjCMethodDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, class_properties, 51, MX_APPLY_METHOD, ClassProperties, ObjCPropertyDecl, NthDecl)
+  MX_VISIT_ENTITY(ObjCContainerDecl, at_start_token, 58, MX_APPLY_METHOD, AtStartToken, Token, NthDecl, TokenUseSelector::AT_START_TOKEN)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_methods, 62, MX_APPLY_METHOD, InstanceMethods, ObjCMethodDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, instance_properties, 176, MX_APPLY_METHOD, InstanceProperties, ObjCPropertyDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, methods, 185, MX_APPLY_METHOD, Methods, ObjCMethodDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCContainerDecl, properties, 321, MX_APPLY_METHOD, Properties, ObjCPropertyDecl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ObjCContainerDecl, declarations_in_context, 354, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_ObjCContainerDecl
 MX_END_VISIT_DECL(ObjCContainerDecl)
 
@@ -10956,16 +18109,16 @@ MX_END_VISIT_DECL(ObjCContainerDecl)
 MX_BEGIN_VISIT_DECL(ObjCCategoryDecl)
   MX_ENTER_VISIT_ObjCCategoryDecl
   MX_VISIT_BASE(ObjCCategoryDecl, ObjCContainerDecl)
-  MX_VISIT_BOOL(ObjCCategoryDecl, is_class_extension, 68, MX_APPLY_METHOD, IsClassExtension, bool, NthDecl)
-  MX_VISIT_ENTITY(ObjCCategoryDecl, category_name_token, 61, MX_APPLY_METHOD, CategoryNameToken, Token, NthDecl, TokenUseSelector::CATEGORY_NAME_TOKEN)
-  MX_VISIT_ENTITY(ObjCCategoryDecl, class_interface, 62, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
-  MX_VISIT_ENTITY(ObjCCategoryDecl, implementation, 63, MX_APPLY_METHOD, Implementation, ObjCCategoryImplDecl, NthDecl, DeclUseSelector::IMPLEMENTATION)
-  MX_VISIT_ENTITY(ObjCCategoryDecl, instance_variable_l_brace_token, 71, MX_APPLY_METHOD, InstanceVariableLBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_L_BRACE_TOKEN)
-  MX_VISIT_ENTITY(ObjCCategoryDecl, instance_variable_r_brace_token, 74, MX_APPLY_METHOD, InstanceVariableRBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_R_BRACE_TOKEN)
-  MX_VISIT_ENTITY(ObjCCategoryDecl, next_class_category, 76, MX_APPLY_METHOD, NextClassCategory, ObjCCategoryDecl, NthDecl, DeclUseSelector::NEXT_CLASS_CATEGORY)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, instance_variables, 350, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocol_tokens, 351, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocols, 352, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
+  MX_VISIT_BOOL(ObjCCategoryDecl, is_class_extension, 73, MX_APPLY_METHOD, IsClassExtension, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCCategoryDecl, category_name_token, 66, MX_APPLY_METHOD, CategoryNameToken, Token, NthDecl, TokenUseSelector::CATEGORY_NAME_TOKEN)
+  MX_VISIT_ENTITY(ObjCCategoryDecl, class_interface, 67, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
+  MX_VISIT_ENTITY(ObjCCategoryDecl, implementation, 68, MX_APPLY_METHOD, Implementation, ObjCCategoryImplDecl, NthDecl, DeclUseSelector::IMPLEMENTATION)
+  MX_VISIT_ENTITY(ObjCCategoryDecl, instance_variable_l_brace_token, 76, MX_APPLY_METHOD, InstanceVariableLBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_L_BRACE_TOKEN)
+  MX_VISIT_ENTITY(ObjCCategoryDecl, instance_variable_r_brace_token, 79, MX_APPLY_METHOD, InstanceVariableRBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_R_BRACE_TOKEN)
+  MX_VISIT_ENTITY(ObjCCategoryDecl, next_class_category, 81, MX_APPLY_METHOD, NextClassCategory, ObjCCategoryDecl, NthDecl, DeclUseSelector::NEXT_CLASS_CATEGORY)
+  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, instance_variables, 355, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocol_tokens, 356, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCCategoryDecl, protocols, 357, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
   MX_EXIT_VISIT_ObjCCategoryDecl
 MX_END_VISIT_DECL(ObjCCategoryDecl)
 
@@ -10979,11 +18132,11 @@ MX_END_VISIT_DECL(ObjCCategoryDecl)
 MX_BEGIN_VISIT_DECL(ObjCProtocolDecl)
   MX_ENTER_VISIT_ObjCProtocolDecl
   MX_VISIT_BASE(ObjCProtocolDecl, ObjCContainerDecl)
-  MX_VISIT_TEXT(ObjCProtocolDecl, obj_c_runtime_name_as_string, 67, MX_APPLY_METHOD, ObjCRuntimeNameAsString, basic_string_view, NthDecl)
-  MX_VISIT_BOOL(ObjCProtocolDecl, has_definition, 68, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCProtocolDecl, is_non_runtime_protocol, 69, MX_APPLY_METHOD, IsNonRuntimeProtocol, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocol_tokens, 350, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocols, 351, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
+  MX_VISIT_TEXT(ObjCProtocolDecl, obj_c_runtime_name_as_string, 72, MX_APPLY_METHOD, ObjCRuntimeNameAsString, basic_string_view, NthDecl)
+  MX_VISIT_BOOL(ObjCProtocolDecl, has_definition, 73, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCProtocolDecl, is_non_runtime_protocol, 74, MX_APPLY_METHOD, IsNonRuntimeProtocol, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocol_tokens, 355, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCProtocolDecl, protocols, 356, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
   MX_EXIT_VISIT_ObjCProtocolDecl
 MX_END_VISIT_DECL(ObjCProtocolDecl)
 
@@ -10997,27 +18150,27 @@ MX_END_VISIT_DECL(ObjCProtocolDecl)
 MX_BEGIN_VISIT_DECL(ObjCInterfaceDecl)
   MX_ENTER_VISIT_ObjCInterfaceDecl
   MX_VISIT_BASE(ObjCInterfaceDecl, ObjCContainerDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, all_referenced_protocols, 350, MX_APPLY_METHOD, AllReferencedProtocols, ObjCProtocolDecl, NthDecl)
-  MX_VISIT_BOOL(ObjCInterfaceDecl, declares_or_inherits_designated_initializers, 68, MX_APPLY_METHOD, DeclaresOrInheritsDesignatedInitializers, bool, NthDecl)
-  MX_VISIT_ENTITY(ObjCInterfaceDecl, end_of_definition_token, 61, MX_APPLY_METHOD, EndOfDefinitionToken, Token, NthDecl, TokenUseSelector::END_OF_DEFINITION_TOKEN)
-  MX_VISIT_ENTITY(ObjCInterfaceDecl, implementation, 62, MX_APPLY_METHOD, Implementation, ObjCImplementationDecl, NthDecl, DeclUseSelector::IMPLEMENTATION)
-  MX_VISIT_TEXT(ObjCInterfaceDecl, obj_c_runtime_name_as_string, 67, MX_APPLY_METHOD, ObjCRuntimeNameAsString, basic_string_view, NthDecl)
-  MX_VISIT_OPTIONAL_ENTITY(ObjCInterfaceDecl, super_class, 63, MX_APPLY_METHOD, SuperClass, ObjCInterfaceDecl, NthDecl, DeclUseSelector::SUPER_CLASS)
-  MX_VISIT_ENTITY(ObjCInterfaceDecl, super_class_token, 71, MX_APPLY_METHOD, SuperClassToken, Token, NthDecl, TokenUseSelector::SUPER_CLASS_TOKEN)
-  MX_VISIT_OPTIONAL_ENTITY(ObjCInterfaceDecl, super_class_type, 74, MX_APPLY_METHOD, SuperClassTypeInfo, Type, NthDecl, TypeUseSelector::SUPER_CLASS_TYPE)
-  MX_VISIT_ENTITY(ObjCInterfaceDecl, type_for_declaration, 76, MX_APPLY_METHOD, TypeForDeclaration, Type, NthDecl, TypeUseSelector::TYPE_FOR_DECLARATION)
-  MX_VISIT_BOOL(ObjCInterfaceDecl, has_definition, 75, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCInterfaceDecl, has_designated_initializers, 77, MX_APPLY_METHOD, HasDesignatedInitializers, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCInterfaceDecl, is_arc_weakref_unavailable, 79, MX_APPLY_METHOD, IsArcWeakrefUnavailable, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCInterfaceDecl, is_implicit_interface_declaration, 87, MX_APPLY_METHOD, IsImplicitInterfaceDeclaration, bool, NthDecl)
-  MX_VISIT_ENTITY(ObjCInterfaceDecl, is_obj_c_requires_property_definitions, 78, MX_APPLY_METHOD, IsObjCRequiresPropertyDefinitions, ObjCInterfaceDecl, NthDecl, DeclUseSelector::IS_OBJ_C_REQUIRES_PROPERTY_DEFINITIONS)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, instance_variables, 351, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_categories, 352, MX_APPLY_METHOD, KnownCategories, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_extensions, 353, MX_APPLY_METHOD, KnownExtensions, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocol_tokens, 354, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocols, 355, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_categories, 356, MX_APPLY_METHOD, VisibleCategories, ObjCCategoryDecl, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_extensions, 357, MX_APPLY_METHOD, VisibleExtensions, ObjCCategoryDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, all_referenced_protocols, 355, MX_APPLY_METHOD, AllReferencedProtocols, ObjCProtocolDecl, NthDecl)
+  MX_VISIT_BOOL(ObjCInterfaceDecl, declares_or_inherits_designated_initializers, 73, MX_APPLY_METHOD, DeclaresOrInheritsDesignatedInitializers, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCInterfaceDecl, end_of_definition_token, 66, MX_APPLY_METHOD, EndOfDefinitionToken, Token, NthDecl, TokenUseSelector::END_OF_DEFINITION_TOKEN)
+  MX_VISIT_ENTITY(ObjCInterfaceDecl, implementation, 67, MX_APPLY_METHOD, Implementation, ObjCImplementationDecl, NthDecl, DeclUseSelector::IMPLEMENTATION)
+  MX_VISIT_TEXT(ObjCInterfaceDecl, obj_c_runtime_name_as_string, 72, MX_APPLY_METHOD, ObjCRuntimeNameAsString, basic_string_view, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(ObjCInterfaceDecl, super_class, 68, MX_APPLY_METHOD, SuperClass, ObjCInterfaceDecl, NthDecl, DeclUseSelector::SUPER_CLASS)
+  MX_VISIT_ENTITY(ObjCInterfaceDecl, super_class_token, 76, MX_APPLY_METHOD, SuperClassToken, Token, NthDecl, TokenUseSelector::SUPER_CLASS_TOKEN)
+  MX_VISIT_OPTIONAL_ENTITY(ObjCInterfaceDecl, super_class_type, 79, MX_APPLY_METHOD, SuperClassTypeInfo, Type, NthDecl, TypeUseSelector::SUPER_CLASS_TYPE)
+  MX_VISIT_ENTITY(ObjCInterfaceDecl, type_for_declaration, 81, MX_APPLY_METHOD, TypeForDeclaration, Type, NthDecl, TypeUseSelector::TYPE_FOR_DECLARATION)
+  MX_VISIT_BOOL(ObjCInterfaceDecl, has_definition, 80, MX_APPLY_METHOD, HasDefinition, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCInterfaceDecl, has_designated_initializers, 82, MX_APPLY_METHOD, HasDesignatedInitializers, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCInterfaceDecl, is_arc_weakref_unavailable, 84, MX_APPLY_METHOD, IsArcWeakrefUnavailable, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCInterfaceDecl, is_implicit_interface_declaration, 92, MX_APPLY_METHOD, IsImplicitInterfaceDeclaration, bool, NthDecl)
+  MX_VISIT_ENTITY(ObjCInterfaceDecl, is_obj_c_requires_property_definitions, 83, MX_APPLY_METHOD, IsObjCRequiresPropertyDefinitions, ObjCInterfaceDecl, NthDecl, DeclUseSelector::IS_OBJ_C_REQUIRES_PROPERTY_DEFINITIONS)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, instance_variables, 356, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_categories, 357, MX_APPLY_METHOD, KnownCategories, ObjCCategoryDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, known_extensions, 358, MX_APPLY_METHOD, KnownExtensions, ObjCCategoryDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocol_tokens, 359, MX_APPLY_METHOD, ProtocolTokens, Token, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, protocols, 360, MX_APPLY_METHOD, Protocols, ObjCProtocolDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_categories, 361, MX_APPLY_METHOD, VisibleCategories, ObjCCategoryDecl, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCInterfaceDecl, visible_extensions, 362, MX_APPLY_METHOD, VisibleExtensions, ObjCCategoryDecl, NthDecl)
   MX_EXIT_VISIT_ObjCInterfaceDecl
 MX_END_VISIT_DECL(ObjCInterfaceDecl)
 
@@ -11031,8 +18184,8 @@ MX_END_VISIT_DECL(ObjCInterfaceDecl)
 MX_BEGIN_VISIT_DECL(ObjCImplDecl)
   MX_ENTER_VISIT_ObjCImplDecl
   MX_VISIT_BASE(ObjCImplDecl, ObjCContainerDecl)
-  MX_VISIT_ENTITY(ObjCImplDecl, class_interface, 61, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
-  MX_VISIT_ENTITY_LIST(ObjCImplDecl, property_implementations, 350, MX_APPLY_METHOD, PropertyImplementations, ObjCPropertyImplDecl, NthDecl)
+  MX_VISIT_ENTITY(ObjCImplDecl, class_interface, 66, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
+  MX_VISIT_ENTITY_LIST(ObjCImplDecl, property_implementations, 355, MX_APPLY_METHOD, PropertyImplementations, ObjCPropertyImplDecl, NthDecl)
   MX_EXIT_VISIT_ObjCImplDecl
 MX_END_VISIT_DECL(ObjCImplDecl)
 
@@ -11046,8 +18199,8 @@ MX_END_VISIT_DECL(ObjCImplDecl)
 MX_BEGIN_VISIT_DECL(ObjCCategoryImplDecl)
   MX_ENTER_VISIT_ObjCCategoryImplDecl
   MX_VISIT_BASE(ObjCCategoryImplDecl, ObjCImplDecl)
-  MX_VISIT_ENTITY(ObjCCategoryImplDecl, category_declaration, 62, MX_APPLY_METHOD, CategoryDeclaration, ObjCCategoryDecl, NthDecl, DeclUseSelector::CATEGORY_DECLARATION)
-  MX_VISIT_ENTITY(ObjCCategoryImplDecl, category_name_token, 63, MX_APPLY_METHOD, CategoryNameToken, Token, NthDecl, TokenUseSelector::CATEGORY_NAME_TOKEN)
+  MX_VISIT_ENTITY(ObjCCategoryImplDecl, category_declaration, 67, MX_APPLY_METHOD, CategoryDeclaration, ObjCCategoryDecl, NthDecl, DeclUseSelector::CATEGORY_DECLARATION)
+  MX_VISIT_ENTITY(ObjCCategoryImplDecl, category_name_token, 68, MX_APPLY_METHOD, CategoryNameToken, Token, NthDecl, TokenUseSelector::CATEGORY_NAME_TOKEN)
   MX_EXIT_VISIT_ObjCCategoryImplDecl
 MX_END_VISIT_DECL(ObjCCategoryImplDecl)
 
@@ -11061,14 +18214,14 @@ MX_END_VISIT_DECL(ObjCCategoryImplDecl)
 MX_BEGIN_VISIT_DECL(ObjCImplementationDecl)
   MX_ENTER_VISIT_ObjCImplementationDecl
   MX_VISIT_BASE(ObjCImplementationDecl, ObjCImplDecl)
-  MX_VISIT_ENTITY(ObjCImplementationDecl, instance_variable_l_brace_token, 62, MX_APPLY_METHOD, InstanceVariableLBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_L_BRACE_TOKEN)
-  MX_VISIT_ENTITY(ObjCImplementationDecl, instance_variable_r_brace_token, 63, MX_APPLY_METHOD, InstanceVariableRBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_R_BRACE_TOKEN)
-  MX_VISIT_TEXT(ObjCImplementationDecl, obj_c_runtime_name_as_string, 67, MX_APPLY_METHOD, ObjCRuntimeNameAsString, basic_string_view, NthDecl)
-  MX_VISIT_ENTITY(ObjCImplementationDecl, super_class, 71, MX_APPLY_METHOD, SuperClass, ObjCInterfaceDecl, NthDecl, DeclUseSelector::SUPER_CLASS)
-  MX_VISIT_ENTITY(ObjCImplementationDecl, super_class_token, 74, MX_APPLY_METHOD, SuperClassToken, Token, NthDecl, TokenUseSelector::SUPER_CLASS_TOKEN)
-  MX_VISIT_BOOL(ObjCImplementationDecl, has_destructors, 68, MX_APPLY_METHOD, HasDestructors, bool, NthDecl)
-  MX_VISIT_BOOL(ObjCImplementationDecl, has_non_zero_constructors, 69, MX_APPLY_METHOD, HasNonZeroConstructors, bool, NthDecl)
-  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 351, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
+  MX_VISIT_ENTITY(ObjCImplementationDecl, instance_variable_l_brace_token, 67, MX_APPLY_METHOD, InstanceVariableLBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_L_BRACE_TOKEN)
+  MX_VISIT_ENTITY(ObjCImplementationDecl, instance_variable_r_brace_token, 68, MX_APPLY_METHOD, InstanceVariableRBraceToken, Token, NthDecl, TokenUseSelector::INSTANCE_VARIABLE_R_BRACE_TOKEN)
+  MX_VISIT_TEXT(ObjCImplementationDecl, obj_c_runtime_name_as_string, 72, MX_APPLY_METHOD, ObjCRuntimeNameAsString, basic_string_view, NthDecl)
+  MX_VISIT_ENTITY(ObjCImplementationDecl, super_class, 76, MX_APPLY_METHOD, SuperClass, ObjCInterfaceDecl, NthDecl, DeclUseSelector::SUPER_CLASS)
+  MX_VISIT_ENTITY(ObjCImplementationDecl, super_class_token, 79, MX_APPLY_METHOD, SuperClassToken, Token, NthDecl, TokenUseSelector::SUPER_CLASS_TOKEN)
+  MX_VISIT_BOOL(ObjCImplementationDecl, has_destructors, 73, MX_APPLY_METHOD, HasDestructors, bool, NthDecl)
+  MX_VISIT_BOOL(ObjCImplementationDecl, has_non_zero_constructors, 74, MX_APPLY_METHOD, HasNonZeroConstructors, bool, NthDecl)
+  MX_VISIT_ENTITY_LIST(ObjCImplementationDecl, instance_variables, 356, MX_APPLY_METHOD, InstanceVariables, ObjCIvarDecl, NthDecl)
   MX_EXIT_VISIT_ObjCImplementationDecl
 MX_END_VISIT_DECL(ObjCImplementationDecl)
 
@@ -11082,7 +18235,7 @@ MX_END_VISIT_DECL(ObjCImplementationDecl)
 MX_BEGIN_VISIT_DECL(ObjCCompatibleAliasDecl)
   MX_ENTER_VISIT_ObjCCompatibleAliasDecl
   MX_VISIT_BASE(ObjCCompatibleAliasDecl, NamedDecl)
-  MX_VISIT_ENTITY(ObjCCompatibleAliasDecl, class_interface, 51, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
+  MX_VISIT_ENTITY(ObjCCompatibleAliasDecl, class_interface, 56, MX_APPLY_METHOD, ClassInterface, ObjCInterfaceDecl, NthDecl, DeclUseSelector::CLASS_INTERFACE)
   MX_EXIT_VISIT_ObjCCompatibleAliasDecl
 MX_END_VISIT_DECL(ObjCCompatibleAliasDecl)
 
@@ -11095,7 +18248,7 @@ MX_END_VISIT_DECL(ObjCCompatibleAliasDecl)
 
 MX_BEGIN_VISIT_DECL(NamespaceDecl)
   MX_ENTER_VISIT_NamespaceDecl
-  MX_VISIT_DECL_CONTEXT(NamespaceDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(NamespaceDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_NamespaceDecl
 MX_END_VISIT_DECL(NamespaceDecl)
 
@@ -11109,10 +18262,10 @@ MX_END_VISIT_DECL(NamespaceDecl)
 MX_BEGIN_VISIT_DECL(NamespaceAliasDecl)
   MX_ENTER_VISIT_NamespaceAliasDecl
   MX_VISIT_BASE(NamespaceAliasDecl, NamedDecl)
-  MX_VISIT_ENTITY(NamespaceAliasDecl, alias_token, 51, MX_APPLY_METHOD, AliasToken, Token, NthDecl, TokenUseSelector::ALIAS_TOKEN)
-  MX_VISIT_ENTITY(NamespaceAliasDecl, aliased_namespace, 52, MX_APPLY_METHOD, AliasedNamespace, NamedDecl, NthDecl, DeclUseSelector::ALIASED_NAMESPACE)
-  MX_VISIT_ENTITY(NamespaceAliasDecl, namespace_token, 53, MX_APPLY_METHOD, NamespaceToken, Token, NthDecl, TokenUseSelector::NAMESPACE_TOKEN)
-  MX_VISIT_ENTITY(NamespaceAliasDecl, target_name_token, 61, MX_APPLY_METHOD, TargetNameToken, Token, NthDecl, TokenUseSelector::TARGET_NAME_TOKEN)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, alias_token, 56, MX_APPLY_METHOD, AliasToken, Token, NthDecl, TokenUseSelector::ALIAS_TOKEN)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, aliased_namespace, 57, MX_APPLY_METHOD, AliasedNamespace, NamedDecl, NthDecl, DeclUseSelector::ALIASED_NAMESPACE)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, namespace_token, 58, MX_APPLY_METHOD, NamespaceToken, Token, NthDecl, TokenUseSelector::NAMESPACE_TOKEN)
+  MX_VISIT_ENTITY(NamespaceAliasDecl, target_name_token, 66, MX_APPLY_METHOD, TargetNameToken, Token, NthDecl, TokenUseSelector::TARGET_NAME_TOKEN)
   MX_EXIT_VISIT_NamespaceAliasDecl
 MX_END_VISIT_DECL(NamespaceAliasDecl)
 
@@ -11125,7 +18278,7 @@ MX_END_VISIT_DECL(NamespaceAliasDecl)
 
 MX_BEGIN_VISIT_DECL(LinkageSpecDecl)
   MX_ENTER_VISIT_LinkageSpecDecl
-  MX_VISIT_DECL_CONTEXT(LinkageSpecDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(LinkageSpecDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_LinkageSpecDecl
 MX_END_VISIT_DECL(LinkageSpecDecl)
 
@@ -11139,10 +18292,10 @@ MX_END_VISIT_DECL(LinkageSpecDecl)
 MX_BEGIN_VISIT_DECL(LifetimeExtendedTemporaryDecl)
   MX_ENTER_VISIT_LifetimeExtendedTemporaryDecl
   MX_VISIT_BASE(LifetimeExtendedTemporaryDecl, Decl)
-  MX_VISIT_ENTITY_LIST(LifetimeExtendedTemporaryDecl, children_expression, 45, MX_APPLY_METHOD, ChildrenExpression, Stmt, NthDecl)
-  MX_VISIT_ENTITY(LifetimeExtendedTemporaryDecl, extending_declaration, 43, MX_APPLY_METHOD, ExtendingDeclaration, ValueDecl, NthDecl, DeclUseSelector::EXTENDING_DECLARATION)
-  MX_VISIT_ENUM(LifetimeExtendedTemporaryDecl, storage_duration, 60, MX_APPLY_METHOD, StorageDuration, StorageDuration, NthDecl)
-  MX_VISIT_ENTITY(LifetimeExtendedTemporaryDecl, temporary_expression, 51, MX_APPLY_METHOD, TemporaryExpression, Expr, NthDecl, StmtUseSelector::TEMPORARY_EXPRESSION)
+  MX_VISIT_ENTITY_LIST(LifetimeExtendedTemporaryDecl, children_expression, 50, MX_APPLY_METHOD, ChildrenExpression, Stmt, NthDecl)
+  MX_VISIT_ENTITY(LifetimeExtendedTemporaryDecl, extending_declaration, 48, MX_APPLY_METHOD, ExtendingDeclaration, ValueDecl, NthDecl, DeclUseSelector::EXTENDING_DECLARATION)
+  MX_VISIT_ENUM(LifetimeExtendedTemporaryDecl, storage_duration, 65, MX_APPLY_METHOD, StorageDuration, StorageDuration, NthDecl)
+  MX_VISIT_ENTITY(LifetimeExtendedTemporaryDecl, temporary_expression, 56, MX_APPLY_METHOD, TemporaryExpression, Expr, NthDecl, StmtUseSelector::TEMPORARY_EXPRESSION)
   MX_EXIT_VISIT_LifetimeExtendedTemporaryDecl
 MX_END_VISIT_DECL(LifetimeExtendedTemporaryDecl)
 
@@ -11156,7 +18309,7 @@ MX_END_VISIT_DECL(LifetimeExtendedTemporaryDecl)
 MX_BEGIN_VISIT_DECL(ImportDecl)
   MX_ENTER_VISIT_ImportDecl
   MX_VISIT_BASE(ImportDecl, Decl)
-  MX_VISIT_ENTITY_LIST(ImportDecl, identifier_tokens, 45, MX_APPLY_METHOD, IdentifierTokens, Token, NthDecl)
+  MX_VISIT_ENTITY_LIST(ImportDecl, identifier_tokens, 50, MX_APPLY_METHOD, IdentifierTokens, Token, NthDecl)
   MX_EXIT_VISIT_ImportDecl
 MX_END_VISIT_DECL(ImportDecl)
 
@@ -11182,11 +18335,11 @@ MX_END_VISIT_DECL(FriendTemplateDecl)
 MX_BEGIN_VISIT_DECL(FriendDecl)
   MX_ENTER_VISIT_FriendDecl
   MX_VISIT_BASE(FriendDecl, Decl)
-  MX_VISIT_OPTIONAL_ENTITY(FriendDecl, friend_declaration, 43, MX_APPLY_METHOD, FriendDeclaration, NamedDecl, NthDecl, DeclUseSelector::FRIEND_DECLARATION)
-  MX_VISIT_ENTITY(FriendDecl, friend_token, 51, MX_APPLY_METHOD, FriendToken, Token, NthDecl, TokenUseSelector::FRIEND_TOKEN)
-  MX_VISIT_OPTIONAL_ENTITY(FriendDecl, friend_type, 52, MX_APPLY_METHOD, FriendType, Type, NthDecl, TypeUseSelector::FRIEND_TYPE)
-  MX_VISIT_BOOL(FriendDecl, is_unsupported_friend, 48, MX_APPLY_METHOD, IsUnsupportedFriend, bool, NthDecl)
-  MX_VISIT_PSEUDO_LIST(FriendDecl, friend_type_template_parameter_lists, 73, MX_APPLY_METHOD, FriendTypeTemplateParameterLists, TemplateParameterList, NthDecl)
+  MX_VISIT_OPTIONAL_ENTITY(FriendDecl, friend_declaration, 48, MX_APPLY_METHOD, FriendDeclaration, NamedDecl, NthDecl, DeclUseSelector::FRIEND_DECLARATION)
+  MX_VISIT_ENTITY(FriendDecl, friend_token, 56, MX_APPLY_METHOD, FriendToken, Token, NthDecl, TokenUseSelector::FRIEND_TOKEN)
+  MX_VISIT_OPTIONAL_ENTITY(FriendDecl, friend_type, 57, MX_APPLY_METHOD, FriendType, Type, NthDecl, TypeUseSelector::FRIEND_TYPE)
+  MX_VISIT_BOOL(FriendDecl, is_unsupported_friend, 53, MX_APPLY_METHOD, IsUnsupportedFriend, bool, NthDecl)
+  MX_VISIT_PSEUDO_LIST(FriendDecl, friend_type_template_parameter_lists, 78, MX_APPLY_METHOD, FriendTypeTemplateParameterLists, TemplateParameterList, NthDecl)
   MX_EXIT_VISIT_FriendDecl
 MX_END_VISIT_DECL(FriendDecl)
 
@@ -11200,9 +18353,9 @@ MX_END_VISIT_DECL(FriendDecl)
 MX_BEGIN_VISIT_DECL(FileScopeAsmDecl)
   MX_ENTER_VISIT_FileScopeAsmDecl
   MX_VISIT_BASE(FileScopeAsmDecl, Decl)
-  MX_VISIT_ENTITY(FileScopeAsmDecl, assembly_token, 43, MX_APPLY_METHOD, AssemblyToken, Token, NthDecl, TokenUseSelector::ASSEMBLY_TOKEN)
-  MX_VISIT_ENTITY(FileScopeAsmDecl, assembly_string, 51, MX_APPLY_METHOD, AssemblyString, StringLiteral, NthDecl, StmtUseSelector::ASSEMBLY_STRING)
-  MX_VISIT_ENTITY(FileScopeAsmDecl, r_paren_token, 52, MX_APPLY_METHOD, RParenToken, Token, NthDecl, TokenUseSelector::R_PAREN_TOKEN)
+  MX_VISIT_ENTITY(FileScopeAsmDecl, assembly_token, 48, MX_APPLY_METHOD, AssemblyToken, Token, NthDecl, TokenUseSelector::ASSEMBLY_TOKEN)
+  MX_VISIT_ENTITY(FileScopeAsmDecl, assembly_string, 56, MX_APPLY_METHOD, AssemblyString, StringLiteral, NthDecl, StmtUseSelector::ASSEMBLY_STRING)
+  MX_VISIT_ENTITY(FileScopeAsmDecl, r_paren_token, 57, MX_APPLY_METHOD, RParenToken, Token, NthDecl, TokenUseSelector::R_PAREN_TOKEN)
   MX_EXIT_VISIT_FileScopeAsmDecl
 MX_END_VISIT_DECL(FileScopeAsmDecl)
 
@@ -11215,7 +18368,7 @@ MX_END_VISIT_DECL(FileScopeAsmDecl)
 
 MX_BEGIN_VISIT_DECL(ExternCContextDecl)
   MX_ENTER_VISIT_ExternCContextDecl
-  MX_VISIT_DECL_CONTEXT(ExternCContextDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ExternCContextDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_ExternCContextDecl
 MX_END_VISIT_DECL(ExternCContextDecl)
 
@@ -11229,10 +18382,10 @@ MX_END_VISIT_DECL(ExternCContextDecl)
 MX_BEGIN_VISIT_DECL(ExportDecl)
   MX_ENTER_VISIT_ExportDecl
   MX_VISIT_BASE(ExportDecl, Decl)
-  MX_VISIT_ENTITY(ExportDecl, export_token, 43, MX_APPLY_METHOD, ExportToken, Token, NthDecl, TokenUseSelector::EXPORT_TOKEN)
-  MX_VISIT_ENTITY(ExportDecl, r_brace_token, 51, MX_APPLY_METHOD, RBraceToken, Token, NthDecl, TokenUseSelector::R_BRACE_TOKEN)
-  MX_VISIT_BOOL(ExportDecl, has_braces, 44, MX_APPLY_METHOD, HasBraces, bool, NthDecl)
-  MX_VISIT_DECL_CONTEXT(ExportDecl, declarations_in_context, 45, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
+  MX_VISIT_ENTITY(ExportDecl, export_token, 48, MX_APPLY_METHOD, ExportToken, Token, NthDecl, TokenUseSelector::EXPORT_TOKEN)
+  MX_VISIT_ENTITY(ExportDecl, r_brace_token, 56, MX_APPLY_METHOD, RBraceToken, Token, NthDecl, TokenUseSelector::R_BRACE_TOKEN)
+  MX_VISIT_BOOL(ExportDecl, has_braces, 49, MX_APPLY_METHOD, HasBraces, bool, NthDecl)
+  MX_VISIT_DECL_CONTEXT(ExportDecl, declarations_in_context, 50, MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, NthDecl)
   MX_EXIT_VISIT_ExportDecl
 MX_END_VISIT_DECL(ExportDecl)
 
@@ -11257,6 +18410,716 @@ MX_END_VISIT_DECL(EmptyDecl)
 #undef MX_EXIT_VISIT_TemplateArgument
 #undef MX_ENTER_VISIT_CXXBaseSpecifier
 #undef MX_EXIT_VISIT_CXXBaseSpecifier
+#undef MX_ENTER_VISIT_Attr
+#undef MX_EXIT_VISIT_Attr
+#undef MX_ENTER_VISIT_AlignValueAttr
+#undef MX_EXIT_VISIT_AlignValueAttr
+#undef MX_ENTER_VISIT_AliasAttr
+#undef MX_EXIT_VISIT_AliasAttr
+#undef MX_ENTER_VISIT_AbiTagAttr
+#undef MX_EXIT_VISIT_AbiTagAttr
+#undef MX_ENTER_VISIT_TypeAttr
+#undef MX_EXIT_VISIT_TypeAttr
+#undef MX_ENTER_VISIT_SPtrAttr
+#undef MX_EXIT_VISIT_SPtrAttr
+#undef MX_ENTER_VISIT_Ptr64Attr
+#undef MX_EXIT_VISIT_Ptr64Attr
+#undef MX_ENTER_VISIT_Ptr32Attr
+#undef MX_EXIT_VISIT_Ptr32Attr
+#undef MX_ENTER_VISIT_OpenCLPrivateAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLPrivateAddressSpaceAttr
+#undef MX_ENTER_VISIT_OpenCLLocalAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLLocalAddressSpaceAttr
+#undef MX_ENTER_VISIT_OpenCLGlobalHostAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLGlobalHostAddressSpaceAttr
+#undef MX_ENTER_VISIT_OpenCLGlobalDeviceAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLGlobalDeviceAddressSpaceAttr
+#undef MX_ENTER_VISIT_OpenCLGlobalAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLGlobalAddressSpaceAttr
+#undef MX_ENTER_VISIT_OpenCLGenericAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLGenericAddressSpaceAttr
+#undef MX_ENTER_VISIT_OpenCLConstantAddressSpaceAttr
+#undef MX_EXIT_VISIT_OpenCLConstantAddressSpaceAttr
+#undef MX_ENTER_VISIT_ObjCKindOfAttr
+#undef MX_EXIT_VISIT_ObjCKindOfAttr
+#undef MX_ENTER_VISIT_ObjCInertUnsafeUnretainedAttr
+#undef MX_EXIT_VISIT_ObjCInertUnsafeUnretainedAttr
+#undef MX_ENTER_VISIT_ObjCGCAttr
+#undef MX_EXIT_VISIT_ObjCGCAttr
+#undef MX_ENTER_VISIT_NoDerefAttr
+#undef MX_EXIT_VISIT_NoDerefAttr
+#undef MX_ENTER_VISIT_CmseNSCallAttr
+#undef MX_EXIT_VISIT_CmseNSCallAttr
+#undef MX_ENTER_VISIT_BTFTypeTagAttr
+#undef MX_EXIT_VISIT_BTFTypeTagAttr
+#undef MX_ENTER_VISIT_ArmMveStrictPolymorphismAttr
+#undef MX_EXIT_VISIT_ArmMveStrictPolymorphismAttr
+#undef MX_ENTER_VISIT_AddressSpaceAttr
+#undef MX_EXIT_VISIT_AddressSpaceAttr
+#undef MX_ENTER_VISIT_UPtrAttr
+#undef MX_EXIT_VISIT_UPtrAttr
+#undef MX_ENTER_VISIT_TypeNullableResultAttr
+#undef MX_EXIT_VISIT_TypeNullableResultAttr
+#undef MX_ENTER_VISIT_TypeNullableAttr
+#undef MX_EXIT_VISIT_TypeNullableAttr
+#undef MX_ENTER_VISIT_TypeNullUnspecifiedAttr
+#undef MX_EXIT_VISIT_TypeNullUnspecifiedAttr
+#undef MX_ENTER_VISIT_TypeNonNullAttr
+#undef MX_EXIT_VISIT_TypeNonNullAttr
+#undef MX_ENTER_VISIT_ThreadAttr
+#undef MX_EXIT_VISIT_ThreadAttr
+#undef MX_ENTER_VISIT_SwiftObjCMembersAttr
+#undef MX_EXIT_VISIT_SwiftObjCMembersAttr
+#undef MX_ENTER_VISIT_StmtAttr
+#undef MX_EXIT_VISIT_StmtAttr
+#undef MX_ENTER_VISIT_OpenCLUnrollHintAttr
+#undef MX_EXIT_VISIT_OpenCLUnrollHintAttr
+#undef MX_ENTER_VISIT_MustTailAttr
+#undef MX_EXIT_VISIT_MustTailAttr
+#undef MX_ENTER_VISIT_LikelyAttr
+#undef MX_EXIT_VISIT_LikelyAttr
+#undef MX_ENTER_VISIT_FallThroughAttr
+#undef MX_EXIT_VISIT_FallThroughAttr
+#undef MX_ENTER_VISIT_UnlikelyAttr
+#undef MX_EXIT_VISIT_UnlikelyAttr
+#undef MX_ENTER_VISIT_SuppressAttr
+#undef MX_EXIT_VISIT_SuppressAttr
+#undef MX_ENTER_VISIT_RenderScriptKernelAttr
+#undef MX_EXIT_VISIT_RenderScriptKernelAttr
+#undef MX_ENTER_VISIT_OverloadableAttr
+#undef MX_EXIT_VISIT_OverloadableAttr
+#undef MX_ENTER_VISIT_OpenCLAccessAttr
+#undef MX_EXIT_VISIT_OpenCLAccessAttr
+#undef MX_ENTER_VISIT_ObjCRuntimeVisibleAttr
+#undef MX_EXIT_VISIT_ObjCRuntimeVisibleAttr
+#undef MX_ENTER_VISIT_ObjCRuntimeNameAttr
+#undef MX_EXIT_VISIT_ObjCRuntimeNameAttr
+#undef MX_ENTER_VISIT_ObjCNonRuntimeProtocolAttr
+#undef MX_EXIT_VISIT_ObjCNonRuntimeProtocolAttr
+#undef MX_ENTER_VISIT_ObjCNonLazyClassAttr
+#undef MX_EXIT_VISIT_ObjCNonLazyClassAttr
+#undef MX_ENTER_VISIT_ObjCDirectMembersAttr
+#undef MX_EXIT_VISIT_ObjCDirectMembersAttr
+#undef MX_ENTER_VISIT_ObjCDirectAttr
+#undef MX_EXIT_VISIT_ObjCDirectAttr
+#undef MX_ENTER_VISIT_ObjCDesignatedInitializerAttr
+#undef MX_EXIT_VISIT_ObjCDesignatedInitializerAttr
+#undef MX_ENTER_VISIT_ObjCClassStubAttr
+#undef MX_EXIT_VISIT_ObjCClassStubAttr
+#undef MX_ENTER_VISIT_ObjCBoxableAttr
+#undef MX_EXIT_VISIT_ObjCBoxableAttr
+#undef MX_ENTER_VISIT_OMPReferencedVarAttr
+#undef MX_EXIT_VISIT_OMPReferencedVarAttr
+#undef MX_ENTER_VISIT_OMPDeclareSimdDeclAttr
+#undef MX_EXIT_VISIT_OMPDeclareSimdDeclAttr
+#undef MX_ENTER_VISIT_OMPCaptureKindAttr
+#undef MX_EXIT_VISIT_OMPCaptureKindAttr
+#undef MX_ENTER_VISIT_NoEscapeAttr
+#undef MX_EXIT_VISIT_NoEscapeAttr
+#undef MX_ENTER_VISIT_NoBuiltinAttr
+#undef MX_EXIT_VISIT_NoBuiltinAttr
+#undef MX_ENTER_VISIT_ModeAttr
+#undef MX_EXIT_VISIT_ModeAttr
+#undef MX_ENTER_VISIT_LoopHintAttr
+#undef MX_EXIT_VISIT_LoopHintAttr
+#undef MX_ENTER_VISIT_LoaderUninitializedAttr
+#undef MX_EXIT_VISIT_LoaderUninitializedAttr
+#undef MX_ENTER_VISIT_InitSegAttr
+#undef MX_EXIT_VISIT_InitSegAttr
+#undef MX_ENTER_VISIT_InheritableAttr
+#undef MX_EXIT_VISIT_InheritableAttr
+#undef MX_ENTER_VISIT_IBOutletCollectionAttr
+#undef MX_EXIT_VISIT_IBOutletCollectionAttr
+#undef MX_ENTER_VISIT_IBOutletAttr
+#undef MX_EXIT_VISIT_IBOutletAttr
+#undef MX_ENTER_VISIT_IBActionAttr
+#undef MX_EXIT_VISIT_IBActionAttr
+#undef MX_ENTER_VISIT_HotAttr
+#undef MX_EXIT_VISIT_HotAttr
+#undef MX_ENTER_VISIT_HIPManagedAttr
+#undef MX_EXIT_VISIT_HIPManagedAttr
+#undef MX_ENTER_VISIT_GuardedVarAttr
+#undef MX_EXIT_VISIT_GuardedVarAttr
+#undef MX_ENTER_VISIT_GuardedByAttr
+#undef MX_EXIT_VISIT_GuardedByAttr
+#undef MX_ENTER_VISIT_GNUInlineAttr
+#undef MX_EXIT_VISIT_GNUInlineAttr
+#undef MX_ENTER_VISIT_FormatAttr
+#undef MX_EXIT_VISIT_FormatAttr
+#undef MX_ENTER_VISIT_FormatArgAttr
+#undef MX_EXIT_VISIT_FormatArgAttr
+#undef MX_ENTER_VISIT_FlattenAttr
+#undef MX_EXIT_VISIT_FlattenAttr
+#undef MX_ENTER_VISIT_FlagEnumAttr
+#undef MX_EXIT_VISIT_FlagEnumAttr
+#undef MX_ENTER_VISIT_FinalAttr
+#undef MX_EXIT_VISIT_FinalAttr
+#undef MX_ENTER_VISIT_FastCallAttr
+#undef MX_EXIT_VISIT_FastCallAttr
+#undef MX_ENTER_VISIT_ExternalSourceSymbolAttr
+#undef MX_EXIT_VISIT_ExternalSourceSymbolAttr
+#undef MX_ENTER_VISIT_ExclusiveTrylockFunctionAttr
+#undef MX_EXIT_VISIT_ExclusiveTrylockFunctionAttr
+#undef MX_ENTER_VISIT_ExcludeFromExplicitInstantiationAttr
+#undef MX_EXIT_VISIT_ExcludeFromExplicitInstantiationAttr
+#undef MX_ENTER_VISIT_ErrorAttr
+#undef MX_EXIT_VISIT_ErrorAttr
+#undef MX_ENTER_VISIT_EnumExtensibilityAttr
+#undef MX_EXIT_VISIT_EnumExtensibilityAttr
+#undef MX_ENTER_VISIT_EnforceTCBLeafAttr
+#undef MX_EXIT_VISIT_EnforceTCBLeafAttr
+#undef MX_ENTER_VISIT_EnforceTCBAttr
+#undef MX_EXIT_VISIT_EnforceTCBAttr
+#undef MX_ENTER_VISIT_EnableIfAttr
+#undef MX_EXIT_VISIT_EnableIfAttr
+#undef MX_ENTER_VISIT_EmptyBasesAttr
+#undef MX_EXIT_VISIT_EmptyBasesAttr
+#undef MX_ENTER_VISIT_DisableTailCallsAttr
+#undef MX_EXIT_VISIT_DisableTailCallsAttr
+#undef MX_ENTER_VISIT_DisableSanitizerInstrumentationAttr
+#undef MX_EXIT_VISIT_DisableSanitizerInstrumentationAttr
+#undef MX_ENTER_VISIT_DiagnoseIfAttr
+#undef MX_EXIT_VISIT_DiagnoseIfAttr
+#undef MX_ENTER_VISIT_DiagnoseAsBuiltinAttr
+#undef MX_EXIT_VISIT_DiagnoseAsBuiltinAttr
+#undef MX_ENTER_VISIT_DestructorAttr
+#undef MX_EXIT_VISIT_DestructorAttr
+#undef MX_ENTER_VISIT_DeprecatedAttr
+#undef MX_EXIT_VISIT_DeprecatedAttr
+#undef MX_ENTER_VISIT_DeclOrStmtAttr
+#undef MX_EXIT_VISIT_DeclOrStmtAttr
+#undef MX_ENTER_VISIT_NoMergeAttr
+#undef MX_EXIT_VISIT_NoMergeAttr
+#undef MX_ENTER_VISIT_DLLImportStaticLocalAttr
+#undef MX_EXIT_VISIT_DLLImportStaticLocalAttr
+#undef MX_ENTER_VISIT_DLLImportAttr
+#undef MX_EXIT_VISIT_DLLImportAttr
+#undef MX_ENTER_VISIT_DLLExportStaticLocalAttr
+#undef MX_EXIT_VISIT_DLLExportStaticLocalAttr
+#undef MX_ENTER_VISIT_DLLExportAttr
+#undef MX_EXIT_VISIT_DLLExportAttr
+#undef MX_ENTER_VISIT_ConvergentAttr
+#undef MX_EXIT_VISIT_ConvergentAttr
+#undef MX_ENTER_VISIT_ConsumableSetOnReadAttr
+#undef MX_EXIT_VISIT_ConsumableSetOnReadAttr
+#undef MX_ENTER_VISIT_ConsumableAutoCastAttr
+#undef MX_EXIT_VISIT_ConsumableAutoCastAttr
+#undef MX_ENTER_VISIT_ConsumableAttr
+#undef MX_EXIT_VISIT_ConsumableAttr
+#undef MX_ENTER_VISIT_ConstructorAttr
+#undef MX_EXIT_VISIT_ConstructorAttr
+#undef MX_ENTER_VISIT_ConstInitAttr
+#undef MX_EXIT_VISIT_ConstInitAttr
+#undef MX_ENTER_VISIT_ConstAttr
+#undef MX_EXIT_VISIT_ConstAttr
+#undef MX_ENTER_VISIT_CommonAttr
+#undef MX_EXIT_VISIT_CommonAttr
+#undef MX_ENTER_VISIT_ColdAttr
+#undef MX_EXIT_VISIT_ColdAttr
+#undef MX_ENTER_VISIT_CodeSegAttr
+#undef MX_EXIT_VISIT_CodeSegAttr
+#undef MX_ENTER_VISIT_CmseNSEntryAttr
+#undef MX_EXIT_VISIT_CmseNSEntryAttr
+#undef MX_ENTER_VISIT_CleanupAttr
+#undef MX_EXIT_VISIT_CleanupAttr
+#undef MX_ENTER_VISIT_CapturedRecordAttr
+#undef MX_EXIT_VISIT_CapturedRecordAttr
+#undef MX_ENTER_VISIT_CapabilityAttr
+#undef MX_EXIT_VISIT_CapabilityAttr
+#undef MX_ENTER_VISIT_CallbackAttr
+#undef MX_EXIT_VISIT_CallbackAttr
+#undef MX_ENTER_VISIT_CallableWhenAttr
+#undef MX_EXIT_VISIT_CallableWhenAttr
+#undef MX_ENTER_VISIT_CXX11NoReturnAttr
+#undef MX_EXIT_VISIT_CXX11NoReturnAttr
+#undef MX_ENTER_VISIT_CUDASharedAttr
+#undef MX_EXIT_VISIT_CUDASharedAttr
+#undef MX_ENTER_VISIT_CUDALaunchBoundsAttr
+#undef MX_EXIT_VISIT_CUDALaunchBoundsAttr
+#undef MX_ENTER_VISIT_CUDAInvalidTargetAttr
+#undef MX_EXIT_VISIT_CUDAInvalidTargetAttr
+#undef MX_ENTER_VISIT_CUDAHostAttr
+#undef MX_EXIT_VISIT_CUDAHostAttr
+#undef MX_ENTER_VISIT_CUDAGlobalAttr
+#undef MX_EXIT_VISIT_CUDAGlobalAttr
+#undef MX_ENTER_VISIT_CUDADeviceBuiltinTextureTypeAttr
+#undef MX_EXIT_VISIT_CUDADeviceBuiltinTextureTypeAttr
+#undef MX_ENTER_VISIT_CUDADeviceBuiltinSurfaceTypeAttr
+#undef MX_EXIT_VISIT_CUDADeviceBuiltinSurfaceTypeAttr
+#undef MX_ENTER_VISIT_CUDADeviceAttr
+#undef MX_EXIT_VISIT_CUDADeviceAttr
+#undef MX_ENTER_VISIT_CUDAConstantAttr
+#undef MX_EXIT_VISIT_CUDAConstantAttr
+#undef MX_ENTER_VISIT_CPUSpecificAttr
+#undef MX_EXIT_VISIT_CPUSpecificAttr
+#undef MX_ENTER_VISIT_CPUDispatchAttr
+#undef MX_EXIT_VISIT_CPUDispatchAttr
+#undef MX_ENTER_VISIT_CFUnknownTransferAttr
+#undef MX_EXIT_VISIT_CFUnknownTransferAttr
+#undef MX_ENTER_VISIT_CFReturnsRetainedAttr
+#undef MX_EXIT_VISIT_CFReturnsRetainedAttr
+#undef MX_ENTER_VISIT_CFReturnsNotRetainedAttr
+#undef MX_EXIT_VISIT_CFReturnsNotRetainedAttr
+#undef MX_ENTER_VISIT_CFICanonicalJumpTableAttr
+#undef MX_EXIT_VISIT_CFICanonicalJumpTableAttr
+#undef MX_ENTER_VISIT_CFGuardAttr
+#undef MX_EXIT_VISIT_CFGuardAttr
+#undef MX_ENTER_VISIT_CFAuditedTransferAttr
+#undef MX_EXIT_VISIT_CFAuditedTransferAttr
+#undef MX_ENTER_VISIT_CDeclAttr
+#undef MX_EXIT_VISIT_CDeclAttr
+#undef MX_ENTER_VISIT_C11NoReturnAttr
+#undef MX_EXIT_VISIT_C11NoReturnAttr
+#undef MX_ENTER_VISIT_BuiltinAttr
+#undef MX_EXIT_VISIT_BuiltinAttr
+#undef MX_ENTER_VISIT_BlocksAttr
+#undef MX_EXIT_VISIT_BlocksAttr
+#undef MX_ENTER_VISIT_BTFDeclTagAttr
+#undef MX_EXIT_VISIT_BTFDeclTagAttr
+#undef MX_ENTER_VISIT_BPFPreserveAccessIndexAttr
+#undef MX_EXIT_VISIT_BPFPreserveAccessIndexAttr
+#undef MX_ENTER_VISIT_AvailabilityAttr
+#undef MX_EXIT_VISIT_AvailabilityAttr
+#undef MX_ENTER_VISIT_AssumptionAttr
+#undef MX_EXIT_VISIT_AssumptionAttr
+#undef MX_ENTER_VISIT_AssumeAlignedAttr
+#undef MX_EXIT_VISIT_AssumeAlignedAttr
+#undef MX_ENTER_VISIT_AssertSharedLockAttr
+#undef MX_EXIT_VISIT_AssertSharedLockAttr
+#undef MX_ENTER_VISIT_AssertExclusiveLockAttr
+#undef MX_EXIT_VISIT_AssertExclusiveLockAttr
+#undef MX_ENTER_VISIT_AssertCapabilityAttr
+#undef MX_EXIT_VISIT_AssertCapabilityAttr
+#undef MX_ENTER_VISIT_AsmLabelAttr
+#undef MX_EXIT_VISIT_AsmLabelAttr
+#undef MX_ENTER_VISIT_ArtificialAttr
+#undef MX_EXIT_VISIT_ArtificialAttr
+#undef MX_ENTER_VISIT_ArmBuiltinAliasAttr
+#undef MX_EXIT_VISIT_ArmBuiltinAliasAttr
+#undef MX_ENTER_VISIT_ArgumentWithTypeTagAttr
+#undef MX_EXIT_VISIT_ArgumentWithTypeTagAttr
+#undef MX_ENTER_VISIT_ArcWeakrefUnavailableAttr
+#undef MX_EXIT_VISIT_ArcWeakrefUnavailableAttr
+#undef MX_ENTER_VISIT_AnyX86NoCfCheckAttr
+#undef MX_EXIT_VISIT_AnyX86NoCfCheckAttr
+#undef MX_ENTER_VISIT_AnyX86NoCallerSavedRegistersAttr
+#undef MX_EXIT_VISIT_AnyX86NoCallerSavedRegistersAttr
+#undef MX_ENTER_VISIT_AnyX86InterruptAttr
+#undef MX_EXIT_VISIT_AnyX86InterruptAttr
+#undef MX_ENTER_VISIT_AnalyzerNoReturnAttr
+#undef MX_EXIT_VISIT_AnalyzerNoReturnAttr
+#undef MX_ENTER_VISIT_AlwaysInlineAttr
+#undef MX_EXIT_VISIT_AlwaysInlineAttr
+#undef MX_ENTER_VISIT_AlwaysDestroyAttr
+#undef MX_EXIT_VISIT_AlwaysDestroyAttr
+#undef MX_ENTER_VISIT_AllocSizeAttr
+#undef MX_EXIT_VISIT_AllocSizeAttr
+#undef MX_ENTER_VISIT_AllocAlignAttr
+#undef MX_EXIT_VISIT_AllocAlignAttr
+#undef MX_ENTER_VISIT_AlignedAttr
+#undef MX_EXIT_VISIT_AlignedAttr
+#undef MX_ENTER_VISIT_AlignNaturalAttr
+#undef MX_EXIT_VISIT_AlignNaturalAttr
+#undef MX_ENTER_VISIT_AlignMac68kAttr
+#undef MX_EXIT_VISIT_AlignMac68kAttr
+#undef MX_ENTER_VISIT_AcquiredBeforeAttr
+#undef MX_EXIT_VISIT_AcquiredBeforeAttr
+#undef MX_ENTER_VISIT_AcquiredAfterAttr
+#undef MX_EXIT_VISIT_AcquiredAfterAttr
+#undef MX_ENTER_VISIT_AcquireHandleAttr
+#undef MX_EXIT_VISIT_AcquireHandleAttr
+#undef MX_ENTER_VISIT_AcquireCapabilityAttr
+#undef MX_EXIT_VISIT_AcquireCapabilityAttr
+#undef MX_ENTER_VISIT_AVRSignalAttr
+#undef MX_EXIT_VISIT_AVRSignalAttr
+#undef MX_ENTER_VISIT_AVRInterruptAttr
+#undef MX_EXIT_VISIT_AVRInterruptAttr
+#undef MX_ENTER_VISIT_ARMInterruptAttr
+#undef MX_EXIT_VISIT_ARMInterruptAttr
+#undef MX_ENTER_VISIT_AMDGPUWavesPerEUAttr
+#undef MX_EXIT_VISIT_AMDGPUWavesPerEUAttr
+#undef MX_ENTER_VISIT_AMDGPUNumVGPRAttr
+#undef MX_EXIT_VISIT_AMDGPUNumVGPRAttr
+#undef MX_ENTER_VISIT_AMDGPUNumSGPRAttr
+#undef MX_EXIT_VISIT_AMDGPUNumSGPRAttr
+#undef MX_ENTER_VISIT_AMDGPUFlatWorkGroupSizeAttr
+#undef MX_EXIT_VISIT_AMDGPUFlatWorkGroupSizeAttr
+#undef MX_ENTER_VISIT_AArch64VectorPcsAttr
+#undef MX_EXIT_VISIT_AArch64VectorPcsAttr
+#undef MX_ENTER_VISIT_XRayLogArgsAttr
+#undef MX_EXIT_VISIT_XRayLogArgsAttr
+#undef MX_ENTER_VISIT_XRayInstrumentAttr
+#undef MX_EXIT_VISIT_XRayInstrumentAttr
+#undef MX_ENTER_VISIT_X86ForceAlignArgPointerAttr
+#undef MX_EXIT_VISIT_X86ForceAlignArgPointerAttr
+#undef MX_ENTER_VISIT_WorkGroupSizeHintAttr
+#undef MX_EXIT_VISIT_WorkGroupSizeHintAttr
+#undef MX_ENTER_VISIT_WebAssemblyImportNameAttr
+#undef MX_EXIT_VISIT_WebAssemblyImportNameAttr
+#undef MX_ENTER_VISIT_WebAssemblyImportModuleAttr
+#undef MX_EXIT_VISIT_WebAssemblyImportModuleAttr
+#undef MX_ENTER_VISIT_WebAssemblyExportNameAttr
+#undef MX_EXIT_VISIT_WebAssemblyExportNameAttr
+#undef MX_ENTER_VISIT_WeakRefAttr
+#undef MX_EXIT_VISIT_WeakRefAttr
+#undef MX_ENTER_VISIT_WeakImportAttr
+#undef MX_EXIT_VISIT_WeakImportAttr
+#undef MX_ENTER_VISIT_WeakAttr
+#undef MX_EXIT_VISIT_WeakAttr
+#undef MX_ENTER_VISIT_WarnUnusedResultAttr
+#undef MX_EXIT_VISIT_WarnUnusedResultAttr
+#undef MX_ENTER_VISIT_WarnUnusedAttr
+#undef MX_EXIT_VISIT_WarnUnusedAttr
+#undef MX_ENTER_VISIT_VisibilityAttr
+#undef MX_EXIT_VISIT_VisibilityAttr
+#undef MX_ENTER_VISIT_VectorCallAttr
+#undef MX_EXIT_VISIT_VectorCallAttr
+#undef MX_ENTER_VISIT_VecTypeHintAttr
+#undef MX_EXIT_VISIT_VecTypeHintAttr
+#undef MX_ENTER_VISIT_VecReturnAttr
+#undef MX_EXIT_VISIT_VecReturnAttr
+#undef MX_ENTER_VISIT_UuidAttr
+#undef MX_EXIT_VISIT_UuidAttr
+#undef MX_ENTER_VISIT_UsingIfExistsAttr
+#undef MX_EXIT_VISIT_UsingIfExistsAttr
+#undef MX_ENTER_VISIT_UsedAttr
+#undef MX_EXIT_VISIT_UsedAttr
+#undef MX_ENTER_VISIT_UnusedAttr
+#undef MX_EXIT_VISIT_UnusedAttr
+#undef MX_ENTER_VISIT_UninitializedAttr
+#undef MX_EXIT_VISIT_UninitializedAttr
+#undef MX_ENTER_VISIT_UnavailableAttr
+#undef MX_EXIT_VISIT_UnavailableAttr
+#undef MX_ENTER_VISIT_TypeVisibilityAttr
+#undef MX_EXIT_VISIT_TypeVisibilityAttr
+#undef MX_ENTER_VISIT_TypeTagForDatatypeAttr
+#undef MX_EXIT_VISIT_TypeTagForDatatypeAttr
+#undef MX_ENTER_VISIT_TryAcquireCapabilityAttr
+#undef MX_EXIT_VISIT_TryAcquireCapabilityAttr
+#undef MX_ENTER_VISIT_TrivialABIAttr
+#undef MX_EXIT_VISIT_TrivialABIAttr
+#undef MX_ENTER_VISIT_TransparentUnionAttr
+#undef MX_EXIT_VISIT_TransparentUnionAttr
+#undef MX_ENTER_VISIT_ThisCallAttr
+#undef MX_EXIT_VISIT_ThisCallAttr
+#undef MX_ENTER_VISIT_TestTypestateAttr
+#undef MX_EXIT_VISIT_TestTypestateAttr
+#undef MX_ENTER_VISIT_TargetClonesAttr
+#undef MX_EXIT_VISIT_TargetClonesAttr
+#undef MX_ENTER_VISIT_TargetAttr
+#undef MX_EXIT_VISIT_TargetAttr
+#undef MX_ENTER_VISIT_TLSModelAttr
+#undef MX_EXIT_VISIT_TLSModelAttr
+#undef MX_ENTER_VISIT_SysVABIAttr
+#undef MX_EXIT_VISIT_SysVABIAttr
+#undef MX_ENTER_VISIT_SwiftPrivateAttr
+#undef MX_EXIT_VISIT_SwiftPrivateAttr
+#undef MX_ENTER_VISIT_SwiftNewTypeAttr
+#undef MX_EXIT_VISIT_SwiftNewTypeAttr
+#undef MX_ENTER_VISIT_SwiftNameAttr
+#undef MX_EXIT_VISIT_SwiftNameAttr
+#undef MX_ENTER_VISIT_SwiftErrorAttr
+#undef MX_EXIT_VISIT_SwiftErrorAttr
+#undef MX_ENTER_VISIT_SwiftCallAttr
+#undef MX_EXIT_VISIT_SwiftCallAttr
+#undef MX_ENTER_VISIT_SwiftBridgedTypedefAttr
+#undef MX_EXIT_VISIT_SwiftBridgedTypedefAttr
+#undef MX_ENTER_VISIT_SwiftBridgeAttr
+#undef MX_EXIT_VISIT_SwiftBridgeAttr
+#undef MX_ENTER_VISIT_SwiftAttrAttr
+#undef MX_EXIT_VISIT_SwiftAttrAttr
+#undef MX_ENTER_VISIT_SwiftAsyncNameAttr
+#undef MX_EXIT_VISIT_SwiftAsyncNameAttr
+#undef MX_ENTER_VISIT_SwiftAsyncErrorAttr
+#undef MX_EXIT_VISIT_SwiftAsyncErrorAttr
+#undef MX_ENTER_VISIT_SwiftAsyncCallAttr
+#undef MX_EXIT_VISIT_SwiftAsyncCallAttr
+#undef MX_ENTER_VISIT_SwiftAsyncAttr
+#undef MX_EXIT_VISIT_SwiftAsyncAttr
+#undef MX_ENTER_VISIT_StrictFPAttr
+#undef MX_EXIT_VISIT_StrictFPAttr
+#undef MX_ENTER_VISIT_StdCallAttr
+#undef MX_EXIT_VISIT_StdCallAttr
+#undef MX_ENTER_VISIT_StandaloneDebugAttr
+#undef MX_EXIT_VISIT_StandaloneDebugAttr
+#undef MX_ENTER_VISIT_SpeculativeLoadHardeningAttr
+#undef MX_EXIT_VISIT_SpeculativeLoadHardeningAttr
+#undef MX_ENTER_VISIT_SharedTrylockFunctionAttr
+#undef MX_EXIT_VISIT_SharedTrylockFunctionAttr
+#undef MX_ENTER_VISIT_SetTypestateAttr
+#undef MX_EXIT_VISIT_SetTypestateAttr
+#undef MX_ENTER_VISIT_SentinelAttr
+#undef MX_EXIT_VISIT_SentinelAttr
+#undef MX_ENTER_VISIT_SelectAnyAttr
+#undef MX_EXIT_VISIT_SelectAnyAttr
+#undef MX_ENTER_VISIT_SectionAttr
+#undef MX_EXIT_VISIT_SectionAttr
+#undef MX_ENTER_VISIT_ScopedLockableAttr
+#undef MX_EXIT_VISIT_ScopedLockableAttr
+#undef MX_ENTER_VISIT_SYCLSpecialClassAttr
+#undef MX_EXIT_VISIT_SYCLSpecialClassAttr
+#undef MX_ENTER_VISIT_SYCLKernelAttr
+#undef MX_EXIT_VISIT_SYCLKernelAttr
+#undef MX_ENTER_VISIT_ReturnsTwiceAttr
+#undef MX_EXIT_VISIT_ReturnsTwiceAttr
+#undef MX_ENTER_VISIT_ReturnsNonNullAttr
+#undef MX_EXIT_VISIT_ReturnsNonNullAttr
+#undef MX_ENTER_VISIT_ReturnTypestateAttr
+#undef MX_EXIT_VISIT_ReturnTypestateAttr
+#undef MX_ENTER_VISIT_RetainAttr
+#undef MX_EXIT_VISIT_RetainAttr
+#undef MX_ENTER_VISIT_RestrictAttr
+#undef MX_EXIT_VISIT_RestrictAttr
+#undef MX_ENTER_VISIT_RequiresCapabilityAttr
+#undef MX_EXIT_VISIT_RequiresCapabilityAttr
+#undef MX_ENTER_VISIT_ReqdWorkGroupSizeAttr
+#undef MX_EXIT_VISIT_ReqdWorkGroupSizeAttr
+#undef MX_ENTER_VISIT_ReleaseCapabilityAttr
+#undef MX_EXIT_VISIT_ReleaseCapabilityAttr
+#undef MX_ENTER_VISIT_ReinitializesAttr
+#undef MX_EXIT_VISIT_ReinitializesAttr
+#undef MX_ENTER_VISIT_RegCallAttr
+#undef MX_EXIT_VISIT_RegCallAttr
+#undef MX_ENTER_VISIT_RISCVInterruptAttr
+#undef MX_EXIT_VISIT_RISCVInterruptAttr
+#undef MX_ENTER_VISIT_PureAttr
+#undef MX_EXIT_VISIT_PureAttr
+#undef MX_ENTER_VISIT_PtGuardedVarAttr
+#undef MX_EXIT_VISIT_PtGuardedVarAttr
+#undef MX_ENTER_VISIT_PtGuardedByAttr
+#undef MX_EXIT_VISIT_PtGuardedByAttr
+#undef MX_ENTER_VISIT_PreserveMostAttr
+#undef MX_EXIT_VISIT_PreserveMostAttr
+#undef MX_ENTER_VISIT_PreserveAllAttr
+#undef MX_EXIT_VISIT_PreserveAllAttr
+#undef MX_ENTER_VISIT_PreferredNameAttr
+#undef MX_EXIT_VISIT_PreferredNameAttr
+#undef MX_ENTER_VISIT_PragmaClangTextSectionAttr
+#undef MX_EXIT_VISIT_PragmaClangTextSectionAttr
+#undef MX_ENTER_VISIT_PragmaClangRodataSectionAttr
+#undef MX_EXIT_VISIT_PragmaClangRodataSectionAttr
+#undef MX_ENTER_VISIT_PragmaClangRelroSectionAttr
+#undef MX_EXIT_VISIT_PragmaClangRelroSectionAttr
+#undef MX_ENTER_VISIT_PragmaClangDataSectionAttr
+#undef MX_EXIT_VISIT_PragmaClangDataSectionAttr
+#undef MX_ENTER_VISIT_PragmaClangBSSSectionAttr
+#undef MX_EXIT_VISIT_PragmaClangBSSSectionAttr
+#undef MX_ENTER_VISIT_PointerAttr
+#undef MX_EXIT_VISIT_PointerAttr
+#undef MX_ENTER_VISIT_PcsAttr
+#undef MX_EXIT_VISIT_PcsAttr
+#undef MX_ENTER_VISIT_PatchableFunctionEntryAttr
+#undef MX_EXIT_VISIT_PatchableFunctionEntryAttr
+#undef MX_ENTER_VISIT_PascalAttr
+#undef MX_EXIT_VISIT_PascalAttr
+#undef MX_ENTER_VISIT_ParamTypestateAttr
+#undef MX_EXIT_VISIT_ParamTypestateAttr
+#undef MX_ENTER_VISIT_PackedAttr
+#undef MX_EXIT_VISIT_PackedAttr
+#undef MX_ENTER_VISIT_OwnershipAttr
+#undef MX_EXIT_VISIT_OwnershipAttr
+#undef MX_ENTER_VISIT_OwnerAttr
+#undef MX_EXIT_VISIT_OwnerAttr
+#undef MX_ENTER_VISIT_OverrideAttr
+#undef MX_EXIT_VISIT_OverrideAttr
+#undef MX_ENTER_VISIT_OptimizeNoneAttr
+#undef MX_EXIT_VISIT_OptimizeNoneAttr
+#undef MX_ENTER_VISIT_OpenCLKernelAttr
+#undef MX_EXIT_VISIT_OpenCLKernelAttr
+#undef MX_ENTER_VISIT_OpenCLIntelReqdSubGroupSizeAttr
+#undef MX_EXIT_VISIT_OpenCLIntelReqdSubGroupSizeAttr
+#undef MX_ENTER_VISIT_ObjCSubclassingRestrictedAttr
+#undef MX_EXIT_VISIT_ObjCSubclassingRestrictedAttr
+#undef MX_ENTER_VISIT_ObjCRootClassAttr
+#undef MX_EXIT_VISIT_ObjCRootClassAttr
+#undef MX_ENTER_VISIT_ObjCReturnsInnerPointerAttr
+#undef MX_EXIT_VISIT_ObjCReturnsInnerPointerAttr
+#undef MX_ENTER_VISIT_ObjCRequiresSuperAttr
+#undef MX_EXIT_VISIT_ObjCRequiresSuperAttr
+#undef MX_ENTER_VISIT_ObjCRequiresPropertyDefsAttr
+#undef MX_EXIT_VISIT_ObjCRequiresPropertyDefsAttr
+#undef MX_ENTER_VISIT_ObjCPreciseLifetimeAttr
+#undef MX_EXIT_VISIT_ObjCPreciseLifetimeAttr
+#undef MX_ENTER_VISIT_ObjCOwnershipAttr
+#undef MX_EXIT_VISIT_ObjCOwnershipAttr
+#undef MX_ENTER_VISIT_ObjCNSObjectAttr
+#undef MX_EXIT_VISIT_ObjCNSObjectAttr
+#undef MX_ENTER_VISIT_ObjCMethodFamilyAttr
+#undef MX_EXIT_VISIT_ObjCMethodFamilyAttr
+#undef MX_ENTER_VISIT_ObjCIndependentClassAttr
+#undef MX_EXIT_VISIT_ObjCIndependentClassAttr
+#undef MX_ENTER_VISIT_ObjCExternallyRetainedAttr
+#undef MX_EXIT_VISIT_ObjCExternallyRetainedAttr
+#undef MX_ENTER_VISIT_ObjCExplicitProtocolImplAttr
+#undef MX_EXIT_VISIT_ObjCExplicitProtocolImplAttr
+#undef MX_ENTER_VISIT_ObjCExceptionAttr
+#undef MX_EXIT_VISIT_ObjCExceptionAttr
+#undef MX_ENTER_VISIT_ObjCBridgeRelatedAttr
+#undef MX_EXIT_VISIT_ObjCBridgeRelatedAttr
+#undef MX_ENTER_VISIT_ObjCBridgeMutableAttr
+#undef MX_EXIT_VISIT_ObjCBridgeMutableAttr
+#undef MX_ENTER_VISIT_ObjCBridgeAttr
+#undef MX_EXIT_VISIT_ObjCBridgeAttr
+#undef MX_ENTER_VISIT_OSReturnsRetainedOnZeroAttr
+#undef MX_EXIT_VISIT_OSReturnsRetainedOnZeroAttr
+#undef MX_ENTER_VISIT_OSReturnsRetainedOnNonZeroAttr
+#undef MX_EXIT_VISIT_OSReturnsRetainedOnNonZeroAttr
+#undef MX_ENTER_VISIT_OSReturnsRetainedAttr
+#undef MX_EXIT_VISIT_OSReturnsRetainedAttr
+#undef MX_ENTER_VISIT_OSReturnsNotRetainedAttr
+#undef MX_EXIT_VISIT_OSReturnsNotRetainedAttr
+#undef MX_ENTER_VISIT_OSConsumesThisAttr
+#undef MX_EXIT_VISIT_OSConsumesThisAttr
+#undef MX_ENTER_VISIT_OMPThreadPrivateDeclAttr
+#undef MX_EXIT_VISIT_OMPThreadPrivateDeclAttr
+#undef MX_ENTER_VISIT_OMPDeclareVariantAttr
+#undef MX_EXIT_VISIT_OMPDeclareVariantAttr
+#undef MX_ENTER_VISIT_OMPDeclareTargetDeclAttr
+#undef MX_EXIT_VISIT_OMPDeclareTargetDeclAttr
+#undef MX_ENTER_VISIT_OMPCaptureNoInitAttr
+#undef MX_EXIT_VISIT_OMPCaptureNoInitAttr
+#undef MX_ENTER_VISIT_OMPAllocateDeclAttr
+#undef MX_EXIT_VISIT_OMPAllocateDeclAttr
+#undef MX_ENTER_VISIT_NotTailCalledAttr
+#undef MX_EXIT_VISIT_NotTailCalledAttr
+#undef MX_ENTER_VISIT_NoUniqueAddressAttr
+#undef MX_EXIT_VISIT_NoUniqueAddressAttr
+#undef MX_ENTER_VISIT_NoThrowAttr
+#undef MX_EXIT_VISIT_NoThrowAttr
+#undef MX_ENTER_VISIT_NoThreadSafetyAnalysisAttr
+#undef MX_EXIT_VISIT_NoThreadSafetyAnalysisAttr
+#undef MX_ENTER_VISIT_NoStackProtectorAttr
+#undef MX_EXIT_VISIT_NoStackProtectorAttr
+#undef MX_ENTER_VISIT_NoSplitStackAttr
+#undef MX_EXIT_VISIT_NoSplitStackAttr
+#undef MX_ENTER_VISIT_NoSpeculativeLoadHardeningAttr
+#undef MX_EXIT_VISIT_NoSpeculativeLoadHardeningAttr
+#undef MX_ENTER_VISIT_NoSanitizeAttr
+#undef MX_EXIT_VISIT_NoSanitizeAttr
+#undef MX_ENTER_VISIT_NoReturnAttr
+#undef MX_EXIT_VISIT_NoReturnAttr
+#undef MX_ENTER_VISIT_NoProfileFunctionAttr
+#undef MX_EXIT_VISIT_NoProfileFunctionAttr
+#undef MX_ENTER_VISIT_NoMips16Attr
+#undef MX_EXIT_VISIT_NoMips16Attr
+#undef MX_ENTER_VISIT_NoMicroMipsAttr
+#undef MX_EXIT_VISIT_NoMicroMipsAttr
+#undef MX_ENTER_VISIT_NoInstrumentFunctionAttr
+#undef MX_EXIT_VISIT_NoInstrumentFunctionAttr
+#undef MX_ENTER_VISIT_NoInlineAttr
+#undef MX_EXIT_VISIT_NoInlineAttr
+#undef MX_ENTER_VISIT_NoDuplicateAttr
+#undef MX_EXIT_VISIT_NoDuplicateAttr
+#undef MX_ENTER_VISIT_NoDestroyAttr
+#undef MX_EXIT_VISIT_NoDestroyAttr
+#undef MX_ENTER_VISIT_NoDebugAttr
+#undef MX_EXIT_VISIT_NoDebugAttr
+#undef MX_ENTER_VISIT_NoCommonAttr
+#undef MX_EXIT_VISIT_NoCommonAttr
+#undef MX_ENTER_VISIT_NoAliasAttr
+#undef MX_EXIT_VISIT_NoAliasAttr
+#undef MX_ENTER_VISIT_NakedAttr
+#undef MX_EXIT_VISIT_NakedAttr
+#undef MX_ENTER_VISIT_NSReturnsRetainedAttr
+#undef MX_EXIT_VISIT_NSReturnsRetainedAttr
+#undef MX_ENTER_VISIT_NSReturnsNotRetainedAttr
+#undef MX_EXIT_VISIT_NSReturnsNotRetainedAttr
+#undef MX_ENTER_VISIT_NSReturnsAutoreleasedAttr
+#undef MX_EXIT_VISIT_NSReturnsAutoreleasedAttr
+#undef MX_ENTER_VISIT_NSErrorDomainAttr
+#undef MX_EXIT_VISIT_NSErrorDomainAttr
+#undef MX_ENTER_VISIT_NSConsumesSelfAttr
+#undef MX_EXIT_VISIT_NSConsumesSelfAttr
+#undef MX_ENTER_VISIT_MipsShortCallAttr
+#undef MX_EXIT_VISIT_MipsShortCallAttr
+#undef MX_ENTER_VISIT_MipsLongCallAttr
+#undef MX_EXIT_VISIT_MipsLongCallAttr
+#undef MX_ENTER_VISIT_MipsInterruptAttr
+#undef MX_EXIT_VISIT_MipsInterruptAttr
+#undef MX_ENTER_VISIT_Mips16Attr
+#undef MX_EXIT_VISIT_Mips16Attr
+#undef MX_ENTER_VISIT_MinVectorWidthAttr
+#undef MX_EXIT_VISIT_MinVectorWidthAttr
+#undef MX_ENTER_VISIT_MinSizeAttr
+#undef MX_EXIT_VISIT_MinSizeAttr
+#undef MX_ENTER_VISIT_MicroMipsAttr
+#undef MX_EXIT_VISIT_MicroMipsAttr
+#undef MX_ENTER_VISIT_MayAliasAttr
+#undef MX_EXIT_VISIT_MayAliasAttr
+#undef MX_ENTER_VISIT_MaxFieldAlignmentAttr
+#undef MX_EXIT_VISIT_MaxFieldAlignmentAttr
+#undef MX_ENTER_VISIT_MSVtorDispAttr
+#undef MX_EXIT_VISIT_MSVtorDispAttr
+#undef MX_ENTER_VISIT_MSStructAttr
+#undef MX_EXIT_VISIT_MSStructAttr
+#undef MX_ENTER_VISIT_MSP430InterruptAttr
+#undef MX_EXIT_VISIT_MSP430InterruptAttr
+#undef MX_ENTER_VISIT_MSNoVTableAttr
+#undef MX_EXIT_VISIT_MSNoVTableAttr
+#undef MX_ENTER_VISIT_MSInheritanceAttr
+#undef MX_EXIT_VISIT_MSInheritanceAttr
+#undef MX_ENTER_VISIT_MSAllocatorAttr
+#undef MX_EXIT_VISIT_MSAllocatorAttr
+#undef MX_ENTER_VISIT_MSABIAttr
+#undef MX_EXIT_VISIT_MSABIAttr
+#undef MX_ENTER_VISIT_MIGServerRoutineAttr
+#undef MX_EXIT_VISIT_MIGServerRoutineAttr
+#undef MX_ENTER_VISIT_M68kInterruptAttr
+#undef MX_EXIT_VISIT_M68kInterruptAttr
+#undef MX_ENTER_VISIT_LocksExcludedAttr
+#undef MX_EXIT_VISIT_LocksExcludedAttr
+#undef MX_ENTER_VISIT_LockReturnedAttr
+#undef MX_EXIT_VISIT_LockReturnedAttr
+#undef MX_ENTER_VISIT_LifetimeBoundAttr
+#undef MX_EXIT_VISIT_LifetimeBoundAttr
+#undef MX_ENTER_VISIT_LeafAttr
+#undef MX_EXIT_VISIT_LeafAttr
+#undef MX_ENTER_VISIT_LayoutVersionAttr
+#undef MX_EXIT_VISIT_LayoutVersionAttr
+#undef MX_ENTER_VISIT_LTOVisibilityPublicAttr
+#undef MX_EXIT_VISIT_LTOVisibilityPublicAttr
+#undef MX_ENTER_VISIT_InternalLinkageAttr
+#undef MX_EXIT_VISIT_InternalLinkageAttr
+#undef MX_ENTER_VISIT_IntelOclBiccAttr
+#undef MX_EXIT_VISIT_IntelOclBiccAttr
+#undef MX_ENTER_VISIT_InitPriorityAttr
+#undef MX_EXIT_VISIT_InitPriorityAttr
+#undef MX_ENTER_VISIT_InheritableParamAttr
+#undef MX_EXIT_VISIT_InheritableParamAttr
+#undef MX_ENTER_VISIT_CarriesDependencyAttr
+#undef MX_EXIT_VISIT_CarriesDependencyAttr
+#undef MX_ENTER_VISIT_CFConsumedAttr
+#undef MX_EXIT_VISIT_CFConsumedAttr
+#undef MX_ENTER_VISIT_AnnotateAttr
+#undef MX_EXIT_VISIT_AnnotateAttr
+#undef MX_ENTER_VISIT_UseHandleAttr
+#undef MX_EXIT_VISIT_UseHandleAttr
+#undef MX_ENTER_VISIT_ReleaseHandleAttr
+#undef MX_EXIT_VISIT_ReleaseHandleAttr
+#undef MX_ENTER_VISIT_PassObjectSizeAttr
+#undef MX_EXIT_VISIT_PassObjectSizeAttr
+#undef MX_ENTER_VISIT_ParameterABIAttr
+#undef MX_EXIT_VISIT_ParameterABIAttr
+#undef MX_ENTER_VISIT_SwiftIndirectResultAttr
+#undef MX_EXIT_VISIT_SwiftIndirectResultAttr
+#undef MX_ENTER_VISIT_SwiftErrorResultAttr
+#undef MX_EXIT_VISIT_SwiftErrorResultAttr
+#undef MX_ENTER_VISIT_SwiftContextAttr
+#undef MX_EXIT_VISIT_SwiftContextAttr
+#undef MX_ENTER_VISIT_SwiftAsyncContextAttr
+#undef MX_EXIT_VISIT_SwiftAsyncContextAttr
+#undef MX_ENTER_VISIT_OSConsumedAttr
+#undef MX_EXIT_VISIT_OSConsumedAttr
+#undef MX_ENTER_VISIT_NonNullAttr
+#undef MX_EXIT_VISIT_NonNullAttr
+#undef MX_ENTER_VISIT_NSConsumedAttr
+#undef MX_EXIT_VISIT_NSConsumedAttr
+#undef MX_ENTER_VISIT_IFuncAttr
+#undef MX_EXIT_VISIT_IFuncAttr
+#undef MX_ENTER_VISIT_CalledOnceAttr
+#undef MX_EXIT_VISIT_CalledOnceAttr
+#undef MX_ENTER_VISIT_BuiltinAliasAttr
+#undef MX_EXIT_VISIT_BuiltinAliasAttr
 #undef MX_ENTER_VISIT_Type
 #undef MX_EXIT_VISIT_Type
 #undef MX_ENTER_VISIT_TemplateTypeParmType
@@ -12085,14 +19948,17 @@ MX_END_VISIT_DECL(EmptyDecl)
 #undef MX_BEGIN_VISIT_DECL
 #undef MX_BEGIN_VISIT_STMT
 #undef MX_BEGIN_VISIT_TYPE
+#undef MX_BEGIN_VISIT_ATTR
 #undef MX_BEGIN_VISIT_ABSTRACT_DECL
 #undef MX_BEGIN_VISIT_ABSTRACT_STMT
 #undef MX_BEGIN_VISIT_ABSTRACT_TYPE
+#undef MX_BEGIN_VISIT_ABSTRACT_ATTR
 #undef MX_BEGIN_VISIT_PSEUDO
 #undef MX_VISIT_PSEUDO_KIND
 #undef MX_END_VISIT_DECL
 #undef MX_END_VISIT_STMT
 #undef MX_END_VISIT_TYPE
+#undef MX_END_VISIT_ATTR
 #undef MX_END_VISIT_PSEUDO
 #undef MX_BEGIN_ENUM_CLASS
 #undef MX_ENUM_CLASS_ENTRY

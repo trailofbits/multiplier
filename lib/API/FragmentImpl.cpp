@@ -149,7 +149,7 @@ std::optional<Decl> FragmentImpl::DeclFor(
         }
       }
 
-    // It's a token inside of another fragment, go get the other fragment.
+    // It's a decl inside of another fragment, go get the other fragment.
     } else {
       auto frag = ep->FragmentFor(ep, decl_id.fragment_id);
       if (frag && decl_id.offset < frag->num_decls) {
@@ -179,7 +179,7 @@ std::optional<Stmt> FragmentImpl::StmtFor(
   if (std::holds_alternative<StatementId>(vid)) {
     StatementId stmt_id = std::get<StatementId>(vid);
 
-    // It's a token inside of the current fragment.
+    // It's a statement inside of the current fragment.
     if (stmt_id.fragment_id == fragment_id) {
       if (stmt_id.offset < num_stmts) {
         Stmt stmt(self, stmt_id.offset);
@@ -189,7 +189,7 @@ std::optional<Stmt> FragmentImpl::StmtFor(
           assert(false);
         }
       }
-    // It's a token inside of another fragment, go get the other fragment.
+    // It's a statement inside of another fragment, go get the other fragment.
     } else {
       auto frag = ep->FragmentFor(ep, stmt_id.fragment_id);
       if (frag && stmt_id.offset < frag->num_stmts) {
@@ -211,7 +211,6 @@ std::optional<Stmt> FragmentImpl::StmtFor(
   return std::nullopt;
 }
 
-
 // Return the type associated with a specific entity ID.
 std::optional<Type> FragmentImpl::TypeFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
@@ -221,7 +220,7 @@ std::optional<Type> FragmentImpl::TypeFor(
   if (std::holds_alternative<TypeId>(vid)) {
     TypeId type_id = std::get<TypeId>(vid);
 
-    // It's a token inside of the current fragment.
+    // It's a type inside of the current fragment.
     if (type_id.fragment_id == fragment_id) {
       if (type_id.offset < num_types) {
         Type type(self, type_id.offset);
@@ -232,13 +231,55 @@ std::optional<Type> FragmentImpl::TypeFor(
         }
       }
 
-    // It's a token inside of another fragment, go get the other fragment.
+    // It's a type inside of another fragment, go get the other fragment.
     } else {
       auto frag = ep->FragmentFor(ep, type_id.fragment_id);
       if (frag && type_id.offset < frag->num_types) {
         Type type(std::move(frag), type_id.offset);
         if (type.id() == eid) {
           return type;
+        } else {
+          assert(false);
+        }
+      }
+    }
+  }
+
+  if (!can_fail) {
+    // TODO(pag): Check version number, do back-off to wait for indexer to
+    //            finish. 
+  }
+
+  return std::nullopt;
+}
+
+// Return the type associated with a specific entity ID.
+std::optional<Attr> FragmentImpl::AttrFor(
+    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  VariantId vid = eid.Unpack();
+
+  // It's a fragment token.
+  if (std::holds_alternative<AttributeId>(vid)) {
+    AttributeId attr_id = std::get<AttributeId>(vid);
+
+    // It's an attribute inside of the current fragment.
+    if (attr_id.fragment_id == fragment_id) {
+      if (attr_id.offset < num_attrs) {
+        Attr attr(self, attr_id.offset);
+        if (attr.id() == eid) {
+          return attr;
+        } else {
+          assert(false);
+        }
+      }
+
+    // It's an attribute inside of another fragment, go get the other fragment.
+    } else {
+      auto frag = ep->FragmentFor(ep, attr_id.fragment_id);
+      if (frag && attr_id.offset < frag->num_attrs) {
+        Attr attr(std::move(frag), attr_id.offset);
+        if (attr.id() == eid) {
+          return attr;
         } else {
           assert(false);
         }

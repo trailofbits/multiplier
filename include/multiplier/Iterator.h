@@ -13,6 +13,7 @@
 
 namespace mx {
 
+class Attr;
 class CXXBaseSpecifier;
 class Decl;
 class Designator;
@@ -365,6 +366,59 @@ class TypeIterator {
   }
 };
 
+class AttrIterator {
+ private:
+  friend class Attr;
+
+  std::shared_ptr<const FragmentImpl> impl;
+  unsigned index{0};
+  unsigned num_attrs{0};
+
+  bool operator==(const AttrIterator &) = delete;
+  bool operator!=(const AttrIterator &) = delete;
+
+  inline AttrIterator(std::shared_ptr<const FragmentImpl> impl_,
+                      unsigned index_, unsigned num_attrs_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_attrs(num_attrs_) {}
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_attrs;
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_attrs;
+  }
+
+  inline operator bool(void) const noexcept {
+    return index < num_attrs;
+  }
+
+  // Return the current type pointed to by the iterator.
+  Attr operator*(void) && noexcept;
+  Attr operator*(void) const & noexcept;
+
+  // Pre-increment.
+  inline AttrIterator &operator++(void) & noexcept {
+    ++index;
+    return *this;
+  }
+
+  // Post-increment.
+  inline AttrIterator operator++(int) && noexcept {
+    return AttrIterator(std::move(impl), index + 1u, num_attrs);
+  }
+
+  // Post-increment.
+  inline AttrIterator operator++(int) & noexcept {
+    return AttrIterator(impl, index++, num_attrs);
+  }
+};
+
 class TokenContext {
  private:
   std::shared_ptr<const FragmentImpl> impl;
@@ -412,6 +466,9 @@ class TokenContext {
 
   // Return the type associated with this context, if any.
   std::optional<Type> as_type(void) const;
+
+  // Return the attribute associated with this context, if any.
+  std::optional<Attr> as_attribute(void) const;
 
   // Return the designator associated with the designated initializer, if any.
   std::optional<Designator> as_designator(void) const;

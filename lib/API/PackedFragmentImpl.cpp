@@ -23,6 +23,7 @@ PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
   num_decls = reader.getDeclarations().size();
   num_stmts = reader.getStatements().size();
   num_types = reader.getTypes().size();
+  num_attrs = reader.getAttributes().size();
   num_pseudos = reader.getOthers().size();
   num_tokens = reader.getTokenKinds().size();
 }
@@ -140,6 +141,10 @@ StmtReader PackedFragmentImpl::NthStmt(unsigned offset) const {
 
 TypeReader PackedFragmentImpl::NthType(unsigned offset) const {
   return reader.getTypes()[offset];
+}
+
+AttrReader PackedFragmentImpl::NthAttr(unsigned offset) const {
+  return reader.getAttributes()[offset];
 }
 
 PseudoReader PackedFragmentImpl::NthPseudo(unsigned offset) const {

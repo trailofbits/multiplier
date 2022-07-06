@@ -55,6 +55,10 @@ Fragment Fragment::containing(const Type &entity) {
   return Fragment(entity.fragment);
 }
 
+Fragment Fragment::containing(const Attr &entity) {
+  return Fragment(entity.fragment);
+}
+
 std::optional<Fragment> Fragment::containing(const Token &entity) {
   if (auto frag = dynamic_cast<const PackedFragmentImpl *>(entity.impl.get())) {
     std::shared_ptr<const FragmentImpl> ptr(entity.impl, frag);

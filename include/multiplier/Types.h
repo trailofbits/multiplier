@@ -19,6 +19,7 @@ class FileInfo;
 class Fragment;
 class FragmentImpl;
 
+enum class AttrKind : unsigned short;
 enum class DeclKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
@@ -46,6 +47,7 @@ static constexpr uint64_t kNumTokensInBigFragment =
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
 
+struct AttributeId;
 struct DeclarationId;
 struct StatementId;
 struct TypeId;
@@ -66,6 +68,7 @@ struct FragmentId {
   inline /* implicit */ FragmentId(const DeclarationId &);
   inline /* implicit */ FragmentId(const StatementId &);
   inline /* implicit */ FragmentId(const TypeId &);
+  inline /* implicit */ FragmentId(const AttributeId &);
   inline /* implicit */ FragmentId(const FragmentTokenId &);
   inline /* implicit */ FragmentId(const TokenSubstitutionId &);
   inline /* implicit */ FragmentId(const DesignatorId &);
@@ -112,6 +115,8 @@ struct StatementId {
   auto operator<=>(const StatementId &) const noexcept = default;
 };
 
+// Identifies a serialized version of a `clang::Type`, `clang::QualType`, or
+// `pasta::Type` inside of a `Fragment`.
 struct TypeId {
   RawEntityId fragment_id;
   TypeKind kind;
@@ -121,6 +126,19 @@ struct TypeId {
   uint32_t offset;
 
   auto operator<=>(const TypeId &) const noexcept = default;
+};
+
+// Identifies a serialized version of a `clang::Attr` or `pasta::Attr` inside
+// of a `Fragment`.
+struct AttributeId {
+  RawEntityId fragment_id;
+  AttrKind kind;
+
+  // Offset of where this attribute is stored inside of
+  // `rpc::Fragment::attrs`.
+  uint32_t offset;
+
+  auto operator<=>(const AttributeId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `Fragment`.
@@ -198,7 +216,7 @@ struct InvalidId {};
 // Possible types of entity ids represented by a packed
 // `EntityId`.
 using VariantId = std::variant<InvalidId, FileId, FragmentId,
-                               DeclarationId, StatementId, TypeId,
+                               DeclarationId, StatementId, TypeId, AttributeId,
                                FragmentTokenId, FileTokenId,
                                TokenSubstitutionId, DesignatorId>;
 
@@ -219,6 +237,7 @@ class EntityId {
   /* implicit */ EntityId(DeclarationId id);
   /* implicit */ EntityId(StatementId id);
   /* implicit */ EntityId(TypeId id);
+  /* implicit */ EntityId(AttributeId id);
   /* implicit */ EntityId(FragmentTokenId id);
   /* implicit */ EntityId(TokenSubstitutionId id);
   /* implicit */ EntityId(DesignatorId id);

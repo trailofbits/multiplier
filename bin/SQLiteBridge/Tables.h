@@ -84,6 +84,7 @@ public:
   };
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
 std::unique_ptr<VirtualTable> GetListTable(mx::EntityProvider::Ptr ep,

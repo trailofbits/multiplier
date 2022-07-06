@@ -34,12 +34,14 @@ class FragmentBuilder {
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
   void Accept(const pasta::Decl &entity);
   void Accept(const pasta::Stmt &entity);
   void Accept(const pasta::Type &entity);
+  void Accept(const pasta::Attr &entity);
   void Accept(const pasta::TemplateArgument &entity);
   void Accept(const pasta::CXXBaseSpecifier &entity);
   void Accept(const pasta::TemplateParameterList &entity);
@@ -50,6 +52,7 @@ class FragmentBuilder {
   void MaybeVisitNext(const pasta::Decl &entity);
   void MaybeVisitNext(const pasta::Stmt &entity);
   void MaybeVisitNext(const pasta::Type &entity);
+  void MaybeVisitNext(const pasta::Attr &entity);
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo);
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo);
@@ -124,6 +127,18 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Type &entity) {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
   if (fragment.type_ids.emplace(type_key, id).second) {
     fragment.types_to_serialize.emplace_back(entity);  // New type found.
+  }
+}
+
+void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
+  auto kind = entity.Kind();
+  mx::AttributeId id;
+  id.fragment_id = fragment.fragment_id;
+  id.offset = static_cast<uint32_t>(fragment.attrs_to_serialize.size());
+  id.kind = mx::FromPasta(kind);
+
+  if (entity_ids.emplace(entity.RawAttr(), id).second) {
+    fragment.attrs_to_serialize.emplace_back(entity);  // New attribute found.
   }
 }
 
@@ -204,6 +219,8 @@ void FragmentBuilder::MaybeVisitNext(
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
+#define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
@@ -260,6 +277,23 @@ void FragmentBuilder::Accept(const pasta::Type &entity) {
   }
 }
 
+
+void FragmentBuilder::Accept(const pasta::Attr &entity) {
+  switch (entity.Kind()) {
+#define MX_VISIT_ATTR(type) \
+    case pasta::AttrKind::k ## type: { \
+      Visit ## type ## Attr( \
+         reinterpret_cast<const pasta::type ## Attr &>(entity)); \
+      break; \
+    }
+
+    PASTA_FOR_EACH_ATTR_IMPL(MX_VISIT_ATTR,
+                             PASTA_IGNORE_ABSTRACT)
+
+#undef MX_VISIT_ATTR
+  }
+}
+
 }  // namespace
 
 void PendingFragment::Build(EntityIdMap &entity_ids,
@@ -267,6 +301,7 @@ void PendingFragment::Build(EntityIdMap &entity_ids,
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;
+  size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
   FragmentBuilder builder(entity_ids, *this);
@@ -283,6 +318,12 @@ void PendingFragment::Build(EntityIdMap &entity_ids,
 
       } else if (auto type = pasta::Type::From(*context)) {
         builder.MaybeVisitNext(*type);
+      
+      } else if (auto attr = pasta::Attr::From(*context)) {
+        builder.MaybeVisitNext(*attr);
+      
+      } else if (auto designator = pasta::Designator::From(*context)) {
+        builder.MaybeVisitNext(*designator);
       }
     }
   }
@@ -293,6 +334,7 @@ void PendingFragment::Build(EntityIdMap &entity_ids,
     size_t num_decls = decls_to_serialize.size();
     size_t num_stmts = stmts_to_serialize.size();
     size_t num_types = types_to_serialize.size();
+    size_t num_attrs = attrs_to_serialize.size();
     size_t num_pseudos = pseudos_to_serialize.size();
 
     for (size_t i = prev_num_decls; i < num_decls; ++i) {
@@ -310,6 +352,12 @@ void PendingFragment::Build(EntityIdMap &entity_ids,
     for (size_t i = prev_num_types; i < num_types; ++i) {
       changed = true;
       pasta::Type entity = types_to_serialize[i];
+      builder.Accept(entity);
+    }
+
+    for (size_t i = prev_num_attrs; i < num_attrs; ++i) {
+      changed = true;
+      pasta::Attr entity = attrs_to_serialize[i];
       builder.Accept(entity);
     }
 
@@ -332,6 +380,7 @@ void PendingFragment::Build(EntityIdMap &entity_ids,
     prev_num_decls = num_decls;
     prev_num_stmts = num_stmts;
     prev_num_types = num_types;
+    prev_num_attrs = num_attrs;
     prev_num_pseudos = num_pseudos;
   }
 }

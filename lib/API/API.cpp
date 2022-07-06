@@ -166,12 +166,20 @@ Type TypeIterator::operator*(void) const & noexcept {
   return Type(impl, index);
 }
 
+Attr AttrIterator::operator*(void) && noexcept {
+  return Attr(std::move(impl), index);
+}
+
+Attr AttrIterator::operator*(void) const & noexcept {
+  return Attr(impl, index);
+}
+
 EntityId Decl::id(void) const {
   DeclarationId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.is_definition = is_definition();
   eid.kind = kind();
-  eid.offset = offset;
+  eid.offset = offset_;
   return eid;
 }
 
@@ -215,21 +223,19 @@ ReferenceRange Decl::references(void) const {
 }
 
 DeclIterator Decl::in_internal(const Fragment &fragment) {
-  return DeclIterator(
-      fragment.impl, 0u, fragment.impl->Fragment().getDeclarations().size());
+  return DeclIterator(fragment.impl, 0u, fragment.impl->num_decls);
 }
 
 EntityId Stmt::id(void) const {
   StatementId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.kind = kind();
-  eid.offset = offset;
+  eid.offset = offset_;
   return eid;
 }
 
 StmtIterator Stmt::in_internal(const Fragment &fragment) {
-  return StmtIterator(
-      fragment.impl, 0u, fragment.impl->Fragment().getStatements().size());
+  return StmtIterator(fragment.impl, 0u, fragment.impl->num_stmts);
 }
 
 UseRange<StmtUseSelector> Stmt::uses(void) const {
@@ -240,17 +246,33 @@ EntityId Type::id(void) const {
   TypeId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.kind = kind();
-  eid.offset = offset;
+  eid.offset = offset_;
   return eid;
 }
 
 TypeIterator Type::in_internal(const Fragment &fragment) {
-  return TypeIterator(
-      fragment.impl, 0u, fragment.impl->Fragment().getTypes().size());
+  return TypeIterator(fragment.impl, 0u, fragment.impl->num_types);
 }
 
 UseRange<TypeUseSelector> Type::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
+
+EntityId Attr::id(void) const {
+  AttributeId eid;
+  eid.fragment_id = fragment->fragment_id;
+  eid.kind = kind();
+  eid.offset = offset_;
+  return eid;
+}
+
+AttrIterator Attr::in_internal(const Fragment &fragment) {
+  return AttrIterator(fragment.impl, 0u, fragment.impl->num_attrs);
+}
+
+UseRange<AttrUseSelector> Attr::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+}
+
 
 }  // namespace mx

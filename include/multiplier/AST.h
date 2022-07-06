@@ -21,71 +21,365 @@
 namespace pasta {
 enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
+enum class AttrKind : unsigned;
+enum class AArch64VectorPcsAttrSpelling : unsigned;
+enum class AMDGPUFlatWorkGroupSizeAttrSpelling : unsigned;
+enum class AMDGPUNumSGPRAttrSpelling : unsigned;
+enum class AMDGPUNumVGPRAttrSpelling : unsigned;
+enum class AMDGPUWavesPerEUAttrSpelling : unsigned;
+enum class ARMInterruptAttrInterruptType : unsigned;
+enum class ARMInterruptAttrSpelling : unsigned;
+enum class AVRInterruptAttrSpelling : unsigned;
+enum class AVRSignalAttrSpelling : unsigned;
+enum class AbiTagAttrSpelling : unsigned;
+enum class AcquireCapabilityAttrSpelling : unsigned;
+enum class AcquireHandleAttrSpelling : unsigned;
+enum class AddressSpaceAttrSpelling : unsigned;
+enum class AliasAttrSpelling : unsigned;
+enum class AlignedAttrSpelling : unsigned;
+enum class AllocAlignAttrSpelling : unsigned;
+enum class AllocSizeAttrSpelling : unsigned;
+enum class AlwaysDestroyAttrSpelling : unsigned;
+enum class AlwaysInlineAttrSpelling : unsigned;
+enum class AnnotateAttrSpelling : unsigned;
+enum class AnyX86InterruptAttrSpelling : unsigned;
+enum class AnyX86NoCallerSavedRegistersAttrSpelling : unsigned;
+enum class AnyX86NoCfCheckAttrSpelling : unsigned;
+enum class ArcWeakrefUnavailableAttrSpelling : unsigned;
+enum class ArgumentWithTypeTagAttrSpelling : unsigned;
+enum class ArmBuiltinAliasAttrSpelling : unsigned;
+enum class ArmMveStrictPolymorphismAttrSpelling : unsigned;
 enum class ArrayTypeArraySizeModifier : unsigned;
+enum class ArtificialAttrSpelling : unsigned;
+enum class AsmLabelAttrSpelling : unsigned;
+enum class AssertCapabilityAttrSpelling : unsigned;
+enum class AssumeAlignedAttrSpelling : unsigned;
+enum class AssumptionAttrSpelling : unsigned;
 enum class AtomicExprAtomicOp : unsigned;
+enum class AvailabilityAttrSpelling : unsigned;
+enum class BPFPreserveAccessIndexAttrSpelling : unsigned;
+enum class BTFDeclTagAttrSpelling : unsigned;
+enum class BTFTypeTagAttrSpelling : unsigned;
+enum class BlocksAttrBlockType : unsigned;
+enum class BlocksAttrSpelling : unsigned;
+enum class BuiltinAliasAttrSpelling : unsigned;
 enum class BuiltinTypeKind : unsigned;
+enum class CDeclAttrSpelling : unsigned;
+enum class CFAuditedTransferAttrSpelling : unsigned;
+enum class CFConsumedAttrSpelling : unsigned;
+enum class CFGuardAttrGuardArg : unsigned;
+enum class CFICanonicalJumpTableAttrSpelling : unsigned;
+enum class CFReturnsNotRetainedAttrSpelling : unsigned;
+enum class CFReturnsRetainedAttrSpelling : unsigned;
+enum class CFUnknownTransferAttrSpelling : unsigned;
+enum class CPUDispatchAttrSpelling : unsigned;
+enum class CPUSpecificAttrSpelling : unsigned;
+enum class CUDAConstantAttrSpelling : unsigned;
+enum class CUDADeviceAttrSpelling : unsigned;
+enum class CUDADeviceBuiltinSurfaceTypeAttrSpelling : unsigned;
+enum class CUDADeviceBuiltinTextureTypeAttrSpelling : unsigned;
+enum class CUDAGlobalAttrSpelling : unsigned;
+enum class CUDAHostAttrSpelling : unsigned;
+enum class CUDALaunchBoundsAttrSpelling : unsigned;
+enum class CUDASharedAttrSpelling : unsigned;
 enum class CXXConstructExprConstructionKind : unsigned;
 enum class CXXNewExprInitializationStyle : unsigned;
 enum class CallExprADLCallKind : bool;
+enum class CallableWhenAttrConsumedState : unsigned;
+enum class CallableWhenAttrSpelling : unsigned;
+enum class CallbackAttrSpelling : unsigned;
+enum class CalledOnceAttrSpelling : unsigned;
+enum class CapabilityAttrSpelling : unsigned;
 enum class CapturedStmtVariableCaptureKind : unsigned;
+enum class CarriesDependencyAttrSpelling : unsigned;
 enum class CharacterLiteralCharacterKind : unsigned;
+enum class CleanupAttrSpelling : unsigned;
+enum class ColdAttrSpelling : unsigned;
+enum class CommonAttrSpelling : unsigned;
+enum class ConstAttrSpelling : unsigned;
+enum class ConstInitAttrSpelling : unsigned;
 enum class ConstantExprResultStorageKind : unsigned;
+enum class ConstructorAttrSpelling : unsigned;
+enum class ConsumableAttrConsumedState : unsigned;
+enum class ConsumableAttrSpelling : unsigned;
+enum class ConsumableAutoCastAttrSpelling : unsigned;
+enum class ConsumableSetOnReadAttrSpelling : unsigned;
+enum class ConvergentAttrSpelling : unsigned;
+enum class DLLExportAttrSpelling : unsigned;
+enum class DLLImportAttrSpelling : unsigned;
 enum class DeclFriendObjectKind : unsigned;
 enum class DeclIdentifierNamespace : unsigned;
 enum class DeclModuleOwnershipKind : unsigned;
 enum class DeclObjCDeclQualifier : unsigned;
+enum class DeprecatedAttrSpelling : unsigned;
+enum class DestructorAttrSpelling : unsigned;
+enum class DiagnoseAsBuiltinAttrSpelling : unsigned;
+enum class DiagnoseIfAttrDiagnosticType : unsigned;
+enum class DisableSanitizerInstrumentationAttrSpelling : unsigned;
+enum class DisableTailCallsAttrSpelling : unsigned;
+enum class EnforceTCBAttrSpelling : unsigned;
+enum class EnforceTCBLeafAttrSpelling : unsigned;
+enum class EnumExtensibilityAttrKind : unsigned;
+enum class EnumExtensibilityAttrSpelling : unsigned;
+enum class ErrorAttrSpelling : unsigned;
+enum class ExcludeFromExplicitInstantiationAttrSpelling : unsigned;
 enum class ExprConstantExprKind : int;
 enum class ExprLValueClassification : unsigned;
 enum class ExprNullPointerConstantKind : unsigned;
 enum class ExprNullPointerConstantValueDependence : unsigned;
 enum class ExprSideEffectsKind : unsigned;
 enum class ExprisModifiableLvalueResult : unsigned;
+enum class ExternalSourceSymbolAttrSpelling : unsigned;
+enum class FallThroughAttrSpelling : unsigned;
+enum class FastCallAttrSpelling : unsigned;
+enum class FinalAttrSpelling : unsigned;
+enum class FlagEnumAttrSpelling : unsigned;
+enum class FlattenAttrSpelling : unsigned;
+enum class FormatArgAttrSpelling : unsigned;
+enum class FormatAttrSpelling : unsigned;
 enum class FunctionDeclTemplatedKind : unsigned;
+enum class GNUInlineAttrSpelling : unsigned;
+enum class GuardedVarAttrSpelling : unsigned;
+enum class HIPManagedAttrSpelling : unsigned;
+enum class HotAttrSpelling : unsigned;
+enum class IBActionAttrSpelling : unsigned;
+enum class IBOutletAttrSpelling : unsigned;
+enum class IBOutletCollectionAttrSpelling : unsigned;
+enum class IFuncAttrSpelling : unsigned;
 enum class ImplicitCastExprOnStack : unsigned;
 enum class ImplicitParamDeclImplicitParamKind : unsigned;
+enum class InitPriorityAttrSpelling : unsigned;
+enum class IntelOclBiccAttrSpelling : unsigned;
+enum class InternalLinkageAttrSpelling : unsigned;
+enum class LTOVisibilityPublicAttrSpelling : unsigned;
+enum class LeafAttrSpelling : unsigned;
+enum class LifetimeBoundAttrSpelling : unsigned;
+enum class LikelyAttrSpelling : unsigned;
 enum class LinkageSpecDeclLanguageIDs : unsigned;
+enum class LoaderUninitializedAttrSpelling : unsigned;
+enum class LoopHintAttrLoopHintState : unsigned;
+enum class LoopHintAttrOptionType : unsigned;
+enum class LoopHintAttrSpelling : unsigned;
+enum class MIGServerRoutineAttrSpelling : unsigned;
+enum class MSABIAttrSpelling : unsigned;
+enum class MSInheritanceAttrSpelling : unsigned;
+enum class MSP430InterruptAttrSpelling : unsigned;
+enum class MSStructAttrSpelling : unsigned;
+enum class MayAliasAttrSpelling : unsigned;
+enum class MicroMipsAttrSpelling : unsigned;
+enum class MinSizeAttrSpelling : unsigned;
+enum class MinVectorWidthAttrSpelling : unsigned;
+enum class Mips16AttrSpelling : unsigned;
+enum class MipsInterruptAttrInterruptType : unsigned;
+enum class MipsInterruptAttrSpelling : unsigned;
+enum class MipsLongCallAttrSpelling : unsigned;
+enum class MipsShortCallAttrSpelling : unsigned;
+enum class ModeAttrSpelling : unsigned;
+enum class MustTailAttrSpelling : unsigned;
+enum class NSConsumedAttrSpelling : unsigned;
+enum class NSConsumesSelfAttrSpelling : unsigned;
+enum class NSReturnsAutoreleasedAttrSpelling : unsigned;
+enum class NSReturnsNotRetainedAttrSpelling : unsigned;
+enum class NSReturnsRetainedAttrSpelling : unsigned;
+enum class NakedAttrSpelling : unsigned;
 enum class NamedDeclExplicitVisibilityKind : unsigned;
+enum class NoBuiltinAttrSpelling : unsigned;
+enum class NoCommonAttrSpelling : unsigned;
+enum class NoDebugAttrSpelling : unsigned;
+enum class NoDerefAttrSpelling : unsigned;
+enum class NoDestroyAttrSpelling : unsigned;
+enum class NoDuplicateAttrSpelling : unsigned;
+enum class NoEscapeAttrSpelling : unsigned;
+enum class NoInlineAttrSpelling : unsigned;
+enum class NoInstrumentFunctionAttrSpelling : unsigned;
+enum class NoMergeAttrSpelling : unsigned;
+enum class NoMicroMipsAttrSpelling : unsigned;
+enum class NoMips16AttrSpelling : unsigned;
+enum class NoProfileFunctionAttrSpelling : unsigned;
+enum class NoReturnAttrSpelling : unsigned;
+enum class NoSanitizeAttrSpelling : unsigned;
+enum class NoSpeculativeLoadHardeningAttrSpelling : unsigned;
+enum class NoSplitStackAttrSpelling : unsigned;
+enum class NoStackProtectorAttrSpelling : unsigned;
+enum class NoThreadSafetyAnalysisAttrSpelling : unsigned;
+enum class NoThrowAttrSpelling : unsigned;
+enum class NonNullAttrSpelling : unsigned;
+enum class NotTailCalledAttrSpelling : unsigned;
+enum class OMPAllocateDeclAttrAllocatorTypeTy : unsigned;
 enum class OMPDeclareReductionDeclInitKind : unsigned;
+enum class OMPDeclareSimdDeclAttrBranchStateTy : unsigned;
+enum class OMPDeclareTargetDeclAttrDevTypeTy : unsigned;
+enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned;
+enum class OMPDeclareVariantAttrInteropType : unsigned;
+enum class OSConsumedAttrSpelling : unsigned;
+enum class OSConsumesThisAttrSpelling : unsigned;
+enum class OSReturnsNotRetainedAttrSpelling : unsigned;
+enum class OSReturnsRetainedAttrSpelling : unsigned;
+enum class OSReturnsRetainedOnNonZeroAttrSpelling : unsigned;
+enum class OSReturnsRetainedOnZeroAttrSpelling : unsigned;
+enum class ObjCBoxableAttrSpelling : unsigned;
+enum class ObjCBridgeAttrSpelling : unsigned;
+enum class ObjCBridgeMutableAttrSpelling : unsigned;
+enum class ObjCBridgeRelatedAttrSpelling : unsigned;
+enum class ObjCClassStubAttrSpelling : unsigned;
+enum class ObjCDesignatedInitializerAttrSpelling : unsigned;
+enum class ObjCDirectAttrSpelling : unsigned;
+enum class ObjCDirectMembersAttrSpelling : unsigned;
+enum class ObjCExceptionAttrSpelling : unsigned;
+enum class ObjCExplicitProtocolImplAttrSpelling : unsigned;
+enum class ObjCExternallyRetainedAttrSpelling : unsigned;
+enum class ObjCGCAttrSpelling : unsigned;
+enum class ObjCIndependentClassAttrSpelling : unsigned;
 enum class ObjCIvarDeclAccessControl : unsigned;
 enum class ObjCMessageExprReceiverKind : unsigned;
 enum class ObjCMethodDeclImplementationControl : unsigned;
+enum class ObjCMethodFamilyAttrFamilyKind : unsigned;
+enum class ObjCMethodFamilyAttrSpelling : unsigned;
+enum class ObjCNSObjectAttrSpelling : unsigned;
+enum class ObjCNonLazyClassAttrSpelling : unsigned;
+enum class ObjCNonRuntimeProtocolAttrSpelling : unsigned;
+enum class ObjCOwnershipAttrSpelling : unsigned;
+enum class ObjCPreciseLifetimeAttrSpelling : unsigned;
 enum class ObjCPropertyDeclPropertyControl : unsigned;
 enum class ObjCPropertyDeclSetterKind : unsigned;
 enum class ObjCPropertyImplDeclKind : unsigned;
+enum class ObjCRequiresPropertyDefsAttrSpelling : unsigned;
+enum class ObjCRequiresSuperAttrSpelling : unsigned;
+enum class ObjCReturnsInnerPointerAttrSpelling : unsigned;
+enum class ObjCRootClassAttrSpelling : unsigned;
+enum class ObjCRuntimeNameAttrSpelling : unsigned;
+enum class ObjCRuntimeVisibleAttrSpelling : unsigned;
+enum class ObjCSubclassingRestrictedAttrSpelling : unsigned;
+enum class OpenCLAccessAttrSpelling : unsigned;
+enum class OpenCLConstantAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGenericAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGlobalAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGlobalDeviceAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLGlobalHostAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLKernelAttrSpelling : unsigned;
+enum class OpenCLLocalAddressSpaceAttrSpelling : unsigned;
+enum class OpenCLPrivateAddressSpaceAttrSpelling : unsigned;
+enum class OptimizeNoneAttrSpelling : unsigned;
+enum class OverloadableAttrSpelling : unsigned;
+enum class OwnershipAttrOwnershipKind : unsigned;
+enum class OwnershipAttrSpelling : unsigned;
+enum class PackedAttrSpelling : unsigned;
+enum class ParamTypestateAttrConsumedState : unsigned;
+enum class ParamTypestateAttrSpelling : unsigned;
+enum class PascalAttrSpelling : unsigned;
+enum class PassObjectSizeAttrSpelling : unsigned;
+enum class PatchableFunctionEntryAttrSpelling : unsigned;
+enum class PcsAttrPCSType : unsigned;
+enum class PcsAttrSpelling : unsigned;
 enum class PredefinedExprIdentKind : unsigned;
+enum class PreferredNameAttrSpelling : unsigned;
+enum class PreserveAllAttrSpelling : unsigned;
+enum class PreserveMostAttrSpelling : unsigned;
+enum class PtGuardedVarAttrSpelling : unsigned;
+enum class PureAttrSpelling : unsigned;
 enum class QualTypeDestructionKind : unsigned;
 enum class QualTypePrimitiveCopyKind : unsigned;
 enum class QualTypePrimitiveDefaultInitializeKind : unsigned;
+enum class RISCVInterruptAttrInterruptType : unsigned;
+enum class RISCVInterruptAttrSpelling : unsigned;
 enum class RecordDeclArgPassingKind : unsigned;
+enum class RegCallAttrSpelling : unsigned;
+enum class ReinitializesAttrSpelling : unsigned;
+enum class ReleaseCapabilityAttrSpelling : unsigned;
+enum class ReleaseHandleAttrSpelling : unsigned;
+enum class RequiresCapabilityAttrSpelling : unsigned;
+enum class RestrictAttrSpelling : unsigned;
+enum class RetainAttrSpelling : unsigned;
+enum class ReturnTypestateAttrConsumedState : unsigned;
+enum class ReturnTypestateAttrSpelling : unsigned;
+enum class ReturnsNonNullAttrSpelling : unsigned;
+enum class ReturnsTwiceAttrSpelling : unsigned;
+enum class SYCLKernelAttrSpelling : unsigned;
+enum class SYCLSpecialClassAttrSpelling : unsigned;
+enum class ScopedLockableAttrSpelling : unsigned;
+enum class SectionAttrSpelling : unsigned;
+enum class SelectAnyAttrSpelling : unsigned;
+enum class SentinelAttrSpelling : unsigned;
+enum class SetTypestateAttrConsumedState : unsigned;
+enum class SetTypestateAttrSpelling : unsigned;
 enum class SourceLocExprIdentKind : unsigned;
+enum class SpeculativeLoadHardeningAttrSpelling : unsigned;
+enum class StandaloneDebugAttrSpelling : unsigned;
+enum class StdCallAttrSpelling : unsigned;
 enum class StmtLikelihood : int;
 enum class StmtKind : unsigned;
 enum class StringLiteralStringKind : unsigned;
+enum class SwiftAsyncAttrKind : unsigned;
+enum class SwiftAsyncAttrSpelling : unsigned;
+enum class SwiftAsyncCallAttrSpelling : unsigned;
+enum class SwiftAsyncContextAttrSpelling : unsigned;
+enum class SwiftAsyncErrorAttrConventionKind : unsigned;
+enum class SwiftAsyncErrorAttrSpelling : unsigned;
+enum class SwiftCallAttrSpelling : unsigned;
+enum class SwiftContextAttrSpelling : unsigned;
+enum class SwiftErrorAttrConventionKind : unsigned;
+enum class SwiftErrorResultAttrSpelling : unsigned;
+enum class SwiftIndirectResultAttrSpelling : unsigned;
+enum class SwiftNewTypeAttrNewtypeKind : unsigned;
+enum class SwiftNewTypeAttrSpelling : unsigned;
+enum class SysVABIAttrSpelling : unsigned;
+enum class TLSModelAttrSpelling : unsigned;
+enum class TargetAttrSpelling : unsigned;
+enum class TargetClonesAttrSpelling : unsigned;
 enum class TemplateArgumentKind : unsigned;
+enum class TestTypestateAttrConsumedState : unsigned;
+enum class TestTypestateAttrSpelling : unsigned;
+enum class ThisCallAttrSpelling : unsigned;
+enum class TransparentUnionAttrSpelling : unsigned;
+enum class TrivialABIAttrSpelling : unsigned;
+enum class TryAcquireCapabilityAttrSpelling : unsigned;
 enum class TypeScalarTypeKind : unsigned;
 enum class TypeKind : unsigned;
+enum class TypeTagForDatatypeAttrSpelling : unsigned;
+enum class TypeVisibilityAttrSpelling : unsigned;
+enum class TypeVisibilityAttrVisibilityType : unsigned;
 enum class UnaryTransformTypeUTTKind : unsigned;
+enum class UnavailableAttrImplicitReason : unsigned;
+enum class UnavailableAttrSpelling : unsigned;
+enum class UninitializedAttrSpelling : unsigned;
+enum class UnlikelyAttrSpelling : unsigned;
+enum class UnusedAttrSpelling : unsigned;
+enum class UseHandleAttrSpelling : unsigned;
+enum class UsedAttrSpelling : unsigned;
 enum class UserDefinedLiteralLiteralOperatorKind : unsigned;
+enum class UsingIfExistsAttrSpelling : unsigned;
+enum class UuidAttrSpelling : unsigned;
 enum class VarDeclDefinitionKind : unsigned;
 enum class VarDeclInitializationStyle : unsigned;
 enum class VarDeclTLSKind : unsigned;
+enum class VecReturnAttrSpelling : unsigned;
+enum class VectorCallAttrSpelling : unsigned;
 enum class VectorTypeVectorKind : unsigned;
+enum class VisibilityAttrSpelling : unsigned;
+enum class VisibilityAttrVisibilityType : unsigned;
+enum class WarnUnusedAttrSpelling : unsigned;
+enum class WarnUnusedResultAttrSpelling : unsigned;
+enum class WeakAttrSpelling : unsigned;
+enum class WeakImportAttrSpelling : unsigned;
+enum class WeakRefAttrSpelling : unsigned;
+enum class WebAssemblyExportNameAttrSpelling : unsigned;
+enum class WebAssemblyImportModuleAttrSpelling : unsigned;
+enum class WebAssemblyImportNameAttrSpelling : unsigned;
+enum class X86ForceAlignArgPointerAttrSpelling : unsigned;
+enum class XRayInstrumentAttrSpelling : unsigned;
+enum class XRayLogArgsAttrSpelling : unsigned;
 enum class ASTDumpOutputFormat : unsigned;
 enum class AccessSpecifier : unsigned;
 enum class AddrSpaceMapMangling : unsigned;
 enum class AlignRequirementKind : int;
-enum class AllocatorTypeTy : unsigned;
 enum class AltivecSrcCompatKind : int;
 enum class ArgumentKind : unsigned;
 enum class ArrayTypeTrait : unsigned;
 enum class AtomicScopeModelKind : int;
-enum class AttributeKind : unsigned;
 enum class AutoTypeKeyword : int;
 enum class AvailabilityResult : unsigned;
 enum class BinaryOperatorKind : unsigned;
 enum class Bits : unsigned char;
-enum class BlockType : unsigned;
-enum class BranchStateTy : unsigned;
 enum class CallingConv : unsigned;
 enum class CanThrowResult : unsigned;
 enum class CapturedRegionKind : unsigned;
@@ -96,15 +390,11 @@ enum class ComparisonCategoryResult : unsigned char;
 enum class ComparisonCategoryType : unsigned char;
 enum class CompilingModuleKind : unsigned;
 enum class ConstexprSpecKind : int;
-enum class ConsumedState : unsigned;
-enum class ConventionKind : unsigned;
 enum class CoreFoundationABI : int;
 enum class DataPositionTy : unsigned long;
 enum class DefaultArgKind : unsigned;
 enum class DefaultCallingConvention : unsigned;
-enum class DevTypeTy : unsigned;
 enum class DiagnosticLevelMask : unsigned;
-enum class DiagnosticType : unsigned;
 enum class ElaboratedTypeKeyword : unsigned;
 enum class EmbedBitcodeKind : unsigned;
 enum class ExceptionHandlingKind : int;
@@ -119,27 +409,22 @@ enum class ExtKind : unsigned;
 enum class ExtendArgsKind : int;
 enum class FPExceptionModeKind : unsigned;
 enum class FPModeKind : unsigned;
-enum class FamilyKind : unsigned;
 enum class FiniteLoopsKind : unsigned;
 enum class FramePointerKind : int;
 enum class GC : unsigned;
 enum class GCMode : unsigned;
 enum class GVALinkage : unsigned;
 enum class GetBuiltinTypeError : unsigned;
-enum class GuardArg : unsigned;
 enum class ID : unsigned;
 enum class IdentifierInfoFlag : unsigned;
 enum class IfStatementKind : unsigned;
 enum class ImbueAttribute : int;
-enum class ImplicitReason : unsigned;
 enum class InClassInitStyle : unsigned;
 enum class InheritedDesignatedInitializersState : unsigned;
 enum class InitStorageKind : unsigned;
 enum class InlineAsmDialectKind : unsigned;
 enum class InlineVariableDefinitionKind : int;
 enum class InliningMethod : unsigned;
-enum class InteropType : unsigned;
-enum class InterruptType : unsigned;
 enum class Kinds : unsigned;
 enum class LambdaCaptureDefault : unsigned;
 enum class LambdaCaptureKind : unsigned;
@@ -150,18 +435,15 @@ enum class LanguageLinkage : unsigned;
 enum class LaxVectorConversionKind : int;
 enum class Level : unsigned;
 enum class Linkage : unsigned char;
-enum class LoopHintState : unsigned;
 enum class MSInheritanceModel : int;
 enum class MSVCMajorVersion : unsigned;
 enum class MSVtorDispMode : int;
-enum class MapTypeTy : unsigned;
 enum class MethodRefFlags : unsigned;
 enum class ModifiableType : unsigned;
 enum class MultiVersionKind : int;
 enum class NameKind : unsigned;
 enum class NeedExtraManglingDecl : unsigned;
 enum class NestedNameSpecifierDependence : unsigned char;
-enum class NewtypeKind : unsigned;
 enum class NonOdrUseReason : unsigned;
 enum class NonceObjCInterface : unsigned;
 enum class NullabilityKind : unsigned char;
@@ -195,11 +477,8 @@ enum class OpenMPOrderClauseKind : unsigned;
 enum class OpenMPReductionClauseModifier : unsigned;
 enum class OpenMPScheduleClauseKind : unsigned;
 enum class OpenMPScheduleClauseModifier : unsigned;
-enum class OptionType : unsigned;
 enum class OverloadedOperatorKind : int;
 enum class OverloadsShown : unsigned;
-enum class OwnershipKind : unsigned;
-enum class PCSType : unsigned;
 enum class PPKeywordKind : unsigned;
 enum class ParameterABI : int;
 enum class ParenLocsOffsets : int;
@@ -224,7 +503,6 @@ enum class SignReturnAddressScopeKind : int;
 enum class SignedOverflowBehaviorTy : unsigned;
 enum class SpecialMemberFlags : unsigned;
 enum class SpecifierKind : unsigned;
-enum class Spelling : unsigned;
 enum class StackProtectorMode : unsigned;
 enum class StorageClass : unsigned;
 enum class StorageDuration : unsigned;
@@ -262,7 +540,7 @@ enum class UnaryOperatorKind : unsigned;
 enum class APValueKind : unsigned;
 enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
-enum class VisibilityType : unsigned;
+enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
 enum class PathKind : signed char;
 enum class FileType : signed char;
@@ -273,6 +551,7 @@ enum class PseudoKind : unsigned char;
 }  // namespace pasta
 namespace mx {
 
+class AttrIterator;
 class DeclIterator;
 class FragmentImpl;
 class FileImpl;
@@ -282,6 +561,7 @@ class Token;
 class TokenContext;
 class TokenContextIterator;
 class TokenRange;
+class TypeIterator;
 class UseBase;
 
 enum class DeclKind : unsigned char {
@@ -393,6 +673,888 @@ inline static constexpr unsigned NumEnumerators(DeclKind) {
 
 const char *EnumeratorName(DeclKind);
 
+enum class AttrKind : unsigned short {
+  A_ARCH64_VECTOR_PCS,
+  AMDGPU_FLAT_WORK_GROUP_SIZE,
+  AMDGPU_NUM_SGPR,
+  AMDGPU_NUM_VGPR,
+  AMDGPU_WAVES_PER_EU,
+  ARM_INTERRUPT,
+  AVR_INTERRUPT,
+  AVR_SIGNAL,
+  ABI_TAG,
+  ACQUIRE_CAPABILITY,
+  ACQUIRE_HANDLE,
+  ACQUIRED_AFTER,
+  ACQUIRED_BEFORE,
+  ADDRESS_SPACE,
+  ALIAS,
+  ALIGN_MAC68K,
+  ALIGN_NATURAL,
+  ALIGN_VALUE,
+  ALIGNED,
+  ALLOC_ALIGN,
+  ALLOC_SIZE,
+  ALWAYS_DESTROY,
+  ALWAYS_INLINE,
+  ANALYZER_NO_RETURN,
+  ANNOTATE,
+  ANY_X86_INTERRUPT,
+  ANY_X86_NO_CALLER_SAVED_REGISTERS,
+  ANY_X86_NO_CF_CHECK,
+  ARC_WEAKREF_UNAVAILABLE,
+  ARGUMENT_WITH_TYPE_TAG,
+  ARM_BUILTIN_ALIAS,
+  ARM_MVE_STRICT_POLYMORPHISM,
+  ARTIFICIAL,
+  ASM_LABEL,
+  ASSERT_CAPABILITY,
+  ASSERT_EXCLUSIVE_LOCK,
+  ASSERT_SHARED_LOCK,
+  ASSUME_ALIGNED,
+  ASSUMPTION,
+  AVAILABILITY,
+  BPF_PRESERVE_ACCESS_INDEX,
+  BTF_DECL_TAG,
+  BTF_TYPE_TAG,
+  BLOCKS,
+  BUILTIN_ALIAS,
+  BUILTIN,
+  C11_NO_RETURN,
+  C_DECL,
+  CF_AUDITED_TRANSFER,
+  CF_CONSUMED,
+  CF_GUARD,
+  CFI_CANONICAL_JUMP_TABLE,
+  CF_RETURNS_NOT_RETAINED,
+  CF_RETURNS_RETAINED,
+  CF_UNKNOWN_TRANSFER,
+  CPU_DISPATCH,
+  CPU_SPECIFIC,
+  CUDA_CONSTANT,
+  CUDA_DEVICE,
+  CUDA_DEVICE_BUILTIN_SURFACE_TYPE,
+  CUDA_DEVICE_BUILTIN_TEXTURE_TYPE,
+  CUDA_GLOBAL,
+  CUDA_HOST,
+  CUDA_INVALID_TARGET,
+  CUDA_LAUNCH_BOUNDS,
+  CUDA_SHARED,
+  CXX11_NO_RETURN,
+  CALLABLE_WHEN,
+  CALLBACK,
+  CALLED_ONCE,
+  CAPABILITY,
+  CAPTURED_RECORD,
+  CARRIES_DEPENDENCY,
+  CLEANUP,
+  CMSE_NS_CALL,
+  CMSE_NS_ENTRY,
+  CODE_SEG,
+  COLD,
+  COMMON,
+  CONST,
+  CONST_INIT,
+  CONSTRUCTOR,
+  CONSUMABLE,
+  CONSUMABLE_AUTO_CAST,
+  CONSUMABLE_SET_ON_READ,
+  CONVERGENT,
+  DLL_EXPORT,
+  DLL_EXPORT_STATIC_LOCAL,
+  DLL_IMPORT,
+  DLL_IMPORT_STATIC_LOCAL,
+  DEPRECATED,
+  DESTRUCTOR,
+  DIAGNOSE_AS_BUILTIN,
+  DIAGNOSE_IF,
+  DISABLE_SANITIZER_INSTRUMENTATION,
+  DISABLE_TAIL_CALLS,
+  EMPTY_BASES,
+  ENABLE_IF,
+  ENFORCE_TCB,
+  ENFORCE_TCB_LEAF,
+  ENUM_EXTENSIBILITY,
+  ERROR,
+  EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  EXCLUSIVE_TRYLOCK_FUNCTION,
+  EXTERNAL_SOURCE_SYMBOL,
+  FALL_THROUGH,
+  FAST_CALL,
+  FINAL,
+  FLAG_ENUM,
+  FLATTEN,
+  FORMAT_ARG,
+  FORMAT,
+  GNU_INLINE,
+  GUARDED_BY,
+  GUARDED_VAR,
+  HIP_MANAGED,
+  HOT,
+  IB_ACTION,
+  IB_OUTLET,
+  IB_OUTLET_COLLECTION,
+  I_FUNC,
+  INIT_PRIORITY,
+  INIT_SEG,
+  INTEL_OCL_BICC,
+  INTERNAL_LINKAGE,
+  LTO_VISIBILITY_PUBLIC,
+  LAYOUT_VERSION,
+  LEAF,
+  LIFETIME_BOUND,
+  LIKELY,
+  LOADER_UNINITIALIZED,
+  LOCK_RETURNED,
+  LOCKS_EXCLUDED,
+  LOOP_HINT,
+  M68K_INTERRUPT,
+  MIG_SERVER_ROUTINE_,
+  MSABI,
+  MS_ALLOCATOR,
+  MS_INHERITANCE,
+  MS_NO_V_TABLE,
+  MSP430_INTERRUPT,
+  MS_STRUCT,
+  MS_VTOR_DISP,
+  MAX_FIELD_ALIGNMENT,
+  MAY_ALIAS,
+  MICRO_MIPS,
+  MIN_SIZE,
+  MIN_VECTOR_WIDTH,
+  MIPS16,
+  MIPS_INTERRUPT,
+  MIPS_LONG_CALL,
+  MIPS_SHORT_CALL,
+  MODE,
+  MUST_TAIL,
+  NS_CONSUMED,
+  NS_CONSUMES_SELF,
+  NS_ERROR_DOMAIN,
+  NS_RETURNS_AUTORELEASED,
+  NS_RETURNS_NOT_RETAINED,
+  NS_RETURNS_RETAINED,
+  NAKED,
+  NO_ALIAS,
+  NO_BUILTIN,
+  NO_COMMON,
+  NO_DEBUG,
+  NO_DEREF,
+  NO_DESTROY,
+  NO_DUPLICATE,
+  NO_ESCAPE,
+  NO_INLINE,
+  NO_INSTRUMENT_FUNCTION,
+  NO_MERGE,
+  NO_MICRO_MIPS,
+  NO_MIPS16,
+  NO_PROFILE_FUNCTION,
+  NO_RETURN,
+  NO_SANITIZE,
+  NO_SPECULATIVE_LOAD_HARDENING,
+  NO_SPLIT_STACK,
+  NO_STACK_PROTECTOR,
+  NO_THREAD_SAFETY_ANALYSIS,
+  NO_THROW,
+  NO_UNIQUE_ADDRESS,
+  NON_NULL,
+  NOT_TAIL_CALLED,
+  OMP_ALLOCATE_DECL,
+  OMP_CAPTURE_KIND,
+  OMP_CAPTURE_NO_INIT,
+  OMP_DECLARE_SIMD_DECL,
+  OMP_DECLARE_TARGET_DECL,
+  OMP_DECLARE_VARIANT,
+  OMP_REFERENCED_VAR,
+  OMP_THREAD_PRIVATE_DECL,
+  OS_CONSUMED,
+  OS_CONSUMES_THIS,
+  OS_RETURNS_NOT_RETAINED,
+  OS_RETURNS_RETAINED,
+  OS_RETURNS_RETAINED_ON_NON_ZERO,
+  OS_RETURNS_RETAINED_ON_ZERO,
+  OBJ_C_BOXABLE,
+  OBJ_C_BRIDGE,
+  OBJ_C_BRIDGE_MUTABLE,
+  OBJ_C_BRIDGE_RELATED,
+  OBJ_C_CLASS_STUB,
+  OBJ_C_DESIGNATED_INITIALIZER,
+  OBJ_C_DIRECT,
+  OBJ_C_DIRECT_MEMBERS,
+  OBJ_C_EXCEPTION,
+  OBJ_C_EXPLICIT_PROTOCOL_IMPL,
+  OBJ_C_EXTERNALLY_RETAINED,
+  OBJ_CGC,
+  OBJ_C_INDEPENDENT_CLASS,
+  OBJ_C_INERT_UNSAFE_UNRETAINED,
+  OBJ_C_KIND_OF,
+  OBJ_C_METHOD_FAMILY,
+  OBJ_CNS_OBJECT,
+  OBJ_C_NON_LAZY_CLASS,
+  OBJ_C_NON_RUNTIME_PROTOCOL,
+  OBJ_C_OWNERSHIP,
+  OBJ_C_PRECISE_LIFETIME,
+  OBJ_C_REQUIRES_PROPERTY_DEFS,
+  OBJ_C_REQUIRES_SUPER,
+  OBJ_C_RETURNS_INNER_POINTER,
+  OBJ_C_ROOT_CLASS,
+  OBJ_C_RUNTIME_NAME,
+  OBJ_C_RUNTIME_VISIBLE,
+  OBJ_C_SUBCLASSING_RESTRICTED,
+  OPEN_CL_ACCESS,
+  OPEN_CL_CONSTANT_ADDRESS_SPACE,
+  OPEN_CL_GENERIC_ADDRESS_SPACE,
+  OPEN_CL_GLOBAL_ADDRESS_SPACE,
+  OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE,
+  OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE,
+  OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE,
+  OPEN_CL_KERNEL,
+  OPEN_CL_LOCAL_ADDRESS_SPACE,
+  OPEN_CL_PRIVATE_ADDRESS_SPACE,
+  OPEN_CL_UNROLL_HINT,
+  OPTIMIZE_NONE,
+  OVERLOADABLE,
+  OVERRIDE,
+  OWNER,
+  OWNERSHIP,
+  PACKED,
+  PARAM_TYPESTATE,
+  PASCAL,
+  PASS_OBJECT_SIZE,
+  PATCHABLE_FUNCTION_ENTRY,
+  PCS,
+  POINTER,
+  PRAGMA_CLANG_BSS_SECTION,
+  PRAGMA_CLANG_DATA_SECTION,
+  PRAGMA_CLANG_RELRO_SECTION,
+  PRAGMA_CLANG_RODATA_SECTION,
+  PRAGMA_CLANG_TEXT_SECTION,
+  PREFERRED_NAME,
+  PRESERVE_ALL,
+  PRESERVE_MOST,
+  PT_GUARDED_BY,
+  PT_GUARDED_VAR,
+  PTR32,
+  PTR64,
+  PURE,
+  RISCV_INTERRUPT,
+  REG_CALL,
+  REINITIALIZES,
+  RELEASE_CAPABILITY,
+  RELEASE_HANDLE,
+  RENDER_SCRIPT_KERNEL,
+  REQD_WORK_GROUP_SIZE,
+  REQUIRES_CAPABILITY,
+  RESTRICT,
+  RETAIN,
+  RETURN_TYPESTATE,
+  RETURNS_NON_NULL,
+  RETURNS_TWICE,
+  S_PTR,
+  SYCL_KERNEL,
+  SYCL_SPECIAL_CLASS,
+  SCOPED_LOCKABLE,
+  SECTION,
+  SELECT_ANY,
+  SENTINEL,
+  SET_TYPESTATE,
+  SHARED_TRYLOCK_FUNCTION,
+  SPECULATIVE_LOAD_HARDENING,
+  STANDALONE_DEBUG,
+  STD_CALL,
+  STRICT_FP,
+  SUPPRESS,
+  SWIFT_ASYNC,
+  SWIFT_ASYNC_CALL,
+  SWIFT_ASYNC_CONTEXT,
+  SWIFT_ASYNC_ERROR,
+  SWIFT_ASYNC_NAME,
+  SWIFT_ATTR,
+  SWIFT_BRIDGE,
+  SWIFT_BRIDGED_TYPEDEF,
+  SWIFT_CALL,
+  SWIFT_CONTEXT,
+  SWIFT_ERROR,
+  SWIFT_ERROR_RESULT,
+  SWIFT_INDIRECT_RESULT,
+  SWIFT_NAME,
+  SWIFT_NEW_TYPE,
+  SWIFT_OBJ_C_MEMBERS,
+  SWIFT_PRIVATE,
+  SYS_VABI,
+  TLS_MODEL,
+  TARGET,
+  TARGET_CLONES,
+  TEST_TYPESTATE,
+  THIS_CALL,
+  THREAD,
+  TRANSPARENT_UNION,
+  TRIVIAL_ABI,
+  TRY_ACQUIRE_CAPABILITY,
+  TYPE_NON_NULL,
+  TYPE_NULL_UNSPECIFIED,
+  TYPE_NULLABLE,
+  TYPE_NULLABLE_RESULT,
+  TYPE_TAG_FOR_DATATYPE,
+  TYPE_VISIBILITY,
+  U_PTR,
+  UNAVAILABLE,
+  UNINITIALIZED,
+  UNLIKELY,
+  UNUSED,
+  USE_HANDLE,
+  USED,
+  USING_IF_EXISTS,
+  UUID,
+  VEC_RETURN,
+  VEC_TYPE_HINT,
+  VECTOR_CALL,
+  VISIBILITY,
+  WARN_UNUSED,
+  WARN_UNUSED_RESULT,
+  WEAK,
+  WEAK_IMPORT,
+  WEAK_REF,
+  WEB_ASSEMBLY_EXPORT_NAME,
+  WEB_ASSEMBLY_IMPORT_MODULE,
+  WEB_ASSEMBLY_IMPORT_NAME,
+  WORK_GROUP_SIZE_HINT,
+  X86_FORCE_ALIGN_ARG_POINTER,
+  X_RAY_INSTRUMENT,
+  X_RAY_LOG_ARGS,
+};
+
+AttrKind FromPasta(pasta::AttrKind pasta_val);
+
+inline static const char *EnumerationName(AttrKind) {
+  return "AttrKind";
+}
+
+inline static constexpr unsigned NumEnumerators(AttrKind) {
+  return 348;
+}
+
+const char *EnumeratorName(AttrKind);
+
+enum class AArch64VectorPcsAttrSpelling : unsigned char {
+  GNU_AARCH64_VECTOR_PCS,
+  CXX11_CLANG_AARCH64_VECTOR_PCS,
+  C2X_CLANG_AARCH64_VECTOR_PCS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AArch64VectorPcsAttrSpelling FromPasta(pasta::AArch64VectorPcsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AArch64VectorPcsAttrSpelling) {
+  return "AArch64VectorPcsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AArch64VectorPcsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AArch64VectorPcsAttrSpelling);
+
+enum class AMDGPUFlatWorkGroupSizeAttrSpelling : unsigned char {
+  GNU_AMDGPU_FLAT_WORK_GROUP_SIZE,
+  CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUFlatWorkGroupSizeAttrSpelling FromPasta(pasta::AMDGPUFlatWorkGroupSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUFlatWorkGroupSizeAttrSpelling) {
+  return "AMDGPUFlatWorkGroupSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUFlatWorkGroupSizeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUFlatWorkGroupSizeAttrSpelling);
+
+enum class AMDGPUNumSGPRAttrSpelling : unsigned char {
+  GNU_AMDGPU_NUM_SGPR,
+  CXX11_CLANG_AMDGPU_NUM_SGPR,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUNumSGPRAttrSpelling FromPasta(pasta::AMDGPUNumSGPRAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUNumSGPRAttrSpelling) {
+  return "AMDGPUNumSGPRAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUNumSGPRAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUNumSGPRAttrSpelling);
+
+enum class AMDGPUNumVGPRAttrSpelling : unsigned char {
+  GNU_AMDGPU_NUM_VGPR,
+  CXX11_CLANG_AMDGPU_NUM_VGPR,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUNumVGPRAttrSpelling FromPasta(pasta::AMDGPUNumVGPRAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUNumVGPRAttrSpelling) {
+  return "AMDGPUNumVGPRAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUNumVGPRAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUNumVGPRAttrSpelling);
+
+enum class AMDGPUWavesPerEUAttrSpelling : unsigned char {
+  GNU_AMDGPU_WAVES_PER_EU,
+  CXX11_CLANG_AMDGPU_WAVES_PER_EU,
+  SPELLING_NOT_CALCULATED,
+};
+
+AMDGPUWavesPerEUAttrSpelling FromPasta(pasta::AMDGPUWavesPerEUAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AMDGPUWavesPerEUAttrSpelling) {
+  return "AMDGPUWavesPerEUAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AMDGPUWavesPerEUAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AMDGPUWavesPerEUAttrSpelling);
+
+enum class ARMInterruptAttrInterruptType : unsigned char {
+  IRQ,
+  FIQ,
+  SWI,
+  ABORT,
+  UNDEF,
+  GENERIC,
+};
+
+ARMInterruptAttrInterruptType FromPasta(pasta::ARMInterruptAttrInterruptType pasta_val);
+
+inline static const char *EnumerationName(ARMInterruptAttrInterruptType) {
+  return "ARMInterruptAttrInterruptType";
+}
+
+inline static constexpr unsigned NumEnumerators(ARMInterruptAttrInterruptType) {
+  return 6;
+}
+
+const char *EnumeratorName(ARMInterruptAttrInterruptType);
+
+enum class ARMInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2X_GNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ARMInterruptAttrSpelling FromPasta(pasta::ARMInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ARMInterruptAttrSpelling) {
+  return "ARMInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ARMInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ARMInterruptAttrSpelling);
+
+enum class AVRInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2X_GNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+AVRInterruptAttrSpelling FromPasta(pasta::AVRInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AVRInterruptAttrSpelling) {
+  return "AVRInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AVRInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AVRInterruptAttrSpelling);
+
+enum class AVRSignalAttrSpelling : unsigned char {
+  GNU_SIGNAL,
+  CXX11_GNU_SIGNAL,
+  C2X_GNU_SIGNAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+AVRSignalAttrSpelling FromPasta(pasta::AVRSignalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AVRSignalAttrSpelling) {
+  return "AVRSignalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AVRSignalAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AVRSignalAttrSpelling);
+
+enum class AbiTagAttrSpelling : unsigned char {
+  GNU_ABI_TAG,
+  CXX11_GNU_ABI_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+AbiTagAttrSpelling FromPasta(pasta::AbiTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AbiTagAttrSpelling) {
+  return "AbiTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AbiTagAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AbiTagAttrSpelling);
+
+enum class AcquireCapabilityAttrSpelling : unsigned char {
+  GNU_ACQUIRE_CAPABILITY,
+  CXX11_CLANG_ACQUIRE_CAPABILITY,
+  GNU_ACQUIRE_SHARED_CAPABILITY,
+  CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY,
+  GNU_EXCLUSIVE_LOCK_FUNCTION,
+  GNU_SHARED_LOCK_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+AcquireCapabilityAttrSpelling FromPasta(pasta::AcquireCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AcquireCapabilityAttrSpelling) {
+  return "AcquireCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AcquireCapabilityAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(AcquireCapabilityAttrSpelling);
+
+enum class AcquireHandleAttrSpelling : unsigned char {
+  GNU_ACQUIRE_HANDLE,
+  CXX11_CLANG_ACQUIRE_HANDLE,
+  C2X_CLANG_ACQUIRE_HANDLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AcquireHandleAttrSpelling FromPasta(pasta::AcquireHandleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AcquireHandleAttrSpelling) {
+  return "AcquireHandleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AcquireHandleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AcquireHandleAttrSpelling);
+
+enum class AddressSpaceAttrSpelling : unsigned char {
+  GNU_ADDRESS_SPACE,
+  CXX11_CLANG_ADDRESS_SPACE,
+  C2X_CLANG_ADDRESS_SPACE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AddressSpaceAttrSpelling FromPasta(pasta::AddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AddressSpaceAttrSpelling) {
+  return "AddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AddressSpaceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AddressSpaceAttrSpelling);
+
+enum class AliasAttrSpelling : unsigned char {
+  GNU_ALIAS,
+  CXX11_GNU_ALIAS,
+  C2X_GNU_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AliasAttrSpelling FromPasta(pasta::AliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AliasAttrSpelling) {
+  return "AliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AliasAttrSpelling);
+
+enum class AlignedAttrSpelling : unsigned char {
+  GNU_ALIGNED,
+  CXX11_GNU_ALIGNED,
+  C2X_GNU_ALIGNED,
+  DECLSPEC_ALIGN,
+  KEYWORD_ALIGNAS,
+  KEYWORD__ALIGNAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AlignedAttrSpelling FromPasta(pasta::AlignedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AlignedAttrSpelling) {
+  return "AlignedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AlignedAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(AlignedAttrSpelling);
+
+enum class AllocAlignAttrSpelling : unsigned char {
+  GNU_ALLOC_ALIGN,
+  CXX11_GNU_ALLOC_ALIGN,
+  C2X_GNU_ALLOC_ALIGN,
+  SPELLING_NOT_CALCULATED,
+};
+
+AllocAlignAttrSpelling FromPasta(pasta::AllocAlignAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AllocAlignAttrSpelling) {
+  return "AllocAlignAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AllocAlignAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AllocAlignAttrSpelling);
+
+enum class AllocSizeAttrSpelling : unsigned char {
+  GNU_ALLOC_SIZE,
+  CXX11_GNU_ALLOC_SIZE,
+  C2X_GNU_ALLOC_SIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AllocSizeAttrSpelling FromPasta(pasta::AllocSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AllocSizeAttrSpelling) {
+  return "AllocSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AllocSizeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AllocSizeAttrSpelling);
+
+enum class AlwaysDestroyAttrSpelling : unsigned char {
+  GNU_ALWAYS_DESTROY,
+  CXX11_CLANG_ALWAYS_DESTROY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AlwaysDestroyAttrSpelling FromPasta(pasta::AlwaysDestroyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AlwaysDestroyAttrSpelling) {
+  return "AlwaysDestroyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AlwaysDestroyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(AlwaysDestroyAttrSpelling);
+
+enum class AlwaysInlineAttrSpelling : unsigned char {
+  GNU_ALWAYS_INLINE,
+  CXX11_GNU_ALWAYS_INLINE,
+  C2X_GNU_ALWAYS_INLINE,
+  KEYWORD_FORCEINLINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AlwaysInlineAttrSpelling FromPasta(pasta::AlwaysInlineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AlwaysInlineAttrSpelling) {
+  return "AlwaysInlineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AlwaysInlineAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(AlwaysInlineAttrSpelling);
+
+enum class AnnotateAttrSpelling : unsigned char {
+  GNU_ANNOTATE,
+  CXX11_CLANG_ANNOTATE,
+  C2X_CLANG_ANNOTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnnotateAttrSpelling FromPasta(pasta::AnnotateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnnotateAttrSpelling) {
+  return "AnnotateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnnotateAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnnotateAttrSpelling);
+
+enum class AnyX86InterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2X_GNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnyX86InterruptAttrSpelling FromPasta(pasta::AnyX86InterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnyX86InterruptAttrSpelling) {
+  return "AnyX86InterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnyX86InterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnyX86InterruptAttrSpelling);
+
+enum class AnyX86NoCallerSavedRegistersAttrSpelling : unsigned char {
+  GNU_NO_CALLER_SAVED_REGISTERS,
+  CXX11_GNU_NO_CALLER_SAVED_REGISTERS,
+  C2X_GNU_NO_CALLER_SAVED_REGISTERS,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnyX86NoCallerSavedRegistersAttrSpelling FromPasta(pasta::AnyX86NoCallerSavedRegistersAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnyX86NoCallerSavedRegistersAttrSpelling) {
+  return "AnyX86NoCallerSavedRegistersAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnyX86NoCallerSavedRegistersAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnyX86NoCallerSavedRegistersAttrSpelling);
+
+enum class AnyX86NoCfCheckAttrSpelling : unsigned char {
+  GNU_NOCF_CHECK,
+  CXX11_GNU_NOCF_CHECK,
+  C2X_GNU_NOCF_CHECK,
+  SPELLING_NOT_CALCULATED,
+};
+
+AnyX86NoCfCheckAttrSpelling FromPasta(pasta::AnyX86NoCfCheckAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AnyX86NoCfCheckAttrSpelling) {
+  return "AnyX86NoCfCheckAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AnyX86NoCfCheckAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AnyX86NoCfCheckAttrSpelling);
+
+enum class ArcWeakrefUnavailableAttrSpelling : unsigned char {
+  GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE,
+  CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE,
+  C2X_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArcWeakrefUnavailableAttrSpelling FromPasta(pasta::ArcWeakrefUnavailableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArcWeakrefUnavailableAttrSpelling) {
+  return "ArcWeakrefUnavailableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArcWeakrefUnavailableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArcWeakrefUnavailableAttrSpelling);
+
+enum class ArgumentWithTypeTagAttrSpelling : unsigned char {
+  GNU_ARGUMENT_WITH_TYPE_TAG,
+  CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG,
+  C2X_CLANG_ARGUMENT_WITH_TYPE_TAG,
+  GNU_POINTER_WITH_TYPE_TAG,
+  CXX11_CLANG_POINTER_WITH_TYPE_TAG,
+  C2X_CLANG_POINTER_WITH_TYPE_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArgumentWithTypeTagAttrSpelling FromPasta(pasta::ArgumentWithTypeTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArgumentWithTypeTagAttrSpelling) {
+  return "ArgumentWithTypeTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArgumentWithTypeTagAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(ArgumentWithTypeTagAttrSpelling);
+
+enum class ArmBuiltinAliasAttrSpelling : unsigned char {
+  GNU_CLANG_ARM_BUILTIN_ALIAS,
+  CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS,
+  C2X_CLANG_CLANG_ARM_BUILTIN_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArmBuiltinAliasAttrSpelling FromPasta(pasta::ArmBuiltinAliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArmBuiltinAliasAttrSpelling) {
+  return "ArmBuiltinAliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArmBuiltinAliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArmBuiltinAliasAttrSpelling);
+
+enum class ArmMveStrictPolymorphismAttrSpelling : unsigned char {
+  GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM,
+  CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM,
+  C2X_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArmMveStrictPolymorphismAttrSpelling FromPasta(pasta::ArmMveStrictPolymorphismAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArmMveStrictPolymorphismAttrSpelling) {
+  return "ArmMveStrictPolymorphismAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArmMveStrictPolymorphismAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArmMveStrictPolymorphismAttrSpelling);
+
 enum class ArrayTypeArraySizeModifier : unsigned char {
   NORMAL,
   STATIC,
@@ -410,6 +1572,100 @@ inline static constexpr unsigned NumEnumerators(ArrayTypeArraySizeModifier) {
 }
 
 const char *EnumeratorName(ArrayTypeArraySizeModifier);
+
+enum class ArtificialAttrSpelling : unsigned char {
+  GNU_ARTIFICIAL,
+  CXX11_GNU_ARTIFICIAL,
+  C2X_GNU_ARTIFICIAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ArtificialAttrSpelling FromPasta(pasta::ArtificialAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ArtificialAttrSpelling) {
+  return "ArtificialAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ArtificialAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ArtificialAttrSpelling);
+
+enum class AsmLabelAttrSpelling : unsigned char {
+  KEYWORD_ASSEMBLY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AsmLabelAttrSpelling FromPasta(pasta::AsmLabelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AsmLabelAttrSpelling) {
+  return "AsmLabelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AsmLabelAttrSpelling) {
+  return 2;
+}
+
+const char *EnumeratorName(AsmLabelAttrSpelling);
+
+enum class AssertCapabilityAttrSpelling : unsigned char {
+  GNU_ASSERT_CAPABILITY,
+  CXX11_CLANG_ASSERT_CAPABILITY,
+  GNU_ASSERT_SHARED_CAPABILITY,
+  CXX11_CLANG_ASSERT_SHARED_CAPABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AssertCapabilityAttrSpelling FromPasta(pasta::AssertCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AssertCapabilityAttrSpelling) {
+  return "AssertCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AssertCapabilityAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(AssertCapabilityAttrSpelling);
+
+enum class AssumeAlignedAttrSpelling : unsigned char {
+  GNU_ASSUME_ALIGNED,
+  CXX11_GNU_ASSUME_ALIGNED,
+  C2X_GNU_ASSUME_ALIGNED,
+  SPELLING_NOT_CALCULATED,
+};
+
+AssumeAlignedAttrSpelling FromPasta(pasta::AssumeAlignedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AssumeAlignedAttrSpelling) {
+  return "AssumeAlignedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AssumeAlignedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AssumeAlignedAttrSpelling);
+
+enum class AssumptionAttrSpelling : unsigned char {
+  GNU_ASSUME,
+  CXX11_CLANG_ASSUME,
+  C2X_CLANG_ASSUME,
+  SPELLING_NOT_CALCULATED,
+};
+
+AssumptionAttrSpelling FromPasta(pasta::AssumptionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AssumptionAttrSpelling) {
+  return "AssumptionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AssumptionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AssumptionAttrSpelling);
 
 enum class AtomicExprAtomicOp : unsigned char {
   C11_ATOMIC_INITIALIZER,
@@ -488,43 +1744,173 @@ inline static constexpr unsigned NumEnumerators(AtomicExprAtomicOp) {
 
 const char *EnumeratorName(AtomicExprAtomicOp);
 
+enum class AvailabilityAttrSpelling : unsigned char {
+  GNU_AVAILABILITY,
+  CXX11_CLANG_AVAILABILITY,
+  C2X_CLANG_AVAILABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+AvailabilityAttrSpelling FromPasta(pasta::AvailabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(AvailabilityAttrSpelling) {
+  return "AvailabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(AvailabilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(AvailabilityAttrSpelling);
+
+enum class BPFPreserveAccessIndexAttrSpelling : unsigned char {
+  GNU_PRESERVE_ACCESS_INDEX,
+  CXX11_CLANG_PRESERVE_ACCESS_INDEX,
+  C2X_CLANG_PRESERVE_ACCESS_INDEX,
+  SPELLING_NOT_CALCULATED,
+};
+
+BPFPreserveAccessIndexAttrSpelling FromPasta(pasta::BPFPreserveAccessIndexAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BPFPreserveAccessIndexAttrSpelling) {
+  return "BPFPreserveAccessIndexAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BPFPreserveAccessIndexAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BPFPreserveAccessIndexAttrSpelling);
+
+enum class BTFDeclTagAttrSpelling : unsigned char {
+  GNU_BTF_DECLARATION_TAG,
+  CXX11_CLANG_BTF_DECLARATION_TAG,
+  C2X_CLANG_BTF_DECLARATION_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+BTFDeclTagAttrSpelling FromPasta(pasta::BTFDeclTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BTFDeclTagAttrSpelling) {
+  return "BTFDeclTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BTFDeclTagAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BTFDeclTagAttrSpelling);
+
+enum class BTFTypeTagAttrSpelling : unsigned char {
+  GNU_BTF_TYPE_TAG,
+  CXX11_CLANG_BTF_TYPE_TAG,
+  C2X_CLANG_BTF_TYPE_TAG,
+  SPELLING_NOT_CALCULATED,
+};
+
+BTFTypeTagAttrSpelling FromPasta(pasta::BTFTypeTagAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BTFTypeTagAttrSpelling) {
+  return "BTFTypeTagAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BTFTypeTagAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BTFTypeTagAttrSpelling);
+
+enum class BlocksAttrBlockType : unsigned char {
+  BY_REFERENCE,
+};
+
+BlocksAttrBlockType FromPasta(pasta::BlocksAttrBlockType pasta_val);
+
+inline static const char *EnumerationName(BlocksAttrBlockType) {
+  return "BlocksAttrBlockType";
+}
+
+inline static constexpr unsigned NumEnumerators(BlocksAttrBlockType) {
+  return 1;
+}
+
+const char *EnumeratorName(BlocksAttrBlockType);
+
+enum class BlocksAttrSpelling : unsigned char {
+  GNU_BLOCKS,
+  CXX11_CLANG_BLOCKS,
+  C2X_CLANG_BLOCKS,
+  SPELLING_NOT_CALCULATED,
+};
+
+BlocksAttrSpelling FromPasta(pasta::BlocksAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BlocksAttrSpelling) {
+  return "BlocksAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BlocksAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BlocksAttrSpelling);
+
+enum class BuiltinAliasAttrSpelling : unsigned char {
+  CXX11_CLANG_BUILTIN_ALIAS,
+  C2X_CLANG_BUILTIN_ALIAS,
+  GNU_CLANG_BUILTIN_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+BuiltinAliasAttrSpelling FromPasta(pasta::BuiltinAliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(BuiltinAliasAttrSpelling) {
+  return "BuiltinAliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(BuiltinAliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(BuiltinAliasAttrSpelling);
+
 enum class BuiltinTypeKind : unsigned char {
-  OCL_IMAGE1_DRO,
-  OCL_IMAGE1_DARRAY_RO,
-  OCL_IMAGE1_DBUFFER_RO,
-  OCL_IMAGE2_DRO,
-  OCL_IMAGE2_DARRAY_RO,
-  OCL_IMAGE2_DDEPTH_RO,
-  OCL_IMAGE2_DARRAY_DEPTH_RO,
-  OCL_IMAGE2_DMSAARO,
-  OCL_IMAGE2_DARRAY_MSAARO,
-  OCL_IMAGE2_DMSAA_DEPTH_RO,
-  OCL_IMAGE2_DARRAY_MSAA_DEPTH_RO,
-  OCL_IMAGE3_DRO,
-  OCL_IMAGE1_DWO,
-  OCL_IMAGE1_DARRAY_WO,
-  OCL_IMAGE1_DBUFFER_WO,
-  OCL_IMAGE2_DWO,
-  OCL_IMAGE2_DARRAY_WO,
-  OCL_IMAGE2_DDEPTH_WO,
-  OCL_IMAGE2_DARRAY_DEPTH_WO,
-  OCL_IMAGE2_DMSAAWO,
-  OCL_IMAGE2_DARRAY_MSAAWO,
-  OCL_IMAGE2_DMSAA_DEPTH_WO,
-  OCL_IMAGE2_DARRAY_MSAA_DEPTH_WO,
-  OCL_IMAGE3_DWO,
-  OCL_IMAGE1_DRW,
-  OCL_IMAGE1_DARRAY_RW,
-  OCL_IMAGE1_DBUFFER_RW,
-  OCL_IMAGE2_DRW,
-  OCL_IMAGE2_DARRAY_RW,
-  OCL_IMAGE2_DDEPTH_RW,
-  OCL_IMAGE2_DARRAY_DEPTH_RW,
-  OCL_IMAGE2_DMSAARW,
-  OCL_IMAGE2_DARRAY_MSAARW,
-  OCL_IMAGE2_DMSAA_DEPTH_RW,
-  OCL_IMAGE2_DARRAY_MSAA_DEPTH_RW,
-  OCL_IMAGE3_DRW,
+  OCL_IMAGE_1D_RO,
+  OCL_IMAGE_1D_ARRAY_RO,
+  OCL_IMAGE_1D_BUFFER_RO,
+  OCL_IMAGE_2D_RO,
+  OCL_IMAGE_2D_ARRAY_RO,
+  OCL_IMAGE_2D_DEPTH_RO,
+  OCL_IMAGE_2D_ARRAY_DEPTH_RO,
+  OCL_IMAGE_2D_MSAARO,
+  OCL_IMAGE_2D_ARRAY_MSAARO,
+  OCL_IMAGE_2D_MSAA_DEPTH_RO,
+  OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_RO,
+  OCL_IMAGE_3D_RO,
+  OCL_IMAGE_1D_WO,
+  OCL_IMAGE_1D_ARRAY_WO,
+  OCL_IMAGE_1D_BUFFER_WO,
+  OCL_IMAGE_2D_WO,
+  OCL_IMAGE_2D_ARRAY_WO,
+  OCL_IMAGE_2D_DEPTH_WO,
+  OCL_IMAGE_2D_ARRAY_DEPTH_WO,
+  OCL_IMAGE_2D_MSAAWO,
+  OCL_IMAGE_2D_ARRAY_MSAAWO,
+  OCL_IMAGE_2D_MSAA_DEPTH_WO,
+  OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_WO,
+  OCL_IMAGE_3D_WO,
+  OCL_IMAGE_1D_RW,
+  OCL_IMAGE_1D_ARRAY_RW,
+  OCL_IMAGE_1D_BUFFER_RW,
+  OCL_IMAGE_2D_RW,
+  OCL_IMAGE_2D_ARRAY_RW,
+  OCL_IMAGE_2D_DEPTH_RW,
+  OCL_IMAGE_2D_ARRAY_DEPTH_RW,
+  OCL_IMAGE_2D_MSAARW,
+  OCL_IMAGE_2D_ARRAY_MSAARW,
+  OCL_IMAGE_2D_MSAA_DEPTH_RW,
+  OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_RW,
+  OCL_IMAGE_3D_RW,
   OCL_INTEL_SUBGROUP_AVC_MCE_PAYLOAD,
   OCL_INTEL_SUBGROUP_AVC_IME_PAYLOAD,
   OCL_INTEL_SUBGROUP_AVC_REF_PAYLOAD,
@@ -549,104 +1935,104 @@ enum class BuiltinTypeKind : unsigned char {
   SVE_FLOAT32,
   SVE_FLOAT64,
   SVE_B_FLOAT16,
-  SVE_INT8_X2,
-  SVE_INT16_X2,
-  SVE_INT32_X2,
-  SVE_INT64_X2,
-  SVE_UINT8_X2,
-  SVE_UINT16_X2,
-  SVE_UINT32_X2,
-  SVE_UINT64_X2,
-  SVE_FLOAT16_X2,
-  SVE_FLOAT32_X2,
-  SVE_FLOAT64_X2,
-  SVE_B_FLOAT16_X2,
-  SVE_INT8_X3,
-  SVE_INT16_X3,
-  SVE_INT32_X3,
-  SVE_INT64_X3,
-  SVE_UINT8_X3,
-  SVE_UINT16_X3,
-  SVE_UINT32_X3,
-  SVE_UINT64_X3,
-  SVE_FLOAT16_X3,
-  SVE_FLOAT32_X3,
-  SVE_FLOAT64_X3,
-  SVE_B_FLOAT16_X3,
-  SVE_INT8_X4,
-  SVE_INT16_X4,
-  SVE_INT32_X4,
-  SVE_INT64_X4,
-  SVE_UINT8_X4,
-  SVE_UINT16_X4,
-  SVE_UINT32_X4,
-  SVE_UINT64_X4,
-  SVE_FLOAT16_X4,
-  SVE_FLOAT32_X4,
-  SVE_FLOAT64_X4,
-  SVE_B_FLOAT16_X4,
+  SVE_INT8X2,
+  SVE_INT16X2,
+  SVE_INT32X2,
+  SVE_INT64X2,
+  SVE_UINT8X2,
+  SVE_UINT16X2,
+  SVE_UINT32X2,
+  SVE_UINT64X2,
+  SVE_FLOAT16X2,
+  SVE_FLOAT32X2,
+  SVE_FLOAT64X2,
+  SVE_B_FLOAT16X2,
+  SVE_INT8X3,
+  SVE_INT16X3,
+  SVE_INT32X3,
+  SVE_INT64X3,
+  SVE_UINT8X3,
+  SVE_UINT16X3,
+  SVE_UINT32X3,
+  SVE_UINT64X3,
+  SVE_FLOAT16X3,
+  SVE_FLOAT32X3,
+  SVE_FLOAT64X3,
+  SVE_B_FLOAT16X3,
+  SVE_INT8X4,
+  SVE_INT16X4,
+  SVE_INT32X4,
+  SVE_INT64X4,
+  SVE_UINT8X4,
+  SVE_UINT16X4,
+  SVE_UINT32X4,
+  SVE_UINT64X4,
+  SVE_FLOAT16X4,
+  SVE_FLOAT32X4,
+  SVE_FLOAT64X4,
+  SVE_B_FLOAT16X4,
   SVE_BOOLEAN,
   VECTOR_QUAD,
   VECTOR_PAIR,
-  RVV_INT8_MF8,
-  RVV_INT8_MF4,
-  RVV_INT8_MF2,
-  RVV_INT8_M1,
-  RVV_INT8_M2,
-  RVV_INT8_M4,
-  RVV_INT8_M8,
-  RVV_UINT8_MF8,
-  RVV_UINT8_MF4,
-  RVV_UINT8_MF2,
-  RVV_UINT8_M1,
-  RVV_UINT8_M2,
-  RVV_UINT8_M4,
-  RVV_UINT8_M8,
-  RVV_INT16_MF4,
-  RVV_INT16_MF2,
-  RVV_INT16_M1,
-  RVV_INT16_M2,
-  RVV_INT16_M4,
-  RVV_INT16_M8,
-  RVV_UINT16_MF4,
-  RVV_UINT16_MF2,
-  RVV_UINT16_M1,
-  RVV_UINT16_M2,
-  RVV_UINT16_M4,
-  RVV_UINT16_M8,
-  RVV_INT32_MF2,
-  RVV_INT32_M1,
-  RVV_INT32_M2,
-  RVV_INT32_M4,
-  RVV_INT32_M8,
-  RVV_UINT32_MF2,
-  RVV_UINT32_M1,
-  RVV_UINT32_M2,
-  RVV_UINT32_M4,
-  RVV_UINT32_M8,
-  RVV_INT64_M1,
-  RVV_INT64_M2,
-  RVV_INT64_M4,
-  RVV_INT64_M8,
-  RVV_UINT64_M1,
-  RVV_UINT64_M2,
-  RVV_UINT64_M4,
-  RVV_UINT64_M8,
-  RVV_FLOAT16_MF4,
-  RVV_FLOAT16_MF2,
-  RVV_FLOAT16_M1,
-  RVV_FLOAT16_M2,
-  RVV_FLOAT16_M4,
-  RVV_FLOAT16_M8,
-  RVV_FLOAT32_MF2,
-  RVV_FLOAT32_M1,
-  RVV_FLOAT32_M2,
-  RVV_FLOAT32_M4,
-  RVV_FLOAT32_M8,
-  RVV_FLOAT64_M1,
-  RVV_FLOAT64_M2,
-  RVV_FLOAT64_M4,
-  RVV_FLOAT64_M8,
+  RVV_INT8MF8,
+  RVV_INT8MF4,
+  RVV_INT8MF2,
+  RVV_INT8M1,
+  RVV_INT8M2,
+  RVV_INT8M4,
+  RVV_INT8M8,
+  RVV_UINT8MF8,
+  RVV_UINT8MF4,
+  RVV_UINT8MF2,
+  RVV_UINT8M1,
+  RVV_UINT8M2,
+  RVV_UINT8M4,
+  RVV_UINT8M8,
+  RVV_INT16MF4,
+  RVV_INT16MF2,
+  RVV_INT16M1,
+  RVV_INT16M2,
+  RVV_INT16M4,
+  RVV_INT16M8,
+  RVV_UINT16MF4,
+  RVV_UINT16MF2,
+  RVV_UINT16M1,
+  RVV_UINT16M2,
+  RVV_UINT16M4,
+  RVV_UINT16M8,
+  RVV_INT32MF2,
+  RVV_INT32M1,
+  RVV_INT32M2,
+  RVV_INT32M4,
+  RVV_INT32M8,
+  RVV_UINT32MF2,
+  RVV_UINT32M1,
+  RVV_UINT32M2,
+  RVV_UINT32M4,
+  RVV_UINT32M8,
+  RVV_INT64M1,
+  RVV_INT64M2,
+  RVV_INT64M4,
+  RVV_INT64M8,
+  RVV_UINT64M1,
+  RVV_UINT64M2,
+  RVV_UINT64M4,
+  RVV_UINT64M8,
+  RVV_FLOAT16MF4,
+  RVV_FLOAT16MF2,
+  RVV_FLOAT16M1,
+  RVV_FLOAT16M2,
+  RVV_FLOAT16M4,
+  RVV_FLOAT16M8,
+  RVV_FLOAT32MF2,
+  RVV_FLOAT32M1,
+  RVV_FLOAT32M2,
+  RVV_FLOAT32M4,
+  RVV_FLOAT32M8,
+  RVV_FLOAT64M1,
+  RVV_FLOAT64M2,
+  RVV_FLOAT64M4,
+  RVV_FLOAT64M8,
   RVV_BOOL1,
   RVV_BOOL2,
   RVV_BOOL4,
@@ -741,6 +2127,340 @@ inline static constexpr unsigned NumEnumerators(BuiltinTypeKind) {
 
 const char *EnumeratorName(BuiltinTypeKind);
 
+enum class CDeclAttrSpelling : unsigned char {
+  GNU_CDECL,
+  CXX11_GNU_CDECL,
+  C2X_GNU_CDECL,
+  KEYWORD_CDECL,
+  SPELLING_NOT_CALCULATED,
+};
+
+CDeclAttrSpelling FromPasta(pasta::CDeclAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CDeclAttrSpelling) {
+  return "CDeclAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CDeclAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CDeclAttrSpelling);
+
+enum class CFAuditedTransferAttrSpelling : unsigned char {
+  GNU_CF_AUDITED_TRANSFER,
+  CXX11_CLANG_CF_AUDITED_TRANSFER,
+  C2X_CLANG_CF_AUDITED_TRANSFER,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFAuditedTransferAttrSpelling FromPasta(pasta::CFAuditedTransferAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFAuditedTransferAttrSpelling) {
+  return "CFAuditedTransferAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFAuditedTransferAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFAuditedTransferAttrSpelling);
+
+enum class CFConsumedAttrSpelling : unsigned char {
+  GNU_CF_CONSUMED,
+  CXX11_CLANG_CF_CONSUMED,
+  C2X_CLANG_CF_CONSUMED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFConsumedAttrSpelling FromPasta(pasta::CFConsumedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFConsumedAttrSpelling) {
+  return "CFConsumedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFConsumedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFConsumedAttrSpelling);
+
+enum class CFGuardAttrGuardArg : unsigned char {
+  NOCF,
+};
+
+CFGuardAttrGuardArg FromPasta(pasta::CFGuardAttrGuardArg pasta_val);
+
+inline static const char *EnumerationName(CFGuardAttrGuardArg) {
+  return "CFGuardAttrGuardArg";
+}
+
+inline static constexpr unsigned NumEnumerators(CFGuardAttrGuardArg) {
+  return 1;
+}
+
+const char *EnumeratorName(CFGuardAttrGuardArg);
+
+enum class CFICanonicalJumpTableAttrSpelling : unsigned char {
+  GNU_CFI_CANONICAL_JUMP_TABLE,
+  CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE,
+  C2X_CLANG_CFI_CANONICAL_JUMP_TABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFICanonicalJumpTableAttrSpelling FromPasta(pasta::CFICanonicalJumpTableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFICanonicalJumpTableAttrSpelling) {
+  return "CFICanonicalJumpTableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFICanonicalJumpTableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFICanonicalJumpTableAttrSpelling);
+
+enum class CFReturnsNotRetainedAttrSpelling : unsigned char {
+  GNU_CF_RETURNS_NOT_RETAINED,
+  CXX11_CLANG_CF_RETURNS_NOT_RETAINED,
+  C2X_CLANG_CF_RETURNS_NOT_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFReturnsNotRetainedAttrSpelling FromPasta(pasta::CFReturnsNotRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFReturnsNotRetainedAttrSpelling) {
+  return "CFReturnsNotRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFReturnsNotRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFReturnsNotRetainedAttrSpelling);
+
+enum class CFReturnsRetainedAttrSpelling : unsigned char {
+  GNU_CF_RETURNS_RETAINED,
+  CXX11_CLANG_CF_RETURNS_RETAINED,
+  C2X_CLANG_CF_RETURNS_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFReturnsRetainedAttrSpelling FromPasta(pasta::CFReturnsRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFReturnsRetainedAttrSpelling) {
+  return "CFReturnsRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFReturnsRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFReturnsRetainedAttrSpelling);
+
+enum class CFUnknownTransferAttrSpelling : unsigned char {
+  GNU_CF_UNKNOWN_TRANSFER,
+  CXX11_CLANG_CF_UNKNOWN_TRANSFER,
+  C2X_CLANG_CF_UNKNOWN_TRANSFER,
+  SPELLING_NOT_CALCULATED,
+};
+
+CFUnknownTransferAttrSpelling FromPasta(pasta::CFUnknownTransferAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CFUnknownTransferAttrSpelling) {
+  return "CFUnknownTransferAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CFUnknownTransferAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CFUnknownTransferAttrSpelling);
+
+enum class CPUDispatchAttrSpelling : unsigned char {
+  GNU_CPU_DISPATCH,
+  CXX11_CLANG_CPU_DISPATCH,
+  C2X_CLANG_CPU_DISPATCH,
+  DECLSPEC_CPU_DISPATCH,
+  SPELLING_NOT_CALCULATED,
+};
+
+CPUDispatchAttrSpelling FromPasta(pasta::CPUDispatchAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CPUDispatchAttrSpelling) {
+  return "CPUDispatchAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CPUDispatchAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CPUDispatchAttrSpelling);
+
+enum class CPUSpecificAttrSpelling : unsigned char {
+  GNU_CPU_SPECIFIC,
+  CXX11_CLANG_CPU_SPECIFIC,
+  C2X_CLANG_CPU_SPECIFIC,
+  DECLSPEC_CPU_SPECIFIC,
+  SPELLING_NOT_CALCULATED,
+};
+
+CPUSpecificAttrSpelling FromPasta(pasta::CPUSpecificAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CPUSpecificAttrSpelling) {
+  return "CPUSpecificAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CPUSpecificAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CPUSpecificAttrSpelling);
+
+enum class CUDAConstantAttrSpelling : unsigned char {
+  GNU_CONSTANT,
+  DECLSPEC_CONSTANT,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDAConstantAttrSpelling FromPasta(pasta::CUDAConstantAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDAConstantAttrSpelling) {
+  return "CUDAConstantAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDAConstantAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDAConstantAttrSpelling);
+
+enum class CUDADeviceAttrSpelling : unsigned char {
+  GNU_DEVICE,
+  DECLSPEC_DEVICE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDADeviceAttrSpelling FromPasta(pasta::CUDADeviceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDADeviceAttrSpelling) {
+  return "CUDADeviceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDADeviceAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDADeviceAttrSpelling);
+
+enum class CUDADeviceBuiltinSurfaceTypeAttrSpelling : unsigned char {
+  GNU_DEVICE_BUILTIN_SURFACE_TYPE,
+  DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDADeviceBuiltinSurfaceTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinSurfaceTypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDADeviceBuiltinSurfaceTypeAttrSpelling) {
+  return "CUDADeviceBuiltinSurfaceTypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDADeviceBuiltinSurfaceTypeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDADeviceBuiltinSurfaceTypeAttrSpelling);
+
+enum class CUDADeviceBuiltinTextureTypeAttrSpelling : unsigned char {
+  GNU_DEVICE_BUILTIN_TEXTURE_TYPE,
+  DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDADeviceBuiltinTextureTypeAttrSpelling FromPasta(pasta::CUDADeviceBuiltinTextureTypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDADeviceBuiltinTextureTypeAttrSpelling) {
+  return "CUDADeviceBuiltinTextureTypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDADeviceBuiltinTextureTypeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDADeviceBuiltinTextureTypeAttrSpelling);
+
+enum class CUDAGlobalAttrSpelling : unsigned char {
+  GNU_GLOBAL,
+  DECLSPEC_GLOBAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDAGlobalAttrSpelling FromPasta(pasta::CUDAGlobalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDAGlobalAttrSpelling) {
+  return "CUDAGlobalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDAGlobalAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDAGlobalAttrSpelling);
+
+enum class CUDAHostAttrSpelling : unsigned char {
+  GNU_HOST,
+  DECLSPEC_HOST,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDAHostAttrSpelling FromPasta(pasta::CUDAHostAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDAHostAttrSpelling) {
+  return "CUDAHostAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDAHostAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDAHostAttrSpelling);
+
+enum class CUDALaunchBoundsAttrSpelling : unsigned char {
+  GNU_LAUNCH_BOUNDS,
+  DECLSPEC_LAUNCH_BOUNDS,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDALaunchBoundsAttrSpelling FromPasta(pasta::CUDALaunchBoundsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDALaunchBoundsAttrSpelling) {
+  return "CUDALaunchBoundsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDALaunchBoundsAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDALaunchBoundsAttrSpelling);
+
+enum class CUDASharedAttrSpelling : unsigned char {
+  GNU_SHARED,
+  DECLSPEC_SHARED,
+  SPELLING_NOT_CALCULATED,
+};
+
+CUDASharedAttrSpelling FromPasta(pasta::CUDASharedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CUDASharedAttrSpelling) {
+  return "CUDASharedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CUDASharedAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CUDASharedAttrSpelling);
+
 enum class CXXConstructExprConstructionKind : unsigned char {
   COMPLETE,
   NON_VIRTUAL_BASE,
@@ -795,6 +2515,100 @@ inline static constexpr unsigned NumEnumerators(CallExprADLCallKind) {
 
 const char *EnumeratorName(CallExprADLCallKind);
 
+enum class CallableWhenAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+CallableWhenAttrConsumedState FromPasta(pasta::CallableWhenAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(CallableWhenAttrConsumedState) {
+  return "CallableWhenAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(CallableWhenAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(CallableWhenAttrConsumedState);
+
+enum class CallableWhenAttrSpelling : unsigned char {
+  GNU_CALLABLE_WHEN,
+  CXX11_CLANG_CALLABLE_WHEN,
+  SPELLING_NOT_CALCULATED,
+};
+
+CallableWhenAttrSpelling FromPasta(pasta::CallableWhenAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CallableWhenAttrSpelling) {
+  return "CallableWhenAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CallableWhenAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CallableWhenAttrSpelling);
+
+enum class CallbackAttrSpelling : unsigned char {
+  GNU_CALLBACK,
+  CXX11_CLANG_CALLBACK,
+  C2X_CLANG_CALLBACK,
+  SPELLING_NOT_CALCULATED,
+};
+
+CallbackAttrSpelling FromPasta(pasta::CallbackAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CallbackAttrSpelling) {
+  return "CallbackAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CallbackAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CallbackAttrSpelling);
+
+enum class CalledOnceAttrSpelling : unsigned char {
+  GNU_CALLED_ONCE,
+  CXX11_CLANG_CALLED_ONCE,
+  C2X_CLANG_CALLED_ONCE,
+  SPELLING_NOT_CALCULATED,
+};
+
+CalledOnceAttrSpelling FromPasta(pasta::CalledOnceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CalledOnceAttrSpelling) {
+  return "CalledOnceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CalledOnceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CalledOnceAttrSpelling);
+
+enum class CapabilityAttrSpelling : unsigned char {
+  GNU_CAPABILITY,
+  CXX11_CLANG_CAPABILITY,
+  GNU_SHARED_CAPABILITY,
+  CXX11_CLANG_SHARED_CAPABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+CapabilityAttrSpelling FromPasta(pasta::CapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CapabilityAttrSpelling) {
+  return "CapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CapabilityAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(CapabilityAttrSpelling);
+
 enum class CapturedStmtVariableCaptureKind : unsigned char {
   THIS,
   BY_REFERENCE,
@@ -813,6 +2627,24 @@ inline static constexpr unsigned NumEnumerators(CapturedStmtVariableCaptureKind)
 }
 
 const char *EnumeratorName(CapturedStmtVariableCaptureKind);
+
+enum class CarriesDependencyAttrSpelling : unsigned char {
+  GNU_CARRIES_DEPENDENCY,
+  CXX11_CARRIES_DEPENDENCY,
+  SPELLING_NOT_CALCULATED,
+};
+
+CarriesDependencyAttrSpelling FromPasta(pasta::CarriesDependencyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CarriesDependencyAttrSpelling) {
+  return "CarriesDependencyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CarriesDependencyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(CarriesDependencyAttrSpelling);
 
 enum class CharacterLiteralCharacterKind : unsigned char {
   ASCII,
@@ -834,6 +2666,101 @@ inline static constexpr unsigned NumEnumerators(CharacterLiteralCharacterKind) {
 
 const char *EnumeratorName(CharacterLiteralCharacterKind);
 
+enum class CleanupAttrSpelling : unsigned char {
+  GNU_CLEANUP,
+  CXX11_GNU_CLEANUP,
+  C2X_GNU_CLEANUP,
+  SPELLING_NOT_CALCULATED,
+};
+
+CleanupAttrSpelling FromPasta(pasta::CleanupAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CleanupAttrSpelling) {
+  return "CleanupAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CleanupAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CleanupAttrSpelling);
+
+enum class ColdAttrSpelling : unsigned char {
+  GNU_COLD,
+  CXX11_GNU_COLD,
+  C2X_GNU_COLD,
+  SPELLING_NOT_CALCULATED,
+};
+
+ColdAttrSpelling FromPasta(pasta::ColdAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ColdAttrSpelling) {
+  return "ColdAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ColdAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ColdAttrSpelling);
+
+enum class CommonAttrSpelling : unsigned char {
+  GNU_COMMON,
+  CXX11_GNU_COMMON,
+  C2X_GNU_COMMON,
+  SPELLING_NOT_CALCULATED,
+};
+
+CommonAttrSpelling FromPasta(pasta::CommonAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(CommonAttrSpelling) {
+  return "CommonAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(CommonAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(CommonAttrSpelling);
+
+enum class ConstAttrSpelling : unsigned char {
+  GNU_CONST,
+  CXX11_GNU_CONST,
+  C2X_GNU_CONST,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConstAttrSpelling FromPasta(pasta::ConstAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConstAttrSpelling) {
+  return "ConstAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConstAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConstAttrSpelling);
+
+enum class ConstInitAttrSpelling : unsigned char {
+  KEYWORD_CONSTINIT,
+  GNU_REQUIRE_CONSTANT_INITIALIZATION,
+  CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConstInitAttrSpelling FromPasta(pasta::ConstInitAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConstInitAttrSpelling) {
+  return "ConstInitAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConstInitAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConstInitAttrSpelling);
+
 enum class ConstantExprResultStorageKind : unsigned char {
   NONE,
   INT64,
@@ -851,6 +2778,156 @@ inline static constexpr unsigned NumEnumerators(ConstantExprResultStorageKind) {
 }
 
 const char *EnumeratorName(ConstantExprResultStorageKind);
+
+enum class ConstructorAttrSpelling : unsigned char {
+  GNU_CONSTRUCTOR,
+  CXX11_GNU_CONSTRUCTOR,
+  C2X_GNU_CONSTRUCTOR,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConstructorAttrSpelling FromPasta(pasta::ConstructorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConstructorAttrSpelling) {
+  return "ConstructorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConstructorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConstructorAttrSpelling);
+
+enum class ConsumableAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+ConsumableAttrConsumedState FromPasta(pasta::ConsumableAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(ConsumableAttrConsumedState) {
+  return "ConsumableAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableAttrConsumedState);
+
+enum class ConsumableAttrSpelling : unsigned char {
+  GNU_CONSUMABLE,
+  CXX11_CLANG_CONSUMABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConsumableAttrSpelling FromPasta(pasta::ConsumableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConsumableAttrSpelling) {
+  return "ConsumableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableAttrSpelling);
+
+enum class ConsumableAutoCastAttrSpelling : unsigned char {
+  GNU_CONSUMABLE_AUTO_CAST_STATE,
+  CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConsumableAutoCastAttrSpelling FromPasta(pasta::ConsumableAutoCastAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConsumableAutoCastAttrSpelling) {
+  return "ConsumableAutoCastAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableAutoCastAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableAutoCastAttrSpelling);
+
+enum class ConsumableSetOnReadAttrSpelling : unsigned char {
+  GNU_CONSUMABLE_STATE_ON_READ,
+  CXX11_CLANG_CONSUMABLE_STATE_ON_READ,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConsumableSetOnReadAttrSpelling FromPasta(pasta::ConsumableSetOnReadAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConsumableSetOnReadAttrSpelling) {
+  return "ConsumableSetOnReadAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConsumableSetOnReadAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ConsumableSetOnReadAttrSpelling);
+
+enum class ConvergentAttrSpelling : unsigned char {
+  GNU_CONVERGENT,
+  CXX11_CLANG_CONVERGENT,
+  C2X_CLANG_CONVERGENT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ConvergentAttrSpelling FromPasta(pasta::ConvergentAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ConvergentAttrSpelling) {
+  return "ConvergentAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ConvergentAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ConvergentAttrSpelling);
+
+enum class DLLExportAttrSpelling : unsigned char {
+  DECLSPEC_DLLEXPORT,
+  GNU_DLLEXPORT,
+  CXX11_GNU_DLLEXPORT,
+  C2X_GNU_DLLEXPORT,
+  SPELLING_NOT_CALCULATED,
+};
+
+DLLExportAttrSpelling FromPasta(pasta::DLLExportAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DLLExportAttrSpelling) {
+  return "DLLExportAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DLLExportAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(DLLExportAttrSpelling);
+
+enum class DLLImportAttrSpelling : unsigned char {
+  DECLSPEC_DLLIMPORT,
+  GNU_DLLIMPORT,
+  CXX11_GNU_DLLIMPORT,
+  C2X_GNU_DLLIMPORT,
+  SPELLING_NOT_CALCULATED,
+};
+
+DLLImportAttrSpelling FromPasta(pasta::DLLImportAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DLLImportAttrSpelling) {
+  return "DLLImportAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DLLImportAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(DLLImportAttrSpelling);
 
 enum class DeclFriendObjectKind : unsigned char {
   NONE,
@@ -940,6 +3017,236 @@ inline static constexpr unsigned NumEnumerators(DeclObjCDeclQualifier) {
 }
 
 const char *EnumeratorName(DeclObjCDeclQualifier);
+
+enum class DeprecatedAttrSpelling : unsigned char {
+  GNU_DEPRECATED,
+  CXX11_GNU_DEPRECATED,
+  C2X_GNU_DEPRECATED,
+  DECLSPEC_DEPRECATED,
+  CXX11_DEPRECATED,
+  C2X_DEPRECATED,
+  SPELLING_NOT_CALCULATED,
+};
+
+DeprecatedAttrSpelling FromPasta(pasta::DeprecatedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DeprecatedAttrSpelling) {
+  return "DeprecatedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DeprecatedAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(DeprecatedAttrSpelling);
+
+enum class DestructorAttrSpelling : unsigned char {
+  GNU_DESTRUCTOR,
+  CXX11_GNU_DESTRUCTOR,
+  C2X_GNU_DESTRUCTOR,
+  SPELLING_NOT_CALCULATED,
+};
+
+DestructorAttrSpelling FromPasta(pasta::DestructorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DestructorAttrSpelling) {
+  return "DestructorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DestructorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DestructorAttrSpelling);
+
+enum class DiagnoseAsBuiltinAttrSpelling : unsigned char {
+  GNU_DIAGNOSE_AS_BUILTIN,
+  CXX11_CLANG_DIAGNOSE_AS_BUILTIN,
+  C2X_CLANG_DIAGNOSE_AS_BUILTIN,
+  SPELLING_NOT_CALCULATED,
+};
+
+DiagnoseAsBuiltinAttrSpelling FromPasta(pasta::DiagnoseAsBuiltinAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DiagnoseAsBuiltinAttrSpelling) {
+  return "DiagnoseAsBuiltinAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DiagnoseAsBuiltinAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DiagnoseAsBuiltinAttrSpelling);
+
+enum class DiagnoseIfAttrDiagnosticType : unsigned char {
+  ERROR,
+  WARNING,
+};
+
+DiagnoseIfAttrDiagnosticType FromPasta(pasta::DiagnoseIfAttrDiagnosticType pasta_val);
+
+inline static const char *EnumerationName(DiagnoseIfAttrDiagnosticType) {
+  return "DiagnoseIfAttrDiagnosticType";
+}
+
+inline static constexpr unsigned NumEnumerators(DiagnoseIfAttrDiagnosticType) {
+  return 2;
+}
+
+const char *EnumeratorName(DiagnoseIfAttrDiagnosticType);
+
+enum class DisableSanitizerInstrumentationAttrSpelling : unsigned char {
+  GNU_DISABLE_SANITIZER_INSTRUMENTATION,
+  CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION,
+  C2X_CLANG_DISABLE_SANITIZER_INSTRUMENTATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+DisableSanitizerInstrumentationAttrSpelling FromPasta(pasta::DisableSanitizerInstrumentationAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DisableSanitizerInstrumentationAttrSpelling) {
+  return "DisableSanitizerInstrumentationAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DisableSanitizerInstrumentationAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DisableSanitizerInstrumentationAttrSpelling);
+
+enum class DisableTailCallsAttrSpelling : unsigned char {
+  GNU_DISABLE_TAIL_CALLS,
+  CXX11_CLANG_DISABLE_TAIL_CALLS,
+  C2X_CLANG_DISABLE_TAIL_CALLS,
+  SPELLING_NOT_CALCULATED,
+};
+
+DisableTailCallsAttrSpelling FromPasta(pasta::DisableTailCallsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(DisableTailCallsAttrSpelling) {
+  return "DisableTailCallsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(DisableTailCallsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(DisableTailCallsAttrSpelling);
+
+enum class EnforceTCBAttrSpelling : unsigned char {
+  GNU_ENFORCE_TCB,
+  CXX11_CLANG_ENFORCE_TCB,
+  C2X_CLANG_ENFORCE_TCB,
+  SPELLING_NOT_CALCULATED,
+};
+
+EnforceTCBAttrSpelling FromPasta(pasta::EnforceTCBAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(EnforceTCBAttrSpelling) {
+  return "EnforceTCBAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(EnforceTCBAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(EnforceTCBAttrSpelling);
+
+enum class EnforceTCBLeafAttrSpelling : unsigned char {
+  GNU_ENFORCE_TCB_LEAF,
+  CXX11_CLANG_ENFORCE_TCB_LEAF,
+  C2X_CLANG_ENFORCE_TCB_LEAF,
+  SPELLING_NOT_CALCULATED,
+};
+
+EnforceTCBLeafAttrSpelling FromPasta(pasta::EnforceTCBLeafAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(EnforceTCBLeafAttrSpelling) {
+  return "EnforceTCBLeafAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(EnforceTCBLeafAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(EnforceTCBLeafAttrSpelling);
+
+enum class EnumExtensibilityAttrKind : unsigned char {
+  CLOSED,
+  OPEN,
+};
+
+EnumExtensibilityAttrKind FromPasta(pasta::EnumExtensibilityAttrKind pasta_val);
+
+inline static const char *EnumerationName(EnumExtensibilityAttrKind) {
+  return "EnumExtensibilityAttrKind";
+}
+
+inline static constexpr unsigned NumEnumerators(EnumExtensibilityAttrKind) {
+  return 2;
+}
+
+const char *EnumeratorName(EnumExtensibilityAttrKind);
+
+enum class EnumExtensibilityAttrSpelling : unsigned char {
+  GNU_ENUM_EXTENSIBILITY,
+  CXX11_CLANG_ENUM_EXTENSIBILITY,
+  C2X_CLANG_ENUM_EXTENSIBILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+EnumExtensibilityAttrSpelling FromPasta(pasta::EnumExtensibilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(EnumExtensibilityAttrSpelling) {
+  return "EnumExtensibilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(EnumExtensibilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(EnumExtensibilityAttrSpelling);
+
+enum class ErrorAttrSpelling : unsigned char {
+  GNU_ERROR,
+  CXX11_GNU_ERROR,
+  C2X_GNU_ERROR,
+  GNU_WARNING,
+  CXX11_GNU_WARNING,
+  C2X_GNU_WARNING,
+  SPELLING_NOT_CALCULATED,
+};
+
+ErrorAttrSpelling FromPasta(pasta::ErrorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ErrorAttrSpelling) {
+  return "ErrorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ErrorAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(ErrorAttrSpelling);
+
+enum class ExcludeFromExplicitInstantiationAttrSpelling : unsigned char {
+  GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  C2X_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ExcludeFromExplicitInstantiationAttrSpelling FromPasta(pasta::ExcludeFromExplicitInstantiationAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ExcludeFromExplicitInstantiationAttrSpelling) {
+  return "ExcludeFromExplicitInstantiationAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ExcludeFromExplicitInstantiationAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ExcludeFromExplicitInstantiationAttrSpelling);
 
 enum class ExprConstantExprKind : unsigned char {
   NORMAL,
@@ -1073,6 +3380,161 @@ inline static constexpr unsigned NumEnumerators(ExprisModifiableLvalueResult) {
 
 const char *EnumeratorName(ExprisModifiableLvalueResult);
 
+enum class ExternalSourceSymbolAttrSpelling : unsigned char {
+  GNU_EXTERNAL_SOURCE_SYMBOL,
+  CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL,
+  C2X_CLANG_EXTERNAL_SOURCE_SYMBOL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ExternalSourceSymbolAttrSpelling FromPasta(pasta::ExternalSourceSymbolAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ExternalSourceSymbolAttrSpelling) {
+  return "ExternalSourceSymbolAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ExternalSourceSymbolAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ExternalSourceSymbolAttrSpelling);
+
+enum class FallThroughAttrSpelling : unsigned char {
+  CXX11_FALLTHROUGH,
+  C2X_FALLTHROUGH,
+  CXX11_CLANG_FALLTHROUGH,
+  GNU_FALLTHROUGH,
+  CXX11_GNU_FALLTHROUGH,
+  C2X_GNU_FALLTHROUGH,
+  SPELLING_NOT_CALCULATED,
+};
+
+FallThroughAttrSpelling FromPasta(pasta::FallThroughAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FallThroughAttrSpelling) {
+  return "FallThroughAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FallThroughAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(FallThroughAttrSpelling);
+
+enum class FastCallAttrSpelling : unsigned char {
+  GNU_FASTCALL,
+  CXX11_GNU_FASTCALL,
+  C2X_GNU_FASTCALL,
+  KEYWORD_FASTCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+FastCallAttrSpelling FromPasta(pasta::FastCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FastCallAttrSpelling) {
+  return "FastCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FastCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(FastCallAttrSpelling);
+
+enum class FinalAttrSpelling : unsigned char {
+  KEYWORD_FINAL,
+  KEYWORD_SEALED,
+  SPELLING_NOT_CALCULATED,
+};
+
+FinalAttrSpelling FromPasta(pasta::FinalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FinalAttrSpelling) {
+  return "FinalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FinalAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(FinalAttrSpelling);
+
+enum class FlagEnumAttrSpelling : unsigned char {
+  GNU_FLAG_ENUM,
+  CXX11_CLANG_FLAG_ENUM,
+  C2X_CLANG_FLAG_ENUM,
+  SPELLING_NOT_CALCULATED,
+};
+
+FlagEnumAttrSpelling FromPasta(pasta::FlagEnumAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FlagEnumAttrSpelling) {
+  return "FlagEnumAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FlagEnumAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FlagEnumAttrSpelling);
+
+enum class FlattenAttrSpelling : unsigned char {
+  GNU_FLATTEN,
+  CXX11_GNU_FLATTEN,
+  C2X_GNU_FLATTEN,
+  SPELLING_NOT_CALCULATED,
+};
+
+FlattenAttrSpelling FromPasta(pasta::FlattenAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FlattenAttrSpelling) {
+  return "FlattenAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FlattenAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FlattenAttrSpelling);
+
+enum class FormatArgAttrSpelling : unsigned char {
+  GNU_FORMAT_ARGUMENT,
+  CXX11_GNU_FORMAT_ARGUMENT,
+  C2X_GNU_FORMAT_ARGUMENT,
+  SPELLING_NOT_CALCULATED,
+};
+
+FormatArgAttrSpelling FromPasta(pasta::FormatArgAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FormatArgAttrSpelling) {
+  return "FormatArgAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FormatArgAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FormatArgAttrSpelling);
+
+enum class FormatAttrSpelling : unsigned char {
+  GNU_FORMAT,
+  CXX11_GNU_FORMAT,
+  C2X_GNU_FORMAT,
+  SPELLING_NOT_CALCULATED,
+};
+
+FormatAttrSpelling FromPasta(pasta::FormatAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(FormatAttrSpelling) {
+  return "FormatAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(FormatAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(FormatAttrSpelling);
+
 enum class FunctionDeclTemplatedKind : unsigned char {
   NON_TEMPLATE,
   FUNCTION_TEMPLATE,
@@ -1092,6 +3554,156 @@ inline static constexpr unsigned NumEnumerators(FunctionDeclTemplatedKind) {
 }
 
 const char *EnumeratorName(FunctionDeclTemplatedKind);
+
+enum class GNUInlineAttrSpelling : unsigned char {
+  GNU_GNU_INLINE,
+  CXX11_GNU_GNU_INLINE,
+  C2X_GNU_GNU_INLINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+GNUInlineAttrSpelling FromPasta(pasta::GNUInlineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(GNUInlineAttrSpelling) {
+  return "GNUInlineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(GNUInlineAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(GNUInlineAttrSpelling);
+
+enum class GuardedVarAttrSpelling : unsigned char {
+  GNU_GUARDED_VARIABLE,
+  CXX11_CLANG_GUARDED_VARIABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(GuardedVarAttrSpelling) {
+  return "GuardedVarAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(GuardedVarAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(GuardedVarAttrSpelling);
+
+enum class HIPManagedAttrSpelling : unsigned char {
+  GNU_MANAGED,
+  DECLSPEC_MANAGED,
+  SPELLING_NOT_CALCULATED,
+};
+
+HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(HIPManagedAttrSpelling) {
+  return "HIPManagedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(HIPManagedAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(HIPManagedAttrSpelling);
+
+enum class HotAttrSpelling : unsigned char {
+  GNU_HOT,
+  CXX11_GNU_HOT,
+  C2X_GNU_HOT,
+  SPELLING_NOT_CALCULATED,
+};
+
+HotAttrSpelling FromPasta(pasta::HotAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(HotAttrSpelling) {
+  return "HotAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(HotAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(HotAttrSpelling);
+
+enum class IBActionAttrSpelling : unsigned char {
+  GNU_IBACTION,
+  CXX11_CLANG_IBACTION,
+  C2X_CLANG_IBACTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+IBActionAttrSpelling FromPasta(pasta::IBActionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IBActionAttrSpelling) {
+  return "IBActionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IBActionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IBActionAttrSpelling);
+
+enum class IBOutletAttrSpelling : unsigned char {
+  GNU_IBOUTLET,
+  CXX11_CLANG_IBOUTLET,
+  C2X_CLANG_IBOUTLET,
+  SPELLING_NOT_CALCULATED,
+};
+
+IBOutletAttrSpelling FromPasta(pasta::IBOutletAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IBOutletAttrSpelling) {
+  return "IBOutletAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IBOutletAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IBOutletAttrSpelling);
+
+enum class IBOutletCollectionAttrSpelling : unsigned char {
+  GNU_IBOUTLETCOLLECTION,
+  CXX11_CLANG_IBOUTLETCOLLECTION,
+  C2X_CLANG_IBOUTLETCOLLECTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+IBOutletCollectionAttrSpelling FromPasta(pasta::IBOutletCollectionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IBOutletCollectionAttrSpelling) {
+  return "IBOutletCollectionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IBOutletCollectionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IBOutletCollectionAttrSpelling);
+
+enum class IFuncAttrSpelling : unsigned char {
+  GNU_IFUNC,
+  CXX11_GNU_IFUNC,
+  C2X_GNU_IFUNC,
+  SPELLING_NOT_CALCULATED,
+};
+
+IFuncAttrSpelling FromPasta(pasta::IFuncAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IFuncAttrSpelling) {
+  return "IFuncAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IFuncAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(IFuncAttrSpelling);
 
 enum class ImplicitCastExprOnStack : unsigned char {
   ON_STACK,
@@ -1130,6 +3742,135 @@ inline static constexpr unsigned NumEnumerators(ImplicitParamDeclImplicitParamKi
 
 const char *EnumeratorName(ImplicitParamDeclImplicitParamKind);
 
+enum class InitPriorityAttrSpelling : unsigned char {
+  GNU_INITIALIZER_PRIORITY,
+  CXX11_GNU_INITIALIZER_PRIORITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+InitPriorityAttrSpelling FromPasta(pasta::InitPriorityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(InitPriorityAttrSpelling) {
+  return "InitPriorityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(InitPriorityAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(InitPriorityAttrSpelling);
+
+enum class IntelOclBiccAttrSpelling : unsigned char {
+  GNU_INTEL_OCL_BICC,
+  CXX11_CLANG_INTEL_OCL_BICC,
+  SPELLING_NOT_CALCULATED,
+};
+
+IntelOclBiccAttrSpelling FromPasta(pasta::IntelOclBiccAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(IntelOclBiccAttrSpelling) {
+  return "IntelOclBiccAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(IntelOclBiccAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(IntelOclBiccAttrSpelling);
+
+enum class InternalLinkageAttrSpelling : unsigned char {
+  GNU_INTERNAL_LINKAGE,
+  CXX11_CLANG_INTERNAL_LINKAGE,
+  C2X_CLANG_INTERNAL_LINKAGE,
+  SPELLING_NOT_CALCULATED,
+};
+
+InternalLinkageAttrSpelling FromPasta(pasta::InternalLinkageAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(InternalLinkageAttrSpelling) {
+  return "InternalLinkageAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(InternalLinkageAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(InternalLinkageAttrSpelling);
+
+enum class LTOVisibilityPublicAttrSpelling : unsigned char {
+  GNU_LTO_VISIBILITY_PUBLIC,
+  CXX11_CLANG_LTO_VISIBILITY_PUBLIC,
+  C2X_CLANG_LTO_VISIBILITY_PUBLIC,
+  SPELLING_NOT_CALCULATED,
+};
+
+LTOVisibilityPublicAttrSpelling FromPasta(pasta::LTOVisibilityPublicAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LTOVisibilityPublicAttrSpelling) {
+  return "LTOVisibilityPublicAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LTOVisibilityPublicAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(LTOVisibilityPublicAttrSpelling);
+
+enum class LeafAttrSpelling : unsigned char {
+  GNU_LEAF,
+  CXX11_GNU_LEAF,
+  C2X_GNU_LEAF,
+  SPELLING_NOT_CALCULATED,
+};
+
+LeafAttrSpelling FromPasta(pasta::LeafAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LeafAttrSpelling) {
+  return "LeafAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LeafAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(LeafAttrSpelling);
+
+enum class LifetimeBoundAttrSpelling : unsigned char {
+  GNU_LIFETIMEBOUND,
+  CXX11_CLANG_LIFETIMEBOUND,
+  SPELLING_NOT_CALCULATED,
+};
+
+LifetimeBoundAttrSpelling FromPasta(pasta::LifetimeBoundAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LifetimeBoundAttrSpelling) {
+  return "LifetimeBoundAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LifetimeBoundAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(LifetimeBoundAttrSpelling);
+
+enum class LikelyAttrSpelling : unsigned char {
+  CXX11_LIKELY,
+  C2X_CLANG_LIKELY,
+  SPELLING_NOT_CALCULATED,
+};
+
+LikelyAttrSpelling FromPasta(pasta::LikelyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LikelyAttrSpelling) {
+  return "LikelyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LikelyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(LikelyAttrSpelling);
+
 enum class LinkageSpecDeclLanguageIDs : unsigned char {
   C,
   CXX,
@@ -1146,6 +3887,526 @@ inline static constexpr unsigned NumEnumerators(LinkageSpecDeclLanguageIDs) {
 }
 
 const char *EnumeratorName(LinkageSpecDeclLanguageIDs);
+
+enum class LoaderUninitializedAttrSpelling : unsigned char {
+  GNU_LOADER_UNINITIALIZED,
+  CXX11_CLANG_LOADER_UNINITIALIZED,
+  C2X_CLANG_LOADER_UNINITIALIZED,
+  SPELLING_NOT_CALCULATED,
+};
+
+LoaderUninitializedAttrSpelling FromPasta(pasta::LoaderUninitializedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LoaderUninitializedAttrSpelling) {
+  return "LoaderUninitializedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LoaderUninitializedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(LoaderUninitializedAttrSpelling);
+
+enum class LoopHintAttrLoopHintState : unsigned char {
+  ENABLE,
+  DISABLE,
+  NUMERIC,
+  FIXED_WIDTH,
+  SCALABLE_WIDTH,
+  ASSUME_SAFETY,
+  FULL,
+};
+
+LoopHintAttrLoopHintState FromPasta(pasta::LoopHintAttrLoopHintState pasta_val);
+
+inline static const char *EnumerationName(LoopHintAttrLoopHintState) {
+  return "LoopHintAttrLoopHintState";
+}
+
+inline static constexpr unsigned NumEnumerators(LoopHintAttrLoopHintState) {
+  return 7;
+}
+
+const char *EnumeratorName(LoopHintAttrLoopHintState);
+
+enum class LoopHintAttrOptionType : unsigned char {
+  VECTORIZE,
+  VECTORIZE_WIDTH,
+  INTERLEAVE,
+  INTERLEAVE_COUNT,
+  UNROLL,
+  UNROLL_COUNT,
+  UNROLL_AND_JAM,
+  UNROLL_AND_JAM_COUNT,
+  PIPELINE_DISABLED,
+  PIPELINE_INITIATION_INTERVAL,
+  DISTRIBUTE,
+  VECTORIZE_PREDICATE,
+};
+
+LoopHintAttrOptionType FromPasta(pasta::LoopHintAttrOptionType pasta_val);
+
+inline static const char *EnumerationName(LoopHintAttrOptionType) {
+  return "LoopHintAttrOptionType";
+}
+
+inline static constexpr unsigned NumEnumerators(LoopHintAttrOptionType) {
+  return 12;
+}
+
+const char *EnumeratorName(LoopHintAttrOptionType);
+
+enum class LoopHintAttrSpelling : unsigned char {
+  PRAGMA_CLANG_LOOP,
+  PRAGMA_UNROLL,
+  PRAGMA_NOUNROLL,
+  PRAGMA_UNROLL_AND_JAM,
+  PRAGMA_NOUNROLL_AND_JAM,
+  SPELLING_NOT_CALCULATED,
+};
+
+LoopHintAttrSpelling FromPasta(pasta::LoopHintAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(LoopHintAttrSpelling) {
+  return "LoopHintAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(LoopHintAttrSpelling) {
+  return 6;
+}
+
+const char *EnumeratorName(LoopHintAttrSpelling);
+
+enum class MIGServerRoutineAttrSpelling : unsigned char {
+  GNU_MIG_SERVER_ROUTINE,
+  CXX11_CLANG_MIG_SERVER_ROUTINE,
+  C2X_CLANG_MIG_SERVER_ROUTINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+MIGServerRoutineAttrSpelling FromPasta(pasta::MIGServerRoutineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MIGServerRoutineAttrSpelling) {
+  return "MIGServerRoutineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MIGServerRoutineAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MIGServerRoutineAttrSpelling);
+
+enum class MSABIAttrSpelling : unsigned char {
+  GNU_MS_ABI,
+  CXX11_GNU_MS_ABI,
+  C2X_GNU_MS_ABI,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSABIAttrSpelling FromPasta(pasta::MSABIAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSABIAttrSpelling) {
+  return "MSABIAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSABIAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MSABIAttrSpelling);
+
+enum class MSInheritanceAttrSpelling : unsigned char {
+  KEYWORD_SINGLE_INHERITANCE,
+  KEYWORD_MULTIPLE_INHERITANCE,
+  KEYWORD_VIRTUAL_INHERITANCE,
+  KEYWORD_UNSPECIFIED_INHERITANCE,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSInheritanceAttrSpelling FromPasta(pasta::MSInheritanceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSInheritanceAttrSpelling) {
+  return "MSInheritanceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSInheritanceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(MSInheritanceAttrSpelling);
+
+enum class MSP430InterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2X_GNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSP430InterruptAttrSpelling FromPasta(pasta::MSP430InterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSP430InterruptAttrSpelling) {
+  return "MSP430InterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSP430InterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MSP430InterruptAttrSpelling);
+
+enum class MSStructAttrSpelling : unsigned char {
+  GNU_MS_STRUCT,
+  CXX11_GNU_MS_STRUCT,
+  C2X_GNU_MS_STRUCT,
+  SPELLING_NOT_CALCULATED,
+};
+
+MSStructAttrSpelling FromPasta(pasta::MSStructAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MSStructAttrSpelling) {
+  return "MSStructAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MSStructAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MSStructAttrSpelling);
+
+enum class MayAliasAttrSpelling : unsigned char {
+  GNU_MAY_ALIAS,
+  CXX11_GNU_MAY_ALIAS,
+  C2X_GNU_MAY_ALIAS,
+  SPELLING_NOT_CALCULATED,
+};
+
+MayAliasAttrSpelling FromPasta(pasta::MayAliasAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MayAliasAttrSpelling) {
+  return "MayAliasAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MayAliasAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MayAliasAttrSpelling);
+
+enum class MicroMipsAttrSpelling : unsigned char {
+  GNU_MICROMIPS,
+  CXX11_GNU_MICROMIPS,
+  C2X_GNU_MICROMIPS,
+  SPELLING_NOT_CALCULATED,
+};
+
+MicroMipsAttrSpelling FromPasta(pasta::MicroMipsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MicroMipsAttrSpelling) {
+  return "MicroMipsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MicroMipsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MicroMipsAttrSpelling);
+
+enum class MinSizeAttrSpelling : unsigned char {
+  GNU_MINSIZE,
+  CXX11_CLANG_MINSIZE,
+  C2X_CLANG_MINSIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+MinSizeAttrSpelling FromPasta(pasta::MinSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MinSizeAttrSpelling) {
+  return "MinSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MinSizeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MinSizeAttrSpelling);
+
+enum class MinVectorWidthAttrSpelling : unsigned char {
+  GNU_MIN_VECTOR_WIDTH,
+  CXX11_CLANG_MIN_VECTOR_WIDTH,
+  C2X_CLANG_MIN_VECTOR_WIDTH,
+  SPELLING_NOT_CALCULATED,
+};
+
+MinVectorWidthAttrSpelling FromPasta(pasta::MinVectorWidthAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MinVectorWidthAttrSpelling) {
+  return "MinVectorWidthAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MinVectorWidthAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MinVectorWidthAttrSpelling);
+
+enum class Mips16AttrSpelling : unsigned char {
+  GNU_MIPS16,
+  CXX11_GNU_MIPS16,
+  C2X_GNU_MIPS16,
+  SPELLING_NOT_CALCULATED,
+};
+
+Mips16AttrSpelling FromPasta(pasta::Mips16AttrSpelling pasta_val);
+
+inline static const char *EnumerationName(Mips16AttrSpelling) {
+  return "Mips16AttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(Mips16AttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(Mips16AttrSpelling);
+
+enum class MipsInterruptAttrInterruptType : unsigned char {
+  SW0,
+  SW1,
+  HW0,
+  HW1,
+  HW2,
+  HW3,
+  HW4,
+  HW5,
+  EIC,
+};
+
+MipsInterruptAttrInterruptType FromPasta(pasta::MipsInterruptAttrInterruptType pasta_val);
+
+inline static const char *EnumerationName(MipsInterruptAttrInterruptType) {
+  return "MipsInterruptAttrInterruptType";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsInterruptAttrInterruptType) {
+  return 9;
+}
+
+const char *EnumeratorName(MipsInterruptAttrInterruptType);
+
+enum class MipsInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2X_GNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+MipsInterruptAttrSpelling FromPasta(pasta::MipsInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MipsInterruptAttrSpelling) {
+  return "MipsInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MipsInterruptAttrSpelling);
+
+enum class MipsLongCallAttrSpelling : unsigned char {
+  GNU_LONG_CALL,
+  CXX11_GNU_LONG_CALL,
+  C2X_GNU_LONG_CALL,
+  GNU_FAR,
+  CXX11_GNU_FAR,
+  C2X_GNU_FAR,
+  SPELLING_NOT_CALCULATED,
+};
+
+MipsLongCallAttrSpelling FromPasta(pasta::MipsLongCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MipsLongCallAttrSpelling) {
+  return "MipsLongCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsLongCallAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(MipsLongCallAttrSpelling);
+
+enum class MipsShortCallAttrSpelling : unsigned char {
+  GNU_SHORT_CALL,
+  CXX11_GNU_SHORT_CALL,
+  C2X_GNU_SHORT_CALL,
+  GNU_NEAR,
+  CXX11_GNU_NEAR,
+  C2X_GNU_NEAR,
+  SPELLING_NOT_CALCULATED,
+};
+
+MipsShortCallAttrSpelling FromPasta(pasta::MipsShortCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MipsShortCallAttrSpelling) {
+  return "MipsShortCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MipsShortCallAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(MipsShortCallAttrSpelling);
+
+enum class ModeAttrSpelling : unsigned char {
+  GNU_MODE,
+  CXX11_GNU_MODE,
+  C2X_GNU_MODE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ModeAttrSpelling FromPasta(pasta::ModeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ModeAttrSpelling) {
+  return "ModeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ModeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ModeAttrSpelling);
+
+enum class MustTailAttrSpelling : unsigned char {
+  GNU_MUSTTAIL,
+  CXX11_CLANG_MUSTTAIL,
+  C2X_CLANG_MUSTTAIL,
+  SPELLING_NOT_CALCULATED,
+};
+
+MustTailAttrSpelling FromPasta(pasta::MustTailAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(MustTailAttrSpelling) {
+  return "MustTailAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(MustTailAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(MustTailAttrSpelling);
+
+enum class NSConsumedAttrSpelling : unsigned char {
+  GNU_NS_CONSUMED,
+  CXX11_CLANG_NS_CONSUMED,
+  C2X_CLANG_NS_CONSUMED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSConsumedAttrSpelling FromPasta(pasta::NSConsumedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSConsumedAttrSpelling) {
+  return "NSConsumedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSConsumedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSConsumedAttrSpelling);
+
+enum class NSConsumesSelfAttrSpelling : unsigned char {
+  GNU_NS_CONSUMES_SELF,
+  CXX11_CLANG_NS_CONSUMES_SELF,
+  C2X_CLANG_NS_CONSUMES_SELF,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSConsumesSelfAttrSpelling FromPasta(pasta::NSConsumesSelfAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSConsumesSelfAttrSpelling) {
+  return "NSConsumesSelfAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSConsumesSelfAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSConsumesSelfAttrSpelling);
+
+enum class NSReturnsAutoreleasedAttrSpelling : unsigned char {
+  GNU_NS_RETURNS_AUTORELEASED,
+  CXX11_CLANG_NS_RETURNS_AUTORELEASED,
+  C2X_CLANG_NS_RETURNS_AUTORELEASED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSReturnsAutoreleasedAttrSpelling FromPasta(pasta::NSReturnsAutoreleasedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSReturnsAutoreleasedAttrSpelling) {
+  return "NSReturnsAutoreleasedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSReturnsAutoreleasedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSReturnsAutoreleasedAttrSpelling);
+
+enum class NSReturnsNotRetainedAttrSpelling : unsigned char {
+  GNU_NS_RETURNS_NOT_RETAINED,
+  CXX11_CLANG_NS_RETURNS_NOT_RETAINED,
+  C2X_CLANG_NS_RETURNS_NOT_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSReturnsNotRetainedAttrSpelling FromPasta(pasta::NSReturnsNotRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSReturnsNotRetainedAttrSpelling) {
+  return "NSReturnsNotRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSReturnsNotRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSReturnsNotRetainedAttrSpelling);
+
+enum class NSReturnsRetainedAttrSpelling : unsigned char {
+  GNU_NS_RETURNS_RETAINED,
+  CXX11_CLANG_NS_RETURNS_RETAINED,
+  C2X_CLANG_NS_RETURNS_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NSReturnsRetainedAttrSpelling FromPasta(pasta::NSReturnsRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NSReturnsRetainedAttrSpelling) {
+  return "NSReturnsRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NSReturnsRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NSReturnsRetainedAttrSpelling);
+
+enum class NakedAttrSpelling : unsigned char {
+  GNU_NAKED,
+  CXX11_GNU_NAKED,
+  C2X_GNU_NAKED,
+  DECLSPEC_NAKED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NakedAttrSpelling FromPasta(pasta::NakedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NakedAttrSpelling) {
+  return "NakedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NakedAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NakedAttrSpelling);
 
 enum class NamedDeclExplicitVisibilityKind : unsigned char {
   VISIBILITY_FOR_TYPE,
@@ -1164,6 +4425,451 @@ inline static constexpr unsigned NumEnumerators(NamedDeclExplicitVisibilityKind)
 
 const char *EnumeratorName(NamedDeclExplicitVisibilityKind);
 
+enum class NoBuiltinAttrSpelling : unsigned char {
+  GNU_NO_BUILTIN,
+  CXX11_CLANG_NO_BUILTIN,
+  C2X_CLANG_NO_BUILTIN,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoBuiltinAttrSpelling FromPasta(pasta::NoBuiltinAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoBuiltinAttrSpelling) {
+  return "NoBuiltinAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoBuiltinAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoBuiltinAttrSpelling);
+
+enum class NoCommonAttrSpelling : unsigned char {
+  GNU_NOCOMMON,
+  CXX11_GNU_NOCOMMON,
+  C2X_GNU_NOCOMMON,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoCommonAttrSpelling FromPasta(pasta::NoCommonAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoCommonAttrSpelling) {
+  return "NoCommonAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoCommonAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoCommonAttrSpelling);
+
+enum class NoDebugAttrSpelling : unsigned char {
+  GNU_NODEBUG,
+  CXX11_GNU_NODEBUG,
+  C2X_GNU_NODEBUG,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDebugAttrSpelling FromPasta(pasta::NoDebugAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDebugAttrSpelling) {
+  return "NoDebugAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDebugAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoDebugAttrSpelling);
+
+enum class NoDerefAttrSpelling : unsigned char {
+  GNU_NODEREF,
+  CXX11_CLANG_NODEREF,
+  C2X_CLANG_NODEREF,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDerefAttrSpelling FromPasta(pasta::NoDerefAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDerefAttrSpelling) {
+  return "NoDerefAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDerefAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoDerefAttrSpelling);
+
+enum class NoDestroyAttrSpelling : unsigned char {
+  GNU_NO_DESTROY,
+  CXX11_CLANG_NO_DESTROY,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDestroyAttrSpelling FromPasta(pasta::NoDestroyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDestroyAttrSpelling) {
+  return "NoDestroyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDestroyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(NoDestroyAttrSpelling);
+
+enum class NoDuplicateAttrSpelling : unsigned char {
+  GNU_NODUPLICATE,
+  CXX11_CLANG_NODUPLICATE,
+  C2X_CLANG_NODUPLICATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoDuplicateAttrSpelling FromPasta(pasta::NoDuplicateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoDuplicateAttrSpelling) {
+  return "NoDuplicateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoDuplicateAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoDuplicateAttrSpelling);
+
+enum class NoEscapeAttrSpelling : unsigned char {
+  GNU_NOESCAPE,
+  CXX11_CLANG_NOESCAPE,
+  C2X_CLANG_NOESCAPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoEscapeAttrSpelling FromPasta(pasta::NoEscapeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoEscapeAttrSpelling) {
+  return "NoEscapeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoEscapeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoEscapeAttrSpelling);
+
+enum class NoInlineAttrSpelling : unsigned char {
+  GNU_NOINLINE,
+  CXX11_GNU_NOINLINE,
+  C2X_GNU_NOINLINE,
+  DECLSPEC_NOINLINE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoInlineAttrSpelling FromPasta(pasta::NoInlineAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoInlineAttrSpelling) {
+  return "NoInlineAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoInlineAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NoInlineAttrSpelling);
+
+enum class NoInstrumentFunctionAttrSpelling : unsigned char {
+  GNU_NO_INSTRUMENT_FUNCTION,
+  CXX11_GNU_NO_INSTRUMENT_FUNCTION,
+  C2X_GNU_NO_INSTRUMENT_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoInstrumentFunctionAttrSpelling FromPasta(pasta::NoInstrumentFunctionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoInstrumentFunctionAttrSpelling) {
+  return "NoInstrumentFunctionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoInstrumentFunctionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoInstrumentFunctionAttrSpelling);
+
+enum class NoMergeAttrSpelling : unsigned char {
+  GNU_NOMERGE,
+  CXX11_CLANG_NOMERGE,
+  C2X_CLANG_NOMERGE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoMergeAttrSpelling FromPasta(pasta::NoMergeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoMergeAttrSpelling) {
+  return "NoMergeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoMergeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoMergeAttrSpelling);
+
+enum class NoMicroMipsAttrSpelling : unsigned char {
+  GNU_NOMICROMIPS,
+  CXX11_GNU_NOMICROMIPS,
+  C2X_GNU_NOMICROMIPS,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoMicroMipsAttrSpelling FromPasta(pasta::NoMicroMipsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoMicroMipsAttrSpelling) {
+  return "NoMicroMipsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoMicroMipsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoMicroMipsAttrSpelling);
+
+enum class NoMips16AttrSpelling : unsigned char {
+  GNU_NOMIPS16,
+  CXX11_GNU_NOMIPS16,
+  C2X_GNU_NOMIPS16,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoMips16AttrSpelling FromPasta(pasta::NoMips16AttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoMips16AttrSpelling) {
+  return "NoMips16AttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoMips16AttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoMips16AttrSpelling);
+
+enum class NoProfileFunctionAttrSpelling : unsigned char {
+  GNU_NO_PROFILE_INSTRUMENT_FUNCTION,
+  CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION,
+  C2X_GNU_NO_PROFILE_INSTRUMENT_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoProfileFunctionAttrSpelling FromPasta(pasta::NoProfileFunctionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoProfileFunctionAttrSpelling) {
+  return "NoProfileFunctionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoProfileFunctionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoProfileFunctionAttrSpelling);
+
+enum class NoReturnAttrSpelling : unsigned char {
+  GNU_NORETURN,
+  CXX11_GNU_NORETURN,
+  C2X_GNU_NORETURN,
+  DECLSPEC_NORETURN,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoReturnAttrSpelling FromPasta(pasta::NoReturnAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoReturnAttrSpelling) {
+  return "NoReturnAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoReturnAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NoReturnAttrSpelling);
+
+enum class NoSanitizeAttrSpelling : unsigned char {
+  GNU_NO_SANITIZE,
+  CXX11_CLANG_NO_SANITIZE,
+  C2X_CLANG_NO_SANITIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoSanitizeAttrSpelling FromPasta(pasta::NoSanitizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoSanitizeAttrSpelling) {
+  return "NoSanitizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoSanitizeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoSanitizeAttrSpelling);
+
+enum class NoSpeculativeLoadHardeningAttrSpelling : unsigned char {
+  GNU_NO_SPECULATIVE_LOAD_HARDENING,
+  CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING,
+  C2X_CLANG_NO_SPECULATIVE_LOAD_HARDENING,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoSpeculativeLoadHardeningAttrSpelling FromPasta(pasta::NoSpeculativeLoadHardeningAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoSpeculativeLoadHardeningAttrSpelling) {
+  return "NoSpeculativeLoadHardeningAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoSpeculativeLoadHardeningAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoSpeculativeLoadHardeningAttrSpelling);
+
+enum class NoSplitStackAttrSpelling : unsigned char {
+  GNU_NO_SPLIT_STACK,
+  CXX11_GNU_NO_SPLIT_STACK,
+  C2X_GNU_NO_SPLIT_STACK,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoSplitStackAttrSpelling FromPasta(pasta::NoSplitStackAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoSplitStackAttrSpelling) {
+  return "NoSplitStackAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoSplitStackAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoSplitStackAttrSpelling);
+
+enum class NoStackProtectorAttrSpelling : unsigned char {
+  GNU_NO_STACK_PROTECTOR,
+  CXX11_CLANG_NO_STACK_PROTECTOR,
+  C2X_CLANG_NO_STACK_PROTECTOR,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoStackProtectorAttrSpelling FromPasta(pasta::NoStackProtectorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoStackProtectorAttrSpelling) {
+  return "NoStackProtectorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoStackProtectorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoStackProtectorAttrSpelling);
+
+enum class NoThreadSafetyAnalysisAttrSpelling : unsigned char {
+  GNU_NO_THREAD_SAFETY_ANALYSIS,
+  CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS,
+  C2X_CLANG_NO_THREAD_SAFETY_ANALYSIS,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoThreadSafetyAnalysisAttrSpelling FromPasta(pasta::NoThreadSafetyAnalysisAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoThreadSafetyAnalysisAttrSpelling) {
+  return "NoThreadSafetyAnalysisAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoThreadSafetyAnalysisAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NoThreadSafetyAnalysisAttrSpelling);
+
+enum class NoThrowAttrSpelling : unsigned char {
+  GNU_NOTHROW,
+  CXX11_GNU_NOTHROW,
+  C2X_GNU_NOTHROW,
+  DECLSPEC_NOTHROW,
+  SPELLING_NOT_CALCULATED,
+};
+
+NoThrowAttrSpelling FromPasta(pasta::NoThrowAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NoThrowAttrSpelling) {
+  return "NoThrowAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NoThrowAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(NoThrowAttrSpelling);
+
+enum class NonNullAttrSpelling : unsigned char {
+  GNU_NONNULL,
+  CXX11_GNU_NONNULL,
+  C2X_GNU_NONNULL,
+  SPELLING_NOT_CALCULATED,
+};
+
+NonNullAttrSpelling FromPasta(pasta::NonNullAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NonNullAttrSpelling) {
+  return "NonNullAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NonNullAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NonNullAttrSpelling);
+
+enum class NotTailCalledAttrSpelling : unsigned char {
+  GNU_NOT_TAIL_CALLED,
+  CXX11_CLANG_NOT_TAIL_CALLED,
+  C2X_CLANG_NOT_TAIL_CALLED,
+  SPELLING_NOT_CALCULATED,
+};
+
+NotTailCalledAttrSpelling FromPasta(pasta::NotTailCalledAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(NotTailCalledAttrSpelling) {
+  return "NotTailCalledAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(NotTailCalledAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(NotTailCalledAttrSpelling);
+
+enum class OMPAllocateDeclAttrAllocatorTypeTy : unsigned char {
+  OMP_NULL_MEMORY_ALLOC,
+  OMP_DEFAULT_MEMORY_ALLOC,
+  OMP_LARGE_CAP_MEMORY_ALLOC,
+  OMP_CONST_MEMORY_ALLOC,
+  OMP_HIGH_BW_MEMORY_ALLOC,
+  OMP_LOW_LAT_MEMORY_ALLOC,
+  OMPC_GROUP_MEMORY_ALLOC,
+  OMPP_TEAM_MEMORY_ALLOC,
+  OMP_THREAD_MEMORY_ALLOC,
+  OMP_USER_DEFINED_MEMORY_ALLOC,
+};
+
+OMPAllocateDeclAttrAllocatorTypeTy FromPasta(pasta::OMPAllocateDeclAttrAllocatorTypeTy pasta_val);
+
+inline static const char *EnumerationName(OMPAllocateDeclAttrAllocatorTypeTy) {
+  return "OMPAllocateDeclAttrAllocatorTypeTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPAllocateDeclAttrAllocatorTypeTy) {
+  return 10;
+}
+
+const char *EnumeratorName(OMPAllocateDeclAttrAllocatorTypeTy);
+
 enum class OMPDeclareReductionDeclInitKind : unsigned char {
   CALL_INITIALIZER,
   DIRECT_INITIALIZER,
@@ -1181,6 +4887,438 @@ inline static constexpr unsigned NumEnumerators(OMPDeclareReductionDeclInitKind)
 }
 
 const char *EnumeratorName(OMPDeclareReductionDeclInitKind);
+
+enum class OMPDeclareSimdDeclAttrBranchStateTy : unsigned char {
+  UNDEFINED,
+  INBRANCH,
+  NOTINBRANCH,
+};
+
+OMPDeclareSimdDeclAttrBranchStateTy FromPasta(pasta::OMPDeclareSimdDeclAttrBranchStateTy pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareSimdDeclAttrBranchStateTy) {
+  return "OMPDeclareSimdDeclAttrBranchStateTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareSimdDeclAttrBranchStateTy) {
+  return 3;
+}
+
+const char *EnumeratorName(OMPDeclareSimdDeclAttrBranchStateTy);
+
+enum class OMPDeclareTargetDeclAttrDevTypeTy : unsigned char {
+  HOST,
+  NO_HOST,
+  ANY,
+};
+
+OMPDeclareTargetDeclAttrDevTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrDevTypeTy pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareTargetDeclAttrDevTypeTy) {
+  return "OMPDeclareTargetDeclAttrDevTypeTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareTargetDeclAttrDevTypeTy) {
+  return 3;
+}
+
+const char *EnumeratorName(OMPDeclareTargetDeclAttrDevTypeTy);
+
+enum class OMPDeclareTargetDeclAttrMapTypeTy : unsigned char {
+  TO,
+  LINK,
+};
+
+OMPDeclareTargetDeclAttrMapTypeTy FromPasta(pasta::OMPDeclareTargetDeclAttrMapTypeTy pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareTargetDeclAttrMapTypeTy) {
+  return "OMPDeclareTargetDeclAttrMapTypeTy";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareTargetDeclAttrMapTypeTy) {
+  return 2;
+}
+
+const char *EnumeratorName(OMPDeclareTargetDeclAttrMapTypeTy);
+
+enum class OMPDeclareVariantAttrInteropType : unsigned char {
+  TARGET,
+  TARGET_SYNC,
+  TARGET_TARGET_SYNC,
+};
+
+OMPDeclareVariantAttrInteropType FromPasta(pasta::OMPDeclareVariantAttrInteropType pasta_val);
+
+inline static const char *EnumerationName(OMPDeclareVariantAttrInteropType) {
+  return "OMPDeclareVariantAttrInteropType";
+}
+
+inline static constexpr unsigned NumEnumerators(OMPDeclareVariantAttrInteropType) {
+  return 3;
+}
+
+const char *EnumeratorName(OMPDeclareVariantAttrInteropType);
+
+enum class OSConsumedAttrSpelling : unsigned char {
+  GNU_OS_CONSUMED,
+  CXX11_CLANG_OS_CONSUMED,
+  C2X_CLANG_OS_CONSUMED,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSConsumedAttrSpelling FromPasta(pasta::OSConsumedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSConsumedAttrSpelling) {
+  return "OSConsumedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSConsumedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSConsumedAttrSpelling);
+
+enum class OSConsumesThisAttrSpelling : unsigned char {
+  GNU_OS_CONSUMES_THIS,
+  CXX11_CLANG_OS_CONSUMES_THIS,
+  C2X_CLANG_OS_CONSUMES_THIS,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSConsumesThisAttrSpelling FromPasta(pasta::OSConsumesThisAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSConsumesThisAttrSpelling) {
+  return "OSConsumesThisAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSConsumesThisAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSConsumesThisAttrSpelling);
+
+enum class OSReturnsNotRetainedAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_NOT_RETAINED,
+  CXX11_CLANG_OS_RETURNS_NOT_RETAINED,
+  C2X_CLANG_OS_RETURNS_NOT_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsNotRetainedAttrSpelling FromPasta(pasta::OSReturnsNotRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsNotRetainedAttrSpelling) {
+  return "OSReturnsNotRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsNotRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsNotRetainedAttrSpelling);
+
+enum class OSReturnsRetainedAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_RETAINED,
+  CXX11_CLANG_OS_RETURNS_RETAINED,
+  C2X_CLANG_OS_RETURNS_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsRetainedAttrSpelling FromPasta(pasta::OSReturnsRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsRetainedAttrSpelling) {
+  return "OSReturnsRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsRetainedAttrSpelling);
+
+enum class OSReturnsRetainedOnNonZeroAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_RETAINED_ON_NON_ZERO,
+  CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO,
+  C2X_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsRetainedOnNonZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnNonZeroAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsRetainedOnNonZeroAttrSpelling) {
+  return "OSReturnsRetainedOnNonZeroAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsRetainedOnNonZeroAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsRetainedOnNonZeroAttrSpelling);
+
+enum class OSReturnsRetainedOnZeroAttrSpelling : unsigned char {
+  GNU_OS_RETURNS_RETAINED_ON_ZERO,
+  CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO,
+  C2X_CLANG_OS_RETURNS_RETAINED_ON_ZERO,
+  SPELLING_NOT_CALCULATED,
+};
+
+OSReturnsRetainedOnZeroAttrSpelling FromPasta(pasta::OSReturnsRetainedOnZeroAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OSReturnsRetainedOnZeroAttrSpelling) {
+  return "OSReturnsRetainedOnZeroAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OSReturnsRetainedOnZeroAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OSReturnsRetainedOnZeroAttrSpelling);
+
+enum class ObjCBoxableAttrSpelling : unsigned char {
+  GNU_OBJC_BOXABLE,
+  CXX11_CLANG_OBJC_BOXABLE,
+  C2X_CLANG_OBJC_BOXABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBoxableAttrSpelling FromPasta(pasta::ObjCBoxableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBoxableAttrSpelling) {
+  return "ObjCBoxableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBoxableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBoxableAttrSpelling);
+
+enum class ObjCBridgeAttrSpelling : unsigned char {
+  GNU_OBJC_BRIDGE,
+  CXX11_CLANG_OBJC_BRIDGE,
+  C2X_CLANG_OBJC_BRIDGE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBridgeAttrSpelling FromPasta(pasta::ObjCBridgeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBridgeAttrSpelling) {
+  return "ObjCBridgeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBridgeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBridgeAttrSpelling);
+
+enum class ObjCBridgeMutableAttrSpelling : unsigned char {
+  GNU_OBJC_BRIDGE_MUTABLE,
+  CXX11_CLANG_OBJC_BRIDGE_MUTABLE,
+  C2X_CLANG_OBJC_BRIDGE_MUTABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBridgeMutableAttrSpelling FromPasta(pasta::ObjCBridgeMutableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBridgeMutableAttrSpelling) {
+  return "ObjCBridgeMutableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBridgeMutableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBridgeMutableAttrSpelling);
+
+enum class ObjCBridgeRelatedAttrSpelling : unsigned char {
+  GNU_OBJC_BRIDGE_RELATED,
+  CXX11_CLANG_OBJC_BRIDGE_RELATED,
+  C2X_CLANG_OBJC_BRIDGE_RELATED,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCBridgeRelatedAttrSpelling FromPasta(pasta::ObjCBridgeRelatedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCBridgeRelatedAttrSpelling) {
+  return "ObjCBridgeRelatedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCBridgeRelatedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCBridgeRelatedAttrSpelling);
+
+enum class ObjCClassStubAttrSpelling : unsigned char {
+  GNU_OBJC_CLASS_STUB,
+  CXX11_CLANG_OBJC_CLASS_STUB,
+  C2X_CLANG_OBJC_CLASS_STUB,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCClassStubAttrSpelling FromPasta(pasta::ObjCClassStubAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCClassStubAttrSpelling) {
+  return "ObjCClassStubAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCClassStubAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCClassStubAttrSpelling);
+
+enum class ObjCDesignatedInitializerAttrSpelling : unsigned char {
+  GNU_OBJC_DESIGNATED_INITIALIZER,
+  CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER,
+  C2X_CLANG_OBJC_DESIGNATED_INITIALIZER,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCDesignatedInitializerAttrSpelling FromPasta(pasta::ObjCDesignatedInitializerAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCDesignatedInitializerAttrSpelling) {
+  return "ObjCDesignatedInitializerAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCDesignatedInitializerAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCDesignatedInitializerAttrSpelling);
+
+enum class ObjCDirectAttrSpelling : unsigned char {
+  GNU_OBJC_DIRECT,
+  CXX11_CLANG_OBJC_DIRECT,
+  C2X_CLANG_OBJC_DIRECT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCDirectAttrSpelling FromPasta(pasta::ObjCDirectAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCDirectAttrSpelling) {
+  return "ObjCDirectAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCDirectAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCDirectAttrSpelling);
+
+enum class ObjCDirectMembersAttrSpelling : unsigned char {
+  GNU_OBJC_DIRECT_MEMBERS,
+  CXX11_CLANG_OBJC_DIRECT_MEMBERS,
+  C2X_CLANG_OBJC_DIRECT_MEMBERS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCDirectMembersAttrSpelling FromPasta(pasta::ObjCDirectMembersAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCDirectMembersAttrSpelling) {
+  return "ObjCDirectMembersAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCDirectMembersAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCDirectMembersAttrSpelling);
+
+enum class ObjCExceptionAttrSpelling : unsigned char {
+  GNU_OBJC_EXCEPTION,
+  CXX11_CLANG_OBJC_EXCEPTION,
+  C2X_CLANG_OBJC_EXCEPTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCExceptionAttrSpelling FromPasta(pasta::ObjCExceptionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCExceptionAttrSpelling) {
+  return "ObjCExceptionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCExceptionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCExceptionAttrSpelling);
+
+enum class ObjCExplicitProtocolImplAttrSpelling : unsigned char {
+  GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION,
+  CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION,
+  C2X_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCExplicitProtocolImplAttrSpelling FromPasta(pasta::ObjCExplicitProtocolImplAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCExplicitProtocolImplAttrSpelling) {
+  return "ObjCExplicitProtocolImplAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCExplicitProtocolImplAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCExplicitProtocolImplAttrSpelling);
+
+enum class ObjCExternallyRetainedAttrSpelling : unsigned char {
+  GNU_OBJC_EXTERNALLY_RETAINED,
+  CXX11_CLANG_OBJC_EXTERNALLY_RETAINED,
+  C2X_CLANG_OBJC_EXTERNALLY_RETAINED,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCExternallyRetainedAttrSpelling FromPasta(pasta::ObjCExternallyRetainedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCExternallyRetainedAttrSpelling) {
+  return "ObjCExternallyRetainedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCExternallyRetainedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCExternallyRetainedAttrSpelling);
+
+enum class ObjCGCAttrSpelling : unsigned char {
+  GNU_OBJC_GC,
+  CXX11_CLANG_OBJC_GC,
+  C2X_CLANG_OBJC_GC,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCGCAttrSpelling FromPasta(pasta::ObjCGCAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCGCAttrSpelling) {
+  return "ObjCGCAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCGCAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCGCAttrSpelling);
+
+enum class ObjCIndependentClassAttrSpelling : unsigned char {
+  GNU_OBJC_INDEPENDENT_CLASS,
+  CXX11_CLANG_OBJC_INDEPENDENT_CLASS,
+  C2X_CLANG_OBJC_INDEPENDENT_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCIndependentClassAttrSpelling FromPasta(pasta::ObjCIndependentClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCIndependentClassAttrSpelling) {
+  return "ObjCIndependentClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCIndependentClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCIndependentClassAttrSpelling);
 
 enum class ObjCIvarDeclAccessControl : unsigned char {
   NONE,
@@ -1239,6 +5377,141 @@ inline static constexpr unsigned NumEnumerators(ObjCMethodDeclImplementationCont
 
 const char *EnumeratorName(ObjCMethodDeclImplementationControl);
 
+enum class ObjCMethodFamilyAttrFamilyKind : unsigned char {
+  NONE,
+  ALLOC,
+  COPY,
+  INITIALIZER,
+  MUTABLE_COPY,
+  NEW,
+};
+
+ObjCMethodFamilyAttrFamilyKind FromPasta(pasta::ObjCMethodFamilyAttrFamilyKind pasta_val);
+
+inline static const char *EnumerationName(ObjCMethodFamilyAttrFamilyKind) {
+  return "ObjCMethodFamilyAttrFamilyKind";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCMethodFamilyAttrFamilyKind) {
+  return 6;
+}
+
+const char *EnumeratorName(ObjCMethodFamilyAttrFamilyKind);
+
+enum class ObjCMethodFamilyAttrSpelling : unsigned char {
+  GNU_OBJC_METHOD_FAMILY,
+  CXX11_CLANG_OBJC_METHOD_FAMILY,
+  C2X_CLANG_OBJC_METHOD_FAMILY,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCMethodFamilyAttrSpelling FromPasta(pasta::ObjCMethodFamilyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCMethodFamilyAttrSpelling) {
+  return "ObjCMethodFamilyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCMethodFamilyAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCMethodFamilyAttrSpelling);
+
+enum class ObjCNSObjectAttrSpelling : unsigned char {
+  GNUNS_OBJECT,
+  CXX11_CLANG_NS_OBJECT,
+  C2X_CLANG_NS_OBJECT,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCNSObjectAttrSpelling FromPasta(pasta::ObjCNSObjectAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCNSObjectAttrSpelling) {
+  return "ObjCNSObjectAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCNSObjectAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCNSObjectAttrSpelling);
+
+enum class ObjCNonLazyClassAttrSpelling : unsigned char {
+  GNU_OBJC_NONLAZY_CLASS,
+  CXX11_CLANG_OBJC_NONLAZY_CLASS,
+  C2X_CLANG_OBJC_NONLAZY_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCNonLazyClassAttrSpelling FromPasta(pasta::ObjCNonLazyClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCNonLazyClassAttrSpelling) {
+  return "ObjCNonLazyClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCNonLazyClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCNonLazyClassAttrSpelling);
+
+enum class ObjCNonRuntimeProtocolAttrSpelling : unsigned char {
+  GNU_OBJC_NON_RUNTIME_PROTOCOL,
+  CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL,
+  C2X_CLANG_OBJC_NON_RUNTIME_PROTOCOL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCNonRuntimeProtocolAttrSpelling FromPasta(pasta::ObjCNonRuntimeProtocolAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCNonRuntimeProtocolAttrSpelling) {
+  return "ObjCNonRuntimeProtocolAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCNonRuntimeProtocolAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCNonRuntimeProtocolAttrSpelling);
+
+enum class ObjCOwnershipAttrSpelling : unsigned char {
+  GNU_OBJC_OWNERSHIP,
+  CXX11_CLANG_OBJC_OWNERSHIP,
+  C2X_CLANG_OBJC_OWNERSHIP,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCOwnershipAttrSpelling FromPasta(pasta::ObjCOwnershipAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCOwnershipAttrSpelling) {
+  return "ObjCOwnershipAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCOwnershipAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCOwnershipAttrSpelling);
+
+enum class ObjCPreciseLifetimeAttrSpelling : unsigned char {
+  GNU_OBJC_PRECISE_LIFETIME,
+  CXX11_CLANG_OBJC_PRECISE_LIFETIME,
+  C2X_CLANG_OBJC_PRECISE_LIFETIME,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCPreciseLifetimeAttrSpelling FromPasta(pasta::ObjCPreciseLifetimeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCPreciseLifetimeAttrSpelling) {
+  return "ObjCPreciseLifetimeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCPreciseLifetimeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCPreciseLifetimeAttrSpelling);
+
 enum class ObjCPropertyDeclPropertyControl : unsigned char {
   NONE,
   REQUIRED,
@@ -1293,6 +5566,546 @@ inline static constexpr unsigned NumEnumerators(ObjCPropertyImplDeclKind) {
 
 const char *EnumeratorName(ObjCPropertyImplDeclKind);
 
+enum class ObjCRequiresPropertyDefsAttrSpelling : unsigned char {
+  GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS,
+  CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS,
+  C2X_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRequiresPropertyDefsAttrSpelling FromPasta(pasta::ObjCRequiresPropertyDefsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRequiresPropertyDefsAttrSpelling) {
+  return "ObjCRequiresPropertyDefsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRequiresPropertyDefsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRequiresPropertyDefsAttrSpelling);
+
+enum class ObjCRequiresSuperAttrSpelling : unsigned char {
+  GNU_OBJC_REQUIRES_SUPER,
+  CXX11_CLANG_OBJC_REQUIRES_SUPER,
+  C2X_CLANG_OBJC_REQUIRES_SUPER,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRequiresSuperAttrSpelling FromPasta(pasta::ObjCRequiresSuperAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRequiresSuperAttrSpelling) {
+  return "ObjCRequiresSuperAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRequiresSuperAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRequiresSuperAttrSpelling);
+
+enum class ObjCReturnsInnerPointerAttrSpelling : unsigned char {
+  GNU_OBJC_RETURNS_INNER_POINTER,
+  CXX11_CLANG_OBJC_RETURNS_INNER_POINTER,
+  C2X_CLANG_OBJC_RETURNS_INNER_POINTER,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCReturnsInnerPointerAttrSpelling FromPasta(pasta::ObjCReturnsInnerPointerAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCReturnsInnerPointerAttrSpelling) {
+  return "ObjCReturnsInnerPointerAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCReturnsInnerPointerAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCReturnsInnerPointerAttrSpelling);
+
+enum class ObjCRootClassAttrSpelling : unsigned char {
+  GNU_OBJC_ROOT_CLASS,
+  CXX11_CLANG_OBJC_ROOT_CLASS,
+  C2X_CLANG_OBJC_ROOT_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRootClassAttrSpelling FromPasta(pasta::ObjCRootClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRootClassAttrSpelling) {
+  return "ObjCRootClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRootClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRootClassAttrSpelling);
+
+enum class ObjCRuntimeNameAttrSpelling : unsigned char {
+  GNU_OBJC_RUNTIME_NAME,
+  CXX11_CLANG_OBJC_RUNTIME_NAME,
+  C2X_CLANG_OBJC_RUNTIME_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRuntimeNameAttrSpelling FromPasta(pasta::ObjCRuntimeNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRuntimeNameAttrSpelling) {
+  return "ObjCRuntimeNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRuntimeNameAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRuntimeNameAttrSpelling);
+
+enum class ObjCRuntimeVisibleAttrSpelling : unsigned char {
+  GNU_OBJC_RUNTIME_VISIBLE,
+  CXX11_CLANG_OBJC_RUNTIME_VISIBLE,
+  C2X_CLANG_OBJC_RUNTIME_VISIBLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCRuntimeVisibleAttrSpelling FromPasta(pasta::ObjCRuntimeVisibleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCRuntimeVisibleAttrSpelling) {
+  return "ObjCRuntimeVisibleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCRuntimeVisibleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCRuntimeVisibleAttrSpelling);
+
+enum class ObjCSubclassingRestrictedAttrSpelling : unsigned char {
+  GNU_OBJC_SUBCLASSING_RESTRICTED,
+  CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED,
+  C2X_CLANG_OBJC_SUBCLASSING_RESTRICTED,
+  SPELLING_NOT_CALCULATED,
+};
+
+ObjCSubclassingRestrictedAttrSpelling FromPasta(pasta::ObjCSubclassingRestrictedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ObjCSubclassingRestrictedAttrSpelling) {
+  return "ObjCSubclassingRestrictedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ObjCSubclassingRestrictedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ObjCSubclassingRestrictedAttrSpelling);
+
+enum class OpenCLAccessAttrSpelling : unsigned char {
+  KEYWORD_READ_ONLY,
+  KEYWORD_WRITE_ONLY,
+  KEYWORD_READ_WRITE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLAccessAttrSpelling FromPasta(pasta::OpenCLAccessAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLAccessAttrSpelling) {
+  return "OpenCLAccessAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLAccessAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenCLAccessAttrSpelling);
+
+enum class OpenCLConstantAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_CONSTANT,
+  GNU_OPENCL_CONSTANT,
+  CXX11_CLANG_OPENCL_CONSTANT,
+  C2X_CLANG_OPENCL_CONSTANT,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLConstantAddressSpaceAttrSpelling FromPasta(pasta::OpenCLConstantAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLConstantAddressSpaceAttrSpelling) {
+  return "OpenCLConstantAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLConstantAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLConstantAddressSpaceAttrSpelling);
+
+enum class OpenCLGenericAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_GENERIC,
+  GNU_OPENCL_GENERIC,
+  CXX11_CLANG_OPENCL_GENERIC,
+  C2X_CLANG_OPENCL_GENERIC,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGenericAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGenericAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGenericAddressSpaceAttrSpelling) {
+  return "OpenCLGenericAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGenericAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLGenericAddressSpaceAttrSpelling);
+
+enum class OpenCLGlobalAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_GLOBAL,
+  GNU_OPENCL_GLOBAL,
+  CXX11_CLANG_OPENCL_GLOBAL,
+  C2X_CLANG_OPENCL_GLOBAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGlobalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGlobalAddressSpaceAttrSpelling) {
+  return "OpenCLGlobalAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGlobalAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLGlobalAddressSpaceAttrSpelling);
+
+enum class OpenCLGlobalDeviceAddressSpaceAttrSpelling : unsigned char {
+  GNU_OPENCL_GLOBAL_DEVICE,
+  CXX11_CLANG_OPENCL_GLOBAL_DEVICE,
+  C2X_CLANG_OPENCL_GLOBAL_DEVICE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGlobalDeviceAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalDeviceAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGlobalDeviceAddressSpaceAttrSpelling) {
+  return "OpenCLGlobalDeviceAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGlobalDeviceAddressSpaceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenCLGlobalDeviceAddressSpaceAttrSpelling);
+
+enum class OpenCLGlobalHostAddressSpaceAttrSpelling : unsigned char {
+  GNU_OPENCL_GLOBAL_HOST,
+  CXX11_CLANG_OPENCL_GLOBAL_HOST,
+  C2X_CLANG_OPENCL_GLOBAL_HOST,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLGlobalHostAddressSpaceAttrSpelling FromPasta(pasta::OpenCLGlobalHostAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLGlobalHostAddressSpaceAttrSpelling) {
+  return "OpenCLGlobalHostAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLGlobalHostAddressSpaceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OpenCLGlobalHostAddressSpaceAttrSpelling);
+
+enum class OpenCLKernelAttrSpelling : unsigned char {
+  KEYWORD_KERNEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLKernelAttrSpelling FromPasta(pasta::OpenCLKernelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLKernelAttrSpelling) {
+  return "OpenCLKernelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLKernelAttrSpelling) {
+  return 2;
+}
+
+const char *EnumeratorName(OpenCLKernelAttrSpelling);
+
+enum class OpenCLLocalAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_LOCAL,
+  GNU_OPENCL_LOCAL,
+  CXX11_CLANG_OPENCL_LOCAL,
+  C2X_CLANG_OPENCL_LOCAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLLocalAddressSpaceAttrSpelling FromPasta(pasta::OpenCLLocalAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLLocalAddressSpaceAttrSpelling) {
+  return "OpenCLLocalAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLLocalAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLLocalAddressSpaceAttrSpelling);
+
+enum class OpenCLPrivateAddressSpaceAttrSpelling : unsigned char {
+  KEYWORD_PRIVATE,
+  GNU_OPENCL_PRIVATE,
+  CXX11_CLANG_OPENCL_PRIVATE,
+  C2X_CLANG_OPENCL_PRIVATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OpenCLPrivateAddressSpaceAttrSpelling FromPasta(pasta::OpenCLPrivateAddressSpaceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OpenCLPrivateAddressSpaceAttrSpelling) {
+  return "OpenCLPrivateAddressSpaceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OpenCLPrivateAddressSpaceAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(OpenCLPrivateAddressSpaceAttrSpelling);
+
+enum class OptimizeNoneAttrSpelling : unsigned char {
+  GNU_OPTNONE,
+  CXX11_CLANG_OPTNONE,
+  C2X_CLANG_OPTNONE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OptimizeNoneAttrSpelling FromPasta(pasta::OptimizeNoneAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OptimizeNoneAttrSpelling) {
+  return "OptimizeNoneAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OptimizeNoneAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OptimizeNoneAttrSpelling);
+
+enum class OverloadableAttrSpelling : unsigned char {
+  GNU_OVERLOADABLE,
+  CXX11_CLANG_OVERLOADABLE,
+  C2X_CLANG_OVERLOADABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+OverloadableAttrSpelling FromPasta(pasta::OverloadableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OverloadableAttrSpelling) {
+  return "OverloadableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OverloadableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(OverloadableAttrSpelling);
+
+enum class OwnershipAttrOwnershipKind : unsigned char {
+  HOLDS,
+  RETURNS,
+  TAKES,
+};
+
+OwnershipAttrOwnershipKind FromPasta(pasta::OwnershipAttrOwnershipKind pasta_val);
+
+inline static const char *EnumerationName(OwnershipAttrOwnershipKind) {
+  return "OwnershipAttrOwnershipKind";
+}
+
+inline static constexpr unsigned NumEnumerators(OwnershipAttrOwnershipKind) {
+  return 3;
+}
+
+const char *EnumeratorName(OwnershipAttrOwnershipKind);
+
+enum class OwnershipAttrSpelling : unsigned char {
+  GNU_OWNERSHIP_HOLDS,
+  CXX11_CLANG_OWNERSHIP_HOLDS,
+  C2X_CLANG_OWNERSHIP_HOLDS,
+  GNU_OWNERSHIP_RETURNS,
+  CXX11_CLANG_OWNERSHIP_RETURNS,
+  C2X_CLANG_OWNERSHIP_RETURNS,
+  GNU_OWNERSHIP_TAKES,
+  CXX11_CLANG_OWNERSHIP_TAKES,
+  C2X_CLANG_OWNERSHIP_TAKES,
+  SPELLING_NOT_CALCULATED,
+};
+
+OwnershipAttrSpelling FromPasta(pasta::OwnershipAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(OwnershipAttrSpelling) {
+  return "OwnershipAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(OwnershipAttrSpelling) {
+  return 10;
+}
+
+const char *EnumeratorName(OwnershipAttrSpelling);
+
+enum class PackedAttrSpelling : unsigned char {
+  GNU_PACKED,
+  CXX11_GNU_PACKED,
+  C2X_GNU_PACKED,
+  SPELLING_NOT_CALCULATED,
+};
+
+PackedAttrSpelling FromPasta(pasta::PackedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PackedAttrSpelling) {
+  return "PackedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PackedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PackedAttrSpelling);
+
+enum class ParamTypestateAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+ParamTypestateAttrConsumedState FromPasta(pasta::ParamTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(ParamTypestateAttrConsumedState) {
+  return "ParamTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(ParamTypestateAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(ParamTypestateAttrConsumedState);
+
+enum class ParamTypestateAttrSpelling : unsigned char {
+  GNU_PARAMETER_TYPESTATE,
+  CXX11_CLANG_PARAMETER_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ParamTypestateAttrSpelling FromPasta(pasta::ParamTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ParamTypestateAttrSpelling) {
+  return "ParamTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ParamTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ParamTypestateAttrSpelling);
+
+enum class PascalAttrSpelling : unsigned char {
+  GNU_PASCAL,
+  CXX11_CLANG_PASCAL,
+  C2X_CLANG_PASCAL,
+  KEYWORD_PASCAL,
+  SPELLING_NOT_CALCULATED,
+};
+
+PascalAttrSpelling FromPasta(pasta::PascalAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PascalAttrSpelling) {
+  return "PascalAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PascalAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(PascalAttrSpelling);
+
+enum class PassObjectSizeAttrSpelling : unsigned char {
+  GNU_PASS_OBJECT_SIZE,
+  CXX11_CLANG_PASS_OBJECT_SIZE,
+  C2X_CLANG_PASS_OBJECT_SIZE,
+  GNU_PASS_DYNAMIC_OBJECT_SIZE,
+  CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE,
+  C2X_CLANG_PASS_DYNAMIC_OBJECT_SIZE,
+  SPELLING_NOT_CALCULATED,
+};
+
+PassObjectSizeAttrSpelling FromPasta(pasta::PassObjectSizeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PassObjectSizeAttrSpelling) {
+  return "PassObjectSizeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PassObjectSizeAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(PassObjectSizeAttrSpelling);
+
+enum class PatchableFunctionEntryAttrSpelling : unsigned char {
+  GNU_PATCHABLE_FUNCTION_ENTRY,
+  CXX11_GNU_PATCHABLE_FUNCTION_ENTRY,
+  C2X_GNU_PATCHABLE_FUNCTION_ENTRY,
+  SPELLING_NOT_CALCULATED,
+};
+
+PatchableFunctionEntryAttrSpelling FromPasta(pasta::PatchableFunctionEntryAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PatchableFunctionEntryAttrSpelling) {
+  return "PatchableFunctionEntryAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PatchableFunctionEntryAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PatchableFunctionEntryAttrSpelling);
+
+enum class PcsAttrPCSType : unsigned char {
+  AAPCS,
+  VFP,
+};
+
+PcsAttrPCSType FromPasta(pasta::PcsAttrPCSType pasta_val);
+
+inline static const char *EnumerationName(PcsAttrPCSType) {
+  return "PcsAttrPCSType";
+}
+
+inline static constexpr unsigned NumEnumerators(PcsAttrPCSType) {
+  return 2;
+}
+
+const char *EnumeratorName(PcsAttrPCSType);
+
+enum class PcsAttrSpelling : unsigned char {
+  GNU_PCS,
+  CXX11_GNU_PCS,
+  C2X_GNU_PCS,
+  SPELLING_NOT_CALCULATED,
+};
+
+PcsAttrSpelling FromPasta(pasta::PcsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PcsAttrSpelling) {
+  return "PcsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PcsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PcsAttrSpelling);
+
 enum class PredefinedExprIdentKind : unsigned char {
   FUNC,
   FUNCTION,
@@ -1315,6 +6128,99 @@ inline static constexpr unsigned NumEnumerators(PredefinedExprIdentKind) {
 }
 
 const char *EnumeratorName(PredefinedExprIdentKind);
+
+enum class PreferredNameAttrSpelling : unsigned char {
+  GNU_PREFERRED_NAME,
+  CXX11_CLANG_PREFERRED_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+PreferredNameAttrSpelling FromPasta(pasta::PreferredNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PreferredNameAttrSpelling) {
+  return "PreferredNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PreferredNameAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(PreferredNameAttrSpelling);
+
+enum class PreserveAllAttrSpelling : unsigned char {
+  GNU_PRESERVE_ALL,
+  CXX11_CLANG_PRESERVE_ALL,
+  C2X_CLANG_PRESERVE_ALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+PreserveAllAttrSpelling FromPasta(pasta::PreserveAllAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PreserveAllAttrSpelling) {
+  return "PreserveAllAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PreserveAllAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PreserveAllAttrSpelling);
+
+enum class PreserveMostAttrSpelling : unsigned char {
+  GNU_PRESERVE_MOST,
+  CXX11_CLANG_PRESERVE_MOST,
+  C2X_CLANG_PRESERVE_MOST,
+  SPELLING_NOT_CALCULATED,
+};
+
+PreserveMostAttrSpelling FromPasta(pasta::PreserveMostAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PreserveMostAttrSpelling) {
+  return "PreserveMostAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PreserveMostAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PreserveMostAttrSpelling);
+
+enum class PtGuardedVarAttrSpelling : unsigned char {
+  GNU_PT_GUARDED_VARIABLE,
+  CXX11_CLANG_PT_GUARDED_VARIABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+PtGuardedVarAttrSpelling FromPasta(pasta::PtGuardedVarAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PtGuardedVarAttrSpelling) {
+  return "PtGuardedVarAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PtGuardedVarAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(PtGuardedVarAttrSpelling);
+
+enum class PureAttrSpelling : unsigned char {
+  GNU_PURE,
+  CXX11_GNU_PURE,
+  C2X_GNU_PURE,
+  SPELLING_NOT_CALCULATED,
+};
+
+PureAttrSpelling FromPasta(pasta::PureAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(PureAttrSpelling) {
+  return "PureAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(PureAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(PureAttrSpelling);
 
 enum class QualTypeDestructionKind : unsigned char {
   NONE,
@@ -1375,6 +6281,43 @@ inline static constexpr unsigned NumEnumerators(QualTypePrimitiveDefaultInitiali
 
 const char *EnumeratorName(QualTypePrimitiveDefaultInitializeKind);
 
+enum class RISCVInterruptAttrInterruptType : unsigned char {
+  USER,
+  SUPERVISOR,
+  MACHINE,
+};
+
+RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType pasta_val);
+
+inline static const char *EnumerationName(RISCVInterruptAttrInterruptType) {
+  return "RISCVInterruptAttrInterruptType";
+}
+
+inline static constexpr unsigned NumEnumerators(RISCVInterruptAttrInterruptType) {
+  return 3;
+}
+
+const char *EnumeratorName(RISCVInterruptAttrInterruptType);
+
+enum class RISCVInterruptAttrSpelling : unsigned char {
+  GNU_INTERRUPT,
+  CXX11_GNU_INTERRUPT,
+  C2X_GNU_INTERRUPT,
+  SPELLING_NOT_CALCULATED,
+};
+
+RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RISCVInterruptAttrSpelling) {
+  return "RISCVInterruptAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RISCVInterruptAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(RISCVInterruptAttrSpelling);
+
 enum class RecordDeclArgPassingKind : unsigned char {
   CAN_PASS_IN_REGS,
   CANNOT_PASS_IN_REGS,
@@ -1392,6 +6335,375 @@ inline static constexpr unsigned NumEnumerators(RecordDeclArgPassingKind) {
 }
 
 const char *EnumeratorName(RecordDeclArgPassingKind);
+
+enum class RegCallAttrSpelling : unsigned char {
+  GNU_REGCALL,
+  CXX11_GNU_REGCALL,
+  C2X_GNU_REGCALL,
+  KEYWORD_REGCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+RegCallAttrSpelling FromPasta(pasta::RegCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RegCallAttrSpelling) {
+  return "RegCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RegCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(RegCallAttrSpelling);
+
+enum class ReinitializesAttrSpelling : unsigned char {
+  GNU_REINITIALIZES,
+  CXX11_CLANG_REINITIALIZES,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReinitializesAttrSpelling FromPasta(pasta::ReinitializesAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReinitializesAttrSpelling) {
+  return "ReinitializesAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReinitializesAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ReinitializesAttrSpelling);
+
+enum class ReleaseCapabilityAttrSpelling : unsigned char {
+  GNU_RELEASE_CAPABILITY,
+  CXX11_CLANG_RELEASE_CAPABILITY,
+  GNU_RELEASE_SHARED_CAPABILITY,
+  CXX11_CLANG_RELEASE_SHARED_CAPABILITY,
+  GNU_RELEASE_GENERIC_CAPABILITY,
+  CXX11_CLANG_RELEASE_GENERIC_CAPABILITY,
+  GNU_UNLOCK_FUNCTION,
+  CXX11_CLANG_UNLOCK_FUNCTION,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReleaseCapabilityAttrSpelling FromPasta(pasta::ReleaseCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReleaseCapabilityAttrSpelling) {
+  return "ReleaseCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReleaseCapabilityAttrSpelling) {
+  return 9;
+}
+
+const char *EnumeratorName(ReleaseCapabilityAttrSpelling);
+
+enum class ReleaseHandleAttrSpelling : unsigned char {
+  GNU_RELEASE_HANDLE,
+  CXX11_CLANG_RELEASE_HANDLE,
+  C2X_CLANG_RELEASE_HANDLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReleaseHandleAttrSpelling FromPasta(pasta::ReleaseHandleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReleaseHandleAttrSpelling) {
+  return "ReleaseHandleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReleaseHandleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ReleaseHandleAttrSpelling);
+
+enum class RequiresCapabilityAttrSpelling : unsigned char {
+  GNU_REQUIRES_CAPABILITY,
+  CXX11_CLANG_REQUIRES_CAPABILITY,
+  GNU_EXCLUSIVE_LOCKS_REQUIRED,
+  CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED,
+  GNU_REQUIRES_SHARED_CAPABILITY,
+  CXX11_CLANG_REQUIRES_SHARED_CAPABILITY,
+  GNU_SHARED_LOCKS_REQUIRED,
+  CXX11_CLANG_SHARED_LOCKS_REQUIRED,
+  SPELLING_NOT_CALCULATED,
+};
+
+RequiresCapabilityAttrSpelling FromPasta(pasta::RequiresCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RequiresCapabilityAttrSpelling) {
+  return "RequiresCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RequiresCapabilityAttrSpelling) {
+  return 9;
+}
+
+const char *EnumeratorName(RequiresCapabilityAttrSpelling);
+
+enum class RestrictAttrSpelling : unsigned char {
+  DECLSPEC_RESTRICT,
+  GNU_MALLOC,
+  CXX11_GNU_MALLOC,
+  C2X_GNU_MALLOC,
+  SPELLING_NOT_CALCULATED,
+};
+
+RestrictAttrSpelling FromPasta(pasta::RestrictAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RestrictAttrSpelling) {
+  return "RestrictAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RestrictAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(RestrictAttrSpelling);
+
+enum class RetainAttrSpelling : unsigned char {
+  GNU_RETAIN,
+  CXX11_GNU_RETAIN,
+  C2X_GNU_RETAIN,
+  SPELLING_NOT_CALCULATED,
+};
+
+RetainAttrSpelling FromPasta(pasta::RetainAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(RetainAttrSpelling) {
+  return "RetainAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(RetainAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(RetainAttrSpelling);
+
+enum class ReturnTypestateAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+ReturnTypestateAttrConsumedState FromPasta(pasta::ReturnTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(ReturnTypestateAttrConsumedState) {
+  return "ReturnTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnTypestateAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(ReturnTypestateAttrConsumedState);
+
+enum class ReturnTypestateAttrSpelling : unsigned char {
+  GNU_RETURN_TYPESTATE,
+  CXX11_CLANG_RETURN_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReturnTypestateAttrSpelling FromPasta(pasta::ReturnTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReturnTypestateAttrSpelling) {
+  return "ReturnTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ReturnTypestateAttrSpelling);
+
+enum class ReturnsNonNullAttrSpelling : unsigned char {
+  GNU_RETURNS_NONNULL,
+  CXX11_GNU_RETURNS_NONNULL,
+  C2X_GNU_RETURNS_NONNULL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReturnsNonNullAttrSpelling FromPasta(pasta::ReturnsNonNullAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReturnsNonNullAttrSpelling) {
+  return "ReturnsNonNullAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnsNonNullAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ReturnsNonNullAttrSpelling);
+
+enum class ReturnsTwiceAttrSpelling : unsigned char {
+  GNU_RETURNS_TWICE,
+  CXX11_GNU_RETURNS_TWICE,
+  C2X_GNU_RETURNS_TWICE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ReturnsTwiceAttrSpelling FromPasta(pasta::ReturnsTwiceAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ReturnsTwiceAttrSpelling) {
+  return "ReturnsTwiceAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ReturnsTwiceAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(ReturnsTwiceAttrSpelling);
+
+enum class SYCLKernelAttrSpelling : unsigned char {
+  GNU_SYCL_KERNEL,
+  CXX11_CLANG_SYCL_KERNEL,
+  C2X_CLANG_SYCL_KERNEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SYCLKernelAttrSpelling FromPasta(pasta::SYCLKernelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SYCLKernelAttrSpelling) {
+  return "SYCLKernelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SYCLKernelAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SYCLKernelAttrSpelling);
+
+enum class SYCLSpecialClassAttrSpelling : unsigned char {
+  GNU_SYCL_SPECIAL_CLASS,
+  CXX11_CLANG_SYCL_SPECIAL_CLASS,
+  C2X_CLANG_SYCL_SPECIAL_CLASS,
+  SPELLING_NOT_CALCULATED,
+};
+
+SYCLSpecialClassAttrSpelling FromPasta(pasta::SYCLSpecialClassAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SYCLSpecialClassAttrSpelling) {
+  return "SYCLSpecialClassAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SYCLSpecialClassAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SYCLSpecialClassAttrSpelling);
+
+enum class ScopedLockableAttrSpelling : unsigned char {
+  GNU_SCOPED_LOCKABLE,
+  CXX11_CLANG_SCOPED_LOCKABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+ScopedLockableAttrSpelling FromPasta(pasta::ScopedLockableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ScopedLockableAttrSpelling) {
+  return "ScopedLockableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ScopedLockableAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(ScopedLockableAttrSpelling);
+
+enum class SectionAttrSpelling : unsigned char {
+  GNU_SECTION,
+  CXX11_GNU_SECTION,
+  C2X_GNU_SECTION,
+  DECLSPEC_ALLOCATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+SectionAttrSpelling FromPasta(pasta::SectionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SectionAttrSpelling) {
+  return "SectionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SectionAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(SectionAttrSpelling);
+
+enum class SelectAnyAttrSpelling : unsigned char {
+  DECLSPEC_SELECTANY,
+  GNU_SELECTANY,
+  CXX11_GNU_SELECTANY,
+  C2X_GNU_SELECTANY,
+  SPELLING_NOT_CALCULATED,
+};
+
+SelectAnyAttrSpelling FromPasta(pasta::SelectAnyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SelectAnyAttrSpelling) {
+  return "SelectAnyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SelectAnyAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(SelectAnyAttrSpelling);
+
+enum class SentinelAttrSpelling : unsigned char {
+  GNU_SENTINEL,
+  CXX11_GNU_SENTINEL,
+  C2X_GNU_SENTINEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SentinelAttrSpelling FromPasta(pasta::SentinelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SentinelAttrSpelling) {
+  return "SentinelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SentinelAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SentinelAttrSpelling);
+
+enum class SetTypestateAttrConsumedState : unsigned char {
+  UNKNOWN,
+  CONSUMED,
+  UNCONSUMED,
+};
+
+SetTypestateAttrConsumedState FromPasta(pasta::SetTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(SetTypestateAttrConsumedState) {
+  return "SetTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(SetTypestateAttrConsumedState) {
+  return 3;
+}
+
+const char *EnumeratorName(SetTypestateAttrConsumedState);
+
+enum class SetTypestateAttrSpelling : unsigned char {
+  GNU_TYPESTATE,
+  CXX11_CLANG_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+SetTypestateAttrSpelling FromPasta(pasta::SetTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SetTypestateAttrSpelling) {
+  return "SetTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SetTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(SetTypestateAttrSpelling);
 
 enum class SourceLocExprIdentKind : unsigned char {
   FUNCTION,
@@ -1411,6 +6723,63 @@ inline static constexpr unsigned NumEnumerators(SourceLocExprIdentKind) {
 }
 
 const char *EnumeratorName(SourceLocExprIdentKind);
+
+enum class SpeculativeLoadHardeningAttrSpelling : unsigned char {
+  GNU_SPECULATIVE_LOAD_HARDENING,
+  CXX11_CLANG_SPECULATIVE_LOAD_HARDENING,
+  C2X_CLANG_SPECULATIVE_LOAD_HARDENING,
+  SPELLING_NOT_CALCULATED,
+};
+
+SpeculativeLoadHardeningAttrSpelling FromPasta(pasta::SpeculativeLoadHardeningAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SpeculativeLoadHardeningAttrSpelling) {
+  return "SpeculativeLoadHardeningAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SpeculativeLoadHardeningAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SpeculativeLoadHardeningAttrSpelling);
+
+enum class StandaloneDebugAttrSpelling : unsigned char {
+  GNU_STANDALONE_DEBUG,
+  CXX11_CLANG_STANDALONE_DEBUG,
+  SPELLING_NOT_CALCULATED,
+};
+
+StandaloneDebugAttrSpelling FromPasta(pasta::StandaloneDebugAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(StandaloneDebugAttrSpelling) {
+  return "StandaloneDebugAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(StandaloneDebugAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(StandaloneDebugAttrSpelling);
+
+enum class StdCallAttrSpelling : unsigned char {
+  GNU_STDCALL,
+  CXX11_GNU_STDCALL,
+  C2X_GNU_STDCALL,
+  KEYWORD_STDCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+StdCallAttrSpelling FromPasta(pasta::StdCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(StdCallAttrSpelling) {
+  return "StdCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(StdCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(StdCallAttrSpelling);
 
 enum class StmtLikelihood : unsigned char {
   UNLIKELY,
@@ -1687,6 +7056,326 @@ inline static constexpr unsigned NumEnumerators(StringLiteralStringKind) {
 
 const char *EnumeratorName(StringLiteralStringKind);
 
+enum class SwiftAsyncAttrKind : unsigned char {
+  NONE,
+  SWIFT_PRIVATE,
+  NOT_SWIFT_PRIVATE,
+};
+
+SwiftAsyncAttrKind FromPasta(pasta::SwiftAsyncAttrKind pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncAttrKind) {
+  return "SwiftAsyncAttrKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncAttrKind) {
+  return 3;
+}
+
+const char *EnumeratorName(SwiftAsyncAttrKind);
+
+enum class SwiftAsyncAttrSpelling : unsigned char {
+  GNU_SWIFT_ASYNC,
+  CXX11_CLANG_SWIFT_ASYNC,
+  C2X_CLANG_SWIFT_ASYNC,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncAttrSpelling FromPasta(pasta::SwiftAsyncAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncAttrSpelling) {
+  return "SwiftAsyncAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncAttrSpelling);
+
+enum class SwiftAsyncCallAttrSpelling : unsigned char {
+  GNU_SWIFTASYNCCALL,
+  CXX11_CLANG_SWIFTASYNCCALL,
+  C2X_CLANG_SWIFTASYNCCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncCallAttrSpelling FromPasta(pasta::SwiftAsyncCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncCallAttrSpelling) {
+  return "SwiftAsyncCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncCallAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncCallAttrSpelling);
+
+enum class SwiftAsyncContextAttrSpelling : unsigned char {
+  GNU_SWIFT_ASYNC_CONTEXT,
+  CXX11_CLANG_SWIFT_ASYNC_CONTEXT,
+  C2X_CLANG_SWIFT_ASYNC_CONTEXT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncContextAttrSpelling FromPasta(pasta::SwiftAsyncContextAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncContextAttrSpelling) {
+  return "SwiftAsyncContextAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncContextAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncContextAttrSpelling);
+
+enum class SwiftAsyncErrorAttrConventionKind : unsigned char {
+  NONE,
+  NON_NULL_ERROR,
+  ZERO_ARGUMENT,
+  NON_ZERO_ARGUMENT,
+};
+
+SwiftAsyncErrorAttrConventionKind FromPasta(pasta::SwiftAsyncErrorAttrConventionKind pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncErrorAttrConventionKind) {
+  return "SwiftAsyncErrorAttrConventionKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncErrorAttrConventionKind) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncErrorAttrConventionKind);
+
+enum class SwiftAsyncErrorAttrSpelling : unsigned char {
+  GNU_SWIFT_ASYNC_ERROR,
+  CXX11_CLANG_SWIFT_ASYNC_ERROR,
+  C2X_CLANG_SWIFT_ASYNC_ERROR,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftAsyncErrorAttrSpelling FromPasta(pasta::SwiftAsyncErrorAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftAsyncErrorAttrSpelling) {
+  return "SwiftAsyncErrorAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftAsyncErrorAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftAsyncErrorAttrSpelling);
+
+enum class SwiftCallAttrSpelling : unsigned char {
+  GNU_SWIFTCALL,
+  CXX11_CLANG_SWIFTCALL,
+  C2X_CLANG_SWIFTCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftCallAttrSpelling FromPasta(pasta::SwiftCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftCallAttrSpelling) {
+  return "SwiftCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftCallAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftCallAttrSpelling);
+
+enum class SwiftContextAttrSpelling : unsigned char {
+  GNU_SWIFT_CONTEXT,
+  CXX11_CLANG_SWIFT_CONTEXT,
+  C2X_CLANG_SWIFT_CONTEXT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftContextAttrSpelling FromPasta(pasta::SwiftContextAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftContextAttrSpelling) {
+  return "SwiftContextAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftContextAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftContextAttrSpelling);
+
+enum class SwiftErrorAttrConventionKind : unsigned char {
+  NONE,
+  NON_NULL_ERROR,
+  NULL_RESULT,
+  ZERO_RESULT,
+  NON_ZERO_RESULT,
+};
+
+SwiftErrorAttrConventionKind FromPasta(pasta::SwiftErrorAttrConventionKind pasta_val);
+
+inline static const char *EnumerationName(SwiftErrorAttrConventionKind) {
+  return "SwiftErrorAttrConventionKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftErrorAttrConventionKind) {
+  return 5;
+}
+
+const char *EnumeratorName(SwiftErrorAttrConventionKind);
+
+enum class SwiftErrorResultAttrSpelling : unsigned char {
+  GNU_SWIFT_ERROR_RESULT,
+  CXX11_CLANG_SWIFT_ERROR_RESULT,
+  C2X_CLANG_SWIFT_ERROR_RESULT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftErrorResultAttrSpelling FromPasta(pasta::SwiftErrorResultAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftErrorResultAttrSpelling) {
+  return "SwiftErrorResultAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftErrorResultAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftErrorResultAttrSpelling);
+
+enum class SwiftIndirectResultAttrSpelling : unsigned char {
+  GNU_SWIFT_INDIRECT_RESULT,
+  CXX11_CLANG_SWIFT_INDIRECT_RESULT,
+  C2X_CLANG_SWIFT_INDIRECT_RESULT,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftIndirectResultAttrSpelling FromPasta(pasta::SwiftIndirectResultAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftIndirectResultAttrSpelling) {
+  return "SwiftIndirectResultAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftIndirectResultAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SwiftIndirectResultAttrSpelling);
+
+enum class SwiftNewTypeAttrNewtypeKind : unsigned char {
+  STRUCT,
+  ENUM,
+};
+
+SwiftNewTypeAttrNewtypeKind FromPasta(pasta::SwiftNewTypeAttrNewtypeKind pasta_val);
+
+inline static const char *EnumerationName(SwiftNewTypeAttrNewtypeKind) {
+  return "SwiftNewTypeAttrNewtypeKind";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftNewTypeAttrNewtypeKind) {
+  return 2;
+}
+
+const char *EnumeratorName(SwiftNewTypeAttrNewtypeKind);
+
+enum class SwiftNewTypeAttrSpelling : unsigned char {
+  GNU_SWIFT_NEWTYPE,
+  GNU_SWIFT_WRAPPER,
+  SPELLING_NOT_CALCULATED,
+};
+
+SwiftNewTypeAttrSpelling FromPasta(pasta::SwiftNewTypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SwiftNewTypeAttrSpelling) {
+  return "SwiftNewTypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SwiftNewTypeAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(SwiftNewTypeAttrSpelling);
+
+enum class SysVABIAttrSpelling : unsigned char {
+  GNU_SYSV_ABI,
+  CXX11_GNU_SYSV_ABI,
+  C2X_GNU_SYSV_ABI,
+  SPELLING_NOT_CALCULATED,
+};
+
+SysVABIAttrSpelling FromPasta(pasta::SysVABIAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(SysVABIAttrSpelling) {
+  return "SysVABIAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(SysVABIAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(SysVABIAttrSpelling);
+
+enum class TLSModelAttrSpelling : unsigned char {
+  GNU_TLS_MODEL,
+  CXX11_GNU_TLS_MODEL,
+  C2X_GNU_TLS_MODEL,
+  SPELLING_NOT_CALCULATED,
+};
+
+TLSModelAttrSpelling FromPasta(pasta::TLSModelAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TLSModelAttrSpelling) {
+  return "TLSModelAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TLSModelAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TLSModelAttrSpelling);
+
+enum class TargetAttrSpelling : unsigned char {
+  GNU_TARGET,
+  CXX11_GNU_TARGET,
+  C2X_GNU_TARGET,
+  SPELLING_NOT_CALCULATED,
+};
+
+TargetAttrSpelling FromPasta(pasta::TargetAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TargetAttrSpelling) {
+  return "TargetAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TargetAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TargetAttrSpelling);
+
+enum class TargetClonesAttrSpelling : unsigned char {
+  GNU_TARGET_CLONES,
+  CXX11_GNU_TARGET_CLONES,
+  C2X_GNU_TARGET_CLONES,
+  SPELLING_NOT_CALCULATED,
+};
+
+TargetClonesAttrSpelling FromPasta(pasta::TargetClonesAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TargetClonesAttrSpelling) {
+  return "TargetClonesAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TargetClonesAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TargetClonesAttrSpelling);
+
 enum class TemplateArgumentKind : unsigned char {
   EMPTY,
   TYPE,
@@ -1710,6 +7399,118 @@ inline static constexpr unsigned NumEnumerators(TemplateArgumentKind) {
 }
 
 const char *EnumeratorName(TemplateArgumentKind);
+
+enum class TestTypestateAttrConsumedState : unsigned char {
+  CONSUMED,
+  UNCONSUMED,
+};
+
+TestTypestateAttrConsumedState FromPasta(pasta::TestTypestateAttrConsumedState pasta_val);
+
+inline static const char *EnumerationName(TestTypestateAttrConsumedState) {
+  return "TestTypestateAttrConsumedState";
+}
+
+inline static constexpr unsigned NumEnumerators(TestTypestateAttrConsumedState) {
+  return 2;
+}
+
+const char *EnumeratorName(TestTypestateAttrConsumedState);
+
+enum class TestTypestateAttrSpelling : unsigned char {
+  GNU_TEST_TYPESTATE,
+  CXX11_CLANG_TEST_TYPESTATE,
+  SPELLING_NOT_CALCULATED,
+};
+
+TestTypestateAttrSpelling FromPasta(pasta::TestTypestateAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TestTypestateAttrSpelling) {
+  return "TestTypestateAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TestTypestateAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(TestTypestateAttrSpelling);
+
+enum class ThisCallAttrSpelling : unsigned char {
+  GNU_THISCALL,
+  CXX11_GNU_THISCALL,
+  C2X_GNU_THISCALL,
+  KEYWORD_THISCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+ThisCallAttrSpelling FromPasta(pasta::ThisCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(ThisCallAttrSpelling) {
+  return "ThisCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(ThisCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(ThisCallAttrSpelling);
+
+enum class TransparentUnionAttrSpelling : unsigned char {
+  GNU_TRANSPARENT_UNION,
+  CXX11_GNU_TRANSPARENT_UNION,
+  C2X_GNU_TRANSPARENT_UNION,
+  SPELLING_NOT_CALCULATED,
+};
+
+TransparentUnionAttrSpelling FromPasta(pasta::TransparentUnionAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TransparentUnionAttrSpelling) {
+  return "TransparentUnionAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TransparentUnionAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TransparentUnionAttrSpelling);
+
+enum class TrivialABIAttrSpelling : unsigned char {
+  GNU_TRIVIAL_ABI,
+  CXX11_CLANG_TRIVIAL_ABI,
+  SPELLING_NOT_CALCULATED,
+};
+
+TrivialABIAttrSpelling FromPasta(pasta::TrivialABIAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TrivialABIAttrSpelling) {
+  return "TrivialABIAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TrivialABIAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(TrivialABIAttrSpelling);
+
+enum class TryAcquireCapabilityAttrSpelling : unsigned char {
+  GNU_TRY_ACQUIRE_CAPABILITY,
+  CXX11_CLANG_TRY_ACQUIRE_CAPABILITY,
+  GNU_TRY_ACQUIRE_SHARED_CAPABILITY,
+  CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+TryAcquireCapabilityAttrSpelling FromPasta(pasta::TryAcquireCapabilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TryAcquireCapabilityAttrSpelling) {
+  return "TryAcquireCapabilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TryAcquireCapabilityAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(TryAcquireCapabilityAttrSpelling);
 
 enum class TypeScalarTypeKind : unsigned char {
   C_POINTER,
@@ -1804,6 +7605,62 @@ inline static constexpr unsigned NumEnumerators(TypeKind) {
 
 const char *EnumeratorName(TypeKind);
 
+enum class TypeTagForDatatypeAttrSpelling : unsigned char {
+  GNU_TYPE_TAG_FOR_DATATYPE,
+  CXX11_CLANG_TYPE_TAG_FOR_DATATYPE,
+  C2X_CLANG_TYPE_TAG_FOR_DATATYPE,
+  SPELLING_NOT_CALCULATED,
+};
+
+TypeTagForDatatypeAttrSpelling FromPasta(pasta::TypeTagForDatatypeAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TypeTagForDatatypeAttrSpelling) {
+  return "TypeTagForDatatypeAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeTagForDatatypeAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TypeTagForDatatypeAttrSpelling);
+
+enum class TypeVisibilityAttrSpelling : unsigned char {
+  GNU_TYPE_VISIBILITY,
+  CXX11_CLANG_TYPE_VISIBILITY,
+  C2X_CLANG_TYPE_VISIBILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+TypeVisibilityAttrSpelling FromPasta(pasta::TypeVisibilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(TypeVisibilityAttrSpelling) {
+  return "TypeVisibilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeVisibilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(TypeVisibilityAttrSpelling);
+
+enum class TypeVisibilityAttrVisibilityType : unsigned char {
+  DEFAULT,
+  HIDDEN,
+  PROTECTED,
+};
+
+TypeVisibilityAttrVisibilityType FromPasta(pasta::TypeVisibilityAttrVisibilityType pasta_val);
+
+inline static const char *EnumerationName(TypeVisibilityAttrVisibilityType) {
+  return "TypeVisibilityAttrVisibilityType";
+}
+
+inline static constexpr unsigned NumEnumerators(TypeVisibilityAttrVisibilityType) {
+  return 3;
+}
+
+const char *EnumeratorName(TypeVisibilityAttrVisibilityType);
+
 enum class UnaryTransformTypeUTTKind : unsigned char {
   ENUM_UNDERLYING_TYPE,
 };
@@ -1819,6 +7676,141 @@ inline static constexpr unsigned NumEnumerators(UnaryTransformTypeUTTKind) {
 }
 
 const char *EnumeratorName(UnaryTransformTypeUTTKind);
+
+enum class UnavailableAttrImplicitReason : unsigned char {
+  NONE,
+  ARC_FORBIDDEN_TYPE,
+  FORBIDDEN_WEAK,
+  ARC_FORBIDDEN_CONVERSION,
+  ARC_INIT_RETURNS_UNRELATED,
+  ARC_FIELD_WITH_OWNERSHIP,
+};
+
+UnavailableAttrImplicitReason FromPasta(pasta::UnavailableAttrImplicitReason pasta_val);
+
+inline static const char *EnumerationName(UnavailableAttrImplicitReason) {
+  return "UnavailableAttrImplicitReason";
+}
+
+inline static constexpr unsigned NumEnumerators(UnavailableAttrImplicitReason) {
+  return 6;
+}
+
+const char *EnumeratorName(UnavailableAttrImplicitReason);
+
+enum class UnavailableAttrSpelling : unsigned char {
+  GNU_UNAVAILABLE,
+  CXX11_CLANG_UNAVAILABLE,
+  C2X_CLANG_UNAVAILABLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+UnavailableAttrSpelling FromPasta(pasta::UnavailableAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UnavailableAttrSpelling) {
+  return "UnavailableAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UnavailableAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(UnavailableAttrSpelling);
+
+enum class UninitializedAttrSpelling : unsigned char {
+  GNU_UNINITIALIZED,
+  CXX11_CLANG_UNINITIALIZED,
+  SPELLING_NOT_CALCULATED,
+};
+
+UninitializedAttrSpelling FromPasta(pasta::UninitializedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UninitializedAttrSpelling) {
+  return "UninitializedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UninitializedAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UninitializedAttrSpelling);
+
+enum class UnlikelyAttrSpelling : unsigned char {
+  CXX11_UNLIKELY,
+  C2X_CLANG_UNLIKELY,
+  SPELLING_NOT_CALCULATED,
+};
+
+UnlikelyAttrSpelling FromPasta(pasta::UnlikelyAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UnlikelyAttrSpelling) {
+  return "UnlikelyAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UnlikelyAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UnlikelyAttrSpelling);
+
+enum class UnusedAttrSpelling : unsigned char {
+  CXX11_MAYBE_UNUSED,
+  GNU_UNUSED,
+  CXX11_GNU_UNUSED,
+  C2X_GNU_UNUSED,
+  C2X_MAYBE_UNUSED,
+  SPELLING_NOT_CALCULATED,
+};
+
+UnusedAttrSpelling FromPasta(pasta::UnusedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UnusedAttrSpelling) {
+  return "UnusedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UnusedAttrSpelling) {
+  return 6;
+}
+
+const char *EnumeratorName(UnusedAttrSpelling);
+
+enum class UseHandleAttrSpelling : unsigned char {
+  GNU_USE_HANDLE,
+  CXX11_CLANG_USE_HANDLE,
+  C2X_CLANG_USE_HANDLE,
+  SPELLING_NOT_CALCULATED,
+};
+
+UseHandleAttrSpelling FromPasta(pasta::UseHandleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UseHandleAttrSpelling) {
+  return "UseHandleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UseHandleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(UseHandleAttrSpelling);
+
+enum class UsedAttrSpelling : unsigned char {
+  GNU_USED,
+  CXX11_GNU_USED,
+  C2X_GNU_USED,
+  SPELLING_NOT_CALCULATED,
+};
+
+UsedAttrSpelling FromPasta(pasta::UsedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UsedAttrSpelling) {
+  return "UsedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UsedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(UsedAttrSpelling);
 
 enum class UserDefinedLiteralLiteralOperatorKind : unsigned char {
   RAW,
@@ -1840,6 +7832,42 @@ inline static constexpr unsigned NumEnumerators(UserDefinedLiteralLiteralOperato
 }
 
 const char *EnumeratorName(UserDefinedLiteralLiteralOperatorKind);
+
+enum class UsingIfExistsAttrSpelling : unsigned char {
+  GNU_USING_IF_EXISTS,
+  CXX11_CLANG_USING_IF_EXISTS,
+  SPELLING_NOT_CALCULATED,
+};
+
+UsingIfExistsAttrSpelling FromPasta(pasta::UsingIfExistsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UsingIfExistsAttrSpelling) {
+  return "UsingIfExistsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UsingIfExistsAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UsingIfExistsAttrSpelling);
+
+enum class UuidAttrSpelling : unsigned char {
+  DECLSPEC_UUID,
+  MICROSOFT_UUID,
+  SPELLING_NOT_CALCULATED,
+};
+
+UuidAttrSpelling FromPasta(pasta::UuidAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(UuidAttrSpelling) {
+  return "UuidAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(UuidAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(UuidAttrSpelling);
 
 enum class VarDeclDefinitionKind : unsigned char {
   DECLARATION_ONLY,
@@ -1895,6 +7923,44 @@ inline static constexpr unsigned NumEnumerators(VarDeclTLSKind) {
 
 const char *EnumeratorName(VarDeclTLSKind);
 
+enum class VecReturnAttrSpelling : unsigned char {
+  GNU_VECRETURN,
+  CXX11_CLANG_VECRETURN,
+  SPELLING_NOT_CALCULATED,
+};
+
+VecReturnAttrSpelling FromPasta(pasta::VecReturnAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(VecReturnAttrSpelling) {
+  return "VecReturnAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(VecReturnAttrSpelling) {
+  return 3;
+}
+
+const char *EnumeratorName(VecReturnAttrSpelling);
+
+enum class VectorCallAttrSpelling : unsigned char {
+  GNU_VECTORCALL,
+  CXX11_CLANG_VECTORCALL,
+  C2X_CLANG_VECTORCALL,
+  KEYWORD_VECTORCALL,
+  SPELLING_NOT_CALCULATED,
+};
+
+VectorCallAttrSpelling FromPasta(pasta::VectorCallAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(VectorCallAttrSpelling) {
+  return "VectorCallAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(VectorCallAttrSpelling) {
+  return 5;
+}
+
+const char *EnumeratorName(VectorCallAttrSpelling);
+
 enum class VectorTypeVectorKind : unsigned char {
   GENERIC_VECTOR,
   ALTI_VEC_VECTOR,
@@ -1917,6 +7983,258 @@ inline static constexpr unsigned NumEnumerators(VectorTypeVectorKind) {
 }
 
 const char *EnumeratorName(VectorTypeVectorKind);
+
+enum class VisibilityAttrSpelling : unsigned char {
+  GNU_VISIBILITY,
+  CXX11_GNU_VISIBILITY,
+  C2X_GNU_VISIBILITY,
+  SPELLING_NOT_CALCULATED,
+};
+
+VisibilityAttrSpelling FromPasta(pasta::VisibilityAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(VisibilityAttrSpelling) {
+  return "VisibilityAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(VisibilityAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(VisibilityAttrSpelling);
+
+enum class VisibilityAttrVisibilityType : unsigned char {
+  DEFAULT,
+  HIDDEN,
+  PROTECTED,
+};
+
+VisibilityAttrVisibilityType FromPasta(pasta::VisibilityAttrVisibilityType pasta_val);
+
+inline static const char *EnumerationName(VisibilityAttrVisibilityType) {
+  return "VisibilityAttrVisibilityType";
+}
+
+inline static constexpr unsigned NumEnumerators(VisibilityAttrVisibilityType) {
+  return 3;
+}
+
+const char *EnumeratorName(VisibilityAttrVisibilityType);
+
+enum class WarnUnusedAttrSpelling : unsigned char {
+  GNU_WARN_UNUSED,
+  CXX11_GNU_WARN_UNUSED,
+  C2X_GNU_WARN_UNUSED,
+  SPELLING_NOT_CALCULATED,
+};
+
+WarnUnusedAttrSpelling FromPasta(pasta::WarnUnusedAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WarnUnusedAttrSpelling) {
+  return "WarnUnusedAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WarnUnusedAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WarnUnusedAttrSpelling);
+
+enum class WarnUnusedResultAttrSpelling : unsigned char {
+  CXX11_NODISCARD,
+  C2X_NODISCARD,
+  CXX11_CLANG_WARN_UNUSED_RESULT,
+  GNU_WARN_UNUSED_RESULT,
+  CXX11_GNU_WARN_UNUSED_RESULT,
+  C2X_GNU_WARN_UNUSED_RESULT,
+  SPELLING_NOT_CALCULATED,
+};
+
+WarnUnusedResultAttrSpelling FromPasta(pasta::WarnUnusedResultAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WarnUnusedResultAttrSpelling) {
+  return "WarnUnusedResultAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WarnUnusedResultAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(WarnUnusedResultAttrSpelling);
+
+enum class WeakAttrSpelling : unsigned char {
+  GNU_WEAK,
+  CXX11_GNU_WEAK,
+  C2X_GNU_WEAK,
+  SPELLING_NOT_CALCULATED,
+};
+
+WeakAttrSpelling FromPasta(pasta::WeakAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WeakAttrSpelling) {
+  return "WeakAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WeakAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WeakAttrSpelling);
+
+enum class WeakImportAttrSpelling : unsigned char {
+  GNU_WEAK_IMPORT,
+  CXX11_CLANG_WEAK_IMPORT,
+  C2X_CLANG_WEAK_IMPORT,
+  SPELLING_NOT_CALCULATED,
+};
+
+WeakImportAttrSpelling FromPasta(pasta::WeakImportAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WeakImportAttrSpelling) {
+  return "WeakImportAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WeakImportAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WeakImportAttrSpelling);
+
+enum class WeakRefAttrSpelling : unsigned char {
+  GNU_WEAKREF,
+  CXX11_GNU_WEAKREF,
+  C2X_GNU_WEAKREF,
+  SPELLING_NOT_CALCULATED,
+};
+
+WeakRefAttrSpelling FromPasta(pasta::WeakRefAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WeakRefAttrSpelling) {
+  return "WeakRefAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WeakRefAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WeakRefAttrSpelling);
+
+enum class WebAssemblyExportNameAttrSpelling : unsigned char {
+  GNU_EXPORT_NAME,
+  CXX11_CLANG_EXPORT_NAME,
+  C2X_CLANG_EXPORT_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+WebAssemblyExportNameAttrSpelling FromPasta(pasta::WebAssemblyExportNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WebAssemblyExportNameAttrSpelling) {
+  return "WebAssemblyExportNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WebAssemblyExportNameAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WebAssemblyExportNameAttrSpelling);
+
+enum class WebAssemblyImportModuleAttrSpelling : unsigned char {
+  GNU_IMPORT_MODULE,
+  CXX11_CLANG_IMPORT_MODULE,
+  C2X_CLANG_IMPORT_MODULE,
+  SPELLING_NOT_CALCULATED,
+};
+
+WebAssemblyImportModuleAttrSpelling FromPasta(pasta::WebAssemblyImportModuleAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WebAssemblyImportModuleAttrSpelling) {
+  return "WebAssemblyImportModuleAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WebAssemblyImportModuleAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WebAssemblyImportModuleAttrSpelling);
+
+enum class WebAssemblyImportNameAttrSpelling : unsigned char {
+  GNU_IMPORT_NAME,
+  CXX11_CLANG_IMPORT_NAME,
+  C2X_CLANG_IMPORT_NAME,
+  SPELLING_NOT_CALCULATED,
+};
+
+WebAssemblyImportNameAttrSpelling FromPasta(pasta::WebAssemblyImportNameAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(WebAssemblyImportNameAttrSpelling) {
+  return "WebAssemblyImportNameAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(WebAssemblyImportNameAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(WebAssemblyImportNameAttrSpelling);
+
+enum class X86ForceAlignArgPointerAttrSpelling : unsigned char {
+  GNU_FORCE_ALIGN_ARGUMENT_POINTER,
+  CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER,
+  C2X_GNU_FORCE_ALIGN_ARGUMENT_POINTER,
+  SPELLING_NOT_CALCULATED,
+};
+
+X86ForceAlignArgPointerAttrSpelling FromPasta(pasta::X86ForceAlignArgPointerAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(X86ForceAlignArgPointerAttrSpelling) {
+  return "X86ForceAlignArgPointerAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(X86ForceAlignArgPointerAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(X86ForceAlignArgPointerAttrSpelling);
+
+enum class XRayInstrumentAttrSpelling : unsigned char {
+  GNU_XRAY_ALWAYS_INSTRUMENT,
+  CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT,
+  C2X_CLANG_XRAY_ALWAYS_INSTRUMENT,
+  GNU_XRAY_NEVER_INSTRUMENT,
+  CXX11_CLANG_XRAY_NEVER_INSTRUMENT,
+  C2X_CLANG_XRAY_NEVER_INSTRUMENT,
+  SPELLING_NOT_CALCULATED,
+};
+
+XRayInstrumentAttrSpelling FromPasta(pasta::XRayInstrumentAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(XRayInstrumentAttrSpelling) {
+  return "XRayInstrumentAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(XRayInstrumentAttrSpelling) {
+  return 7;
+}
+
+const char *EnumeratorName(XRayInstrumentAttrSpelling);
+
+enum class XRayLogArgsAttrSpelling : unsigned char {
+  GNU_XRAY_LOG_ARGUMENTS,
+  CXX11_CLANG_XRAY_LOG_ARGUMENTS,
+  C2X_CLANG_XRAY_LOG_ARGUMENTS,
+  SPELLING_NOT_CALCULATED,
+};
+
+XRayLogArgsAttrSpelling FromPasta(pasta::XRayLogArgsAttrSpelling pasta_val);
+
+inline static const char *EnumerationName(XRayLogArgsAttrSpelling) {
+  return "XRayLogArgsAttrSpelling";
+}
+
+inline static constexpr unsigned NumEnumerators(XRayLogArgsAttrSpelling) {
+  return 4;
+}
+
+const char *EnumeratorName(XRayLogArgsAttrSpelling);
 
 enum class ASTDumpOutputFormat : unsigned char {
   DEFAULT,
@@ -1990,31 +8308,6 @@ inline static constexpr unsigned NumEnumerators(AlignRequirementKind) {
 }
 
 const char *EnumeratorName(AlignRequirementKind);
-
-enum class AllocatorTypeTy : unsigned char {
-  OMP_NULL_MEMORY_ALLOC,
-  OMP_DEFAULT_MEMORY_ALLOC,
-  OMP_LARGE_CAP_MEMORY_ALLOC,
-  OMP_CONST_MEMORY_ALLOC,
-  OMP_HIGH_BW_MEMORY_ALLOC,
-  OMP_LOW_LAT_MEMORY_ALLOC,
-  OMPC_GROUP_MEMORY_ALLOC,
-  OMPP_TEAM_MEMORY_ALLOC,
-  OMP_THREAD_MEMORY_ALLOC,
-  OMP_USER_DEFINED_MEMORY_ALLOC,
-};
-
-AllocatorTypeTy FromPasta(pasta::AllocatorTypeTy pasta_val);
-
-inline static const char *EnumerationName(AllocatorTypeTy) {
-  return "AllocatorTypeTy";
-}
-
-inline static constexpr unsigned NumEnumerators(AllocatorTypeTy) {
-  return 10;
-}
-
-const char *EnumeratorName(AllocatorTypeTy);
 
 enum class AltivecSrcCompatKind : unsigned char {
   MIXED,
@@ -2099,369 +8392,6 @@ inline static constexpr unsigned NumEnumerators(AtomicScopeModelKind) {
 }
 
 const char *EnumeratorName(AtomicScopeModelKind);
-
-enum class AttributeKind : unsigned short {
-  ADDRESS_SPACE,
-  ARM_MVE_STRICT_POLYMORPHISM,
-  BTF_TYPE_TAG,
-  CMSE_NS_CALL,
-  NO_DEREF,
-  OBJ_CGC,
-  OBJ_C_INERT_UNSAFE_UNRETAINED,
-  OBJ_C_KIND_OF,
-  OPEN_CL_CONSTANT_ADDRESS_SPACE,
-  OPEN_CL_GENERIC_ADDRESS_SPACE,
-  OPEN_CL_GLOBAL_ADDRESS_SPACE,
-  OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE,
-  OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE,
-  OPEN_CL_LOCAL_ADDRESS_SPACE,
-  OPEN_CL_PRIVATE_ADDRESS_SPACE,
-  PTR32,
-  PTR64,
-  S_PTR,
-  TYPE_NON_NULL,
-  TYPE_NULL_UNSPECIFIED,
-  TYPE_NULLABLE,
-  TYPE_NULLABLE_RESULT,
-  U_PTR,
-  FALL_THROUGH,
-  LIKELY,
-  MUST_TAIL,
-  OPEN_CL_UNROLL_HINT,
-  SUPPRESS,
-  UNLIKELY,
-  NO_MERGE,
-  A_ARCH64_VECTOR_PCS,
-  ACQUIRE_HANDLE,
-  ANY_X86_NO_CF_CHECK,
-  C_DECL,
-  FAST_CALL,
-  INTEL_OCL_BICC,
-  LIFETIME_BOUND,
-  MSABI,
-  NS_RETURNS_RETAINED,
-  OBJ_C_OWNERSHIP,
-  PASCAL,
-  PCS,
-  PRESERVE_ALL,
-  PRESERVE_MOST,
-  REG_CALL,
-  STD_CALL,
-  SWIFT_ASYNC_CALL,
-  SWIFT_CALL,
-  SYS_VABI,
-  THIS_CALL,
-  VECTOR_CALL,
-  SWIFT_ASYNC_CONTEXT,
-  SWIFT_CONTEXT,
-  SWIFT_ERROR_RESULT,
-  SWIFT_INDIRECT_RESULT,
-  ANNOTATE,
-  CF_CONSUMED,
-  CARRIES_DEPENDENCY,
-  NS_CONSUMED,
-  NON_NULL,
-  OS_CONSUMED,
-  PASS_OBJECT_SIZE,
-  RELEASE_HANDLE,
-  USE_HANDLE,
-  AMDGPU_FLAT_WORK_GROUP_SIZE,
-  AMDGPU_NUM_SGPR,
-  AMDGPU_NUM_VGPR,
-  AMDGPU_WAVES_PER_EU,
-  ARM_INTERRUPT,
-  AVR_INTERRUPT,
-  AVR_SIGNAL,
-  ACQUIRE_CAPABILITY,
-  ACQUIRED_AFTER,
-  ACQUIRED_BEFORE,
-  ALIGN_MAC68_K,
-  ALIGN_NATURAL,
-  ALIGNED,
-  ALLOC_ALIGN,
-  ALLOC_SIZE,
-  ALWAYS_DESTROY,
-  ALWAYS_INLINE,
-  ANALYZER_NO_RETURN,
-  ANY_X86_INTERRUPT,
-  ANY_X86_NO_CALLER_SAVED_REGISTERS,
-  ARC_WEAKREF_UNAVAILABLE,
-  ARGUMENT_WITH_TYPE_TAG,
-  ARM_BUILTIN_ALIAS,
-  ARTIFICIAL,
-  ASSEMBLY_LABEL,
-  ASSERT_CAPABILITY,
-  ASSERT_EXCLUSIVE_LOCK,
-  ASSERT_SHARED_LOCK,
-  ASSUME_ALIGNED,
-  ASSUMPTION,
-  AVAILABILITY,
-  BPF_PRESERVE_ACCESS_INDEX,
-  BTF_DECL_TAG,
-  BLOCKS,
-  BUILTIN,
-  C11_NO_RETURN,
-  CF_AUDITED_TRANSFER,
-  CF_GUARD,
-  CFI_CANONICAL_JUMP_TABLE,
-  CF_RETURNS_NOT_RETAINED,
-  CF_RETURNS_RETAINED,
-  CF_UNKNOWN_TRANSFER,
-  CPU_DISPATCH,
-  CPU_SPECIFIC,
-  CUDA_CONSTANT,
-  CUDA_DEVICE,
-  CUDA_DEVICE_BUILTIN_SURFACE_TYPE,
-  CUDA_DEVICE_BUILTIN_TEXTURE_TYPE,
-  CUDA_GLOBAL,
-  CUDA_HOST,
-  CUDA_INVALID_TARGET,
-  CUDA_LAUNCH_BOUNDS,
-  CUDA_SHARED,
-  CXX11_NO_RETURN,
-  CALLABLE_WHEN,
-  CALLBACK,
-  CAPABILITY,
-  CAPTURED_RECORD,
-  CLEANUP,
-  CMSE_NS_ENTRY,
-  CODE_SEG,
-  COLD,
-  COMMON,
-  CONST,
-  CONST_INITIALIZER,
-  CONSTRUCTOR,
-  CONSUMABLE,
-  CONSUMABLE_AUTO_CAST,
-  CONSUMABLE_SET_ON_READ,
-  CONVERGENT,
-  DLL_EXPORT,
-  DLL_EXPORT_STATIC_LOCAL,
-  DLL_IMPORT,
-  DLL_IMPORT_STATIC_LOCAL,
-  DEPRECATED,
-  DESTRUCTOR,
-  DIAGNOSE_AS_BUILTIN,
-  DIAGNOSE_IF,
-  DISABLE_SANITIZER_INSTRUMENTATION,
-  DISABLE_TAIL_CALLS,
-  EMPTY_BASES,
-  ENABLE_IF,
-  ENFORCE_TCB,
-  ENFORCE_TCB_LEAF,
-  ENUM_EXTENSIBILITY,
-  ERROR,
-  EXCLUDE_FROM_EXPLICIT_INSTANTIATION,
-  EXCLUSIVE_TRYLOCK_FUNCTION,
-  EXTERNAL_SOURCE_SYMBOL,
-  FINAL,
-  FLAG_ENUM,
-  FLATTEN,
-  FORMAT,
-  FORMAT_ARGUMENT,
-  GNU_INLINE,
-  GUARDED_BY,
-  GUARDED_VARIABLE,
-  HIP_MANAGED,
-  HOT,
-  IB_ACTION,
-  IB_OUTLET,
-  IB_OUTLET_COLLECTION,
-  INITIALIZER_PRIORITY,
-  INTERNAL_LINKAGE,
-  LTO_VISIBILITY_PUBLIC,
-  LAYOUT_VERSION,
-  LEAF,
-  LOCK_RETURNED,
-  LOCKS_EXCLUDED,
-  M68_KINTERRUPT,
-  MIG_SERVER_ROUTINE__,
-  MS_ALLOCATOR,
-  MS_INHERITANCE,
-  MS_NO_V_TABLE,
-  MSP430_INTERRUPT,
-  MS_STRUCT,
-  MS_VTOR_DISP,
-  MAX_FIELD_ALIGNMENT,
-  MAY_ALIAS,
-  MICRO_MIPS,
-  MIN_SIZE,
-  MIN_VECTOR_WIDTH,
-  MIPS16,
-  MIPS_INTERRUPT,
-  MIPS_LONG_CALL,
-  MIPS_SHORT_CALL,
-  NS_CONSUMES_SELF,
-  NS_ERROR_DOMAIN,
-  NS_RETURNS_AUTORELEASED,
-  NS_RETURNS_NOT_RETAINED,
-  NAKED,
-  NO_ALIAS,
-  NO_COMMON,
-  NO_DEBUG,
-  NO_DESTROY,
-  NO_DUPLICATE,
-  NO_INLINE,
-  NO_INSTRUMENT_FUNCTION,
-  NO_MICRO_MIPS,
-  NO_MIPS16,
-  NO_PROFILE_FUNCTION,
-  NO_RETURN,
-  NO_SANITIZE,
-  NO_SPECULATIVE_LOAD_HARDENING,
-  NO_SPLIT_STACK,
-  NO_STACK_PROTECTOR,
-  NO_THREAD_SAFETY_ANALYSIS,
-  NO_THROW,
-  NO_UNIQUE_ADDRESS,
-  NOT_TAIL_CALLED,
-  OMP_ALLOCATE_DECLARATION,
-  OMP_CAPTURE_NO_INITIALIZER,
-  OMP_DECLARE_TARGET_DECLARATION,
-  OMP_DECLARE_VARIANT,
-  OMP_THREAD_PRIVATE_DECLARATION,
-  OS_CONSUMES_THIS,
-  OS_RETURNS_NOT_RETAINED,
-  OS_RETURNS_RETAINED,
-  OS_RETURNS_RETAINED_ON_NON_ZERO,
-  OS_RETURNS_RETAINED_ON_ZERO,
-  OBJ_C_BRIDGE,
-  OBJ_C_BRIDGE_MUTABLE,
-  OBJ_C_BRIDGE_RELATED,
-  OBJ_C_EXCEPTION,
-  OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION,
-  OBJ_C_EXTERNALLY_RETAINED,
-  OBJ_C_INDEPENDENT_CLASS,
-  OBJ_C_METHOD_FAMILY,
-  OBJ_CNS_OBJECT,
-  OBJ_C_PRECISE_LIFETIME,
-  OBJ_C_REQUIRES_PROPERTY_DEFINITIONS,
-  OBJ_C_REQUIRES_SUPER,
-  OBJ_C_RETURNS_INNER_POINTER,
-  OBJ_C_ROOT_CLASS,
-  OBJ_C_SUBCLASSING_RESTRICTED,
-  OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE,
-  OPEN_CL_KERNEL,
-  OPTIMIZE_NONE,
-  OVERRIDE,
-  OWNER,
-  OWNERSHIP,
-  PACKED,
-  PARAMETER_TYPESTATE,
-  PATCHABLE_FUNCTION_ENTRY,
-  POINTER,
-  PRAGMA_CLANG_BSS_SECTION,
-  PRAGMA_CLANG_DATA_SECTION,
-  PRAGMA_CLANG_RELRO_SECTION,
-  PRAGMA_CLANG_RODATA_SECTION,
-  PRAGMA_CLANG_TEXT_SECTION,
-  PREFERRED_NAME,
-  PT_GUARDED_BY,
-  PT_GUARDED_VARIABLE,
-  PURE,
-  RISCV_INTERRUPT,
-  REINITIALIZES,
-  RELEASE_CAPABILITY,
-  REQD_WORK_GROUP_SIZE,
-  REQUIRES_CAPABILITY,
-  RESTRICT,
-  RETAIN,
-  RETURN_TYPESTATE,
-  RETURNS_NON_NULL,
-  RETURNS_TWICE,
-  SYCL_KERNEL,
-  SYCL_SPECIAL_CLASS,
-  SCOPED_LOCKABLE,
-  SECTION,
-  SELECT_ANY,
-  SENTINEL,
-  SET_TYPESTATE,
-  SHARED_TRYLOCK_FUNCTION,
-  SPECULATIVE_LOAD_HARDENING,
-  STANDALONE_DEBUG,
-  STRICT_FP,
-  SWIFT_ASYNC,
-  SWIFT_ASYNC_ERROR,
-  SWIFT_ASYNC_NAME,
-  SWIFT_ATTRIBUTE,
-  SWIFT_BRIDGE,
-  SWIFT_BRIDGED_TYPEDEF,
-  SWIFT_ERROR,
-  SWIFT_NAME,
-  SWIFT_NEW_TYPE,
-  SWIFT_PRIVATE,
-  TLS_MODEL,
-  TARGET,
-  TARGET_CLONES,
-  TEST_TYPESTATE,
-  TRANSPARENT_UNION,
-  TRIVIAL_ABI,
-  TRY_ACQUIRE_CAPABILITY,
-  TYPE_TAG_FOR_DATATYPE,
-  TYPE_VISIBILITY,
-  UNAVAILABLE,
-  UNINITIALIZED,
-  UNUSED,
-  USED,
-  USING_IF_EXISTS,
-  UUID,
-  VEC_RETURN,
-  VEC_TYPE_HINT,
-  VISIBILITY,
-  WARN_UNUSED,
-  WARN_UNUSED_RESULT,
-  WEAK,
-  WEAK_IMPORT,
-  WEAK_REFERENCE,
-  WEB_ASSEMBLY_EXPORT_NAME,
-  WEB_ASSEMBLY_IMPORT_MODULE,
-  WEB_ASSEMBLY_IMPORT_NAME,
-  WORK_GROUP_SIZE_HINT,
-  X86_FORCE_ALIGN_ARGUMENT_POINTER,
-  X_RAY_INSTRUMENT,
-  X_RAY_LOG_ARGUMENTS,
-  ABI_TAG,
-  ALIAS,
-  ALIGN_VALUE,
-  BUILTIN_ALIAS,
-  CALLED_ONCE,
-  I_FUNC,
-  INITIALIZER_SEG,
-  LOADER_UNINITIALIZED,
-  LOOP_HINT,
-  MODE,
-  NO_BUILTIN,
-  NO_ESCAPE,
-  OMP_CAPTURE_KIND,
-  OMP_DECLARE_SIMD_DECLARATION,
-  OMP_REFERENCED_VARIABLE,
-  OBJ_C_BOXABLE,
-  OBJ_C_CLASS_STUB,
-  OBJ_C_DESIGNATED_INITIALIZER,
-  OBJ_C_DIRECT,
-  OBJ_C_DIRECT_MEMBERS,
-  OBJ_C_NON_LAZY_CLASS,
-  OBJ_C_NON_RUNTIME_PROTOCOL,
-  OBJ_C_RUNTIME_NAME,
-  OBJ_C_RUNTIME_VISIBLE,
-  OPEN_CL_ACCESS,
-  OVERLOADABLE,
-  RENDER_SCRIPT_KERNEL,
-  SWIFT_OBJ_C_MEMBERS,
-  THREAD,
-};
-
-AttributeKind FromPasta(pasta::AttributeKind pasta_val);
-
-inline static const char *EnumerationName(AttributeKind) {
-  return "AttributeKind";
-}
-
-inline static constexpr unsigned NumEnumerators(AttributeKind) {
-  return 348;
-}
-
-const char *EnumeratorName(AttributeKind);
 
 enum class AutoTypeKeyword : unsigned char {
   AUTO,
@@ -2571,40 +8501,6 @@ inline static constexpr unsigned NumEnumerators(Bits) {
 }
 
 const char *EnumeratorName(Bits);
-
-enum class BlockType : unsigned char {
-  BY_REFERENCE,
-};
-
-BlockType FromPasta(pasta::BlockType pasta_val);
-
-inline static const char *EnumerationName(BlockType) {
-  return "BlockType";
-}
-
-inline static constexpr unsigned NumEnumerators(BlockType) {
-  return 1;
-}
-
-const char *EnumeratorName(BlockType);
-
-enum class BranchStateTy : unsigned char {
-  UNDEFINED,
-  INBRANCH,
-  NOTINBRANCH,
-};
-
-BranchStateTy FromPasta(pasta::BranchStateTy pasta_val);
-
-inline static const char *EnumerationName(BranchStateTy) {
-  return "BranchStateTy";
-}
-
-inline static constexpr unsigned NumEnumerators(BranchStateTy) {
-  return 3;
-}
-
-const char *EnumeratorName(BranchStateTy);
 
 enum class CallingConv : unsigned char {
   C,
@@ -2878,43 +8774,6 @@ inline static constexpr unsigned NumEnumerators(ConstexprSpecKind) {
 
 const char *EnumeratorName(ConstexprSpecKind);
 
-enum class ConsumedState : unsigned char {
-  UNKNOWN,
-  CONSUMED,
-  UNCONSUMED,
-};
-
-ConsumedState FromPasta(pasta::ConsumedState pasta_val);
-
-inline static const char *EnumerationName(ConsumedState) {
-  return "ConsumedState";
-}
-
-inline static constexpr unsigned NumEnumerators(ConsumedState) {
-  return 3;
-}
-
-const char *EnumeratorName(ConsumedState);
-
-enum class ConventionKind : unsigned char {
-  NONE,
-  NON_NULL_ERROR,
-  ZERO_ARGUMENT,
-  NON_ZERO_ARGUMENT,
-};
-
-ConventionKind FromPasta(pasta::ConventionKind pasta_val);
-
-inline static const char *EnumerationName(ConventionKind) {
-  return "ConventionKind";
-}
-
-inline static constexpr unsigned NumEnumerators(ConventionKind) {
-  return 4;
-}
-
-const char *EnumeratorName(ConventionKind);
-
 enum class CoreFoundationABI : unsigned char {
   UNSPECIFIED,
   STANDALONE,
@@ -2996,24 +8855,6 @@ inline static constexpr unsigned NumEnumerators(DefaultCallingConvention) {
 
 const char *EnumeratorName(DefaultCallingConvention);
 
-enum class DevTypeTy : unsigned char {
-  HOST,
-  NO_HOST,
-  ANY,
-};
-
-DevTypeTy FromPasta(pasta::DevTypeTy pasta_val);
-
-inline static const char *EnumerationName(DevTypeTy) {
-  return "DevTypeTy";
-}
-
-inline static constexpr unsigned NumEnumerators(DevTypeTy) {
-  return 3;
-}
-
-const char *EnumeratorName(DevTypeTy);
-
 enum class DiagnosticLevelMask : unsigned char {
   NONE,
   NOTE,
@@ -3034,23 +8875,6 @@ inline static constexpr unsigned NumEnumerators(DiagnosticLevelMask) {
 }
 
 const char *EnumeratorName(DiagnosticLevelMask);
-
-enum class DiagnosticType : unsigned char {
-  ERROR,
-  WARNING,
-};
-
-DiagnosticType FromPasta(pasta::DiagnosticType pasta_val);
-
-inline static const char *EnumerationName(DiagnosticType) {
-  return "DiagnosticType";
-}
-
-inline static constexpr unsigned NumEnumerators(DiagnosticType) {
-  return 2;
-}
-
-const char *EnumeratorName(DiagnosticType);
 
 enum class ElaboratedTypeKeyword : unsigned char {
   STRUCT,
@@ -3331,27 +9155,6 @@ inline static constexpr unsigned NumEnumerators(FPModeKind) {
 
 const char *EnumeratorName(FPModeKind);
 
-enum class FamilyKind : unsigned char {
-  NONE,
-  ALLOC,
-  COPY,
-  INITIALIZER,
-  MUTABLE_COPY,
-  NEW,
-};
-
-FamilyKind FromPasta(pasta::FamilyKind pasta_val);
-
-inline static const char *EnumerationName(FamilyKind) {
-  return "FamilyKind";
-}
-
-inline static constexpr unsigned NumEnumerators(FamilyKind) {
-  return 6;
-}
-
-const char *EnumeratorName(FamilyKind);
-
 enum class FiniteLoopsKind : unsigned char {
   LANGUAGE,
   ALWAYS,
@@ -3464,22 +9267,6 @@ inline static constexpr unsigned NumEnumerators(GetBuiltinTypeError) {
 
 const char *EnumeratorName(GetBuiltinTypeError);
 
-enum class GuardArg : unsigned char {
-  NOCF,
-};
-
-GuardArg FromPasta(pasta::GuardArg pasta_val);
-
-inline static const char *EnumerationName(GuardArg) {
-  return "GuardArg";
-}
-
-inline static constexpr unsigned NumEnumerators(GuardArg) {
-  return 1;
-}
-
-const char *EnumeratorName(GuardArg);
-
 enum class ID : unsigned char {
   WORK_GROUP,
   DEVICE,
@@ -3555,27 +9342,6 @@ inline static constexpr unsigned NumEnumerators(ImbueAttribute) {
 }
 
 const char *EnumeratorName(ImbueAttribute);
-
-enum class ImplicitReason : unsigned char {
-  NONE,
-  ARC_FORBIDDEN_TYPE,
-  FORBIDDEN_WEAK,
-  ARC_FORBIDDEN_CONVERSION,
-  ARC_INIT_RETURNS_UNRELATED,
-  ARC_FIELD_WITH_OWNERSHIP,
-};
-
-ImplicitReason FromPasta(pasta::ImplicitReason pasta_val);
-
-inline static const char *EnumerationName(ImplicitReason) {
-  return "ImplicitReason";
-}
-
-inline static constexpr unsigned NumEnumerators(ImplicitReason) {
-  return 6;
-}
-
-const char *EnumeratorName(ImplicitReason);
 
 enum class InClassInitStyle : unsigned char {
   NO_INITIALIZER,
@@ -3686,45 +9452,6 @@ inline static constexpr unsigned NumEnumerators(InliningMethod) {
 
 const char *EnumeratorName(InliningMethod);
 
-enum class InteropType : unsigned char {
-  TARGET,
-  TARGET_SYNC,
-  TARGET_TARGET_SYNC,
-};
-
-InteropType FromPasta(pasta::InteropType pasta_val);
-
-inline static const char *EnumerationName(InteropType) {
-  return "InteropType";
-}
-
-inline static constexpr unsigned NumEnumerators(InteropType) {
-  return 3;
-}
-
-const char *EnumeratorName(InteropType);
-
-enum class InterruptType : unsigned char {
-  IRQ,
-  FIQ,
-  SWI,
-  ABORT,
-  UNDEF,
-  GENERIC,
-};
-
-InterruptType FromPasta(pasta::InterruptType pasta_val);
-
-inline static const char *EnumerationName(InterruptType) {
-  return "InterruptType";
-}
-
-inline static constexpr unsigned NumEnumerators(InterruptType) {
-  return 6;
-}
-
-const char *EnumeratorName(InterruptType);
-
 enum class Kinds : unsigned char {
   L_VALUE,
   X_VALUE,
@@ -3829,13 +9556,13 @@ enum class LangFeatures : unsigned char {
   C99,
   C11,
   C17,
-  C2_X,
+  C2X,
   C_PLUS_PLUS,
   C_PLUS_PLUS11,
   C_PLUS_PLUS14,
   C_PLUS_PLUS17,
   C_PLUS_PLUS20,
-  C_PLUS_PLUS2_B,
+  C_PLUS_PLUS2B,
   DIGRAPHS,
   GNU_MODE,
   HEX_FLOAT,
@@ -3961,28 +9688,6 @@ inline static constexpr unsigned NumEnumerators(Linkage) {
 
 const char *EnumeratorName(Linkage);
 
-enum class LoopHintState : unsigned char {
-  ENABLE,
-  DISABLE,
-  NUMERIC,
-  FIXED_WIDTH,
-  SCALABLE_WIDTH,
-  ASSUME_SAFETY,
-  FULL,
-};
-
-LoopHintState FromPasta(pasta::LoopHintState pasta_val);
-
-inline static const char *EnumerationName(LoopHintState) {
-  return "LoopHintState";
-}
-
-inline static constexpr unsigned NumEnumerators(LoopHintState) {
-  return 7;
-}
-
-const char *EnumeratorName(LoopHintState);
-
 enum class MSInheritanceModel : unsigned char {
   SINGLE,
   MULTIPLE,
@@ -4044,23 +9749,6 @@ inline static constexpr unsigned NumEnumerators(MSVtorDispMode) {
 }
 
 const char *EnumeratorName(MSVtorDispMode);
-
-enum class MapTypeTy : unsigned char {
-  TO,
-  LINK,
-};
-
-MapTypeTy FromPasta(pasta::MapTypeTy pasta_val);
-
-inline static const char *EnumerationName(MapTypeTy) {
-  return "MapTypeTy";
-}
-
-inline static constexpr unsigned NumEnumerators(MapTypeTy) {
-  return 2;
-}
-
-const char *EnumeratorName(MapTypeTy);
 
 enum class MethodRefFlags : unsigned char {
   METHOD_REFERENCE_NONE,
@@ -4185,23 +9873,6 @@ inline static constexpr unsigned NumEnumerators(NestedNameSpecifierDependence) {
 }
 
 const char *EnumeratorName(NestedNameSpecifierDependence);
-
-enum class NewtypeKind : unsigned char {
-  STRUCT,
-  ENUM,
-};
-
-NewtypeKind FromPasta(pasta::NewtypeKind pasta_val);
-
-inline static const char *EnumerationName(NewtypeKind) {
-  return "NewtypeKind";
-}
-
-inline static constexpr unsigned NumEnumerators(NewtypeKind) {
-  return 2;
-}
-
-const char *EnumeratorName(NewtypeKind);
 
 enum class NonOdrUseReason : unsigned char {
   NONE,
@@ -4820,33 +10491,6 @@ inline static constexpr unsigned NumEnumerators(OpenMPScheduleClauseModifier) {
 
 const char *EnumeratorName(OpenMPScheduleClauseModifier);
 
-enum class OptionType : unsigned char {
-  VECTORIZE,
-  VECTORIZE_WIDTH,
-  INTERLEAVE,
-  INTERLEAVE_COUNT,
-  UNROLL,
-  UNROLL_COUNT,
-  UNROLL_AND_JAM,
-  UNROLL_AND_JAM_COUNT,
-  PIPELINE_DISABLED,
-  PIPELINE_INITIATION_INTERVAL,
-  DISTRIBUTE,
-  VECTORIZE_PREDICATE,
-};
-
-OptionType FromPasta(pasta::OptionType pasta_val);
-
-inline static const char *EnumerationName(OptionType) {
-  return "OptionType";
-}
-
-inline static constexpr unsigned NumEnumerators(OptionType) {
-  return 12;
-}
-
-const char *EnumeratorName(OptionType);
-
 enum class OverloadedOperatorKind : unsigned char {
   NONE,
   NEW,
@@ -4924,41 +10568,6 @@ inline static constexpr unsigned NumEnumerators(OverloadsShown) {
 }
 
 const char *EnumeratorName(OverloadsShown);
-
-enum class OwnershipKind : unsigned char {
-  HOLDS,
-  RETURNS,
-  TAKES,
-};
-
-OwnershipKind FromPasta(pasta::OwnershipKind pasta_val);
-
-inline static const char *EnumerationName(OwnershipKind) {
-  return "OwnershipKind";
-}
-
-inline static constexpr unsigned NumEnumerators(OwnershipKind) {
-  return 3;
-}
-
-const char *EnumeratorName(OwnershipKind);
-
-enum class PCSType : unsigned char {
-  AAPCS,
-  VFP,
-};
-
-PCSType FromPasta(pasta::PCSType pasta_val);
-
-inline static const char *EnumerationName(PCSType) {
-  return "PCSType";
-}
-
-inline static constexpr unsigned NumEnumerators(PCSType) {
-  return 2;
-}
-
-const char *EnumeratorName(PCSType);
 
 enum class ParameterABI : unsigned char {
   ORDINARY,
@@ -5295,7 +10904,7 @@ enum class SanitizerOrdinal : unsigned char {
   FUNCTION,
   INTEGER_DIVIDE_BY_ZERO,
   NONNULL_ATTRIBUTE,
-  NULL__,
+  NULL_,
   NULLABILITY_ARGUMENT,
   NULLABILITY_ASSIGN,
   NULLABILITY_RETURN,
@@ -5467,25 +11076,6 @@ inline static constexpr unsigned NumEnumerators(SpecifierKind) {
 }
 
 const char *EnumeratorName(SpecifierKind);
-
-enum class Spelling : unsigned char {
-  GNU_AARCH64_VECTOR_PCS,
-  CXX11_CLANG_AARCH64_VECTOR_PCS,
-  C2_XCLANG_AARCH64_VECTOR_PCS,
-  SPELLING_NOT_CALCULATED,
-};
-
-Spelling FromPasta(pasta::Spelling pasta_val);
-
-inline static const char *EnumerationName(Spelling) {
-  return "Spelling";
-}
-
-inline static constexpr unsigned NumEnumerators(Spelling) {
-  return 4;
-}
-
-const char *EnumeratorName(Spelling);
 
 enum class StackProtectorMode : unsigned char {
   OFF,
@@ -5701,7 +11291,7 @@ const char *EnumeratorName(SyncScope);
 enum class Syntax : unsigned char {
   GNU,
   CXX11,
-  C2_X,
+  C2X,
   DECLSPEC,
   MICROSOFT,
   KEYWORD,
@@ -6216,18 +11806,18 @@ enum class TokenKind : unsigned short {
   KEYWORD___READ_WRITE,
   KEYWORD___BUILTIN_ASTYPE,
   KEYWORD_VEC_STEP,
-  KEYWORD_IMAGE1_DT,
-  KEYWORD_IMAGE1_DARRAY_T,
-  KEYWORD_IMAGE1_DBUFFER_T,
-  KEYWORD_IMAGE2_DT,
-  KEYWORD_IMAGE2_DARRAY_T,
-  KEYWORD_IMAGE2_DDEPTH_T,
-  KEYWORD_IMAGE2_DARRAY_DEPTH_T,
-  KEYWORD_IMAGE2_DMSAA_T,
-  KEYWORD_IMAGE2_DARRAY_MSAA_T,
-  KEYWORD_IMAGE2_DMSAA_DEPTH_T,
-  KEYWORD_IMAGE2_DARRAY_MSAA_DEPTH_T,
-  KEYWORD_IMAGE3_DT,
+  KEYWORD_IMAGE_1D_T,
+  KEYWORD_IMAGE_1D_ARRAY_T,
+  KEYWORD_IMAGE_1D_BUFFER_T,
+  KEYWORD_IMAGE_2D_T,
+  KEYWORD_IMAGE_2D_ARRAY_T,
+  KEYWORD_IMAGE_2D_DEPTH_T,
+  KEYWORD_IMAGE_2D_ARRAY_DEPTH_T,
+  KEYWORD_IMAGE_2D_MSAA_T,
+  KEYWORD_IMAGE_2D_ARRAY_MSAA_T,
+  KEYWORD_IMAGE_2D_MSAA_DEPTH_T,
+  KEYWORD_IMAGE_2D_ARRAY_MSAA_DEPTH_T,
+  KEYWORD_IMAGE_3D_T,
   KEYWORD_PIPE,
   KEYWORD_ADDRSPACE_CAST,
   KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN,
@@ -6580,18 +12170,18 @@ enum class TypeSpecifierType : unsigned char {
   AUTO_TYPE,
   UNKNOWN_ANYTYPE,
   ATOMIC,
-  IMAGE1_DT,
-  IMAGE1_DARRAY_T,
-  IMAGE1_DBUFFER_T,
-  IMAGE2_DT,
-  IMAGE2_DARRAY_T,
-  IMAGE2_DDEPTH_T,
-  IMAGE2_DARRAY_DEPTH_T,
-  IMAGE2_DMSAA_T,
-  IMAGE2_DARRAY_MSAA_T,
-  IMAGE2_DMSAA_DEPTH_T,
-  IMAGE2_DARRAY_MSAA_DEPTH_T,
-  IMAGE3_DT,
+  IMAGE_1D_T,
+  IMAGE_1D_ARRAY_T,
+  IMAGE_1D_BUFFER_T,
+  IMAGE_2D_T,
+  IMAGE_2D_ARRAY_T,
+  IMAGE_2D_DEPTH_T,
+  IMAGE_2D_ARRAY_DEPTH_T,
+  IMAGE_2D_MSAA_T,
+  IMAGE_2D_ARRAY_MSAA_T,
+  IMAGE_2D_MSAA_DEPTH_T,
+  IMAGE_2D_ARRAY_MSAA_DEPTH_T,
+  IMAGE_3D_T,
   ERROR,
 };
 
@@ -6839,23 +12429,28 @@ inline static constexpr unsigned NumEnumerators(Visibility) {
 
 const char *EnumeratorName(Visibility);
 
-enum class VisibilityType : unsigned char {
-  DEFAULT,
-  HIDDEN,
-  PROTECTED,
+enum class AttributeSyntax : unsigned char {
+  GNU,
+  CXX11,
+  C2X,
+  DECLSPEC,
+  MICROSOFT,
+  KEYWORD,
+  PRAGMA,
+  CONTEXT_SENSITIVE_KEYWORD,
 };
 
-VisibilityType FromPasta(pasta::VisibilityType pasta_val);
+AttributeSyntax FromPasta(pasta::AttributeSyntax pasta_val);
 
-inline static const char *EnumerationName(VisibilityType) {
-  return "VisibilityType";
+inline static const char *EnumerationName(AttributeSyntax) {
+  return "AttributeSyntax";
 }
 
-inline static constexpr unsigned NumEnumerators(VisibilityType) {
-  return 3;
+inline static constexpr unsigned NumEnumerators(AttributeSyntax) {
+  return 8;
 }
 
-const char *EnumeratorName(VisibilityType);
+const char *EnumeratorName(AttributeSyntax);
 
 enum class DeclCategory : unsigned char {
   UNKNOWN,
@@ -7412,9 +13007,366 @@ class LValueReferenceType;
 class ObjCInterfaceType;
 class RValueReferenceType;
 class RecordType;
+class Attr;
+class BuiltinAliasAttr;
+class CalledOnceAttr;
+class IFuncAttr;
+class InheritableAttr;
+class InheritableParamAttr;
+class InitPriorityAttr;
+class InitSegAttr;
+class IntelOclBiccAttr;
+class InternalLinkageAttr;
+class LTOVisibilityPublicAttr;
+class LayoutVersionAttr;
+class LeafAttr;
+class LifetimeBoundAttr;
+class LoaderUninitializedAttr;
+class LockReturnedAttr;
+class LocksExcludedAttr;
+class LoopHintAttr;
+class M68kInterruptAttr;
+class MIGServerRoutineAttr;
+class MSABIAttr;
+class MSAllocatorAttr;
+class MSInheritanceAttr;
+class MSNoVTableAttr;
+class MSP430InterruptAttr;
+class MSStructAttr;
+class MSVtorDispAttr;
+class MaxFieldAlignmentAttr;
+class MayAliasAttr;
+class MicroMipsAttr;
+class MinSizeAttr;
+class MinVectorWidthAttr;
+class Mips16Attr;
+class MipsInterruptAttr;
+class MipsLongCallAttr;
+class MipsShortCallAttr;
+class ModeAttr;
+class NSConsumedAttr;
+class NSConsumesSelfAttr;
+class NSErrorDomainAttr;
+class NSReturnsAutoreleasedAttr;
+class NSReturnsNotRetainedAttr;
+class NSReturnsRetainedAttr;
+class NakedAttr;
+class NoAliasAttr;
+class NoBuiltinAttr;
+class NoCommonAttr;
+class NoDebugAttr;
+class NoDestroyAttr;
+class NoDuplicateAttr;
+class NoEscapeAttr;
+class NoInlineAttr;
+class NoInstrumentFunctionAttr;
+class NoMicroMipsAttr;
+class NoMips16Attr;
+class NoProfileFunctionAttr;
+class NoReturnAttr;
+class NoSanitizeAttr;
+class NoSpeculativeLoadHardeningAttr;
+class NoSplitStackAttr;
+class NoStackProtectorAttr;
+class NoThreadSafetyAnalysisAttr;
+class NoThrowAttr;
+class NoUniqueAddressAttr;
+class NonNullAttr;
+class NotTailCalledAttr;
+class OMPAllocateDeclAttr;
+class OMPCaptureKindAttr;
+class OMPCaptureNoInitAttr;
+class OMPDeclareSimdDeclAttr;
+class OMPDeclareTargetDeclAttr;
+class OMPDeclareVariantAttr;
+class OMPReferencedVarAttr;
+class OMPThreadPrivateDeclAttr;
+class OSConsumedAttr;
+class OSConsumesThisAttr;
+class OSReturnsNotRetainedAttr;
+class OSReturnsRetainedAttr;
+class OSReturnsRetainedOnNonZeroAttr;
+class OSReturnsRetainedOnZeroAttr;
+class ObjCBoxableAttr;
+class ObjCBridgeAttr;
+class ObjCBridgeMutableAttr;
+class ObjCBridgeRelatedAttr;
+class ObjCClassStubAttr;
+class ObjCDesignatedInitializerAttr;
+class ObjCDirectAttr;
+class ObjCDirectMembersAttr;
+class ObjCExceptionAttr;
+class ObjCExplicitProtocolImplAttr;
+class ObjCExternallyRetainedAttr;
+class ObjCIndependentClassAttr;
+class ObjCMethodFamilyAttr;
+class ObjCNSObjectAttr;
+class ObjCNonLazyClassAttr;
+class ObjCNonRuntimeProtocolAttr;
+class ObjCOwnershipAttr;
+class ObjCPreciseLifetimeAttr;
+class ObjCRequiresPropertyDefsAttr;
+class ObjCRequiresSuperAttr;
+class ObjCReturnsInnerPointerAttr;
+class ObjCRootClassAttr;
+class ObjCRuntimeNameAttr;
+class ObjCRuntimeVisibleAttr;
+class ObjCSubclassingRestrictedAttr;
+class OpenCLAccessAttr;
+class OpenCLIntelReqdSubGroupSizeAttr;
+class OpenCLKernelAttr;
+class OptimizeNoneAttr;
+class OverloadableAttr;
+class OverrideAttr;
+class OwnerAttr;
+class OwnershipAttr;
+class PackedAttr;
+class ParamTypestateAttr;
+class ParameterABIAttr;
+class PascalAttr;
+class PassObjectSizeAttr;
+class PatchableFunctionEntryAttr;
+class PcsAttr;
+class PointerAttr;
+class PragmaClangBSSSectionAttr;
+class PragmaClangDataSectionAttr;
+class PragmaClangRelroSectionAttr;
+class PragmaClangRodataSectionAttr;
+class PragmaClangTextSectionAttr;
+class PreferredNameAttr;
+class PreserveAllAttr;
+class PreserveMostAttr;
+class PtGuardedByAttr;
+class PtGuardedVarAttr;
+class PureAttr;
+class RISCVInterruptAttr;
+class RegCallAttr;
+class ReinitializesAttr;
+class ReleaseCapabilityAttr;
+class ReleaseHandleAttr;
+class RenderScriptKernelAttr;
+class ReqdWorkGroupSizeAttr;
+class RequiresCapabilityAttr;
+class RestrictAttr;
+class RetainAttr;
+class ReturnTypestateAttr;
+class ReturnsNonNullAttr;
+class ReturnsTwiceAttr;
+class SYCLKernelAttr;
+class SYCLSpecialClassAttr;
+class ScopedLockableAttr;
+class SectionAttr;
+class SelectAnyAttr;
+class SentinelAttr;
+class SetTypestateAttr;
+class SharedTrylockFunctionAttr;
+class SpeculativeLoadHardeningAttr;
+class StandaloneDebugAttr;
+class StdCallAttr;
+class StmtAttr;
+class StrictFPAttr;
+class SuppressAttr;
+class SwiftAsyncAttr;
+class SwiftAsyncCallAttr;
+class SwiftAsyncContextAttr;
+class SwiftAsyncErrorAttr;
+class SwiftAsyncNameAttr;
+class SwiftAttrAttr;
+class SwiftBridgeAttr;
+class SwiftBridgedTypedefAttr;
+class SwiftCallAttr;
+class SwiftContextAttr;
+class SwiftErrorAttr;
+class SwiftErrorResultAttr;
+class SwiftIndirectResultAttr;
+class SwiftNameAttr;
+class SwiftNewTypeAttr;
+class SwiftObjCMembersAttr;
+class SwiftPrivateAttr;
+class SysVABIAttr;
+class TLSModelAttr;
+class TargetAttr;
+class TargetClonesAttr;
+class TestTypestateAttr;
+class ThisCallAttr;
+class ThreadAttr;
+class TransparentUnionAttr;
+class TrivialABIAttr;
+class TryAcquireCapabilityAttr;
+class TypeAttr;
+class TypeNonNullAttr;
+class TypeNullUnspecifiedAttr;
+class TypeNullableAttr;
+class TypeNullableResultAttr;
+class TypeTagForDatatypeAttr;
+class TypeVisibilityAttr;
+class UPtrAttr;
+class UnavailableAttr;
+class UninitializedAttr;
+class UnlikelyAttr;
+class UnusedAttr;
+class UseHandleAttr;
+class UsedAttr;
+class UsingIfExistsAttr;
+class UuidAttr;
+class VecReturnAttr;
+class VecTypeHintAttr;
+class VectorCallAttr;
+class VisibilityAttr;
+class WarnUnusedAttr;
+class WarnUnusedResultAttr;
+class WeakAttr;
+class WeakImportAttr;
+class WeakRefAttr;
+class WebAssemblyExportNameAttr;
+class WebAssemblyImportModuleAttr;
+class WebAssemblyImportNameAttr;
+class WorkGroupSizeHintAttr;
+class X86ForceAlignArgPointerAttr;
+class XRayInstrumentAttr;
+class XRayLogArgsAttr;
+class AArch64VectorPcsAttr;
+class AMDGPUFlatWorkGroupSizeAttr;
+class AMDGPUNumSGPRAttr;
+class AMDGPUNumVGPRAttr;
+class AMDGPUWavesPerEUAttr;
+class ARMInterruptAttr;
+class AVRInterruptAttr;
+class AVRSignalAttr;
+class AbiTagAttr;
+class AcquireCapabilityAttr;
+class AcquireHandleAttr;
+class AcquiredAfterAttr;
+class AcquiredBeforeAttr;
+class AddressSpaceAttr;
+class AliasAttr;
+class AlignMac68kAttr;
+class AlignNaturalAttr;
+class AlignValueAttr;
+class AlignedAttr;
+class AllocAlignAttr;
+class AllocSizeAttr;
+class AlwaysDestroyAttr;
+class AlwaysInlineAttr;
+class AnalyzerNoReturnAttr;
+class AnnotateAttr;
+class AnyX86InterruptAttr;
+class AnyX86NoCallerSavedRegistersAttr;
+class AnyX86NoCfCheckAttr;
+class ArcWeakrefUnavailableAttr;
+class ArgumentWithTypeTagAttr;
+class ArmBuiltinAliasAttr;
+class ArmMveStrictPolymorphismAttr;
+class ArtificialAttr;
+class AsmLabelAttr;
+class AssertCapabilityAttr;
+class AssertExclusiveLockAttr;
+class AssertSharedLockAttr;
+class AssumeAlignedAttr;
+class AssumptionAttr;
+class AvailabilityAttr;
+class BPFPreserveAccessIndexAttr;
+class BTFDeclTagAttr;
+class BTFTypeTagAttr;
+class BlocksAttr;
+class BuiltinAttr;
+class C11NoReturnAttr;
+class CDeclAttr;
+class CFAuditedTransferAttr;
+class CFConsumedAttr;
+class CFGuardAttr;
+class CFICanonicalJumpTableAttr;
+class CFReturnsNotRetainedAttr;
+class CFReturnsRetainedAttr;
+class CFUnknownTransferAttr;
+class CPUDispatchAttr;
+class CPUSpecificAttr;
+class CUDAConstantAttr;
+class CUDADeviceAttr;
+class CUDADeviceBuiltinSurfaceTypeAttr;
+class CUDADeviceBuiltinTextureTypeAttr;
+class CUDAGlobalAttr;
+class CUDAHostAttr;
+class CUDAInvalidTargetAttr;
+class CUDALaunchBoundsAttr;
+class CUDASharedAttr;
+class CXX11NoReturnAttr;
+class CallableWhenAttr;
+class CallbackAttr;
+class CapabilityAttr;
+class CapturedRecordAttr;
+class CarriesDependencyAttr;
+class CleanupAttr;
+class CmseNSCallAttr;
+class CmseNSEntryAttr;
+class CodeSegAttr;
+class ColdAttr;
+class CommonAttr;
+class ConstAttr;
+class ConstInitAttr;
+class ConstructorAttr;
+class ConsumableAttr;
+class ConsumableAutoCastAttr;
+class ConsumableSetOnReadAttr;
+class ConvergentAttr;
+class DLLExportAttr;
+class DLLExportStaticLocalAttr;
+class DLLImportAttr;
+class DLLImportStaticLocalAttr;
+class DeclOrStmtAttr;
+class DeprecatedAttr;
+class DestructorAttr;
+class DiagnoseAsBuiltinAttr;
+class DiagnoseIfAttr;
+class DisableSanitizerInstrumentationAttr;
+class DisableTailCallsAttr;
+class EmptyBasesAttr;
+class EnableIfAttr;
+class EnforceTCBAttr;
+class EnforceTCBLeafAttr;
+class EnumExtensibilityAttr;
+class ErrorAttr;
+class ExcludeFromExplicitInstantiationAttr;
+class ExclusiveTrylockFunctionAttr;
+class ExternalSourceSymbolAttr;
+class FallThroughAttr;
+class FastCallAttr;
+class FinalAttr;
+class FlagEnumAttr;
+class FlattenAttr;
+class FormatArgAttr;
+class FormatAttr;
+class GNUInlineAttr;
+class GuardedByAttr;
+class GuardedVarAttr;
+class HIPManagedAttr;
+class HotAttr;
+class IBActionAttr;
+class IBOutletAttr;
+class IBOutletCollectionAttr;
+class LikelyAttr;
+class MustTailAttr;
+class NoDerefAttr;
+class NoMergeAttr;
+class ObjCGCAttr;
+class ObjCInertUnsafeUnretainedAttr;
+class ObjCKindOfAttr;
+class OpenCLConstantAddressSpaceAttr;
+class OpenCLGenericAddressSpaceAttr;
+class OpenCLGlobalAddressSpaceAttr;
+class OpenCLGlobalDeviceAddressSpaceAttr;
+class OpenCLGlobalHostAddressSpaceAttr;
+class OpenCLLocalAddressSpaceAttr;
+class OpenCLPrivateAddressSpaceAttr;
+class OpenCLUnrollHintAttr;
+class Ptr32Attr;
+class Ptr64Attr;
+class SPtrAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class Decl;
   friend class DeclIterator;
   friend class File;
@@ -7433,7 +13385,7 @@ class Designator {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   Designator(Designator &&) noexcept = default;
@@ -7441,9 +13393,9 @@ class Designator {
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
 
-  inline Designator(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline Designator(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   bool is_field_designator(void) const;
   bool is_array_designator(void) const;
@@ -7460,6 +13412,8 @@ class Designator {
 
 class TemplateParameterList {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class Decl;
   friend class DeclIterator;
   friend class File;
@@ -7478,7 +13432,7 @@ class TemplateParameterList {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
@@ -7486,9 +13440,9 @@ class TemplateParameterList {
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
 
-  inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   unsigned num_parameters(void) const;
   unsigned num_required_parameters(void) const;
@@ -7505,6 +13459,8 @@ class TemplateParameterList {
 
 class TemplateArgument {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class Decl;
   friend class DeclIterator;
   friend class File;
@@ -7523,7 +13479,7 @@ class TemplateArgument {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   TemplateArgument(TemplateArgument &&) noexcept = default;
@@ -7531,9 +13487,9 @@ class TemplateArgument {
   TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
   TemplateArgument &operator=(const TemplateArgument &) = default;
 
-  inline TemplateArgument(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline TemplateArgument(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   TemplateArgumentKind kind(void) const;
   bool is_null(void) const;
@@ -7549,6 +13505,8 @@ class TemplateArgument {
 
 class CXXBaseSpecifier {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class Decl;
   friend class DeclIterator;
   friend class File;
@@ -7567,7 +13525,7 @@ class CXXBaseSpecifier {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
@@ -7575,9 +13533,9 @@ class CXXBaseSpecifier {
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
-  inline CXXBaseSpecifier(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline CXXBaseSpecifier(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;
@@ -7591,10 +13549,18163 @@ class CXXBaseSpecifier {
   Type base_type(void) const;
 };
 
+using AttrRange = DerivedEntityRange<AttrIterator, Attr>;
+using AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Attr>;
+class Attr {
+ protected:
+  friend class AttrIterator;
+  friend class Decl;
+  friend class DeclIterator;
+  friend class File;
+  friend class Fragment;
+  friend class FragmentImpl;
+  friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
+  friend class Stmt;
+  friend class StmtIterator;
+  friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset_;
+
+ public:
+  Attr(Attr &&) noexcept = default;
+  Attr(const Attr &) = default;
+  Attr &operator=(Attr &&) noexcept = default;
+  Attr &operator=(const Attr &) = default;
+
+  inline Attr(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : fragment(std::move(fragment_)),
+        offset_(offset__) {}
+
+  inline static std::optional<Attr> from(const Attr &self) {
+    return self;
+  }
+
+  inline static std::optional<Attr> from(const std::optional<Attr> &self) {
+    return self;
+  }
+
+  inline static std::optional<Attr> from(const TokenContext &c) {
+    return c.as_attribute();
+  }
+
+  EntityId id(void) const;
+  UseRange<AttrUseSelector> uses(void) const;
+
+ protected:
+  static AttrIterator in_internal(const Fragment &fragment);
+
+ public:
+  inline static AttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Attr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  Token token(void) const;
+  bool is_implicit(void) const;
+  bool is_inherited(void) const;
+  bool is_late_parsed(void) const;
+  bool is_pack_expansion(void) const;
+  AttrKind kind(void) const;
+  TokenRange tokens(void) const;
+};
+
+using AlignValueAttrRange = DerivedEntityRange<AttrIterator, AlignValueAttr>;
+using AlignValueAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlignValueAttr>;
+class AlignValueAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static AlignValueAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AlignValueAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AlignValueAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALIGN_VALUE;
+  }
+
+  static std::optional<AlignValueAttr> from(const TokenContext &c);
+  static std::optional<AlignValueAttr> from(const Attr &parent);
+
+  inline static std::optional<AlignValueAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AlignValueAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr alignment(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AliasAttrRange = DerivedEntityRange<AttrIterator, AliasAttr>;
+using AliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AliasAttr>;
+class AliasAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static AliasAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AliasAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AliasAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALIAS;
+  }
+
+  static std::optional<AliasAttr> from(const TokenContext &c);
+  static std::optional<AliasAttr> from(const Attr &parent);
+
+  inline static std::optional<AliasAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view aliasee(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AbiTagAttrRange = DerivedEntityRange<AttrIterator, AbiTagAttr>;
+using AbiTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AbiTagAttr>;
+class AbiTagAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static AbiTagAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AbiTagAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AbiTagAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ABI_TAG;
+  }
+
+  static std::optional<AbiTagAttr> from(const TokenContext &c);
+  static std::optional<AbiTagAttr> from(const Attr &parent);
+
+  inline static std::optional<AbiTagAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AbiTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TypeAttrRange = DerivedEntityRange<AttrIterator, TypeAttr>;
+using TypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeAttr>;
+class TypeAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static TypeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  static std::optional<TypeAttr> from(const TokenContext &c);
+  static std::optional<TypeAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+};
+
+using SPtrAttrRange = DerivedEntityRange<AttrIterator, SPtrAttr>;
+using SPtrAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SPtrAttr>;
+class SPtrAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static SPtrAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SPtrAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SPtrAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::S_PTR;
+  }
+
+  static std::optional<SPtrAttr> from(const TokenContext &c);
+  static std::optional<SPtrAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<SPtrAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return SPtrAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SPtrAttr> from(const Attr &parent);
+
+  inline static std::optional<SPtrAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SPtrAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using Ptr64AttrRange = DerivedEntityRange<AttrIterator, Ptr64Attr>;
+using Ptr64AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Ptr64Attr>;
+class Ptr64Attr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static Ptr64AttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static Ptr64AttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Ptr64Attr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PTR64;
+  }
+
+  static std::optional<Ptr64Attr> from(const TokenContext &c);
+  static std::optional<Ptr64Attr> from(const TypeAttr &parent);
+
+  inline static std::optional<Ptr64Attr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return Ptr64Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<Ptr64Attr> from(const Attr &parent);
+
+  inline static std::optional<Ptr64Attr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return Ptr64Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using Ptr32AttrRange = DerivedEntityRange<AttrIterator, Ptr32Attr>;
+using Ptr32AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Ptr32Attr>;
+class Ptr32Attr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static Ptr32AttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static Ptr32AttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Ptr32Attr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PTR32;
+  }
+
+  static std::optional<Ptr32Attr> from(const TokenContext &c);
+  static std::optional<Ptr32Attr> from(const TypeAttr &parent);
+
+  inline static std::optional<Ptr32Attr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return Ptr32Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<Ptr32Attr> from(const Attr &parent);
+
+  inline static std::optional<Ptr32Attr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return Ptr32Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OpenCLPrivateAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLPrivateAddressSpaceAttr>;
+using OpenCLPrivateAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLPrivateAddressSpaceAttr>;
+class OpenCLPrivateAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLPrivateAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLPrivateAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLPrivateAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_PRIVATE_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLPrivateAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLPrivateAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLPrivateAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLPrivateAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLPrivateAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLPrivateAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLPrivateAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OpenCLPrivateAddressSpaceAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OpenCLLocalAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLLocalAddressSpaceAttr>;
+using OpenCLLocalAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLLocalAddressSpaceAttr>;
+class OpenCLLocalAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLLocalAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLLocalAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLLocalAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_LOCAL_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLLocalAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLLocalAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLLocalAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLLocalAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OpenCLLocalAddressSpaceAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OpenCLGlobalHostAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLGlobalHostAddressSpaceAttr>;
+using OpenCLGlobalHostAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLGlobalHostAddressSpaceAttr>;
+class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLGlobalHostAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLGlobalHostAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLGlobalHostAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLGlobalHostAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLGlobalHostAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLGlobalHostAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OpenCLGlobalDeviceAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLGlobalDeviceAddressSpaceAttr>;
+using OpenCLGlobalDeviceAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLGlobalDeviceAddressSpaceAttr>;
+class OpenCLGlobalDeviceAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLGlobalDeviceAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLGlobalDeviceAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLGlobalDeviceAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLGlobalDeviceAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLGlobalDeviceAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLGlobalDeviceAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OpenCLGlobalAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLGlobalAddressSpaceAttr>;
+using OpenCLGlobalAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLGlobalAddressSpaceAttr>;
+class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLGlobalAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLGlobalAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLGlobalAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_GLOBAL_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLGlobalAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLGlobalAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLGlobalAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLGlobalAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLGlobalAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLGlobalAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OpenCLGlobalAddressSpaceAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OpenCLGenericAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLGenericAddressSpaceAttr>;
+using OpenCLGenericAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLGenericAddressSpaceAttr>;
+class OpenCLGenericAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLGenericAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLGenericAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLGenericAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_GENERIC_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLGenericAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLGenericAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLGenericAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLGenericAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLGenericAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLGenericAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLGenericAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OpenCLGenericAddressSpaceAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OpenCLConstantAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLConstantAddressSpaceAttr>;
+using OpenCLConstantAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLConstantAddressSpaceAttr>;
+class OpenCLConstantAddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLConstantAddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLConstantAddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLConstantAddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_CONSTANT_ADDRESS_SPACE;
+  }
+
+  static std::optional<OpenCLConstantAddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<OpenCLConstantAddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<OpenCLConstantAddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return OpenCLConstantAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLConstantAddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLConstantAddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLConstantAddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OpenCLConstantAddressSpaceAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ObjCKindOfAttrRange = DerivedEntityRange<AttrIterator, ObjCKindOfAttr>;
+using ObjCKindOfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCKindOfAttr>;
+class ObjCKindOfAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static ObjCKindOfAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCKindOfAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCKindOfAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_KIND_OF;
+  }
+
+  static std::optional<ObjCKindOfAttr> from(const TokenContext &c);
+  static std::optional<ObjCKindOfAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<ObjCKindOfAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return ObjCKindOfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCKindOfAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCKindOfAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCKindOfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCInertUnsafeUnretainedAttrRange = DerivedEntityRange<AttrIterator, ObjCInertUnsafeUnretainedAttr>;
+using ObjCInertUnsafeUnretainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCInertUnsafeUnretainedAttr>;
+class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static ObjCInertUnsafeUnretainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCInertUnsafeUnretainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCInertUnsafeUnretainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_INERT_UNSAFE_UNRETAINED;
+  }
+
+  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const TokenContext &c);
+  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return ObjCInertUnsafeUnretainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCInertUnsafeUnretainedAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCInertUnsafeUnretainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCInertUnsafeUnretainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCGCAttrRange = DerivedEntityRange<AttrIterator, ObjCGCAttr>;
+using ObjCGCAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCGCAttr>;
+class ObjCGCAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static ObjCGCAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCGCAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCGCAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_CGC;
+  }
+
+  static std::optional<ObjCGCAttr> from(const TokenContext &c);
+  static std::optional<ObjCGCAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<ObjCGCAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return ObjCGCAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCGCAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCGCAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCGCAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoDerefAttrRange = DerivedEntityRange<AttrIterator, NoDerefAttr>;
+using NoDerefAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDerefAttr>;
+class NoDerefAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static NoDerefAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoDerefAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoDerefAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_DEREF;
+  }
+
+  static std::optional<NoDerefAttr> from(const TokenContext &c);
+  static std::optional<NoDerefAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<NoDerefAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return NoDerefAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoDerefAttr> from(const Attr &parent);
+
+  inline static std::optional<NoDerefAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoDerefAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CmseNSCallAttrRange = DerivedEntityRange<AttrIterator, CmseNSCallAttr>;
+using CmseNSCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CmseNSCallAttr>;
+class CmseNSCallAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static CmseNSCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CmseNSCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CmseNSCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CMSE_NS_CALL;
+  }
+
+  static std::optional<CmseNSCallAttr> from(const TokenContext &c);
+  static std::optional<CmseNSCallAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<CmseNSCallAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return CmseNSCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CmseNSCallAttr> from(const Attr &parent);
+
+  inline static std::optional<CmseNSCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CmseNSCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using BTFTypeTagAttrRange = DerivedEntityRange<AttrIterator, BTFTypeTagAttr>;
+using BTFTypeTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BTFTypeTagAttr>;
+class BTFTypeTagAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static BTFTypeTagAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BTFTypeTagAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BTFTypeTagAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::BTF_TYPE_TAG;
+  }
+
+  static std::optional<BTFTypeTagAttr> from(const TokenContext &c);
+  static std::optional<BTFTypeTagAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<BTFTypeTagAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return BTFTypeTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<BTFTypeTagAttr> from(const Attr &parent);
+
+  inline static std::optional<BTFTypeTagAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return BTFTypeTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view btf_type_tag(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ArmMveStrictPolymorphismAttrRange = DerivedEntityRange<AttrIterator, ArmMveStrictPolymorphismAttr>;
+using ArmMveStrictPolymorphismAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArmMveStrictPolymorphismAttr>;
+class ArmMveStrictPolymorphismAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static ArmMveStrictPolymorphismAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ArmMveStrictPolymorphismAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArmMveStrictPolymorphismAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ARM_MVE_STRICT_POLYMORPHISM;
+  }
+
+  static std::optional<ArmMveStrictPolymorphismAttr> from(const TokenContext &c);
+  static std::optional<ArmMveStrictPolymorphismAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return ArmMveStrictPolymorphismAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ArmMveStrictPolymorphismAttr> from(const Attr &parent);
+
+  inline static std::optional<ArmMveStrictPolymorphismAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ArmMveStrictPolymorphismAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AddressSpaceAttrRange = DerivedEntityRange<AttrIterator, AddressSpaceAttr>;
+using AddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AddressSpaceAttr>;
+class AddressSpaceAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static AddressSpaceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AddressSpaceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AddressSpaceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ADDRESS_SPACE;
+  }
+
+  static std::optional<AddressSpaceAttr> from(const TokenContext &c);
+  static std::optional<AddressSpaceAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<AddressSpaceAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return AddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AddressSpaceAttr> from(const Attr &parent);
+
+  inline static std::optional<AddressSpaceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AddressSpaceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using UPtrAttrRange = DerivedEntityRange<AttrIterator, UPtrAttr>;
+using UPtrAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UPtrAttr>;
+class UPtrAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static UPtrAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UPtrAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UPtrAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::U_PTR;
+  }
+
+  static std::optional<UPtrAttr> from(const TokenContext &c);
+  static std::optional<UPtrAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<UPtrAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return UPtrAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UPtrAttr> from(const Attr &parent);
+
+  inline static std::optional<UPtrAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UPtrAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TypeNullableResultAttrRange = DerivedEntityRange<AttrIterator, TypeNullableResultAttr>;
+using TypeNullableResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeNullableResultAttr>;
+class TypeNullableResultAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static TypeNullableResultAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeNullableResultAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeNullableResultAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TYPE_NULLABLE_RESULT;
+  }
+
+  static std::optional<TypeNullableResultAttr> from(const TokenContext &c);
+  static std::optional<TypeNullableResultAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<TypeNullableResultAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return TypeNullableResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TypeNullableResultAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeNullableResultAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeNullableResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TypeNullableAttrRange = DerivedEntityRange<AttrIterator, TypeNullableAttr>;
+using TypeNullableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeNullableAttr>;
+class TypeNullableAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static TypeNullableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeNullableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeNullableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TYPE_NULLABLE;
+  }
+
+  static std::optional<TypeNullableAttr> from(const TokenContext &c);
+  static std::optional<TypeNullableAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<TypeNullableAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return TypeNullableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TypeNullableAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeNullableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeNullableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TypeNullUnspecifiedAttrRange = DerivedEntityRange<AttrIterator, TypeNullUnspecifiedAttr>;
+using TypeNullUnspecifiedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeNullUnspecifiedAttr>;
+class TypeNullUnspecifiedAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static TypeNullUnspecifiedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeNullUnspecifiedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeNullUnspecifiedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TYPE_NULL_UNSPECIFIED;
+  }
+
+  static std::optional<TypeNullUnspecifiedAttr> from(const TokenContext &c);
+  static std::optional<TypeNullUnspecifiedAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<TypeNullUnspecifiedAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return TypeNullUnspecifiedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TypeNullUnspecifiedAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeNullUnspecifiedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeNullUnspecifiedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TypeNonNullAttrRange = DerivedEntityRange<AttrIterator, TypeNonNullAttr>;
+using TypeNonNullAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeNonNullAttr>;
+class TypeNonNullAttr : public TypeAttr {
+ private:
+  friend class FragmentImpl;
+  friend class TypeAttr;
+  friend class Attr;
+ public:
+  inline static TypeNonNullAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeNonNullAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeNonNullAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TYPE_NON_NULL;
+  }
+
+  static std::optional<TypeNonNullAttr> from(const TokenContext &c);
+  static std::optional<TypeNonNullAttr> from(const TypeAttr &parent);
+
+  inline static std::optional<TypeNonNullAttr> from(const std::optional<TypeAttr> &parent) {
+    if (parent) {
+      return TypeNonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TypeNonNullAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeNonNullAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeNonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ThreadAttrRange = DerivedEntityRange<AttrIterator, ThreadAttr>;
+using ThreadAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ThreadAttr>;
+class ThreadAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ThreadAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ThreadAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ThreadAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::THREAD;
+  }
+
+  static std::optional<ThreadAttr> from(const TokenContext &c);
+  static std::optional<ThreadAttr> from(const Attr &parent);
+
+  inline static std::optional<ThreadAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ThreadAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftObjCMembersAttrRange = DerivedEntityRange<AttrIterator, SwiftObjCMembersAttr>;
+using SwiftObjCMembersAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftObjCMembersAttr>;
+class SwiftObjCMembersAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static SwiftObjCMembersAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftObjCMembersAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftObjCMembersAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_OBJ_C_MEMBERS;
+  }
+
+  static std::optional<SwiftObjCMembersAttr> from(const TokenContext &c);
+  static std::optional<SwiftObjCMembersAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftObjCMembersAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftObjCMembersAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using StmtAttrRange = DerivedEntityRange<AttrIterator, StmtAttr>;
+using StmtAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StmtAttr>;
+class StmtAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static StmtAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static StmtAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StmtAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  static std::optional<StmtAttr> from(const TokenContext &c);
+  static std::optional<StmtAttr> from(const Attr &parent);
+
+  inline static std::optional<StmtAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return StmtAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+};
+
+using OpenCLUnrollHintAttrRange = DerivedEntityRange<AttrIterator, OpenCLUnrollHintAttr>;
+using OpenCLUnrollHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLUnrollHintAttr>;
+class OpenCLUnrollHintAttr : public StmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class StmtAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLUnrollHintAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLUnrollHintAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLUnrollHintAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_UNROLL_HINT;
+  }
+
+  static std::optional<OpenCLUnrollHintAttr> from(const TokenContext &c);
+  static std::optional<OpenCLUnrollHintAttr> from(const StmtAttr &parent);
+
+  inline static std::optional<OpenCLUnrollHintAttr> from(const std::optional<StmtAttr> &parent) {
+    if (parent) {
+      return OpenCLUnrollHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLUnrollHintAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLUnrollHintAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLUnrollHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MustTailAttrRange = DerivedEntityRange<AttrIterator, MustTailAttr>;
+using MustTailAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MustTailAttr>;
+class MustTailAttr : public StmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class StmtAttr;
+  friend class Attr;
+ public:
+  inline static MustTailAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MustTailAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MustTailAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MUST_TAIL;
+  }
+
+  static std::optional<MustTailAttr> from(const TokenContext &c);
+  static std::optional<MustTailAttr> from(const StmtAttr &parent);
+
+  inline static std::optional<MustTailAttr> from(const std::optional<StmtAttr> &parent) {
+    if (parent) {
+      return MustTailAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MustTailAttr> from(const Attr &parent);
+
+  inline static std::optional<MustTailAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MustTailAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LikelyAttrRange = DerivedEntityRange<AttrIterator, LikelyAttr>;
+using LikelyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LikelyAttr>;
+class LikelyAttr : public StmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class StmtAttr;
+  friend class Attr;
+ public:
+  inline static LikelyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LikelyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LikelyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LIKELY;
+  }
+
+  static std::optional<LikelyAttr> from(const TokenContext &c);
+  static std::optional<LikelyAttr> from(const StmtAttr &parent);
+
+  inline static std::optional<LikelyAttr> from(const std::optional<StmtAttr> &parent) {
+    if (parent) {
+      return LikelyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LikelyAttr> from(const Attr &parent);
+
+  inline static std::optional<LikelyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LikelyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using FallThroughAttrRange = DerivedEntityRange<AttrIterator, FallThroughAttr>;
+using FallThroughAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FallThroughAttr>;
+class FallThroughAttr : public StmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class StmtAttr;
+  friend class Attr;
+ public:
+  inline static FallThroughAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FallThroughAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FallThroughAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FALL_THROUGH;
+  }
+
+  static std::optional<FallThroughAttr> from(const TokenContext &c);
+  static std::optional<FallThroughAttr> from(const StmtAttr &parent);
+
+  inline static std::optional<FallThroughAttr> from(const std::optional<StmtAttr> &parent) {
+    if (parent) {
+      return FallThroughAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FallThroughAttr> from(const Attr &parent);
+
+  inline static std::optional<FallThroughAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FallThroughAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using UnlikelyAttrRange = DerivedEntityRange<AttrIterator, UnlikelyAttr>;
+using UnlikelyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnlikelyAttr>;
+class UnlikelyAttr : public StmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class StmtAttr;
+  friend class Attr;
+ public:
+  inline static UnlikelyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UnlikelyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnlikelyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::UNLIKELY;
+  }
+
+  static std::optional<UnlikelyAttr> from(const TokenContext &c);
+  static std::optional<UnlikelyAttr> from(const StmtAttr &parent);
+
+  inline static std::optional<UnlikelyAttr> from(const std::optional<StmtAttr> &parent) {
+    if (parent) {
+      return UnlikelyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UnlikelyAttr> from(const Attr &parent);
+
+  inline static std::optional<UnlikelyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UnlikelyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SuppressAttrRange = DerivedEntityRange<AttrIterator, SuppressAttr>;
+using SuppressAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SuppressAttr>;
+class SuppressAttr : public StmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class StmtAttr;
+  friend class Attr;
+ public:
+  inline static SuppressAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SuppressAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SuppressAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SUPPRESS;
+  }
+
+  static std::optional<SuppressAttr> from(const TokenContext &c);
+  static std::optional<SuppressAttr> from(const StmtAttr &parent);
+
+  inline static std::optional<SuppressAttr> from(const std::optional<StmtAttr> &parent) {
+    if (parent) {
+      return SuppressAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SuppressAttr> from(const Attr &parent);
+
+  inline static std::optional<SuppressAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SuppressAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using RenderScriptKernelAttrRange = DerivedEntityRange<AttrIterator, RenderScriptKernelAttr>;
+using RenderScriptKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RenderScriptKernelAttr>;
+class RenderScriptKernelAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static RenderScriptKernelAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RenderScriptKernelAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RenderScriptKernelAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RENDER_SCRIPT_KERNEL;
+  }
+
+  static std::optional<RenderScriptKernelAttr> from(const TokenContext &c);
+  static std::optional<RenderScriptKernelAttr> from(const Attr &parent);
+
+  inline static std::optional<RenderScriptKernelAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return RenderScriptKernelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OverloadableAttrRange = DerivedEntityRange<AttrIterator, OverloadableAttr>;
+using OverloadableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OverloadableAttr>;
+class OverloadableAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static OverloadableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OverloadableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OverloadableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OVERLOADABLE;
+  }
+
+  static std::optional<OverloadableAttr> from(const TokenContext &c);
+  static std::optional<OverloadableAttr> from(const Attr &parent);
+
+  inline static std::optional<OverloadableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OverloadableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OpenCLAccessAttrRange = DerivedEntityRange<AttrIterator, OpenCLAccessAttr>;
+using OpenCLAccessAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLAccessAttr>;
+class OpenCLAccessAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static OpenCLAccessAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLAccessAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLAccessAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_ACCESS;
+  }
+
+  static std::optional<OpenCLAccessAttr> from(const TokenContext &c);
+  static std::optional<OpenCLAccessAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLAccessAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLAccessAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OpenCLAccessAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_read_only(void) const;
+  bool is_read_write(void) const;
+  bool is_write_only(void) const;
+};
+
+using ObjCRuntimeVisibleAttrRange = DerivedEntityRange<AttrIterator, ObjCRuntimeVisibleAttr>;
+using ObjCRuntimeVisibleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCRuntimeVisibleAttr>;
+class ObjCRuntimeVisibleAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCRuntimeVisibleAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCRuntimeVisibleAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCRuntimeVisibleAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_RUNTIME_VISIBLE;
+  }
+
+  static std::optional<ObjCRuntimeVisibleAttr> from(const TokenContext &c);
+  static std::optional<ObjCRuntimeVisibleAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCRuntimeVisibleAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCRuntimeVisibleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCRuntimeNameAttrRange = DerivedEntityRange<AttrIterator, ObjCRuntimeNameAttr>;
+using ObjCRuntimeNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCRuntimeNameAttr>;
+class ObjCRuntimeNameAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCRuntimeNameAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCRuntimeNameAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCRuntimeNameAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_RUNTIME_NAME;
+  }
+
+  static std::optional<ObjCRuntimeNameAttr> from(const TokenContext &c);
+  static std::optional<ObjCRuntimeNameAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCRuntimeNameAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCRuntimeNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view metadata_name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ObjCNonRuntimeProtocolAttrRange = DerivedEntityRange<AttrIterator, ObjCNonRuntimeProtocolAttr>;
+using ObjCNonRuntimeProtocolAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCNonRuntimeProtocolAttr>;
+class ObjCNonRuntimeProtocolAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCNonRuntimeProtocolAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCNonRuntimeProtocolAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCNonRuntimeProtocolAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_NON_RUNTIME_PROTOCOL;
+  }
+
+  static std::optional<ObjCNonRuntimeProtocolAttr> from(const TokenContext &c);
+  static std::optional<ObjCNonRuntimeProtocolAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCNonRuntimeProtocolAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCNonRuntimeProtocolAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCNonLazyClassAttrRange = DerivedEntityRange<AttrIterator, ObjCNonLazyClassAttr>;
+using ObjCNonLazyClassAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCNonLazyClassAttr>;
+class ObjCNonLazyClassAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCNonLazyClassAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCNonLazyClassAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCNonLazyClassAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_NON_LAZY_CLASS;
+  }
+
+  static std::optional<ObjCNonLazyClassAttr> from(const TokenContext &c);
+  static std::optional<ObjCNonLazyClassAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCNonLazyClassAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCNonLazyClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCDirectMembersAttrRange = DerivedEntityRange<AttrIterator, ObjCDirectMembersAttr>;
+using ObjCDirectMembersAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCDirectMembersAttr>;
+class ObjCDirectMembersAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCDirectMembersAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCDirectMembersAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCDirectMembersAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_DIRECT_MEMBERS;
+  }
+
+  static std::optional<ObjCDirectMembersAttr> from(const TokenContext &c);
+  static std::optional<ObjCDirectMembersAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCDirectMembersAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCDirectMembersAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCDirectAttrRange = DerivedEntityRange<AttrIterator, ObjCDirectAttr>;
+using ObjCDirectAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCDirectAttr>;
+class ObjCDirectAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCDirectAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCDirectAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCDirectAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_DIRECT;
+  }
+
+  static std::optional<ObjCDirectAttr> from(const TokenContext &c);
+  static std::optional<ObjCDirectAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCDirectAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCDirectAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCDesignatedInitializerAttrRange = DerivedEntityRange<AttrIterator, ObjCDesignatedInitializerAttr>;
+using ObjCDesignatedInitializerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCDesignatedInitializerAttr>;
+class ObjCDesignatedInitializerAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCDesignatedInitializerAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCDesignatedInitializerAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCDesignatedInitializerAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_DESIGNATED_INITIALIZER;
+  }
+
+  static std::optional<ObjCDesignatedInitializerAttr> from(const TokenContext &c);
+  static std::optional<ObjCDesignatedInitializerAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCDesignatedInitializerAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCDesignatedInitializerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCClassStubAttrRange = DerivedEntityRange<AttrIterator, ObjCClassStubAttr>;
+using ObjCClassStubAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCClassStubAttr>;
+class ObjCClassStubAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCClassStubAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCClassStubAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCClassStubAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_CLASS_STUB;
+  }
+
+  static std::optional<ObjCClassStubAttr> from(const TokenContext &c);
+  static std::optional<ObjCClassStubAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCClassStubAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCClassStubAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCBoxableAttrRange = DerivedEntityRange<AttrIterator, ObjCBoxableAttr>;
+using ObjCBoxableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBoxableAttr>;
+class ObjCBoxableAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ObjCBoxableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCBoxableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBoxableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_BOXABLE;
+  }
+
+  static std::optional<ObjCBoxableAttr> from(const TokenContext &c);
+  static std::optional<ObjCBoxableAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCBoxableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCBoxableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OMPReferencedVarAttrRange = DerivedEntityRange<AttrIterator, OMPReferencedVarAttr>;
+using OMPReferencedVarAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPReferencedVarAttr>;
+class OMPReferencedVarAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static OMPReferencedVarAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPReferencedVarAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPReferencedVarAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_REFERENCED_VAR;
+  }
+
+  static std::optional<OMPReferencedVarAttr> from(const TokenContext &c);
+  static std::optional<OMPReferencedVarAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPReferencedVarAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPReferencedVarAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr reference(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OMPDeclareSimdDeclAttrRange = DerivedEntityRange<AttrIterator, OMPDeclareSimdDeclAttr>;
+using OMPDeclareSimdDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareSimdDeclAttr>;
+class OMPDeclareSimdDeclAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static OMPDeclareSimdDeclAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPDeclareSimdDeclAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclareSimdDeclAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_DECLARE_SIMD_DECL;
+  }
+
+  static std::optional<OMPDeclareSimdDeclAttr> from(const TokenContext &c);
+  static std::optional<OMPDeclareSimdDeclAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPDeclareSimdDeclAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPDeclareSimdDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OMPDeclareSimdDeclAttrBranchStateTy branch_state(void) const;
+  Expr simdlen(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OMPCaptureKindAttrRange = DerivedEntityRange<AttrIterator, OMPCaptureKindAttr>;
+using OMPCaptureKindAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCaptureKindAttr>;
+class OMPCaptureKindAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static OMPCaptureKindAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPCaptureKindAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCaptureKindAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_CAPTURE_KIND;
+  }
+
+  static std::optional<OMPCaptureKindAttr> from(const TokenContext &c);
+  static std::optional<OMPCaptureKindAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPCaptureKindAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPCaptureKindAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoEscapeAttrRange = DerivedEntityRange<AttrIterator, NoEscapeAttr>;
+using NoEscapeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoEscapeAttr>;
+class NoEscapeAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static NoEscapeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoEscapeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoEscapeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_ESCAPE;
+  }
+
+  static std::optional<NoEscapeAttr> from(const TokenContext &c);
+  static std::optional<NoEscapeAttr> from(const Attr &parent);
+
+  inline static std::optional<NoEscapeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoEscapeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoBuiltinAttrRange = DerivedEntityRange<AttrIterator, NoBuiltinAttr>;
+using NoBuiltinAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoBuiltinAttr>;
+class NoBuiltinAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static NoBuiltinAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoBuiltinAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoBuiltinAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_BUILTIN;
+  }
+
+  static std::optional<NoBuiltinAttr> from(const TokenContext &c);
+  static std::optional<NoBuiltinAttr> from(const Attr &parent);
+
+  inline static std::optional<NoBuiltinAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoBuiltinAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ModeAttrRange = DerivedEntityRange<AttrIterator, ModeAttr>;
+using ModeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ModeAttr>;
+class ModeAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static ModeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ModeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ModeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MODE;
+  }
+
+  static std::optional<ModeAttr> from(const TokenContext &c);
+  static std::optional<ModeAttr> from(const Attr &parent);
+
+  inline static std::optional<ModeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ModeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LoopHintAttrRange = DerivedEntityRange<AttrIterator, LoopHintAttr>;
+using LoopHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LoopHintAttr>;
+class LoopHintAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static LoopHintAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LoopHintAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LoopHintAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LOOP_HINT;
+  }
+
+  static std::optional<LoopHintAttr> from(const TokenContext &c);
+  static std::optional<LoopHintAttr> from(const Attr &parent);
+
+  inline static std::optional<LoopHintAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LoopHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  LoopHintAttrOptionType option(void) const;
+  LoopHintAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  LoopHintAttrLoopHintState state(void) const;
+  Expr value(void) const;
+};
+
+using LoaderUninitializedAttrRange = DerivedEntityRange<AttrIterator, LoaderUninitializedAttr>;
+using LoaderUninitializedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LoaderUninitializedAttr>;
+class LoaderUninitializedAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static LoaderUninitializedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LoaderUninitializedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LoaderUninitializedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LOADER_UNINITIALIZED;
+  }
+
+  static std::optional<LoaderUninitializedAttr> from(const TokenContext &c);
+  static std::optional<LoaderUninitializedAttr> from(const Attr &parent);
+
+  inline static std::optional<LoaderUninitializedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LoaderUninitializedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using InitSegAttrRange = DerivedEntityRange<AttrIterator, InitSegAttr>;
+using InitSegAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, InitSegAttr>;
+class InitSegAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static InitSegAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static InitSegAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InitSegAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::INIT_SEG;
+  }
+
+  static std::optional<InitSegAttr> from(const TokenContext &c);
+  static std::optional<InitSegAttr> from(const Attr &parent);
+
+  inline static std::optional<InitSegAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return InitSegAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view section(void) const;
+  std::string_view spelling(void) const;
+};
+
+using InheritableAttrRange = DerivedEntityRange<AttrIterator, InheritableAttr>;
+using InheritableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, InheritableAttr>;
+class InheritableAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static InheritableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static InheritableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InheritableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  static std::optional<InheritableAttr> from(const TokenContext &c);
+  static std::optional<InheritableAttr> from(const Attr &parent);
+
+  inline static std::optional<InheritableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return InheritableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool should_inherit_even_if_already_present(void) const;
+};
+
+using IBOutletCollectionAttrRange = DerivedEntityRange<AttrIterator, IBOutletCollectionAttr>;
+using IBOutletCollectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IBOutletCollectionAttr>;
+class IBOutletCollectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static IBOutletCollectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static IBOutletCollectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IBOutletCollectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::IB_OUTLET_COLLECTION;
+  }
+
+  static std::optional<IBOutletCollectionAttr> from(const TokenContext &c);
+  static std::optional<IBOutletCollectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<IBOutletCollectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return IBOutletCollectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<IBOutletCollectionAttr> from(const Attr &parent);
+
+  inline static std::optional<IBOutletCollectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return IBOutletCollectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Type interface(void) const;
+  Type interface_token(void) const;
+  std::string_view spelling(void) const;
+};
+
+using IBOutletAttrRange = DerivedEntityRange<AttrIterator, IBOutletAttr>;
+using IBOutletAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IBOutletAttr>;
+class IBOutletAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static IBOutletAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static IBOutletAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IBOutletAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::IB_OUTLET;
+  }
+
+  static std::optional<IBOutletAttr> from(const TokenContext &c);
+  static std::optional<IBOutletAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<IBOutletAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return IBOutletAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<IBOutletAttr> from(const Attr &parent);
+
+  inline static std::optional<IBOutletAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return IBOutletAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using IBActionAttrRange = DerivedEntityRange<AttrIterator, IBActionAttr>;
+using IBActionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IBActionAttr>;
+class IBActionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static IBActionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static IBActionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IBActionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::IB_ACTION;
+  }
+
+  static std::optional<IBActionAttr> from(const TokenContext &c);
+  static std::optional<IBActionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<IBActionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return IBActionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<IBActionAttr> from(const Attr &parent);
+
+  inline static std::optional<IBActionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return IBActionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using HotAttrRange = DerivedEntityRange<AttrIterator, HotAttr>;
+using HotAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, HotAttr>;
+class HotAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static HotAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static HotAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : HotAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::HOT;
+  }
+
+  static std::optional<HotAttr> from(const TokenContext &c);
+  static std::optional<HotAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<HotAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return HotAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<HotAttr> from(const Attr &parent);
+
+  inline static std::optional<HotAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return HotAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using HIPManagedAttrRange = DerivedEntityRange<AttrIterator, HIPManagedAttr>;
+using HIPManagedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, HIPManagedAttr>;
+class HIPManagedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static HIPManagedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static HIPManagedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : HIPManagedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::HIP_MANAGED;
+  }
+
+  static std::optional<HIPManagedAttr> from(const TokenContext &c);
+  static std::optional<HIPManagedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<HIPManagedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return HIPManagedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<HIPManagedAttr> from(const Attr &parent);
+
+  inline static std::optional<HIPManagedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return HIPManagedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using GuardedVarAttrRange = DerivedEntityRange<AttrIterator, GuardedVarAttr>;
+using GuardedVarAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, GuardedVarAttr>;
+class GuardedVarAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static GuardedVarAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static GuardedVarAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GuardedVarAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::GUARDED_VAR;
+  }
+
+  static std::optional<GuardedVarAttr> from(const TokenContext &c);
+  static std::optional<GuardedVarAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<GuardedVarAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return GuardedVarAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<GuardedVarAttr> from(const Attr &parent);
+
+  inline static std::optional<GuardedVarAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return GuardedVarAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using GuardedByAttrRange = DerivedEntityRange<AttrIterator, GuardedByAttr>;
+using GuardedByAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, GuardedByAttr>;
+class GuardedByAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static GuardedByAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static GuardedByAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GuardedByAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::GUARDED_BY;
+  }
+
+  static std::optional<GuardedByAttr> from(const TokenContext &c);
+  static std::optional<GuardedByAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<GuardedByAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return GuardedByAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<GuardedByAttr> from(const Attr &parent);
+
+  inline static std::optional<GuardedByAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return GuardedByAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr argument(void) const;
+  std::string_view spelling(void) const;
+};
+
+using GNUInlineAttrRange = DerivedEntityRange<AttrIterator, GNUInlineAttr>;
+using GNUInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, GNUInlineAttr>;
+class GNUInlineAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static GNUInlineAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static GNUInlineAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : GNUInlineAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::GNU_INLINE;
+  }
+
+  static std::optional<GNUInlineAttr> from(const TokenContext &c);
+  static std::optional<GNUInlineAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<GNUInlineAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return GNUInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<GNUInlineAttr> from(const Attr &parent);
+
+  inline static std::optional<GNUInlineAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return GNUInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using FormatAttrRange = DerivedEntityRange<AttrIterator, FormatAttr>;
+using FormatAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FormatAttr>;
+class FormatAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static FormatAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FormatAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FormatAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FORMAT;
+  }
+
+  static std::optional<FormatAttr> from(const TokenContext &c);
+  static std::optional<FormatAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<FormatAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return FormatAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FormatAttr> from(const Attr &parent);
+
+  inline static std::optional<FormatAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FormatAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using FormatArgAttrRange = DerivedEntityRange<AttrIterator, FormatArgAttr>;
+using FormatArgAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FormatArgAttr>;
+class FormatArgAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static FormatArgAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FormatArgAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FormatArgAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FORMAT_ARG;
+  }
+
+  static std::optional<FormatArgAttr> from(const TokenContext &c);
+  static std::optional<FormatArgAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<FormatArgAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return FormatArgAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FormatArgAttr> from(const Attr &parent);
+
+  inline static std::optional<FormatArgAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FormatArgAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using FlattenAttrRange = DerivedEntityRange<AttrIterator, FlattenAttr>;
+using FlattenAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FlattenAttr>;
+class FlattenAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static FlattenAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FlattenAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FlattenAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FLATTEN;
+  }
+
+  static std::optional<FlattenAttr> from(const TokenContext &c);
+  static std::optional<FlattenAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<FlattenAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return FlattenAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FlattenAttr> from(const Attr &parent);
+
+  inline static std::optional<FlattenAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FlattenAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using FlagEnumAttrRange = DerivedEntityRange<AttrIterator, FlagEnumAttr>;
+using FlagEnumAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FlagEnumAttr>;
+class FlagEnumAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static FlagEnumAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FlagEnumAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FlagEnumAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FLAG_ENUM;
+  }
+
+  static std::optional<FlagEnumAttr> from(const TokenContext &c);
+  static std::optional<FlagEnumAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<FlagEnumAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return FlagEnumAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FlagEnumAttr> from(const Attr &parent);
+
+  inline static std::optional<FlagEnumAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FlagEnumAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using FinalAttrRange = DerivedEntityRange<AttrIterator, FinalAttr>;
+using FinalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FinalAttr>;
+class FinalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static FinalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FinalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FinalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FINAL;
+  }
+
+  static std::optional<FinalAttr> from(const TokenContext &c);
+  static std::optional<FinalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<FinalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return FinalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FinalAttr> from(const Attr &parent);
+
+  inline static std::optional<FinalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FinalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  FinalAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_spelled_as_sealed(void) const;
+};
+
+using FastCallAttrRange = DerivedEntityRange<AttrIterator, FastCallAttr>;
+using FastCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FastCallAttr>;
+class FastCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static FastCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static FastCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : FastCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::FAST_CALL;
+  }
+
+  static std::optional<FastCallAttr> from(const TokenContext &c);
+  static std::optional<FastCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<FastCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return FastCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<FastCallAttr> from(const Attr &parent);
+
+  inline static std::optional<FastCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return FastCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ExternalSourceSymbolAttrRange = DerivedEntityRange<AttrIterator, ExternalSourceSymbolAttr>;
+using ExternalSourceSymbolAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExternalSourceSymbolAttr>;
+class ExternalSourceSymbolAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ExternalSourceSymbolAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ExternalSourceSymbolAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExternalSourceSymbolAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::EXTERNAL_SOURCE_SYMBOL;
+  }
+
+  static std::optional<ExternalSourceSymbolAttr> from(const TokenContext &c);
+  static std::optional<ExternalSourceSymbolAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ExternalSourceSymbolAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ExternalSourceSymbolAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ExternalSourceSymbolAttr> from(const Attr &parent);
+
+  inline static std::optional<ExternalSourceSymbolAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ExternalSourceSymbolAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view defined_in(void) const;
+  bool generated_declaration(void) const;
+  std::string_view language(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ExclusiveTrylockFunctionAttrRange = DerivedEntityRange<AttrIterator, ExclusiveTrylockFunctionAttr>;
+using ExclusiveTrylockFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExclusiveTrylockFunctionAttr>;
+class ExclusiveTrylockFunctionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ExclusiveTrylockFunctionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ExclusiveTrylockFunctionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExclusiveTrylockFunctionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::EXCLUSIVE_TRYLOCK_FUNCTION;
+  }
+
+  static std::optional<ExclusiveTrylockFunctionAttr> from(const TokenContext &c);
+  static std::optional<ExclusiveTrylockFunctionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ExclusiveTrylockFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ExclusiveTrylockFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ExclusiveTrylockFunctionAttr> from(const Attr &parent);
+
+  inline static std::optional<ExclusiveTrylockFunctionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ExclusiveTrylockFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  Expr success_value(void) const;
+};
+
+using ExcludeFromExplicitInstantiationAttrRange = DerivedEntityRange<AttrIterator, ExcludeFromExplicitInstantiationAttr>;
+using ExcludeFromExplicitInstantiationAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExcludeFromExplicitInstantiationAttr>;
+class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ExcludeFromExplicitInstantiationAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ExcludeFromExplicitInstantiationAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ExcludeFromExplicitInstantiationAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::EXCLUDE_FROM_EXPLICIT_INSTANTIATION;
+  }
+
+  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const TokenContext &c);
+  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ExcludeFromExplicitInstantiationAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ExcludeFromExplicitInstantiationAttr> from(const Attr &parent);
+
+  inline static std::optional<ExcludeFromExplicitInstantiationAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ExcludeFromExplicitInstantiationAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ErrorAttrRange = DerivedEntityRange<AttrIterator, ErrorAttr>;
+using ErrorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ErrorAttr>;
+class ErrorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ErrorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ErrorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ErrorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ERROR;
+  }
+
+  static std::optional<ErrorAttr> from(const TokenContext &c);
+  static std::optional<ErrorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ErrorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ErrorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ErrorAttr> from(const Attr &parent);
+
+  inline static std::optional<ErrorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ErrorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ErrorAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  std::string_view user_diagnostic(void) const;
+  bool is_error(void) const;
+  bool is_warning(void) const;
+};
+
+using EnumExtensibilityAttrRange = DerivedEntityRange<AttrIterator, EnumExtensibilityAttr>;
+using EnumExtensibilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumExtensibilityAttr>;
+class EnumExtensibilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static EnumExtensibilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static EnumExtensibilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnumExtensibilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ENUM_EXTENSIBILITY;
+  }
+
+  static std::optional<EnumExtensibilityAttr> from(const TokenContext &c);
+  static std::optional<EnumExtensibilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<EnumExtensibilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return EnumExtensibilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<EnumExtensibilityAttr> from(const Attr &parent);
+
+  inline static std::optional<EnumExtensibilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return EnumExtensibilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  EnumExtensibilityAttrKind extensibility(void) const;
+  std::string_view spelling(void) const;
+};
+
+using EnforceTCBLeafAttrRange = DerivedEntityRange<AttrIterator, EnforceTCBLeafAttr>;
+using EnforceTCBLeafAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnforceTCBLeafAttr>;
+class EnforceTCBLeafAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static EnforceTCBLeafAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static EnforceTCBLeafAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnforceTCBLeafAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ENFORCE_TCB_LEAF;
+  }
+
+  static std::optional<EnforceTCBLeafAttr> from(const TokenContext &c);
+  static std::optional<EnforceTCBLeafAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<EnforceTCBLeafAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return EnforceTCBLeafAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<EnforceTCBLeafAttr> from(const Attr &parent);
+
+  inline static std::optional<EnforceTCBLeafAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return EnforceTCBLeafAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  std::string_view tcb_name(void) const;
+};
+
+using EnforceTCBAttrRange = DerivedEntityRange<AttrIterator, EnforceTCBAttr>;
+using EnforceTCBAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnforceTCBAttr>;
+class EnforceTCBAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static EnforceTCBAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static EnforceTCBAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnforceTCBAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ENFORCE_TCB;
+  }
+
+  static std::optional<EnforceTCBAttr> from(const TokenContext &c);
+  static std::optional<EnforceTCBAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<EnforceTCBAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return EnforceTCBAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<EnforceTCBAttr> from(const Attr &parent);
+
+  inline static std::optional<EnforceTCBAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return EnforceTCBAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  std::string_view tcb_name(void) const;
+};
+
+using EnableIfAttrRange = DerivedEntityRange<AttrIterator, EnableIfAttr>;
+using EnableIfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnableIfAttr>;
+class EnableIfAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static EnableIfAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static EnableIfAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EnableIfAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ENABLE_IF;
+  }
+
+  static std::optional<EnableIfAttr> from(const TokenContext &c);
+  static std::optional<EnableIfAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<EnableIfAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return EnableIfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<EnableIfAttr> from(const Attr &parent);
+
+  inline static std::optional<EnableIfAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return EnableIfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr condition(void) const;
+  std::string_view message(void) const;
+  std::string_view spelling(void) const;
+};
+
+using EmptyBasesAttrRange = DerivedEntityRange<AttrIterator, EmptyBasesAttr>;
+using EmptyBasesAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EmptyBasesAttr>;
+class EmptyBasesAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static EmptyBasesAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static EmptyBasesAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : EmptyBasesAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::EMPTY_BASES;
+  }
+
+  static std::optional<EmptyBasesAttr> from(const TokenContext &c);
+  static std::optional<EmptyBasesAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<EmptyBasesAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return EmptyBasesAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<EmptyBasesAttr> from(const Attr &parent);
+
+  inline static std::optional<EmptyBasesAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return EmptyBasesAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DisableTailCallsAttrRange = DerivedEntityRange<AttrIterator, DisableTailCallsAttr>;
+using DisableTailCallsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DisableTailCallsAttr>;
+class DisableTailCallsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DisableTailCallsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DisableTailCallsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DisableTailCallsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DISABLE_TAIL_CALLS;
+  }
+
+  static std::optional<DisableTailCallsAttr> from(const TokenContext &c);
+  static std::optional<DisableTailCallsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DisableTailCallsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DisableTailCallsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DisableTailCallsAttr> from(const Attr &parent);
+
+  inline static std::optional<DisableTailCallsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DisableTailCallsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DisableSanitizerInstrumentationAttrRange = DerivedEntityRange<AttrIterator, DisableSanitizerInstrumentationAttr>;
+using DisableSanitizerInstrumentationAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DisableSanitizerInstrumentationAttr>;
+class DisableSanitizerInstrumentationAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DisableSanitizerInstrumentationAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DisableSanitizerInstrumentationAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DisableSanitizerInstrumentationAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DISABLE_SANITIZER_INSTRUMENTATION;
+  }
+
+  static std::optional<DisableSanitizerInstrumentationAttr> from(const TokenContext &c);
+  static std::optional<DisableSanitizerInstrumentationAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DisableSanitizerInstrumentationAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DisableSanitizerInstrumentationAttr> from(const Attr &parent);
+
+  inline static std::optional<DisableSanitizerInstrumentationAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DisableSanitizerInstrumentationAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DiagnoseIfAttrRange = DerivedEntityRange<AttrIterator, DiagnoseIfAttr>;
+using DiagnoseIfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DiagnoseIfAttr>;
+class DiagnoseIfAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DiagnoseIfAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DiagnoseIfAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DiagnoseIfAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DIAGNOSE_IF;
+  }
+
+  static std::optional<DiagnoseIfAttr> from(const TokenContext &c);
+  static std::optional<DiagnoseIfAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DiagnoseIfAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DiagnoseIfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DiagnoseIfAttr> from(const Attr &parent);
+
+  inline static std::optional<DiagnoseIfAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DiagnoseIfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool argument_dependent(void) const;
+  Expr condition(void) const;
+  DiagnoseIfAttrDiagnosticType diagnostic_type(void) const;
+  std::string_view message(void) const;
+  NamedDecl parent(void) const;
+  std::string_view spelling(void) const;
+  bool is_error(void) const;
+  bool is_warning(void) const;
+};
+
+using DiagnoseAsBuiltinAttrRange = DerivedEntityRange<AttrIterator, DiagnoseAsBuiltinAttr>;
+using DiagnoseAsBuiltinAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DiagnoseAsBuiltinAttr>;
+class DiagnoseAsBuiltinAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DiagnoseAsBuiltinAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DiagnoseAsBuiltinAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DiagnoseAsBuiltinAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DIAGNOSE_AS_BUILTIN;
+  }
+
+  static std::optional<DiagnoseAsBuiltinAttr> from(const TokenContext &c);
+  static std::optional<DiagnoseAsBuiltinAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DiagnoseAsBuiltinAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DiagnoseAsBuiltinAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DiagnoseAsBuiltinAttr> from(const Attr &parent);
+
+  inline static std::optional<DiagnoseAsBuiltinAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DiagnoseAsBuiltinAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  FunctionDecl function(void) const;
+  std::string_view spelling(void) const;
+};
+
+using DestructorAttrRange = DerivedEntityRange<AttrIterator, DestructorAttr>;
+using DestructorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DestructorAttr>;
+class DestructorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DestructorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DestructorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DestructorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DESTRUCTOR;
+  }
+
+  static std::optional<DestructorAttr> from(const TokenContext &c);
+  static std::optional<DestructorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DestructorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DestructorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DestructorAttr> from(const Attr &parent);
+
+  inline static std::optional<DestructorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DestructorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DeprecatedAttrRange = DerivedEntityRange<AttrIterator, DeprecatedAttr>;
+using DeprecatedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeprecatedAttr>;
+class DeprecatedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DeprecatedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DeprecatedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeprecatedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DEPRECATED;
+  }
+
+  static std::optional<DeprecatedAttr> from(const TokenContext &c);
+  static std::optional<DeprecatedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DeprecatedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DeprecatedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DeprecatedAttr> from(const Attr &parent);
+
+  inline static std::optional<DeprecatedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DeprecatedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view message(void) const;
+  std::string_view replacement(void) const;
+  std::string_view spelling(void) const;
+};
+
+using DeclOrStmtAttrRange = DerivedEntityRange<AttrIterator, DeclOrStmtAttr>;
+using DeclOrStmtAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeclOrStmtAttr>;
+class DeclOrStmtAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DeclOrStmtAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DeclOrStmtAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DeclOrStmtAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  static std::optional<DeclOrStmtAttr> from(const TokenContext &c);
+  static std::optional<DeclOrStmtAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DeclOrStmtAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DeclOrStmtAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DeclOrStmtAttr> from(const Attr &parent);
+
+  inline static std::optional<DeclOrStmtAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DeclOrStmtAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+};
+
+using NoMergeAttrRange = DerivedEntityRange<AttrIterator, NoMergeAttr>;
+using NoMergeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoMergeAttr>;
+class NoMergeAttr : public DeclOrStmtAttr {
+ private:
+  friend class FragmentImpl;
+  friend class DeclOrStmtAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoMergeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoMergeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoMergeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_MERGE;
+  }
+
+  static std::optional<NoMergeAttr> from(const TokenContext &c);
+  static std::optional<NoMergeAttr> from(const DeclOrStmtAttr &parent);
+
+  inline static std::optional<NoMergeAttr> from(const std::optional<DeclOrStmtAttr> &parent) {
+    if (parent) {
+      return NoMergeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoMergeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoMergeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoMergeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoMergeAttr> from(const Attr &parent);
+
+  inline static std::optional<NoMergeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoMergeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DLLImportStaticLocalAttrRange = DerivedEntityRange<AttrIterator, DLLImportStaticLocalAttr>;
+using DLLImportStaticLocalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DLLImportStaticLocalAttr>;
+class DLLImportStaticLocalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DLLImportStaticLocalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DLLImportStaticLocalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DLLImportStaticLocalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DLL_IMPORT_STATIC_LOCAL;
+  }
+
+  static std::optional<DLLImportStaticLocalAttr> from(const TokenContext &c);
+  static std::optional<DLLImportStaticLocalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DLLImportStaticLocalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DLLImportStaticLocalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DLLImportStaticLocalAttr> from(const Attr &parent);
+
+  inline static std::optional<DLLImportStaticLocalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DLLImportStaticLocalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DLLImportAttrRange = DerivedEntityRange<AttrIterator, DLLImportAttr>;
+using DLLImportAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DLLImportAttr>;
+class DLLImportAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DLLImportAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DLLImportAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DLLImportAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DLL_IMPORT;
+  }
+
+  static std::optional<DLLImportAttr> from(const TokenContext &c);
+  static std::optional<DLLImportAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DLLImportAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DLLImportAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DLLImportAttr> from(const Attr &parent);
+
+  inline static std::optional<DLLImportAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DLLImportAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DLLExportStaticLocalAttrRange = DerivedEntityRange<AttrIterator, DLLExportStaticLocalAttr>;
+using DLLExportStaticLocalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DLLExportStaticLocalAttr>;
+class DLLExportStaticLocalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DLLExportStaticLocalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DLLExportStaticLocalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DLLExportStaticLocalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DLL_EXPORT_STATIC_LOCAL;
+  }
+
+  static std::optional<DLLExportStaticLocalAttr> from(const TokenContext &c);
+  static std::optional<DLLExportStaticLocalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DLLExportStaticLocalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DLLExportStaticLocalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DLLExportStaticLocalAttr> from(const Attr &parent);
+
+  inline static std::optional<DLLExportStaticLocalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DLLExportStaticLocalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using DLLExportAttrRange = DerivedEntityRange<AttrIterator, DLLExportAttr>;
+using DLLExportAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DLLExportAttr>;
+class DLLExportAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static DLLExportAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static DLLExportAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : DLLExportAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::DLL_EXPORT;
+  }
+
+  static std::optional<DLLExportAttr> from(const TokenContext &c);
+  static std::optional<DLLExportAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<DLLExportAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return DLLExportAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<DLLExportAttr> from(const Attr &parent);
+
+  inline static std::optional<DLLExportAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return DLLExportAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ConvergentAttrRange = DerivedEntityRange<AttrIterator, ConvergentAttr>;
+using ConvergentAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConvergentAttr>;
+class ConvergentAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConvergentAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConvergentAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConvergentAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONVERGENT;
+  }
+
+  static std::optional<ConvergentAttr> from(const TokenContext &c);
+  static std::optional<ConvergentAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConvergentAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConvergentAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConvergentAttr> from(const Attr &parent);
+
+  inline static std::optional<ConvergentAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConvergentAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ConsumableSetOnReadAttrRange = DerivedEntityRange<AttrIterator, ConsumableSetOnReadAttr>;
+using ConsumableSetOnReadAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConsumableSetOnReadAttr>;
+class ConsumableSetOnReadAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConsumableSetOnReadAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConsumableSetOnReadAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConsumableSetOnReadAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONSUMABLE_SET_ON_READ;
+  }
+
+  static std::optional<ConsumableSetOnReadAttr> from(const TokenContext &c);
+  static std::optional<ConsumableSetOnReadAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConsumableSetOnReadAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConsumableSetOnReadAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConsumableSetOnReadAttr> from(const Attr &parent);
+
+  inline static std::optional<ConsumableSetOnReadAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConsumableSetOnReadAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ConsumableAutoCastAttrRange = DerivedEntityRange<AttrIterator, ConsumableAutoCastAttr>;
+using ConsumableAutoCastAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConsumableAutoCastAttr>;
+class ConsumableAutoCastAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConsumableAutoCastAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConsumableAutoCastAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConsumableAutoCastAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONSUMABLE_AUTO_CAST;
+  }
+
+  static std::optional<ConsumableAutoCastAttr> from(const TokenContext &c);
+  static std::optional<ConsumableAutoCastAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConsumableAutoCastAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConsumableAutoCastAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConsumableAutoCastAttr> from(const Attr &parent);
+
+  inline static std::optional<ConsumableAutoCastAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConsumableAutoCastAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ConsumableAttrRange = DerivedEntityRange<AttrIterator, ConsumableAttr>;
+using ConsumableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConsumableAttr>;
+class ConsumableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConsumableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConsumableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConsumableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONSUMABLE;
+  }
+
+  static std::optional<ConsumableAttr> from(const TokenContext &c);
+  static std::optional<ConsumableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConsumableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConsumableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConsumableAttr> from(const Attr &parent);
+
+  inline static std::optional<ConsumableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConsumableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ConsumableAttrConsumedState default_state(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ConstructorAttrRange = DerivedEntityRange<AttrIterator, ConstructorAttr>;
+using ConstructorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstructorAttr>;
+class ConstructorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConstructorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConstructorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstructorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONSTRUCTOR;
+  }
+
+  static std::optional<ConstructorAttr> from(const TokenContext &c);
+  static std::optional<ConstructorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConstructorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConstructorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConstructorAttr> from(const Attr &parent);
+
+  inline static std::optional<ConstructorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConstructorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ConstInitAttrRange = DerivedEntityRange<AttrIterator, ConstInitAttr>;
+using ConstInitAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstInitAttr>;
+class ConstInitAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConstInitAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConstInitAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstInitAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONST_INIT;
+  }
+
+  static std::optional<ConstInitAttr> from(const TokenContext &c);
+  static std::optional<ConstInitAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConstInitAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConstInitAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConstInitAttr> from(const Attr &parent);
+
+  inline static std::optional<ConstInitAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConstInitAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ConstInitAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_constinit(void) const;
+};
+
+using ConstAttrRange = DerivedEntityRange<AttrIterator, ConstAttr>;
+using ConstAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstAttr>;
+class ConstAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ConstAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ConstAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ConstAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CONST;
+  }
+
+  static std::optional<ConstAttr> from(const TokenContext &c);
+  static std::optional<ConstAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ConstAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ConstAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ConstAttr> from(const Attr &parent);
+
+  inline static std::optional<ConstAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ConstAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CommonAttrRange = DerivedEntityRange<AttrIterator, CommonAttr>;
+using CommonAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CommonAttr>;
+class CommonAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CommonAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CommonAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CommonAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::COMMON;
+  }
+
+  static std::optional<CommonAttr> from(const TokenContext &c);
+  static std::optional<CommonAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CommonAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CommonAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CommonAttr> from(const Attr &parent);
+
+  inline static std::optional<CommonAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CommonAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ColdAttrRange = DerivedEntityRange<AttrIterator, ColdAttr>;
+using ColdAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ColdAttr>;
+class ColdAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ColdAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ColdAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ColdAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::COLD;
+  }
+
+  static std::optional<ColdAttr> from(const TokenContext &c);
+  static std::optional<ColdAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ColdAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ColdAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ColdAttr> from(const Attr &parent);
+
+  inline static std::optional<ColdAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ColdAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CodeSegAttrRange = DerivedEntityRange<AttrIterator, CodeSegAttr>;
+using CodeSegAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CodeSegAttr>;
+class CodeSegAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CodeSegAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CodeSegAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CodeSegAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CODE_SEG;
+  }
+
+  static std::optional<CodeSegAttr> from(const TokenContext &c);
+  static std::optional<CodeSegAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CodeSegAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CodeSegAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CodeSegAttr> from(const Attr &parent);
+
+  inline static std::optional<CodeSegAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CodeSegAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using CmseNSEntryAttrRange = DerivedEntityRange<AttrIterator, CmseNSEntryAttr>;
+using CmseNSEntryAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CmseNSEntryAttr>;
+class CmseNSEntryAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CmseNSEntryAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CmseNSEntryAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CmseNSEntryAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CMSE_NS_ENTRY;
+  }
+
+  static std::optional<CmseNSEntryAttr> from(const TokenContext &c);
+  static std::optional<CmseNSEntryAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CmseNSEntryAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CmseNSEntryAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CmseNSEntryAttr> from(const Attr &parent);
+
+  inline static std::optional<CmseNSEntryAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CmseNSEntryAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CleanupAttrRange = DerivedEntityRange<AttrIterator, CleanupAttr>;
+using CleanupAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CleanupAttr>;
+class CleanupAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CleanupAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CleanupAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CleanupAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CLEANUP;
+  }
+
+  static std::optional<CleanupAttr> from(const TokenContext &c);
+  static std::optional<CleanupAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CleanupAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CleanupAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CleanupAttr> from(const Attr &parent);
+
+  inline static std::optional<CleanupAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CleanupAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  FunctionDecl function_declaration(void) const;
+  std::string_view spelling(void) const;
+};
+
+using CapturedRecordAttrRange = DerivedEntityRange<AttrIterator, CapturedRecordAttr>;
+using CapturedRecordAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CapturedRecordAttr>;
+class CapturedRecordAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CapturedRecordAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CapturedRecordAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CapturedRecordAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CAPTURED_RECORD;
+  }
+
+  static std::optional<CapturedRecordAttr> from(const TokenContext &c);
+  static std::optional<CapturedRecordAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CapturedRecordAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CapturedRecordAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CapturedRecordAttr> from(const Attr &parent);
+
+  inline static std::optional<CapturedRecordAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CapturedRecordAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CapabilityAttrRange = DerivedEntityRange<AttrIterator, CapabilityAttr>;
+using CapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CapabilityAttr>;
+class CapabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CapabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CapabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CapabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CAPABILITY;
+  }
+
+  static std::optional<CapabilityAttr> from(const TokenContext &c);
+  static std::optional<CapabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CapabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<CapabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  CapabilityAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_shared(void) const;
+};
+
+using CallbackAttrRange = DerivedEntityRange<AttrIterator, CallbackAttr>;
+using CallbackAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CallbackAttr>;
+class CallbackAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CallbackAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CallbackAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CallbackAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CALLBACK;
+  }
+
+  static std::optional<CallbackAttr> from(const TokenContext &c);
+  static std::optional<CallbackAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CallbackAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CallbackAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CallbackAttr> from(const Attr &parent);
+
+  inline static std::optional<CallbackAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CallbackAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CallableWhenAttrRange = DerivedEntityRange<AttrIterator, CallableWhenAttr>;
+using CallableWhenAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CallableWhenAttr>;
+class CallableWhenAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CallableWhenAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CallableWhenAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CallableWhenAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CALLABLE_WHEN;
+  }
+
+  static std::optional<CallableWhenAttr> from(const TokenContext &c);
+  static std::optional<CallableWhenAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CallableWhenAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CallableWhenAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CallableWhenAttr> from(const Attr &parent);
+
+  inline static std::optional<CallableWhenAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CallableWhenAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CXX11NoReturnAttrRange = DerivedEntityRange<AttrIterator, CXX11NoReturnAttr>;
+using CXX11NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXX11NoReturnAttr>;
+class CXX11NoReturnAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CXX11NoReturnAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CXX11NoReturnAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CXX11NoReturnAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CXX11_NO_RETURN;
+  }
+
+  static std::optional<CXX11NoReturnAttr> from(const TokenContext &c);
+  static std::optional<CXX11NoReturnAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CXX11NoReturnAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CXX11NoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CXX11NoReturnAttr> from(const Attr &parent);
+
+  inline static std::optional<CXX11NoReturnAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CXX11NoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDASharedAttrRange = DerivedEntityRange<AttrIterator, CUDASharedAttr>;
+using CUDASharedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDASharedAttr>;
+class CUDASharedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDASharedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDASharedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDASharedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_SHARED;
+  }
+
+  static std::optional<CUDASharedAttr> from(const TokenContext &c);
+  static std::optional<CUDASharedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDASharedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDASharedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDASharedAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDASharedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDASharedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDALaunchBoundsAttrRange = DerivedEntityRange<AttrIterator, CUDALaunchBoundsAttr>;
+using CUDALaunchBoundsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDALaunchBoundsAttr>;
+class CUDALaunchBoundsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDALaunchBoundsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDALaunchBoundsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDALaunchBoundsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_LAUNCH_BOUNDS;
+  }
+
+  static std::optional<CUDALaunchBoundsAttr> from(const TokenContext &c);
+  static std::optional<CUDALaunchBoundsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDALaunchBoundsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDALaunchBoundsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDALaunchBoundsAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDALaunchBoundsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDALaunchBoundsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr max_threads(void) const;
+  Expr min_blocks(void) const;
+  std::string_view spelling(void) const;
+};
+
+using CUDAInvalidTargetAttrRange = DerivedEntityRange<AttrIterator, CUDAInvalidTargetAttr>;
+using CUDAInvalidTargetAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDAInvalidTargetAttr>;
+class CUDAInvalidTargetAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDAInvalidTargetAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDAInvalidTargetAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDAInvalidTargetAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_INVALID_TARGET;
+  }
+
+  static std::optional<CUDAInvalidTargetAttr> from(const TokenContext &c);
+  static std::optional<CUDAInvalidTargetAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDAInvalidTargetAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDAInvalidTargetAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDAInvalidTargetAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDAInvalidTargetAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDAInvalidTargetAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDAHostAttrRange = DerivedEntityRange<AttrIterator, CUDAHostAttr>;
+using CUDAHostAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDAHostAttr>;
+class CUDAHostAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDAHostAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDAHostAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDAHostAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_HOST;
+  }
+
+  static std::optional<CUDAHostAttr> from(const TokenContext &c);
+  static std::optional<CUDAHostAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDAHostAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDAHostAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDAHostAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDAHostAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDAHostAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDAGlobalAttrRange = DerivedEntityRange<AttrIterator, CUDAGlobalAttr>;
+using CUDAGlobalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDAGlobalAttr>;
+class CUDAGlobalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDAGlobalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDAGlobalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDAGlobalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_GLOBAL;
+  }
+
+  static std::optional<CUDAGlobalAttr> from(const TokenContext &c);
+  static std::optional<CUDAGlobalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDAGlobalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDAGlobalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDAGlobalAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDAGlobalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDAGlobalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDADeviceBuiltinTextureTypeAttrRange = DerivedEntityRange<AttrIterator, CUDADeviceBuiltinTextureTypeAttr>;
+using CUDADeviceBuiltinTextureTypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDADeviceBuiltinTextureTypeAttr>;
+class CUDADeviceBuiltinTextureTypeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDADeviceBuiltinTextureTypeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDADeviceBuiltinTextureTypeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDADeviceBuiltinTextureTypeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_DEVICE_BUILTIN_TEXTURE_TYPE;
+  }
+
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const TokenContext &c);
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDADeviceBuiltinTextureTypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDADeviceBuiltinTextureTypeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDADeviceBuiltinTextureTypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDADeviceBuiltinSurfaceTypeAttrRange = DerivedEntityRange<AttrIterator, CUDADeviceBuiltinSurfaceTypeAttr>;
+using CUDADeviceBuiltinSurfaceTypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDADeviceBuiltinSurfaceTypeAttr>;
+class CUDADeviceBuiltinSurfaceTypeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDADeviceBuiltinSurfaceTypeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDADeviceBuiltinSurfaceTypeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDADeviceBuiltinSurfaceTypeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_DEVICE_BUILTIN_SURFACE_TYPE;
+  }
+
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const TokenContext &c);
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDADeviceBuiltinSurfaceTypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDADeviceBuiltinSurfaceTypeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDADeviceBuiltinSurfaceTypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDADeviceAttrRange = DerivedEntityRange<AttrIterator, CUDADeviceAttr>;
+using CUDADeviceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDADeviceAttr>;
+class CUDADeviceAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDADeviceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDADeviceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDADeviceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_DEVICE;
+  }
+
+  static std::optional<CUDADeviceAttr> from(const TokenContext &c);
+  static std::optional<CUDADeviceAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDADeviceAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDADeviceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDADeviceAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDADeviceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDADeviceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CUDAConstantAttrRange = DerivedEntityRange<AttrIterator, CUDAConstantAttr>;
+using CUDAConstantAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDAConstantAttr>;
+class CUDAConstantAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CUDAConstantAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CUDAConstantAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CUDAConstantAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CUDA_CONSTANT;
+  }
+
+  static std::optional<CUDAConstantAttr> from(const TokenContext &c);
+  static std::optional<CUDAConstantAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CUDAConstantAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CUDAConstantAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CUDAConstantAttr> from(const Attr &parent);
+
+  inline static std::optional<CUDAConstantAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CUDAConstantAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CPUSpecificAttrRange = DerivedEntityRange<AttrIterator, CPUSpecificAttr>;
+using CPUSpecificAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CPUSpecificAttr>;
+class CPUSpecificAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CPUSpecificAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CPUSpecificAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CPUSpecificAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CPU_SPECIFIC;
+  }
+
+  static std::optional<CPUSpecificAttr> from(const TokenContext &c);
+  static std::optional<CPUSpecificAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CPUSpecificAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CPUSpecificAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CPUSpecificAttr> from(const Attr &parent);
+
+  inline static std::optional<CPUSpecificAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CPUSpecificAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CPUDispatchAttrRange = DerivedEntityRange<AttrIterator, CPUDispatchAttr>;
+using CPUDispatchAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CPUDispatchAttr>;
+class CPUDispatchAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CPUDispatchAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CPUDispatchAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CPUDispatchAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CPU_DISPATCH;
+  }
+
+  static std::optional<CPUDispatchAttr> from(const TokenContext &c);
+  static std::optional<CPUDispatchAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CPUDispatchAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CPUDispatchAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CPUDispatchAttr> from(const Attr &parent);
+
+  inline static std::optional<CPUDispatchAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CPUDispatchAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CFUnknownTransferAttrRange = DerivedEntityRange<AttrIterator, CFUnknownTransferAttr>;
+using CFUnknownTransferAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFUnknownTransferAttr>;
+class CFUnknownTransferAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFUnknownTransferAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFUnknownTransferAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFUnknownTransferAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CF_UNKNOWN_TRANSFER;
+  }
+
+  static std::optional<CFUnknownTransferAttr> from(const TokenContext &c);
+  static std::optional<CFUnknownTransferAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFUnknownTransferAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFUnknownTransferAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFUnknownTransferAttr> from(const Attr &parent);
+
+  inline static std::optional<CFUnknownTransferAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFUnknownTransferAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CFReturnsRetainedAttrRange = DerivedEntityRange<AttrIterator, CFReturnsRetainedAttr>;
+using CFReturnsRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFReturnsRetainedAttr>;
+class CFReturnsRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFReturnsRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFReturnsRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFReturnsRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CF_RETURNS_RETAINED;
+  }
+
+  static std::optional<CFReturnsRetainedAttr> from(const TokenContext &c);
+  static std::optional<CFReturnsRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFReturnsRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFReturnsRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFReturnsRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<CFReturnsRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFReturnsRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CFReturnsNotRetainedAttrRange = DerivedEntityRange<AttrIterator, CFReturnsNotRetainedAttr>;
+using CFReturnsNotRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFReturnsNotRetainedAttr>;
+class CFReturnsNotRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFReturnsNotRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFReturnsNotRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFReturnsNotRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CF_RETURNS_NOT_RETAINED;
+  }
+
+  static std::optional<CFReturnsNotRetainedAttr> from(const TokenContext &c);
+  static std::optional<CFReturnsNotRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFReturnsNotRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFReturnsNotRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFReturnsNotRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<CFReturnsNotRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFReturnsNotRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CFICanonicalJumpTableAttrRange = DerivedEntityRange<AttrIterator, CFICanonicalJumpTableAttr>;
+using CFICanonicalJumpTableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFICanonicalJumpTableAttr>;
+class CFICanonicalJumpTableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFICanonicalJumpTableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFICanonicalJumpTableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFICanonicalJumpTableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CFI_CANONICAL_JUMP_TABLE;
+  }
+
+  static std::optional<CFICanonicalJumpTableAttr> from(const TokenContext &c);
+  static std::optional<CFICanonicalJumpTableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFICanonicalJumpTableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFICanonicalJumpTableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFICanonicalJumpTableAttr> from(const Attr &parent);
+
+  inline static std::optional<CFICanonicalJumpTableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFICanonicalJumpTableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CFGuardAttrRange = DerivedEntityRange<AttrIterator, CFGuardAttr>;
+using CFGuardAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFGuardAttr>;
+class CFGuardAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFGuardAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFGuardAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFGuardAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CF_GUARD;
+  }
+
+  static std::optional<CFGuardAttr> from(const TokenContext &c);
+  static std::optional<CFGuardAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFGuardAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFGuardAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFGuardAttr> from(const Attr &parent);
+
+  inline static std::optional<CFGuardAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFGuardAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  CFGuardAttrGuardArg guard(void) const;
+  std::string_view spelling(void) const;
+};
+
+using CFAuditedTransferAttrRange = DerivedEntityRange<AttrIterator, CFAuditedTransferAttr>;
+using CFAuditedTransferAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFAuditedTransferAttr>;
+class CFAuditedTransferAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFAuditedTransferAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFAuditedTransferAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFAuditedTransferAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CF_AUDITED_TRANSFER;
+  }
+
+  static std::optional<CFAuditedTransferAttr> from(const TokenContext &c);
+  static std::optional<CFAuditedTransferAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFAuditedTransferAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFAuditedTransferAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFAuditedTransferAttr> from(const Attr &parent);
+
+  inline static std::optional<CFAuditedTransferAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFAuditedTransferAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CDeclAttrRange = DerivedEntityRange<AttrIterator, CDeclAttr>;
+using CDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CDeclAttr>;
+class CDeclAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CDeclAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CDeclAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CDeclAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::C_DECL;
+  }
+
+  static std::optional<CDeclAttr> from(const TokenContext &c);
+  static std::optional<CDeclAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CDeclAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CDeclAttr> from(const Attr &parent);
+
+  inline static std::optional<CDeclAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using C11NoReturnAttrRange = DerivedEntityRange<AttrIterator, C11NoReturnAttr>;
+using C11NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, C11NoReturnAttr>;
+class C11NoReturnAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static C11NoReturnAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static C11NoReturnAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : C11NoReturnAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::C11_NO_RETURN;
+  }
+
+  static std::optional<C11NoReturnAttr> from(const TokenContext &c);
+  static std::optional<C11NoReturnAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<C11NoReturnAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return C11NoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<C11NoReturnAttr> from(const Attr &parent);
+
+  inline static std::optional<C11NoReturnAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return C11NoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using BuiltinAttrRange = DerivedEntityRange<AttrIterator, BuiltinAttr>;
+using BuiltinAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinAttr>;
+class BuiltinAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static BuiltinAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BuiltinAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BuiltinAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::BUILTIN;
+  }
+
+  static std::optional<BuiltinAttr> from(const TokenContext &c);
+  static std::optional<BuiltinAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<BuiltinAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return BuiltinAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<BuiltinAttr> from(const Attr &parent);
+
+  inline static std::optional<BuiltinAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return BuiltinAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using BlocksAttrRange = DerivedEntityRange<AttrIterator, BlocksAttr>;
+using BlocksAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlocksAttr>;
+class BlocksAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static BlocksAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BlocksAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BlocksAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::BLOCKS;
+  }
+
+  static std::optional<BlocksAttr> from(const TokenContext &c);
+  static std::optional<BlocksAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<BlocksAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return BlocksAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<BlocksAttr> from(const Attr &parent);
+
+  inline static std::optional<BlocksAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return BlocksAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  BlocksAttrBlockType type(void) const;
+};
+
+using BTFDeclTagAttrRange = DerivedEntityRange<AttrIterator, BTFDeclTagAttr>;
+using BTFDeclTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BTFDeclTagAttr>;
+class BTFDeclTagAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static BTFDeclTagAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BTFDeclTagAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BTFDeclTagAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::BTF_DECL_TAG;
+  }
+
+  static std::optional<BTFDeclTagAttr> from(const TokenContext &c);
+  static std::optional<BTFDeclTagAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<BTFDeclTagAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return BTFDeclTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<BTFDeclTagAttr> from(const Attr &parent);
+
+  inline static std::optional<BTFDeclTagAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return BTFDeclTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view btf_decl_tag(void) const;
+  std::string_view spelling(void) const;
+};
+
+using BPFPreserveAccessIndexAttrRange = DerivedEntityRange<AttrIterator, BPFPreserveAccessIndexAttr>;
+using BPFPreserveAccessIndexAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BPFPreserveAccessIndexAttr>;
+class BPFPreserveAccessIndexAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static BPFPreserveAccessIndexAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BPFPreserveAccessIndexAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BPFPreserveAccessIndexAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::BPF_PRESERVE_ACCESS_INDEX;
+  }
+
+  static std::optional<BPFPreserveAccessIndexAttr> from(const TokenContext &c);
+  static std::optional<BPFPreserveAccessIndexAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<BPFPreserveAccessIndexAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return BPFPreserveAccessIndexAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<BPFPreserveAccessIndexAttr> from(const Attr &parent);
+
+  inline static std::optional<BPFPreserveAccessIndexAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return BPFPreserveAccessIndexAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AvailabilityAttrRange = DerivedEntityRange<AttrIterator, AvailabilityAttr>;
+using AvailabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AvailabilityAttr>;
+class AvailabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AvailabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AvailabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AvailabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AVAILABILITY;
+  }
+
+  static std::optional<AvailabilityAttr> from(const TokenContext &c);
+  static std::optional<AvailabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AvailabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AvailabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AvailabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<AvailabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AvailabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view message(void) const;
+  std::string_view replacement(void) const;
+  std::string_view spelling(void) const;
+  bool strict(void) const;
+  bool unavailable(void) const;
+};
+
+using AssumptionAttrRange = DerivedEntityRange<AttrIterator, AssumptionAttr>;
+using AssumptionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AssumptionAttr>;
+class AssumptionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AssumptionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AssumptionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AssumptionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ASSUMPTION;
+  }
+
+  static std::optional<AssumptionAttr> from(const TokenContext &c);
+  static std::optional<AssumptionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AssumptionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AssumptionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AssumptionAttr> from(const Attr &parent);
+
+  inline static std::optional<AssumptionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AssumptionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view assumption(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AssumeAlignedAttrRange = DerivedEntityRange<AttrIterator, AssumeAlignedAttr>;
+using AssumeAlignedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AssumeAlignedAttr>;
+class AssumeAlignedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AssumeAlignedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AssumeAlignedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AssumeAlignedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ASSUME_ALIGNED;
+  }
+
+  static std::optional<AssumeAlignedAttr> from(const TokenContext &c);
+  static std::optional<AssumeAlignedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AssumeAlignedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AssumeAlignedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AssumeAlignedAttr> from(const Attr &parent);
+
+  inline static std::optional<AssumeAlignedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AssumeAlignedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr alignment(void) const;
+  Expr offset(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AssertSharedLockAttrRange = DerivedEntityRange<AttrIterator, AssertSharedLockAttr>;
+using AssertSharedLockAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AssertSharedLockAttr>;
+class AssertSharedLockAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AssertSharedLockAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AssertSharedLockAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AssertSharedLockAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ASSERT_SHARED_LOCK;
+  }
+
+  static std::optional<AssertSharedLockAttr> from(const TokenContext &c);
+  static std::optional<AssertSharedLockAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AssertSharedLockAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AssertSharedLockAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AssertSharedLockAttr> from(const Attr &parent);
+
+  inline static std::optional<AssertSharedLockAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AssertSharedLockAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AssertExclusiveLockAttrRange = DerivedEntityRange<AttrIterator, AssertExclusiveLockAttr>;
+using AssertExclusiveLockAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AssertExclusiveLockAttr>;
+class AssertExclusiveLockAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AssertExclusiveLockAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AssertExclusiveLockAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AssertExclusiveLockAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ASSERT_EXCLUSIVE_LOCK;
+  }
+
+  static std::optional<AssertExclusiveLockAttr> from(const TokenContext &c);
+  static std::optional<AssertExclusiveLockAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AssertExclusiveLockAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AssertExclusiveLockAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AssertExclusiveLockAttr> from(const Attr &parent);
+
+  inline static std::optional<AssertExclusiveLockAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AssertExclusiveLockAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AssertCapabilityAttrRange = DerivedEntityRange<AttrIterator, AssertCapabilityAttr>;
+using AssertCapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AssertCapabilityAttr>;
+class AssertCapabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AssertCapabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AssertCapabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AssertCapabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ASSERT_CAPABILITY;
+  }
+
+  static std::optional<AssertCapabilityAttr> from(const TokenContext &c);
+  static std::optional<AssertCapabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AssertCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AssertCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AssertCapabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<AssertCapabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AssertCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  AssertCapabilityAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_shared(void) const;
+};
+
+using AsmLabelAttrRange = DerivedEntityRange<AttrIterator, AsmLabelAttr>;
+using AsmLabelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AsmLabelAttr>;
+class AsmLabelAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AsmLabelAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AsmLabelAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AsmLabelAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ASM_LABEL;
+  }
+
+  static std::optional<AsmLabelAttr> from(const TokenContext &c);
+  static std::optional<AsmLabelAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AsmLabelAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AsmLabelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AsmLabelAttr> from(const Attr &parent);
+
+  inline static std::optional<AsmLabelAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AsmLabelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool is_literal_label(void) const;
+  std::string_view label(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ArtificialAttrRange = DerivedEntityRange<AttrIterator, ArtificialAttr>;
+using ArtificialAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArtificialAttr>;
+class ArtificialAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ArtificialAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ArtificialAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArtificialAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ARTIFICIAL;
+  }
+
+  static std::optional<ArtificialAttr> from(const TokenContext &c);
+  static std::optional<ArtificialAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ArtificialAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ArtificialAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ArtificialAttr> from(const Attr &parent);
+
+  inline static std::optional<ArtificialAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ArtificialAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ArmBuiltinAliasAttrRange = DerivedEntityRange<AttrIterator, ArmBuiltinAliasAttr>;
+using ArmBuiltinAliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArmBuiltinAliasAttr>;
+class ArmBuiltinAliasAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ArmBuiltinAliasAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ArmBuiltinAliasAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArmBuiltinAliasAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ARM_BUILTIN_ALIAS;
+  }
+
+  static std::optional<ArmBuiltinAliasAttr> from(const TokenContext &c);
+  static std::optional<ArmBuiltinAliasAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ArmBuiltinAliasAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ArmBuiltinAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ArmBuiltinAliasAttr> from(const Attr &parent);
+
+  inline static std::optional<ArmBuiltinAliasAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ArmBuiltinAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ArgumentWithTypeTagAttrRange = DerivedEntityRange<AttrIterator, ArgumentWithTypeTagAttr>;
+using ArgumentWithTypeTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArgumentWithTypeTagAttr>;
+class ArgumentWithTypeTagAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ArgumentWithTypeTagAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ArgumentWithTypeTagAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArgumentWithTypeTagAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ARGUMENT_WITH_TYPE_TAG;
+  }
+
+  static std::optional<ArgumentWithTypeTagAttr> from(const TokenContext &c);
+  static std::optional<ArgumentWithTypeTagAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ArgumentWithTypeTagAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ArgumentWithTypeTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ArgumentWithTypeTagAttr> from(const Attr &parent);
+
+  inline static std::optional<ArgumentWithTypeTagAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ArgumentWithTypeTagAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool is_pointer(void) const;
+  ArgumentWithTypeTagAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ArcWeakrefUnavailableAttrRange = DerivedEntityRange<AttrIterator, ArcWeakrefUnavailableAttr>;
+using ArcWeakrefUnavailableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArcWeakrefUnavailableAttr>;
+class ArcWeakrefUnavailableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ArcWeakrefUnavailableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ArcWeakrefUnavailableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ArcWeakrefUnavailableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ARC_WEAKREF_UNAVAILABLE;
+  }
+
+  static std::optional<ArcWeakrefUnavailableAttr> from(const TokenContext &c);
+  static std::optional<ArcWeakrefUnavailableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ArcWeakrefUnavailableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ArcWeakrefUnavailableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ArcWeakrefUnavailableAttr> from(const Attr &parent);
+
+  inline static std::optional<ArcWeakrefUnavailableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ArcWeakrefUnavailableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AnyX86NoCfCheckAttrRange = DerivedEntityRange<AttrIterator, AnyX86NoCfCheckAttr>;
+using AnyX86NoCfCheckAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnyX86NoCfCheckAttr>;
+class AnyX86NoCfCheckAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AnyX86NoCfCheckAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AnyX86NoCfCheckAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AnyX86NoCfCheckAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ANY_X86_NO_CF_CHECK;
+  }
+
+  static std::optional<AnyX86NoCfCheckAttr> from(const TokenContext &c);
+  static std::optional<AnyX86NoCfCheckAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AnyX86NoCfCheckAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AnyX86NoCfCheckAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AnyX86NoCfCheckAttr> from(const Attr &parent);
+
+  inline static std::optional<AnyX86NoCfCheckAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AnyX86NoCfCheckAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AnyX86NoCallerSavedRegistersAttrRange = DerivedEntityRange<AttrIterator, AnyX86NoCallerSavedRegistersAttr>;
+using AnyX86NoCallerSavedRegistersAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnyX86NoCallerSavedRegistersAttr>;
+class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AnyX86NoCallerSavedRegistersAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AnyX86NoCallerSavedRegistersAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AnyX86NoCallerSavedRegistersAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ANY_X86_NO_CALLER_SAVED_REGISTERS;
+  }
+
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const TokenContext &c);
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AnyX86NoCallerSavedRegistersAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const Attr &parent);
+
+  inline static std::optional<AnyX86NoCallerSavedRegistersAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AnyX86NoCallerSavedRegistersAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AnyX86InterruptAttrRange = DerivedEntityRange<AttrIterator, AnyX86InterruptAttr>;
+using AnyX86InterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnyX86InterruptAttr>;
+class AnyX86InterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AnyX86InterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AnyX86InterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AnyX86InterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ANY_X86_INTERRUPT;
+  }
+
+  static std::optional<AnyX86InterruptAttr> from(const TokenContext &c);
+  static std::optional<AnyX86InterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AnyX86InterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AnyX86InterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AnyX86InterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<AnyX86InterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AnyX86InterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AnalyzerNoReturnAttrRange = DerivedEntityRange<AttrIterator, AnalyzerNoReturnAttr>;
+using AnalyzerNoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnalyzerNoReturnAttr>;
+class AnalyzerNoReturnAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AnalyzerNoReturnAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AnalyzerNoReturnAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AnalyzerNoReturnAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ANALYZER_NO_RETURN;
+  }
+
+  static std::optional<AnalyzerNoReturnAttr> from(const TokenContext &c);
+  static std::optional<AnalyzerNoReturnAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AnalyzerNoReturnAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AnalyzerNoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AnalyzerNoReturnAttr> from(const Attr &parent);
+
+  inline static std::optional<AnalyzerNoReturnAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AnalyzerNoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AlwaysInlineAttrRange = DerivedEntityRange<AttrIterator, AlwaysInlineAttr>;
+using AlwaysInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlwaysInlineAttr>;
+class AlwaysInlineAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AlwaysInlineAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AlwaysInlineAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AlwaysInlineAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALWAYS_INLINE;
+  }
+
+  static std::optional<AlwaysInlineAttr> from(const TokenContext &c);
+  static std::optional<AlwaysInlineAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AlwaysInlineAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AlwaysInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AlwaysInlineAttr> from(const Attr &parent);
+
+  inline static std::optional<AlwaysInlineAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AlwaysInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  AlwaysInlineAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AlwaysDestroyAttrRange = DerivedEntityRange<AttrIterator, AlwaysDestroyAttr>;
+using AlwaysDestroyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlwaysDestroyAttr>;
+class AlwaysDestroyAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AlwaysDestroyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AlwaysDestroyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AlwaysDestroyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALWAYS_DESTROY;
+  }
+
+  static std::optional<AlwaysDestroyAttr> from(const TokenContext &c);
+  static std::optional<AlwaysDestroyAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AlwaysDestroyAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AlwaysDestroyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AlwaysDestroyAttr> from(const Attr &parent);
+
+  inline static std::optional<AlwaysDestroyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AlwaysDestroyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AllocSizeAttrRange = DerivedEntityRange<AttrIterator, AllocSizeAttr>;
+using AllocSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AllocSizeAttr>;
+class AllocSizeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AllocSizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AllocSizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AllocSizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALLOC_SIZE;
+  }
+
+  static std::optional<AllocSizeAttr> from(const TokenContext &c);
+  static std::optional<AllocSizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AllocSizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AllocSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AllocSizeAttr> from(const Attr &parent);
+
+  inline static std::optional<AllocSizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AllocSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AllocAlignAttrRange = DerivedEntityRange<AttrIterator, AllocAlignAttr>;
+using AllocAlignAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AllocAlignAttr>;
+class AllocAlignAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AllocAlignAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AllocAlignAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AllocAlignAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALLOC_ALIGN;
+  }
+
+  static std::optional<AllocAlignAttr> from(const TokenContext &c);
+  static std::optional<AllocAlignAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AllocAlignAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AllocAlignAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AllocAlignAttr> from(const Attr &parent);
+
+  inline static std::optional<AllocAlignAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AllocAlignAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AlignedAttrRange = DerivedEntityRange<AttrIterator, AlignedAttr>;
+using AlignedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlignedAttr>;
+class AlignedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AlignedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AlignedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AlignedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALIGNED;
+  }
+
+  static std::optional<AlignedAttr> from(const TokenContext &c);
+  static std::optional<AlignedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AlignedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AlignedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AlignedAttr> from(const Attr &parent);
+
+  inline static std::optional<AlignedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AlignedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr alignment_expression(void) const;
+  Type alignment_type(void) const;
+  AlignedAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_alignas(void) const;
+  bool is_alignment_dependent(void) const;
+  bool is_alignment_error_dependent(void) const;
+  bool is_alignment_expression(void) const;
+  bool is_c11(void) const;
+  bool is_declspec(void) const;
+  bool is_gnu(void) const;
+};
+
+using AlignNaturalAttrRange = DerivedEntityRange<AttrIterator, AlignNaturalAttr>;
+using AlignNaturalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlignNaturalAttr>;
+class AlignNaturalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AlignNaturalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AlignNaturalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AlignNaturalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALIGN_NATURAL;
+  }
+
+  static std::optional<AlignNaturalAttr> from(const TokenContext &c);
+  static std::optional<AlignNaturalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AlignNaturalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AlignNaturalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AlignNaturalAttr> from(const Attr &parent);
+
+  inline static std::optional<AlignNaturalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AlignNaturalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AlignMac68kAttrRange = DerivedEntityRange<AttrIterator, AlignMac68kAttr>;
+using AlignMac68kAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlignMac68kAttr>;
+class AlignMac68kAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AlignMac68kAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AlignMac68kAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AlignMac68kAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ALIGN_MAC68K;
+  }
+
+  static std::optional<AlignMac68kAttr> from(const TokenContext &c);
+  static std::optional<AlignMac68kAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AlignMac68kAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AlignMac68kAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AlignMac68kAttr> from(const Attr &parent);
+
+  inline static std::optional<AlignMac68kAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AlignMac68kAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AcquiredBeforeAttrRange = DerivedEntityRange<AttrIterator, AcquiredBeforeAttr>;
+using AcquiredBeforeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AcquiredBeforeAttr>;
+class AcquiredBeforeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AcquiredBeforeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AcquiredBeforeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AcquiredBeforeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ACQUIRED_BEFORE;
+  }
+
+  static std::optional<AcquiredBeforeAttr> from(const TokenContext &c);
+  static std::optional<AcquiredBeforeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AcquiredBeforeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AcquiredBeforeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AcquiredBeforeAttr> from(const Attr &parent);
+
+  inline static std::optional<AcquiredBeforeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AcquiredBeforeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AcquiredAfterAttrRange = DerivedEntityRange<AttrIterator, AcquiredAfterAttr>;
+using AcquiredAfterAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AcquiredAfterAttr>;
+class AcquiredAfterAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AcquiredAfterAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AcquiredAfterAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AcquiredAfterAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ACQUIRED_AFTER;
+  }
+
+  static std::optional<AcquiredAfterAttr> from(const TokenContext &c);
+  static std::optional<AcquiredAfterAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AcquiredAfterAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AcquiredAfterAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AcquiredAfterAttr> from(const Attr &parent);
+
+  inline static std::optional<AcquiredAfterAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AcquiredAfterAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AcquireHandleAttrRange = DerivedEntityRange<AttrIterator, AcquireHandleAttr>;
+using AcquireHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AcquireHandleAttr>;
+class AcquireHandleAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AcquireHandleAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AcquireHandleAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AcquireHandleAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ACQUIRE_HANDLE;
+  }
+
+  static std::optional<AcquireHandleAttr> from(const TokenContext &c);
+  static std::optional<AcquireHandleAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AcquireHandleAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AcquireHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AcquireHandleAttr> from(const Attr &parent);
+
+  inline static std::optional<AcquireHandleAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AcquireHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view handle_type(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AcquireCapabilityAttrRange = DerivedEntityRange<AttrIterator, AcquireCapabilityAttr>;
+using AcquireCapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AcquireCapabilityAttr>;
+class AcquireCapabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AcquireCapabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AcquireCapabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AcquireCapabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ACQUIRE_CAPABILITY;
+  }
+
+  static std::optional<AcquireCapabilityAttr> from(const TokenContext &c);
+  static std::optional<AcquireCapabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AcquireCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AcquireCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AcquireCapabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<AcquireCapabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AcquireCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  AcquireCapabilityAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_shared(void) const;
+};
+
+using AVRSignalAttrRange = DerivedEntityRange<AttrIterator, AVRSignalAttr>;
+using AVRSignalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AVRSignalAttr>;
+class AVRSignalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AVRSignalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AVRSignalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AVRSignalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AVR_SIGNAL;
+  }
+
+  static std::optional<AVRSignalAttr> from(const TokenContext &c);
+  static std::optional<AVRSignalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AVRSignalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AVRSignalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AVRSignalAttr> from(const Attr &parent);
+
+  inline static std::optional<AVRSignalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AVRSignalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AVRInterruptAttrRange = DerivedEntityRange<AttrIterator, AVRInterruptAttr>;
+using AVRInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AVRInterruptAttr>;
+class AVRInterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AVRInterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AVRInterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AVRInterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AVR_INTERRUPT;
+  }
+
+  static std::optional<AVRInterruptAttr> from(const TokenContext &c);
+  static std::optional<AVRInterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AVRInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AVRInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AVRInterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<AVRInterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AVRInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ARMInterruptAttrRange = DerivedEntityRange<AttrIterator, ARMInterruptAttr>;
+using ARMInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ARMInterruptAttr>;
+class ARMInterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ARMInterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ARMInterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ARMInterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ARM_INTERRUPT;
+  }
+
+  static std::optional<ARMInterruptAttr> from(const TokenContext &c);
+  static std::optional<ARMInterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ARMInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ARMInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ARMInterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<ARMInterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ARMInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ARMInterruptAttrInterruptType interrupt(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AMDGPUWavesPerEUAttrRange = DerivedEntityRange<AttrIterator, AMDGPUWavesPerEUAttr>;
+using AMDGPUWavesPerEUAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUWavesPerEUAttr>;
+class AMDGPUWavesPerEUAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AMDGPUWavesPerEUAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AMDGPUWavesPerEUAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AMDGPUWavesPerEUAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AMDGPU_WAVES_PER_EU;
+  }
+
+  static std::optional<AMDGPUWavesPerEUAttr> from(const TokenContext &c);
+  static std::optional<AMDGPUWavesPerEUAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AMDGPUWavesPerEUAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AMDGPUWavesPerEUAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AMDGPUWavesPerEUAttr> from(const Attr &parent);
+
+  inline static std::optional<AMDGPUWavesPerEUAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AMDGPUWavesPerEUAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr max(void) const;
+  Expr min(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AMDGPUNumVGPRAttrRange = DerivedEntityRange<AttrIterator, AMDGPUNumVGPRAttr>;
+using AMDGPUNumVGPRAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUNumVGPRAttr>;
+class AMDGPUNumVGPRAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AMDGPUNumVGPRAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AMDGPUNumVGPRAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AMDGPUNumVGPRAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AMDGPU_NUM_VGPR;
+  }
+
+  static std::optional<AMDGPUNumVGPRAttr> from(const TokenContext &c);
+  static std::optional<AMDGPUNumVGPRAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AMDGPUNumVGPRAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AMDGPUNumVGPRAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AMDGPUNumVGPRAttr> from(const Attr &parent);
+
+  inline static std::optional<AMDGPUNumVGPRAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AMDGPUNumVGPRAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AMDGPUNumSGPRAttrRange = DerivedEntityRange<AttrIterator, AMDGPUNumSGPRAttr>;
+using AMDGPUNumSGPRAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUNumSGPRAttr>;
+class AMDGPUNumSGPRAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AMDGPUNumSGPRAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AMDGPUNumSGPRAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AMDGPUNumSGPRAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AMDGPU_NUM_SGPR;
+  }
+
+  static std::optional<AMDGPUNumSGPRAttr> from(const TokenContext &c);
+  static std::optional<AMDGPUNumSGPRAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AMDGPUNumSGPRAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AMDGPUNumSGPRAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AMDGPUNumSGPRAttr> from(const Attr &parent);
+
+  inline static std::optional<AMDGPUNumSGPRAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AMDGPUNumSGPRAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AMDGPUFlatWorkGroupSizeAttrRange = DerivedEntityRange<AttrIterator, AMDGPUFlatWorkGroupSizeAttr>;
+using AMDGPUFlatWorkGroupSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUFlatWorkGroupSizeAttr>;
+class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AMDGPUFlatWorkGroupSizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AMDGPUFlatWorkGroupSizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AMDGPUFlatWorkGroupSizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::AMDGPU_FLAT_WORK_GROUP_SIZE;
+  }
+
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const TokenContext &c);
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AMDGPUFlatWorkGroupSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const Attr &parent);
+
+  inline static std::optional<AMDGPUFlatWorkGroupSizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AMDGPUFlatWorkGroupSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr max(void) const;
+  Expr min(void) const;
+  std::string_view spelling(void) const;
+};
+
+using AArch64VectorPcsAttrRange = DerivedEntityRange<AttrIterator, AArch64VectorPcsAttr>;
+using AArch64VectorPcsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AArch64VectorPcsAttr>;
+class AArch64VectorPcsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AArch64VectorPcsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AArch64VectorPcsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AArch64VectorPcsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::A_ARCH64_VECTOR_PCS;
+  }
+
+  static std::optional<AArch64VectorPcsAttr> from(const TokenContext &c);
+  static std::optional<AArch64VectorPcsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AArch64VectorPcsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AArch64VectorPcsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AArch64VectorPcsAttr> from(const Attr &parent);
+
+  inline static std::optional<AArch64VectorPcsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AArch64VectorPcsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using XRayLogArgsAttrRange = DerivedEntityRange<AttrIterator, XRayLogArgsAttr>;
+using XRayLogArgsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, XRayLogArgsAttr>;
+class XRayLogArgsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static XRayLogArgsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static XRayLogArgsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : XRayLogArgsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::X_RAY_LOG_ARGS;
+  }
+
+  static std::optional<XRayLogArgsAttr> from(const TokenContext &c);
+  static std::optional<XRayLogArgsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<XRayLogArgsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return XRayLogArgsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<XRayLogArgsAttr> from(const Attr &parent);
+
+  inline static std::optional<XRayLogArgsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return XRayLogArgsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using XRayInstrumentAttrRange = DerivedEntityRange<AttrIterator, XRayInstrumentAttr>;
+using XRayInstrumentAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, XRayInstrumentAttr>;
+class XRayInstrumentAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static XRayInstrumentAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static XRayInstrumentAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : XRayInstrumentAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::X_RAY_INSTRUMENT;
+  }
+
+  static std::optional<XRayInstrumentAttr> from(const TokenContext &c);
+  static std::optional<XRayInstrumentAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<XRayInstrumentAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return XRayInstrumentAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<XRayInstrumentAttr> from(const Attr &parent);
+
+  inline static std::optional<XRayInstrumentAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return XRayInstrumentAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool always_x_ray_instrument(void) const;
+  XRayInstrumentAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool never_x_ray_instrument(void) const;
+};
+
+using X86ForceAlignArgPointerAttrRange = DerivedEntityRange<AttrIterator, X86ForceAlignArgPointerAttr>;
+using X86ForceAlignArgPointerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, X86ForceAlignArgPointerAttr>;
+class X86ForceAlignArgPointerAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static X86ForceAlignArgPointerAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static X86ForceAlignArgPointerAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : X86ForceAlignArgPointerAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::X86_FORCE_ALIGN_ARG_POINTER;
+  }
+
+  static std::optional<X86ForceAlignArgPointerAttr> from(const TokenContext &c);
+  static std::optional<X86ForceAlignArgPointerAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<X86ForceAlignArgPointerAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return X86ForceAlignArgPointerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<X86ForceAlignArgPointerAttr> from(const Attr &parent);
+
+  inline static std::optional<X86ForceAlignArgPointerAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return X86ForceAlignArgPointerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using WorkGroupSizeHintAttrRange = DerivedEntityRange<AttrIterator, WorkGroupSizeHintAttr>;
+using WorkGroupSizeHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WorkGroupSizeHintAttr>;
+class WorkGroupSizeHintAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WorkGroupSizeHintAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WorkGroupSizeHintAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WorkGroupSizeHintAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WORK_GROUP_SIZE_HINT;
+  }
+
+  static std::optional<WorkGroupSizeHintAttr> from(const TokenContext &c);
+  static std::optional<WorkGroupSizeHintAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WorkGroupSizeHintAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WorkGroupSizeHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WorkGroupSizeHintAttr> from(const Attr &parent);
+
+  inline static std::optional<WorkGroupSizeHintAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WorkGroupSizeHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using WebAssemblyImportNameAttrRange = DerivedEntityRange<AttrIterator, WebAssemblyImportNameAttr>;
+using WebAssemblyImportNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WebAssemblyImportNameAttr>;
+class WebAssemblyImportNameAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WebAssemblyImportNameAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WebAssemblyImportNameAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WebAssemblyImportNameAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WEB_ASSEMBLY_IMPORT_NAME;
+  }
+
+  static std::optional<WebAssemblyImportNameAttr> from(const TokenContext &c);
+  static std::optional<WebAssemblyImportNameAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WebAssemblyImportNameAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WebAssemblyImportNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WebAssemblyImportNameAttr> from(const Attr &parent);
+
+  inline static std::optional<WebAssemblyImportNameAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WebAssemblyImportNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view import_name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using WebAssemblyImportModuleAttrRange = DerivedEntityRange<AttrIterator, WebAssemblyImportModuleAttr>;
+using WebAssemblyImportModuleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WebAssemblyImportModuleAttr>;
+class WebAssemblyImportModuleAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WebAssemblyImportModuleAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WebAssemblyImportModuleAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WebAssemblyImportModuleAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WEB_ASSEMBLY_IMPORT_MODULE;
+  }
+
+  static std::optional<WebAssemblyImportModuleAttr> from(const TokenContext &c);
+  static std::optional<WebAssemblyImportModuleAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WebAssemblyImportModuleAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WebAssemblyImportModuleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WebAssemblyImportModuleAttr> from(const Attr &parent);
+
+  inline static std::optional<WebAssemblyImportModuleAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WebAssemblyImportModuleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view import_module(void) const;
+  std::string_view spelling(void) const;
+};
+
+using WebAssemblyExportNameAttrRange = DerivedEntityRange<AttrIterator, WebAssemblyExportNameAttr>;
+using WebAssemblyExportNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WebAssemblyExportNameAttr>;
+class WebAssemblyExportNameAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WebAssemblyExportNameAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WebAssemblyExportNameAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WebAssemblyExportNameAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WEB_ASSEMBLY_EXPORT_NAME;
+  }
+
+  static std::optional<WebAssemblyExportNameAttr> from(const TokenContext &c);
+  static std::optional<WebAssemblyExportNameAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WebAssemblyExportNameAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WebAssemblyExportNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WebAssemblyExportNameAttr> from(const Attr &parent);
+
+  inline static std::optional<WebAssemblyExportNameAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WebAssemblyExportNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view export_name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using WeakRefAttrRange = DerivedEntityRange<AttrIterator, WeakRefAttr>;
+using WeakRefAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WeakRefAttr>;
+class WeakRefAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WeakRefAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WeakRefAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WeakRefAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WEAK_REF;
+  }
+
+  static std::optional<WeakRefAttr> from(const TokenContext &c);
+  static std::optional<WeakRefAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WeakRefAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WeakRefAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WeakRefAttr> from(const Attr &parent);
+
+  inline static std::optional<WeakRefAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WeakRefAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view aliasee(void) const;
+  std::string_view spelling(void) const;
+};
+
+using WeakImportAttrRange = DerivedEntityRange<AttrIterator, WeakImportAttr>;
+using WeakImportAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WeakImportAttr>;
+class WeakImportAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WeakImportAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WeakImportAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WeakImportAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WEAK_IMPORT;
+  }
+
+  static std::optional<WeakImportAttr> from(const TokenContext &c);
+  static std::optional<WeakImportAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WeakImportAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WeakImportAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WeakImportAttr> from(const Attr &parent);
+
+  inline static std::optional<WeakImportAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WeakImportAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using WeakAttrRange = DerivedEntityRange<AttrIterator, WeakAttr>;
+using WeakAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WeakAttr>;
+class WeakAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WeakAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WeakAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WeakAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WEAK;
+  }
+
+  static std::optional<WeakAttr> from(const TokenContext &c);
+  static std::optional<WeakAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WeakAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WeakAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WeakAttr> from(const Attr &parent);
+
+  inline static std::optional<WeakAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WeakAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using WarnUnusedResultAttrRange = DerivedEntityRange<AttrIterator, WarnUnusedResultAttr>;
+using WarnUnusedResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WarnUnusedResultAttr>;
+class WarnUnusedResultAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WarnUnusedResultAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WarnUnusedResultAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WarnUnusedResultAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WARN_UNUSED_RESULT;
+  }
+
+  static std::optional<WarnUnusedResultAttr> from(const TokenContext &c);
+  static std::optional<WarnUnusedResultAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WarnUnusedResultAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WarnUnusedResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WarnUnusedResultAttr> from(const Attr &parent);
+
+  inline static std::optional<WarnUnusedResultAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WarnUnusedResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool is_cxx11_no_discard(void) const;
+  std::string_view message(void) const;
+  WarnUnusedResultAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using WarnUnusedAttrRange = DerivedEntityRange<AttrIterator, WarnUnusedAttr>;
+using WarnUnusedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WarnUnusedAttr>;
+class WarnUnusedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static WarnUnusedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static WarnUnusedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : WarnUnusedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::WARN_UNUSED;
+  }
+
+  static std::optional<WarnUnusedAttr> from(const TokenContext &c);
+  static std::optional<WarnUnusedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<WarnUnusedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return WarnUnusedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<WarnUnusedAttr> from(const Attr &parent);
+
+  inline static std::optional<WarnUnusedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return WarnUnusedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using VisibilityAttrRange = DerivedEntityRange<AttrIterator, VisibilityAttr>;
+using VisibilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VisibilityAttr>;
+class VisibilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static VisibilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static VisibilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VisibilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::VISIBILITY;
+  }
+
+  static std::optional<VisibilityAttr> from(const TokenContext &c);
+  static std::optional<VisibilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<VisibilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return VisibilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<VisibilityAttr> from(const Attr &parent);
+
+  inline static std::optional<VisibilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return VisibilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  VisibilityAttrVisibilityType visibility(void) const;
+};
+
+using VectorCallAttrRange = DerivedEntityRange<AttrIterator, VectorCallAttr>;
+using VectorCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VectorCallAttr>;
+class VectorCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static VectorCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static VectorCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VectorCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::VECTOR_CALL;
+  }
+
+  static std::optional<VectorCallAttr> from(const TokenContext &c);
+  static std::optional<VectorCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<VectorCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return VectorCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<VectorCallAttr> from(const Attr &parent);
+
+  inline static std::optional<VectorCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return VectorCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using VecTypeHintAttrRange = DerivedEntityRange<AttrIterator, VecTypeHintAttr>;
+using VecTypeHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VecTypeHintAttr>;
+class VecTypeHintAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static VecTypeHintAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static VecTypeHintAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VecTypeHintAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::VEC_TYPE_HINT;
+  }
+
+  static std::optional<VecTypeHintAttr> from(const TokenContext &c);
+  static std::optional<VecTypeHintAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<VecTypeHintAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return VecTypeHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<VecTypeHintAttr> from(const Attr &parent);
+
+  inline static std::optional<VecTypeHintAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return VecTypeHintAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  Type type_hint(void) const;
+  Type type_hint_token(void) const;
+};
+
+using VecReturnAttrRange = DerivedEntityRange<AttrIterator, VecReturnAttr>;
+using VecReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VecReturnAttr>;
+class VecReturnAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static VecReturnAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static VecReturnAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : VecReturnAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::VEC_RETURN;
+  }
+
+  static std::optional<VecReturnAttr> from(const TokenContext &c);
+  static std::optional<VecReturnAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<VecReturnAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return VecReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<VecReturnAttr> from(const Attr &parent);
+
+  inline static std::optional<VecReturnAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return VecReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using UuidAttrRange = DerivedEntityRange<AttrIterator, UuidAttr>;
+using UuidAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UuidAttr>;
+class UuidAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UuidAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UuidAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UuidAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::UUID;
+  }
+
+  static std::optional<UuidAttr> from(const TokenContext &c);
+  static std::optional<UuidAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UuidAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UuidAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UuidAttr> from(const Attr &parent);
+
+  inline static std::optional<UuidAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UuidAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view guid(void) const;
+  MSGuidDecl guid_declaration(void) const;
+  std::string_view spelling(void) const;
+};
+
+using UsingIfExistsAttrRange = DerivedEntityRange<AttrIterator, UsingIfExistsAttr>;
+using UsingIfExistsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingIfExistsAttr>;
+class UsingIfExistsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UsingIfExistsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UsingIfExistsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsingIfExistsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::USING_IF_EXISTS;
+  }
+
+  static std::optional<UsingIfExistsAttr> from(const TokenContext &c);
+  static std::optional<UsingIfExistsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UsingIfExistsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UsingIfExistsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UsingIfExistsAttr> from(const Attr &parent);
+
+  inline static std::optional<UsingIfExistsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UsingIfExistsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using UsedAttrRange = DerivedEntityRange<AttrIterator, UsedAttr>;
+using UsedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsedAttr>;
+class UsedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UsedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UsedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UsedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::USED;
+  }
+
+  static std::optional<UsedAttr> from(const TokenContext &c);
+  static std::optional<UsedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UsedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UsedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UsedAttr> from(const Attr &parent);
+
+  inline static std::optional<UsedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UsedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using UnusedAttrRange = DerivedEntityRange<AttrIterator, UnusedAttr>;
+using UnusedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnusedAttr>;
+class UnusedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UnusedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UnusedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnusedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::UNUSED;
+  }
+
+  static std::optional<UnusedAttr> from(const TokenContext &c);
+  static std::optional<UnusedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UnusedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UnusedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UnusedAttr> from(const Attr &parent);
+
+  inline static std::optional<UnusedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UnusedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  UnusedAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using UninitializedAttrRange = DerivedEntityRange<AttrIterator, UninitializedAttr>;
+using UninitializedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UninitializedAttr>;
+class UninitializedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UninitializedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UninitializedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UninitializedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::UNINITIALIZED;
+  }
+
+  static std::optional<UninitializedAttr> from(const TokenContext &c);
+  static std::optional<UninitializedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UninitializedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UninitializedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UninitializedAttr> from(const Attr &parent);
+
+  inline static std::optional<UninitializedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UninitializedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using UnavailableAttrRange = DerivedEntityRange<AttrIterator, UnavailableAttr>;
+using UnavailableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnavailableAttr>;
+class UnavailableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UnavailableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UnavailableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UnavailableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::UNAVAILABLE;
+  }
+
+  static std::optional<UnavailableAttr> from(const TokenContext &c);
+  static std::optional<UnavailableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UnavailableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UnavailableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UnavailableAttr> from(const Attr &parent);
+
+  inline static std::optional<UnavailableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UnavailableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  UnavailableAttrImplicitReason implicit_reason(void) const;
+  std::string_view message(void) const;
+  std::string_view spelling(void) const;
+};
+
+using TypeVisibilityAttrRange = DerivedEntityRange<AttrIterator, TypeVisibilityAttr>;
+using TypeVisibilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeVisibilityAttr>;
+class TypeVisibilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TypeVisibilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeVisibilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeVisibilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TYPE_VISIBILITY;
+  }
+
+  static std::optional<TypeVisibilityAttr> from(const TokenContext &c);
+  static std::optional<TypeVisibilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TypeVisibilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TypeVisibilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TypeVisibilityAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeVisibilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeVisibilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  TypeVisibilityAttrVisibilityType visibility(void) const;
+};
+
+using TypeTagForDatatypeAttrRange = DerivedEntityRange<AttrIterator, TypeTagForDatatypeAttr>;
+using TypeTagForDatatypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeTagForDatatypeAttr>;
+class TypeTagForDatatypeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TypeTagForDatatypeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TypeTagForDatatypeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TypeTagForDatatypeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TYPE_TAG_FOR_DATATYPE;
+  }
+
+  static std::optional<TypeTagForDatatypeAttr> from(const TokenContext &c);
+  static std::optional<TypeTagForDatatypeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TypeTagForDatatypeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TypeTagForDatatypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TypeTagForDatatypeAttr> from(const Attr &parent);
+
+  inline static std::optional<TypeTagForDatatypeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TypeTagForDatatypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool layout_compatible(void) const;
+  Type matching_c_type(void) const;
+  Type matching_c_type_token(void) const;
+  bool must_be_null(void) const;
+  std::string_view spelling(void) const;
+};
+
+using TryAcquireCapabilityAttrRange = DerivedEntityRange<AttrIterator, TryAcquireCapabilityAttr>;
+using TryAcquireCapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TryAcquireCapabilityAttr>;
+class TryAcquireCapabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TryAcquireCapabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TryAcquireCapabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TryAcquireCapabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TRY_ACQUIRE_CAPABILITY;
+  }
+
+  static std::optional<TryAcquireCapabilityAttr> from(const TokenContext &c);
+  static std::optional<TryAcquireCapabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TryAcquireCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TryAcquireCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TryAcquireCapabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<TryAcquireCapabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TryAcquireCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  TryAcquireCapabilityAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  Expr success_value(void) const;
+  bool is_shared(void) const;
+};
+
+using TrivialABIAttrRange = DerivedEntityRange<AttrIterator, TrivialABIAttr>;
+using TrivialABIAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TrivialABIAttr>;
+class TrivialABIAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TrivialABIAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TrivialABIAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TrivialABIAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TRIVIAL_ABI;
+  }
+
+  static std::optional<TrivialABIAttr> from(const TokenContext &c);
+  static std::optional<TrivialABIAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TrivialABIAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TrivialABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TrivialABIAttr> from(const Attr &parent);
+
+  inline static std::optional<TrivialABIAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TrivialABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TransparentUnionAttrRange = DerivedEntityRange<AttrIterator, TransparentUnionAttr>;
+using TransparentUnionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TransparentUnionAttr>;
+class TransparentUnionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TransparentUnionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TransparentUnionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TransparentUnionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TRANSPARENT_UNION;
+  }
+
+  static std::optional<TransparentUnionAttr> from(const TokenContext &c);
+  static std::optional<TransparentUnionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TransparentUnionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TransparentUnionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TransparentUnionAttr> from(const Attr &parent);
+
+  inline static std::optional<TransparentUnionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TransparentUnionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ThisCallAttrRange = DerivedEntityRange<AttrIterator, ThisCallAttr>;
+using ThisCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ThisCallAttr>;
+class ThisCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ThisCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ThisCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ThisCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::THIS_CALL;
+  }
+
+  static std::optional<ThisCallAttr> from(const TokenContext &c);
+  static std::optional<ThisCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ThisCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ThisCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ThisCallAttr> from(const Attr &parent);
+
+  inline static std::optional<ThisCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ThisCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TestTypestateAttrRange = DerivedEntityRange<AttrIterator, TestTypestateAttr>;
+using TestTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TestTypestateAttr>;
+class TestTypestateAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TestTypestateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TestTypestateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TestTypestateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TEST_TYPESTATE;
+  }
+
+  static std::optional<TestTypestateAttr> from(const TokenContext &c);
+  static std::optional<TestTypestateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TestTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TestTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TestTypestateAttr> from(const Attr &parent);
+
+  inline static std::optional<TestTypestateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TestTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  TestTypestateAttrConsumedState test_state(void) const;
+};
+
+using TargetClonesAttrRange = DerivedEntityRange<AttrIterator, TargetClonesAttr>;
+using TargetClonesAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TargetClonesAttr>;
+class TargetClonesAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TargetClonesAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TargetClonesAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TargetClonesAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TARGET_CLONES;
+  }
+
+  static std::optional<TargetClonesAttr> from(const TokenContext &c);
+  static std::optional<TargetClonesAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TargetClonesAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TargetClonesAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TargetClonesAttr> from(const Attr &parent);
+
+  inline static std::optional<TargetClonesAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TargetClonesAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using TargetAttrRange = DerivedEntityRange<AttrIterator, TargetAttr>;
+using TargetAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TargetAttr>;
+class TargetAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TargetAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TargetAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TargetAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TARGET;
+  }
+
+  static std::optional<TargetAttr> from(const TokenContext &c);
+  static std::optional<TargetAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TargetAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TargetAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TargetAttr> from(const Attr &parent);
+
+  inline static std::optional<TargetAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TargetAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view architecture(void) const;
+  std::string_view features_string(void) const;
+  std::string_view spelling(void) const;
+  bool is_default_version(void) const;
+};
+
+using TLSModelAttrRange = DerivedEntityRange<AttrIterator, TLSModelAttr>;
+using TLSModelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TLSModelAttr>;
+class TLSModelAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static TLSModelAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static TLSModelAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : TLSModelAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::TLS_MODEL;
+  }
+
+  static std::optional<TLSModelAttr> from(const TokenContext &c);
+  static std::optional<TLSModelAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<TLSModelAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return TLSModelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<TLSModelAttr> from(const Attr &parent);
+
+  inline static std::optional<TLSModelAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return TLSModelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view model(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SysVABIAttrRange = DerivedEntityRange<AttrIterator, SysVABIAttr>;
+using SysVABIAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SysVABIAttr>;
+class SysVABIAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SysVABIAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SysVABIAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SysVABIAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SYS_VABI;
+  }
+
+  static std::optional<SysVABIAttr> from(const TokenContext &c);
+  static std::optional<SysVABIAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SysVABIAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SysVABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SysVABIAttr> from(const Attr &parent);
+
+  inline static std::optional<SysVABIAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SysVABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftPrivateAttrRange = DerivedEntityRange<AttrIterator, SwiftPrivateAttr>;
+using SwiftPrivateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftPrivateAttr>;
+class SwiftPrivateAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftPrivateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftPrivateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftPrivateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_PRIVATE;
+  }
+
+  static std::optional<SwiftPrivateAttr> from(const TokenContext &c);
+  static std::optional<SwiftPrivateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftPrivateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftPrivateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftPrivateAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftPrivateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftPrivateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftNewTypeAttrRange = DerivedEntityRange<AttrIterator, SwiftNewTypeAttr>;
+using SwiftNewTypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftNewTypeAttr>;
+class SwiftNewTypeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftNewTypeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftNewTypeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftNewTypeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_NEW_TYPE;
+  }
+
+  static std::optional<SwiftNewTypeAttr> from(const TokenContext &c);
+  static std::optional<SwiftNewTypeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftNewTypeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftNewTypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftNewTypeAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftNewTypeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftNewTypeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  SwiftNewTypeAttrNewtypeKind newtype_kind(void) const;
+  SwiftNewTypeAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SwiftNameAttrRange = DerivedEntityRange<AttrIterator, SwiftNameAttr>;
+using SwiftNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftNameAttr>;
+class SwiftNameAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftNameAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftNameAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftNameAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_NAME;
+  }
+
+  static std::optional<SwiftNameAttr> from(const TokenContext &c);
+  static std::optional<SwiftNameAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftNameAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftNameAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftNameAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SwiftErrorAttrRange = DerivedEntityRange<AttrIterator, SwiftErrorAttr>;
+using SwiftErrorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftErrorAttr>;
+class SwiftErrorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftErrorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftErrorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftErrorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ERROR;
+  }
+
+  static std::optional<SwiftErrorAttr> from(const TokenContext &c);
+  static std::optional<SwiftErrorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftErrorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftErrorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftErrorAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftErrorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftErrorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  SwiftErrorAttrConventionKind convention(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SwiftCallAttrRange = DerivedEntityRange<AttrIterator, SwiftCallAttr>;
+using SwiftCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftCallAttr>;
+class SwiftCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_CALL;
+  }
+
+  static std::optional<SwiftCallAttr> from(const TokenContext &c);
+  static std::optional<SwiftCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftCallAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftBridgedTypedefAttrRange = DerivedEntityRange<AttrIterator, SwiftBridgedTypedefAttr>;
+using SwiftBridgedTypedefAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftBridgedTypedefAttr>;
+class SwiftBridgedTypedefAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftBridgedTypedefAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftBridgedTypedefAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftBridgedTypedefAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_BRIDGED_TYPEDEF;
+  }
+
+  static std::optional<SwiftBridgedTypedefAttr> from(const TokenContext &c);
+  static std::optional<SwiftBridgedTypedefAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftBridgedTypedefAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftBridgedTypedefAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftBridgedTypedefAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftBridgedTypedefAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftBridgedTypedefAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftBridgeAttrRange = DerivedEntityRange<AttrIterator, SwiftBridgeAttr>;
+using SwiftBridgeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftBridgeAttr>;
+class SwiftBridgeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftBridgeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftBridgeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftBridgeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_BRIDGE;
+  }
+
+  static std::optional<SwiftBridgeAttr> from(const TokenContext &c);
+  static std::optional<SwiftBridgeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftBridgeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftBridgeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftBridgeAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftBridgeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftBridgeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  std::string_view swift_type(void) const;
+};
+
+using SwiftAttrAttrRange = DerivedEntityRange<AttrIterator, SwiftAttrAttr>;
+using SwiftAttrAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAttrAttr>;
+class SwiftAttrAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftAttrAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftAttrAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftAttrAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ATTR;
+  }
+
+  static std::optional<SwiftAttrAttr> from(const TokenContext &c);
+  static std::optional<SwiftAttrAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftAttrAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftAttrAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAttrAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftAttrAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftAttrAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view attribute(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SwiftAsyncNameAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncNameAttr>;
+using SwiftAsyncNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncNameAttr>;
+class SwiftAsyncNameAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftAsyncNameAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftAsyncNameAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftAsyncNameAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ASYNC_NAME;
+  }
+
+  static std::optional<SwiftAsyncNameAttr> from(const TokenContext &c);
+  static std::optional<SwiftAsyncNameAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftAsyncNameAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncNameAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftAsyncNameAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftAsyncNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SwiftAsyncErrorAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncErrorAttr>;
+using SwiftAsyncErrorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncErrorAttr>;
+class SwiftAsyncErrorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftAsyncErrorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftAsyncErrorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftAsyncErrorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ASYNC_ERROR;
+  }
+
+  static std::optional<SwiftAsyncErrorAttr> from(const TokenContext &c);
+  static std::optional<SwiftAsyncErrorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftAsyncErrorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncErrorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncErrorAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftAsyncErrorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftAsyncErrorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  SwiftAsyncErrorAttrConventionKind convention(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SwiftAsyncCallAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncCallAttr>;
+using SwiftAsyncCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncCallAttr>;
+class SwiftAsyncCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftAsyncCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftAsyncCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftAsyncCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ASYNC_CALL;
+  }
+
+  static std::optional<SwiftAsyncCallAttr> from(const TokenContext &c);
+  static std::optional<SwiftAsyncCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftAsyncCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncCallAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftAsyncCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftAsyncCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftAsyncAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncAttr>;
+using SwiftAsyncAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncAttr>;
+class SwiftAsyncAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftAsyncAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftAsyncAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftAsyncAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ASYNC;
+  }
+
+  static std::optional<SwiftAsyncAttr> from(const TokenContext &c);
+  static std::optional<SwiftAsyncAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftAsyncAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftAsyncAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftAsyncAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using StrictFPAttrRange = DerivedEntityRange<AttrIterator, StrictFPAttr>;
+using StrictFPAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StrictFPAttr>;
+class StrictFPAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static StrictFPAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static StrictFPAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StrictFPAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::STRICT_FP;
+  }
+
+  static std::optional<StrictFPAttr> from(const TokenContext &c);
+  static std::optional<StrictFPAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<StrictFPAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return StrictFPAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<StrictFPAttr> from(const Attr &parent);
+
+  inline static std::optional<StrictFPAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return StrictFPAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using StdCallAttrRange = DerivedEntityRange<AttrIterator, StdCallAttr>;
+using StdCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StdCallAttr>;
+class StdCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static StdCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static StdCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StdCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::STD_CALL;
+  }
+
+  static std::optional<StdCallAttr> from(const TokenContext &c);
+  static std::optional<StdCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<StdCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return StdCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<StdCallAttr> from(const Attr &parent);
+
+  inline static std::optional<StdCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return StdCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using StandaloneDebugAttrRange = DerivedEntityRange<AttrIterator, StandaloneDebugAttr>;
+using StandaloneDebugAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StandaloneDebugAttr>;
+class StandaloneDebugAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static StandaloneDebugAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static StandaloneDebugAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : StandaloneDebugAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::STANDALONE_DEBUG;
+  }
+
+  static std::optional<StandaloneDebugAttr> from(const TokenContext &c);
+  static std::optional<StandaloneDebugAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<StandaloneDebugAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return StandaloneDebugAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<StandaloneDebugAttr> from(const Attr &parent);
+
+  inline static std::optional<StandaloneDebugAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return StandaloneDebugAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SpeculativeLoadHardeningAttrRange = DerivedEntityRange<AttrIterator, SpeculativeLoadHardeningAttr>;
+using SpeculativeLoadHardeningAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SpeculativeLoadHardeningAttr>;
+class SpeculativeLoadHardeningAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SpeculativeLoadHardeningAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SpeculativeLoadHardeningAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SpeculativeLoadHardeningAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SPECULATIVE_LOAD_HARDENING;
+  }
+
+  static std::optional<SpeculativeLoadHardeningAttr> from(const TokenContext &c);
+  static std::optional<SpeculativeLoadHardeningAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SpeculativeLoadHardeningAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SpeculativeLoadHardeningAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SpeculativeLoadHardeningAttr> from(const Attr &parent);
+
+  inline static std::optional<SpeculativeLoadHardeningAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SpeculativeLoadHardeningAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SharedTrylockFunctionAttrRange = DerivedEntityRange<AttrIterator, SharedTrylockFunctionAttr>;
+using SharedTrylockFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SharedTrylockFunctionAttr>;
+class SharedTrylockFunctionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SharedTrylockFunctionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SharedTrylockFunctionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SharedTrylockFunctionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SHARED_TRYLOCK_FUNCTION;
+  }
+
+  static std::optional<SharedTrylockFunctionAttr> from(const TokenContext &c);
+  static std::optional<SharedTrylockFunctionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SharedTrylockFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SharedTrylockFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SharedTrylockFunctionAttr> from(const Attr &parent);
+
+  inline static std::optional<SharedTrylockFunctionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SharedTrylockFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  Expr success_value(void) const;
+};
+
+using SetTypestateAttrRange = DerivedEntityRange<AttrIterator, SetTypestateAttr>;
+using SetTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SetTypestateAttr>;
+class SetTypestateAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SetTypestateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SetTypestateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SetTypestateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SET_TYPESTATE;
+  }
+
+  static std::optional<SetTypestateAttr> from(const TokenContext &c);
+  static std::optional<SetTypestateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SetTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SetTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SetTypestateAttr> from(const Attr &parent);
+
+  inline static std::optional<SetTypestateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SetTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  SetTypestateAttrConsumedState new_state(void) const;
+  std::string_view spelling(void) const;
+};
+
+using SentinelAttrRange = DerivedEntityRange<AttrIterator, SentinelAttr>;
+using SentinelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SentinelAttr>;
+class SentinelAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SentinelAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SentinelAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SentinelAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SENTINEL;
+  }
+
+  static std::optional<SentinelAttr> from(const TokenContext &c);
+  static std::optional<SentinelAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SentinelAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SentinelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SentinelAttr> from(const Attr &parent);
+
+  inline static std::optional<SentinelAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SentinelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SelectAnyAttrRange = DerivedEntityRange<AttrIterator, SelectAnyAttr>;
+using SelectAnyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SelectAnyAttr>;
+class SelectAnyAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SelectAnyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SelectAnyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SelectAnyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SELECT_ANY;
+  }
+
+  static std::optional<SelectAnyAttr> from(const TokenContext &c);
+  static std::optional<SelectAnyAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SelectAnyAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SelectAnyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SelectAnyAttr> from(const Attr &parent);
+
+  inline static std::optional<SelectAnyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SelectAnyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SectionAttrRange = DerivedEntityRange<AttrIterator, SectionAttr>;
+using SectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SectionAttr>;
+class SectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SECTION;
+  }
+
+  static std::optional<SectionAttr> from(const TokenContext &c);
+  static std::optional<SectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SectionAttr> from(const Attr &parent);
+
+  inline static std::optional<SectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  SectionAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ScopedLockableAttrRange = DerivedEntityRange<AttrIterator, ScopedLockableAttr>;
+using ScopedLockableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ScopedLockableAttr>;
+class ScopedLockableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ScopedLockableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ScopedLockableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ScopedLockableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SCOPED_LOCKABLE;
+  }
+
+  static std::optional<ScopedLockableAttr> from(const TokenContext &c);
+  static std::optional<ScopedLockableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ScopedLockableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ScopedLockableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ScopedLockableAttr> from(const Attr &parent);
+
+  inline static std::optional<ScopedLockableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ScopedLockableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SYCLSpecialClassAttrRange = DerivedEntityRange<AttrIterator, SYCLSpecialClassAttr>;
+using SYCLSpecialClassAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SYCLSpecialClassAttr>;
+class SYCLSpecialClassAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SYCLSpecialClassAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SYCLSpecialClassAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SYCLSpecialClassAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SYCL_SPECIAL_CLASS;
+  }
+
+  static std::optional<SYCLSpecialClassAttr> from(const TokenContext &c);
+  static std::optional<SYCLSpecialClassAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SYCLSpecialClassAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SYCLSpecialClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SYCLSpecialClassAttr> from(const Attr &parent);
+
+  inline static std::optional<SYCLSpecialClassAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SYCLSpecialClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SYCLKernelAttrRange = DerivedEntityRange<AttrIterator, SYCLKernelAttr>;
+using SYCLKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SYCLKernelAttr>;
+class SYCLKernelAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SYCLKernelAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SYCLKernelAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SYCLKernelAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SYCL_KERNEL;
+  }
+
+  static std::optional<SYCLKernelAttr> from(const TokenContext &c);
+  static std::optional<SYCLKernelAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SYCLKernelAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SYCLKernelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SYCLKernelAttr> from(const Attr &parent);
+
+  inline static std::optional<SYCLKernelAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SYCLKernelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ReturnsTwiceAttrRange = DerivedEntityRange<AttrIterator, ReturnsTwiceAttr>;
+using ReturnsTwiceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReturnsTwiceAttr>;
+class ReturnsTwiceAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReturnsTwiceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReturnsTwiceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReturnsTwiceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RETURNS_TWICE;
+  }
+
+  static std::optional<ReturnsTwiceAttr> from(const TokenContext &c);
+  static std::optional<ReturnsTwiceAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReturnsTwiceAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReturnsTwiceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReturnsTwiceAttr> from(const Attr &parent);
+
+  inline static std::optional<ReturnsTwiceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReturnsTwiceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ReturnsNonNullAttrRange = DerivedEntityRange<AttrIterator, ReturnsNonNullAttr>;
+using ReturnsNonNullAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReturnsNonNullAttr>;
+class ReturnsNonNullAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReturnsNonNullAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReturnsNonNullAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReturnsNonNullAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RETURNS_NON_NULL;
+  }
+
+  static std::optional<ReturnsNonNullAttr> from(const TokenContext &c);
+  static std::optional<ReturnsNonNullAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReturnsNonNullAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReturnsNonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReturnsNonNullAttr> from(const Attr &parent);
+
+  inline static std::optional<ReturnsNonNullAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReturnsNonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ReturnTypestateAttrRange = DerivedEntityRange<AttrIterator, ReturnTypestateAttr>;
+using ReturnTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReturnTypestateAttr>;
+class ReturnTypestateAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReturnTypestateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReturnTypestateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReturnTypestateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RETURN_TYPESTATE;
+  }
+
+  static std::optional<ReturnTypestateAttr> from(const TokenContext &c);
+  static std::optional<ReturnTypestateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReturnTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReturnTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReturnTypestateAttr> from(const Attr &parent);
+
+  inline static std::optional<ReturnTypestateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReturnTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  ReturnTypestateAttrConsumedState state(void) const;
+};
+
+using RetainAttrRange = DerivedEntityRange<AttrIterator, RetainAttr>;
+using RetainAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RetainAttr>;
+class RetainAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static RetainAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RetainAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RetainAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RETAIN;
+  }
+
+  static std::optional<RetainAttr> from(const TokenContext &c);
+  static std::optional<RetainAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<RetainAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return RetainAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<RetainAttr> from(const Attr &parent);
+
+  inline static std::optional<RetainAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return RetainAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using RestrictAttrRange = DerivedEntityRange<AttrIterator, RestrictAttr>;
+using RestrictAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RestrictAttr>;
+class RestrictAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static RestrictAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RestrictAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RestrictAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RESTRICT;
+  }
+
+  static std::optional<RestrictAttr> from(const TokenContext &c);
+  static std::optional<RestrictAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<RestrictAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return RestrictAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<RestrictAttr> from(const Attr &parent);
+
+  inline static std::optional<RestrictAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return RestrictAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  RestrictAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using RequiresCapabilityAttrRange = DerivedEntityRange<AttrIterator, RequiresCapabilityAttr>;
+using RequiresCapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RequiresCapabilityAttr>;
+class RequiresCapabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static RequiresCapabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RequiresCapabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RequiresCapabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::REQUIRES_CAPABILITY;
+  }
+
+  static std::optional<RequiresCapabilityAttr> from(const TokenContext &c);
+  static std::optional<RequiresCapabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<RequiresCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return RequiresCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<RequiresCapabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<RequiresCapabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return RequiresCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  RequiresCapabilityAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_shared(void) const;
+};
+
+using ReqdWorkGroupSizeAttrRange = DerivedEntityRange<AttrIterator, ReqdWorkGroupSizeAttr>;
+using ReqdWorkGroupSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReqdWorkGroupSizeAttr>;
+class ReqdWorkGroupSizeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReqdWorkGroupSizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReqdWorkGroupSizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReqdWorkGroupSizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::REQD_WORK_GROUP_SIZE;
+  }
+
+  static std::optional<ReqdWorkGroupSizeAttr> from(const TokenContext &c);
+  static std::optional<ReqdWorkGroupSizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReqdWorkGroupSizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReqdWorkGroupSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReqdWorkGroupSizeAttr> from(const Attr &parent);
+
+  inline static std::optional<ReqdWorkGroupSizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReqdWorkGroupSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ReleaseCapabilityAttrRange = DerivedEntityRange<AttrIterator, ReleaseCapabilityAttr>;
+using ReleaseCapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReleaseCapabilityAttr>;
+class ReleaseCapabilityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReleaseCapabilityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReleaseCapabilityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReleaseCapabilityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RELEASE_CAPABILITY;
+  }
+
+  static std::optional<ReleaseCapabilityAttr> from(const TokenContext &c);
+  static std::optional<ReleaseCapabilityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReleaseCapabilityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReleaseCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReleaseCapabilityAttr> from(const Attr &parent);
+
+  inline static std::optional<ReleaseCapabilityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReleaseCapabilityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ReleaseCapabilityAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_generic(void) const;
+  bool is_shared(void) const;
+};
+
+using ReinitializesAttrRange = DerivedEntityRange<AttrIterator, ReinitializesAttr>;
+using ReinitializesAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReinitializesAttr>;
+class ReinitializesAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReinitializesAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReinitializesAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReinitializesAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::REINITIALIZES;
+  }
+
+  static std::optional<ReinitializesAttr> from(const TokenContext &c);
+  static std::optional<ReinitializesAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReinitializesAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReinitializesAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReinitializesAttr> from(const Attr &parent);
+
+  inline static std::optional<ReinitializesAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReinitializesAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using RegCallAttrRange = DerivedEntityRange<AttrIterator, RegCallAttr>;
+using RegCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RegCallAttr>;
+class RegCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static RegCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RegCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RegCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::REG_CALL;
+  }
+
+  static std::optional<RegCallAttr> from(const TokenContext &c);
+  static std::optional<RegCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<RegCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return RegCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<RegCallAttr> from(const Attr &parent);
+
+  inline static std::optional<RegCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return RegCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using RISCVInterruptAttrRange = DerivedEntityRange<AttrIterator, RISCVInterruptAttr>;
+using RISCVInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RISCVInterruptAttr>;
+class RISCVInterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static RISCVInterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static RISCVInterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : RISCVInterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RISCV_INTERRUPT;
+  }
+
+  static std::optional<RISCVInterruptAttr> from(const TokenContext &c);
+  static std::optional<RISCVInterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<RISCVInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return RISCVInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<RISCVInterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<RISCVInterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return RISCVInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  RISCVInterruptAttrInterruptType interrupt(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PureAttrRange = DerivedEntityRange<AttrIterator, PureAttr>;
+using PureAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PureAttr>;
+class PureAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PureAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PureAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PureAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PURE;
+  }
+
+  static std::optional<PureAttr> from(const TokenContext &c);
+  static std::optional<PureAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PureAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PureAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PureAttr> from(const Attr &parent);
+
+  inline static std::optional<PureAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PureAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using PtGuardedVarAttrRange = DerivedEntityRange<AttrIterator, PtGuardedVarAttr>;
+using PtGuardedVarAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PtGuardedVarAttr>;
+class PtGuardedVarAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PtGuardedVarAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PtGuardedVarAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PtGuardedVarAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PT_GUARDED_VAR;
+  }
+
+  static std::optional<PtGuardedVarAttr> from(const TokenContext &c);
+  static std::optional<PtGuardedVarAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PtGuardedVarAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PtGuardedVarAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PtGuardedVarAttr> from(const Attr &parent);
+
+  inline static std::optional<PtGuardedVarAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PtGuardedVarAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using PtGuardedByAttrRange = DerivedEntityRange<AttrIterator, PtGuardedByAttr>;
+using PtGuardedByAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PtGuardedByAttr>;
+class PtGuardedByAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PtGuardedByAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PtGuardedByAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PtGuardedByAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PT_GUARDED_BY;
+  }
+
+  static std::optional<PtGuardedByAttr> from(const TokenContext &c);
+  static std::optional<PtGuardedByAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PtGuardedByAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PtGuardedByAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PtGuardedByAttr> from(const Attr &parent);
+
+  inline static std::optional<PtGuardedByAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PtGuardedByAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr argument(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PreserveMostAttrRange = DerivedEntityRange<AttrIterator, PreserveMostAttr>;
+using PreserveMostAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PreserveMostAttr>;
+class PreserveMostAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PreserveMostAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PreserveMostAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PreserveMostAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRESERVE_MOST;
+  }
+
+  static std::optional<PreserveMostAttr> from(const TokenContext &c);
+  static std::optional<PreserveMostAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PreserveMostAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PreserveMostAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PreserveMostAttr> from(const Attr &parent);
+
+  inline static std::optional<PreserveMostAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PreserveMostAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using PreserveAllAttrRange = DerivedEntityRange<AttrIterator, PreserveAllAttr>;
+using PreserveAllAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PreserveAllAttr>;
+class PreserveAllAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PreserveAllAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PreserveAllAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PreserveAllAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRESERVE_ALL;
+  }
+
+  static std::optional<PreserveAllAttr> from(const TokenContext &c);
+  static std::optional<PreserveAllAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PreserveAllAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PreserveAllAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PreserveAllAttr> from(const Attr &parent);
+
+  inline static std::optional<PreserveAllAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PreserveAllAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using PreferredNameAttrRange = DerivedEntityRange<AttrIterator, PreferredNameAttr>;
+using PreferredNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PreferredNameAttr>;
+class PreferredNameAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PreferredNameAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PreferredNameAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PreferredNameAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PREFERRED_NAME;
+  }
+
+  static std::optional<PreferredNameAttr> from(const TokenContext &c);
+  static std::optional<PreferredNameAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PreferredNameAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PreferredNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PreferredNameAttr> from(const Attr &parent);
+
+  inline static std::optional<PreferredNameAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PreferredNameAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  Type typedef_type(void) const;
+  Type typedef_type_token(void) const;
+};
+
+using PragmaClangTextSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangTextSectionAttr>;
+using PragmaClangTextSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangTextSectionAttr>;
+class PragmaClangTextSectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PragmaClangTextSectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PragmaClangTextSectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaClangTextSectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRAGMA_CLANG_TEXT_SECTION;
+  }
+
+  static std::optional<PragmaClangTextSectionAttr> from(const TokenContext &c);
+  static std::optional<PragmaClangTextSectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PragmaClangTextSectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PragmaClangTextSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PragmaClangTextSectionAttr> from(const Attr &parent);
+
+  inline static std::optional<PragmaClangTextSectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PragmaClangTextSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PragmaClangRodataSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangRodataSectionAttr>;
+using PragmaClangRodataSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangRodataSectionAttr>;
+class PragmaClangRodataSectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PragmaClangRodataSectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PragmaClangRodataSectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaClangRodataSectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRAGMA_CLANG_RODATA_SECTION;
+  }
+
+  static std::optional<PragmaClangRodataSectionAttr> from(const TokenContext &c);
+  static std::optional<PragmaClangRodataSectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PragmaClangRodataSectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PragmaClangRodataSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PragmaClangRodataSectionAttr> from(const Attr &parent);
+
+  inline static std::optional<PragmaClangRodataSectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PragmaClangRodataSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PragmaClangRelroSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangRelroSectionAttr>;
+using PragmaClangRelroSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangRelroSectionAttr>;
+class PragmaClangRelroSectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PragmaClangRelroSectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PragmaClangRelroSectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaClangRelroSectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRAGMA_CLANG_RELRO_SECTION;
+  }
+
+  static std::optional<PragmaClangRelroSectionAttr> from(const TokenContext &c);
+  static std::optional<PragmaClangRelroSectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PragmaClangRelroSectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PragmaClangRelroSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PragmaClangRelroSectionAttr> from(const Attr &parent);
+
+  inline static std::optional<PragmaClangRelroSectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PragmaClangRelroSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PragmaClangDataSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangDataSectionAttr>;
+using PragmaClangDataSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangDataSectionAttr>;
+class PragmaClangDataSectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PragmaClangDataSectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PragmaClangDataSectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaClangDataSectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRAGMA_CLANG_DATA_SECTION;
+  }
+
+  static std::optional<PragmaClangDataSectionAttr> from(const TokenContext &c);
+  static std::optional<PragmaClangDataSectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PragmaClangDataSectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PragmaClangDataSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PragmaClangDataSectionAttr> from(const Attr &parent);
+
+  inline static std::optional<PragmaClangDataSectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PragmaClangDataSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PragmaClangBSSSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangBSSSectionAttr>;
+using PragmaClangBSSSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangBSSSectionAttr>;
+class PragmaClangBSSSectionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PragmaClangBSSSectionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PragmaClangBSSSectionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PragmaClangBSSSectionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PRAGMA_CLANG_BSS_SECTION;
+  }
+
+  static std::optional<PragmaClangBSSSectionAttr> from(const TokenContext &c);
+  static std::optional<PragmaClangBSSSectionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PragmaClangBSSSectionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PragmaClangBSSSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PragmaClangBSSSectionAttr> from(const Attr &parent);
+
+  inline static std::optional<PragmaClangBSSSectionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PragmaClangBSSSectionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view name(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PointerAttrRange = DerivedEntityRange<AttrIterator, PointerAttr>;
+using PointerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PointerAttr>;
+class PointerAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PointerAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PointerAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PointerAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::POINTER;
+  }
+
+  static std::optional<PointerAttr> from(const TokenContext &c);
+  static std::optional<PointerAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PointerAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PointerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PointerAttr> from(const Attr &parent);
+
+  inline static std::optional<PointerAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PointerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Type deref_type(void) const;
+  Type deref_type_token(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PcsAttrRange = DerivedEntityRange<AttrIterator, PcsAttr>;
+using PcsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PcsAttr>;
+class PcsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PcsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PcsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PcsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PCS;
+  }
+
+  static std::optional<PcsAttr> from(const TokenContext &c);
+  static std::optional<PcsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PcsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PcsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PcsAttr> from(const Attr &parent);
+
+  inline static std::optional<PcsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PcsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  PcsAttrPCSType pcs(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PatchableFunctionEntryAttrRange = DerivedEntityRange<AttrIterator, PatchableFunctionEntryAttr>;
+using PatchableFunctionEntryAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PatchableFunctionEntryAttr>;
+class PatchableFunctionEntryAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PatchableFunctionEntryAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PatchableFunctionEntryAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PatchableFunctionEntryAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PATCHABLE_FUNCTION_ENTRY;
+  }
+
+  static std::optional<PatchableFunctionEntryAttr> from(const TokenContext &c);
+  static std::optional<PatchableFunctionEntryAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PatchableFunctionEntryAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PatchableFunctionEntryAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PatchableFunctionEntryAttr> from(const Attr &parent);
+
+  inline static std::optional<PatchableFunctionEntryAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PatchableFunctionEntryAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using PascalAttrRange = DerivedEntityRange<AttrIterator, PascalAttr>;
+using PascalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PascalAttr>;
+class PascalAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PascalAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PascalAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PascalAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PASCAL;
+  }
+
+  static std::optional<PascalAttr> from(const TokenContext &c);
+  static std::optional<PascalAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PascalAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PascalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PascalAttr> from(const Attr &parent);
+
+  inline static std::optional<PascalAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PascalAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ParamTypestateAttrRange = DerivedEntityRange<AttrIterator, ParamTypestateAttr>;
+using ParamTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParamTypestateAttr>;
+class ParamTypestateAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ParamTypestateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ParamTypestateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ParamTypestateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PARAM_TYPESTATE;
+  }
+
+  static std::optional<ParamTypestateAttr> from(const TokenContext &c);
+  static std::optional<ParamTypestateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ParamTypestateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ParamTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ParamTypestateAttr> from(const Attr &parent);
+
+  inline static std::optional<ParamTypestateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ParamTypestateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ParamTypestateAttrConsumedState parameter_state(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PackedAttrRange = DerivedEntityRange<AttrIterator, PackedAttr>;
+using PackedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PackedAttr>;
+class PackedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PackedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PackedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PackedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PACKED;
+  }
+
+  static std::optional<PackedAttr> from(const TokenContext &c);
+  static std::optional<PackedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PackedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PackedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PackedAttr> from(const Attr &parent);
+
+  inline static std::optional<PackedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PackedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OwnershipAttrRange = DerivedEntityRange<AttrIterator, OwnershipAttr>;
+using OwnershipAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OwnershipAttr>;
+class OwnershipAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OwnershipAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OwnershipAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OwnershipAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OWNERSHIP;
+  }
+
+  static std::optional<OwnershipAttr> from(const TokenContext &c);
+  static std::optional<OwnershipAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OwnershipAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OwnershipAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OwnershipAttr> from(const Attr &parent);
+
+  inline static std::optional<OwnershipAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OwnershipAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OwnershipAttrOwnershipKind own_kind(void) const;
+  OwnershipAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_holds(void) const;
+  bool is_returns(void) const;
+  bool is_takes(void) const;
+};
+
+using OwnerAttrRange = DerivedEntityRange<AttrIterator, OwnerAttr>;
+using OwnerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OwnerAttr>;
+class OwnerAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OwnerAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OwnerAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OwnerAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OWNER;
+  }
+
+  static std::optional<OwnerAttr> from(const TokenContext &c);
+  static std::optional<OwnerAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OwnerAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OwnerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OwnerAttr> from(const Attr &parent);
+
+  inline static std::optional<OwnerAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OwnerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Type deref_type(void) const;
+  Type deref_type_token(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OverrideAttrRange = DerivedEntityRange<AttrIterator, OverrideAttr>;
+using OverrideAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OverrideAttr>;
+class OverrideAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OverrideAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OverrideAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OverrideAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OVERRIDE;
+  }
+
+  static std::optional<OverrideAttr> from(const TokenContext &c);
+  static std::optional<OverrideAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OverrideAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OverrideAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OverrideAttr> from(const Attr &parent);
+
+  inline static std::optional<OverrideAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OverrideAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OptimizeNoneAttrRange = DerivedEntityRange<AttrIterator, OptimizeNoneAttr>;
+using OptimizeNoneAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OptimizeNoneAttr>;
+class OptimizeNoneAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OptimizeNoneAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OptimizeNoneAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OptimizeNoneAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPTIMIZE_NONE;
+  }
+
+  static std::optional<OptimizeNoneAttr> from(const TokenContext &c);
+  static std::optional<OptimizeNoneAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OptimizeNoneAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OptimizeNoneAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OptimizeNoneAttr> from(const Attr &parent);
+
+  inline static std::optional<OptimizeNoneAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OptimizeNoneAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OpenCLKernelAttrRange = DerivedEntityRange<AttrIterator, OpenCLKernelAttr>;
+using OpenCLKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLKernelAttr>;
+class OpenCLKernelAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLKernelAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLKernelAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLKernelAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_KERNEL;
+  }
+
+  static std::optional<OpenCLKernelAttr> from(const TokenContext &c);
+  static std::optional<OpenCLKernelAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OpenCLKernelAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OpenCLKernelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLKernelAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLKernelAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLKernelAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OpenCLIntelReqdSubGroupSizeAttrRange = DerivedEntityRange<AttrIterator, OpenCLIntelReqdSubGroupSizeAttr>;
+using OpenCLIntelReqdSubGroupSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLIntelReqdSubGroupSizeAttr>;
+class OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OpenCLIntelReqdSubGroupSizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OpenCLIntelReqdSubGroupSizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OpenCLIntelReqdSubGroupSizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE;
+  }
+
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const TokenContext &c);
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OpenCLIntelReqdSubGroupSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const Attr &parent);
+
+  inline static std::optional<OpenCLIntelReqdSubGroupSizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OpenCLIntelReqdSubGroupSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCSubclassingRestrictedAttrRange = DerivedEntityRange<AttrIterator, ObjCSubclassingRestrictedAttr>;
+using ObjCSubclassingRestrictedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCSubclassingRestrictedAttr>;
+class ObjCSubclassingRestrictedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCSubclassingRestrictedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCSubclassingRestrictedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCSubclassingRestrictedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_SUBCLASSING_RESTRICTED;
+  }
+
+  static std::optional<ObjCSubclassingRestrictedAttr> from(const TokenContext &c);
+  static std::optional<ObjCSubclassingRestrictedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCSubclassingRestrictedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCSubclassingRestrictedAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCSubclassingRestrictedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCSubclassingRestrictedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCRootClassAttrRange = DerivedEntityRange<AttrIterator, ObjCRootClassAttr>;
+using ObjCRootClassAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCRootClassAttr>;
+class ObjCRootClassAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCRootClassAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCRootClassAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCRootClassAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_ROOT_CLASS;
+  }
+
+  static std::optional<ObjCRootClassAttr> from(const TokenContext &c);
+  static std::optional<ObjCRootClassAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCRootClassAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCRootClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCRootClassAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCRootClassAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCRootClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCReturnsInnerPointerAttrRange = DerivedEntityRange<AttrIterator, ObjCReturnsInnerPointerAttr>;
+using ObjCReturnsInnerPointerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCReturnsInnerPointerAttr>;
+class ObjCReturnsInnerPointerAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCReturnsInnerPointerAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCReturnsInnerPointerAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCReturnsInnerPointerAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_RETURNS_INNER_POINTER;
+  }
+
+  static std::optional<ObjCReturnsInnerPointerAttr> from(const TokenContext &c);
+  static std::optional<ObjCReturnsInnerPointerAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCReturnsInnerPointerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCReturnsInnerPointerAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCReturnsInnerPointerAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCReturnsInnerPointerAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCRequiresSuperAttrRange = DerivedEntityRange<AttrIterator, ObjCRequiresSuperAttr>;
+using ObjCRequiresSuperAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCRequiresSuperAttr>;
+class ObjCRequiresSuperAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCRequiresSuperAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCRequiresSuperAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCRequiresSuperAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_REQUIRES_SUPER;
+  }
+
+  static std::optional<ObjCRequiresSuperAttr> from(const TokenContext &c);
+  static std::optional<ObjCRequiresSuperAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCRequiresSuperAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCRequiresSuperAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCRequiresSuperAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCRequiresSuperAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCRequiresSuperAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCRequiresPropertyDefsAttrRange = DerivedEntityRange<AttrIterator, ObjCRequiresPropertyDefsAttr>;
+using ObjCRequiresPropertyDefsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCRequiresPropertyDefsAttr>;
+class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCRequiresPropertyDefsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCRequiresPropertyDefsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCRequiresPropertyDefsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_REQUIRES_PROPERTY_DEFS;
+  }
+
+  static std::optional<ObjCRequiresPropertyDefsAttr> from(const TokenContext &c);
+  static std::optional<ObjCRequiresPropertyDefsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCRequiresPropertyDefsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCRequiresPropertyDefsAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCRequiresPropertyDefsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCRequiresPropertyDefsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCPreciseLifetimeAttrRange = DerivedEntityRange<AttrIterator, ObjCPreciseLifetimeAttr>;
+using ObjCPreciseLifetimeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPreciseLifetimeAttr>;
+class ObjCPreciseLifetimeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCPreciseLifetimeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCPreciseLifetimeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCPreciseLifetimeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_PRECISE_LIFETIME;
+  }
+
+  static std::optional<ObjCPreciseLifetimeAttr> from(const TokenContext &c);
+  static std::optional<ObjCPreciseLifetimeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCPreciseLifetimeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCPreciseLifetimeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCPreciseLifetimeAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCPreciseLifetimeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCPreciseLifetimeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCOwnershipAttrRange = DerivedEntityRange<AttrIterator, ObjCOwnershipAttr>;
+using ObjCOwnershipAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCOwnershipAttr>;
+class ObjCOwnershipAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCOwnershipAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCOwnershipAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCOwnershipAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_OWNERSHIP;
+  }
+
+  static std::optional<ObjCOwnershipAttr> from(const TokenContext &c);
+  static std::optional<ObjCOwnershipAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCOwnershipAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCOwnershipAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCOwnershipAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCOwnershipAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCOwnershipAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCNSObjectAttrRange = DerivedEntityRange<AttrIterator, ObjCNSObjectAttr>;
+using ObjCNSObjectAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCNSObjectAttr>;
+class ObjCNSObjectAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCNSObjectAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCNSObjectAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCNSObjectAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_CNS_OBJECT;
+  }
+
+  static std::optional<ObjCNSObjectAttr> from(const TokenContext &c);
+  static std::optional<ObjCNSObjectAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCNSObjectAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCNSObjectAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCNSObjectAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCNSObjectAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCNSObjectAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCMethodFamilyAttrRange = DerivedEntityRange<AttrIterator, ObjCMethodFamilyAttr>;
+using ObjCMethodFamilyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCMethodFamilyAttr>;
+class ObjCMethodFamilyAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCMethodFamilyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCMethodFamilyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCMethodFamilyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_METHOD_FAMILY;
+  }
+
+  static std::optional<ObjCMethodFamilyAttr> from(const TokenContext &c);
+  static std::optional<ObjCMethodFamilyAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCMethodFamilyAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCMethodFamilyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCMethodFamilyAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCMethodFamilyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCMethodFamilyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ObjCMethodFamilyAttrFamilyKind family(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ObjCIndependentClassAttrRange = DerivedEntityRange<AttrIterator, ObjCIndependentClassAttr>;
+using ObjCIndependentClassAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIndependentClassAttr>;
+class ObjCIndependentClassAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCIndependentClassAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCIndependentClassAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCIndependentClassAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_INDEPENDENT_CLASS;
+  }
+
+  static std::optional<ObjCIndependentClassAttr> from(const TokenContext &c);
+  static std::optional<ObjCIndependentClassAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCIndependentClassAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCIndependentClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCIndependentClassAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCIndependentClassAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCIndependentClassAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCExternallyRetainedAttrRange = DerivedEntityRange<AttrIterator, ObjCExternallyRetainedAttr>;
+using ObjCExternallyRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCExternallyRetainedAttr>;
+class ObjCExternallyRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCExternallyRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCExternallyRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCExternallyRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_EXTERNALLY_RETAINED;
+  }
+
+  static std::optional<ObjCExternallyRetainedAttr> from(const TokenContext &c);
+  static std::optional<ObjCExternallyRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCExternallyRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCExternallyRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCExternallyRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCExternallyRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCExternallyRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCExplicitProtocolImplAttrRange = DerivedEntityRange<AttrIterator, ObjCExplicitProtocolImplAttr>;
+using ObjCExplicitProtocolImplAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCExplicitProtocolImplAttr>;
+class ObjCExplicitProtocolImplAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCExplicitProtocolImplAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCExplicitProtocolImplAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCExplicitProtocolImplAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_EXPLICIT_PROTOCOL_IMPL;
+  }
+
+  static std::optional<ObjCExplicitProtocolImplAttr> from(const TokenContext &c);
+  static std::optional<ObjCExplicitProtocolImplAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCExplicitProtocolImplAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCExplicitProtocolImplAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCExplicitProtocolImplAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCExplicitProtocolImplAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCExceptionAttrRange = DerivedEntityRange<AttrIterator, ObjCExceptionAttr>;
+using ObjCExceptionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCExceptionAttr>;
+class ObjCExceptionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCExceptionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCExceptionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCExceptionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_EXCEPTION;
+  }
+
+  static std::optional<ObjCExceptionAttr> from(const TokenContext &c);
+  static std::optional<ObjCExceptionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCExceptionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCExceptionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCExceptionAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCExceptionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCExceptionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCBridgeRelatedAttrRange = DerivedEntityRange<AttrIterator, ObjCBridgeRelatedAttr>;
+using ObjCBridgeRelatedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBridgeRelatedAttr>;
+class ObjCBridgeRelatedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCBridgeRelatedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCBridgeRelatedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBridgeRelatedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_BRIDGE_RELATED;
+  }
+
+  static std::optional<ObjCBridgeRelatedAttr> from(const TokenContext &c);
+  static std::optional<ObjCBridgeRelatedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCBridgeRelatedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCBridgeRelatedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCBridgeRelatedAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCBridgeRelatedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCBridgeRelatedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCBridgeMutableAttrRange = DerivedEntityRange<AttrIterator, ObjCBridgeMutableAttr>;
+using ObjCBridgeMutableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBridgeMutableAttr>;
+class ObjCBridgeMutableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCBridgeMutableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCBridgeMutableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBridgeMutableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_BRIDGE_MUTABLE;
+  }
+
+  static std::optional<ObjCBridgeMutableAttr> from(const TokenContext &c);
+  static std::optional<ObjCBridgeMutableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCBridgeMutableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCBridgeMutableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCBridgeMutableAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCBridgeMutableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCBridgeMutableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using ObjCBridgeAttrRange = DerivedEntityRange<AttrIterator, ObjCBridgeAttr>;
+using ObjCBridgeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBridgeAttr>;
+class ObjCBridgeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ObjCBridgeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ObjCBridgeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ObjCBridgeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OBJ_C_BRIDGE;
+  }
+
+  static std::optional<ObjCBridgeAttr> from(const TokenContext &c);
+  static std::optional<ObjCBridgeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ObjCBridgeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ObjCBridgeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ObjCBridgeAttr> from(const Attr &parent);
+
+  inline static std::optional<ObjCBridgeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ObjCBridgeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OSReturnsRetainedOnZeroAttrRange = DerivedEntityRange<AttrIterator, OSReturnsRetainedOnZeroAttr>;
+using OSReturnsRetainedOnZeroAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSReturnsRetainedOnZeroAttr>;
+class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OSReturnsRetainedOnZeroAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OSReturnsRetainedOnZeroAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OSReturnsRetainedOnZeroAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OS_RETURNS_RETAINED_ON_ZERO;
+  }
+
+  static std::optional<OSReturnsRetainedOnZeroAttr> from(const TokenContext &c);
+  static std::optional<OSReturnsRetainedOnZeroAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OSReturnsRetainedOnZeroAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSReturnsRetainedOnZeroAttr> from(const Attr &parent);
+
+  inline static std::optional<OSReturnsRetainedOnZeroAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OSReturnsRetainedOnZeroAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OSReturnsRetainedOnNonZeroAttrRange = DerivedEntityRange<AttrIterator, OSReturnsRetainedOnNonZeroAttr>;
+using OSReturnsRetainedOnNonZeroAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSReturnsRetainedOnNonZeroAttr>;
+class OSReturnsRetainedOnNonZeroAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OSReturnsRetainedOnNonZeroAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OSReturnsRetainedOnNonZeroAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OSReturnsRetainedOnNonZeroAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OS_RETURNS_RETAINED_ON_NON_ZERO;
+  }
+
+  static std::optional<OSReturnsRetainedOnNonZeroAttr> from(const TokenContext &c);
+  static std::optional<OSReturnsRetainedOnNonZeroAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OSReturnsRetainedOnNonZeroAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OSReturnsRetainedOnNonZeroAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSReturnsRetainedOnNonZeroAttr> from(const Attr &parent);
+
+  inline static std::optional<OSReturnsRetainedOnNonZeroAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OSReturnsRetainedOnNonZeroAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OSReturnsRetainedAttrRange = DerivedEntityRange<AttrIterator, OSReturnsRetainedAttr>;
+using OSReturnsRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSReturnsRetainedAttr>;
+class OSReturnsRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OSReturnsRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OSReturnsRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OSReturnsRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OS_RETURNS_RETAINED;
+  }
+
+  static std::optional<OSReturnsRetainedAttr> from(const TokenContext &c);
+  static std::optional<OSReturnsRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OSReturnsRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OSReturnsRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSReturnsRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<OSReturnsRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OSReturnsRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OSReturnsNotRetainedAttrRange = DerivedEntityRange<AttrIterator, OSReturnsNotRetainedAttr>;
+using OSReturnsNotRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSReturnsNotRetainedAttr>;
+class OSReturnsNotRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OSReturnsNotRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OSReturnsNotRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OSReturnsNotRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OS_RETURNS_NOT_RETAINED;
+  }
+
+  static std::optional<OSReturnsNotRetainedAttr> from(const TokenContext &c);
+  static std::optional<OSReturnsNotRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OSReturnsNotRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OSReturnsNotRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSReturnsNotRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<OSReturnsNotRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OSReturnsNotRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OSConsumesThisAttrRange = DerivedEntityRange<AttrIterator, OSConsumesThisAttr>;
+using OSConsumesThisAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSConsumesThisAttr>;
+class OSConsumesThisAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OSConsumesThisAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OSConsumesThisAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OSConsumesThisAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OS_CONSUMES_THIS;
+  }
+
+  static std::optional<OSConsumesThisAttr> from(const TokenContext &c);
+  static std::optional<OSConsumesThisAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OSConsumesThisAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OSConsumesThisAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSConsumesThisAttr> from(const Attr &parent);
+
+  inline static std::optional<OSConsumesThisAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OSConsumesThisAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OMPThreadPrivateDeclAttrRange = DerivedEntityRange<AttrIterator, OMPThreadPrivateDeclAttr>;
+using OMPThreadPrivateDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPThreadPrivateDeclAttr>;
+class OMPThreadPrivateDeclAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OMPThreadPrivateDeclAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPThreadPrivateDeclAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPThreadPrivateDeclAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_THREAD_PRIVATE_DECL;
+  }
+
+  static std::optional<OMPThreadPrivateDeclAttr> from(const TokenContext &c);
+  static std::optional<OMPThreadPrivateDeclAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OMPThreadPrivateDeclAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OMPThreadPrivateDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPThreadPrivateDeclAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPThreadPrivateDeclAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPThreadPrivateDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OMPDeclareVariantAttrRange = DerivedEntityRange<AttrIterator, OMPDeclareVariantAttr>;
+using OMPDeclareVariantAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareVariantAttr>;
+class OMPDeclareVariantAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OMPDeclareVariantAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPDeclareVariantAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclareVariantAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_DECLARE_VARIANT;
+  }
+
+  static std::optional<OMPDeclareVariantAttr> from(const TokenContext &c);
+  static std::optional<OMPDeclareVariantAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OMPDeclareVariantAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OMPDeclareVariantAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPDeclareVariantAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPDeclareVariantAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPDeclareVariantAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  Expr variant_func_reference(void) const;
+};
+
+using OMPDeclareTargetDeclAttrRange = DerivedEntityRange<AttrIterator, OMPDeclareTargetDeclAttr>;
+using OMPDeclareTargetDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareTargetDeclAttr>;
+class OMPDeclareTargetDeclAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OMPDeclareTargetDeclAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPDeclareTargetDeclAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPDeclareTargetDeclAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_DECLARE_TARGET_DECL;
+  }
+
+  static std::optional<OMPDeclareTargetDeclAttr> from(const TokenContext &c);
+  static std::optional<OMPDeclareTargetDeclAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OMPDeclareTargetDeclAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OMPDeclareTargetDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPDeclareTargetDeclAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPDeclareTargetDeclAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPDeclareTargetDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  OMPDeclareTargetDeclAttrDevTypeTy dev_type(void) const;
+  bool indirect(void) const;
+  Expr indirect_expression(void) const;
+  OMPDeclareTargetDeclAttrMapTypeTy map_type(void) const;
+  std::string_view spelling(void) const;
+};
+
+using OMPCaptureNoInitAttrRange = DerivedEntityRange<AttrIterator, OMPCaptureNoInitAttr>;
+using OMPCaptureNoInitAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCaptureNoInitAttr>;
+class OMPCaptureNoInitAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OMPCaptureNoInitAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPCaptureNoInitAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPCaptureNoInitAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_CAPTURE_NO_INIT;
+  }
+
+  static std::optional<OMPCaptureNoInitAttr> from(const TokenContext &c);
+  static std::optional<OMPCaptureNoInitAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OMPCaptureNoInitAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OMPCaptureNoInitAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPCaptureNoInitAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPCaptureNoInitAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPCaptureNoInitAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OMPAllocateDeclAttrRange = DerivedEntityRange<AttrIterator, OMPAllocateDeclAttr>;
+using OMPAllocateDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPAllocateDeclAttr>;
+class OMPAllocateDeclAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OMPAllocateDeclAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OMPAllocateDeclAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OMPAllocateDeclAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OMP_ALLOCATE_DECL;
+  }
+
+  static std::optional<OMPAllocateDeclAttr> from(const TokenContext &c);
+  static std::optional<OMPAllocateDeclAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OMPAllocateDeclAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OMPAllocateDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OMPAllocateDeclAttr> from(const Attr &parent);
+
+  inline static std::optional<OMPAllocateDeclAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OMPAllocateDeclAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr alignment(void) const;
+  Expr allocator(void) const;
+  OMPAllocateDeclAttrAllocatorTypeTy allocator_type(void) const;
+  std::string_view spelling(void) const;
+};
+
+using NotTailCalledAttrRange = DerivedEntityRange<AttrIterator, NotTailCalledAttr>;
+using NotTailCalledAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NotTailCalledAttr>;
+class NotTailCalledAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NotTailCalledAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NotTailCalledAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NotTailCalledAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NOT_TAIL_CALLED;
+  }
+
+  static std::optional<NotTailCalledAttr> from(const TokenContext &c);
+  static std::optional<NotTailCalledAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NotTailCalledAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NotTailCalledAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NotTailCalledAttr> from(const Attr &parent);
+
+  inline static std::optional<NotTailCalledAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NotTailCalledAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoUniqueAddressAttrRange = DerivedEntityRange<AttrIterator, NoUniqueAddressAttr>;
+using NoUniqueAddressAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoUniqueAddressAttr>;
+class NoUniqueAddressAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoUniqueAddressAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoUniqueAddressAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoUniqueAddressAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_UNIQUE_ADDRESS;
+  }
+
+  static std::optional<NoUniqueAddressAttr> from(const TokenContext &c);
+  static std::optional<NoUniqueAddressAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoUniqueAddressAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoUniqueAddressAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoUniqueAddressAttr> from(const Attr &parent);
+
+  inline static std::optional<NoUniqueAddressAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoUniqueAddressAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoThrowAttrRange = DerivedEntityRange<AttrIterator, NoThrowAttr>;
+using NoThrowAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoThrowAttr>;
+class NoThrowAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoThrowAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoThrowAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoThrowAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_THROW;
+  }
+
+  static std::optional<NoThrowAttr> from(const TokenContext &c);
+  static std::optional<NoThrowAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoThrowAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoThrowAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoThrowAttr> from(const Attr &parent);
+
+  inline static std::optional<NoThrowAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoThrowAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoThreadSafetyAnalysisAttrRange = DerivedEntityRange<AttrIterator, NoThreadSafetyAnalysisAttr>;
+using NoThreadSafetyAnalysisAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoThreadSafetyAnalysisAttr>;
+class NoThreadSafetyAnalysisAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoThreadSafetyAnalysisAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoThreadSafetyAnalysisAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoThreadSafetyAnalysisAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_THREAD_SAFETY_ANALYSIS;
+  }
+
+  static std::optional<NoThreadSafetyAnalysisAttr> from(const TokenContext &c);
+  static std::optional<NoThreadSafetyAnalysisAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoThreadSafetyAnalysisAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoThreadSafetyAnalysisAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoThreadSafetyAnalysisAttr> from(const Attr &parent);
+
+  inline static std::optional<NoThreadSafetyAnalysisAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoThreadSafetyAnalysisAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoStackProtectorAttrRange = DerivedEntityRange<AttrIterator, NoStackProtectorAttr>;
+using NoStackProtectorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoStackProtectorAttr>;
+class NoStackProtectorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoStackProtectorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoStackProtectorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoStackProtectorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_STACK_PROTECTOR;
+  }
+
+  static std::optional<NoStackProtectorAttr> from(const TokenContext &c);
+  static std::optional<NoStackProtectorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoStackProtectorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoStackProtectorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoStackProtectorAttr> from(const Attr &parent);
+
+  inline static std::optional<NoStackProtectorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoStackProtectorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoSplitStackAttrRange = DerivedEntityRange<AttrIterator, NoSplitStackAttr>;
+using NoSplitStackAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoSplitStackAttr>;
+class NoSplitStackAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoSplitStackAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoSplitStackAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoSplitStackAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_SPLIT_STACK;
+  }
+
+  static std::optional<NoSplitStackAttr> from(const TokenContext &c);
+  static std::optional<NoSplitStackAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoSplitStackAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoSplitStackAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoSplitStackAttr> from(const Attr &parent);
+
+  inline static std::optional<NoSplitStackAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoSplitStackAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoSpeculativeLoadHardeningAttrRange = DerivedEntityRange<AttrIterator, NoSpeculativeLoadHardeningAttr>;
+using NoSpeculativeLoadHardeningAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoSpeculativeLoadHardeningAttr>;
+class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoSpeculativeLoadHardeningAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoSpeculativeLoadHardeningAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoSpeculativeLoadHardeningAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_SPECULATIVE_LOAD_HARDENING;
+  }
+
+  static std::optional<NoSpeculativeLoadHardeningAttr> from(const TokenContext &c);
+  static std::optional<NoSpeculativeLoadHardeningAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoSpeculativeLoadHardeningAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoSpeculativeLoadHardeningAttr> from(const Attr &parent);
+
+  inline static std::optional<NoSpeculativeLoadHardeningAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoSpeculativeLoadHardeningAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoSanitizeAttrRange = DerivedEntityRange<AttrIterator, NoSanitizeAttr>;
+using NoSanitizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoSanitizeAttr>;
+class NoSanitizeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoSanitizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoSanitizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoSanitizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_SANITIZE;
+  }
+
+  static std::optional<NoSanitizeAttr> from(const TokenContext &c);
+  static std::optional<NoSanitizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoSanitizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoSanitizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoSanitizeAttr> from(const Attr &parent);
+
+  inline static std::optional<NoSanitizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoSanitizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  bool has_coverage(void) const;
+};
+
+using NoReturnAttrRange = DerivedEntityRange<AttrIterator, NoReturnAttr>;
+using NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoReturnAttr>;
+class NoReturnAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoReturnAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoReturnAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoReturnAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_RETURN;
+  }
+
+  static std::optional<NoReturnAttr> from(const TokenContext &c);
+  static std::optional<NoReturnAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoReturnAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoReturnAttr> from(const Attr &parent);
+
+  inline static std::optional<NoReturnAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoReturnAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoProfileFunctionAttrRange = DerivedEntityRange<AttrIterator, NoProfileFunctionAttr>;
+using NoProfileFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoProfileFunctionAttr>;
+class NoProfileFunctionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoProfileFunctionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoProfileFunctionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoProfileFunctionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_PROFILE_FUNCTION;
+  }
+
+  static std::optional<NoProfileFunctionAttr> from(const TokenContext &c);
+  static std::optional<NoProfileFunctionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoProfileFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoProfileFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoProfileFunctionAttr> from(const Attr &parent);
+
+  inline static std::optional<NoProfileFunctionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoProfileFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoMips16AttrRange = DerivedEntityRange<AttrIterator, NoMips16Attr>;
+using NoMips16AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoMips16Attr>;
+class NoMips16Attr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoMips16AttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoMips16AttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoMips16Attr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_MIPS16;
+  }
+
+  static std::optional<NoMips16Attr> from(const TokenContext &c);
+  static std::optional<NoMips16Attr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoMips16Attr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoMips16Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoMips16Attr> from(const Attr &parent);
+
+  inline static std::optional<NoMips16Attr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoMips16Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoMicroMipsAttrRange = DerivedEntityRange<AttrIterator, NoMicroMipsAttr>;
+using NoMicroMipsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoMicroMipsAttr>;
+class NoMicroMipsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoMicroMipsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoMicroMipsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoMicroMipsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_MICRO_MIPS;
+  }
+
+  static std::optional<NoMicroMipsAttr> from(const TokenContext &c);
+  static std::optional<NoMicroMipsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoMicroMipsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoMicroMipsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoMicroMipsAttr> from(const Attr &parent);
+
+  inline static std::optional<NoMicroMipsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoMicroMipsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoInstrumentFunctionAttrRange = DerivedEntityRange<AttrIterator, NoInstrumentFunctionAttr>;
+using NoInstrumentFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInstrumentFunctionAttr>;
+class NoInstrumentFunctionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoInstrumentFunctionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoInstrumentFunctionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoInstrumentFunctionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_INSTRUMENT_FUNCTION;
+  }
+
+  static std::optional<NoInstrumentFunctionAttr> from(const TokenContext &c);
+  static std::optional<NoInstrumentFunctionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoInstrumentFunctionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoInstrumentFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoInstrumentFunctionAttr> from(const Attr &parent);
+
+  inline static std::optional<NoInstrumentFunctionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoInstrumentFunctionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoInlineAttrRange = DerivedEntityRange<AttrIterator, NoInlineAttr>;
+using NoInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInlineAttr>;
+class NoInlineAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoInlineAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoInlineAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoInlineAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_INLINE;
+  }
+
+  static std::optional<NoInlineAttr> from(const TokenContext &c);
+  static std::optional<NoInlineAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoInlineAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoInlineAttr> from(const Attr &parent);
+
+  inline static std::optional<NoInlineAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoDuplicateAttrRange = DerivedEntityRange<AttrIterator, NoDuplicateAttr>;
+using NoDuplicateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDuplicateAttr>;
+class NoDuplicateAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoDuplicateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoDuplicateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoDuplicateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_DUPLICATE;
+  }
+
+  static std::optional<NoDuplicateAttr> from(const TokenContext &c);
+  static std::optional<NoDuplicateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoDuplicateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoDuplicateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoDuplicateAttr> from(const Attr &parent);
+
+  inline static std::optional<NoDuplicateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoDuplicateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoDestroyAttrRange = DerivedEntityRange<AttrIterator, NoDestroyAttr>;
+using NoDestroyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDestroyAttr>;
+class NoDestroyAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoDestroyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoDestroyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoDestroyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_DESTROY;
+  }
+
+  static std::optional<NoDestroyAttr> from(const TokenContext &c);
+  static std::optional<NoDestroyAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoDestroyAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoDestroyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoDestroyAttr> from(const Attr &parent);
+
+  inline static std::optional<NoDestroyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoDestroyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoDebugAttrRange = DerivedEntityRange<AttrIterator, NoDebugAttr>;
+using NoDebugAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDebugAttr>;
+class NoDebugAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoDebugAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoDebugAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoDebugAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_DEBUG;
+  }
+
+  static std::optional<NoDebugAttr> from(const TokenContext &c);
+  static std::optional<NoDebugAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoDebugAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoDebugAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoDebugAttr> from(const Attr &parent);
+
+  inline static std::optional<NoDebugAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoDebugAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoCommonAttrRange = DerivedEntityRange<AttrIterator, NoCommonAttr>;
+using NoCommonAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoCommonAttr>;
+class NoCommonAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoCommonAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoCommonAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoCommonAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_COMMON;
+  }
+
+  static std::optional<NoCommonAttr> from(const TokenContext &c);
+  static std::optional<NoCommonAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoCommonAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoCommonAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoCommonAttr> from(const Attr &parent);
+
+  inline static std::optional<NoCommonAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoCommonAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NoAliasAttrRange = DerivedEntityRange<AttrIterator, NoAliasAttr>;
+using NoAliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoAliasAttr>;
+class NoAliasAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NoAliasAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NoAliasAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NoAliasAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NO_ALIAS;
+  }
+
+  static std::optional<NoAliasAttr> from(const TokenContext &c);
+  static std::optional<NoAliasAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NoAliasAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NoAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NoAliasAttr> from(const Attr &parent);
+
+  inline static std::optional<NoAliasAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NoAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NakedAttrRange = DerivedEntityRange<AttrIterator, NakedAttr>;
+using NakedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NakedAttr>;
+class NakedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NakedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NakedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NakedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NAKED;
+  }
+
+  static std::optional<NakedAttr> from(const TokenContext &c);
+  static std::optional<NakedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NakedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NakedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NakedAttr> from(const Attr &parent);
+
+  inline static std::optional<NakedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NakedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NSReturnsRetainedAttrRange = DerivedEntityRange<AttrIterator, NSReturnsRetainedAttr>;
+using NSReturnsRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSReturnsRetainedAttr>;
+class NSReturnsRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NSReturnsRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NSReturnsRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NSReturnsRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NS_RETURNS_RETAINED;
+  }
+
+  static std::optional<NSReturnsRetainedAttr> from(const TokenContext &c);
+  static std::optional<NSReturnsRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NSReturnsRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NSReturnsRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSReturnsRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<NSReturnsRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NSReturnsRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NSReturnsNotRetainedAttrRange = DerivedEntityRange<AttrIterator, NSReturnsNotRetainedAttr>;
+using NSReturnsNotRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSReturnsNotRetainedAttr>;
+class NSReturnsNotRetainedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NSReturnsNotRetainedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NSReturnsNotRetainedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NSReturnsNotRetainedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NS_RETURNS_NOT_RETAINED;
+  }
+
+  static std::optional<NSReturnsNotRetainedAttr> from(const TokenContext &c);
+  static std::optional<NSReturnsNotRetainedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NSReturnsNotRetainedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NSReturnsNotRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSReturnsNotRetainedAttr> from(const Attr &parent);
+
+  inline static std::optional<NSReturnsNotRetainedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NSReturnsNotRetainedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NSReturnsAutoreleasedAttrRange = DerivedEntityRange<AttrIterator, NSReturnsAutoreleasedAttr>;
+using NSReturnsAutoreleasedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSReturnsAutoreleasedAttr>;
+class NSReturnsAutoreleasedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NSReturnsAutoreleasedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NSReturnsAutoreleasedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NSReturnsAutoreleasedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NS_RETURNS_AUTORELEASED;
+  }
+
+  static std::optional<NSReturnsAutoreleasedAttr> from(const TokenContext &c);
+  static std::optional<NSReturnsAutoreleasedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NSReturnsAutoreleasedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NSReturnsAutoreleasedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSReturnsAutoreleasedAttr> from(const Attr &parent);
+
+  inline static std::optional<NSReturnsAutoreleasedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NSReturnsAutoreleasedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NSErrorDomainAttrRange = DerivedEntityRange<AttrIterator, NSErrorDomainAttr>;
+using NSErrorDomainAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSErrorDomainAttr>;
+class NSErrorDomainAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NSErrorDomainAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NSErrorDomainAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NSErrorDomainAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NS_ERROR_DOMAIN;
+  }
+
+  static std::optional<NSErrorDomainAttr> from(const TokenContext &c);
+  static std::optional<NSErrorDomainAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NSErrorDomainAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NSErrorDomainAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSErrorDomainAttr> from(const Attr &parent);
+
+  inline static std::optional<NSErrorDomainAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NSErrorDomainAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  VarDecl error_domain(void) const;
+  std::string_view spelling(void) const;
+};
+
+using NSConsumesSelfAttrRange = DerivedEntityRange<AttrIterator, NSConsumesSelfAttr>;
+using NSConsumesSelfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSConsumesSelfAttr>;
+class NSConsumesSelfAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NSConsumesSelfAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NSConsumesSelfAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NSConsumesSelfAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NS_CONSUMES_SELF;
+  }
+
+  static std::optional<NSConsumesSelfAttr> from(const TokenContext &c);
+  static std::optional<NSConsumesSelfAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NSConsumesSelfAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NSConsumesSelfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSConsumesSelfAttr> from(const Attr &parent);
+
+  inline static std::optional<NSConsumesSelfAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NSConsumesSelfAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MipsShortCallAttrRange = DerivedEntityRange<AttrIterator, MipsShortCallAttr>;
+using MipsShortCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MipsShortCallAttr>;
+class MipsShortCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MipsShortCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MipsShortCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MipsShortCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIPS_SHORT_CALL;
+  }
+
+  static std::optional<MipsShortCallAttr> from(const TokenContext &c);
+  static std::optional<MipsShortCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MipsShortCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MipsShortCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MipsShortCallAttr> from(const Attr &parent);
+
+  inline static std::optional<MipsShortCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MipsShortCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  MipsShortCallAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using MipsLongCallAttrRange = DerivedEntityRange<AttrIterator, MipsLongCallAttr>;
+using MipsLongCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MipsLongCallAttr>;
+class MipsLongCallAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MipsLongCallAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MipsLongCallAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MipsLongCallAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIPS_LONG_CALL;
+  }
+
+  static std::optional<MipsLongCallAttr> from(const TokenContext &c);
+  static std::optional<MipsLongCallAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MipsLongCallAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MipsLongCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MipsLongCallAttr> from(const Attr &parent);
+
+  inline static std::optional<MipsLongCallAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MipsLongCallAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  MipsLongCallAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using MipsInterruptAttrRange = DerivedEntityRange<AttrIterator, MipsInterruptAttr>;
+using MipsInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MipsInterruptAttr>;
+class MipsInterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MipsInterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MipsInterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MipsInterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIPS_INTERRUPT;
+  }
+
+  static std::optional<MipsInterruptAttr> from(const TokenContext &c);
+  static std::optional<MipsInterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MipsInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MipsInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MipsInterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<MipsInterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MipsInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  MipsInterruptAttrInterruptType interrupt(void) const;
+  std::string_view spelling(void) const;
+};
+
+using Mips16AttrRange = DerivedEntityRange<AttrIterator, Mips16Attr>;
+using Mips16AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Mips16Attr>;
+class Mips16Attr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static Mips16AttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static Mips16AttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : Mips16Attr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIPS16;
+  }
+
+  static std::optional<Mips16Attr> from(const TokenContext &c);
+  static std::optional<Mips16Attr> from(const InheritableAttr &parent);
+
+  inline static std::optional<Mips16Attr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return Mips16Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<Mips16Attr> from(const Attr &parent);
+
+  inline static std::optional<Mips16Attr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return Mips16Attr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MinVectorWidthAttrRange = DerivedEntityRange<AttrIterator, MinVectorWidthAttr>;
+using MinVectorWidthAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MinVectorWidthAttr>;
+class MinVectorWidthAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MinVectorWidthAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MinVectorWidthAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MinVectorWidthAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIN_VECTOR_WIDTH;
+  }
+
+  static std::optional<MinVectorWidthAttr> from(const TokenContext &c);
+  static std::optional<MinVectorWidthAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MinVectorWidthAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MinVectorWidthAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MinVectorWidthAttr> from(const Attr &parent);
+
+  inline static std::optional<MinVectorWidthAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MinVectorWidthAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MinSizeAttrRange = DerivedEntityRange<AttrIterator, MinSizeAttr>;
+using MinSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MinSizeAttr>;
+class MinSizeAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MinSizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MinSizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MinSizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIN_SIZE;
+  }
+
+  static std::optional<MinSizeAttr> from(const TokenContext &c);
+  static std::optional<MinSizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MinSizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MinSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MinSizeAttr> from(const Attr &parent);
+
+  inline static std::optional<MinSizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MinSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MicroMipsAttrRange = DerivedEntityRange<AttrIterator, MicroMipsAttr>;
+using MicroMipsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MicroMipsAttr>;
+class MicroMipsAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MicroMipsAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MicroMipsAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MicroMipsAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MICRO_MIPS;
+  }
+
+  static std::optional<MicroMipsAttr> from(const TokenContext &c);
+  static std::optional<MicroMipsAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MicroMipsAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MicroMipsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MicroMipsAttr> from(const Attr &parent);
+
+  inline static std::optional<MicroMipsAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MicroMipsAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MayAliasAttrRange = DerivedEntityRange<AttrIterator, MayAliasAttr>;
+using MayAliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MayAliasAttr>;
+class MayAliasAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MayAliasAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MayAliasAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MayAliasAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MAY_ALIAS;
+  }
+
+  static std::optional<MayAliasAttr> from(const TokenContext &c);
+  static std::optional<MayAliasAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MayAliasAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MayAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MayAliasAttr> from(const Attr &parent);
+
+  inline static std::optional<MayAliasAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MayAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MaxFieldAlignmentAttrRange = DerivedEntityRange<AttrIterator, MaxFieldAlignmentAttr>;
+using MaxFieldAlignmentAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MaxFieldAlignmentAttr>;
+class MaxFieldAlignmentAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MaxFieldAlignmentAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MaxFieldAlignmentAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MaxFieldAlignmentAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MAX_FIELD_ALIGNMENT;
+  }
+
+  static std::optional<MaxFieldAlignmentAttr> from(const TokenContext &c);
+  static std::optional<MaxFieldAlignmentAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MaxFieldAlignmentAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MaxFieldAlignmentAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MaxFieldAlignmentAttr> from(const Attr &parent);
+
+  inline static std::optional<MaxFieldAlignmentAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MaxFieldAlignmentAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MSVtorDispAttrRange = DerivedEntityRange<AttrIterator, MSVtorDispAttr>;
+using MSVtorDispAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSVtorDispAttr>;
+class MSVtorDispAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSVtorDispAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSVtorDispAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSVtorDispAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MS_VTOR_DISP;
+  }
+
+  static std::optional<MSVtorDispAttr> from(const TokenContext &c);
+  static std::optional<MSVtorDispAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSVtorDispAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSVtorDispAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSVtorDispAttr> from(const Attr &parent);
+
+  inline static std::optional<MSVtorDispAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSVtorDispAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+  MSVtorDispMode vtor_disp_mode(void) const;
+};
+
+using MSStructAttrRange = DerivedEntityRange<AttrIterator, MSStructAttr>;
+using MSStructAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSStructAttr>;
+class MSStructAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSStructAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSStructAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSStructAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MS_STRUCT;
+  }
+
+  static std::optional<MSStructAttr> from(const TokenContext &c);
+  static std::optional<MSStructAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSStructAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSStructAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSStructAttr> from(const Attr &parent);
+
+  inline static std::optional<MSStructAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSStructAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MSP430InterruptAttrRange = DerivedEntityRange<AttrIterator, MSP430InterruptAttr>;
+using MSP430InterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSP430InterruptAttr>;
+class MSP430InterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSP430InterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSP430InterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSP430InterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MSP430_INTERRUPT;
+  }
+
+  static std::optional<MSP430InterruptAttr> from(const TokenContext &c);
+  static std::optional<MSP430InterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSP430InterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSP430InterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSP430InterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<MSP430InterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSP430InterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MSNoVTableAttrRange = DerivedEntityRange<AttrIterator, MSNoVTableAttr>;
+using MSNoVTableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSNoVTableAttr>;
+class MSNoVTableAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSNoVTableAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSNoVTableAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSNoVTableAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MS_NO_V_TABLE;
+  }
+
+  static std::optional<MSNoVTableAttr> from(const TokenContext &c);
+  static std::optional<MSNoVTableAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSNoVTableAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSNoVTableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSNoVTableAttr> from(const Attr &parent);
+
+  inline static std::optional<MSNoVTableAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSNoVTableAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MSInheritanceAttrRange = DerivedEntityRange<AttrIterator, MSInheritanceAttr>;
+using MSInheritanceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSInheritanceAttr>;
+class MSInheritanceAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSInheritanceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSInheritanceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSInheritanceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MS_INHERITANCE;
+  }
+
+  static std::optional<MSInheritanceAttr> from(const TokenContext &c);
+  static std::optional<MSInheritanceAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSInheritanceAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSInheritanceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSInheritanceAttr> from(const Attr &parent);
+
+  inline static std::optional<MSInheritanceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSInheritanceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  bool best_case(void) const;
+  MSInheritanceModel inheritance_model(void) const;
+  MSInheritanceAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
+using MSAllocatorAttrRange = DerivedEntityRange<AttrIterator, MSAllocatorAttr>;
+using MSAllocatorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSAllocatorAttr>;
+class MSAllocatorAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSAllocatorAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSAllocatorAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSAllocatorAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MS_ALLOCATOR;
+  }
+
+  static std::optional<MSAllocatorAttr> from(const TokenContext &c);
+  static std::optional<MSAllocatorAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSAllocatorAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSAllocatorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSAllocatorAttr> from(const Attr &parent);
+
+  inline static std::optional<MSAllocatorAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSAllocatorAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MSABIAttrRange = DerivedEntityRange<AttrIterator, MSABIAttr>;
+using MSABIAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSABIAttr>;
+class MSABIAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MSABIAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MSABIAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MSABIAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MSABI;
+  }
+
+  static std::optional<MSABIAttr> from(const TokenContext &c);
+  static std::optional<MSABIAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MSABIAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MSABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MSABIAttr> from(const Attr &parent);
+
+  inline static std::optional<MSABIAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MSABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using MIGServerRoutineAttrRange = DerivedEntityRange<AttrIterator, MIGServerRoutineAttr>;
+using MIGServerRoutineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MIGServerRoutineAttr>;
+class MIGServerRoutineAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static MIGServerRoutineAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static MIGServerRoutineAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : MIGServerRoutineAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::MIG_SERVER_ROUTINE_;
+  }
+
+  static std::optional<MIGServerRoutineAttr> from(const TokenContext &c);
+  static std::optional<MIGServerRoutineAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<MIGServerRoutineAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return MIGServerRoutineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<MIGServerRoutineAttr> from(const Attr &parent);
+
+  inline static std::optional<MIGServerRoutineAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return MIGServerRoutineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using M68kInterruptAttrRange = DerivedEntityRange<AttrIterator, M68kInterruptAttr>;
+using M68kInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, M68kInterruptAttr>;
+class M68kInterruptAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static M68kInterruptAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static M68kInterruptAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : M68kInterruptAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::M68K_INTERRUPT;
+  }
+
+  static std::optional<M68kInterruptAttr> from(const TokenContext &c);
+  static std::optional<M68kInterruptAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<M68kInterruptAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return M68kInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<M68kInterruptAttr> from(const Attr &parent);
+
+  inline static std::optional<M68kInterruptAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return M68kInterruptAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LocksExcludedAttrRange = DerivedEntityRange<AttrIterator, LocksExcludedAttr>;
+using LocksExcludedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LocksExcludedAttr>;
+class LocksExcludedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static LocksExcludedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LocksExcludedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LocksExcludedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LOCKS_EXCLUDED;
+  }
+
+  static std::optional<LocksExcludedAttr> from(const TokenContext &c);
+  static std::optional<LocksExcludedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<LocksExcludedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return LocksExcludedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LocksExcludedAttr> from(const Attr &parent);
+
+  inline static std::optional<LocksExcludedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LocksExcludedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LockReturnedAttrRange = DerivedEntityRange<AttrIterator, LockReturnedAttr>;
+using LockReturnedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LockReturnedAttr>;
+class LockReturnedAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static LockReturnedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LockReturnedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LockReturnedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LOCK_RETURNED;
+  }
+
+  static std::optional<LockReturnedAttr> from(const TokenContext &c);
+  static std::optional<LockReturnedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<LockReturnedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return LockReturnedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LockReturnedAttr> from(const Attr &parent);
+
+  inline static std::optional<LockReturnedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LockReturnedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  Expr argument(void) const;
+  std::string_view spelling(void) const;
+};
+
+using LifetimeBoundAttrRange = DerivedEntityRange<AttrIterator, LifetimeBoundAttr>;
+using LifetimeBoundAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LifetimeBoundAttr>;
+class LifetimeBoundAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static LifetimeBoundAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LifetimeBoundAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LifetimeBoundAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LIFETIME_BOUND;
+  }
+
+  static std::optional<LifetimeBoundAttr> from(const TokenContext &c);
+  static std::optional<LifetimeBoundAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<LifetimeBoundAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return LifetimeBoundAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LifetimeBoundAttr> from(const Attr &parent);
+
+  inline static std::optional<LifetimeBoundAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LifetimeBoundAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LeafAttrRange = DerivedEntityRange<AttrIterator, LeafAttr>;
+using LeafAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LeafAttr>;
+class LeafAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static LeafAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LeafAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LeafAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LEAF;
+  }
+
+  static std::optional<LeafAttr> from(const TokenContext &c);
+  static std::optional<LeafAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<LeafAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return LeafAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LeafAttr> from(const Attr &parent);
+
+  inline static std::optional<LeafAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LeafAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LayoutVersionAttrRange = DerivedEntityRange<AttrIterator, LayoutVersionAttr>;
+using LayoutVersionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LayoutVersionAttr>;
+class LayoutVersionAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static LayoutVersionAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LayoutVersionAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LayoutVersionAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LAYOUT_VERSION;
+  }
+
+  static std::optional<LayoutVersionAttr> from(const TokenContext &c);
+  static std::optional<LayoutVersionAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<LayoutVersionAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return LayoutVersionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LayoutVersionAttr> from(const Attr &parent);
+
+  inline static std::optional<LayoutVersionAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LayoutVersionAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using LTOVisibilityPublicAttrRange = DerivedEntityRange<AttrIterator, LTOVisibilityPublicAttr>;
+using LTOVisibilityPublicAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LTOVisibilityPublicAttr>;
+class LTOVisibilityPublicAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static LTOVisibilityPublicAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static LTOVisibilityPublicAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : LTOVisibilityPublicAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::LTO_VISIBILITY_PUBLIC;
+  }
+
+  static std::optional<LTOVisibilityPublicAttr> from(const TokenContext &c);
+  static std::optional<LTOVisibilityPublicAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<LTOVisibilityPublicAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return LTOVisibilityPublicAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<LTOVisibilityPublicAttr> from(const Attr &parent);
+
+  inline static std::optional<LTOVisibilityPublicAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return LTOVisibilityPublicAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using InternalLinkageAttrRange = DerivedEntityRange<AttrIterator, InternalLinkageAttr>;
+using InternalLinkageAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, InternalLinkageAttr>;
+class InternalLinkageAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static InternalLinkageAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static InternalLinkageAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InternalLinkageAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::INTERNAL_LINKAGE;
+  }
+
+  static std::optional<InternalLinkageAttr> from(const TokenContext &c);
+  static std::optional<InternalLinkageAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<InternalLinkageAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return InternalLinkageAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<InternalLinkageAttr> from(const Attr &parent);
+
+  inline static std::optional<InternalLinkageAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return InternalLinkageAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using IntelOclBiccAttrRange = DerivedEntityRange<AttrIterator, IntelOclBiccAttr>;
+using IntelOclBiccAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IntelOclBiccAttr>;
+class IntelOclBiccAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static IntelOclBiccAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static IntelOclBiccAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IntelOclBiccAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::INTEL_OCL_BICC;
+  }
+
+  static std::optional<IntelOclBiccAttr> from(const TokenContext &c);
+  static std::optional<IntelOclBiccAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<IntelOclBiccAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return IntelOclBiccAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<IntelOclBiccAttr> from(const Attr &parent);
+
+  inline static std::optional<IntelOclBiccAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return IntelOclBiccAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using InitPriorityAttrRange = DerivedEntityRange<AttrIterator, InitPriorityAttr>;
+using InitPriorityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, InitPriorityAttr>;
+class InitPriorityAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static InitPriorityAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static InitPriorityAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InitPriorityAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::INIT_PRIORITY;
+  }
+
+  static std::optional<InitPriorityAttr> from(const TokenContext &c);
+  static std::optional<InitPriorityAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<InitPriorityAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return InitPriorityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<InitPriorityAttr> from(const Attr &parent);
+
+  inline static std::optional<InitPriorityAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return InitPriorityAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using InheritableParamAttrRange = DerivedEntityRange<AttrIterator, InheritableParamAttr>;
+using InheritableParamAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, InheritableParamAttr>;
+class InheritableParamAttr : public InheritableAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static InheritableParamAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static InheritableParamAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : InheritableParamAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  static std::optional<InheritableParamAttr> from(const TokenContext &c);
+  static std::optional<InheritableParamAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<InheritableParamAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return InheritableParamAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<InheritableParamAttr> from(const Attr &parent);
+
+  inline static std::optional<InheritableParamAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return InheritableParamAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+};
+
+using CarriesDependencyAttrRange = DerivedEntityRange<AttrIterator, CarriesDependencyAttr>;
+using CarriesDependencyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CarriesDependencyAttr>;
+class CarriesDependencyAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CarriesDependencyAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CarriesDependencyAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CarriesDependencyAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CARRIES_DEPENDENCY;
+  }
+
+  static std::optional<CarriesDependencyAttr> from(const TokenContext &c);
+  static std::optional<CarriesDependencyAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<CarriesDependencyAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return CarriesDependencyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CarriesDependencyAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CarriesDependencyAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CarriesDependencyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CarriesDependencyAttr> from(const Attr &parent);
+
+  inline static std::optional<CarriesDependencyAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CarriesDependencyAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using CFConsumedAttrRange = DerivedEntityRange<AttrIterator, CFConsumedAttr>;
+using CFConsumedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFConsumedAttr>;
+class CFConsumedAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static CFConsumedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CFConsumedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CFConsumedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CF_CONSUMED;
+  }
+
+  static std::optional<CFConsumedAttr> from(const TokenContext &c);
+  static std::optional<CFConsumedAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<CFConsumedAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return CFConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFConsumedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<CFConsumedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return CFConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<CFConsumedAttr> from(const Attr &parent);
+
+  inline static std::optional<CFConsumedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CFConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using AnnotateAttrRange = DerivedEntityRange<AttrIterator, AnnotateAttr>;
+using AnnotateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnnotateAttr>;
+class AnnotateAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static AnnotateAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static AnnotateAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : AnnotateAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::ANNOTATE;
+  }
+
+  static std::optional<AnnotateAttr> from(const TokenContext &c);
+  static std::optional<AnnotateAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<AnnotateAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return AnnotateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AnnotateAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<AnnotateAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return AnnotateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<AnnotateAttr> from(const Attr &parent);
+
+  inline static std::optional<AnnotateAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return AnnotateAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view annotation(void) const;
+  std::string_view spelling(void) const;
+};
+
+using UseHandleAttrRange = DerivedEntityRange<AttrIterator, UseHandleAttr>;
+using UseHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UseHandleAttr>;
+class UseHandleAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static UseHandleAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static UseHandleAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : UseHandleAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::USE_HANDLE;
+  }
+
+  static std::optional<UseHandleAttr> from(const TokenContext &c);
+  static std::optional<UseHandleAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<UseHandleAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return UseHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UseHandleAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<UseHandleAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return UseHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<UseHandleAttr> from(const Attr &parent);
+
+  inline static std::optional<UseHandleAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return UseHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view handle_type(void) const;
+  std::string_view spelling(void) const;
+};
+
+using ReleaseHandleAttrRange = DerivedEntityRange<AttrIterator, ReleaseHandleAttr>;
+using ReleaseHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReleaseHandleAttr>;
+class ReleaseHandleAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ReleaseHandleAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ReleaseHandleAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ReleaseHandleAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::RELEASE_HANDLE;
+  }
+
+  static std::optional<ReleaseHandleAttr> from(const TokenContext &c);
+  static std::optional<ReleaseHandleAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<ReleaseHandleAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return ReleaseHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReleaseHandleAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ReleaseHandleAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ReleaseHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ReleaseHandleAttr> from(const Attr &parent);
+
+  inline static std::optional<ReleaseHandleAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ReleaseHandleAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view handle_type(void) const;
+  std::string_view spelling(void) const;
+};
+
+using PassObjectSizeAttrRange = DerivedEntityRange<AttrIterator, PassObjectSizeAttr>;
+using PassObjectSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PassObjectSizeAttr>;
+class PassObjectSizeAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static PassObjectSizeAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static PassObjectSizeAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : PassObjectSizeAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::PASS_OBJECT_SIZE;
+  }
+
+  static std::optional<PassObjectSizeAttr> from(const TokenContext &c);
+  static std::optional<PassObjectSizeAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<PassObjectSizeAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return PassObjectSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PassObjectSizeAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<PassObjectSizeAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return PassObjectSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<PassObjectSizeAttr> from(const Attr &parent);
+
+  inline static std::optional<PassObjectSizeAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return PassObjectSizeAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  PassObjectSizeAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+  bool is_dynamic(void) const;
+};
+
+using ParameterABIAttrRange = DerivedEntityRange<AttrIterator, ParameterABIAttr>;
+using ParameterABIAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParameterABIAttr>;
+class ParameterABIAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static ParameterABIAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static ParameterABIAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : ParameterABIAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  static std::optional<ParameterABIAttr> from(const TokenContext &c);
+  static std::optional<ParameterABIAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<ParameterABIAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return ParameterABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ParameterABIAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<ParameterABIAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return ParameterABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<ParameterABIAttr> from(const Attr &parent);
+
+  inline static std::optional<ParameterABIAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return ParameterABIAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  ParameterABI abi(void) const;
+};
+
+using SwiftIndirectResultAttrRange = DerivedEntityRange<AttrIterator, SwiftIndirectResultAttr>;
+using SwiftIndirectResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftIndirectResultAttr>;
+class SwiftIndirectResultAttr : public ParameterABIAttr {
+ private:
+  friend class FragmentImpl;
+  friend class ParameterABIAttr;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftIndirectResultAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftIndirectResultAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftIndirectResultAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_INDIRECT_RESULT;
+  }
+
+  static std::optional<SwiftIndirectResultAttr> from(const TokenContext &c);
+  static std::optional<SwiftIndirectResultAttr> from(const ParameterABIAttr &parent);
+
+  inline static std::optional<SwiftIndirectResultAttr> from(const std::optional<ParameterABIAttr> &parent) {
+    if (parent) {
+      return SwiftIndirectResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftIndirectResultAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<SwiftIndirectResultAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return SwiftIndirectResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftIndirectResultAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftIndirectResultAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftIndirectResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftIndirectResultAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftIndirectResultAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftIndirectResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftErrorResultAttrRange = DerivedEntityRange<AttrIterator, SwiftErrorResultAttr>;
+using SwiftErrorResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftErrorResultAttr>;
+class SwiftErrorResultAttr : public ParameterABIAttr {
+ private:
+  friend class FragmentImpl;
+  friend class ParameterABIAttr;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftErrorResultAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftErrorResultAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftErrorResultAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ERROR_RESULT;
+  }
+
+  static std::optional<SwiftErrorResultAttr> from(const TokenContext &c);
+  static std::optional<SwiftErrorResultAttr> from(const ParameterABIAttr &parent);
+
+  inline static std::optional<SwiftErrorResultAttr> from(const std::optional<ParameterABIAttr> &parent) {
+    if (parent) {
+      return SwiftErrorResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftErrorResultAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<SwiftErrorResultAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return SwiftErrorResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftErrorResultAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftErrorResultAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftErrorResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftErrorResultAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftErrorResultAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftErrorResultAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftContextAttrRange = DerivedEntityRange<AttrIterator, SwiftContextAttr>;
+using SwiftContextAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftContextAttr>;
+class SwiftContextAttr : public ParameterABIAttr {
+ private:
+  friend class FragmentImpl;
+  friend class ParameterABIAttr;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftContextAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftContextAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftContextAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_CONTEXT;
+  }
+
+  static std::optional<SwiftContextAttr> from(const TokenContext &c);
+  static std::optional<SwiftContextAttr> from(const ParameterABIAttr &parent);
+
+  inline static std::optional<SwiftContextAttr> from(const std::optional<ParameterABIAttr> &parent) {
+    if (parent) {
+      return SwiftContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftContextAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<SwiftContextAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return SwiftContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftContextAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftContextAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftContextAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftContextAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using SwiftAsyncContextAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncContextAttr>;
+using SwiftAsyncContextAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncContextAttr>;
+class SwiftAsyncContextAttr : public ParameterABIAttr {
+ private:
+  friend class FragmentImpl;
+  friend class ParameterABIAttr;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static SwiftAsyncContextAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static SwiftAsyncContextAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : SwiftAsyncContextAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::SWIFT_ASYNC_CONTEXT;
+  }
+
+  static std::optional<SwiftAsyncContextAttr> from(const TokenContext &c);
+  static std::optional<SwiftAsyncContextAttr> from(const ParameterABIAttr &parent);
+
+  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<ParameterABIAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncContextAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncContextAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return SwiftAsyncContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<SwiftAsyncContextAttr> from(const Attr &parent);
+
+  inline static std::optional<SwiftAsyncContextAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return SwiftAsyncContextAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using OSConsumedAttrRange = DerivedEntityRange<AttrIterator, OSConsumedAttr>;
+using OSConsumedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSConsumedAttr>;
+class OSConsumedAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static OSConsumedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static OSConsumedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : OSConsumedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::OS_CONSUMED;
+  }
+
+  static std::optional<OSConsumedAttr> from(const TokenContext &c);
+  static std::optional<OSConsumedAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<OSConsumedAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return OSConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSConsumedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<OSConsumedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return OSConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<OSConsumedAttr> from(const Attr &parent);
+
+  inline static std::optional<OSConsumedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return OSConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NonNullAttrRange = DerivedEntityRange<AttrIterator, NonNullAttr>;
+using NonNullAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NonNullAttr>;
+class NonNullAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NonNullAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NonNullAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NonNullAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NON_NULL;
+  }
+
+  static std::optional<NonNullAttr> from(const TokenContext &c);
+  static std::optional<NonNullAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<NonNullAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return NonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NonNullAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NonNullAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NonNullAttr> from(const Attr &parent);
+
+  inline static std::optional<NonNullAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NonNullAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using NSConsumedAttrRange = DerivedEntityRange<AttrIterator, NSConsumedAttr>;
+using NSConsumedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSConsumedAttr>;
+class NSConsumedAttr : public InheritableParamAttr {
+ private:
+  friend class FragmentImpl;
+  friend class InheritableParamAttr;
+  friend class InheritableAttr;
+  friend class Attr;
+ public:
+  inline static NSConsumedAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static NSConsumedAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : NSConsumedAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::NS_CONSUMED;
+  }
+
+  static std::optional<NSConsumedAttr> from(const TokenContext &c);
+  static std::optional<NSConsumedAttr> from(const InheritableParamAttr &parent);
+
+  inline static std::optional<NSConsumedAttr> from(const std::optional<InheritableParamAttr> &parent) {
+    if (parent) {
+      return NSConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSConsumedAttr> from(const InheritableAttr &parent);
+
+  inline static std::optional<NSConsumedAttr> from(const std::optional<InheritableAttr> &parent) {
+    if (parent) {
+      return NSConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  static std::optional<NSConsumedAttr> from(const Attr &parent);
+
+  inline static std::optional<NSConsumedAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return NSConsumedAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using IFuncAttrRange = DerivedEntityRange<AttrIterator, IFuncAttr>;
+using IFuncAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IFuncAttr>;
+class IFuncAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static IFuncAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static IFuncAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : IFuncAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::I_FUNC;
+  }
+
+  static std::optional<IFuncAttr> from(const TokenContext &c);
+  static std::optional<IFuncAttr> from(const Attr &parent);
+
+  inline static std::optional<IFuncAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return IFuncAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view resolver(void) const;
+  std::string_view spelling(void) const;
+};
+
+using CalledOnceAttrRange = DerivedEntityRange<AttrIterator, CalledOnceAttr>;
+using CalledOnceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CalledOnceAttr>;
+class CalledOnceAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static CalledOnceAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static CalledOnceAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : CalledOnceAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::CALLED_ONCE;
+  }
+
+  static std::optional<CalledOnceAttr> from(const TokenContext &c);
+  static std::optional<CalledOnceAttr> from(const Attr &parent);
+
+  inline static std::optional<CalledOnceAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return CalledOnceAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  std::string_view spelling(void) const;
+};
+
+using BuiltinAliasAttrRange = DerivedEntityRange<AttrIterator, BuiltinAliasAttr>;
+using BuiltinAliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinAliasAttr>;
+class BuiltinAliasAttr : public Attr {
+ private:
+  friend class FragmentImpl;
+  friend class Attr;
+ public:
+  inline static BuiltinAliasAttrRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
+  inline static BuiltinAliasAttrContainingTokenRange containing(const Token &tok) {
+    return TokenContextIterator(TokenContext::of(tok));
+  }
+
+  inline bool contains(const Token &tok) {
+    for(auto &parent : BuiltinAliasAttr::containing(tok)) {
+      if(parent.id() == id()) { return true; }
+    }
+    return false;
+  }
+
+  inline static constexpr AttrKind static_kind(void) {
+    return AttrKind::BUILTIN_ALIAS;
+  }
+
+  static std::optional<BuiltinAliasAttr> from(const TokenContext &c);
+  static std::optional<BuiltinAliasAttr> from(const Attr &parent);
+
+  inline static std::optional<BuiltinAliasAttr> from(const std::optional<Attr> &parent) {
+    if (parent) {
+      return BuiltinAliasAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
+  BuiltinAliasAttrSpelling semantic_spelling(void) const;
+  std::string_view spelling(void) const;
+};
+
 using TypeRange = DerivedEntityRange<TypeIterator, Type>;
 using TypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, Type>;
 class Type {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class Decl;
   friend class DeclIterator;
   friend class File;
@@ -7612,7 +31723,7 @@ class Type {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   Type(Type &&) noexcept = default;
@@ -7620,9 +31731,9 @@ class Type {
   Type &operator=(Type &&) noexcept = default;
   Type &operator=(const Type &) = default;
 
-  inline Type(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline Type(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   inline static std::optional<Type> from(const Type &self) {
     return self;
@@ -7773,42 +31884,42 @@ class Type {
   bool is_nothrow_t(void) const;
   bool is_null_pointer_type(void) const;
   bool is_ocl_ext_opaque_type(void) const;
-  bool is_ocl_image1_darray_ro_type(void) const;
-  bool is_ocl_image1_darray_rw_type(void) const;
-  bool is_ocl_image1_darray_wo_type(void) const;
-  bool is_ocl_image1_dbuffer_ro_type(void) const;
-  bool is_ocl_image1_dbuffer_rw_type(void) const;
-  bool is_ocl_image1_dbuffer_wo_type(void) const;
-  bool is_ocl_image1_dro_type(void) const;
-  bool is_ocl_image1_drw_type(void) const;
-  bool is_ocl_image1_dwo_type(void) const;
-  bool is_ocl_image2_darray_depth_ro_type(void) const;
-  bool is_ocl_image2_darray_depth_rw_type(void) const;
-  bool is_ocl_image2_darray_depth_wo_type(void) const;
-  bool is_ocl_image2_darray_msaa_depth_ro_type(void) const;
-  bool is_ocl_image2_darray_msaa_depth_rw_type(void) const;
-  bool is_ocl_image2_darray_msaa_depth_wo_type(void) const;
-  bool is_ocl_image2_darray_msaaro_type(void) const;
-  bool is_ocl_image2_darray_msaarw_type(void) const;
-  bool is_ocl_image2_darray_msaawo_type(void) const;
-  bool is_ocl_image2_darray_ro_type(void) const;
-  bool is_ocl_image2_darray_rw_type(void) const;
-  bool is_ocl_image2_darray_wo_type(void) const;
-  bool is_ocl_image2_ddepth_ro_type(void) const;
-  bool is_ocl_image2_ddepth_rw_type(void) const;
-  bool is_ocl_image2_ddepth_wo_type(void) const;
-  bool is_ocl_image2_dmsaa_depth_ro_type(void) const;
-  bool is_ocl_image2_dmsaa_depth_rw_type(void) const;
-  bool is_ocl_image2_dmsaa_depth_wo_type(void) const;
-  bool is_ocl_image2_dmsaaro_type(void) const;
-  bool is_ocl_image2_dmsaarw_type(void) const;
-  bool is_ocl_image2_dmsaawo_type(void) const;
-  bool is_ocl_image2_dro_type(void) const;
-  bool is_ocl_image2_drw_type(void) const;
-  bool is_ocl_image2_dwo_type(void) const;
-  bool is_ocl_image3_dro_type(void) const;
-  bool is_ocl_image3_drw_type(void) const;
-  bool is_ocl_image3_dwo_type(void) const;
+  bool is_ocl_image_1d_array_ro_type(void) const;
+  bool is_ocl_image_1d_array_rw_type(void) const;
+  bool is_ocl_image_1d_array_wo_type(void) const;
+  bool is_ocl_image_1d_buffer_ro_type(void) const;
+  bool is_ocl_image_1d_buffer_rw_type(void) const;
+  bool is_ocl_image_1d_buffer_wo_type(void) const;
+  bool is_ocl_image_1d_ro_type(void) const;
+  bool is_ocl_image_1d_rw_type(void) const;
+  bool is_ocl_image_1d_wo_type(void) const;
+  bool is_ocl_image_2d_array_depth_ro_type(void) const;
+  bool is_ocl_image_2d_array_depth_rw_type(void) const;
+  bool is_ocl_image_2d_array_depth_wo_type(void) const;
+  bool is_ocl_image_2d_array_msaa_depth_ro_type(void) const;
+  bool is_ocl_image_2d_array_msaa_depth_rw_type(void) const;
+  bool is_ocl_image_2d_array_msaa_depth_wo_type(void) const;
+  bool is_ocl_image_2d_array_msaaro_type(void) const;
+  bool is_ocl_image_2d_array_msaarw_type(void) const;
+  bool is_ocl_image_2d_array_msaawo_type(void) const;
+  bool is_ocl_image_2d_array_ro_type(void) const;
+  bool is_ocl_image_2d_array_rw_type(void) const;
+  bool is_ocl_image_2d_array_wo_type(void) const;
+  bool is_ocl_image_2d_depth_ro_type(void) const;
+  bool is_ocl_image_2d_depth_rw_type(void) const;
+  bool is_ocl_image_2d_depth_wo_type(void) const;
+  bool is_ocl_image_2d_msaa_depth_ro_type(void) const;
+  bool is_ocl_image_2d_msaa_depth_rw_type(void) const;
+  bool is_ocl_image_2d_msaa_depth_wo_type(void) const;
+  bool is_ocl_image_2d_msaaro_type(void) const;
+  bool is_ocl_image_2d_msaarw_type(void) const;
+  bool is_ocl_image_2d_msaawo_type(void) const;
+  bool is_ocl_image_2d_ro_type(void) const;
+  bool is_ocl_image_2d_rw_type(void) const;
+  bool is_ocl_image_2d_wo_type(void) const;
+  bool is_ocl_image_3d_ro_type(void) const;
+  bool is_ocl_image_3d_rw_type(void) const;
+  bool is_ocl_image_3d_wo_type(void) const;
   bool is_ocl_intel_subgroup_avc_ime_dual_reference_streamin_type(void) const;
   bool is_ocl_intel_subgroup_avc_ime_payload_type(void) const;
   bool is_ocl_intel_subgroup_avc_ime_result_dual_reference_streamout_type(void) const;
@@ -9790,7 +33901,7 @@ class AttributedType : public Type {
   }
 
   Type desugar(void) const;
-  AttributeKind attribute_kind(void) const;
+  AttrKind attribute_kind(void) const;
   Type equivalent_type(void) const;
   std::optional<NullabilityKind> immediate_nullability(void) const;
   Type modified_type(void) const;
@@ -10738,6 +34849,8 @@ using StmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>,
 
 class Stmt {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class Decl;
   friend class DeclIterator;
   friend class File;
@@ -10755,7 +34868,7 @@ class Stmt {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   Stmt(Stmt &&) noexcept = default;
@@ -10763,9 +34876,9 @@ class Stmt {
   Stmt &operator=(Stmt &&) noexcept = default;
   Stmt &operator=(const Stmt &) = default;
 
-  inline Stmt(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline Stmt(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   inline static std::optional<Stmt> from(const Stmt &self) {
     return self;
@@ -19547,6 +43660,7 @@ class CallExpr : public Expr {
   std::optional<Decl> callee_declaration(void) const;
   std::optional<FunctionDecl> direct_callee(void) const;
   Token r_paren_token(void) const;
+  std::optional<Attr> unused_result_attribute(void) const;
   bool has_stored_fp_features(void) const;
   bool has_unused_result_attribute(void) const;
   bool is_builtin_assume_false(void) const;
@@ -27322,6 +51436,7 @@ class AttributedStmt : public ValueStmt {
   }
 
   Token attribute_token(void) const;
+  std::vector<Attr> attributes(void) const;
   Stmt sub_statement(void) const;
 };
 
@@ -27559,6 +51674,8 @@ using DeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>,
 
 class Decl {
  protected:
+  friend class Attr;
+  friend class AttrIterator;
   friend class DeclIterator;
   friend class File;
   friend class Fragment;
@@ -27576,7 +51693,7 @@ class Decl {
   template <typename> friend class UseIterator;
 
   std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset;
+  unsigned offset_;
 
  public:
   Decl(Decl &&) noexcept = default;
@@ -27584,9 +51701,9 @@ class Decl {
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
 
-  inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset_)
+  inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
       : fragment(std::move(fragment_)),
-        offset(offset_) {}
+        offset_(offset__) {}
 
   inline static std::optional<Decl> from(const Decl &self) {
     return self;
@@ -27634,9 +51751,12 @@ class Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
+  std::vector<Attr> attributes(void) const;
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
+  std::optional<Attr> defining_attribute(void) const;
   std::optional<TemplateParameterList> described_template_parameters(void) const;
+  std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
   std::optional<FunctionType> function_type(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
@@ -34940,6 +59060,7 @@ enum class DeclUseSelector : unsigned short {
   DICTIONARY_WITH_OBJECTS_METHOD,
   DIRECT_CALLEE,
   ENUM_DECLARATION,
+  ERROR_DOMAIN,
   EXCEPTION_DECLARATION,
   EXCEPTION_SPEC_DECLARATION,
   EXCEPTION_SPEC_TEMPLATE,
@@ -34950,6 +59071,8 @@ enum class DeclUseSelector : unsigned short {
   FIRST_QUALIFIER_FOUND_IN_SCOPE,
   FOUND_DECLARATION,
   FRIEND_DECLARATION,
+  FUNCTION,
+  FUNCTION_DECLARATION,
   GETTER_METHOD_DECLARATION,
   GUID_DECLARATION,
   HOLDING_VARIABLE,
@@ -34993,6 +59116,7 @@ enum class DeclUseSelector : unsigned short {
   PACK,
   PARAMETER,
   PARAMETER_PACK,
+  PARENT,
   POINTEE_CXX_RECORD_DECLARATION,
   PROMISE_DECLARATION,
   PROPERTY_DECLARATION,
@@ -35024,14 +59148,17 @@ inline static const char *EnumerationName(DeclUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
-  return 116;
+  return 120;
 }
 
 const char *EnumeratorName(DeclUseSelector);
 
 enum class StmtUseSelector : unsigned short {
   ADDR_SPACE_EXPRESSION,
+  ALIGNMENT,
+  ALIGNMENT_EXPRESSION,
   ALLOCATE,
+  ALLOCATOR,
   ARGUMENT,
   ARGUMENT_EXPRESSION,
   ARRAY_FILLER,
@@ -35122,6 +59249,7 @@ enum class StmtUseSelector : unsigned short {
   IN_CLASS_INITIALIZER,
   INCREMENT,
   INDEX,
+  INDIRECT_EXPRESSION,
   INITIALIZER,
   INITIALIZER_EXPRESSION,
   INITIALIZER_ORIGINAL,
@@ -35142,7 +59270,11 @@ enum class StmtUseSelector : unsigned short {
   LOWER_BOUND,
   LOWER_BOUND_VARIABLE,
   MAPPER_VARIABLE_REFERENCE,
+  MAX,
+  MAX_THREADS,
   MESSAGE,
+  MIN,
+  MIN_BLOCKS,
   NEXT_LOWER_BOUND,
   NEXT_SWITCH_CASE,
   NEXT_UPPER_BOUND,
@@ -35150,6 +59282,7 @@ enum class StmtUseSelector : unsigned short {
   NUM_BITS_EXPRESSION,
   NUM_ITERATIONS,
   OBJ_C_PROPERTY,
+  OFFSET,
   OPAQUE_VALUE,
   OPERAND,
   OPERATOR_COAWAIT_LOOKUP,
@@ -35172,6 +59305,7 @@ enum class StmtUseSelector : unsigned short {
   RAW_STATEMENT,
   READY_EXPRESSION,
   REDUCTION_REFERENCE,
+  REFERENCE,
   REPLACEMENT,
   REQUIRES_CLAUSE,
   RESULT_DECLARATION,
@@ -35187,6 +59321,7 @@ enum class StmtUseSelector : unsigned short {
   SCOPE,
   SEMANTIC_FORM,
   SETTER_CXX_ASSIGNMENT,
+  SIMDLEN,
   SIZE_EXPRESSION,
   SOURCE_EXPRESSION,
   SRC_EXPRESSION,
@@ -35200,6 +59335,7 @@ enum class StmtUseSelector : unsigned short {
   SUB_EXPRESSION,
   SUB_EXPRESSION_AS_WRITTEN,
   SUB_STATEMENT,
+  SUCCESS_VALUE,
   SUSPEND_EXPRESSION,
   SYNCH_BODY,
   SYNCH_EXPRESSION,
@@ -35220,8 +59356,10 @@ enum class StmtUseSelector : unsigned short {
   UPDATER,
   UPPER_BOUND_VARIABLE,
   V,
+  VALUE,
   VALUE1,
   VALUE2,
+  VARIANT_FUNC_REFERENCE,
   WEAK,
   X,
 };
@@ -35231,13 +59369,14 @@ inline static const char *EnumerationName(StmtUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(StmtUseSelector) {
-  return 194;
+  return 208;
 }
 
 const char *EnumeratorName(StmtUseSelector);
 
 enum class TypeUseSelector : unsigned short {
   ALIASED_TYPE,
+  ALIGNMENT_TYPE,
   ALLOCATED_TYPE,
   ARGUMENT_TYPE,
   ARRAY_ELEMENT_TYPE_NO_TYPE_QUALIFIED,
@@ -35269,6 +59408,8 @@ enum class TypeUseSelector : unsigned short {
   DECLARED_RETURN_TYPE,
   DEFAULT_ARGUMENT,
   DEFAULT_ARGUMENT_INFO,
+  DEREF_TYPE,
+  DEREF_TYPE_TOKEN,
   DESTROYED_TYPE,
   DESUGAR,
   DESUGARED_TYPE,
@@ -35282,10 +59423,14 @@ enum class TypeUseSelector : unsigned short {
   INJECTED_TST,
   INNER_TYPE,
   INTEGER_TYPE,
+  INTERFACE,
+  INTERFACE_TOKEN,
   INTERFACE_TYPE,
   LAMBDA_TYPE,
   LOCAL_UNQUALIFIED_TYPE,
   LOCALLY_UNQUALIFIED_SINGLE_STEP_DESUGARED_TYPE,
+  MATCHING_C_TYPE,
+  MATCHING_C_TYPE_TOKEN,
   MODIFIED_TYPE,
   NAMED_TYPE,
   NON_L_VALUE_EXPRESSION_TYPE,
@@ -35321,9 +59466,13 @@ enum class TypeUseSelector : unsigned short {
   TYPE,
   TYPE_AS_WRITTEN,
   TYPE_FOR_DECLARATION,
+  TYPE_HINT,
+  TYPE_HINT_TOKEN,
   TYPE_OF_ARGUMENT,
   TYPE_OPERAND,
   TYPE_OPERAND_SOURCE_INFO,
+  TYPEDEF_TYPE,
+  TYPEDEF_TYPE_TOKEN,
   UNDERLYING_TYPE,
   UNQUALIFIED_DESUGARED_TYPE,
   UNQUALIFIED_TYPE,
@@ -35340,7 +59489,7 @@ inline static const char *EnumerationName(TypeUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeUseSelector) {
-  return 96;
+  return 107;
 }
 
 const char *EnumeratorName(TypeUseSelector);
@@ -35472,6 +59621,730 @@ inline static constexpr unsigned NumEnumerators(TokenUseSelector) {
 }
 
 const char *EnumeratorName(TokenUseSelector);
+
+enum class AttrUseSelector : unsigned short {
+  DEFINING_ATTRIBUTE,
+  EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE,
+  UNUSED_RESULT_ATTRIBUTE,
+};
+
+inline static const char *EnumerationName(AttrUseSelector) {
+  return "AttrUseSelector";
+}
+
+inline static constexpr unsigned NumEnumerators(AttrUseSelector) {
+  return 3;
+}
+
+const char *EnumeratorName(AttrUseSelector);
+
+static_assert(sizeof(AlignValueAttr) == sizeof(Attr));
+
+static_assert(sizeof(AliasAttr) == sizeof(Attr));
+
+static_assert(sizeof(AbiTagAttr) == sizeof(Attr));
+
+static_assert(sizeof(TypeAttr) == sizeof(Attr));
+
+static_assert(sizeof(SPtrAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(Ptr64Attr) == sizeof(TypeAttr));
+
+static_assert(sizeof(Ptr32Attr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLPrivateAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLLocalAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLGlobalHostAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLGlobalDeviceAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLGlobalAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLGenericAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(OpenCLConstantAddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(ObjCKindOfAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(ObjCInertUnsafeUnretainedAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(ObjCGCAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(NoDerefAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(CmseNSCallAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(BTFTypeTagAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(ArmMveStrictPolymorphismAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(AddressSpaceAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(UPtrAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(TypeNullableResultAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(TypeNullableAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(TypeNullUnspecifiedAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(TypeNonNullAttr) == sizeof(TypeAttr));
+
+static_assert(sizeof(ThreadAttr) == sizeof(Attr));
+
+static_assert(sizeof(SwiftObjCMembersAttr) == sizeof(Attr));
+
+static_assert(sizeof(StmtAttr) == sizeof(Attr));
+
+static_assert(sizeof(OpenCLUnrollHintAttr) == sizeof(StmtAttr));
+
+static_assert(sizeof(MustTailAttr) == sizeof(StmtAttr));
+
+static_assert(sizeof(LikelyAttr) == sizeof(StmtAttr));
+
+static_assert(sizeof(FallThroughAttr) == sizeof(StmtAttr));
+
+static_assert(sizeof(UnlikelyAttr) == sizeof(StmtAttr));
+
+static_assert(sizeof(SuppressAttr) == sizeof(StmtAttr));
+
+static_assert(sizeof(RenderScriptKernelAttr) == sizeof(Attr));
+
+static_assert(sizeof(OverloadableAttr) == sizeof(Attr));
+
+static_assert(sizeof(OpenCLAccessAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCRuntimeVisibleAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCRuntimeNameAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCNonRuntimeProtocolAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCNonLazyClassAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCDirectMembersAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCDirectAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCDesignatedInitializerAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCClassStubAttr) == sizeof(Attr));
+
+static_assert(sizeof(ObjCBoxableAttr) == sizeof(Attr));
+
+static_assert(sizeof(OMPReferencedVarAttr) == sizeof(Attr));
+
+static_assert(sizeof(OMPDeclareSimdDeclAttr) == sizeof(Attr));
+
+static_assert(sizeof(OMPCaptureKindAttr) == sizeof(Attr));
+
+static_assert(sizeof(NoEscapeAttr) == sizeof(Attr));
+
+static_assert(sizeof(NoBuiltinAttr) == sizeof(Attr));
+
+static_assert(sizeof(ModeAttr) == sizeof(Attr));
+
+static_assert(sizeof(LoopHintAttr) == sizeof(Attr));
+
+static_assert(sizeof(LoaderUninitializedAttr) == sizeof(Attr));
+
+static_assert(sizeof(InitSegAttr) == sizeof(Attr));
+
+static_assert(sizeof(InheritableAttr) == sizeof(Attr));
+
+static_assert(sizeof(IBOutletCollectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(IBOutletAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(IBActionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(HotAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(HIPManagedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(GuardedVarAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(GuardedByAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(GNUInlineAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(FormatAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(FormatArgAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(FlattenAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(FlagEnumAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(FinalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(FastCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ExternalSourceSymbolAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ExclusiveTrylockFunctionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ExcludeFromExplicitInstantiationAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ErrorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(EnumExtensibilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(EnforceTCBLeafAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(EnforceTCBAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(EnableIfAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(EmptyBasesAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DisableTailCallsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DisableSanitizerInstrumentationAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DiagnoseIfAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DiagnoseAsBuiltinAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DestructorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DeprecatedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DeclOrStmtAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoMergeAttr) == sizeof(DeclOrStmtAttr));
+
+static_assert(sizeof(DLLImportStaticLocalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DLLImportAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DLLExportStaticLocalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(DLLExportAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConvergentAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConsumableSetOnReadAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConsumableAutoCastAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConsumableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConstructorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConstInitAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ConstAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CommonAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ColdAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CodeSegAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CmseNSEntryAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CleanupAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CapturedRecordAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CapabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CallbackAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CallableWhenAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CXX11NoReturnAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDASharedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDALaunchBoundsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDAInvalidTargetAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDAHostAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDAGlobalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDADeviceBuiltinTextureTypeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDADeviceBuiltinSurfaceTypeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDADeviceAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CUDAConstantAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CPUSpecificAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CPUDispatchAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CFUnknownTransferAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CFReturnsRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CFReturnsNotRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CFICanonicalJumpTableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CFGuardAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CFAuditedTransferAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CDeclAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(C11NoReturnAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(BuiltinAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(BlocksAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(BTFDeclTagAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(BPFPreserveAccessIndexAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AvailabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AssumptionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AssumeAlignedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AssertSharedLockAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AssertExclusiveLockAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AssertCapabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AsmLabelAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ArtificialAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ArmBuiltinAliasAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ArgumentWithTypeTagAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ArcWeakrefUnavailableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AnyX86NoCfCheckAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AnyX86NoCallerSavedRegistersAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AnyX86InterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AnalyzerNoReturnAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AlwaysInlineAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AlwaysDestroyAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AllocSizeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AllocAlignAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AlignedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AlignNaturalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AlignMac68kAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AcquiredBeforeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AcquiredAfterAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AcquireHandleAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AcquireCapabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AVRSignalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AVRInterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ARMInterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AMDGPUWavesPerEUAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AMDGPUNumVGPRAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AMDGPUNumSGPRAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AMDGPUFlatWorkGroupSizeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(AArch64VectorPcsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(XRayLogArgsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(XRayInstrumentAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(X86ForceAlignArgPointerAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WorkGroupSizeHintAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WebAssemblyImportNameAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WebAssemblyImportModuleAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WebAssemblyExportNameAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WeakRefAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WeakImportAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WeakAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WarnUnusedResultAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(WarnUnusedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(VisibilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(VectorCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(VecTypeHintAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(VecReturnAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(UuidAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(UsingIfExistsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(UsedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(UnusedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(UninitializedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(UnavailableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TypeVisibilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TypeTagForDatatypeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TryAcquireCapabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TrivialABIAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TransparentUnionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ThisCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TestTypestateAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TargetClonesAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TargetAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(TLSModelAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SysVABIAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftPrivateAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftNewTypeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftNameAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftErrorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftBridgedTypedefAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftBridgeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftAttrAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftAsyncNameAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftAsyncErrorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftAsyncCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SwiftAsyncAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(StrictFPAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(StdCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(StandaloneDebugAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SpeculativeLoadHardeningAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SharedTrylockFunctionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SetTypestateAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SentinelAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SelectAnyAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ScopedLockableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SYCLSpecialClassAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(SYCLKernelAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ReturnsTwiceAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ReturnsNonNullAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ReturnTypestateAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(RetainAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(RestrictAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(RequiresCapabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ReqdWorkGroupSizeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ReleaseCapabilityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ReinitializesAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(RegCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(RISCVInterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PureAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PtGuardedVarAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PtGuardedByAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PreserveMostAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PreserveAllAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PreferredNameAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PragmaClangTextSectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PragmaClangRodataSectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PragmaClangRelroSectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PragmaClangDataSectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PragmaClangBSSSectionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PointerAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PcsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PatchableFunctionEntryAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PascalAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ParamTypestateAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(PackedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OwnershipAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OwnerAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OverrideAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OptimizeNoneAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OpenCLKernelAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OpenCLIntelReqdSubGroupSizeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCSubclassingRestrictedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCRootClassAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCReturnsInnerPointerAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCRequiresSuperAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCRequiresPropertyDefsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCPreciseLifetimeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCOwnershipAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCNSObjectAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCMethodFamilyAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCIndependentClassAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCExternallyRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCExplicitProtocolImplAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCExceptionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCBridgeRelatedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCBridgeMutableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(ObjCBridgeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OSReturnsRetainedOnZeroAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OSReturnsRetainedOnNonZeroAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OSReturnsRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OSReturnsNotRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OSConsumesThisAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OMPThreadPrivateDeclAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OMPDeclareVariantAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OMPDeclareTargetDeclAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OMPCaptureNoInitAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(OMPAllocateDeclAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NotTailCalledAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoUniqueAddressAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoThrowAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoThreadSafetyAnalysisAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoStackProtectorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoSplitStackAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoSpeculativeLoadHardeningAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoSanitizeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoReturnAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoProfileFunctionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoMips16Attr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoMicroMipsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoInstrumentFunctionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoInlineAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoDuplicateAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoDestroyAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoDebugAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoCommonAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NoAliasAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NakedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NSReturnsRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NSReturnsNotRetainedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NSReturnsAutoreleasedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NSErrorDomainAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(NSConsumesSelfAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MipsShortCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MipsLongCallAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MipsInterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(Mips16Attr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MinVectorWidthAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MinSizeAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MicroMipsAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MayAliasAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MaxFieldAlignmentAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSVtorDispAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSStructAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSP430InterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSNoVTableAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSInheritanceAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSAllocatorAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MSABIAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(MIGServerRoutineAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(M68kInterruptAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(LocksExcludedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(LockReturnedAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(LifetimeBoundAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(LeafAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(LayoutVersionAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(LTOVisibilityPublicAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(InternalLinkageAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(IntelOclBiccAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(InitPriorityAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(InheritableParamAttr) == sizeof(InheritableAttr));
+
+static_assert(sizeof(CarriesDependencyAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(CFConsumedAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(AnnotateAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(UseHandleAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(ReleaseHandleAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(PassObjectSizeAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(ParameterABIAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(SwiftIndirectResultAttr) == sizeof(ParameterABIAttr));
+
+static_assert(sizeof(SwiftErrorResultAttr) == sizeof(ParameterABIAttr));
+
+static_assert(sizeof(SwiftContextAttr) == sizeof(ParameterABIAttr));
+
+static_assert(sizeof(SwiftAsyncContextAttr) == sizeof(ParameterABIAttr));
+
+static_assert(sizeof(OSConsumedAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(NonNullAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(NSConsumedAttr) == sizeof(InheritableParamAttr));
+
+static_assert(sizeof(IFuncAttr) == sizeof(Attr));
+
+static_assert(sizeof(CalledOnceAttr) == sizeof(Attr));
+
+static_assert(sizeof(BuiltinAliasAttr) == sizeof(Attr));
 
 static_assert(sizeof(TemplateTypeParmType) == sizeof(Type));
 

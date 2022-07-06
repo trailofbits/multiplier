@@ -267,6 +267,12 @@ static void PersistTokenContexts(
         if (eid != mx::kInvalidEntityId) {
           contexts[eid].insert(context.value());
         }
+
+      } else if (auto attr = pasta::Attr::From(c)) {
+        const mx::RawEntityId eid = em.EntityId(*attr);
+        if (eid != mx::kInvalidEntityId) {
+          contexts[eid].insert(context.value());
+        }
       
       } else if (auto designator = pasta::Designator::From(c)) {
         const uint32_t offset = em.PseudoId(*designator);
@@ -324,6 +330,13 @@ static void PersistTokenContexts(
     // Types.
     } else if (std::holds_alternative<mx::TypeId>(vid)) {
       mx::TypeId id = std::get<mx::TypeId>(vid);
+      if (id.fragment_id != frag_id) {
+        continue;  // Not sure how but oh well.
+      }
+
+    // Attributes.
+    } else if (std::holds_alternative<mx::AttributeId>(vid)) {
+      mx::AttributeId id = std::get<mx::AttributeId>(vid);
       if (id.fragment_id != frag_id) {
         continue;  // Not sure how but oh well.
       }

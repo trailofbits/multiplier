@@ -68,6 +68,10 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Stmt &entity) const {
   return EntityId(entity.RawStmt());
 }
 
+mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
+  return EntityId(entity.RawAttr());
+}
+
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
   if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
     return it->second;

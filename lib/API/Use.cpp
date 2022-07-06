@@ -34,6 +34,7 @@ namespace {
 #define MX_BEGIN_VISIT_DECL(name) DECLARE_FIND_READER_USES(Decl, name)
 #define MX_BEGIN_VISIT_STMT(name) DECLARE_FIND_READER_USES(Stmt, name)
 #define MX_BEGIN_VISIT_TYPE(name) DECLARE_FIND_READER_USES(Type, name)
+#define MX_BEGIN_VISIT_ATTR(name) DECLARE_FIND_READER_USES(Attr, name)
 #define MX_BEGIN_VISIT_PSEUDO(name) DECLARE_FIND_READER_USES(Pseudo, name)
 
 #include <multiplier/Visitor.inc.h>
@@ -57,11 +58,13 @@ namespace {
 #define MX_BEGIN_VISIT_DECL(name) DEFINE_FIND_READER_KIND_USES(Decl, name)
 #define MX_BEGIN_VISIT_STMT(name) DEFINE_FIND_READER_KIND_USES(Stmt, name)
 #define MX_BEGIN_VISIT_TYPE(name) DEFINE_FIND_READER_KIND_USES(Type, name)
+#define MX_BEGIN_VISIT_ATTR(name) DEFINE_FIND_READER_KIND_USES(Attr, name)
 #define MX_BEGIN_VISIT_PSEUDO(name) DEFINE_FIND_READER_KIND_USES(Pseudo, name)
 #define MX_END_VISIT_DECL(name) }
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
+#define MX_END_VISIT_ATTR MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
 }  // namespace
@@ -107,6 +110,12 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  search_ids.push_back(entity.id());
+  fragment_ids.push_back(entity.fragment->fragment_id);
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   search_ids.push_back(entity.id());
   fragment_ids.push_back(entity.fragment->fragment_id);
@@ -206,6 +215,37 @@ bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
   return false;
 }
 
+bool UseIteratorImpl::FindNextAttr(UseIteratorBase &self) {
+  while (self.list_offset < self.use.fragment->num_attrs) {
+    self.use.offset = self.list_offset++;
+    mx::ast::Attr::Reader reader = self.use.fragment->NthAttr(self.use.offset);
+    bool found = false;
+
+    self.use.selectors.reset();
+
+    for (auto eid : search_ids) {
+      switch (Get_Attr_Kind(reader)) {
+
+#define MX_BEGIN_VISIT_ABSTRACT_ATTR(name)
+#define MX_BEGIN_VISIT_ATTR(name) \
+    case name::static_kind(): \
+      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      break;
+
+#include <multiplier/Visitor.inc.h>
+
+      }
+    }
+
+    if (found) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
 bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
   while (self.list_offset < self.use.fragment->num_pseudos) {
     TemplateArgument *dummy = nullptr;
@@ -284,6 +324,15 @@ bool UseIteratorImpl::FindNext(UseIteratorBase &self) {
           return true;
         } else {
           // Skip to next list; didn't find.
+          self.use.kind = UseKind::ATTRIBUTE;
+          self.list_offset = 0u;
+          continue;
+        }
+      case UseKind::ATTRIBUTE:
+        if (FindNextAttr(self)) {
+          return true;
+        } else {
+          // Skip to next list; didn't find.
           self.use.kind = UseKind::CXX_BASE_SPECIFIER;
           self.list_offset = 0u;
           continue;
@@ -319,36 +368,42 @@ UseBase::~UseBase(void) {}
 UseBase::UseBase(Decl entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
-      offset(entity.offset),
+      offset(entity.offset_),
       kind(UseKind::DECLARATION) {}
 
 UseBase::UseBase(Stmt entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
-      offset(entity.offset),
+      offset(entity.offset_),
       kind(UseKind::STATEMENT) {}
 
 UseBase::UseBase(Type entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
-      offset(entity.offset),
+      offset(entity.offset_),
       kind(UseKind::TYPE) {}
+
+UseBase::UseBase(Attr entity, UseSelectorSet selectors_)
+    : selectors(std::move(selectors_)),
+      fragment(std::move(entity.fragment)),
+      offset(entity.offset_),
+      kind(UseKind::ATTRIBUTE) {}
 
 UseBase::UseBase(CXXBaseSpecifier entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
-      offset(entity.offset),
+      offset(entity.offset_),
       kind(UseKind::CXX_BASE_SPECIFIER) {}
 
 UseBase::UseBase(TemplateArgument entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
-      offset(entity.offset),
+      offset(entity.offset_),
       kind(UseKind::TEMPLATE_ARGUMENT) {}
 
 UseBase::UseBase(TemplateParameterList entity, UseSelectorSet selectors_)
     : fragment(std::move(entity.fragment)),
-      offset(entity.offset),
+      offset(entity.offset_),
       kind(UseKind::TEMPLATE_PARAMETER_LIST) {}
 
 std::optional<Decl> UseBase::as_declaration(void) const {
@@ -370,6 +425,14 @@ std::optional<Stmt> UseBase::as_statement(void) const {
 std::optional<Type> UseBase::as_type(void) const {
   if (kind == UseKind::TYPE && fragment && offset < fragment->num_types) {
     return Type(fragment, offset);
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<Attr> UseBase::as_attribute(void) const {
+  if (kind == UseKind::ATTRIBUTE && fragment && offset < fragment->num_attrs) {
+    return Attr(fragment, offset);
   } else {
     return std::nullopt;
   }
@@ -403,8 +466,7 @@ UseBase::as_template_parameter_list(void) const {
   }
 }
 
-std::optional<Designator>
-UseBase::as_designator(void) const {
+std::optional<Designator> UseBase::as_designator(void) const {
   if (kind == UseKind::DESIGNATOR && fragment &&
       offset < fragment->num_pseudos) {
     return Designator(fragment, offset);

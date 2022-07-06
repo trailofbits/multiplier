@@ -162,6 +162,664 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="AttrKind"></a>AttrKind</summary>
+
+Available enumerations:
+
+* `A_ARCH64_VECTOR_PCS`
+* `AMDGPU_FLAT_WORK_GROUP_SIZE`
+* `AMDGPU_NUM_SGPR`
+* `AMDGPU_NUM_VGPR`
+* `AMDGPU_WAVES_PER_EU`
+* `ARM_INTERRUPT`
+* `AVR_INTERRUPT`
+* `AVR_SIGNAL`
+* `ABI_TAG`
+* `ACQUIRE_CAPABILITY`
+* `ACQUIRE_HANDLE`
+* `ACQUIRED_AFTER`
+* `ACQUIRED_BEFORE`
+* `ADDRESS_SPACE`
+* `ALIAS`
+* `ALIGN_MAC68K`
+* `ALIGN_NATURAL`
+* `ALIGN_VALUE`
+* `ALIGNED`
+* `ALLOC_ALIGN`
+* `ALLOC_SIZE`
+* `ALWAYS_DESTROY`
+* `ALWAYS_INLINE`
+* `ANALYZER_NO_RETURN`
+* `ANNOTATE`
+* `ANY_X86_INTERRUPT`
+* `ANY_X86_NO_CALLER_SAVED_REGISTERS`
+* `ANY_X86_NO_CF_CHECK`
+* `ARC_WEAKREF_UNAVAILABLE`
+* `ARGUMENT_WITH_TYPE_TAG`
+* `ARM_BUILTIN_ALIAS`
+* `ARM_MVE_STRICT_POLYMORPHISM`
+* `ARTIFICIAL`
+* `ASM_LABEL`
+* `ASSERT_CAPABILITY`
+* `ASSERT_EXCLUSIVE_LOCK`
+* `ASSERT_SHARED_LOCK`
+* `ASSUME_ALIGNED`
+* `ASSUMPTION`
+* `AVAILABILITY`
+* `BPF_PRESERVE_ACCESS_INDEX`
+* `BTF_DECL_TAG`
+* `BTF_TYPE_TAG`
+* `BLOCKS`
+* `BUILTIN_ALIAS`
+* `BUILTIN`
+* `C11_NO_RETURN`
+* `C_DECL`
+* `CF_AUDITED_TRANSFER`
+* `CF_CONSUMED`
+* `CF_GUARD`
+* `CFI_CANONICAL_JUMP_TABLE`
+* `CF_RETURNS_NOT_RETAINED`
+* `CF_RETURNS_RETAINED`
+* `CF_UNKNOWN_TRANSFER`
+* `CPU_DISPATCH`
+* `CPU_SPECIFIC`
+* `CUDA_CONSTANT`
+* `CUDA_DEVICE`
+* `CUDA_DEVICE_BUILTIN_SURFACE_TYPE`
+* `CUDA_DEVICE_BUILTIN_TEXTURE_TYPE`
+* `CUDA_GLOBAL`
+* `CUDA_HOST`
+* `CUDA_INVALID_TARGET`
+* `CUDA_LAUNCH_BOUNDS`
+* `CUDA_SHARED`
+* `CXX11_NO_RETURN`
+* `CALLABLE_WHEN`
+* `CALLBACK`
+* `CALLED_ONCE`
+* `CAPABILITY`
+* `CAPTURED_RECORD`
+* `CARRIES_DEPENDENCY`
+* `CLEANUP`
+* `CMSE_NS_CALL`
+* `CMSE_NS_ENTRY`
+* `CODE_SEG`
+* `COLD`
+* `COMMON`
+* `CONST`
+* `CONST_INIT`
+* `CONSTRUCTOR`
+* `CONSUMABLE`
+* `CONSUMABLE_AUTO_CAST`
+* `CONSUMABLE_SET_ON_READ`
+* `CONVERGENT`
+* `DLL_EXPORT`
+* `DLL_EXPORT_STATIC_LOCAL`
+* `DLL_IMPORT`
+* `DLL_IMPORT_STATIC_LOCAL`
+* `DEPRECATED`
+* `DESTRUCTOR`
+* `DIAGNOSE_AS_BUILTIN`
+* `DIAGNOSE_IF`
+* `DISABLE_SANITIZER_INSTRUMENTATION`
+* `DISABLE_TAIL_CALLS`
+* `EMPTY_BASES`
+* `ENABLE_IF`
+* `ENFORCE_TCB`
+* `ENFORCE_TCB_LEAF`
+* `ENUM_EXTENSIBILITY`
+* `ERROR`
+* `EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `EXCLUSIVE_TRYLOCK_FUNCTION`
+* `EXTERNAL_SOURCE_SYMBOL`
+* `FALL_THROUGH`
+* `FAST_CALL`
+* `FINAL`
+* `FLAG_ENUM`
+* `FLATTEN`
+* `FORMAT_ARG`
+* `FORMAT`
+* `GNU_INLINE`
+* `GUARDED_BY`
+* `GUARDED_VAR`
+* `HIP_MANAGED`
+* `HOT`
+* `IB_ACTION`
+* `IB_OUTLET`
+* `IB_OUTLET_COLLECTION`
+* `I_FUNC`
+* `INIT_PRIORITY`
+* `INIT_SEG`
+* `INTEL_OCL_BICC`
+* `INTERNAL_LINKAGE`
+* `LTO_VISIBILITY_PUBLIC`
+* `LAYOUT_VERSION`
+* `LEAF`
+* `LIFETIME_BOUND`
+* `LIKELY`
+* `LOADER_UNINITIALIZED`
+* `LOCK_RETURNED`
+* `LOCKS_EXCLUDED`
+* `LOOP_HINT`
+* `M68K_INTERRUPT`
+* `MIG_SERVER_ROUTINE_`
+* `MSABI`
+* `MS_ALLOCATOR`
+* `MS_INHERITANCE`
+* `MS_NO_V_TABLE`
+* `MSP430_INTERRUPT`
+* `MS_STRUCT`
+* `MS_VTOR_DISP`
+* `MAX_FIELD_ALIGNMENT`
+* `MAY_ALIAS`
+* `MICRO_MIPS`
+* `MIN_SIZE`
+* `MIN_VECTOR_WIDTH`
+* `MIPS16`
+* `MIPS_INTERRUPT`
+* `MIPS_LONG_CALL`
+* `MIPS_SHORT_CALL`
+* `MODE`
+* `MUST_TAIL`
+* `NS_CONSUMED`
+* `NS_CONSUMES_SELF`
+* `NS_ERROR_DOMAIN`
+* `NS_RETURNS_AUTORELEASED`
+* `NS_RETURNS_NOT_RETAINED`
+* `NS_RETURNS_RETAINED`
+* `NAKED`
+* `NO_ALIAS`
+* `NO_BUILTIN`
+* `NO_COMMON`
+* `NO_DEBUG`
+* `NO_DEREF`
+* `NO_DESTROY`
+* `NO_DUPLICATE`
+* `NO_ESCAPE`
+* `NO_INLINE`
+* `NO_INSTRUMENT_FUNCTION`
+* `NO_MERGE`
+* `NO_MICRO_MIPS`
+* `NO_MIPS16`
+* `NO_PROFILE_FUNCTION`
+* `NO_RETURN`
+* `NO_SANITIZE`
+* `NO_SPECULATIVE_LOAD_HARDENING`
+* `NO_SPLIT_STACK`
+* `NO_STACK_PROTECTOR`
+* `NO_THREAD_SAFETY_ANALYSIS`
+* `NO_THROW`
+* `NO_UNIQUE_ADDRESS`
+* `NON_NULL`
+* `NOT_TAIL_CALLED`
+* `OMP_ALLOCATE_DECL`
+* `OMP_CAPTURE_KIND`
+* `OMP_CAPTURE_NO_INIT`
+* `OMP_DECLARE_SIMD_DECL`
+* `OMP_DECLARE_TARGET_DECL`
+* `OMP_DECLARE_VARIANT`
+* `OMP_REFERENCED_VAR`
+* `OMP_THREAD_PRIVATE_DECL`
+* `OS_CONSUMED`
+* `OS_CONSUMES_THIS`
+* `OS_RETURNS_NOT_RETAINED`
+* `OS_RETURNS_RETAINED`
+* `OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `OS_RETURNS_RETAINED_ON_ZERO`
+* `OBJ_C_BOXABLE`
+* `OBJ_C_BRIDGE`
+* `OBJ_C_BRIDGE_MUTABLE`
+* `OBJ_C_BRIDGE_RELATED`
+* `OBJ_C_CLASS_STUB`
+* `OBJ_C_DESIGNATED_INITIALIZER`
+* `OBJ_C_DIRECT`
+* `OBJ_C_DIRECT_MEMBERS`
+* `OBJ_C_EXCEPTION`
+* `OBJ_C_EXPLICIT_PROTOCOL_IMPL`
+* `OBJ_C_EXTERNALLY_RETAINED`
+* `OBJ_CGC`
+* `OBJ_C_INDEPENDENT_CLASS`
+* `OBJ_C_INERT_UNSAFE_UNRETAINED`
+* `OBJ_C_KIND_OF`
+* `OBJ_C_METHOD_FAMILY`
+* `OBJ_CNS_OBJECT`
+* `OBJ_C_NON_LAZY_CLASS`
+* `OBJ_C_NON_RUNTIME_PROTOCOL`
+* `OBJ_C_OWNERSHIP`
+* `OBJ_C_PRECISE_LIFETIME`
+* `OBJ_C_REQUIRES_PROPERTY_DEFS`
+* `OBJ_C_REQUIRES_SUPER`
+* `OBJ_C_RETURNS_INNER_POINTER`
+* `OBJ_C_ROOT_CLASS`
+* `OBJ_C_RUNTIME_NAME`
+* `OBJ_C_RUNTIME_VISIBLE`
+* `OBJ_C_SUBCLASSING_RESTRICTED`
+* `OPEN_CL_ACCESS`
+* `OPEN_CL_CONSTANT_ADDRESS_SPACE`
+* `OPEN_CL_GENERIC_ADDRESS_SPACE`
+* `OPEN_CL_GLOBAL_ADDRESS_SPACE`
+* `OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE`
+* `OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE`
+* `OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE`
+* `OPEN_CL_KERNEL`
+* `OPEN_CL_LOCAL_ADDRESS_SPACE`
+* `OPEN_CL_PRIVATE_ADDRESS_SPACE`
+* `OPEN_CL_UNROLL_HINT`
+* `OPTIMIZE_NONE`
+* `OVERLOADABLE`
+* `OVERRIDE`
+* `OWNER`
+* `OWNERSHIP`
+* `PACKED`
+* `PARAM_TYPESTATE`
+* `PASCAL`
+* `PASS_OBJECT_SIZE`
+* `PATCHABLE_FUNCTION_ENTRY`
+* `PCS`
+* `POINTER`
+* `PRAGMA_CLANG_BSS_SECTION`
+* `PRAGMA_CLANG_DATA_SECTION`
+* `PRAGMA_CLANG_RELRO_SECTION`
+* `PRAGMA_CLANG_RODATA_SECTION`
+* `PRAGMA_CLANG_TEXT_SECTION`
+* `PREFERRED_NAME`
+* `PRESERVE_ALL`
+* `PRESERVE_MOST`
+* `PT_GUARDED_BY`
+* `PT_GUARDED_VAR`
+* `PTR32`
+* `PTR64`
+* `PURE`
+* `RISCV_INTERRUPT`
+* `REG_CALL`
+* `REINITIALIZES`
+* `RELEASE_CAPABILITY`
+* `RELEASE_HANDLE`
+* `RENDER_SCRIPT_KERNEL`
+* `REQD_WORK_GROUP_SIZE`
+* `REQUIRES_CAPABILITY`
+* `RESTRICT`
+* `RETAIN`
+* `RETURN_TYPESTATE`
+* `RETURNS_NON_NULL`
+* `RETURNS_TWICE`
+* `S_PTR`
+* `SYCL_KERNEL`
+* `SYCL_SPECIAL_CLASS`
+* `SCOPED_LOCKABLE`
+* `SECTION`
+* `SELECT_ANY`
+* `SENTINEL`
+* `SET_TYPESTATE`
+* `SHARED_TRYLOCK_FUNCTION`
+* `SPECULATIVE_LOAD_HARDENING`
+* `STANDALONE_DEBUG`
+* `STD_CALL`
+* `STRICT_FP`
+* `SUPPRESS`
+* `SWIFT_ASYNC`
+* `SWIFT_ASYNC_CALL`
+* `SWIFT_ASYNC_CONTEXT`
+* `SWIFT_ASYNC_ERROR`
+* `SWIFT_ASYNC_NAME`
+* `SWIFT_ATTR`
+* `SWIFT_BRIDGE`
+* `SWIFT_BRIDGED_TYPEDEF`
+* `SWIFT_CALL`
+* `SWIFT_CONTEXT`
+* `SWIFT_ERROR`
+* `SWIFT_ERROR_RESULT`
+* `SWIFT_INDIRECT_RESULT`
+* `SWIFT_NAME`
+* `SWIFT_NEW_TYPE`
+* `SWIFT_OBJ_C_MEMBERS`
+* `SWIFT_PRIVATE`
+* `SYS_VABI`
+* `TLS_MODEL`
+* `TARGET`
+* `TARGET_CLONES`
+* `TEST_TYPESTATE`
+* `THIS_CALL`
+* `THREAD`
+* `TRANSPARENT_UNION`
+* `TRIVIAL_ABI`
+* `TRY_ACQUIRE_CAPABILITY`
+* `TYPE_NON_NULL`
+* `TYPE_NULL_UNSPECIFIED`
+* `TYPE_NULLABLE`
+* `TYPE_NULLABLE_RESULT`
+* `TYPE_TAG_FOR_DATATYPE`
+* `TYPE_VISIBILITY`
+* `U_PTR`
+* `UNAVAILABLE`
+* `UNINITIALIZED`
+* `UNLIKELY`
+* `UNUSED`
+* `USE_HANDLE`
+* `USED`
+* `USING_IF_EXISTS`
+* `UUID`
+* `VEC_RETURN`
+* `VEC_TYPE_HINT`
+* `VECTOR_CALL`
+* `VISIBILITY`
+* `WARN_UNUSED`
+* `WARN_UNUSED_RESULT`
+* `WEAK`
+* `WEAK_IMPORT`
+* `WEAK_REF`
+* `WEB_ASSEMBLY_EXPORT_NAME`
+* `WEB_ASSEMBLY_IMPORT_MODULE`
+* `WEB_ASSEMBLY_IMPORT_NAME`
+* `WORK_GROUP_SIZE_HINT`
+* `X86_FORCE_ALIGN_ARG_POINTER`
+* `X_RAY_INSTRUMENT`
+* `X_RAY_LOG_ARGS`
+
+</details>
+
+<details><summary><a name="AArch64VectorPcsAttrSpelling"></a>AArch64VectorPcsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AARCH64_VECTOR_PCS`
+* `CXX11_CLANG_AARCH64_VECTOR_PCS`
+* `C2X_CLANG_AARCH64_VECTOR_PCS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUFlatWorkGroupSizeAttrSpelling"></a>AMDGPUFlatWorkGroupSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_FLAT_WORK_GROUP_SIZE`
+* `CXX11_CLANG_AMDGPU_FLAT_WORK_GROUP_SIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUNumSGPRAttrSpelling"></a>AMDGPUNumSGPRAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_NUM_SGPR`
+* `CXX11_CLANG_AMDGPU_NUM_SGPR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUNumVGPRAttrSpelling"></a>AMDGPUNumVGPRAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_NUM_VGPR`
+* `CXX11_CLANG_AMDGPU_NUM_VGPR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AMDGPUWavesPerEUAttrSpelling"></a>AMDGPUWavesPerEUAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AMDGPU_WAVES_PER_EU`
+* `CXX11_CLANG_AMDGPU_WAVES_PER_EU`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ARMInterruptAttrInterruptType"></a>ARMInterruptAttrInterruptType</summary>
+
+Available enumerations:
+
+* `IRQ`
+* `FIQ`
+* `SWI`
+* `ABORT`
+* `UNDEF`
+* `GENERIC`
+
+</details>
+
+<details><summary><a name="ARMInterruptAttrSpelling"></a>ARMInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2X_GNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AVRInterruptAttrSpelling"></a>AVRInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2X_GNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AVRSignalAttrSpelling"></a>AVRSignalAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SIGNAL`
+* `CXX11_GNU_SIGNAL`
+* `C2X_GNU_SIGNAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AbiTagAttrSpelling"></a>AbiTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ABI_TAG`
+* `CXX11_GNU_ABI_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AcquireCapabilityAttrSpelling"></a>AcquireCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ACQUIRE_CAPABILITY`
+* `CXX11_CLANG_ACQUIRE_CAPABILITY`
+* `GNU_ACQUIRE_SHARED_CAPABILITY`
+* `CXX11_CLANG_ACQUIRE_SHARED_CAPABILITY`
+* `GNU_EXCLUSIVE_LOCK_FUNCTION`
+* `GNU_SHARED_LOCK_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AcquireHandleAttrSpelling"></a>AcquireHandleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ACQUIRE_HANDLE`
+* `CXX11_CLANG_ACQUIRE_HANDLE`
+* `C2X_CLANG_ACQUIRE_HANDLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AddressSpaceAttrSpelling"></a>AddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ADDRESS_SPACE`
+* `CXX11_CLANG_ADDRESS_SPACE`
+* `C2X_CLANG_ADDRESS_SPACE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AliasAttrSpelling"></a>AliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALIAS`
+* `CXX11_GNU_ALIAS`
+* `C2X_GNU_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AlignedAttrSpelling"></a>AlignedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALIGNED`
+* `CXX11_GNU_ALIGNED`
+* `C2X_GNU_ALIGNED`
+* `DECLSPEC_ALIGN`
+* `KEYWORD_ALIGNAS`
+* `KEYWORD__ALIGNAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AllocAlignAttrSpelling"></a>AllocAlignAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALLOC_ALIGN`
+* `CXX11_GNU_ALLOC_ALIGN`
+* `C2X_GNU_ALLOC_ALIGN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AllocSizeAttrSpelling"></a>AllocSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALLOC_SIZE`
+* `CXX11_GNU_ALLOC_SIZE`
+* `C2X_GNU_ALLOC_SIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AlwaysDestroyAttrSpelling"></a>AlwaysDestroyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALWAYS_DESTROY`
+* `CXX11_CLANG_ALWAYS_DESTROY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AlwaysInlineAttrSpelling"></a>AlwaysInlineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ALWAYS_INLINE`
+* `CXX11_GNU_ALWAYS_INLINE`
+* `C2X_GNU_ALWAYS_INLINE`
+* `KEYWORD_FORCEINLINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnnotateAttrSpelling"></a>AnnotateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ANNOTATE`
+* `CXX11_CLANG_ANNOTATE`
+* `C2X_CLANG_ANNOTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnyX86InterruptAttrSpelling"></a>AnyX86InterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2X_GNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnyX86NoCallerSavedRegistersAttrSpelling"></a>AnyX86NoCallerSavedRegistersAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_CALLER_SAVED_REGISTERS`
+* `CXX11_GNU_NO_CALLER_SAVED_REGISTERS`
+* `C2X_GNU_NO_CALLER_SAVED_REGISTERS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AnyX86NoCfCheckAttrSpelling"></a>AnyX86NoCfCheckAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOCF_CHECK`
+* `CXX11_GNU_NOCF_CHECK`
+* `C2X_GNU_NOCF_CHECK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArcWeakrefUnavailableAttrSpelling"></a>ArcWeakrefUnavailableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE`
+* `CXX11_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE`
+* `C2X_CLANG_OBJC_ARC_WEAK_REFERENCE_UNAVAILABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArgumentWithTypeTagAttrSpelling"></a>ArgumentWithTypeTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ARGUMENT_WITH_TYPE_TAG`
+* `CXX11_CLANG_ARGUMENT_WITH_TYPE_TAG`
+* `C2X_CLANG_ARGUMENT_WITH_TYPE_TAG`
+* `GNU_POINTER_WITH_TYPE_TAG`
+* `CXX11_CLANG_POINTER_WITH_TYPE_TAG`
+* `C2X_CLANG_POINTER_WITH_TYPE_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArmBuiltinAliasAttrSpelling"></a>ArmBuiltinAliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CLANG_ARM_BUILTIN_ALIAS`
+* `CXX11_CLANG_CLANG_ARM_BUILTIN_ALIAS`
+* `C2X_CLANG_CLANG_ARM_BUILTIN_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ArmMveStrictPolymorphismAttrSpelling"></a>ArmMveStrictPolymorphismAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CLANG_ARM_MVE_STRICT_POLYMORPHISM`
+* `CXX11_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM`
+* `C2X_CLANG_CLANG_ARM_MVE_STRICT_POLYMORPHISM`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="ArrayTypeArraySizeModifier"></a>ArrayTypeArraySizeModifier</summary>
 
 Available enumerations:
@@ -169,6 +827,60 @@ Available enumerations:
 * `NORMAL`
 * `STATIC`
 * `STAR`
+
+</details>
+
+<details><summary><a name="ArtificialAttrSpelling"></a>ArtificialAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ARTIFICIAL`
+* `CXX11_GNU_ARTIFICIAL`
+* `C2X_GNU_ARTIFICIAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AsmLabelAttrSpelling"></a>AsmLabelAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_ASSEMBLY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AssertCapabilityAttrSpelling"></a>AssertCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ASSERT_CAPABILITY`
+* `CXX11_CLANG_ASSERT_CAPABILITY`
+* `GNU_ASSERT_SHARED_CAPABILITY`
+* `CXX11_CLANG_ASSERT_SHARED_CAPABILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AssumeAlignedAttrSpelling"></a>AssumeAlignedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ASSUME_ALIGNED`
+* `CXX11_GNU_ASSUME_ALIGNED`
+* `C2X_GNU_ASSUME_ALIGNED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="AssumptionAttrSpelling"></a>AssumptionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ASSUME`
+* `CXX11_CLANG_ASSUME`
+* `C2X_CLANG_ASSUME`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -241,46 +953,120 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="AvailabilityAttrSpelling"></a>AvailabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_AVAILABILITY`
+* `CXX11_CLANG_AVAILABILITY`
+* `C2X_CLANG_AVAILABILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BPFPreserveAccessIndexAttrSpelling"></a>BPFPreserveAccessIndexAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PRESERVE_ACCESS_INDEX`
+* `CXX11_CLANG_PRESERVE_ACCESS_INDEX`
+* `C2X_CLANG_PRESERVE_ACCESS_INDEX`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BTFDeclTagAttrSpelling"></a>BTFDeclTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_BTF_DECLARATION_TAG`
+* `CXX11_CLANG_BTF_DECLARATION_TAG`
+* `C2X_CLANG_BTF_DECLARATION_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BTFTypeTagAttrSpelling"></a>BTFTypeTagAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_BTF_TYPE_TAG`
+* `CXX11_CLANG_BTF_TYPE_TAG`
+* `C2X_CLANG_BTF_TYPE_TAG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BlocksAttrBlockType"></a>BlocksAttrBlockType</summary>
+
+Available enumerations:
+
+* `BY_REFERENCE`
+
+</details>
+
+<details><summary><a name="BlocksAttrSpelling"></a>BlocksAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_BLOCKS`
+* `CXX11_CLANG_BLOCKS`
+* `C2X_CLANG_BLOCKS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="BuiltinAliasAttrSpelling"></a>BuiltinAliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_CLANG_BUILTIN_ALIAS`
+* `C2X_CLANG_BUILTIN_ALIAS`
+* `GNU_CLANG_BUILTIN_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="BuiltinTypeKind"></a>BuiltinTypeKind</summary>
 
 Available enumerations:
 
-* `OCL_IMAGE1_DRO`
-* `OCL_IMAGE1_DARRAY_RO`
-* `OCL_IMAGE1_DBUFFER_RO`
-* `OCL_IMAGE2_DRO`
-* `OCL_IMAGE2_DARRAY_RO`
-* `OCL_IMAGE2_DDEPTH_RO`
-* `OCL_IMAGE2_DARRAY_DEPTH_RO`
-* `OCL_IMAGE2_DMSAARO`
-* `OCL_IMAGE2_DARRAY_MSAARO`
-* `OCL_IMAGE2_DMSAA_DEPTH_RO`
-* `OCL_IMAGE2_DARRAY_MSAA_DEPTH_RO`
-* `OCL_IMAGE3_DRO`
-* `OCL_IMAGE1_DWO`
-* `OCL_IMAGE1_DARRAY_WO`
-* `OCL_IMAGE1_DBUFFER_WO`
-* `OCL_IMAGE2_DWO`
-* `OCL_IMAGE2_DARRAY_WO`
-* `OCL_IMAGE2_DDEPTH_WO`
-* `OCL_IMAGE2_DARRAY_DEPTH_WO`
-* `OCL_IMAGE2_DMSAAWO`
-* `OCL_IMAGE2_DARRAY_MSAAWO`
-* `OCL_IMAGE2_DMSAA_DEPTH_WO`
-* `OCL_IMAGE2_DARRAY_MSAA_DEPTH_WO`
-* `OCL_IMAGE3_DWO`
-* `OCL_IMAGE1_DRW`
-* `OCL_IMAGE1_DARRAY_RW`
-* `OCL_IMAGE1_DBUFFER_RW`
-* `OCL_IMAGE2_DRW`
-* `OCL_IMAGE2_DARRAY_RW`
-* `OCL_IMAGE2_DDEPTH_RW`
-* `OCL_IMAGE2_DARRAY_DEPTH_RW`
-* `OCL_IMAGE2_DMSAARW`
-* `OCL_IMAGE2_DARRAY_MSAARW`
-* `OCL_IMAGE2_DMSAA_DEPTH_RW`
-* `OCL_IMAGE2_DARRAY_MSAA_DEPTH_RW`
-* `OCL_IMAGE3_DRW`
+* `OCL_IMAGE_1D_RO`
+* `OCL_IMAGE_1D_ARRAY_RO`
+* `OCL_IMAGE_1D_BUFFER_RO`
+* `OCL_IMAGE_2D_RO`
+* `OCL_IMAGE_2D_ARRAY_RO`
+* `OCL_IMAGE_2D_DEPTH_RO`
+* `OCL_IMAGE_2D_ARRAY_DEPTH_RO`
+* `OCL_IMAGE_2D_MSAARO`
+* `OCL_IMAGE_2D_ARRAY_MSAARO`
+* `OCL_IMAGE_2D_MSAA_DEPTH_RO`
+* `OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_RO`
+* `OCL_IMAGE_3D_RO`
+* `OCL_IMAGE_1D_WO`
+* `OCL_IMAGE_1D_ARRAY_WO`
+* `OCL_IMAGE_1D_BUFFER_WO`
+* `OCL_IMAGE_2D_WO`
+* `OCL_IMAGE_2D_ARRAY_WO`
+* `OCL_IMAGE_2D_DEPTH_WO`
+* `OCL_IMAGE_2D_ARRAY_DEPTH_WO`
+* `OCL_IMAGE_2D_MSAAWO`
+* `OCL_IMAGE_2D_ARRAY_MSAAWO`
+* `OCL_IMAGE_2D_MSAA_DEPTH_WO`
+* `OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_WO`
+* `OCL_IMAGE_3D_WO`
+* `OCL_IMAGE_1D_RW`
+* `OCL_IMAGE_1D_ARRAY_RW`
+* `OCL_IMAGE_1D_BUFFER_RW`
+* `OCL_IMAGE_2D_RW`
+* `OCL_IMAGE_2D_ARRAY_RW`
+* `OCL_IMAGE_2D_DEPTH_RW`
+* `OCL_IMAGE_2D_ARRAY_DEPTH_RW`
+* `OCL_IMAGE_2D_MSAARW`
+* `OCL_IMAGE_2D_ARRAY_MSAARW`
+* `OCL_IMAGE_2D_MSAA_DEPTH_RW`
+* `OCL_IMAGE_2D_ARRAY_MSAA_DEPTH_RW`
+* `OCL_IMAGE_3D_RW`
 * `OCL_INTEL_SUBGROUP_AVC_MCE_PAYLOAD`
 * `OCL_INTEL_SUBGROUP_AVC_IME_PAYLOAD`
 * `OCL_INTEL_SUBGROUP_AVC_REF_PAYLOAD`
@@ -305,104 +1091,104 @@ Available enumerations:
 * `SVE_FLOAT32`
 * `SVE_FLOAT64`
 * `SVE_B_FLOAT16`
-* `SVE_INT8_X2`
-* `SVE_INT16_X2`
-* `SVE_INT32_X2`
-* `SVE_INT64_X2`
-* `SVE_UINT8_X2`
-* `SVE_UINT16_X2`
-* `SVE_UINT32_X2`
-* `SVE_UINT64_X2`
-* `SVE_FLOAT16_X2`
-* `SVE_FLOAT32_X2`
-* `SVE_FLOAT64_X2`
-* `SVE_B_FLOAT16_X2`
-* `SVE_INT8_X3`
-* `SVE_INT16_X3`
-* `SVE_INT32_X3`
-* `SVE_INT64_X3`
-* `SVE_UINT8_X3`
-* `SVE_UINT16_X3`
-* `SVE_UINT32_X3`
-* `SVE_UINT64_X3`
-* `SVE_FLOAT16_X3`
-* `SVE_FLOAT32_X3`
-* `SVE_FLOAT64_X3`
-* `SVE_B_FLOAT16_X3`
-* `SVE_INT8_X4`
-* `SVE_INT16_X4`
-* `SVE_INT32_X4`
-* `SVE_INT64_X4`
-* `SVE_UINT8_X4`
-* `SVE_UINT16_X4`
-* `SVE_UINT32_X4`
-* `SVE_UINT64_X4`
-* `SVE_FLOAT16_X4`
-* `SVE_FLOAT32_X4`
-* `SVE_FLOAT64_X4`
-* `SVE_B_FLOAT16_X4`
+* `SVE_INT8X2`
+* `SVE_INT16X2`
+* `SVE_INT32X2`
+* `SVE_INT64X2`
+* `SVE_UINT8X2`
+* `SVE_UINT16X2`
+* `SVE_UINT32X2`
+* `SVE_UINT64X2`
+* `SVE_FLOAT16X2`
+* `SVE_FLOAT32X2`
+* `SVE_FLOAT64X2`
+* `SVE_B_FLOAT16X2`
+* `SVE_INT8X3`
+* `SVE_INT16X3`
+* `SVE_INT32X3`
+* `SVE_INT64X3`
+* `SVE_UINT8X3`
+* `SVE_UINT16X3`
+* `SVE_UINT32X3`
+* `SVE_UINT64X3`
+* `SVE_FLOAT16X3`
+* `SVE_FLOAT32X3`
+* `SVE_FLOAT64X3`
+* `SVE_B_FLOAT16X3`
+* `SVE_INT8X4`
+* `SVE_INT16X4`
+* `SVE_INT32X4`
+* `SVE_INT64X4`
+* `SVE_UINT8X4`
+* `SVE_UINT16X4`
+* `SVE_UINT32X4`
+* `SVE_UINT64X4`
+* `SVE_FLOAT16X4`
+* `SVE_FLOAT32X4`
+* `SVE_FLOAT64X4`
+* `SVE_B_FLOAT16X4`
 * `SVE_BOOLEAN`
 * `VECTOR_QUAD`
 * `VECTOR_PAIR`
-* `RVV_INT8_MF8`
-* `RVV_INT8_MF4`
-* `RVV_INT8_MF2`
-* `RVV_INT8_M1`
-* `RVV_INT8_M2`
-* `RVV_INT8_M4`
-* `RVV_INT8_M8`
-* `RVV_UINT8_MF8`
-* `RVV_UINT8_MF4`
-* `RVV_UINT8_MF2`
-* `RVV_UINT8_M1`
-* `RVV_UINT8_M2`
-* `RVV_UINT8_M4`
-* `RVV_UINT8_M8`
-* `RVV_INT16_MF4`
-* `RVV_INT16_MF2`
-* `RVV_INT16_M1`
-* `RVV_INT16_M2`
-* `RVV_INT16_M4`
-* `RVV_INT16_M8`
-* `RVV_UINT16_MF4`
-* `RVV_UINT16_MF2`
-* `RVV_UINT16_M1`
-* `RVV_UINT16_M2`
-* `RVV_UINT16_M4`
-* `RVV_UINT16_M8`
-* `RVV_INT32_MF2`
-* `RVV_INT32_M1`
-* `RVV_INT32_M2`
-* `RVV_INT32_M4`
-* `RVV_INT32_M8`
-* `RVV_UINT32_MF2`
-* `RVV_UINT32_M1`
-* `RVV_UINT32_M2`
-* `RVV_UINT32_M4`
-* `RVV_UINT32_M8`
-* `RVV_INT64_M1`
-* `RVV_INT64_M2`
-* `RVV_INT64_M4`
-* `RVV_INT64_M8`
-* `RVV_UINT64_M1`
-* `RVV_UINT64_M2`
-* `RVV_UINT64_M4`
-* `RVV_UINT64_M8`
-* `RVV_FLOAT16_MF4`
-* `RVV_FLOAT16_MF2`
-* `RVV_FLOAT16_M1`
-* `RVV_FLOAT16_M2`
-* `RVV_FLOAT16_M4`
-* `RVV_FLOAT16_M8`
-* `RVV_FLOAT32_MF2`
-* `RVV_FLOAT32_M1`
-* `RVV_FLOAT32_M2`
-* `RVV_FLOAT32_M4`
-* `RVV_FLOAT32_M8`
-* `RVV_FLOAT64_M1`
-* `RVV_FLOAT64_M2`
-* `RVV_FLOAT64_M4`
-* `RVV_FLOAT64_M8`
+* `RVV_INT8MF8`
+* `RVV_INT8MF4`
+* `RVV_INT8MF2`
+* `RVV_INT8M1`
+* `RVV_INT8M2`
+* `RVV_INT8M4`
+* `RVV_INT8M8`
+* `RVV_UINT8MF8`
+* `RVV_UINT8MF4`
+* `RVV_UINT8MF2`
+* `RVV_UINT8M1`
+* `RVV_UINT8M2`
+* `RVV_UINT8M4`
+* `RVV_UINT8M8`
+* `RVV_INT16MF4`
+* `RVV_INT16MF2`
+* `RVV_INT16M1`
+* `RVV_INT16M2`
+* `RVV_INT16M4`
+* `RVV_INT16M8`
+* `RVV_UINT16MF4`
+* `RVV_UINT16MF2`
+* `RVV_UINT16M1`
+* `RVV_UINT16M2`
+* `RVV_UINT16M4`
+* `RVV_UINT16M8`
+* `RVV_INT32MF2`
+* `RVV_INT32M1`
+* `RVV_INT32M2`
+* `RVV_INT32M4`
+* `RVV_INT32M8`
+* `RVV_UINT32MF2`
+* `RVV_UINT32M1`
+* `RVV_UINT32M2`
+* `RVV_UINT32M4`
+* `RVV_UINT32M8`
+* `RVV_INT64M1`
+* `RVV_INT64M2`
+* `RVV_INT64M4`
+* `RVV_INT64M8`
+* `RVV_UINT64M1`
+* `RVV_UINT64M2`
+* `RVV_UINT64M4`
+* `RVV_UINT64M8`
+* `RVV_FLOAT16MF4`
+* `RVV_FLOAT16MF2`
+* `RVV_FLOAT16M1`
+* `RVV_FLOAT16M2`
+* `RVV_FLOAT16M4`
+* `RVV_FLOAT16M8`
+* `RVV_FLOAT32MF2`
+* `RVV_FLOAT32M1`
+* `RVV_FLOAT32M2`
+* `RVV_FLOAT32M4`
+* `RVV_FLOAT32M8`
+* `RVV_FLOAT64M1`
+* `RVV_FLOAT64M2`
+* `RVV_FLOAT64M4`
+* `RVV_FLOAT64M8`
 * `RVV_BOOL1`
 * `RVV_BOOL2`
 * `RVV_BOOL4`
@@ -486,6 +1272,196 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="CDeclAttrSpelling"></a>CDeclAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CDECL`
+* `CXX11_GNU_CDECL`
+* `C2X_GNU_CDECL`
+* `KEYWORD_CDECL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFAuditedTransferAttrSpelling"></a>CFAuditedTransferAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_AUDITED_TRANSFER`
+* `CXX11_CLANG_CF_AUDITED_TRANSFER`
+* `C2X_CLANG_CF_AUDITED_TRANSFER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFConsumedAttrSpelling"></a>CFConsumedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_CONSUMED`
+* `CXX11_CLANG_CF_CONSUMED`
+* `C2X_CLANG_CF_CONSUMED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFGuardAttrGuardArg"></a>CFGuardAttrGuardArg</summary>
+
+Available enumerations:
+
+* `NOCF`
+
+</details>
+
+<details><summary><a name="CFICanonicalJumpTableAttrSpelling"></a>CFICanonicalJumpTableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CFI_CANONICAL_JUMP_TABLE`
+* `CXX11_CLANG_CFI_CANONICAL_JUMP_TABLE`
+* `C2X_CLANG_CFI_CANONICAL_JUMP_TABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFReturnsNotRetainedAttrSpelling"></a>CFReturnsNotRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_RETURNS_NOT_RETAINED`
+* `CXX11_CLANG_CF_RETURNS_NOT_RETAINED`
+* `C2X_CLANG_CF_RETURNS_NOT_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFReturnsRetainedAttrSpelling"></a>CFReturnsRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_RETURNS_RETAINED`
+* `CXX11_CLANG_CF_RETURNS_RETAINED`
+* `C2X_CLANG_CF_RETURNS_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CFUnknownTransferAttrSpelling"></a>CFUnknownTransferAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CF_UNKNOWN_TRANSFER`
+* `CXX11_CLANG_CF_UNKNOWN_TRANSFER`
+* `C2X_CLANG_CF_UNKNOWN_TRANSFER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CPUDispatchAttrSpelling"></a>CPUDispatchAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CPU_DISPATCH`
+* `CXX11_CLANG_CPU_DISPATCH`
+* `C2X_CLANG_CPU_DISPATCH`
+* `DECLSPEC_CPU_DISPATCH`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CPUSpecificAttrSpelling"></a>CPUSpecificAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CPU_SPECIFIC`
+* `CXX11_CLANG_CPU_SPECIFIC`
+* `C2X_CLANG_CPU_SPECIFIC`
+* `DECLSPEC_CPU_SPECIFIC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDAConstantAttrSpelling"></a>CUDAConstantAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSTANT`
+* `DECLSPEC_CONSTANT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDADeviceAttrSpelling"></a>CUDADeviceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEVICE`
+* `DECLSPEC_DEVICE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDADeviceBuiltinSurfaceTypeAttrSpelling"></a>CUDADeviceBuiltinSurfaceTypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEVICE_BUILTIN_SURFACE_TYPE`
+* `DECLSPEC_DEVICE_BUILTIN_SURFACE_TYPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDADeviceBuiltinTextureTypeAttrSpelling"></a>CUDADeviceBuiltinTextureTypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEVICE_BUILTIN_TEXTURE_TYPE`
+* `DECLSPEC_DEVICE_BUILTIN_TEXTURE_TYPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDAGlobalAttrSpelling"></a>CUDAGlobalAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_GLOBAL`
+* `DECLSPEC_GLOBAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDAHostAttrSpelling"></a>CUDAHostAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_HOST`
+* `DECLSPEC_HOST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDALaunchBoundsAttrSpelling"></a>CUDALaunchBoundsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LAUNCH_BOUNDS`
+* `DECLSPEC_LAUNCH_BOUNDS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CUDASharedAttrSpelling"></a>CUDASharedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SHARED`
+* `DECLSPEC_SHARED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="CXXConstructExprConstructionKind"></a>CXXConstructExprConstructionKind</summary>
 
 Available enumerations:
@@ -516,6 +1492,60 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="CallableWhenAttrConsumedState"></a>CallableWhenAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="CallableWhenAttrSpelling"></a>CallableWhenAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CALLABLE_WHEN`
+* `CXX11_CLANG_CALLABLE_WHEN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CallbackAttrSpelling"></a>CallbackAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CALLBACK`
+* `CXX11_CLANG_CALLBACK`
+* `C2X_CLANG_CALLBACK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CalledOnceAttrSpelling"></a>CalledOnceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CALLED_ONCE`
+* `CXX11_CLANG_CALLED_ONCE`
+* `C2X_CLANG_CALLED_ONCE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CapabilityAttrSpelling"></a>CapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CAPABILITY`
+* `CXX11_CLANG_CAPABILITY`
+* `GNU_SHARED_CAPABILITY`
+* `CXX11_CLANG_SHARED_CAPABILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="CapturedStmtVariableCaptureKind"></a>CapturedStmtVariableCaptureKind</summary>
 
 Available enumerations:
@@ -524,6 +1554,16 @@ Available enumerations:
 * `BY_REFERENCE`
 * `BY_COPY`
 * `VLA_TYPE`
+
+</details>
+
+<details><summary><a name="CarriesDependencyAttrSpelling"></a>CarriesDependencyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CARRIES_DEPENDENCY`
+* `CXX11_CARRIES_DEPENDENCY`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -539,6 +1579,61 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="CleanupAttrSpelling"></a>CleanupAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CLEANUP`
+* `CXX11_GNU_CLEANUP`
+* `C2X_GNU_CLEANUP`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ColdAttrSpelling"></a>ColdAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_COLD`
+* `CXX11_GNU_COLD`
+* `C2X_GNU_COLD`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="CommonAttrSpelling"></a>CommonAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_COMMON`
+* `CXX11_GNU_COMMON`
+* `C2X_GNU_COMMON`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConstAttrSpelling"></a>ConstAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONST`
+* `CXX11_GNU_CONST`
+* `C2X_GNU_CONST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConstInitAttrSpelling"></a>ConstInitAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_CONSTINIT`
+* `GNU_REQUIRE_CONSTANT_INITIALIZATION`
+* `CXX11_CLANG_REQUIRE_CONSTANT_INITIALIZATION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="ConstantExprResultStorageKind"></a>ConstantExprResultStorageKind</summary>
 
 Available enumerations:
@@ -546,6 +1641,92 @@ Available enumerations:
 * `NONE`
 * `INT64`
 * `AP_VALUE`
+
+</details>
+
+<details><summary><a name="ConstructorAttrSpelling"></a>ConstructorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSTRUCTOR`
+* `CXX11_GNU_CONSTRUCTOR`
+* `C2X_GNU_CONSTRUCTOR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConsumableAttrConsumedState"></a>ConsumableAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="ConsumableAttrSpelling"></a>ConsumableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSUMABLE`
+* `CXX11_CLANG_CONSUMABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConsumableAutoCastAttrSpelling"></a>ConsumableAutoCastAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSUMABLE_AUTO_CAST_STATE`
+* `CXX11_CLANG_CONSUMABLE_AUTO_CAST_STATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConsumableSetOnReadAttrSpelling"></a>ConsumableSetOnReadAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONSUMABLE_STATE_ON_READ`
+* `CXX11_CLANG_CONSUMABLE_STATE_ON_READ`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ConvergentAttrSpelling"></a>ConvergentAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_CONVERGENT`
+* `CXX11_CLANG_CONVERGENT`
+* `C2X_CLANG_CONVERGENT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DLLExportAttrSpelling"></a>DLLExportAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_DLLEXPORT`
+* `GNU_DLLEXPORT`
+* `CXX11_GNU_DLLEXPORT`
+* `C2X_GNU_DLLEXPORT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DLLImportAttrSpelling"></a>DLLImportAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_DLLIMPORT`
+* `GNU_DLLIMPORT`
+* `CXX11_GNU_DLLIMPORT`
+* `C2X_GNU_DLLIMPORT`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -603,6 +1784,140 @@ Available enumerations:
 * `BYREF`
 * `ONEWAY`
 * `CS_NULLABILITY`
+
+</details>
+
+<details><summary><a name="DeprecatedAttrSpelling"></a>DeprecatedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DEPRECATED`
+* `CXX11_GNU_DEPRECATED`
+* `C2X_GNU_DEPRECATED`
+* `DECLSPEC_DEPRECATED`
+* `CXX11_DEPRECATED`
+* `C2X_DEPRECATED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DestructorAttrSpelling"></a>DestructorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DESTRUCTOR`
+* `CXX11_GNU_DESTRUCTOR`
+* `C2X_GNU_DESTRUCTOR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DiagnoseAsBuiltinAttrSpelling"></a>DiagnoseAsBuiltinAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DIAGNOSE_AS_BUILTIN`
+* `CXX11_CLANG_DIAGNOSE_AS_BUILTIN`
+* `C2X_CLANG_DIAGNOSE_AS_BUILTIN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DiagnoseIfAttrDiagnosticType"></a>DiagnoseIfAttrDiagnosticType</summary>
+
+Available enumerations:
+
+* `ERROR`
+* `WARNING`
+
+</details>
+
+<details><summary><a name="DisableSanitizerInstrumentationAttrSpelling"></a>DisableSanitizerInstrumentationAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DISABLE_SANITIZER_INSTRUMENTATION`
+* `CXX11_CLANG_DISABLE_SANITIZER_INSTRUMENTATION`
+* `C2X_CLANG_DISABLE_SANITIZER_INSTRUMENTATION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="DisableTailCallsAttrSpelling"></a>DisableTailCallsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_DISABLE_TAIL_CALLS`
+* `CXX11_CLANG_DISABLE_TAIL_CALLS`
+* `C2X_CLANG_DISABLE_TAIL_CALLS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="EnforceTCBAttrSpelling"></a>EnforceTCBAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ENFORCE_TCB`
+* `CXX11_CLANG_ENFORCE_TCB`
+* `C2X_CLANG_ENFORCE_TCB`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="EnforceTCBLeafAttrSpelling"></a>EnforceTCBLeafAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ENFORCE_TCB_LEAF`
+* `CXX11_CLANG_ENFORCE_TCB_LEAF`
+* `C2X_CLANG_ENFORCE_TCB_LEAF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="EnumExtensibilityAttrKind"></a>EnumExtensibilityAttrKind</summary>
+
+Available enumerations:
+
+* `CLOSED`
+* `OPEN`
+
+</details>
+
+<details><summary><a name="EnumExtensibilityAttrSpelling"></a>EnumExtensibilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ENUM_EXTENSIBILITY`
+* `CXX11_CLANG_ENUM_EXTENSIBILITY`
+* `C2X_CLANG_ENUM_EXTENSIBILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ErrorAttrSpelling"></a>ErrorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_ERROR`
+* `CXX11_GNU_ERROR`
+* `C2X_GNU_ERROR`
+* `GNU_WARNING`
+* `CXX11_GNU_WARNING`
+* `C2X_GNU_WARNING`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ExcludeFromExplicitInstantiationAttrSpelling"></a>ExcludeFromExplicitInstantiationAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `CXX11_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `C2X_CLANG_EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -690,6 +2005,97 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="ExternalSourceSymbolAttrSpelling"></a>ExternalSourceSymbolAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_EXTERNAL_SOURCE_SYMBOL`
+* `CXX11_CLANG_EXTERNAL_SOURCE_SYMBOL`
+* `C2X_CLANG_EXTERNAL_SOURCE_SYMBOL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FallThroughAttrSpelling"></a>FallThroughAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_FALLTHROUGH`
+* `C2X_FALLTHROUGH`
+* `CXX11_CLANG_FALLTHROUGH`
+* `GNU_FALLTHROUGH`
+* `CXX11_GNU_FALLTHROUGH`
+* `C2X_GNU_FALLTHROUGH`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FastCallAttrSpelling"></a>FastCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FASTCALL`
+* `CXX11_GNU_FASTCALL`
+* `C2X_GNU_FASTCALL`
+* `KEYWORD_FASTCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FinalAttrSpelling"></a>FinalAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_FINAL`
+* `KEYWORD_SEALED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FlagEnumAttrSpelling"></a>FlagEnumAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FLAG_ENUM`
+* `CXX11_CLANG_FLAG_ENUM`
+* `C2X_CLANG_FLAG_ENUM`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FlattenAttrSpelling"></a>FlattenAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FLATTEN`
+* `CXX11_GNU_FLATTEN`
+* `C2X_GNU_FLATTEN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FormatArgAttrSpelling"></a>FormatArgAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FORMAT_ARGUMENT`
+* `CXX11_GNU_FORMAT_ARGUMENT`
+* `C2X_GNU_FORMAT_ARGUMENT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="FormatAttrSpelling"></a>FormatAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FORMAT`
+* `CXX11_GNU_FORMAT`
+* `C2X_GNU_FORMAT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="FunctionDeclTemplatedKind"></a>FunctionDeclTemplatedKind</summary>
 
 Available enumerations:
@@ -699,6 +2105,92 @@ Available enumerations:
 * `MEMBER_SPECIALIZATION`
 * `FUNCTION_TEMPLATE_SPECIALIZATION`
 * `DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION`
+
+</details>
+
+<details><summary><a name="GNUInlineAttrSpelling"></a>GNUInlineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_GNU_INLINE`
+* `CXX11_GNU_GNU_INLINE`
+* `C2X_GNU_GNU_INLINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="GuardedVarAttrSpelling"></a>GuardedVarAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_GUARDED_VARIABLE`
+* `CXX11_CLANG_GUARDED_VARIABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="HIPManagedAttrSpelling"></a>HIPManagedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MANAGED`
+* `DECLSPEC_MANAGED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="HotAttrSpelling"></a>HotAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_HOT`
+* `CXX11_GNU_HOT`
+* `C2X_GNU_HOT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IBActionAttrSpelling"></a>IBActionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IBACTION`
+* `CXX11_CLANG_IBACTION`
+* `C2X_CLANG_IBACTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IBOutletAttrSpelling"></a>IBOutletAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IBOUTLET`
+* `CXX11_CLANG_IBOUTLET`
+* `C2X_CLANG_IBOUTLET`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IBOutletCollectionAttrSpelling"></a>IBOutletCollectionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IBOUTLETCOLLECTION`
+* `CXX11_CLANG_IBOUTLETCOLLECTION`
+* `C2X_CLANG_IBOUTLETCOLLECTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IFuncAttrSpelling"></a>IFuncAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IFUNC`
+* `CXX11_GNU_IFUNC`
+* `C2X_GNU_IFUNC`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -723,12 +2215,397 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="InitPriorityAttrSpelling"></a>InitPriorityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INITIALIZER_PRIORITY`
+* `CXX11_GNU_INITIALIZER_PRIORITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="IntelOclBiccAttrSpelling"></a>IntelOclBiccAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTEL_OCL_BICC`
+* `CXX11_CLANG_INTEL_OCL_BICC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="InternalLinkageAttrSpelling"></a>InternalLinkageAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERNAL_LINKAGE`
+* `CXX11_CLANG_INTERNAL_LINKAGE`
+* `C2X_CLANG_INTERNAL_LINKAGE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LTOVisibilityPublicAttrSpelling"></a>LTOVisibilityPublicAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LTO_VISIBILITY_PUBLIC`
+* `CXX11_CLANG_LTO_VISIBILITY_PUBLIC`
+* `C2X_CLANG_LTO_VISIBILITY_PUBLIC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LeafAttrSpelling"></a>LeafAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LEAF`
+* `CXX11_GNU_LEAF`
+* `C2X_GNU_LEAF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LifetimeBoundAttrSpelling"></a>LifetimeBoundAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LIFETIMEBOUND`
+* `CXX11_CLANG_LIFETIMEBOUND`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LikelyAttrSpelling"></a>LikelyAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_LIKELY`
+* `C2X_CLANG_LIKELY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="LinkageSpecDeclLanguageIDs"></a>LinkageSpecDeclLanguageIDs</summary>
 
 Available enumerations:
 
 * `C`
 * `CXX`
+
+</details>
+
+<details><summary><a name="LoaderUninitializedAttrSpelling"></a>LoaderUninitializedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LOADER_UNINITIALIZED`
+* `CXX11_CLANG_LOADER_UNINITIALIZED`
+* `C2X_CLANG_LOADER_UNINITIALIZED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="LoopHintAttrLoopHintState"></a>LoopHintAttrLoopHintState</summary>
+
+Available enumerations:
+
+* `ENABLE`
+* `DISABLE`
+* `NUMERIC`
+* `FIXED_WIDTH`
+* `SCALABLE_WIDTH`
+* `ASSUME_SAFETY`
+* `FULL`
+
+</details>
+
+<details><summary><a name="LoopHintAttrOptionType"></a>LoopHintAttrOptionType</summary>
+
+Available enumerations:
+
+* `VECTORIZE`
+* `VECTORIZE_WIDTH`
+* `INTERLEAVE`
+* `INTERLEAVE_COUNT`
+* `UNROLL`
+* `UNROLL_COUNT`
+* `UNROLL_AND_JAM`
+* `UNROLL_AND_JAM_COUNT`
+* `PIPELINE_DISABLED`
+* `PIPELINE_INITIATION_INTERVAL`
+* `DISTRIBUTE`
+* `VECTORIZE_PREDICATE`
+
+</details>
+
+<details><summary><a name="LoopHintAttrSpelling"></a>LoopHintAttrSpelling</summary>
+
+Available enumerations:
+
+* `PRAGMA_CLANG_LOOP`
+* `PRAGMA_UNROLL`
+* `PRAGMA_NOUNROLL`
+* `PRAGMA_UNROLL_AND_JAM`
+* `PRAGMA_NOUNROLL_AND_JAM`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MIGServerRoutineAttrSpelling"></a>MIGServerRoutineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MIG_SERVER_ROUTINE`
+* `CXX11_CLANG_MIG_SERVER_ROUTINE`
+* `C2X_CLANG_MIG_SERVER_ROUTINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSABIAttrSpelling"></a>MSABIAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MS_ABI`
+* `CXX11_GNU_MS_ABI`
+* `C2X_GNU_MS_ABI`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSInheritanceAttrSpelling"></a>MSInheritanceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_SINGLE_INHERITANCE`
+* `KEYWORD_MULTIPLE_INHERITANCE`
+* `KEYWORD_VIRTUAL_INHERITANCE`
+* `KEYWORD_UNSPECIFIED_INHERITANCE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSP430InterruptAttrSpelling"></a>MSP430InterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2X_GNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MSStructAttrSpelling"></a>MSStructAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MS_STRUCT`
+* `CXX11_GNU_MS_STRUCT`
+* `C2X_GNU_MS_STRUCT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MayAliasAttrSpelling"></a>MayAliasAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MAY_ALIAS`
+* `CXX11_GNU_MAY_ALIAS`
+* `C2X_GNU_MAY_ALIAS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MicroMipsAttrSpelling"></a>MicroMipsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MICROMIPS`
+* `CXX11_GNU_MICROMIPS`
+* `C2X_GNU_MICROMIPS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MinSizeAttrSpelling"></a>MinSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MINSIZE`
+* `CXX11_CLANG_MINSIZE`
+* `C2X_CLANG_MINSIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MinVectorWidthAttrSpelling"></a>MinVectorWidthAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MIN_VECTOR_WIDTH`
+* `CXX11_CLANG_MIN_VECTOR_WIDTH`
+* `C2X_CLANG_MIN_VECTOR_WIDTH`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="Mips16AttrSpelling"></a>Mips16AttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MIPS16`
+* `CXX11_GNU_MIPS16`
+* `C2X_GNU_MIPS16`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MipsInterruptAttrInterruptType"></a>MipsInterruptAttrInterruptType</summary>
+
+Available enumerations:
+
+* `SW0`
+* `SW1`
+* `HW0`
+* `HW1`
+* `HW2`
+* `HW3`
+* `HW4`
+* `HW5`
+* `EIC`
+
+</details>
+
+<details><summary><a name="MipsInterruptAttrSpelling"></a>MipsInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2X_GNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MipsLongCallAttrSpelling"></a>MipsLongCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_LONG_CALL`
+* `CXX11_GNU_LONG_CALL`
+* `C2X_GNU_LONG_CALL`
+* `GNU_FAR`
+* `CXX11_GNU_FAR`
+* `C2X_GNU_FAR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MipsShortCallAttrSpelling"></a>MipsShortCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SHORT_CALL`
+* `CXX11_GNU_SHORT_CALL`
+* `C2X_GNU_SHORT_CALL`
+* `GNU_NEAR`
+* `CXX11_GNU_NEAR`
+* `C2X_GNU_NEAR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ModeAttrSpelling"></a>ModeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MODE`
+* `CXX11_GNU_MODE`
+* `C2X_GNU_MODE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="MustTailAttrSpelling"></a>MustTailAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_MUSTTAIL`
+* `CXX11_CLANG_MUSTTAIL`
+* `C2X_CLANG_MUSTTAIL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSConsumedAttrSpelling"></a>NSConsumedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_CONSUMED`
+* `CXX11_CLANG_NS_CONSUMED`
+* `C2X_CLANG_NS_CONSUMED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSConsumesSelfAttrSpelling"></a>NSConsumesSelfAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_CONSUMES_SELF`
+* `CXX11_CLANG_NS_CONSUMES_SELF`
+* `C2X_CLANG_NS_CONSUMES_SELF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSReturnsAutoreleasedAttrSpelling"></a>NSReturnsAutoreleasedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_RETURNS_AUTORELEASED`
+* `CXX11_CLANG_NS_RETURNS_AUTORELEASED`
+* `C2X_CLANG_NS_RETURNS_AUTORELEASED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSReturnsNotRetainedAttrSpelling"></a>NSReturnsNotRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_RETURNS_NOT_RETAINED`
+* `CXX11_CLANG_NS_RETURNS_NOT_RETAINED`
+* `C2X_CLANG_NS_RETURNS_NOT_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NSReturnsRetainedAttrSpelling"></a>NSReturnsRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NS_RETURNS_RETAINED`
+* `CXX11_CLANG_NS_RETURNS_RETAINED`
+* `C2X_CLANG_NS_RETURNS_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NakedAttrSpelling"></a>NakedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NAKED`
+* `CXX11_GNU_NAKED`
+* `C2X_GNU_NAKED`
+* `DECLSPEC_NAKED`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -741,6 +2618,267 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="NoBuiltinAttrSpelling"></a>NoBuiltinAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_BUILTIN`
+* `CXX11_CLANG_NO_BUILTIN`
+* `C2X_CLANG_NO_BUILTIN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoCommonAttrSpelling"></a>NoCommonAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOCOMMON`
+* `CXX11_GNU_NOCOMMON`
+* `C2X_GNU_NOCOMMON`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDebugAttrSpelling"></a>NoDebugAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NODEBUG`
+* `CXX11_GNU_NODEBUG`
+* `C2X_GNU_NODEBUG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDerefAttrSpelling"></a>NoDerefAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NODEREF`
+* `CXX11_CLANG_NODEREF`
+* `C2X_CLANG_NODEREF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDestroyAttrSpelling"></a>NoDestroyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_DESTROY`
+* `CXX11_CLANG_NO_DESTROY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoDuplicateAttrSpelling"></a>NoDuplicateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NODUPLICATE`
+* `CXX11_CLANG_NODUPLICATE`
+* `C2X_CLANG_NODUPLICATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoEscapeAttrSpelling"></a>NoEscapeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOESCAPE`
+* `CXX11_CLANG_NOESCAPE`
+* `C2X_CLANG_NOESCAPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoInlineAttrSpelling"></a>NoInlineAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOINLINE`
+* `CXX11_GNU_NOINLINE`
+* `C2X_GNU_NOINLINE`
+* `DECLSPEC_NOINLINE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoInstrumentFunctionAttrSpelling"></a>NoInstrumentFunctionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_INSTRUMENT_FUNCTION`
+* `CXX11_GNU_NO_INSTRUMENT_FUNCTION`
+* `C2X_GNU_NO_INSTRUMENT_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoMergeAttrSpelling"></a>NoMergeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOMERGE`
+* `CXX11_CLANG_NOMERGE`
+* `C2X_CLANG_NOMERGE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoMicroMipsAttrSpelling"></a>NoMicroMipsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOMICROMIPS`
+* `CXX11_GNU_NOMICROMIPS`
+* `C2X_GNU_NOMICROMIPS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoMips16AttrSpelling"></a>NoMips16AttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOMIPS16`
+* `CXX11_GNU_NOMIPS16`
+* `C2X_GNU_NOMIPS16`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoProfileFunctionAttrSpelling"></a>NoProfileFunctionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_PROFILE_INSTRUMENT_FUNCTION`
+* `CXX11_GNU_NO_PROFILE_INSTRUMENT_FUNCTION`
+* `C2X_GNU_NO_PROFILE_INSTRUMENT_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoReturnAttrSpelling"></a>NoReturnAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NORETURN`
+* `CXX11_GNU_NORETURN`
+* `C2X_GNU_NORETURN`
+* `DECLSPEC_NORETURN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoSanitizeAttrSpelling"></a>NoSanitizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_SANITIZE`
+* `CXX11_CLANG_NO_SANITIZE`
+* `C2X_CLANG_NO_SANITIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoSpeculativeLoadHardeningAttrSpelling"></a>NoSpeculativeLoadHardeningAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_SPECULATIVE_LOAD_HARDENING`
+* `CXX11_CLANG_NO_SPECULATIVE_LOAD_HARDENING`
+* `C2X_CLANG_NO_SPECULATIVE_LOAD_HARDENING`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoSplitStackAttrSpelling"></a>NoSplitStackAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_SPLIT_STACK`
+* `CXX11_GNU_NO_SPLIT_STACK`
+* `C2X_GNU_NO_SPLIT_STACK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoStackProtectorAttrSpelling"></a>NoStackProtectorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_STACK_PROTECTOR`
+* `CXX11_CLANG_NO_STACK_PROTECTOR`
+* `C2X_CLANG_NO_STACK_PROTECTOR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoThreadSafetyAnalysisAttrSpelling"></a>NoThreadSafetyAnalysisAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NO_THREAD_SAFETY_ANALYSIS`
+* `CXX11_CLANG_NO_THREAD_SAFETY_ANALYSIS`
+* `C2X_CLANG_NO_THREAD_SAFETY_ANALYSIS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NoThrowAttrSpelling"></a>NoThrowAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOTHROW`
+* `CXX11_GNU_NOTHROW`
+* `C2X_GNU_NOTHROW`
+* `DECLSPEC_NOTHROW`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NonNullAttrSpelling"></a>NonNullAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NONNULL`
+* `CXX11_GNU_NONNULL`
+* `C2X_GNU_NONNULL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="NotTailCalledAttrSpelling"></a>NotTailCalledAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_NOT_TAIL_CALLED`
+* `CXX11_CLANG_NOT_TAIL_CALLED`
+* `C2X_CLANG_NOT_TAIL_CALLED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OMPAllocateDeclAttrAllocatorTypeTy"></a>OMPAllocateDeclAttrAllocatorTypeTy</summary>
+
+Available enumerations:
+
+* `OMP_NULL_MEMORY_ALLOC`
+* `OMP_DEFAULT_MEMORY_ALLOC`
+* `OMP_LARGE_CAP_MEMORY_ALLOC`
+* `OMP_CONST_MEMORY_ALLOC`
+* `OMP_HIGH_BW_MEMORY_ALLOC`
+* `OMP_LOW_LAT_MEMORY_ALLOC`
+* `OMPC_GROUP_MEMORY_ALLOC`
+* `OMPP_TEAM_MEMORY_ALLOC`
+* `OMP_THREAD_MEMORY_ALLOC`
+* `OMP_USER_DEFINED_MEMORY_ALLOC`
+
+</details>
+
 <details><summary><a name="OMPDeclareReductionDeclInitKind"></a>OMPDeclareReductionDeclInitKind</summary>
 
 Available enumerations:
@@ -748,6 +2886,254 @@ Available enumerations:
 * `CALL_INITIALIZER`
 * `DIRECT_INITIALIZER`
 * `COPY_INITIALIZER`
+
+</details>
+
+<details><summary><a name="OMPDeclareSimdDeclAttrBranchStateTy"></a>OMPDeclareSimdDeclAttrBranchStateTy</summary>
+
+Available enumerations:
+
+* `UNDEFINED`
+* `INBRANCH`
+* `NOTINBRANCH`
+
+</details>
+
+<details><summary><a name="OMPDeclareTargetDeclAttrDevTypeTy"></a>OMPDeclareTargetDeclAttrDevTypeTy</summary>
+
+Available enumerations:
+
+* `HOST`
+* `NO_HOST`
+* `ANY`
+
+</details>
+
+<details><summary><a name="OMPDeclareTargetDeclAttrMapTypeTy"></a>OMPDeclareTargetDeclAttrMapTypeTy</summary>
+
+Available enumerations:
+
+* `TO`
+* `LINK`
+
+</details>
+
+<details><summary><a name="OMPDeclareVariantAttrInteropType"></a>OMPDeclareVariantAttrInteropType</summary>
+
+Available enumerations:
+
+* `TARGET`
+* `TARGET_SYNC`
+* `TARGET_TARGET_SYNC`
+
+</details>
+
+<details><summary><a name="OSConsumedAttrSpelling"></a>OSConsumedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_CONSUMED`
+* `CXX11_CLANG_OS_CONSUMED`
+* `C2X_CLANG_OS_CONSUMED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSConsumesThisAttrSpelling"></a>OSConsumesThisAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_CONSUMES_THIS`
+* `CXX11_CLANG_OS_CONSUMES_THIS`
+* `C2X_CLANG_OS_CONSUMES_THIS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsNotRetainedAttrSpelling"></a>OSReturnsNotRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_NOT_RETAINED`
+* `CXX11_CLANG_OS_RETURNS_NOT_RETAINED`
+* `C2X_CLANG_OS_RETURNS_NOT_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedAttrSpelling"></a>OSReturnsRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_RETAINED`
+* `CXX11_CLANG_OS_RETURNS_RETAINED`
+* `C2X_CLANG_OS_RETURNS_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedOnNonZeroAttrSpelling"></a>OSReturnsRetainedOnNonZeroAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `CXX11_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `C2X_CLANG_OS_RETURNS_RETAINED_ON_NON_ZERO`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedOnZeroAttrSpelling"></a>OSReturnsRetainedOnZeroAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OS_RETURNS_RETAINED_ON_ZERO`
+* `CXX11_CLANG_OS_RETURNS_RETAINED_ON_ZERO`
+* `C2X_CLANG_OS_RETURNS_RETAINED_ON_ZERO`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBoxableAttrSpelling"></a>ObjCBoxableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BOXABLE`
+* `CXX11_CLANG_OBJC_BOXABLE`
+* `C2X_CLANG_OBJC_BOXABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBridgeAttrSpelling"></a>ObjCBridgeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BRIDGE`
+* `CXX11_CLANG_OBJC_BRIDGE`
+* `C2X_CLANG_OBJC_BRIDGE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBridgeMutableAttrSpelling"></a>ObjCBridgeMutableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BRIDGE_MUTABLE`
+* `CXX11_CLANG_OBJC_BRIDGE_MUTABLE`
+* `C2X_CLANG_OBJC_BRIDGE_MUTABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCBridgeRelatedAttrSpelling"></a>ObjCBridgeRelatedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_BRIDGE_RELATED`
+* `CXX11_CLANG_OBJC_BRIDGE_RELATED`
+* `C2X_CLANG_OBJC_BRIDGE_RELATED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCClassStubAttrSpelling"></a>ObjCClassStubAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_CLASS_STUB`
+* `CXX11_CLANG_OBJC_CLASS_STUB`
+* `C2X_CLANG_OBJC_CLASS_STUB`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCDesignatedInitializerAttrSpelling"></a>ObjCDesignatedInitializerAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_DESIGNATED_INITIALIZER`
+* `CXX11_CLANG_OBJC_DESIGNATED_INITIALIZER`
+* `C2X_CLANG_OBJC_DESIGNATED_INITIALIZER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCDirectAttrSpelling"></a>ObjCDirectAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_DIRECT`
+* `CXX11_CLANG_OBJC_DIRECT`
+* `C2X_CLANG_OBJC_DIRECT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCDirectMembersAttrSpelling"></a>ObjCDirectMembersAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_DIRECT_MEMBERS`
+* `CXX11_CLANG_OBJC_DIRECT_MEMBERS`
+* `C2X_CLANG_OBJC_DIRECT_MEMBERS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCExceptionAttrSpelling"></a>ObjCExceptionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_EXCEPTION`
+* `CXX11_CLANG_OBJC_EXCEPTION`
+* `C2X_CLANG_OBJC_EXCEPTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCExplicitProtocolImplAttrSpelling"></a>ObjCExplicitProtocolImplAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION`
+* `CXX11_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION`
+* `C2X_CLANG_OBJC_PROTOCOL_REQUIRES_EXPLICIT_IMPLEMENTATION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCExternallyRetainedAttrSpelling"></a>ObjCExternallyRetainedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_EXTERNALLY_RETAINED`
+* `CXX11_CLANG_OBJC_EXTERNALLY_RETAINED`
+* `C2X_CLANG_OBJC_EXTERNALLY_RETAINED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCGCAttrSpelling"></a>ObjCGCAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_GC`
+* `CXX11_CLANG_OBJC_GC`
+* `C2X_CLANG_OBJC_GC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCIndependentClassAttrSpelling"></a>ObjCIndependentClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_INDEPENDENT_CLASS`
+* `CXX11_CLANG_OBJC_INDEPENDENT_CLASS`
+* `C2X_CLANG_OBJC_INDEPENDENT_CLASS`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -784,6 +3170,85 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="ObjCMethodFamilyAttrFamilyKind"></a>ObjCMethodFamilyAttrFamilyKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `ALLOC`
+* `COPY`
+* `INITIALIZER`
+* `MUTABLE_COPY`
+* `NEW`
+
+</details>
+
+<details><summary><a name="ObjCMethodFamilyAttrSpelling"></a>ObjCMethodFamilyAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_METHOD_FAMILY`
+* `CXX11_CLANG_OBJC_METHOD_FAMILY`
+* `C2X_CLANG_OBJC_METHOD_FAMILY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCNSObjectAttrSpelling"></a>ObjCNSObjectAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNUNS_OBJECT`
+* `CXX11_CLANG_NS_OBJECT`
+* `C2X_CLANG_NS_OBJECT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCNonLazyClassAttrSpelling"></a>ObjCNonLazyClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_NONLAZY_CLASS`
+* `CXX11_CLANG_OBJC_NONLAZY_CLASS`
+* `C2X_CLANG_OBJC_NONLAZY_CLASS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCNonRuntimeProtocolAttrSpelling"></a>ObjCNonRuntimeProtocolAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_NON_RUNTIME_PROTOCOL`
+* `CXX11_CLANG_OBJC_NON_RUNTIME_PROTOCOL`
+* `C2X_CLANG_OBJC_NON_RUNTIME_PROTOCOL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCOwnershipAttrSpelling"></a>ObjCOwnershipAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_OWNERSHIP`
+* `CXX11_CLANG_OBJC_OWNERSHIP`
+* `C2X_CLANG_OBJC_OWNERSHIP`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCPreciseLifetimeAttrSpelling"></a>ObjCPreciseLifetimeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_PRECISE_LIFETIME`
+* `CXX11_CLANG_OBJC_PRECISE_LIFETIME`
+* `C2X_CLANG_OBJC_PRECISE_LIFETIME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="ObjCPropertyDeclPropertyControl"></a>ObjCPropertyDeclPropertyControl</summary>
 
 Available enumerations:
@@ -814,6 +3279,322 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="ObjCRequiresPropertyDefsAttrSpelling"></a>ObjCRequiresPropertyDefsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_REQUIRES_PROPERTY_DEFINITIONS`
+* `CXX11_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS`
+* `C2X_CLANG_OBJC_REQUIRES_PROPERTY_DEFINITIONS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRequiresSuperAttrSpelling"></a>ObjCRequiresSuperAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_REQUIRES_SUPER`
+* `CXX11_CLANG_OBJC_REQUIRES_SUPER`
+* `C2X_CLANG_OBJC_REQUIRES_SUPER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCReturnsInnerPointerAttrSpelling"></a>ObjCReturnsInnerPointerAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_RETURNS_INNER_POINTER`
+* `CXX11_CLANG_OBJC_RETURNS_INNER_POINTER`
+* `C2X_CLANG_OBJC_RETURNS_INNER_POINTER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRootClassAttrSpelling"></a>ObjCRootClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_ROOT_CLASS`
+* `CXX11_CLANG_OBJC_ROOT_CLASS`
+* `C2X_CLANG_OBJC_ROOT_CLASS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRuntimeNameAttrSpelling"></a>ObjCRuntimeNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_RUNTIME_NAME`
+* `CXX11_CLANG_OBJC_RUNTIME_NAME`
+* `C2X_CLANG_OBJC_RUNTIME_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCRuntimeVisibleAttrSpelling"></a>ObjCRuntimeVisibleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_RUNTIME_VISIBLE`
+* `CXX11_CLANG_OBJC_RUNTIME_VISIBLE`
+* `C2X_CLANG_OBJC_RUNTIME_VISIBLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ObjCSubclassingRestrictedAttrSpelling"></a>ObjCSubclassingRestrictedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OBJC_SUBCLASSING_RESTRICTED`
+* `CXX11_CLANG_OBJC_SUBCLASSING_RESTRICTED`
+* `C2X_CLANG_OBJC_SUBCLASSING_RESTRICTED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLAccessAttrSpelling"></a>OpenCLAccessAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_READ_ONLY`
+* `KEYWORD_WRITE_ONLY`
+* `KEYWORD_READ_WRITE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLConstantAddressSpaceAttrSpelling"></a>OpenCLConstantAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_CONSTANT`
+* `GNU_OPENCL_CONSTANT`
+* `CXX11_CLANG_OPENCL_CONSTANT`
+* `C2X_CLANG_OPENCL_CONSTANT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGenericAddressSpaceAttrSpelling"></a>OpenCLGenericAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_GENERIC`
+* `GNU_OPENCL_GENERIC`
+* `CXX11_CLANG_OPENCL_GENERIC`
+* `C2X_CLANG_OPENCL_GENERIC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGlobalAddressSpaceAttrSpelling"></a>OpenCLGlobalAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_GLOBAL`
+* `GNU_OPENCL_GLOBAL`
+* `CXX11_CLANG_OPENCL_GLOBAL`
+* `C2X_CLANG_OPENCL_GLOBAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGlobalDeviceAddressSpaceAttrSpelling"></a>OpenCLGlobalDeviceAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OPENCL_GLOBAL_DEVICE`
+* `CXX11_CLANG_OPENCL_GLOBAL_DEVICE`
+* `C2X_CLANG_OPENCL_GLOBAL_DEVICE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLGlobalHostAddressSpaceAttrSpelling"></a>OpenCLGlobalHostAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OPENCL_GLOBAL_HOST`
+* `CXX11_CLANG_OPENCL_GLOBAL_HOST`
+* `C2X_CLANG_OPENCL_GLOBAL_HOST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLKernelAttrSpelling"></a>OpenCLKernelAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_KERNEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLLocalAddressSpaceAttrSpelling"></a>OpenCLLocalAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_LOCAL`
+* `GNU_OPENCL_LOCAL`
+* `CXX11_CLANG_OPENCL_LOCAL`
+* `C2X_CLANG_OPENCL_LOCAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OpenCLPrivateAddressSpaceAttrSpelling"></a>OpenCLPrivateAddressSpaceAttrSpelling</summary>
+
+Available enumerations:
+
+* `KEYWORD_PRIVATE`
+* `GNU_OPENCL_PRIVATE`
+* `CXX11_CLANG_OPENCL_PRIVATE`
+* `C2X_CLANG_OPENCL_PRIVATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OptimizeNoneAttrSpelling"></a>OptimizeNoneAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OPTNONE`
+* `CXX11_CLANG_OPTNONE`
+* `C2X_CLANG_OPTNONE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OverloadableAttrSpelling"></a>OverloadableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OVERLOADABLE`
+* `CXX11_CLANG_OVERLOADABLE`
+* `C2X_CLANG_OVERLOADABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="OwnershipAttrOwnershipKind"></a>OwnershipAttrOwnershipKind</summary>
+
+Available enumerations:
+
+* `HOLDS`
+* `RETURNS`
+* `TAKES`
+
+</details>
+
+<details><summary><a name="OwnershipAttrSpelling"></a>OwnershipAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_OWNERSHIP_HOLDS`
+* `CXX11_CLANG_OWNERSHIP_HOLDS`
+* `C2X_CLANG_OWNERSHIP_HOLDS`
+* `GNU_OWNERSHIP_RETURNS`
+* `CXX11_CLANG_OWNERSHIP_RETURNS`
+* `C2X_CLANG_OWNERSHIP_RETURNS`
+* `GNU_OWNERSHIP_TAKES`
+* `CXX11_CLANG_OWNERSHIP_TAKES`
+* `C2X_CLANG_OWNERSHIP_TAKES`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PackedAttrSpelling"></a>PackedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PACKED`
+* `CXX11_GNU_PACKED`
+* `C2X_GNU_PACKED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ParamTypestateAttrConsumedState"></a>ParamTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="ParamTypestateAttrSpelling"></a>ParamTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PARAMETER_TYPESTATE`
+* `CXX11_CLANG_PARAMETER_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PascalAttrSpelling"></a>PascalAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PASCAL`
+* `CXX11_CLANG_PASCAL`
+* `C2X_CLANG_PASCAL`
+* `KEYWORD_PASCAL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PassObjectSizeAttrSpelling"></a>PassObjectSizeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PASS_OBJECT_SIZE`
+* `CXX11_CLANG_PASS_OBJECT_SIZE`
+* `C2X_CLANG_PASS_OBJECT_SIZE`
+* `GNU_PASS_DYNAMIC_OBJECT_SIZE`
+* `CXX11_CLANG_PASS_DYNAMIC_OBJECT_SIZE`
+* `C2X_CLANG_PASS_DYNAMIC_OBJECT_SIZE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PatchableFunctionEntryAttrSpelling"></a>PatchableFunctionEntryAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PATCHABLE_FUNCTION_ENTRY`
+* `CXX11_GNU_PATCHABLE_FUNCTION_ENTRY`
+* `C2X_GNU_PATCHABLE_FUNCTION_ENTRY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PcsAttrPCSType"></a>PcsAttrPCSType</summary>
+
+Available enumerations:
+
+* `AAPCS`
+* `VFP`
+
+</details>
+
+<details><summary><a name="PcsAttrSpelling"></a>PcsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PCS`
+* `CXX11_GNU_PCS`
+* `C2X_GNU_PCS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="PredefinedExprIdentKind"></a>PredefinedExprIdentKind</summary>
 
 Available enumerations:
@@ -826,6 +3607,59 @@ Available enumerations:
 * `L_FUNC_SIG`
 * `PRETTY_FUNCTION`
 * `PRETTY_FUNCTION_NO_VIRTUAL`
+
+</details>
+
+<details><summary><a name="PreferredNameAttrSpelling"></a>PreferredNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PREFERRED_NAME`
+* `CXX11_CLANG_PREFERRED_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PreserveAllAttrSpelling"></a>PreserveAllAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PRESERVE_ALL`
+* `CXX11_CLANG_PRESERVE_ALL`
+* `C2X_CLANG_PRESERVE_ALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PreserveMostAttrSpelling"></a>PreserveMostAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PRESERVE_MOST`
+* `CXX11_CLANG_PRESERVE_MOST`
+* `C2X_CLANG_PRESERVE_MOST`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PtGuardedVarAttrSpelling"></a>PtGuardedVarAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PT_GUARDED_VARIABLE`
+* `CXX11_CLANG_PT_GUARDED_VARIABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="PureAttrSpelling"></a>PureAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_PURE`
+* `CXX11_GNU_PURE`
+* `C2X_GNU_PURE`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -864,6 +3698,27 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="RISCVInterruptAttrInterruptType"></a>RISCVInterruptAttrInterruptType</summary>
+
+Available enumerations:
+
+* `USER`
+* `SUPERVISOR`
+* `MACHINE`
+
+</details>
+
+<details><summary><a name="RISCVInterruptAttrSpelling"></a>RISCVInterruptAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_INTERRUPT`
+* `CXX11_GNU_INTERRUPT`
+* `C2X_GNU_INTERRUPT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="RecordDeclArgPassingKind"></a>RecordDeclArgPassingKind</summary>
 
 Available enumerations:
@@ -871,6 +3726,223 @@ Available enumerations:
 * `CAN_PASS_IN_REGS`
 * `CANNOT_PASS_IN_REGS`
 * `CAN_NEVER_PASS_IN_REGS`
+
+</details>
+
+<details><summary><a name="RegCallAttrSpelling"></a>RegCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_REGCALL`
+* `CXX11_GNU_REGCALL`
+* `C2X_GNU_REGCALL`
+* `KEYWORD_REGCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReinitializesAttrSpelling"></a>ReinitializesAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_REINITIALIZES`
+* `CXX11_CLANG_REINITIALIZES`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReleaseCapabilityAttrSpelling"></a>ReleaseCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RELEASE_CAPABILITY`
+* `CXX11_CLANG_RELEASE_CAPABILITY`
+* `GNU_RELEASE_SHARED_CAPABILITY`
+* `CXX11_CLANG_RELEASE_SHARED_CAPABILITY`
+* `GNU_RELEASE_GENERIC_CAPABILITY`
+* `CXX11_CLANG_RELEASE_GENERIC_CAPABILITY`
+* `GNU_UNLOCK_FUNCTION`
+* `CXX11_CLANG_UNLOCK_FUNCTION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReleaseHandleAttrSpelling"></a>ReleaseHandleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RELEASE_HANDLE`
+* `CXX11_CLANG_RELEASE_HANDLE`
+* `C2X_CLANG_RELEASE_HANDLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="RequiresCapabilityAttrSpelling"></a>RequiresCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_REQUIRES_CAPABILITY`
+* `CXX11_CLANG_REQUIRES_CAPABILITY`
+* `GNU_EXCLUSIVE_LOCKS_REQUIRED`
+* `CXX11_CLANG_EXCLUSIVE_LOCKS_REQUIRED`
+* `GNU_REQUIRES_SHARED_CAPABILITY`
+* `CXX11_CLANG_REQUIRES_SHARED_CAPABILITY`
+* `GNU_SHARED_LOCKS_REQUIRED`
+* `CXX11_CLANG_SHARED_LOCKS_REQUIRED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="RestrictAttrSpelling"></a>RestrictAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_RESTRICT`
+* `GNU_MALLOC`
+* `CXX11_GNU_MALLOC`
+* `C2X_GNU_MALLOC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="RetainAttrSpelling"></a>RetainAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETAIN`
+* `CXX11_GNU_RETAIN`
+* `C2X_GNU_RETAIN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReturnTypestateAttrConsumedState"></a>ReturnTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="ReturnTypestateAttrSpelling"></a>ReturnTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETURN_TYPESTATE`
+* `CXX11_CLANG_RETURN_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReturnsNonNullAttrSpelling"></a>ReturnsNonNullAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETURNS_NONNULL`
+* `CXX11_GNU_RETURNS_NONNULL`
+* `C2X_GNU_RETURNS_NONNULL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ReturnsTwiceAttrSpelling"></a>ReturnsTwiceAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_RETURNS_TWICE`
+* `CXX11_GNU_RETURNS_TWICE`
+* `C2X_GNU_RETURNS_TWICE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SYCLKernelAttrSpelling"></a>SYCLKernelAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SYCL_KERNEL`
+* `CXX11_CLANG_SYCL_KERNEL`
+* `C2X_CLANG_SYCL_KERNEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SYCLSpecialClassAttrSpelling"></a>SYCLSpecialClassAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SYCL_SPECIAL_CLASS`
+* `CXX11_CLANG_SYCL_SPECIAL_CLASS`
+* `C2X_CLANG_SYCL_SPECIAL_CLASS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ScopedLockableAttrSpelling"></a>ScopedLockableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SCOPED_LOCKABLE`
+* `CXX11_CLANG_SCOPED_LOCKABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SectionAttrSpelling"></a>SectionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SECTION`
+* `CXX11_GNU_SECTION`
+* `C2X_GNU_SECTION`
+* `DECLSPEC_ALLOCATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SelectAnyAttrSpelling"></a>SelectAnyAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_SELECTANY`
+* `GNU_SELECTANY`
+* `CXX11_GNU_SELECTANY`
+* `C2X_GNU_SELECTANY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SentinelAttrSpelling"></a>SentinelAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SENTINEL`
+* `CXX11_GNU_SENTINEL`
+* `C2X_GNU_SENTINEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SetTypestateAttrConsumedState"></a>SetTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `UNKNOWN`
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="SetTypestateAttrSpelling"></a>SetTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TYPESTATE`
+* `CXX11_CLANG_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -882,6 +3954,39 @@ Available enumerations:
 * `FILE`
 * `LINE`
 * `COLUMN`
+
+</details>
+
+<details><summary><a name="SpeculativeLoadHardeningAttrSpelling"></a>SpeculativeLoadHardeningAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SPECULATIVE_LOAD_HARDENING`
+* `CXX11_CLANG_SPECULATIVE_LOAD_HARDENING`
+* `C2X_CLANG_SPECULATIVE_LOAD_HARDENING`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="StandaloneDebugAttrSpelling"></a>StandaloneDebugAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_STANDALONE_DEBUG`
+* `CXX11_CLANG_STANDALONE_DEBUG`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="StdCallAttrSpelling"></a>StdCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_STDCALL`
+* `CXX11_GNU_STDCALL`
+* `C2X_GNU_STDCALL`
+* `KEYWORD_STDCALL`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1136,6 +4241,190 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="SwiftAsyncAttrKind"></a>SwiftAsyncAttrKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `SWIFT_PRIVATE`
+* `NOT_SWIFT_PRIVATE`
+
+</details>
+
+<details><summary><a name="SwiftAsyncAttrSpelling"></a>SwiftAsyncAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ASYNC`
+* `CXX11_CLANG_SWIFT_ASYNC`
+* `C2X_CLANG_SWIFT_ASYNC`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftAsyncCallAttrSpelling"></a>SwiftAsyncCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFTASYNCCALL`
+* `CXX11_CLANG_SWIFTASYNCCALL`
+* `C2X_CLANG_SWIFTASYNCCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftAsyncContextAttrSpelling"></a>SwiftAsyncContextAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ASYNC_CONTEXT`
+* `CXX11_CLANG_SWIFT_ASYNC_CONTEXT`
+* `C2X_CLANG_SWIFT_ASYNC_CONTEXT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftAsyncErrorAttrConventionKind"></a>SwiftAsyncErrorAttrConventionKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `NON_NULL_ERROR`
+* `ZERO_ARGUMENT`
+* `NON_ZERO_ARGUMENT`
+
+</details>
+
+<details><summary><a name="SwiftAsyncErrorAttrSpelling"></a>SwiftAsyncErrorAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ASYNC_ERROR`
+* `CXX11_CLANG_SWIFT_ASYNC_ERROR`
+* `C2X_CLANG_SWIFT_ASYNC_ERROR`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftCallAttrSpelling"></a>SwiftCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFTCALL`
+* `CXX11_CLANG_SWIFTCALL`
+* `C2X_CLANG_SWIFTCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftContextAttrSpelling"></a>SwiftContextAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_CONTEXT`
+* `CXX11_CLANG_SWIFT_CONTEXT`
+* `C2X_CLANG_SWIFT_CONTEXT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftErrorAttrConventionKind"></a>SwiftErrorAttrConventionKind</summary>
+
+Available enumerations:
+
+* `NONE`
+* `NON_NULL_ERROR`
+* `NULL_RESULT`
+* `ZERO_RESULT`
+* `NON_ZERO_RESULT`
+
+</details>
+
+<details><summary><a name="SwiftErrorResultAttrSpelling"></a>SwiftErrorResultAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_ERROR_RESULT`
+* `CXX11_CLANG_SWIFT_ERROR_RESULT`
+* `C2X_CLANG_SWIFT_ERROR_RESULT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftIndirectResultAttrSpelling"></a>SwiftIndirectResultAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_INDIRECT_RESULT`
+* `CXX11_CLANG_SWIFT_INDIRECT_RESULT`
+* `C2X_CLANG_SWIFT_INDIRECT_RESULT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SwiftNewTypeAttrNewtypeKind"></a>SwiftNewTypeAttrNewtypeKind</summary>
+
+Available enumerations:
+
+* `STRUCT`
+* `ENUM`
+
+</details>
+
+<details><summary><a name="SwiftNewTypeAttrSpelling"></a>SwiftNewTypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SWIFT_NEWTYPE`
+* `GNU_SWIFT_WRAPPER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="SysVABIAttrSpelling"></a>SysVABIAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_SYSV_ABI`
+* `CXX11_GNU_SYSV_ABI`
+* `C2X_GNU_SYSV_ABI`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TLSModelAttrSpelling"></a>TLSModelAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TLS_MODEL`
+* `CXX11_GNU_TLS_MODEL`
+* `C2X_GNU_TLS_MODEL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TargetAttrSpelling"></a>TargetAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TARGET`
+* `CXX11_GNU_TARGET`
+* `C2X_GNU_TARGET`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TargetClonesAttrSpelling"></a>TargetClonesAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TARGET_CLONES`
+* `CXX11_GNU_TARGET_CLONES`
+* `C2X_GNU_TARGET_CLONES`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="TemplateArgumentKind"></a>TemplateArgumentKind</summary>
 
 Available enumerations:
@@ -1149,6 +4438,70 @@ Available enumerations:
 * `TEMPLATE_EXPANSION`
 * `EXPRESSION`
 * `PACK`
+
+</details>
+
+<details><summary><a name="TestTypestateAttrConsumedState"></a>TestTypestateAttrConsumedState</summary>
+
+Available enumerations:
+
+* `CONSUMED`
+* `UNCONSUMED`
+
+</details>
+
+<details><summary><a name="TestTypestateAttrSpelling"></a>TestTypestateAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TEST_TYPESTATE`
+* `CXX11_CLANG_TEST_TYPESTATE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="ThisCallAttrSpelling"></a>ThisCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_THISCALL`
+* `CXX11_GNU_THISCALL`
+* `C2X_GNU_THISCALL`
+* `KEYWORD_THISCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TransparentUnionAttrSpelling"></a>TransparentUnionAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TRANSPARENT_UNION`
+* `CXX11_GNU_TRANSPARENT_UNION`
+* `C2X_GNU_TRANSPARENT_UNION`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TrivialABIAttrSpelling"></a>TrivialABIAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TRIVIAL_ABI`
+* `CXX11_CLANG_TRIVIAL_ABI`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TryAcquireCapabilityAttrSpelling"></a>TryAcquireCapabilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TRY_ACQUIRE_CAPABILITY`
+* `CXX11_CLANG_TRY_ACQUIRE_CAPABILITY`
+* `GNU_TRY_ACQUIRE_SHARED_CAPABILITY`
+* `CXX11_CLANG_TRY_ACQUIRE_SHARED_CAPABILITY`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1229,11 +4582,122 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="TypeTagForDatatypeAttrSpelling"></a>TypeTagForDatatypeAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TYPE_TAG_FOR_DATATYPE`
+* `CXX11_CLANG_TYPE_TAG_FOR_DATATYPE`
+* `C2X_CLANG_TYPE_TAG_FOR_DATATYPE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TypeVisibilityAttrSpelling"></a>TypeVisibilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_TYPE_VISIBILITY`
+* `CXX11_CLANG_TYPE_VISIBILITY`
+* `C2X_CLANG_TYPE_VISIBILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="TypeVisibilityAttrVisibilityType"></a>TypeVisibilityAttrVisibilityType</summary>
+
+Available enumerations:
+
+* `DEFAULT`
+* `HIDDEN`
+* `PROTECTED`
+
+</details>
+
 <details><summary><a name="UnaryTransformTypeUTTKind"></a>UnaryTransformTypeUTTKind</summary>
 
 Available enumerations:
 
 * `ENUM_UNDERLYING_TYPE`
+
+</details>
+
+<details><summary><a name="UnavailableAttrImplicitReason"></a>UnavailableAttrImplicitReason</summary>
+
+Available enumerations:
+
+* `NONE`
+* `ARC_FORBIDDEN_TYPE`
+* `FORBIDDEN_WEAK`
+* `ARC_FORBIDDEN_CONVERSION`
+* `ARC_INIT_RETURNS_UNRELATED`
+* `ARC_FIELD_WITH_OWNERSHIP`
+
+</details>
+
+<details><summary><a name="UnavailableAttrSpelling"></a>UnavailableAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_UNAVAILABLE`
+* `CXX11_CLANG_UNAVAILABLE`
+* `C2X_CLANG_UNAVAILABLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UninitializedAttrSpelling"></a>UninitializedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_UNINITIALIZED`
+* `CXX11_CLANG_UNINITIALIZED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UnlikelyAttrSpelling"></a>UnlikelyAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_UNLIKELY`
+* `C2X_CLANG_UNLIKELY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UnusedAttrSpelling"></a>UnusedAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_MAYBE_UNUSED`
+* `GNU_UNUSED`
+* `CXX11_GNU_UNUSED`
+* `C2X_GNU_UNUSED`
+* `C2X_MAYBE_UNUSED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UseHandleAttrSpelling"></a>UseHandleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_USE_HANDLE`
+* `CXX11_CLANG_USE_HANDLE`
+* `C2X_CLANG_USE_HANDLE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UsedAttrSpelling"></a>UsedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_USED`
+* `CXX11_GNU_USED`
+* `C2X_GNU_USED`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1247,6 +4711,26 @@ Available enumerations:
 * `FLOATING`
 * `STRING`
 * `CHARACTER`
+
+</details>
+
+<details><summary><a name="UsingIfExistsAttrSpelling"></a>UsingIfExistsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_USING_IF_EXISTS`
+* `CXX11_CLANG_USING_IF_EXISTS`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="UuidAttrSpelling"></a>UuidAttrSpelling</summary>
+
+Available enumerations:
+
+* `DECLSPEC_UUID`
+* `MICROSOFT_UUID`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1280,6 +4764,28 @@ Available enumerations:
 
 </details>
 
+<details><summary><a name="VecReturnAttrSpelling"></a>VecReturnAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_VECRETURN`
+* `CXX11_CLANG_VECRETURN`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="VectorCallAttrSpelling"></a>VectorCallAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_VECTORCALL`
+* `CXX11_CLANG_VECTORCALL`
+* `C2X_CLANG_VECTORCALL`
+* `KEYWORD_VECTORCALL`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
 <details><summary><a name="VectorTypeVectorKind"></a>VectorTypeVectorKind</summary>
 
 Available enumerations:
@@ -1292,6 +4798,154 @@ Available enumerations:
 * `NEON_POLY_VECTOR`
 * `SVE_FIXED_LENGTH_DATA_VECTOR`
 * `SVE_FIXED_LENGTH_PREDICATE_VECTOR`
+
+</details>
+
+<details><summary><a name="VisibilityAttrSpelling"></a>VisibilityAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_VISIBILITY`
+* `CXX11_GNU_VISIBILITY`
+* `C2X_GNU_VISIBILITY`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="VisibilityAttrVisibilityType"></a>VisibilityAttrVisibilityType</summary>
+
+Available enumerations:
+
+* `DEFAULT`
+* `HIDDEN`
+* `PROTECTED`
+
+</details>
+
+<details><summary><a name="WarnUnusedAttrSpelling"></a>WarnUnusedAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WARN_UNUSED`
+* `CXX11_GNU_WARN_UNUSED`
+* `C2X_GNU_WARN_UNUSED`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WarnUnusedResultAttrSpelling"></a>WarnUnusedResultAttrSpelling</summary>
+
+Available enumerations:
+
+* `CXX11_NODISCARD`
+* `C2X_NODISCARD`
+* `CXX11_CLANG_WARN_UNUSED_RESULT`
+* `GNU_WARN_UNUSED_RESULT`
+* `CXX11_GNU_WARN_UNUSED_RESULT`
+* `C2X_GNU_WARN_UNUSED_RESULT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WeakAttrSpelling"></a>WeakAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WEAK`
+* `CXX11_GNU_WEAK`
+* `C2X_GNU_WEAK`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WeakImportAttrSpelling"></a>WeakImportAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WEAK_IMPORT`
+* `CXX11_CLANG_WEAK_IMPORT`
+* `C2X_CLANG_WEAK_IMPORT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WeakRefAttrSpelling"></a>WeakRefAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_WEAKREF`
+* `CXX11_GNU_WEAKREF`
+* `C2X_GNU_WEAKREF`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WebAssemblyExportNameAttrSpelling"></a>WebAssemblyExportNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_EXPORT_NAME`
+* `CXX11_CLANG_EXPORT_NAME`
+* `C2X_CLANG_EXPORT_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WebAssemblyImportModuleAttrSpelling"></a>WebAssemblyImportModuleAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IMPORT_MODULE`
+* `CXX11_CLANG_IMPORT_MODULE`
+* `C2X_CLANG_IMPORT_MODULE`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="WebAssemblyImportNameAttrSpelling"></a>WebAssemblyImportNameAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_IMPORT_NAME`
+* `CXX11_CLANG_IMPORT_NAME`
+* `C2X_CLANG_IMPORT_NAME`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="X86ForceAlignArgPointerAttrSpelling"></a>X86ForceAlignArgPointerAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_FORCE_ALIGN_ARGUMENT_POINTER`
+* `CXX11_GNU_FORCE_ALIGN_ARGUMENT_POINTER`
+* `C2X_GNU_FORCE_ALIGN_ARGUMENT_POINTER`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="XRayInstrumentAttrSpelling"></a>XRayInstrumentAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_XRAY_ALWAYS_INSTRUMENT`
+* `CXX11_CLANG_XRAY_ALWAYS_INSTRUMENT`
+* `C2X_CLANG_XRAY_ALWAYS_INSTRUMENT`
+* `GNU_XRAY_NEVER_INSTRUMENT`
+* `CXX11_CLANG_XRAY_NEVER_INSTRUMENT`
+* `C2X_CLANG_XRAY_NEVER_INSTRUMENT`
+* `SPELLING_NOT_CALCULATED`
+
+</details>
+
+<details><summary><a name="XRayLogArgsAttrSpelling"></a>XRayLogArgsAttrSpelling</summary>
+
+Available enumerations:
+
+* `GNU_XRAY_LOG_ARGUMENTS`
+* `CXX11_CLANG_XRAY_LOG_ARGUMENTS`
+* `C2X_CLANG_XRAY_LOG_ARGUMENTS`
+* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -1333,23 +4987,6 @@ Available enumerations:
 * `REQUIRED_BY_TYPEDEF`
 * `REQUIRED_BY_RECORD`
 * `REQUIRED_BY_ENUM`
-
-</details>
-
-<details><summary><a name="AllocatorTypeTy"></a>AllocatorTypeTy</summary>
-
-Available enumerations:
-
-* `OMP_NULL_MEMORY_ALLOC`
-* `OMP_DEFAULT_MEMORY_ALLOC`
-* `OMP_LARGE_CAP_MEMORY_ALLOC`
-* `OMP_CONST_MEMORY_ALLOC`
-* `OMP_HIGH_BW_MEMORY_ALLOC`
-* `OMP_LOW_LAT_MEMORY_ALLOC`
-* `OMPC_GROUP_MEMORY_ALLOC`
-* `OMPP_TEAM_MEMORY_ALLOC`
-* `OMP_THREAD_MEMORY_ALLOC`
-* `OMP_USER_DEFINED_MEMORY_ALLOC`
 
 </details>
 
@@ -1401,361 +5038,6 @@ Available enumerations:
 * `NONE`
 * `OPEN_CL`
 * `HIP`
-
-</details>
-
-<details><summary><a name="AttributeKind"></a>AttributeKind</summary>
-
-Available enumerations:
-
-* `ADDRESS_SPACE`
-* `ARM_MVE_STRICT_POLYMORPHISM`
-* `BTF_TYPE_TAG`
-* `CMSE_NS_CALL`
-* `NO_DEREF`
-* `OBJ_CGC`
-* `OBJ_C_INERT_UNSAFE_UNRETAINED`
-* `OBJ_C_KIND_OF`
-* `OPEN_CL_CONSTANT_ADDRESS_SPACE`
-* `OPEN_CL_GENERIC_ADDRESS_SPACE`
-* `OPEN_CL_GLOBAL_ADDRESS_SPACE`
-* `OPEN_CL_GLOBAL_DEVICE_ADDRESS_SPACE`
-* `OPEN_CL_GLOBAL_HOST_ADDRESS_SPACE`
-* `OPEN_CL_LOCAL_ADDRESS_SPACE`
-* `OPEN_CL_PRIVATE_ADDRESS_SPACE`
-* `PTR32`
-* `PTR64`
-* `S_PTR`
-* `TYPE_NON_NULL`
-* `TYPE_NULL_UNSPECIFIED`
-* `TYPE_NULLABLE`
-* `TYPE_NULLABLE_RESULT`
-* `U_PTR`
-* `FALL_THROUGH`
-* `LIKELY`
-* `MUST_TAIL`
-* `OPEN_CL_UNROLL_HINT`
-* `SUPPRESS`
-* `UNLIKELY`
-* `NO_MERGE`
-* `A_ARCH64_VECTOR_PCS`
-* `ACQUIRE_HANDLE`
-* `ANY_X86_NO_CF_CHECK`
-* `C_DECL`
-* `FAST_CALL`
-* `INTEL_OCL_BICC`
-* `LIFETIME_BOUND`
-* `MSABI`
-* `NS_RETURNS_RETAINED`
-* `OBJ_C_OWNERSHIP`
-* `PASCAL`
-* `PCS`
-* `PRESERVE_ALL`
-* `PRESERVE_MOST`
-* `REG_CALL`
-* `STD_CALL`
-* `SWIFT_ASYNC_CALL`
-* `SWIFT_CALL`
-* `SYS_VABI`
-* `THIS_CALL`
-* `VECTOR_CALL`
-* `SWIFT_ASYNC_CONTEXT`
-* `SWIFT_CONTEXT`
-* `SWIFT_ERROR_RESULT`
-* `SWIFT_INDIRECT_RESULT`
-* `ANNOTATE`
-* `CF_CONSUMED`
-* `CARRIES_DEPENDENCY`
-* `NS_CONSUMED`
-* `NON_NULL`
-* `OS_CONSUMED`
-* `PASS_OBJECT_SIZE`
-* `RELEASE_HANDLE`
-* `USE_HANDLE`
-* `AMDGPU_FLAT_WORK_GROUP_SIZE`
-* `AMDGPU_NUM_SGPR`
-* `AMDGPU_NUM_VGPR`
-* `AMDGPU_WAVES_PER_EU`
-* `ARM_INTERRUPT`
-* `AVR_INTERRUPT`
-* `AVR_SIGNAL`
-* `ACQUIRE_CAPABILITY`
-* `ACQUIRED_AFTER`
-* `ACQUIRED_BEFORE`
-* `ALIGN_MAC68_K`
-* `ALIGN_NATURAL`
-* `ALIGNED`
-* `ALLOC_ALIGN`
-* `ALLOC_SIZE`
-* `ALWAYS_DESTROY`
-* `ALWAYS_INLINE`
-* `ANALYZER_NO_RETURN`
-* `ANY_X86_INTERRUPT`
-* `ANY_X86_NO_CALLER_SAVED_REGISTERS`
-* `ARC_WEAKREF_UNAVAILABLE`
-* `ARGUMENT_WITH_TYPE_TAG`
-* `ARM_BUILTIN_ALIAS`
-* `ARTIFICIAL`
-* `ASSEMBLY_LABEL`
-* `ASSERT_CAPABILITY`
-* `ASSERT_EXCLUSIVE_LOCK`
-* `ASSERT_SHARED_LOCK`
-* `ASSUME_ALIGNED`
-* `ASSUMPTION`
-* `AVAILABILITY`
-* `BPF_PRESERVE_ACCESS_INDEX`
-* `BTF_DECL_TAG`
-* `BLOCKS`
-* `BUILTIN`
-* `C11_NO_RETURN`
-* `CF_AUDITED_TRANSFER`
-* `CF_GUARD`
-* `CFI_CANONICAL_JUMP_TABLE`
-* `CF_RETURNS_NOT_RETAINED`
-* `CF_RETURNS_RETAINED`
-* `CF_UNKNOWN_TRANSFER`
-* `CPU_DISPATCH`
-* `CPU_SPECIFIC`
-* `CUDA_CONSTANT`
-* `CUDA_DEVICE`
-* `CUDA_DEVICE_BUILTIN_SURFACE_TYPE`
-* `CUDA_DEVICE_BUILTIN_TEXTURE_TYPE`
-* `CUDA_GLOBAL`
-* `CUDA_HOST`
-* `CUDA_INVALID_TARGET`
-* `CUDA_LAUNCH_BOUNDS`
-* `CUDA_SHARED`
-* `CXX11_NO_RETURN`
-* `CALLABLE_WHEN`
-* `CALLBACK`
-* `CAPABILITY`
-* `CAPTURED_RECORD`
-* `CLEANUP`
-* `CMSE_NS_ENTRY`
-* `CODE_SEG`
-* `COLD`
-* `COMMON`
-* `CONST`
-* `CONST_INITIALIZER`
-* `CONSTRUCTOR`
-* `CONSUMABLE`
-* `CONSUMABLE_AUTO_CAST`
-* `CONSUMABLE_SET_ON_READ`
-* `CONVERGENT`
-* `DLL_EXPORT`
-* `DLL_EXPORT_STATIC_LOCAL`
-* `DLL_IMPORT`
-* `DLL_IMPORT_STATIC_LOCAL`
-* `DEPRECATED`
-* `DESTRUCTOR`
-* `DIAGNOSE_AS_BUILTIN`
-* `DIAGNOSE_IF`
-* `DISABLE_SANITIZER_INSTRUMENTATION`
-* `DISABLE_TAIL_CALLS`
-* `EMPTY_BASES`
-* `ENABLE_IF`
-* `ENFORCE_TCB`
-* `ENFORCE_TCB_LEAF`
-* `ENUM_EXTENSIBILITY`
-* `ERROR`
-* `EXCLUDE_FROM_EXPLICIT_INSTANTIATION`
-* `EXCLUSIVE_TRYLOCK_FUNCTION`
-* `EXTERNAL_SOURCE_SYMBOL`
-* `FINAL`
-* `FLAG_ENUM`
-* `FLATTEN`
-* `FORMAT`
-* `FORMAT_ARGUMENT`
-* `GNU_INLINE`
-* `GUARDED_BY`
-* `GUARDED_VARIABLE`
-* `HIP_MANAGED`
-* `HOT`
-* `IB_ACTION`
-* `IB_OUTLET`
-* `IB_OUTLET_COLLECTION`
-* `INITIALIZER_PRIORITY`
-* `INTERNAL_LINKAGE`
-* `LTO_VISIBILITY_PUBLIC`
-* `LAYOUT_VERSION`
-* `LEAF`
-* `LOCK_RETURNED`
-* `LOCKS_EXCLUDED`
-* `M68_KINTERRUPT`
-* `MIG_SERVER_ROUTINE__`
-* `MS_ALLOCATOR`
-* `MS_INHERITANCE`
-* `MS_NO_V_TABLE`
-* `MSP430_INTERRUPT`
-* `MS_STRUCT`
-* `MS_VTOR_DISP`
-* `MAX_FIELD_ALIGNMENT`
-* `MAY_ALIAS`
-* `MICRO_MIPS`
-* `MIN_SIZE`
-* `MIN_VECTOR_WIDTH`
-* `MIPS16`
-* `MIPS_INTERRUPT`
-* `MIPS_LONG_CALL`
-* `MIPS_SHORT_CALL`
-* `NS_CONSUMES_SELF`
-* `NS_ERROR_DOMAIN`
-* `NS_RETURNS_AUTORELEASED`
-* `NS_RETURNS_NOT_RETAINED`
-* `NAKED`
-* `NO_ALIAS`
-* `NO_COMMON`
-* `NO_DEBUG`
-* `NO_DESTROY`
-* `NO_DUPLICATE`
-* `NO_INLINE`
-* `NO_INSTRUMENT_FUNCTION`
-* `NO_MICRO_MIPS`
-* `NO_MIPS16`
-* `NO_PROFILE_FUNCTION`
-* `NO_RETURN`
-* `NO_SANITIZE`
-* `NO_SPECULATIVE_LOAD_HARDENING`
-* `NO_SPLIT_STACK`
-* `NO_STACK_PROTECTOR`
-* `NO_THREAD_SAFETY_ANALYSIS`
-* `NO_THROW`
-* `NO_UNIQUE_ADDRESS`
-* `NOT_TAIL_CALLED`
-* `OMP_ALLOCATE_DECLARATION`
-* `OMP_CAPTURE_NO_INITIALIZER`
-* `OMP_DECLARE_TARGET_DECLARATION`
-* `OMP_DECLARE_VARIANT`
-* `OMP_THREAD_PRIVATE_DECLARATION`
-* `OS_CONSUMES_THIS`
-* `OS_RETURNS_NOT_RETAINED`
-* `OS_RETURNS_RETAINED`
-* `OS_RETURNS_RETAINED_ON_NON_ZERO`
-* `OS_RETURNS_RETAINED_ON_ZERO`
-* `OBJ_C_BRIDGE`
-* `OBJ_C_BRIDGE_MUTABLE`
-* `OBJ_C_BRIDGE_RELATED`
-* `OBJ_C_EXCEPTION`
-* `OBJ_C_EXPLICIT_PROTOCOL_IMPLEMENTATION`
-* `OBJ_C_EXTERNALLY_RETAINED`
-* `OBJ_C_INDEPENDENT_CLASS`
-* `OBJ_C_METHOD_FAMILY`
-* `OBJ_CNS_OBJECT`
-* `OBJ_C_PRECISE_LIFETIME`
-* `OBJ_C_REQUIRES_PROPERTY_DEFINITIONS`
-* `OBJ_C_REQUIRES_SUPER`
-* `OBJ_C_RETURNS_INNER_POINTER`
-* `OBJ_C_ROOT_CLASS`
-* `OBJ_C_SUBCLASSING_RESTRICTED`
-* `OPEN_CL_INTEL_REQD_SUB_GROUP_SIZE`
-* `OPEN_CL_KERNEL`
-* `OPTIMIZE_NONE`
-* `OVERRIDE`
-* `OWNER`
-* `OWNERSHIP`
-* `PACKED`
-* `PARAMETER_TYPESTATE`
-* `PATCHABLE_FUNCTION_ENTRY`
-* `POINTER`
-* `PRAGMA_CLANG_BSS_SECTION`
-* `PRAGMA_CLANG_DATA_SECTION`
-* `PRAGMA_CLANG_RELRO_SECTION`
-* `PRAGMA_CLANG_RODATA_SECTION`
-* `PRAGMA_CLANG_TEXT_SECTION`
-* `PREFERRED_NAME`
-* `PT_GUARDED_BY`
-* `PT_GUARDED_VARIABLE`
-* `PURE`
-* `RISCV_INTERRUPT`
-* `REINITIALIZES`
-* `RELEASE_CAPABILITY`
-* `REQD_WORK_GROUP_SIZE`
-* `REQUIRES_CAPABILITY`
-* `RESTRICT`
-* `RETAIN`
-* `RETURN_TYPESTATE`
-* `RETURNS_NON_NULL`
-* `RETURNS_TWICE`
-* `SYCL_KERNEL`
-* `SYCL_SPECIAL_CLASS`
-* `SCOPED_LOCKABLE`
-* `SECTION`
-* `SELECT_ANY`
-* `SENTINEL`
-* `SET_TYPESTATE`
-* `SHARED_TRYLOCK_FUNCTION`
-* `SPECULATIVE_LOAD_HARDENING`
-* `STANDALONE_DEBUG`
-* `STRICT_FP`
-* `SWIFT_ASYNC`
-* `SWIFT_ASYNC_ERROR`
-* `SWIFT_ASYNC_NAME`
-* `SWIFT_ATTRIBUTE`
-* `SWIFT_BRIDGE`
-* `SWIFT_BRIDGED_TYPEDEF`
-* `SWIFT_ERROR`
-* `SWIFT_NAME`
-* `SWIFT_NEW_TYPE`
-* `SWIFT_PRIVATE`
-* `TLS_MODEL`
-* `TARGET`
-* `TARGET_CLONES`
-* `TEST_TYPESTATE`
-* `TRANSPARENT_UNION`
-* `TRIVIAL_ABI`
-* `TRY_ACQUIRE_CAPABILITY`
-* `TYPE_TAG_FOR_DATATYPE`
-* `TYPE_VISIBILITY`
-* `UNAVAILABLE`
-* `UNINITIALIZED`
-* `UNUSED`
-* `USED`
-* `USING_IF_EXISTS`
-* `UUID`
-* `VEC_RETURN`
-* `VEC_TYPE_HINT`
-* `VISIBILITY`
-* `WARN_UNUSED`
-* `WARN_UNUSED_RESULT`
-* `WEAK`
-* `WEAK_IMPORT`
-* `WEAK_REFERENCE`
-* `WEB_ASSEMBLY_EXPORT_NAME`
-* `WEB_ASSEMBLY_IMPORT_MODULE`
-* `WEB_ASSEMBLY_IMPORT_NAME`
-* `WORK_GROUP_SIZE_HINT`
-* `X86_FORCE_ALIGN_ARGUMENT_POINTER`
-* `X_RAY_INSTRUMENT`
-* `X_RAY_LOG_ARGUMENTS`
-* `ABI_TAG`
-* `ALIAS`
-* `ALIGN_VALUE`
-* `BUILTIN_ALIAS`
-* `CALLED_ONCE`
-* `I_FUNC`
-* `INITIALIZER_SEG`
-* `LOADER_UNINITIALIZED`
-* `LOOP_HINT`
-* `MODE`
-* `NO_BUILTIN`
-* `NO_ESCAPE`
-* `OMP_CAPTURE_KIND`
-* `OMP_DECLARE_SIMD_DECLARATION`
-* `OMP_REFERENCED_VARIABLE`
-* `OBJ_C_BOXABLE`
-* `OBJ_C_CLASS_STUB`
-* `OBJ_C_DESIGNATED_INITIALIZER`
-* `OBJ_C_DIRECT`
-* `OBJ_C_DIRECT_MEMBERS`
-* `OBJ_C_NON_LAZY_CLASS`
-* `OBJ_C_NON_RUNTIME_PROTOCOL`
-* `OBJ_C_RUNTIME_NAME`
-* `OBJ_C_RUNTIME_VISIBLE`
-* `OPEN_CL_ACCESS`
-* `OVERLOADABLE`
-* `RENDER_SCRIPT_KERNEL`
-* `SWIFT_OBJ_C_MEMBERS`
-* `THREAD`
 
 </details>
 
@@ -1833,24 +5115,6 @@ Available enumerations:
 * `ERROR`
 * `VARIABLY_MODIFIED`
 * `SYNTACTIC`
-
-</details>
-
-<details><summary><a name="BlockType"></a>BlockType</summary>
-
-Available enumerations:
-
-* `BY_REFERENCE`
-
-</details>
-
-<details><summary><a name="BranchStateTy"></a>BranchStateTy</summary>
-
-Available enumerations:
-
-* `UNDEFINED`
-* `INBRANCH`
-* `NOTINBRANCH`
 
 </details>
 
@@ -2046,27 +5310,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="ConsumedState"></a>ConsumedState</summary>
-
-Available enumerations:
-
-* `UNKNOWN`
-* `CONSUMED`
-* `UNCONSUMED`
-
-</details>
-
-<details><summary><a name="ConventionKind"></a>ConventionKind</summary>
-
-Available enumerations:
-
-* `NONE`
-* `NON_NULL_ERROR`
-* `ZERO_ARGUMENT`
-* `NON_ZERO_ARGUMENT`
-
-</details>
-
 <details><summary><a name="CoreFoundationABI"></a>CoreFoundationABI</summary>
 
 Available enumerations:
@@ -2116,16 +5359,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="DevTypeTy"></a>DevTypeTy</summary>
-
-Available enumerations:
-
-* `HOST`
-* `NO_HOST`
-* `ANY`
-
-</details>
-
 <details><summary><a name="DiagnosticLevelMask"></a>DiagnosticLevelMask</summary>
 
 Available enumerations:
@@ -2136,15 +5369,6 @@ Available enumerations:
 * `WARNING`
 * `ERROR`
 * `ALL`
-
-</details>
-
-<details><summary><a name="DiagnosticType"></a>DiagnosticType</summary>
-
-Available enumerations:
-
-* `ERROR`
-* `WARNING`
 
 </details>
 
@@ -2315,19 +5539,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="FamilyKind"></a>FamilyKind</summary>
-
-Available enumerations:
-
-* `NONE`
-* `ALLOC`
-* `COPY`
-* `INITIALIZER`
-* `MUTABLE_COPY`
-* `NEW`
-
-</details>
-
 <details><summary><a name="FiniteLoopsKind"></a>FiniteLoopsKind</summary>
 
 Available enumerations:
@@ -2392,14 +5603,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="GuardArg"></a>GuardArg</summary>
-
-Available enumerations:
-
-* `NOCF`
-
-</details>
-
 <details><summary><a name="ID"></a>ID</summary>
 
 Available enumerations:
@@ -2440,19 +5643,6 @@ Available enumerations:
 * `ALWAYS`
 * `NEVER`
 * `ALWAYSARG1`
-
-</details>
-
-<details><summary><a name="ImplicitReason"></a>ImplicitReason</summary>
-
-Available enumerations:
-
-* `NONE`
-* `ARC_FORBIDDEN_TYPE`
-* `FORBIDDEN_WEAK`
-* `ARC_FORBIDDEN_CONVERSION`
-* `ARC_INIT_RETURNS_UNRELATED`
-* `ARC_FIELD_WITH_OWNERSHIP`
 
 </details>
 
@@ -2514,29 +5704,6 @@ Available enumerations:
 * `NORMAL_INLINING`
 * `ONLY_HINT_INLINING`
 * `ONLY_ALWAYS_INLINING`
-
-</details>
-
-<details><summary><a name="InteropType"></a>InteropType</summary>
-
-Available enumerations:
-
-* `TARGET`
-* `TARGET_SYNC`
-* `TARGET_TARGET_SYNC`
-
-</details>
-
-<details><summary><a name="InterruptType"></a>InterruptType</summary>
-
-Available enumerations:
-
-* `IRQ`
-* `FIQ`
-* `SWI`
-* `ABORT`
-* `UNDEF`
-* `GENERIC`
 
 </details>
 
@@ -2615,13 +5782,13 @@ Available enumerations:
 * `C99`
 * `C11`
 * `C17`
-* `C2_X`
+* `C2X`
 * `C_PLUS_PLUS`
 * `C_PLUS_PLUS11`
 * `C_PLUS_PLUS14`
 * `C_PLUS_PLUS17`
 * `C_PLUS_PLUS20`
-* `C_PLUS_PLUS2_B`
+* `C_PLUS_PLUS2B`
 * `DIGRAPHS`
 * `GNU_MODE`
 * `HEX_FLOAT`
@@ -2696,20 +5863,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="LoopHintState"></a>LoopHintState</summary>
-
-Available enumerations:
-
-* `ENABLE`
-* `DISABLE`
-* `NUMERIC`
-* `FIXED_WIDTH`
-* `SCALABLE_WIDTH`
-* `ASSUME_SAFETY`
-* `FULL`
-
-</details>
-
 <details><summary><a name="MSInheritanceModel"></a>MSInheritanceModel</summary>
 
 Available enumerations:
@@ -2745,15 +5898,6 @@ Available enumerations:
 * `NEVER`
 * `FOR_VIRTUAL_BASE_OVERRIDE`
 * `FOR_VF_TABLE`
-
-</details>
-
-<details><summary><a name="MapTypeTy"></a>MapTypeTy</summary>
-
-Available enumerations:
-
-* `TO`
-* `LINK`
 
 </details>
 
@@ -2830,15 +5974,6 @@ Available enumerations:
 * `NONE`
 * `DEPENDENT_INSTANTIATION`
 * `ALL`
-
-</details>
-
-<details><summary><a name="NewtypeKind"></a>NewtypeKind</summary>
-
-Available enumerations:
-
-* `STRUCT`
-* `ENUM`
 
 </details>
 
@@ -3203,25 +6338,6 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="OptionType"></a>OptionType</summary>
-
-Available enumerations:
-
-* `VECTORIZE`
-* `VECTORIZE_WIDTH`
-* `INTERLEAVE`
-* `INTERLEAVE_COUNT`
-* `UNROLL`
-* `UNROLL_COUNT`
-* `UNROLL_AND_JAM`
-* `UNROLL_AND_JAM_COUNT`
-* `PIPELINE_DISABLED`
-* `PIPELINE_INITIATION_INTERVAL`
-* `DISTRIBUTE`
-* `VECTORIZE_PREDICATE`
-
-</details>
-
 <details><summary><a name="OverloadedOperatorKind"></a>OverloadedOperatorKind</summary>
 
 Available enumerations:
@@ -3281,25 +6397,6 @@ Available enumerations:
 
 * `ALL`
 * `BEST`
-
-</details>
-
-<details><summary><a name="OwnershipKind"></a>OwnershipKind</summary>
-
-Available enumerations:
-
-* `HOLDS`
-* `RETURNS`
-* `TAKES`
-
-</details>
-
-<details><summary><a name="PCSType"></a>PCSType</summary>
-
-Available enumerations:
-
-* `AAPCS`
-* `VFP`
 
 </details>
 
@@ -3512,7 +6609,7 @@ Available enumerations:
 * `FUNCTION`
 * `INTEGER_DIVIDE_BY_ZERO`
 * `NONNULL_ATTRIBUTE`
-* `NULL__`
+* `NULL_`
 * `NULLABILITY_ARGUMENT`
 * `NULLABILITY_ASSIGN`
 * `NULLABILITY_RETURN`
@@ -3623,17 +6720,6 @@ Available enumerations:
 * `TYPE_SPEC_WITH_TEMPLATE`
 * `GLOBAL`
 * `SUPER`
-
-</details>
-
-<details><summary><a name="Spelling"></a>Spelling</summary>
-
-Available enumerations:
-
-* `GNU_AARCH64_VECTOR_PCS`
-* `CXX11_CLANG_AARCH64_VECTOR_PCS`
-* `C2_XCLANG_AARCH64_VECTOR_PCS`
-* `SPELLING_NOT_CALCULATED`
 
 </details>
 
@@ -3772,7 +6858,7 @@ Available enumerations:
 
 * `GNU`
 * `CXX11`
-* `C2_X`
+* `C2X`
 * `DECLSPEC`
 * `MICROSOFT`
 * `KEYWORD`
@@ -4199,18 +7285,18 @@ Available enumerations:
 * `KEYWORD___READ_WRITE`
 * `KEYWORD___BUILTIN_ASTYPE`
 * `KEYWORD_VEC_STEP`
-* `KEYWORD_IMAGE1_DT`
-* `KEYWORD_IMAGE1_DARRAY_T`
-* `KEYWORD_IMAGE1_DBUFFER_T`
-* `KEYWORD_IMAGE2_DT`
-* `KEYWORD_IMAGE2_DARRAY_T`
-* `KEYWORD_IMAGE2_DDEPTH_T`
-* `KEYWORD_IMAGE2_DARRAY_DEPTH_T`
-* `KEYWORD_IMAGE2_DMSAA_T`
-* `KEYWORD_IMAGE2_DARRAY_MSAA_T`
-* `KEYWORD_IMAGE2_DMSAA_DEPTH_T`
-* `KEYWORD_IMAGE2_DARRAY_MSAA_DEPTH_T`
-* `KEYWORD_IMAGE3_DT`
+* `KEYWORD_IMAGE_1D_T`
+* `KEYWORD_IMAGE_1D_ARRAY_T`
+* `KEYWORD_IMAGE_1D_BUFFER_T`
+* `KEYWORD_IMAGE_2D_T`
+* `KEYWORD_IMAGE_2D_ARRAY_T`
+* `KEYWORD_IMAGE_2D_DEPTH_T`
+* `KEYWORD_IMAGE_2D_ARRAY_DEPTH_T`
+* `KEYWORD_IMAGE_2D_MSAA_T`
+* `KEYWORD_IMAGE_2D_ARRAY_MSAA_T`
+* `KEYWORD_IMAGE_2D_MSAA_DEPTH_T`
+* `KEYWORD_IMAGE_2D_ARRAY_MSAA_DEPTH_T`
+* `KEYWORD_IMAGE_3D_T`
 * `KEYWORD_PIPE`
 * `KEYWORD_ADDRSPACE_CAST`
 * `KEYWORD___BUILTIN_OMP_REQUIRED_SIMD_ALIGN`
@@ -4507,18 +7593,18 @@ Available enumerations:
 * `AUTO_TYPE`
 * `UNKNOWN_ANYTYPE`
 * `ATOMIC`
-* `IMAGE1_DT`
-* `IMAGE1_DARRAY_T`
-* `IMAGE1_DBUFFER_T`
-* `IMAGE2_DT`
-* `IMAGE2_DARRAY_T`
-* `IMAGE2_DDEPTH_T`
-* `IMAGE2_DARRAY_DEPTH_T`
-* `IMAGE2_DMSAA_T`
-* `IMAGE2_DARRAY_MSAA_T`
-* `IMAGE2_DMSAA_DEPTH_T`
-* `IMAGE2_DARRAY_MSAA_DEPTH_T`
-* `IMAGE3_DT`
+* `IMAGE_1D_T`
+* `IMAGE_1D_ARRAY_T`
+* `IMAGE_1D_BUFFER_T`
+* `IMAGE_2D_T`
+* `IMAGE_2D_ARRAY_T`
+* `IMAGE_2D_DEPTH_T`
+* `IMAGE_2D_ARRAY_DEPTH_T`
+* `IMAGE_2D_MSAA_T`
+* `IMAGE_2D_ARRAY_MSAA_T`
+* `IMAGE_2D_MSAA_DEPTH_T`
+* `IMAGE_2D_ARRAY_MSAA_DEPTH_T`
+* `IMAGE_3D_T`
 * `ERROR`
 
 </details>
@@ -4691,13 +7777,18 @@ Available enumerations:
 
 </details>
 
-<details><summary><a name="VisibilityType"></a>VisibilityType</summary>
+<details><summary><a name="AttributeSyntax"></a>AttributeSyntax</summary>
 
 Available enumerations:
 
-* `DEFAULT`
-* `HIDDEN`
-* `PROTECTED`
+* `GNU`
+* `CXX11`
+* `C2X`
+* `DECLSPEC`
+* `MICROSOFT`
+* `KEYWORD`
+* `PRAGMA`
+* `CONTEXT_SENSITIVE_KEYWORD`
 
 </details>
 
@@ -4849,6 +7940,4099 @@ In addition to the fields listed in each entry's summary, every table also has `
 | `base_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
  -->
 
+<details><summary><a name="Attr"></a>Attr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `token` | `INTEGER` | :heavy_check_mark: | |
+| `is_implicit` | `INTEGER` | :heavy_check_mark: | |
+| `is_inherited` | `INTEGER` | :heavy_check_mark: | |
+| `is_late_parsed` | `INTEGER` | :heavy_check_mark: | |
+| `is_pack_expansion` | `INTEGER` | :heavy_check_mark: | |
+| `kind` | `INTEGER` | :heavy_check_mark: | [`AttrKind`](#AttrKind) |
+
+</details>
+
+<details><summary><a name="AlignValueAttr"></a>AlignValueAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `alignment` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="AliasAttr"></a>AliasAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `aliasee` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="AbiTagAttr"></a>AbiTagAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="TypeAttr"></a>TypeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="SPtrAttr"></a>SPtrAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="Ptr64Attr"></a>Ptr64Attr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="Ptr32Attr"></a>Ptr32Attr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLPrivateAddressSpaceAttr"></a>OpenCLPrivateAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OpenCLPrivateAddressSpaceAttrSpelling`](#OpenCLPrivateAddressSpaceAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLLocalAddressSpaceAttr"></a>OpenCLLocalAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OpenCLLocalAddressSpaceAttrSpelling`](#OpenCLLocalAddressSpaceAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLGlobalHostAddressSpaceAttr"></a>OpenCLGlobalHostAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLGlobalDeviceAddressSpaceAttr"></a>OpenCLGlobalDeviceAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLGlobalAddressSpaceAttr"></a>OpenCLGlobalAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OpenCLGlobalAddressSpaceAttrSpelling`](#OpenCLGlobalAddressSpaceAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLGenericAddressSpaceAttr"></a>OpenCLGenericAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OpenCLGenericAddressSpaceAttrSpelling`](#OpenCLGenericAddressSpaceAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLConstantAddressSpaceAttr"></a>OpenCLConstantAddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OpenCLConstantAddressSpaceAttrSpelling`](#OpenCLConstantAddressSpaceAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCKindOfAttr"></a>ObjCKindOfAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCInertUnsafeUnretainedAttr"></a>ObjCInertUnsafeUnretainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCGCAttr"></a>ObjCGCAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="NoDerefAttr"></a>NoDerefAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="CmseNSCallAttr"></a>CmseNSCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="BTFTypeTagAttr"></a>BTFTypeTagAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `btf_type_tag` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="ArmMveStrictPolymorphismAttr"></a>ArmMveStrictPolymorphismAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="AddressSpaceAttr"></a>AddressSpaceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="UPtrAttr"></a>UPtrAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="TypeNullableResultAttr"></a>TypeNullableResultAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="TypeNullableAttr"></a>TypeNullableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="TypeNullUnspecifiedAttr"></a>TypeNullUnspecifiedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="TypeNonNullAttr"></a>TypeNonNullAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`TypeAttr`](#TypeAttr).
+
+
+</details>
+
+<details><summary><a name="ThreadAttr"></a>ThreadAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="SwiftObjCMembersAttr"></a>SwiftObjCMembersAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="StmtAttr"></a>StmtAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="OpenCLUnrollHintAttr"></a>OpenCLUnrollHintAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`StmtAttr`](#StmtAttr).
+
+
+</details>
+
+<details><summary><a name="MustTailAttr"></a>MustTailAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`StmtAttr`](#StmtAttr).
+
+
+</details>
+
+<details><summary><a name="LikelyAttr"></a>LikelyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`StmtAttr`](#StmtAttr).
+
+
+</details>
+
+<details><summary><a name="FallThroughAttr"></a>FallThroughAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`StmtAttr`](#StmtAttr).
+
+
+</details>
+
+<details><summary><a name="UnlikelyAttr"></a>UnlikelyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`StmtAttr`](#StmtAttr).
+
+
+</details>
+
+<details><summary><a name="SuppressAttr"></a>SuppressAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`StmtAttr`](#StmtAttr).
+
+
+</details>
+
+<details><summary><a name="RenderScriptKernelAttr"></a>RenderScriptKernelAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="OverloadableAttr"></a>OverloadableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="OpenCLAccessAttr"></a>OpenCLAccessAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OpenCLAccessAttrSpelling`](#OpenCLAccessAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_read_only` | `INTEGER` | :heavy_check_mark: | |
+| `is_read_write` | `INTEGER` | :heavy_check_mark: | |
+| `is_write_only` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCRuntimeVisibleAttr"></a>ObjCRuntimeVisibleAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCRuntimeNameAttr"></a>ObjCRuntimeNameAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `metadata_name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCNonRuntimeProtocolAttr"></a>ObjCNonRuntimeProtocolAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCNonLazyClassAttr"></a>ObjCNonLazyClassAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCDirectMembersAttr"></a>ObjCDirectMembersAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCDirectAttr"></a>ObjCDirectAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCDesignatedInitializerAttr"></a>ObjCDesignatedInitializerAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCClassStubAttr"></a>ObjCClassStubAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ObjCBoxableAttr"></a>ObjCBoxableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="OMPReferencedVarAttr"></a>OMPReferencedVarAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `reference` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="OMPDeclareSimdDeclAttr"></a>OMPDeclareSimdDeclAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `branch_state` | `INTEGER` | :heavy_check_mark: | [`OMPDeclareSimdDeclAttrBranchStateTy`](#OMPDeclareSimdDeclAttrBranchStateTy) |
+| `simdlen` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="OMPCaptureKindAttr"></a>OMPCaptureKindAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="NoEscapeAttr"></a>NoEscapeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="NoBuiltinAttr"></a>NoBuiltinAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="ModeAttr"></a>ModeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="LoopHintAttr"></a>LoopHintAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `option` | `INTEGER` | :heavy_check_mark: | [`LoopHintAttrOptionType`](#LoopHintAttrOptionType) |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`LoopHintAttrSpelling`](#LoopHintAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `state` | `INTEGER` | :heavy_check_mark: | [`LoopHintAttrLoopHintState`](#LoopHintAttrLoopHintState) |
+| `value` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="LoaderUninitializedAttr"></a>LoaderUninitializedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="InitSegAttr"></a>InitSegAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `section` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="InheritableAttr"></a>InheritableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `should_inherit_even_if_already_present` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="IBOutletCollectionAttr"></a>IBOutletCollectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `interface` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `interface_token` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="IBOutletAttr"></a>IBOutletAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="IBActionAttr"></a>IBActionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="HotAttr"></a>HotAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="HIPManagedAttr"></a>HIPManagedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="GuardedVarAttr"></a>GuardedVarAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="GuardedByAttr"></a>GuardedByAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `argument` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="GNUInlineAttr"></a>GNUInlineAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="FormatAttr"></a>FormatAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="FormatArgAttr"></a>FormatArgAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="FlattenAttr"></a>FlattenAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="FlagEnumAttr"></a>FlagEnumAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="FinalAttr"></a>FinalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`FinalAttrSpelling`](#FinalAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_spelled_as_sealed` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="FastCallAttr"></a>FastCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ExternalSourceSymbolAttr"></a>ExternalSourceSymbolAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `defined_in` | `TEXT` | :heavy_check_mark: | |
+| `generated_declaration` | `INTEGER` | :heavy_check_mark: | |
+| `language` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ExclusiveTrylockFunctionAttr"></a>ExclusiveTrylockFunctionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `success_value` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ExcludeFromExplicitInstantiationAttr"></a>ExcludeFromExplicitInstantiationAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ErrorAttr"></a>ErrorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`ErrorAttrSpelling`](#ErrorAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `user_diagnostic` | `TEXT` | :heavy_check_mark: | |
+| `is_error` | `INTEGER` | :heavy_check_mark: | |
+| `is_warning` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="EnumExtensibilityAttr"></a>EnumExtensibilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `extensibility` | `INTEGER` | :heavy_check_mark: | [`EnumExtensibilityAttrKind`](#EnumExtensibilityAttrKind) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="EnforceTCBLeafAttr"></a>EnforceTCBLeafAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `tcb_name` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="EnforceTCBAttr"></a>EnforceTCBAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `tcb_name` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="EnableIfAttr"></a>EnableIfAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `condition` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `message` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="EmptyBasesAttr"></a>EmptyBasesAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DisableTailCallsAttr"></a>DisableTailCallsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DisableSanitizerInstrumentationAttr"></a>DisableSanitizerInstrumentationAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DiagnoseIfAttr"></a>DiagnoseIfAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `argument_dependent` | `INTEGER` | :heavy_check_mark: | |
+| `condition` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `diagnostic_type` | `INTEGER` | :heavy_check_mark: | [`DiagnoseIfAttrDiagnosticType`](#DiagnoseIfAttrDiagnosticType) |
+| `message` | `TEXT` | :heavy_check_mark: | |
+| `parent` | `INTEGER` | :heavy_check_mark: | [`NamedDecl`](#NamedDecl) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_error` | `INTEGER` | :heavy_check_mark: | |
+| `is_warning` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DiagnoseAsBuiltinAttr"></a>DiagnoseAsBuiltinAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `function` | `INTEGER` | :heavy_check_mark: | [`FunctionDecl`](#FunctionDecl) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DestructorAttr"></a>DestructorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DeprecatedAttr"></a>DeprecatedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `message` | `TEXT` | :heavy_check_mark: | |
+| `replacement` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DeclOrStmtAttr"></a>DeclOrStmtAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoMergeAttr"></a>NoMergeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`DeclOrStmtAttr`](#DeclOrStmtAttr).
+
+
+</details>
+
+<details><summary><a name="DLLImportStaticLocalAttr"></a>DLLImportStaticLocalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DLLImportAttr"></a>DLLImportAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DLLExportStaticLocalAttr"></a>DLLExportStaticLocalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="DLLExportAttr"></a>DLLExportAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConvergentAttr"></a>ConvergentAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConsumableSetOnReadAttr"></a>ConsumableSetOnReadAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConsumableAutoCastAttr"></a>ConsumableAutoCastAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConsumableAttr"></a>ConsumableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `default_state` | `INTEGER` | :heavy_check_mark: | [`ConsumableAttrConsumedState`](#ConsumableAttrConsumedState) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConstructorAttr"></a>ConstructorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConstInitAttr"></a>ConstInitAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`ConstInitAttrSpelling`](#ConstInitAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_constinit` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ConstAttr"></a>ConstAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CommonAttr"></a>CommonAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ColdAttr"></a>ColdAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CodeSegAttr"></a>CodeSegAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CmseNSEntryAttr"></a>CmseNSEntryAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CleanupAttr"></a>CleanupAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `function_declaration` | `INTEGER` | :heavy_check_mark: | [`FunctionDecl`](#FunctionDecl) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CapturedRecordAttr"></a>CapturedRecordAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CapabilityAttr"></a>CapabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`CapabilityAttrSpelling`](#CapabilityAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_shared` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CallbackAttr"></a>CallbackAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CallableWhenAttr"></a>CallableWhenAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CXX11NoReturnAttr"></a>CXX11NoReturnAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDASharedAttr"></a>CUDASharedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDALaunchBoundsAttr"></a>CUDALaunchBoundsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `max_threads` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `min_blocks` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDAInvalidTargetAttr"></a>CUDAInvalidTargetAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDAHostAttr"></a>CUDAHostAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDAGlobalAttr"></a>CUDAGlobalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDADeviceBuiltinTextureTypeAttr"></a>CUDADeviceBuiltinTextureTypeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDADeviceBuiltinSurfaceTypeAttr"></a>CUDADeviceBuiltinSurfaceTypeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDADeviceAttr"></a>CUDADeviceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CUDAConstantAttr"></a>CUDAConstantAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CPUSpecificAttr"></a>CPUSpecificAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CPUDispatchAttr"></a>CPUDispatchAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CFUnknownTransferAttr"></a>CFUnknownTransferAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CFReturnsRetainedAttr"></a>CFReturnsRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CFReturnsNotRetainedAttr"></a>CFReturnsNotRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CFICanonicalJumpTableAttr"></a>CFICanonicalJumpTableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CFGuardAttr"></a>CFGuardAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `guard` | `INTEGER` | :heavy_check_mark: | [`CFGuardAttrGuardArg`](#CFGuardAttrGuardArg) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CFAuditedTransferAttr"></a>CFAuditedTransferAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CDeclAttr"></a>CDeclAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="C11NoReturnAttr"></a>C11NoReturnAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="BuiltinAttr"></a>BuiltinAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="BlocksAttr"></a>BlocksAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `type` | `INTEGER` | :heavy_check_mark: | [`BlocksAttrBlockType`](#BlocksAttrBlockType) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="BTFDeclTagAttr"></a>BTFDeclTagAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `btf_decl_tag` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="BPFPreserveAccessIndexAttr"></a>BPFPreserveAccessIndexAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AvailabilityAttr"></a>AvailabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `message` | `TEXT` | :heavy_check_mark: | |
+| `replacement` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `strict` | `INTEGER` | :heavy_check_mark: | |
+| `unavailable` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AssumptionAttr"></a>AssumptionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `assumption` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AssumeAlignedAttr"></a>AssumeAlignedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `alignment` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `offset` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AssertSharedLockAttr"></a>AssertSharedLockAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AssertExclusiveLockAttr"></a>AssertExclusiveLockAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AssertCapabilityAttr"></a>AssertCapabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`AssertCapabilityAttrSpelling`](#AssertCapabilityAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_shared` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AsmLabelAttr"></a>AsmLabelAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `is_literal_label` | `INTEGER` | :heavy_check_mark: | |
+| `label` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ArtificialAttr"></a>ArtificialAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ArmBuiltinAliasAttr"></a>ArmBuiltinAliasAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ArgumentWithTypeTagAttr"></a>ArgumentWithTypeTagAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `is_pointer` | `INTEGER` | :heavy_check_mark: | |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`ArgumentWithTypeTagAttrSpelling`](#ArgumentWithTypeTagAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ArcWeakrefUnavailableAttr"></a>ArcWeakrefUnavailableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AnyX86NoCfCheckAttr"></a>AnyX86NoCfCheckAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AnyX86NoCallerSavedRegistersAttr"></a>AnyX86NoCallerSavedRegistersAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AnyX86InterruptAttr"></a>AnyX86InterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AnalyzerNoReturnAttr"></a>AnalyzerNoReturnAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AlwaysInlineAttr"></a>AlwaysInlineAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`AlwaysInlineAttrSpelling`](#AlwaysInlineAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AlwaysDestroyAttr"></a>AlwaysDestroyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AllocSizeAttr"></a>AllocSizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AllocAlignAttr"></a>AllocAlignAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AlignedAttr"></a>AlignedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `alignment_expression` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `alignment_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`AlignedAttrSpelling`](#AlignedAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_alignas` | `INTEGER` | :heavy_check_mark: | |
+| `is_alignment_dependent` | `INTEGER` | :heavy_check_mark: | |
+| `is_alignment_error_dependent` | `INTEGER` | :heavy_check_mark: | |
+| `is_alignment_expression` | `INTEGER` | :heavy_check_mark: | |
+| `is_c11` | `INTEGER` | :heavy_check_mark: | |
+| `is_declspec` | `INTEGER` | :heavy_check_mark: | |
+| `is_gnu` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AlignNaturalAttr"></a>AlignNaturalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AlignMac68kAttr"></a>AlignMac68kAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AcquiredBeforeAttr"></a>AcquiredBeforeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AcquiredAfterAttr"></a>AcquiredAfterAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AcquireHandleAttr"></a>AcquireHandleAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `handle_type` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AcquireCapabilityAttr"></a>AcquireCapabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`AcquireCapabilityAttrSpelling`](#AcquireCapabilityAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_shared` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AVRSignalAttr"></a>AVRSignalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AVRInterruptAttr"></a>AVRInterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ARMInterruptAttr"></a>ARMInterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `interrupt` | `INTEGER` | :heavy_check_mark: | [`ARMInterruptAttrInterruptType`](#ARMInterruptAttrInterruptType) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AMDGPUWavesPerEUAttr"></a>AMDGPUWavesPerEUAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `max` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `min` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AMDGPUNumVGPRAttr"></a>AMDGPUNumVGPRAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AMDGPUNumSGPRAttr"></a>AMDGPUNumSGPRAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AMDGPUFlatWorkGroupSizeAttr"></a>AMDGPUFlatWorkGroupSizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `max` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `min` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="AArch64VectorPcsAttr"></a>AArch64VectorPcsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="XRayLogArgsAttr"></a>XRayLogArgsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="XRayInstrumentAttr"></a>XRayInstrumentAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `always_x_ray_instrument` | `INTEGER` | :heavy_check_mark: | |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`XRayInstrumentAttrSpelling`](#XRayInstrumentAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `never_x_ray_instrument` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="X86ForceAlignArgPointerAttr"></a>X86ForceAlignArgPointerAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WorkGroupSizeHintAttr"></a>WorkGroupSizeHintAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WebAssemblyImportNameAttr"></a>WebAssemblyImportNameAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `import_name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WebAssemblyImportModuleAttr"></a>WebAssemblyImportModuleAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `import_module` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WebAssemblyExportNameAttr"></a>WebAssemblyExportNameAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `export_name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WeakRefAttr"></a>WeakRefAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `aliasee` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WeakImportAttr"></a>WeakImportAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WeakAttr"></a>WeakAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WarnUnusedResultAttr"></a>WarnUnusedResultAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `is_cxx11_no_discard` | `INTEGER` | :heavy_check_mark: | |
+| `message` | `TEXT` | :heavy_check_mark: | |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`WarnUnusedResultAttrSpelling`](#WarnUnusedResultAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="WarnUnusedAttr"></a>WarnUnusedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="VisibilityAttr"></a>VisibilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `visibility` | `INTEGER` | :heavy_check_mark: | [`VisibilityAttrVisibilityType`](#VisibilityAttrVisibilityType) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="VectorCallAttr"></a>VectorCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="VecTypeHintAttr"></a>VecTypeHintAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `type_hint` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `type_hint_token` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="VecReturnAttr"></a>VecReturnAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="UuidAttr"></a>UuidAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `guid` | `TEXT` | :heavy_check_mark: | |
+| `guid_declaration` | `INTEGER` | :heavy_check_mark: | [`MSGuidDecl`](#MSGuidDecl) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="UsingIfExistsAttr"></a>UsingIfExistsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="UsedAttr"></a>UsedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="UnusedAttr"></a>UnusedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`UnusedAttrSpelling`](#UnusedAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="UninitializedAttr"></a>UninitializedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="UnavailableAttr"></a>UnavailableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `implicit_reason` | `INTEGER` | :heavy_check_mark: | [`UnavailableAttrImplicitReason`](#UnavailableAttrImplicitReason) |
+| `message` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TypeVisibilityAttr"></a>TypeVisibilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `visibility` | `INTEGER` | :heavy_check_mark: | [`TypeVisibilityAttrVisibilityType`](#TypeVisibilityAttrVisibilityType) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TypeTagForDatatypeAttr"></a>TypeTagForDatatypeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `layout_compatible` | `INTEGER` | :heavy_check_mark: | |
+| `matching_c_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `matching_c_type_token` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `must_be_null` | `INTEGER` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TryAcquireCapabilityAttr"></a>TryAcquireCapabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`TryAcquireCapabilityAttrSpelling`](#TryAcquireCapabilityAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `success_value` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `is_shared` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TrivialABIAttr"></a>TrivialABIAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TransparentUnionAttr"></a>TransparentUnionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ThisCallAttr"></a>ThisCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TestTypestateAttr"></a>TestTypestateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `test_state` | `INTEGER` | :heavy_check_mark: | [`TestTypestateAttrConsumedState`](#TestTypestateAttrConsumedState) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TargetClonesAttr"></a>TargetClonesAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TargetAttr"></a>TargetAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `architecture` | `TEXT` | :heavy_check_mark: | |
+| `features_string` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_default_version` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="TLSModelAttr"></a>TLSModelAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `model` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SysVABIAttr"></a>SysVABIAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftPrivateAttr"></a>SwiftPrivateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftNewTypeAttr"></a>SwiftNewTypeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `newtype_kind` | `INTEGER` | :heavy_check_mark: | [`SwiftNewTypeAttrNewtypeKind`](#SwiftNewTypeAttrNewtypeKind) |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`SwiftNewTypeAttrSpelling`](#SwiftNewTypeAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftNameAttr"></a>SwiftNameAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftErrorAttr"></a>SwiftErrorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `convention` | `INTEGER` | :heavy_check_mark: | [`SwiftErrorAttrConventionKind`](#SwiftErrorAttrConventionKind) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftCallAttr"></a>SwiftCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftBridgedTypedefAttr"></a>SwiftBridgedTypedefAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftBridgeAttr"></a>SwiftBridgeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `swift_type` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftAttrAttr"></a>SwiftAttrAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `attribute` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftAsyncNameAttr"></a>SwiftAsyncNameAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftAsyncErrorAttr"></a>SwiftAsyncErrorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `convention` | `INTEGER` | :heavy_check_mark: | [`SwiftAsyncErrorAttrConventionKind`](#SwiftAsyncErrorAttrConventionKind) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftAsyncCallAttr"></a>SwiftAsyncCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftAsyncAttr"></a>SwiftAsyncAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="StrictFPAttr"></a>StrictFPAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="StdCallAttr"></a>StdCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="StandaloneDebugAttr"></a>StandaloneDebugAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SpeculativeLoadHardeningAttr"></a>SpeculativeLoadHardeningAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SharedTrylockFunctionAttr"></a>SharedTrylockFunctionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `success_value` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SetTypestateAttr"></a>SetTypestateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `new_state` | `INTEGER` | :heavy_check_mark: | [`SetTypestateAttrConsumedState`](#SetTypestateAttrConsumedState) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SentinelAttr"></a>SentinelAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SelectAnyAttr"></a>SelectAnyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SectionAttr"></a>SectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`SectionAttrSpelling`](#SectionAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ScopedLockableAttr"></a>ScopedLockableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SYCLSpecialClassAttr"></a>SYCLSpecialClassAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="SYCLKernelAttr"></a>SYCLKernelAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ReturnsTwiceAttr"></a>ReturnsTwiceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ReturnsNonNullAttr"></a>ReturnsNonNullAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ReturnTypestateAttr"></a>ReturnTypestateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `state` | `INTEGER` | :heavy_check_mark: | [`ReturnTypestateAttrConsumedState`](#ReturnTypestateAttrConsumedState) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="RetainAttr"></a>RetainAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="RestrictAttr"></a>RestrictAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`RestrictAttrSpelling`](#RestrictAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="RequiresCapabilityAttr"></a>RequiresCapabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`RequiresCapabilityAttrSpelling`](#RequiresCapabilityAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_shared` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ReqdWorkGroupSizeAttr"></a>ReqdWorkGroupSizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ReleaseCapabilityAttr"></a>ReleaseCapabilityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`ReleaseCapabilityAttrSpelling`](#ReleaseCapabilityAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_generic` | `INTEGER` | :heavy_check_mark: | |
+| `is_shared` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ReinitializesAttr"></a>ReinitializesAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="RegCallAttr"></a>RegCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="RISCVInterruptAttr"></a>RISCVInterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `interrupt` | `INTEGER` | :heavy_check_mark: | [`RISCVInterruptAttrInterruptType`](#RISCVInterruptAttrInterruptType) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PureAttr"></a>PureAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PtGuardedVarAttr"></a>PtGuardedVarAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PtGuardedByAttr"></a>PtGuardedByAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `argument` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PreserveMostAttr"></a>PreserveMostAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PreserveAllAttr"></a>PreserveAllAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PreferredNameAttr"></a>PreferredNameAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `typedef_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `typedef_type_token` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PragmaClangTextSectionAttr"></a>PragmaClangTextSectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PragmaClangRodataSectionAttr"></a>PragmaClangRodataSectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PragmaClangRelroSectionAttr"></a>PragmaClangRelroSectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PragmaClangDataSectionAttr"></a>PragmaClangDataSectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PragmaClangBSSSectionAttr"></a>PragmaClangBSSSectionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `name` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PointerAttr"></a>PointerAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `deref_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `deref_type_token` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PcsAttr"></a>PcsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `pcs` | `INTEGER` | :heavy_check_mark: | [`PcsAttrPCSType`](#PcsAttrPCSType) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PatchableFunctionEntryAttr"></a>PatchableFunctionEntryAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PascalAttr"></a>PascalAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ParamTypestateAttr"></a>ParamTypestateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `parameter_state` | `INTEGER` | :heavy_check_mark: | [`ParamTypestateAttrConsumedState`](#ParamTypestateAttrConsumedState) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="PackedAttr"></a>PackedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OwnershipAttr"></a>OwnershipAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `own_kind` | `INTEGER` | :heavy_check_mark: | [`OwnershipAttrOwnershipKind`](#OwnershipAttrOwnershipKind) |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`OwnershipAttrSpelling`](#OwnershipAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_holds` | `INTEGER` | :heavy_check_mark: | |
+| `is_returns` | `INTEGER` | :heavy_check_mark: | |
+| `is_takes` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OwnerAttr"></a>OwnerAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `deref_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `deref_type_token` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OverrideAttr"></a>OverrideAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OptimizeNoneAttr"></a>OptimizeNoneAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLKernelAttr"></a>OpenCLKernelAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OpenCLIntelReqdSubGroupSizeAttr"></a>OpenCLIntelReqdSubGroupSizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCSubclassingRestrictedAttr"></a>ObjCSubclassingRestrictedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCRootClassAttr"></a>ObjCRootClassAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCReturnsInnerPointerAttr"></a>ObjCReturnsInnerPointerAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCRequiresSuperAttr"></a>ObjCRequiresSuperAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCRequiresPropertyDefsAttr"></a>ObjCRequiresPropertyDefsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCPreciseLifetimeAttr"></a>ObjCPreciseLifetimeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCOwnershipAttr"></a>ObjCOwnershipAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCNSObjectAttr"></a>ObjCNSObjectAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCMethodFamilyAttr"></a>ObjCMethodFamilyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `family` | `INTEGER` | :heavy_check_mark: | [`ObjCMethodFamilyAttrFamilyKind`](#ObjCMethodFamilyAttrFamilyKind) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCIndependentClassAttr"></a>ObjCIndependentClassAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCExternallyRetainedAttr"></a>ObjCExternallyRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCExplicitProtocolImplAttr"></a>ObjCExplicitProtocolImplAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCExceptionAttr"></a>ObjCExceptionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCBridgeRelatedAttr"></a>ObjCBridgeRelatedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCBridgeMutableAttr"></a>ObjCBridgeMutableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="ObjCBridgeAttr"></a>ObjCBridgeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedOnZeroAttr"></a>OSReturnsRetainedOnZeroAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedOnNonZeroAttr"></a>OSReturnsRetainedOnNonZeroAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OSReturnsRetainedAttr"></a>OSReturnsRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OSReturnsNotRetainedAttr"></a>OSReturnsNotRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OSConsumesThisAttr"></a>OSConsumesThisAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OMPThreadPrivateDeclAttr"></a>OMPThreadPrivateDeclAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OMPDeclareVariantAttr"></a>OMPDeclareVariantAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `variant_func_reference` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OMPDeclareTargetDeclAttr"></a>OMPDeclareTargetDeclAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `dev_type` | `INTEGER` | :heavy_check_mark: | [`OMPDeclareTargetDeclAttrDevTypeTy`](#OMPDeclareTargetDeclAttrDevTypeTy) |
+| `indirect` | `INTEGER` | :heavy_check_mark: | |
+| `indirect_expression` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `map_type` | `INTEGER` | :heavy_check_mark: | [`OMPDeclareTargetDeclAttrMapTypeTy`](#OMPDeclareTargetDeclAttrMapTypeTy) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OMPCaptureNoInitAttr"></a>OMPCaptureNoInitAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="OMPAllocateDeclAttr"></a>OMPAllocateDeclAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `alignment` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `allocator` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `allocator_type` | `INTEGER` | :heavy_check_mark: | [`OMPAllocateDeclAttrAllocatorTypeTy`](#OMPAllocateDeclAttrAllocatorTypeTy) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NotTailCalledAttr"></a>NotTailCalledAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoUniqueAddressAttr"></a>NoUniqueAddressAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoThrowAttr"></a>NoThrowAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoThreadSafetyAnalysisAttr"></a>NoThreadSafetyAnalysisAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoStackProtectorAttr"></a>NoStackProtectorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoSplitStackAttr"></a>NoSplitStackAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoSpeculativeLoadHardeningAttr"></a>NoSpeculativeLoadHardeningAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoSanitizeAttr"></a>NoSanitizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `has_coverage` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoReturnAttr"></a>NoReturnAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoProfileFunctionAttr"></a>NoProfileFunctionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoMips16Attr"></a>NoMips16Attr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoMicroMipsAttr"></a>NoMicroMipsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoInstrumentFunctionAttr"></a>NoInstrumentFunctionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoInlineAttr"></a>NoInlineAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoDuplicateAttr"></a>NoDuplicateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoDestroyAttr"></a>NoDestroyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoDebugAttr"></a>NoDebugAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoCommonAttr"></a>NoCommonAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NoAliasAttr"></a>NoAliasAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NakedAttr"></a>NakedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NSReturnsRetainedAttr"></a>NSReturnsRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NSReturnsNotRetainedAttr"></a>NSReturnsNotRetainedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NSReturnsAutoreleasedAttr"></a>NSReturnsAutoreleasedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NSErrorDomainAttr"></a>NSErrorDomainAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `error_domain` | `INTEGER` | :heavy_check_mark: | [`VarDecl`](#VarDecl) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="NSConsumesSelfAttr"></a>NSConsumesSelfAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MipsShortCallAttr"></a>MipsShortCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`MipsShortCallAttrSpelling`](#MipsShortCallAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MipsLongCallAttr"></a>MipsLongCallAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`MipsLongCallAttrSpelling`](#MipsLongCallAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MipsInterruptAttr"></a>MipsInterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `interrupt` | `INTEGER` | :heavy_check_mark: | [`MipsInterruptAttrInterruptType`](#MipsInterruptAttrInterruptType) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="Mips16Attr"></a>Mips16Attr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MinVectorWidthAttr"></a>MinVectorWidthAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MinSizeAttr"></a>MinSizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MicroMipsAttr"></a>MicroMipsAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MayAliasAttr"></a>MayAliasAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MaxFieldAlignmentAttr"></a>MaxFieldAlignmentAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSVtorDispAttr"></a>MSVtorDispAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `vtor_disp_mode` | `INTEGER` | :heavy_check_mark: | [`MSVtorDispMode`](#MSVtorDispMode) |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSStructAttr"></a>MSStructAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSP430InterruptAttr"></a>MSP430InterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSNoVTableAttr"></a>MSNoVTableAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSInheritanceAttr"></a>MSInheritanceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `best_case` | `INTEGER` | :heavy_check_mark: | |
+| `inheritance_model` | `INTEGER` | :heavy_check_mark: | [`MSInheritanceModel`](#MSInheritanceModel) |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`MSInheritanceAttrSpelling`](#MSInheritanceAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSAllocatorAttr"></a>MSAllocatorAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MSABIAttr"></a>MSABIAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="MIGServerRoutineAttr"></a>MIGServerRoutineAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="M68kInterruptAttr"></a>M68kInterruptAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="LocksExcludedAttr"></a>LocksExcludedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="LockReturnedAttr"></a>LockReturnedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `argument` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="LifetimeBoundAttr"></a>LifetimeBoundAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="LeafAttr"></a>LeafAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="LayoutVersionAttr"></a>LayoutVersionAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="LTOVisibilityPublicAttr"></a>LTOVisibilityPublicAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="InternalLinkageAttr"></a>InternalLinkageAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="IntelOclBiccAttr"></a>IntelOclBiccAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="InitPriorityAttr"></a>InitPriorityAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="InheritableParamAttr"></a>InheritableParamAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+
+This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
+
+
+</details>
+
+<details><summary><a name="CarriesDependencyAttr"></a>CarriesDependencyAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="CFConsumedAttr"></a>CFConsumedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="AnnotateAttr"></a>AnnotateAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `annotation` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="UseHandleAttr"></a>UseHandleAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `handle_type` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="ReleaseHandleAttr"></a>ReleaseHandleAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `handle_type` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="PassObjectSizeAttr"></a>PassObjectSizeAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`PassObjectSizeAttrSpelling`](#PassObjectSizeAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+| `is_dynamic` | `INTEGER` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="ParameterABIAttr"></a>ParameterABIAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `abi` | `INTEGER` | :heavy_check_mark: | [`ParameterABI`](#ParameterABI) |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftIndirectResultAttr"></a>SwiftIndirectResultAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`ParameterABIAttr`](#ParameterABIAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftErrorResultAttr"></a>SwiftErrorResultAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`ParameterABIAttr`](#ParameterABIAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftContextAttr"></a>SwiftContextAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`ParameterABIAttr`](#ParameterABIAttr).
+
+
+</details>
+
+<details><summary><a name="SwiftAsyncContextAttr"></a>SwiftAsyncContextAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`ParameterABIAttr`](#ParameterABIAttr).
+
+
+</details>
+
+<details><summary><a name="OSConsumedAttr"></a>OSConsumedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="NonNullAttr"></a>NonNullAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="NSConsumedAttr"></a>NSConsumedAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`InheritableParamAttr`](#InheritableParamAttr).
+
+
+</details>
+
+<details><summary><a name="IFuncAttr"></a>IFuncAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `resolver` | `TEXT` | :heavy_check_mark: | |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="CalledOnceAttr"></a>CalledOnceAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
+<details><summary><a name="BuiltinAliasAttr"></a>BuiltinAliasAttr</summary>
+
+| Name | Type | `NOT NULL` | References |
+| --- | --- | --- | --- |
+| `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`BuiltinAliasAttrSpelling`](#BuiltinAliasAttrSpelling) |
+| `spelling` | `TEXT` | :heavy_check_mark: | |
+
+This table also includes all of the fields contained in [`Attr`](#Attr).
+
+
+</details>
+
 <details><summary><a name="Type"></a>Type</summary>
 
 | Name | Type | `NOT NULL` | References |
@@ -4968,42 +12152,42 @@ In addition to the fields listed in each entry's summary, every table also has `
 | `is_nothrow_t` | `INTEGER` | :heavy_check_mark: | |
 | `is_null_pointer_type` | `INTEGER` | :heavy_check_mark: | |
 | `is_ocl_ext_opaque_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_darray_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_darray_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_darray_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_dbuffer_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_dbuffer_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_dbuffer_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_dro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_drw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image1_dwo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_msaa_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_msaa_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_msaa_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_msaaro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_msaarw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_msaawo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_darray_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_ddepth_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_ddepth_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_ddepth_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dmsaa_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dmsaa_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dmsaa_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dmsaaro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dmsaarw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dmsaawo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_drw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image2_dwo_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image3_dro_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image3_drw_type` | `INTEGER` | :heavy_check_mark: | |
-| `is_ocl_image3_dwo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_array_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_array_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_array_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_buffer_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_buffer_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_buffer_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_1d_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_msaa_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_msaa_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_msaa_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_msaaro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_msaarw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_msaawo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_array_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_msaa_depth_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_msaa_depth_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_msaa_depth_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_msaaro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_msaarw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_msaawo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_2d_wo_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_3d_ro_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_3d_rw_type` | `INTEGER` | :heavy_check_mark: | |
+| `is_ocl_image_3d_wo_type` | `INTEGER` | :heavy_check_mark: | |
 | `is_ocl_intel_subgroup_avc_ime_dual_reference_streamin_type` | `INTEGER` | :heavy_check_mark: | |
 | `is_ocl_intel_subgroup_avc_ime_payload_type` | `INTEGER` | :heavy_check_mark: | |
 | `is_ocl_intel_subgroup_avc_ime_result_dual_reference_streamout_type` | `INTEGER` | :heavy_check_mark: | |
@@ -5710,7 +12894,7 @@ This table also includes all of the fields contained in [`Type`](#Type).
 | Name | Type | `NOT NULL` | References |
 | --- | --- | --- | --- |
 | `desugar` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
-| `attribute_kind` | `INTEGER` | :heavy_check_mark: | [`AttributeKind`](#AttributeKind) |
+| `attribute_kind` | `INTEGER` | :heavy_check_mark: | [`AttrKind`](#AttrKind) |
 | `equivalent_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
 | `immediate_nullability` | `INTEGER` | :x: | |
 | `modified_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
@@ -7634,6 +14818,7 @@ This table also includes all of the fields contained in [`ExplicitCastExpr`](#Ex
 | `callee_declaration` | `INTEGER` | :x: | [`Decl`](#Decl) |
 | `direct_callee` | `INTEGER` | :x: | [`FunctionDecl`](#FunctionDecl) |
 | `r_paren_token` | `INTEGER` | :heavy_check_mark: | |
+| `unused_result_attribute` | `INTEGER` | :x: | [`Attr`](#Attr) |
 | `has_stored_fp_features` | `INTEGER` | :heavy_check_mark: | |
 | `has_unused_result_attribute` | `INTEGER` | :heavy_check_mark: | |
 | `is_builtin_assume_false` | `INTEGER` | :heavy_check_mark: | |
@@ -9215,6 +16400,8 @@ This table also includes all of the fields contained in [`SwitchCase`](#SwitchCa
 | `is_definition` | `INTEGER` | :heavy_check_mark: | |
 | `access` | `INTEGER` | :heavy_check_mark: | [`AccessSpecifier`](#AccessSpecifier) |
 | `availability` | `INTEGER` | :heavy_check_mark: | [`AvailabilityResult`](#AvailabilityResult) |
+| `defining_attribute` | `INTEGER` | :x: | [`Attr`](#Attr) |
+| `external_source_symbol_attribute` | `INTEGER` | :x: | [`ExternalSourceSymbolAttr`](#ExternalSourceSymbolAttr) |
 | `friend_object_kind` | `INTEGER` | :heavy_check_mark: | [`DeclFriendObjectKind`](#DeclFriendObjectKind) |
 | `function_type` | `INTEGER` | :x: | [`FunctionType`](#FunctionType) |
 | `module_ownership_kind` | `INTEGER` | :heavy_check_mark: | [`DeclModuleOwnershipKind`](#DeclModuleOwnershipKind) |
@@ -11332,6 +18519,24 @@ These tables can only be queried on `parent_id`.
 * Parent type: [`FunctionParmPackExpr`](#FunctionParmPackExpr)
 * Value type: `INTEGER`
 * References: [`VarDecl`](#VarDecl)
+
+</details>
+
+
+<details><summary><a name="AttributedStmtAttributes"></a>AttributedStmtAttributes</summary>
+
+* Parent type: [`AttributedStmt`](#AttributedStmt)
+* Value type: `INTEGER`
+* References: [`Attr`](#Attr)
+
+</details>
+
+
+<details><summary><a name="DeclAttributes"></a>DeclAttributes</summary>
+
+* Parent type: [`Decl`](#Decl)
+* Value type: `INTEGER`
+* References: [`Attr`](#Attr)
 
 </details>
 

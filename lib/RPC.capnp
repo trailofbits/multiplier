@@ -138,40 +138,41 @@ struct Fragment @0xe5f27760091f9a3a {
   declarations @3 :List(AST.Decl);
   statements @4 :List(AST.Stmt);
   types @5 :List(AST.Type);
-  others @6 :List(AST.Pseudo);
+  attributes @6 :List(AST.Attr);
+  others @7 :List(AST.Pseudo);
   
   # List of top-level declarations in this code chunk.
-  topLevelDeclarations @7 :List(UInt64);
+  topLevelDeclarations @8 :List(UInt64);
   
   # List of token substitutions in this fragment.
-  tokenSubstitutions @8 :List(TokenSubstitution);
+  tokenSubstitutions @9 :List(TokenSubstitution);
   
   # The actual parsed tokens, as a text buffer. Each token is separated by a
   # single space. There are no newlines, except those that might be inside of
   # character/string literals.
-  parsedTokenData @9 :Text;
+  parsedTokenData @10 :Text;
   
   # List of parsed token kinds in this fragment.
-  tokenKinds @10 :List(UInt16);
+  tokenKinds @11 :List(UInt16);
   
   # List of offsets of the beginning of tokens. There is one extra element in
   # here than there are tokens, which represents the size of the data.
-  tokenOffsets @11 :List(UInt32);
+  tokenOffsets @12 :List(UInt32);
   
   # List of token IDs for file tokens corresponding with the parsed tokens.
-  fileTokenIds @12 :List(UInt64);
+  fileTokenIds @13 :List(UInt64);
   
   # List of token contexts. 
-  tokenContexts @13 :List(TokenContext);
+  tokenContexts @14 :List(TokenContext);
   
   # List of offsets of token contexts for each of the tokens.
-  tokenContextOffsets @14 :List(UInt32);
+  tokenContextOffsets @15 :List(UInt32);
   
   # List of tokens/substitution IDs in the top level.
-  unparsedTokens @15 :List(UInt64);
+  unparsedTokens @16 :List(UInt64);
 
   # Source IR in text format
-  mlir @16 :Text;
+  mlir @17 :Text;
 }
 
 struct RegexMatch @0xc119a143d978fd1e {
