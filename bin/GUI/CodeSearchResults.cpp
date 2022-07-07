@@ -503,7 +503,7 @@ void CodeSearchResultsItemDelegate::paint(
         ++num_printed_chars;
 
         const QChar ch = d->code.data[j];
-        QRectF glyph_rect(0.0, 0.0, font_metrics.width(ch),
+        QRectF glyph_rect(0.0, 0.0, font_metrics.horizontalAdvance(ch),
                           font_metrics.height());
         glyph_rect.moveTo(pos);
 

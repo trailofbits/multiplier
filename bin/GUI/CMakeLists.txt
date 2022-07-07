@@ -8,7 +8,11 @@
 
 set(MX_QT "Qt${MX_QT_VERSION}")
 set(MX_GUI_DIR "${CMAKE_CURRENT_LIST_DIR}")
-find_package(${MX_QT} COMPONENTS Core Widgets REQUIRED)
+set(MX_QT_COMPONENTS Core Widgets)
+if(MX_QT_VERSION GREATER "5")
+  list(APPEND MX_QT_COMPONENTS Core5Compat)
+endif()
+find_package(${MX_QT} COMPONENTS ${MX_QT_COMPONENTS} REQUIRED)
 
 if(PLATFORM_MACOS)
   set(executable_type "MACOSX_BUNDLE")
@@ -88,6 +92,12 @@ target_link_libraries("${exe_name}" PRIVATE
   ${MX_QT}::Core
   ${MX_QT}::Widgets
 )
+
+if(MX_QT_VERSION GREATER "5")
+  target_link_libraries("${exe_name}" PRIVATE
+    ${MX_QT}::Core5Compat
+  )
+endif()
 
 set_target_properties("${exe_name}"
   PROPERTIES

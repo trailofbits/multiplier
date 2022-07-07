@@ -15,7 +15,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
-#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QGuiApplication>
