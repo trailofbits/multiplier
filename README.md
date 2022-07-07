@@ -178,3 +178,10 @@ cmake \
 
 make install -j13
 ```
+
+If you are building the project on macOS, you can generate a redistributable .dmg file of the UI by using the qt_deploy target:
+
+```shell
+cmake --build . --target qt_deploy
+```
+

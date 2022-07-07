@@ -75,6 +75,10 @@ add_executable("${exe_name}" "${executable_type}"
 )
 
 if(PLATFORM_MACOS)
+  qt_deploy_target("${exe_name}")
+endif()
+
+if(PLATFORM_MACOS)
   set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons/Logo.ico")
 
   target_sources("${exe_name}" PRIVATE
