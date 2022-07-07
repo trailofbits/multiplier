@@ -31,8 +31,20 @@ function(qt_deploy_target target_name)
   if(NOT TARGET "qt_deploy")
     add_custom_target("qt_deploy")
   endif()
-
-  find_program(macdeployqt_path "macdeployqt")
+  
+  if(NOT "x${Qt6_DIR}x" STREQUAL "xx")
+    get_filename_component(qt_cmake_dir "${Qt6_DIR}" DIRECTORY)
+  elseif(NOT "x${Qt5_DIR}x" STREQUAL "xx")
+    get_filename_component(qt_cmake_dir "${Qt5_DIR}" DIRECTORY)
+  else()
+    message(FATAL_ERROR "Failed to find Qt${MX_QT}_Dir")
+  endif()
+  
+  
+  get_filename_component(qt_lib_dir "${qt_cmake_dir}" DIRECTORY)
+  get_filename_component(qt_root_dir "${qt_lib_dir}" DIRECTORY)
+  find_program(macdeployqt_path "macdeployqt" HINTS "${qt_root_dir}/bin")
+  
   if(NOT macdeployqt_path)
     message(WARNING "The macdeployqt executable was not found")
     return()
@@ -46,7 +58,6 @@ function(qt_deploy_target target_name)
     OUTPUT "${output_path}"
     DEPENDS "${target_name}"
     COMMAND "${macdeployqt_path}" "${target_bundle_path}" -verbose=2 -dmg -always-overwrite
-    COMMAND "${CMAKE_COMMAND}" -E rename "${CMAKE_BINARY_DIR}/${output_file_name}" "${output_file_name}"
     COMMENT "Running macdeployqt on target ${target_name}..."
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     VERBATIM

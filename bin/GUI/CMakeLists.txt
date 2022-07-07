@@ -74,23 +74,6 @@ add_executable("${exe_name}" "${executable_type}"
   Util.h
 )
 
-if(PLATFORM_MACOS)
-  qt_deploy_target("${exe_name}")
-endif()
-
-if(PLATFORM_MACOS)
-  set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons/Logo.ico")
-
-  target_sources("${exe_name}" PRIVATE
-    "${icon_path}"
-  )
-
-  set_source_files_properties("${icon_path}"
-    PROPERTIES
-      MACOSX_PACKAGE_LOCATION "Resources"
-  )
-endif()
-
 target_link_libraries("${exe_name}" PRIVATE
   "mx-api"
   ${MX_QT}::Core
@@ -110,7 +93,19 @@ set_target_properties("${exe_name}"
     AUTORCC TRUE
 )
 
+
 if(PLATFORM_MACOS)
+  set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons/Logo.ico")
+
+  target_sources("${exe_name}" PRIVATE
+    "${icon_path}"
+  )
+
+  set_source_files_properties("${icon_path}"
+    PROPERTIES
+      MACOSX_PACKAGE_LOCATION "Resources"
+  )
+
   target_sources("${exe_name}" PRIVATE
     "MacOSUtils.h"
     "MacOSUtils.mm"
@@ -120,6 +115,8 @@ if(PLATFORM_MACOS)
     PRIVATE
       "-framework AppKit"
   )
+  
+  qt_deploy_target("${exe_name}")
 endif(PLATFORM_MACOS)
 
 if(MX_ENABLE_INSTALL)
