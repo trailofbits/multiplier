@@ -270,8 +270,8 @@ static std::string Data(const std::string &data) {
   for (auto ch : data) {
     switch (ch) {
       // To keep xdot happy
-      case '[': ss << "\\["; break;
-      case ']': ss << "\\]"; break;
+      case '[': ss << " &#91;"; break;
+      case ']': ss << "&#93;"; break;
       // HTML escapes
       case '<': ss << "&lt;"; break;
       case '>': ss << "&gt;"; break;
