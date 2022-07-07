@@ -6,7 +6,7 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-function(qt_deploy_target target_name)
+function(qt_deploy_target target_name target_bundle_path)
   if(NOT TARGET "${target_name}")
     message(FATAL_ERROR "Target ${target_name} is not (yet) defined")
   endif()
@@ -20,13 +20,6 @@ function(qt_deploy_target target_name)
   if(NOT target_output_name)
     set(target_output_name "${target_name}")
   endif()
-
-  get_target_property(target_output_suffix "${target_name}" SUFFIX)
-  if(NOT target_output_suffix)
-    set(target_output_suffix "app")
-  endif()
-
-  set(target_bundle_path "${target_binary_dir}/${target_output_name}.${target_output_suffix}")
 
   if(NOT TARGET "qt_deploy")
     add_custom_target("qt_deploy")

@@ -15,11 +15,10 @@ endif()
 find_package(${MX_QT} COMPONENTS ${MX_QT_COMPONENTS} REQUIRED)
 
 if(PLATFORM_MACOS)
-  set(executable_type "MACOSX_BUNDLE")
   set(MACOSX_BUNDLE_ICON_FILE "Logo.ico")
 endif()
 
-set(exe_name "Multiplier")
+set(exe_name "mx-gui")
 add_executable("${exe_name}" "${executable_type}"
 
   Resources/resources.qrc
@@ -96,27 +95,56 @@ set_target_properties("${exe_name}"
 
 if(PLATFORM_MACOS)
   set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons/Logo.ico")
-
-  target_sources("${exe_name}" PRIVATE
-    "${icon_path}"
-  )
-
-  set_source_files_properties("${icon_path}"
-    PROPERTIES
-      MACOSX_PACKAGE_LOCATION "Resources"
-  )
-
-  target_sources("${exe_name}" PRIVATE
-    "MacOSUtils.h"
-    "MacOSUtils.mm"
-  )
+  set(plist_path "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist")
 
   target_link_libraries("${exe_name}"
     PRIVATE
       "-framework AppKit"
   )
   
-  qt_deploy_target("${exe_name}")
+  target_sources("${exe_name}" PRIVATE
+    "${icon_path}"
+    "${plist_path}"
+    "MacOSUtils.h"
+    "MacOSUtils.mm"
+  )
+  
+  set_source_files_properties("${icon_path}"
+    PROPERTIES
+      MACOSX_PACKAGE_LOCATION "Resources"
+  )
+  
+  set_source_files_properties("${plist_path}"
+    PROPERTIES
+      MACOSX_PACKAGE_LOCATION "Contents"
+  )
+  set(output_bundle_path "${CMAKE_CURRENT_BINARY_DIR}/Multiplier.app")
+  
+  add_custom_command(
+    OUTPUT "${output_bundle_path}"
+    DEPENDS "mx-gui" "mx-index" "mx-import" "mxsqlitebridge"
+    
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents/Frameworks"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents/MacOS"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents/Resources"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents/bin"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents/lib"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${output_bundle_path}/Contents/PlugIns"
+    COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-gui>" "${output_bundle_path}/Contents/MacOS/Multiplier"
+    COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-index>" "${output_bundle_path}/Contents/bin/mx-index"
+    COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-import>" "${output_bundle_path}/Contents/bin/mx-import"
+    COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-import>" "${output_bundle_path}/Contents/lib/mxsqlitebridge"
+    COMMAND "${CMAKE_COMMAND}" -E copy "${plist_path}" "${output_bundle_path}/Contents/Info.plist"
+    COMMAND "${CMAKE_COMMAND}" -E copy "${icon_path}" "${output_bundle_path}/Contents/Resources/Logo.ico"
+  )
+  
+  add_custom_target("mx-gui-bundle" ALL
+    DEPENDS "${output_bundle_path}"
+  )
+  
+  qt_deploy_target("mx-gui-bundle" "${output_bundle_path}")
+
 endif(PLATFORM_MACOS)
 
 if(MX_ENABLE_INSTALL)
@@ -125,4 +153,14 @@ if(MX_ENABLE_INSTALL)
       "${exe_name}"
     DESTINATION
       "${CMAKE_INSTALL_BINDIR}")
-endif()
+  
+  
+  if(PLATFORM_MACOS)
+    install(
+      DIRECTORY
+        "${output_bundle_path}"
+      DESTINATION
+        "."
+      USE_SOURCE_PERMISSIONS)
+  endif(PLATFORM_MACOS)
+endif(MX_ENABLE_INSTALL)
