@@ -32,6 +32,10 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 
+if(PLATFORM_MACOS)
+  include("cmake/macdeployqt.cmake")
+endif()
+
 if(MX_ENABLE_WEGGLI)
   include("cmake/Corrosion.cmake")
   find_program(CBINDGEN cbindgen REQUIRED HINTS "$ENV{HOME}/.cargo/bin")
