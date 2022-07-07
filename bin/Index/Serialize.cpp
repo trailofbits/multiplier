@@ -1829,19 +1829,35 @@ void SerializeAlignedAttr(EntityMapper &es, mx::ast::Attr::Builder b, const past
   (void) b;
   (void) e;
   SerializeInheritableAttr(es, b, e);
-  b.setVal8(es.EntityId(e.AlignmentExpression()));
-  b.setVal17(es.EntityId(e.AlignmentType()));
+  auto v8 = e.AlignmentExpression();
+  if (v8) {
+    auto id8 = es.EntityId(v8.value());
+    b.setVal8(id8);
+    b.setVal13(id8 != mx::kInvalidEntityId);
+  } else {
+    b.setVal8(mx::kInvalidEntityId);
+    b.setVal13(false);
+  }
+  auto v17 = e.AlignmentType();
+  if (v17) {
+    auto id17 = es.EntityId(v17.value());
+    b.setVal17(id17);
+    b.setVal14(id17 != mx::kInvalidEntityId);
+  } else {
+    b.setVal17(mx::kInvalidEntityId);
+    b.setVal14(false);
+  }
   b.setVal11(static_cast<unsigned char>(mx::FromPasta(e.SemanticSpelling())));
   auto v9 = e.Spelling();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
-  b.setVal13(e.IsAlignas());
-  b.setVal14(e.IsAlignmentDependent());
-  b.setVal19(e.IsAlignmentErrorDependent());
-  b.setVal20(e.IsAlignmentExpression());
-  b.setVal21(e.IsC11());
-  b.setVal22(e.IsDeclspec());
-  b.setVal23(e.IsGNU());
+  b.setVal19(e.IsAlignas());
+  b.setVal20(e.IsAlignmentDependent());
+  b.setVal21(e.IsAlignmentErrorDependent());
+  b.setVal22(e.IsAlignmentExpression());
+  b.setVal23(e.IsC11());
+  b.setVal24(e.IsDeclspec());
+  b.setVal25(e.IsGNU());
 }
 
 void SerializeAlignNaturalAttr(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::AlignNaturalAttr &e) {

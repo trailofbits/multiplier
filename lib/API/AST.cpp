@@ -18855,16 +18855,24 @@ std::optional<AlignedAttr> AlignedAttr::from(const Attr &parent) {
   }
 }
 
-Expr AlignedAttr::alignment_expression(void) const {
+std::optional<Expr> AlignedAttr::alignment_expression(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal8());
-  return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
+  if (!self.getVal13()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal8());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
-Type AlignedAttr::alignment_type(void) const {
+std::optional<Type> AlignedAttr::alignment_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
-  return fragment->TypeFor(fragment, id, false).value();
+  if (!self.getVal14()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal17());
+    return fragment->TypeFor(fragment, id);
+  }
 }
 
 AlignedAttrSpelling AlignedAttr::semantic_spelling(void) const {
@@ -18880,37 +18888,37 @@ std::string_view AlignedAttr::spelling(void) const {
 
 bool AlignedAttr::is_alignas(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal19();
 }
 
 bool AlignedAttr::is_alignment_dependent(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal20();
 }
 
 bool AlignedAttr::is_alignment_error_dependent(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal19();
+  return self.getVal21();
 }
 
 bool AlignedAttr::is_alignment_expression(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal20();
+  return self.getVal22();
 }
 
 bool AlignedAttr::is_c11(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal21();
+  return self.getVal23();
 }
 
 bool AlignedAttr::is_declspec(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal22();
+  return self.getVal24();
 }
 
 bool AlignedAttr::is_gnu(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal23();
+  return self.getVal25();
 }
 
 std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const TokenContext &c) {

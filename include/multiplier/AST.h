@@ -21176,8 +21176,8 @@ class AlignedAttr : public InheritableAttr {
     }
   }
 
-  Expr alignment_expression(void) const;
-  Type alignment_type(void) const;
+  std::optional<Expr> alignment_expression(void) const;
+  std::optional<Type> alignment_type(void) const;
   AlignedAttrSpelling semantic_spelling(void) const;
   std::string_view spelling(void) const;
   bool is_alignas(void) const;

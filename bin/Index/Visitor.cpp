@@ -72,7 +72,7 @@ bool EntityVisitor::EnterVarDecl(const pasta::VarDecl &decl) {
 }
 
 void EntityVisitor::VisitFriendDecl(const pasta::FriendDecl &decl) {
-  if (Enter(decl)) {
+  if (EnterDecl(decl)) {
     for (pasta::TemplateParameterList ls :
              decl.FriendTypeTemplateParameterLists()) {
       for (const pasta::NamedDecl &param_decl : ls.Parameters()) {
@@ -126,7 +126,7 @@ void EntityVisitor::VisitRecordDecl(const pasta::RecordDecl &decl) {
 }
 
 void EntityVisitor::VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) {
-  if (Enter(decl)) {
+  if (EnterDecl(decl)) {
     if (auto init = decl.InitializerExpression()) {
       Accept(*init);
     }
@@ -143,7 +143,7 @@ void EntityVisitor::VisitEnumDecl(const pasta::EnumDecl &decl) {
 }
 
 void EntityVisitor::VisitTypedefNameDecl(const pasta::TypedefNameDecl &decl) {
-  if (Enter(decl)) {
+  if (EnterDecl(decl)) {
     if (auto tag = decl.AnonymousDeclarationWithTypedefName()) {
       Accept(*tag);
     }
@@ -351,6 +351,13 @@ void EntityVisitor::VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stm
 
 bool EntityVisitor::EnterDecl(const pasta::Decl &decl) {
   if (Enter(decl)) {
+    for (const pasta::Attr &attr : decl.Attributes()) {
+      if (auto aligned_attr = pasta::AlignedAttr::From(attr)) {
+        if (auto aligned_expr = aligned_attr->AlignmentExpression()) {
+          Accept(*aligned_expr);
+        }
+      }
+    }
     if (auto ls = decl.DescribedTemplateParameters()) {
       for (const pasta::NamedDecl &param_decl : ls->Parameters()) {
         Accept(param_decl);

@@ -9702,8 +9702,8 @@ This table also includes all of the fields contained in [`InheritableAttr`](#Inh
 
 | Name | Type | `NOT NULL` | References |
 | --- | --- | --- | --- |
-| `alignment_expression` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
-| `alignment_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `alignment_expression` | `INTEGER` | :x: | [`Expr`](#Expr) |
+| `alignment_type` | `INTEGER` | :x: | [`Type`](#Type) |
 | `semantic_spelling` | `INTEGER` | :heavy_check_mark: | [`AlignedAttrSpelling`](#AlignedAttrSpelling) |
 | `spelling` | `TEXT` | :heavy_check_mark: | |
 | `is_alignas` | `INTEGER` | :heavy_check_mark: | |

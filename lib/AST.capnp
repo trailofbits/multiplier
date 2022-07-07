@@ -863,11 +863,13 @@ struct Attr @0xe5b70746662da9f3 {
   val21 @16 :Bool;
   val22 @17 :Bool;
   val23 @18 :Bool;
-  val0 @19 :UInt64;
-  val6 @20 :UInt64;
-  val7 @21 :UInt64;
-  val8 @22 :UInt64;
-  val17 @23 :UInt64;
+  val24 @19 :Bool;
+  val25 @20 :Bool;
+  val0 @21 :UInt64;
+  val6 @22 :UInt64;
+  val7 @23 :UInt64;
+  val8 @24 :UInt64;
+  val17 @25 :UInt64;
 }
 
 struct Pseudo @0xa5b20a8972c73a6b {
