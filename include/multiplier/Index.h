@@ -114,6 +114,7 @@ class EntityProvider {
   // done client side, and we coarsely communicate whether or not the entire
   // cache is out-of-date via non-decreasing version numbers returned by client-
   // to-indexer requests.
+  virtual unsigned VersionNumber(const Ptr &) = 0;
   virtual unsigned VersionNumber(void) = 0;
 
   // Update the version number. This is basically a signal to invalidate any
@@ -199,6 +200,13 @@ class Index {
 
   static Index containing(const Fragment &fragment);
   static Index containing(const File &file);
+
+  // Return the version number of the index. A version number of `0` is
+  // invalid, a version number of `1` means we've connected to a fresh/empty
+  // indexer with nothing indexed, a version number `2 * n` for `n >= 1` means
+  // that indexing is underway, and a version number of `(2 * n) + 1` for
+  // `n >= 1` means that indexing is done.
+  unsigned version_number(bool block=false) const;
 
   // Clear any internal caches.
   void clear_caches(void) const;

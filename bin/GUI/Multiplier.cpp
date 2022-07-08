@@ -40,6 +40,7 @@
 #include "FileBrowserView.h"
 #include "FileView.h"
 #include "HistoryBrowserView.h"
+#include "IndexMonitorThread.h"
 #include "OmniBoxView.h"
 #include "OpenConnectionDialog.h"
 #include "ReferenceBrowserView.h"
@@ -48,7 +49,14 @@
 
 namespace mx::gui {
 
-enum class ConnectionState : int { kNotConnected, kConnecting, kConnected };
+enum class ConnectionState : int {
+  kNotConnected,
+  kConnecting,
+  kConnectedNoIndex,
+  kConnectedIndexing,
+  kConnectedInitializing,
+  kConnected
+};
 
 namespace {
 
@@ -112,6 +120,8 @@ struct Multiplier::PrivateData final {
   QString indexer_port;
   QProcess *launched_indexer{nullptr};
 
+  IndexMonitorThread *monitor{nullptr};
+
   ConnectionState connection_state{ConnectionState::kNotConnected};
 
   inline PrivateData(::mx::gui::Configuration &config_)
@@ -149,13 +159,25 @@ const ::mx::FileLocationCache &Multiplier::FileLocationCache(void) const {
 
 void Multiplier::paintEvent(QPaintEvent *event) {
   QString message;
-  if (d->connection_state == ConnectionState::kConnected) {
-    this->QWidget::paintEvent(event);
-    return;
-  } else if (d->connection_state == ConnectionState::kConnecting) {
-    message = tr("Connecting...");
-  } else {
-    message = tr("Not connected.");
+  switch (d->connection_state) {
+    case ConnectionState::kNotConnected:
+      message = tr("Not connected.");
+      break;
+    case ConnectionState::kConnecting:
+      message = tr("Connecting...");
+      break;
+    case ConnectionState::kConnectedNoIndex:
+      message = tr("Ready for build importing.");
+      break;
+    case ConnectionState::kConnectedIndexing:
+      message = tr("Indexing...");
+      break;
+    case ConnectionState::kConnectedInitializing:
+      message = tr("Synchronizing with index...");
+      break;
+    case ConnectionState::kConnected:
+      this->QWidget::paintEvent(event);
+      return;
   }
 
   static const auto kTextFlags = Qt::AlignCenter | Qt::TextSingleLine;
@@ -401,19 +423,19 @@ void Multiplier::InitializeMenus(void) {
 
   d->menus.file_menu = menuBar()->addMenu(tr("File"));
   d->menus.file_menu->addAction(d->menus.file_connect_action);
-  d->menus.file_menu->addAction(d->menus.file_disconnect_action);
-
-  if (!d->config.indexer_exe_path.empty() &&
-      !d->config.importer_exe_path.empty()) {
+  if (!d->config.indexer_exe_path.empty()) {
     d->menus.file_launch_action = new QAction(tr("Launch new indexer"));
     connect(d->menus.file_launch_action, &QAction::triggered,
             this, &Multiplier::OnFileLaunchAction);
+    d->menus.file_menu->addAction(d->menus.file_launch_action);
+  }
 
+  d->menus.file_menu->addAction(d->menus.file_disconnect_action);
+
+  if (!d->config.importer_exe_path.empty()) {
     d->menus.file_import_action = new QAction(tr("Import build"));
     connect(d->menus.file_import_action, &QAction::triggered,
             this, &Multiplier::OnFileImportAction);
-
-    d->menus.file_menu->addAction(d->menus.file_launch_action);
     d->menus.file_menu->addAction(d->menus.file_import_action);
   }
 
@@ -427,14 +449,15 @@ void Multiplier::InitializeMenus(void) {
 }
 
 void Multiplier::UpdateMenus(void) {
+  bool is_disconnected = d->connection_state == ConnectionState::kNotConnected;
   bool is_connected = d->connection_state == ConnectionState::kConnected;
-  d->menus.file_connect_action->setEnabled(!is_connected);
+  d->menus.file_connect_action->setEnabled(is_disconnected);
   d->menus.file_disconnect_action->setEnabled(is_connected);
   if (d->menus.file_launch_action) {
-    d->menus.file_launch_action->setEnabled(!is_connected);
+    d->menus.file_launch_action->setEnabled(is_disconnected);
   }
   if (d->menus.file_import_action) {
-    d->menus.file_import_action->setEnabled(is_connected);
+    d->menus.file_import_action->setEnabled(!is_disconnected);
   }
   d->menus.view_reference_browser_action->setEnabled(is_connected);
   d->menus.view_history_browser_action->setEnabled(is_connected);
@@ -444,7 +467,6 @@ void Multiplier::UpdateMenus(void) {
 void Multiplier::UpdateWidgets(void) {
   switch (d->connection_state) {
     case ConnectionState::kNotConnected:
-    case ConnectionState::kConnecting:
       d->file_browser_view->Clear();
       d->history_browser_view->Clear();
       d->reference_browser_view->Clear();
@@ -452,6 +474,7 @@ void Multiplier::UpdateWidgets(void) {
       d->file_browser_dock->hide();
       d->history_browser_dock->hide();
       d->reference_browser_dock->hide();
+      d->code_browser_view->Disconnected();
       break;
 
     case ConnectionState::kConnected:
@@ -459,6 +482,13 @@ void Multiplier::UpdateWidgets(void) {
       d->history_browser_dock->show();
       d->reference_browser_dock->show();
       d->code_browser_view->Connected();
+      break;
+
+    default:
+      d->file_browser_dock->hide();
+      d->history_browser_dock->hide();
+      d->reference_browser_dock->hide();
+      d->code_browser_view->Disconnected();
       break;
   }
 }
@@ -541,37 +571,67 @@ void Multiplier::OnSourceFileDoubleClicked(
 }
 
 void Multiplier::OnLaunchedIndexerReady(void) {
+  d->monitor = new IndexMonitorThread(
+      EntityProvider::in_memory_cache(
+          EntityProvider::from_remote(
+              d->indexer_host.toStdString(),
+              d->indexer_port.toStdString()),
+          10u * 60u  /* 10 minutes */));
 
-  d->index = EntityProvider::in_memory_cache(
-      EntityProvider::from_remote(
-          d->indexer_host.toStdString(),
-          d->indexer_port.toStdString()),
-      10u * 60u  /* 10 minutes */);
+  connect(d->monitor, &IndexMonitorThread::VersionNumberChanged,
+          this, &Multiplier::OnVersionNumberChanged);
 
-  auto downloader = new DownloadFileListThread(Index());
-  downloader->setAutoDelete(true);
+  d->monitor->Start();
+}
 
-  connect(downloader, &DownloadFileListThread::DownloadedFileList,
-          d->file_browser_view, &FileBrowserView::OnDownloadedFileList);
+void Multiplier::OnVersionNumberChanged(::mx::Index index_) {
+  d->index = std::move(index_);
 
-  connect(downloader, &DownloadFileListThread::DownloadedFileList,
-          d->reference_browser_view, &ReferenceBrowserView::OnDownloadedFileList);
+  auto version_number = d->index.version_number();
+  std::cerr << "Version number changed: " << version_number << '\n';
+  if (!version_number) {
+    OnFileDisconnectAction();
+    return;
 
-  connect(downloader, &DownloadFileListThread::DownloadedFileList,
-          d->history_browser_view, &HistoryBrowserView::OnDownloadedFileList);
+  } else if (version_number == 1) {
+    d->connection_state = ConnectionState::kConnectedNoIndex;
+    UpdateUI();
 
-  connect(downloader, &DownloadFileListThread::DownloadedFileList,
-          d->code_browser_view, &CodeBrowserView::OnDownloadedFileList);
+  } else if (!(version_number % 2)) {
+    d->connection_state = ConnectionState::kConnectedIndexing;
+    UpdateUI();
 
-  connect(downloader, &DownloadFileListThread::DownloadedFileList,
-          d->code_browser_view->OmniBox(), &OmniBoxView::OnDownloadedFileList);
+  } else {
+    d->connection_state = ConnectionState::kConnectedInitializing;
+    UpdateUI();
 
-  QThreadPool::globalInstance()->start(downloader);
+    auto downloader = new DownloadFileListThread(Index());
+    downloader->setAutoDelete(true);
+
+    connect(downloader, &DownloadFileListThread::DownloadedFileList,
+            d->file_browser_view, &FileBrowserView::OnDownloadedFileList);
+
+    connect(downloader, &DownloadFileListThread::DownloadedFileList,
+            d->reference_browser_view, &ReferenceBrowserView::OnDownloadedFileList);
+
+    connect(downloader, &DownloadFileListThread::DownloadedFileList,
+            d->history_browser_view, &HistoryBrowserView::OnDownloadedFileList);
+
+    connect(downloader, &DownloadFileListThread::DownloadedFileList,
+            d->code_browser_view, &CodeBrowserView::OnDownloadedFileList);
+
+    connect(downloader, &DownloadFileListThread::DownloadedFileList,
+            d->code_browser_view->OmniBox(), &OmniBoxView::OnDownloadedFileList);
+
+    QThreadPool::globalInstance()->start(downloader);
+  }
 }
 
 void Multiplier::OnLaunchStarted(void) {
-
+  std::cerr << "Indexer has started\n";
   // The indexer can take a bit of time to get ready.
+  //
+  // TODO(pag): This is such a hack.
   QTimer::singleShot(3 * 1000, this, &Multiplier::OnLaunchedIndexerReady);
 }
 
@@ -586,6 +646,7 @@ void Multiplier::OnLaunchFailed(QProcess::ProcessError error) {
 
 
 void Multiplier::OnFileImportAction(void) {
+
   QString file_str = QFileDialog::getOpenFileName(this, tr("Import build"));
 
   std::filesystem::path file_path = file_str.toStdString();
@@ -602,6 +663,9 @@ void Multiplier::OnFileImportAction(void) {
         QMessageBox::Ok);
     return;
   }
+
+  d->connection_state = ConnectionState::kConnectedIndexing;
+  UpdateUI();
 
   QStringList args;
   args.push_back("--host");
@@ -725,6 +789,11 @@ void Multiplier::OnFileDisconnectAction(void) {
     d->launched_indexer->disconnect();
     d->launched_indexer->deleteLater();
     d->launched_indexer = nullptr;
+  }
+
+  if (d->monitor) {
+    d->monitor->Stop();
+    d->monitor = nullptr;
   }
 
   ClearLastLocations();

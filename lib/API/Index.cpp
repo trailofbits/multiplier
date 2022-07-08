@@ -13,6 +13,19 @@ namespace mx {
 
 Index::~Index(void) {}
 
+// Return the version number of the index. A version number of `0` is
+// invalid, a version number of `1` means we've connected to a fresh/empty
+// indexer with nothing indexed, a version number `2 * n` for `n >= 1` means
+// that indexing is underway, and a version number of `(2 * n) + 1` for
+// `n >= 1` means that indexing is done.
+unsigned Index::version_number(bool block) const {
+  if (block) {
+    return impl->VersionNumber(impl);
+  } else {
+    return impl->VersionNumber();
+  }
+}
+
 Index Index::containing(const Fragment &fragment) {
   return Index(fragment.impl->ep);
 }

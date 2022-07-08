@@ -26,6 +26,10 @@ unsigned CachingEntityProvider::VersionNumber(void) {
   return version_number;
 }
 
+unsigned CachingEntityProvider::VersionNumber(const Ptr &self) {
+  return next->VersionNumber(self);
+}
+
 void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
   fragments.clear();
   files.clear();

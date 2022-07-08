@@ -176,8 +176,6 @@ void CodeBrowserView::OnCloseFileViewTab(int index) {
 }
 
 void CodeBrowserView::OnDownloadedFileList(FilePathList files) {
-  Clear();
-  d->file_id_to_path.clear();
   for (auto &[path_, file_id_] : files) {
     std::filesystem::path path = path_;
     RawEntityId file_id = file_id_;

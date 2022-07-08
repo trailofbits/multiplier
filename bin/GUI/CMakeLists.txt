@@ -47,6 +47,9 @@ add_executable("${exe_name}"
   
   HistoryBrowserView.cpp
   HistoryBrowserView.h
+  
+  IndexMonitorThread.cpp
+  IndexMonitorThread.h
 
   Main.cpp
   

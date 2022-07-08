@@ -124,6 +124,8 @@ void FileBrowserView::OnFilterFileView(const QString &text) {
 }
 
 void FileBrowserView::OnDownloadedFileList(FilePathList files) {
+  Clear();
+
   QTreeWidgetItem *root_item = nullptr;
 
   std::set<std::filesystem::path> has_files;

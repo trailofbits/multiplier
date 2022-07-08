@@ -205,6 +205,9 @@ int main(int argc, char *argv[]) {
   qRegisterMetaType<mx::Token>("Token");
   qRegisterMetaType<mx::TokenRange>("TokenRange");
   qRegisterMetaType<mx::TokenList>("TokenList");
+  qRegisterMetaType<mx::Index>("Index");
+  qRegisterMetaType<mx::Index>("::mx::Index");
+  qRegisterMetaType<mx::Index>("mx::Index");
   qRegisterMetaType<std::optional<mx::File>>("std::optional<File>");
   qRegisterMetaType<std::optional<mx::Fragment>>("std::optional<Fragment>");
   qRegisterMetaType<std::optional<mx::Decl>>("std::optional<Decl>");

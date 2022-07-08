@@ -16,6 +16,10 @@ unsigned InvalidEntityProvider::VersionNumber(void) {
   return 0u;
 }
 
+unsigned InvalidEntityProvider::VersionNumber(const Ptr &) {
+  return 0u;
+}
+
 void InvalidEntityProvider::VersionNumberChanged(unsigned) {}
 
 FilePathList InvalidEntityProvider::ListFiles(const Ptr &) {

@@ -62,6 +62,7 @@ class CachingEntityProvider final : public EntityProvider {
   void ClearCache(void) final;
 
   unsigned VersionNumber(void) final;
+  unsigned VersionNumber(const Ptr &) final;
 
   void VersionNumberChanged(unsigned) final;
 

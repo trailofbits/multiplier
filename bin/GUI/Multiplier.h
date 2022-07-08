@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <memory>
+#include <multiplier/Index.h>
 #include <multiplier/Types.h>
 #include <QMainWindow>
 #include <QProcess>
@@ -76,6 +77,7 @@ class Multiplier final : public QMainWindow {
   void OnOpenDock(QString title, QWidget *widget);
 
  private slots:
+  void OnVersionNumberChanged(::mx::Index index);
   void OnLaunchStarted(void);
   void OnLaunchedIndexerReady(void);
   void OnLaunchFailed(QProcess::ProcessError error);

@@ -63,6 +63,7 @@ class RemoteEntityProvider final : public EntityProvider {
 
   // Return the version number.
   unsigned VersionNumber(void) final;
+  unsigned VersionNumber(const Ptr &) final;
 
   // Update the version number. This is basically a signal to invalidate any
   // caches.

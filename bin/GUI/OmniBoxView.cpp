@@ -341,7 +341,6 @@ void OmniBoxView::Focus(void) {
 }
 
 void OmniBoxView::OnDownloadedFileList(FilePathList files) {
-  Clear();
   for (auto &[path, index] : files) {
     d->file_id_to_path.emplace(index, std::move(path));
   }

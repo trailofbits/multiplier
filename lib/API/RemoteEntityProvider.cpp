@@ -120,6 +120,29 @@ unsigned RemoteEntityProvider::VersionNumber(void) {
   return version_number;
 }
 
+// Return the version number.
+unsigned RemoteEntityProvider::VersionNumber(const Ptr &self) try {
+  ClientConnection &cc = Connection(self);
+  capnp::Request<mx::rpc::Multiplier::HelloParams,
+                 mx::rpc::Multiplier::HelloResults> hello_req =
+      cc.client.helloRequest();
+
+  capnp::Response<mx::rpc::Multiplier::HelloResults> hello_resp =
+      hello_req.send().wait(cc.connection.getWaitScope());
+
+  auto new_version_number = hello_resp.getVersionNumber();
+  if (MaybeUpdateVersionNumber(self, new_version_number)) {
+    return new_version_number;
+
+  } else {
+    return VersionNumber();
+  }
+
+// TODO(pag): Log something.
+} catch (...) {
+  return VersionNumber();
+}
+
 // Update the version number. This is basically a signal to invalidate any
 // caches.
 void RemoteEntityProvider::VersionNumberChanged(unsigned) {}
