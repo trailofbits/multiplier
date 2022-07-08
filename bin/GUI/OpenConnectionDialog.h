@@ -23,7 +23,7 @@ class OpenConnectionDialog final : public QDialog {
   Q_OBJECT
 
  public:
-  static std::optional<ConnectionSettings> Run(void);
+  static std::optional<ConnectionSettings> Run(const QString &title);
 
   OpenConnectionDialog(const OpenConnectionDialog &) = delete;
   OpenConnectionDialog &operator=(const OpenConnectionDialog &) = delete;

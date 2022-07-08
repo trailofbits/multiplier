@@ -7,6 +7,7 @@
 #include <memory>
 #include <multiplier/Types.h>
 #include <QMainWindow>
+#include <QProcess>
 
 #include "Event.h"
 
@@ -75,6 +76,12 @@ class Multiplier final : public QMainWindow {
   void OnOpenDock(QString title, QWidget *widget);
 
  private slots:
+  void OnLaunchStarted(void);
+  void OnLaunchedIndexerReady(void);
+  void OnLaunchFailed(QProcess::ProcessError error);
+
+  void OnFileImportAction(void);
+  void OnFileLaunchAction(void);
   void OnFileConnectAction(void);
   void OnFileDisconnectAction(void);
   void OnFileExitAction(void);
@@ -82,7 +89,6 @@ class Multiplier final : public QMainWindow {
   void OnViewReferenceBrowserAction(void);
   void OnViewHistoryBrowserAction(void);
   void OnHelpAboutAction(void);
-  void OnConnectionStateChange(ConnectionState state);
   void OnMoveReferenceBrowser(Qt::DockWidgetArea area);
 
  public slots:

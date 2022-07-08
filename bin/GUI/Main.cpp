@@ -4,28 +4,29 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <cstdint>
-#include <cstdlib>
-#include <gflags/gflags.h>
-#include <glog/logging.h>
-#include <memory>
-#include <multiplier/Index.h>
 #include <QApplication>
 #include <QDebug>
 #include <QFontDatabase>
 #include <QMetaType>
 #include <QPixmap>
 #include <QSplashScreen>
+
+#include <climits>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <filesystem>
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+#include <memory>
+#include <multiplier/Index.h>
+#include <system_error>
 #include <tuple>
 
 #include "CodeView.h"
 #include "Configuration.h"
 #include "Multiplier.h"
 #include "ReferenceBrowserView.h"
-
-namespace {
-
-} // namespace
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, false);

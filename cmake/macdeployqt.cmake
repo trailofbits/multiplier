@@ -30,7 +30,7 @@ function(qt_deploy_target target_name target_bundle_path)
   elseif(NOT "x${Qt5_DIR}x" STREQUAL "xx")
     get_filename_component(qt_cmake_dir "${Qt5_DIR}" DIRECTORY)
   else()
-    message(FATAL_ERROR "Failed to find Qt${MX_QT}_Dir")
+    message(FATAL_ERROR "Failed to find ${MX_QT}_Dir")
   endif()
   
   

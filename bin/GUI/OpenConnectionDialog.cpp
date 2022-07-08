@@ -31,9 +31,10 @@ struct OpenConnectionDialog::PrivateData final {
   QLineEdit *input_file_path{nullptr};
 };
 
-std::optional<ConnectionSettings> OpenConnectionDialog::Run(void) {
+std::optional<ConnectionSettings> OpenConnectionDialog::Run(
+    const QString &title) {
   OpenConnectionDialog dialog;
-  dialog.setWindowTitle(tr("Connect to the Multiplier indexer"));
+  dialog.setWindowTitle(title);
 
   if (dialog.exec() == QDialog::Accepted) {
     return dialog.d->connection_settings;

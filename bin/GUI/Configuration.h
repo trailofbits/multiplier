@@ -11,6 +11,9 @@
 
 #include "Event.h"
 
+// NOTE(pag): Must be after Qt includes in `Event.h`.
+#include <filesystem>
+
 namespace mx::gui {
 
 // TODO(pag): All of this would probably make more sense as a protobuf format.
@@ -153,6 +156,9 @@ struct Configuration {
   // always want an event to fire, then do it here. The only tested thing for
   // these is the source; the modifiers/click/key constraints are ignored.
   std::vector<EventAction> immediate_actions;
+
+  std::filesystem::path indexer_exe_path;
+  std::filesystem::path importer_exe_path;
 
   Configuration(void);
 };

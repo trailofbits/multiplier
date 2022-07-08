@@ -14,12 +14,8 @@ if(MX_QT_VERSION GREATER "5")
 endif()
 find_package(${MX_QT} COMPONENTS ${MX_QT_COMPONENTS} REQUIRED)
 
-if(PLATFORM_MACOS)
-  set(MACOSX_BUNDLE_ICON_FILE "Logo.ico")
-endif()
-
 set(exe_name "mx-gui")
-add_executable("${exe_name}" "${executable_type}"
+add_executable("${exe_name}"
 
   Resources/resources.qrc
   

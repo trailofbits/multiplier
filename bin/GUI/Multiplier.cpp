@@ -14,6 +14,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QByteArray>
 #include <QCloseEvent>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -24,7 +25,9 @@
 #include <QPainter>
 #include <QRect>
 #include <QScreen>
+#include <QStringList>
 #include <QThreadPool>
+#include <QTimer>
 
 #include <algorithm>
 #include <multiplier/Index.h>
@@ -54,6 +57,8 @@ struct MainMindowMenus final {
   QMenu *file_menu{nullptr};
   QAction *file_connect_action{nullptr};
   QAction *file_disconnect_action{nullptr};
+  QAction *file_launch_action{nullptr};
+  QAction *file_import_action{nullptr};
   QAction *file_exit_action{nullptr};
 
   QMenu *view_menu{nullptr};
@@ -102,6 +107,10 @@ struct Multiplier::PrivateData final {
 
   mx::Index index;
   mx::FileLocationCache line_cache;
+
+  QString indexer_host;
+  QString indexer_port;
+  QProcess *launched_indexer{nullptr};
 
   ConnectionState connection_state{ConnectionState::kNotConnected};
 
@@ -366,15 +375,15 @@ void Multiplier::InitializeMenus(void) {
   // File menu
   //
 
-  d->menus.file_connect_action = new QAction(tr("&Connect"));
+  d->menus.file_connect_action = new QAction(tr("Connect to existing indexer"));
   connect(d->menus.file_connect_action, &QAction::triggered,
           this, &Multiplier::OnFileConnectAction);
 
-  d->menus.file_disconnect_action = new QAction(tr("&Disconnect"));
+  d->menus.file_disconnect_action = new QAction(tr("Disconnect"));
   connect(d->menus.file_disconnect_action, &QAction::triggered,
           this, &Multiplier::OnFileDisconnectAction);
 
-  d->menus.file_exit_action = new QAction(tr("&Exit"));
+  d->menus.file_exit_action = new QAction(tr("Exit"));
   connect(d->menus.file_exit_action, &QAction::triggered,
           this, &Multiplier::OnFileExitAction);
 
@@ -393,6 +402,21 @@ void Multiplier::InitializeMenus(void) {
   d->menus.file_menu = menuBar()->addMenu(tr("File"));
   d->menus.file_menu->addAction(d->menus.file_connect_action);
   d->menus.file_menu->addAction(d->menus.file_disconnect_action);
+
+  if (!d->config.indexer_exe_path.empty() &&
+      !d->config.importer_exe_path.empty()) {
+    d->menus.file_launch_action = new QAction(tr("Launch new indexer"));
+    connect(d->menus.file_launch_action, &QAction::triggered,
+            this, &Multiplier::OnFileLaunchAction);
+
+    d->menus.file_import_action = new QAction(tr("Import build"));
+    connect(d->menus.file_import_action, &QAction::triggered,
+            this, &Multiplier::OnFileImportAction);
+
+    d->menus.file_menu->addAction(d->menus.file_launch_action);
+    d->menus.file_menu->addAction(d->menus.file_import_action);
+  }
+
   d->menus.file_menu->addSeparator();
   d->menus.file_menu->addAction(d->menus.file_exit_action);
 
@@ -406,6 +430,12 @@ void Multiplier::UpdateMenus(void) {
   bool is_connected = d->connection_state == ConnectionState::kConnected;
   d->menus.file_connect_action->setEnabled(!is_connected);
   d->menus.file_disconnect_action->setEnabled(is_connected);
+  if (d->menus.file_launch_action) {
+    d->menus.file_launch_action->setEnabled(!is_connected);
+  }
+  if (d->menus.file_import_action) {
+    d->menus.file_import_action->setEnabled(is_connected);
+  }
   d->menus.view_reference_browser_action->setEnabled(is_connected);
   d->menus.view_history_browser_action->setEnabled(is_connected);
   d->menus.view_file_browser_action->setEnabled(is_connected);
@@ -455,7 +485,7 @@ void Multiplier::ClearLastLocations(void) {
 
   // Fill in with empty stuff. The way `EmitActions` works is that it relies
   // on the event sources being present.
-  std::ignore =d->last_locations[EventSource::kReferenceBrowserPreviewClickSource];
+  std::ignore = d->last_locations[EventSource::kReferenceBrowserPreviewClickSource];
   std::ignore = d->last_locations[EventSource::kReferenceBrowserPreviewClickDest];
   std::ignore = d->last_locations[EventSource::kReferenceBrowser];
   std::ignore = d->last_locations[EventSource::kCodeBrowserClickSource];
@@ -466,17 +496,6 @@ void Multiplier::ClearLastLocations(void) {
   std::ignore = d->last_locations[EventSource::kCodeSearchResultPreviewClickSource];
   std::ignore = d->last_locations[EventSource::kCodeSearchResultPreviewClickDest];
   std::ignore = d->last_locations[EventSource::kEntitySearchResult];
-}
-
-void Multiplier::OnConnectionStateChange(ConnectionState state) {
-  if (ConnectionState::kConnected == state) {
-    d->connection_state = ConnectionState::kConnected;
-  } else if (ConnectionState::kNotConnected == state) {
-    d->connection_state = ConnectionState::kNotConnected;
-  } else {
-    assert(false);
-  }
-  UpdateUI();
 }
 
 void Multiplier::OnMoveReferenceBrowser(Qt::DockWidgetArea area) {
@@ -521,19 +540,12 @@ void Multiplier::OnSourceFileDoubleClicked(
   d->code_browser_view->OpenFile(std::move(path), file_id, true);
 }
 
-void Multiplier::OnFileConnectAction(void) {
-  auto connect_settings = OpenConnectionDialog::Run();
-  if (!connect_settings.has_value()) {
-    return;
-  }
-
-  d->connection_state = ConnectionState::kConnecting;
-  UpdateUI();
+void Multiplier::OnLaunchedIndexerReady(void) {
 
   d->index = EntityProvider::in_memory_cache(
       EntityProvider::from_remote(
-          connect_settings->host.toStdString(),
-          connect_settings->port.toStdString()),
+          d->indexer_host.toStdString(),
+          d->indexer_port.toStdString()),
       10u * 60u  /* 10 minutes */);
 
   auto downloader = new DownloadFileListThread(Index());
@@ -557,6 +569,148 @@ void Multiplier::OnFileConnectAction(void) {
   QThreadPool::globalInstance()->start(downloader);
 }
 
+void Multiplier::OnLaunchStarted(void) {
+
+  // The indexer can take a bit of time to get ready.
+  QTimer::singleShot(3 * 1000, this, &Multiplier::OnLaunchedIndexerReady);
+}
+
+void Multiplier::OnLaunchFailed(QProcess::ProcessError error) {
+  std::cerr << "Launch failed?\n";
+  d->launched_indexer->disconnect();
+  d->launched_indexer->deleteLater();
+  d->launched_indexer = nullptr;
+  d->connection_state = ConnectionState::kNotConnected;
+  UpdateUI();
+}
+
+
+void Multiplier::OnFileImportAction(void) {
+  QString file_str = QFileDialog::getOpenFileName(this, tr("Import build"));
+
+  std::filesystem::path file_path = file_str.toStdString();
+
+  // Get the full path to the workspace.
+  std::error_code ec;
+  auto full_file_path = std::filesystem::absolute(file_path, ec);
+  if (ec) {
+    (void) QMessageBox::warning(
+        this, tr("Import Error"),
+        tr("Could not locate file %1: %2")
+            .arg(file_str)
+            .arg(QString::fromStdString(ec.message())),
+        QMessageBox::Ok);
+    return;
+  }
+
+  QStringList args;
+  args.push_back("--host");
+  args.push_back(d->indexer_host);
+  args.push_back("--port");
+  args.push_back(d->indexer_port);
+  args.push_back("--path");
+  args.push_back(QString::fromStdString(full_file_path.generic_string()));
+#ifndef NDEBUG
+  args.push_back("--logtostderr");
+  args.push_back("--minloglevel");
+  args.push_back("0");
+#endif
+
+  auto importer = new QProcess;
+  std::cerr << "Starting importer process: " << d->config.importer_exe_path.generic_string() << '\n';
+  importer->start(
+      QString::fromStdString(d->config.importer_exe_path.generic_string()),
+      args);
+  importer->waitForFinished(-1);
+  importer->deleteLater();
+}
+
+void Multiplier::OnFileLaunchAction(void) {
+  QString workspace_dir = QFileDialog::getExistingDirectory(
+      this, tr("Open Workspace Directory"),
+      "/tmp", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+  std::filesystem::path workspace_path = workspace_dir.toStdString();
+
+  // Try to create the workspace directories if they're missing.
+  std::error_code ec;
+  std::filesystem::create_directories(workspace_path, ec);
+  if (ec) {
+    (void) QMessageBox::warning(
+        this, tr("Launch Error"),
+        tr("Could not create workspace directory %1: %2")
+            .arg(workspace_dir)
+            .arg(QString::fromStdString(ec.message())),
+        QMessageBox::Ok);
+    return;
+  }
+
+  // Get the full path to the workspace.
+  auto full_workspace_path = std::filesystem::absolute(workspace_path, ec);
+  if (ec) {
+    (void) QMessageBox::warning(
+        this, tr("Launch Error"),
+        tr("Could not locate workspace directory %1: %2")
+            .arg(workspace_dir)
+            .arg(QString::fromStdString(ec.message())),
+        QMessageBox::Ok);
+    return;
+  }
+
+  auto connect_settings = OpenConnectionDialog::Run(
+      tr("Configure the new indexer"));
+  if (!connect_settings.has_value()) {
+    return;
+  }
+
+  d->connection_state = ConnectionState::kConnecting;
+  UpdateUI();
+
+  d->indexer_host = connect_settings->host;
+  d->indexer_port = connect_settings->port;
+
+  QStringList args;
+  args.push_back("--workspace_dir");
+  args.push_back(QString::fromStdString(full_workspace_path.generic_string()));
+  args.push_back("--host");
+  args.push_back(d->indexer_host);
+  args.push_back("--port");
+  args.push_back(d->indexer_port);
+#ifndef NDEBUG
+  args.push_back("--logtostderr");
+  args.push_back("--minloglevel");
+  args.push_back("0");
+#endif
+
+  d->launched_indexer = new QProcess;
+
+  connect(d->launched_indexer, &QProcess::started,
+          this, &Multiplier::OnLaunchStarted);
+
+  connect(d->launched_indexer, &QProcess::errorOccurred,
+          this, &Multiplier::OnLaunchFailed);
+
+  std::cerr << "Starting indexer process: " << d->config.indexer_exe_path.generic_string() << '\n';
+  d->launched_indexer->start(
+      QString::fromStdString(d->config.indexer_exe_path.generic_string()),
+      args);
+}
+
+void Multiplier::OnFileConnectAction(void) {
+  auto connect_settings = OpenConnectionDialog::Run(
+      tr("Connect to the Multiplier indexer"));
+  if (!connect_settings.has_value()) {
+    return;
+  }
+
+  d->connection_state = ConnectionState::kConnecting;
+  UpdateUI();
+
+  d->indexer_host = connect_settings->host;
+  d->indexer_port = connect_settings->port;
+  OnLaunchedIndexerReady();
+}
+
 void Multiplier::OnFileDisconnectAction(void) {
   d->connection_state = ConnectionState::kNotConnected;
   d->index = mx::Index();
@@ -565,6 +719,14 @@ void Multiplier::OnFileDisconnectAction(void) {
   d->history_browser_view->Clear();
   d->code_browser_view->Clear();
   d->code_browser_view->Disconnected();
+
+  if (d->launched_indexer) {
+    d->launched_indexer->kill();
+    d->launched_indexer->disconnect();
+    d->launched_indexer->deleteLater();
+    d->launched_indexer = nullptr;
+  }
+
   ClearLastLocations();
   UpdateUI();
 }
