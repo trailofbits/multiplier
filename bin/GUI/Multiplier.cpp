@@ -588,7 +588,6 @@ void Multiplier::OnVersionNumberChanged(::mx::Index index_) {
   d->index = std::move(index_);
 
   auto version_number = d->index.version_number();
-  std::cerr << "Version number changed: " << version_number << '\n';
   if (!version_number) {
     OnFileDisconnectAction();
     return;
@@ -628,7 +627,6 @@ void Multiplier::OnVersionNumberChanged(::mx::Index index_) {
 }
 
 void Multiplier::OnLaunchStarted(void) {
-  std::cerr << "Indexer has started\n";
   // The indexer can take a bit of time to get ready.
   //
   // TODO(pag): This is such a hack.
@@ -636,14 +634,12 @@ void Multiplier::OnLaunchStarted(void) {
 }
 
 void Multiplier::OnLaunchFailed(QProcess::ProcessError error) {
-  std::cerr << "Launch failed?\n";
   d->launched_indexer->disconnect();
   d->launched_indexer->deleteLater();
   d->launched_indexer = nullptr;
   d->connection_state = ConnectionState::kNotConnected;
   UpdateUI();
 }
-
 
 void Multiplier::OnFileImportAction(void) {
 
@@ -675,13 +671,11 @@ void Multiplier::OnFileImportAction(void) {
   args.push_back("--path");
   args.push_back(QString::fromStdString(full_file_path.generic_string()));
 #ifndef NDEBUG
-  args.push_back("--logtostderr");
   args.push_back("--minloglevel");
   args.push_back("0");
 #endif
 
   auto importer = new QProcess;
-  std::cerr << "Starting importer process: " << d->config.importer_exe_path.generic_string() << '\n';
   importer->start(
       QString::fromStdString(d->config.importer_exe_path.generic_string()),
       args);
@@ -741,7 +735,6 @@ void Multiplier::OnFileLaunchAction(void) {
   args.push_back("--port");
   args.push_back(d->indexer_port);
 #ifndef NDEBUG
-  args.push_back("--logtostderr");
   args.push_back("--minloglevel");
   args.push_back("0");
 #endif
@@ -754,7 +747,6 @@ void Multiplier::OnFileLaunchAction(void) {
   connect(d->launched_indexer, &QProcess::errorOccurred,
           this, &Multiplier::OnLaunchFailed);
 
-  std::cerr << "Starting indexer process: " << d->config.indexer_exe_path.generic_string() << '\n';
   d->launched_indexer->start(
       QString::fromStdString(d->config.indexer_exe_path.generic_string()),
       args);
