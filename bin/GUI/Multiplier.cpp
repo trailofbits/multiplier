@@ -644,6 +644,9 @@ void Multiplier::OnLaunchFailed(QProcess::ProcessError error) {
 void Multiplier::OnFileImportAction(void) {
 
   QString file_str = QFileDialog::getOpenFileName(this, tr("Import build"));
+  if (!file_str.size()) {
+    return;
+  }
 
   std::filesystem::path file_path = file_str.toStdString();
 
