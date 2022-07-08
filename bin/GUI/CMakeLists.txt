@@ -91,8 +91,32 @@ set_target_properties("${exe_name}"
     AUTORCC TRUE
 )
 
+# Find libLTO.so or libLTO.dylib. LLVM relies on these, and LLVM is used in
+# PASTA, which is used in mx-index and mx-import.
+find_library(lib_lto LTO)
+if("${lib_lto}" STREQUAL "lib_lto-NOTFOUND")
+  message(FATAL_ERROR "Could not find libLTO")
+else()
+  message(STATUS "Found LTO library: ${lib_lto}")
+endif()
+get_filename_component(lib_lto_name "${lib_lto}" NAME)
+
+# Find libRemarks.so or libRemarks.dylib. LLVM relies on these, and LLVM is
+# used in PASTA, which is used in mx-index and mx-import.
+find_library(lib_remarks Remarks)
+if("${lib_remarks}" STREQUAL "lib_remarks-NOTFOUND")
+  message(FATAL_ERROR "Could not find libRemarks")
+else()
+  message(STATUS "Found Remarks library: ${lib_remarks}")
+endif()
+get_filename_component(lib_remarks_name "${lib_remarks}" NAME)
 
 if(PLATFORM_MACOS)
+  find_program(install_name_tool install_name_tool)
+  if("${install_name_tool}" STREQUAL "install_name_tool-NOTFOUND")
+    message(FATAL_ERROR "Could not find install_name_tool")  
+  endif()
+
   set(icon_path "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons/Logo.ico")
   set(plist_path "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist")
 
@@ -133,7 +157,13 @@ if(PLATFORM_MACOS)
     COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-gui>" "${output_bundle_path}/Contents/MacOS/Multiplier"
     COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-index>" "${output_bundle_path}/Contents/bin/mx-index"
     COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-import>" "${output_bundle_path}/Contents/bin/mx-import"
-    COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mx-import>" "${output_bundle_path}/Contents/lib/mxsqlitebridge"
+    COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:mxsqlitebridge>" "${output_bundle_path}/Contents/lib/mxsqlitebridge.a"
+    COMMAND "${CMAKE_COMMAND}" -E copy "${lib_lto}" "${output_bundle_path}/Contents/lib/${lib_lto_name}"
+    COMMAND "${CMAKE_COMMAND}" -E copy "${lib_remarks}" "${output_bundle_path}/Contents/lib/${lib_remarks_name}"
+    COMMAND "${install_name_tool}" -change "@rpath/${lib_lto_name}" "@loader_path/../lib/${lib_lto_name}" "${output_bundle_path}/Contents/bin/mx-index"
+    COMMAND "${install_name_tool}" -change "@rpath/${lib_lto_name}" "@loader_path/../lib/${lib_lto_name}" "${output_bundle_path}/Contents/bin/mx-import"
+    COMMAND "${install_name_tool}" -change "@rpath/${lib_remarks_name}" "@loader_path/../lib/${lib_remarks_name}" "${output_bundle_path}/Contents/bin/mx-index"
+    COMMAND "${install_name_tool}" -change "@rpath/${lib_remarks_name}" "@loader_path/../lib/${lib_remarks_name}" "${output_bundle_path}/Contents/bin/mx-import"
     COMMAND "${CMAKE_COMMAND}" -E copy "${plist_path}" "${output_bundle_path}/Contents/Info.plist"
     COMMAND "${CMAKE_COMMAND}" -E copy "${icon_path}" "${output_bundle_path}/Contents/Resources/Logo.ico"
   )
