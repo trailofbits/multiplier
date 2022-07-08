@@ -11,8 +11,8 @@ add_library("mx-syntex"
   "AST.h"
   "Grammar.cpp"
   "Grammar.h"
-  "Lexer.cpp"
-  "Lexer.h"
+  "Parser.cpp"
+  "Parser.h"
 )
 
 target_link_libraries("mx-syntex"

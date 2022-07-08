@@ -6,13 +6,11 @@
 
 #pragma once
 
-#include <cstdint>
+#include <cassert>
 #include <deque>
-#include <iosfwd>
 #include <string>
 #include <variant>
 #include <vector>
-#include <optional>
 
 namespace mx {
 class Decl;
@@ -30,6 +28,24 @@ namespace syntex {
 
 class AST;
 class Parser;
+
+struct NonTerminal {
+  std::variant<std::monostate,
+                mx::DeclKind,
+                mx::StmtKind,
+                mx::TypeKind,
+                mx::TokenKind> data;
+
+  NonTerminal() {}
+  NonTerminal(mx::DeclKind k) : data(k) {}
+  NonTerminal(mx::StmtKind k) : data(k) {}
+  NonTerminal(mx::TypeKind k) : data(k) {}
+  NonTerminal(mx::TokenKind k) : data(k) {}
+
+  bool operator==(const NonTerminal& other) const {
+    return data == other.data;
+  }
+};
 
 class ASTNode {
  private:
@@ -74,6 +90,41 @@ class ASTNode {
 
   bool operator==(const ASTNode &that) const noexcept;
 };
+
+
+std::ostream& operator<<(std::ostream& os, const NonTerminal& nt);
+
+static NonTerminal NodeToNonTerminal(const ASTNode *node) {
+  switch (node->kind) {
+    default:
+    case ASTNode::kFragment:
+      assert(false);
+      abort();
+      break;
+    case ASTNode::kDeclKind:
+      return NonTerminal(static_cast<mx::DeclKind>(node->kind_val));
+    case ASTNode::kStmtKind:
+      return NonTerminal(static_cast<mx::StmtKind>(node->kind_val));
+    case ASTNode::kTypeKind:
+      return NonTerminal(static_cast<mx::TypeKind>(node->kind_val));
+    case ASTNode::kTokenKind:
+      return NonTerminal(static_cast<mx::TokenKind>(node->kind_val));
+  }
+}
+
+/*
+
+static bool NodeIsComma(const ASTNode *node) {
+  return node->kind == ASTNode::kTokenKind &&
+         node->kind_val == static_cast<unsigned short>(mx::TokenKind::COMMA);
+}
+
+static bool NodeIsSemicolon(const ASTNode *node) {
+  return node->kind == ASTNode::kTokenKind &&
+         node->kind_val == static_cast<unsigned short>(mx::TokenKind::SEMI);
+}
+
+*/
 
 // An AST.
 class AST {

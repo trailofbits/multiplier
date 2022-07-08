@@ -9,9 +9,8 @@
 #include <iostream>
 #include <multiplier/Index.h>
 #include <sstream>
-#include "AST.h"
-#include "Grammar.h"
-#include "Lexer.h"
+
+#include "Parser.h"
 
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
@@ -34,18 +33,10 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port));
 
   syntex::Grammar grammar(FLAGS_index_dir);
-
-  // Tokenize
-  auto tokens = syntex::Tokenize(grammar, FLAGS_query);
-  for (auto& token : tokens)
-    std::cout << token << "\n";
-
-  // Parse
-  syntex::Parse(grammar, tokens);
+  syntex::Parse(grammar, FLAGS_query);
 
   return EXIT_SUCCESS;
 }

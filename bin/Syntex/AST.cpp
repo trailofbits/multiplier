@@ -6,9 +6,11 @@
 
 #include "AST.h"
 
-#include <multiplier/Index.h>
+#include <cstdint>
+#include <optional>
 #include <ostream>
 #include <sstream>
+#include <multiplier/Index.h>
 
 namespace syntex {
 

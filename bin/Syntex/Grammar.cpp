@@ -208,38 +208,6 @@ struct Serializer<Reader, Writer, SmallBloomFilter> {
 
 namespace syntex {
 
-namespace {
-
-static NonTerminal NodeToNonTerminal(const ASTNode *node) {
-  switch (node->kind) {
-    default:
-    case ASTNode::kFragment:
-      assert(false);
-      abort();
-      break;
-    case ASTNode::kDeclKind:
-      return NonTerminal(static_cast<mx::DeclKind>(node->kind_val));
-    case ASTNode::kStmtKind:
-      return NonTerminal(static_cast<mx::StmtKind>(node->kind_val));
-    case ASTNode::kTypeKind:
-      return NonTerminal(static_cast<mx::TypeKind>(node->kind_val));
-    case ASTNode::kTokenKind:
-      return NonTerminal(static_cast<mx::TokenKind>(node->kind_val));
-  }
-}
-
-static bool NodeIsComma(const ASTNode *node) {
-  return node->kind == ASTNode::kTokenKind &&
-         node->kind_val == static_cast<unsigned short>(mx::TokenKind::COMMA);
-}
-
-static bool NodeIsSemicolon(const ASTNode *node) {
-  return node->kind == ASTNode::kTokenKind &&
-         node->kind_val == static_cast<unsigned short>(mx::TokenKind::SEMI);
-}
-
-}  // namespace
-
 std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
   if (std::holds_alternative<mx::DeclKind>(nt.data)) {
     os << "DeclKind::" << EnumeratorName(std::get<mx::DeclKind>(nt.data));
@@ -306,15 +274,13 @@ Grammar::~Grammar(void) {}
 Grammar::Grammar(std::filesystem::path grammar_dir)
     : impl(std::make_shared<GrammarImpl>(std::move(grammar_dir))) {}
 
-mx::TokenKind Grammar::ClassifyIdent(std::string_view& spelling) const {
-  // FIXME: this should really use some kind of heterogenous lookup instead of
-  // constructing a temporary string
-  Terminal terminal = { std::string(spelling) };
-  auto kind = impl->tokens.TryGet(terminal);
-  if (kind.has_value())
+// Determine the kind of an identifier based on its spelling
+std::optional<mx::TokenKind> Grammar::ClassifyIdent(std::string_view spelling) const {
+  auto kind = impl->tokens.TryGet({ std::string(spelling) });
+  if (kind.has_value() && *kind != mx::TokenKind::IDENTIFIER)
     return kind.value();
   else
-    return mx::TokenKind::IDENTIFIER;
+    return {};
 }
 
 // Find all productions beginning with the specified non-terminal
@@ -417,151 +383,6 @@ void Grammar::Import(const mx::Fragment &fragment) {
   }
 
   impl->features.Set(fragment.id(), fragment_features);
-}
-
-//
-// Parser item
-//
-
-class Item {
- private:
-  Item(const NonTerminal *cur_, const NonTerminal *end_)
-    : cur(cur_),
-      end(end_) {}
-
- public:
-  const NonTerminal *cur, *end;
-  ASTNode::ChildVector child_vector;
-
-  Item(const Rule& rule)
-    : cur(&rule.non_terminals.front()),
-      end(&rule.non_terminals.back()) {}
-
-  bool AtEnd() const {
-    return cur == end;
-  }
-
-  const NonTerminal& Cur() const {
-    return *cur;
-  }
-
-  Item Forward(const ASTNode *child) {
-    assert(cur < end);
-    Item new_item(cur + 1, end);
-    new_item.child_vector.insert(
-      new_item.child_vector.end(),
-      child_vector.begin(),
-      child_vector.end());
-    new_item.child_vector.push_back(child);
-    return new_item;
-  }
-
-  const ASTNode *ResultingNode(AST& ast) {
-    if (std::holds_alternative<mx::DeclKind>(cur->data)) {
-      return ast.ConstructNode(std::get<mx::DeclKind>(cur->data), child_vector);
-    } else if (std::holds_alternative<mx::StmtKind>(cur->data)) {
-      return ast.ConstructNode(std::get<mx::StmtKind>(cur->data), child_vector);
-    } else if (std::holds_alternative<mx::TypeKind>(cur->data)) {
-      return ast.ConstructNode(std::get<mx::TypeKind>(cur->data), child_vector);
-    } else {
-      assert(false);
-    }
-  }
-};
-
-//
-// Parsed fragment
-//
-
-struct Fragment {
-  const ASTNode *node;
-  size_t next;
-
-  Fragment(const ASTNode *node_, size_t next_)
-    : node(node_), next(next_) {}
-};
-
-//
-// Wrapper around parsing functions
-//
-
-class Parser {
-private:
-  // Resulting AST
-  AST m_ast;
-
-  // Grammar to be processed
-  const Grammar& m_grammar;
-
-  // Input tokens
-  std::unordered_map<size_t, std::vector<Token>> m_tokens;
-
-  // Partial parses for each source location
-  std::unordered_map<size_t, std::vector<Fragment>> m_parses;
-
-public:
-  Parser(const Grammar& grammar, const std::vector<Token>& tokens)
-    : m_grammar(grammar)
-  {
-    for (auto& token : tokens)
-      m_tokens[token.begin].push_back(token);
-  }
-
-  void MatchRule(std::vector<Fragment>& result, Item item, size_t position) {
-    if (item.AtEnd())
-      // Try to match the result as a new prefix
-      MatchPrefix(result, Fragment(item.ResultingNode(m_ast), position));
-    else
-      // Otherwise see if we can move forward with this rule
-      for (auto& frag : ParsesAtIndex(position))
-        if (NodeToNonTerminal(frag.node) == item.Cur())
-          MatchRule(result, item.Forward(frag.node), frag.next);
-  }
-
-  void MatchPrefix(std::vector<Fragment>& result, Fragment frag) {
-    for (auto& rule : m_grammar.MatchProductions(NodeToNonTerminal(frag.node)))
-      // Find all possible ways we can match this grammar rule
-      MatchRule(result, Item(rule).Forward(frag.node), frag.next);
-
-    // Add the input fragment itself
-    result.push_back(frag);
-  }
-
-  const std::vector<Fragment>& ParsesAtIndex(size_t index) {
-    // Lookup memoized parses at this index
-    auto parse = m_parses.find(index);
-    if (parse != m_parses.end())
-      return parse->second;
-
-    // And only do computation if the lookup found nothing
-    std::vector<Fragment>& result = m_parses[index];
-    auto it = m_tokens.find(index);
-    if (it != m_tokens.end())
-      for (auto& token : it->second) {
-        auto node = m_ast.ConstructNode(token.kind, std::string(token.spelling));
-        MatchPrefix(result, Fragment(node, token.next));
-      }
-    return result;
-  }
-
-  void Parse() {
-    // Start computing parses at index 0
-    auto fragments = ParsesAtIndex(0);
-
-    // Print fragments at index 0
-    std::cout << "-------------------\n";
-    for (auto& frag : fragments)
-      std::cout << "  " << NodeToNonTerminal(frag.node) << "\n";
-    std::cout << "-------------------\n";
-
-    // Print AST to cerr
-    m_ast.PrintDOT(std::cerr);
-  }
-};
-
-void Parse(const Grammar& grammar, const std::vector<Token>& tokens) {
-  Parser parser(grammar, tokens);
-  parser.Parse();
 }
 
 }  // namespace syntex
