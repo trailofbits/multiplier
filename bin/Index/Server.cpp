@@ -132,6 +132,105 @@ std::shared_ptr<ServerImpl> Server::Build(ServerOptions &options_) {
   return ret;
 }
 
+static void RenderPath(std::stringstream &ss,
+                       mx::rpc::CompileCommand::Reader cc,
+                       mx::rpc::IncludePath::Reader ip,
+                       const char *extra) {
+  auto dir = ip.getDirectory().cStr();
+  if (ip.getLocation() == mx::rpc::IncludePathLocation::ABSOLUTE) {
+    ss << ' ' << dir;
+  } else {
+    auto sysroot_dir = cc.getSystemRootIncludeDirectory().cStr();
+    auto sysroot_dir_len = cc.getSystemRootIncludeDirectory().size();
+    if (sysroot_dir_len && sysroot_dir[0] == '/') {
+      ss << ' ' << sysroot_dir;
+      if (sysroot_dir[sysroot_dir_len] != '/') {
+        ss << '/';
+      }
+      if (dir[0] == '/') {
+        dir = &(dir[1]);
+      }
+      ss << extra << dir;
+    } else {
+      ss << ' ' << extra << dir;
+    }
+  }
+}
+
+static pasta::Result<pasta::Compiler, std::string> CreateCompilerFromCommand(
+    const pasta::FileManager &fm,
+    mx::rpc::CompileCommand::Reader cc) {
+  std::stringstream ver_sysroot;
+  std::stringstream ver_nosysroot;
+
+  auto cc_path = cc.getCompilerPath().cStr();
+  auto working_dir = cc.getWorkingDirectory().cStr();
+
+  ver_sysroot << " \"" << cc_path << "\" -cc1";
+  ver_nosysroot << " \"" << cc_path << "\" -cc1";
+
+  if (cc.hasResourceDirectory() && cc.getResourceDirectory().size()) {
+    auto resource_dir = cc.getResourceDirectory().cStr();
+    ver_sysroot << " -resource-dir " << resource_dir;
+    ver_nosysroot << " -resource-dir " << resource_dir;
+  }
+
+  ver_sysroot << '\n';
+  ver_nosysroot << '\n';
+
+  if (cc.hasInstallationDirectory() && cc.getInstallationDirectory().size()) {
+    auto install_dir = cc.getInstallationDirectory().cStr();
+    ver_sysroot << "InstalledDir: " << install_dir << '\n';
+    ver_nosysroot << "InstalledDir: " << install_dir << '\n';
+  }
+
+  if (cc.hasSystemRootDirectory() && cc.getSystemRootDirectory().size()) {
+    auto sysroot_dir = cc.getSystemRootDirectory().cStr();
+    ver_sysroot << "Configured with: --with-sysroot=" << sysroot_dir << '\n';
+    ver_nosysroot << "Configured with: --with-sysroot=" << sysroot_dir << '\n';
+  }
+
+  ver_sysroot << "#include \"...\" search starts here:\n";
+  ver_nosysroot << "#include \"...\" search starts here:\n";
+
+  for (auto path : cc.getUserIncludePaths()) {
+    RenderPath(ver_sysroot, cc, path, "");
+    ver_sysroot << '\n';
+
+    RenderPath(ver_nosysroot, cc, path, "xyz-abc-mx/");
+    ver_nosysroot << '\n';
+  }
+
+  ver_sysroot << "#include <...> search starts here:\n";
+  ver_nosysroot << "#include <...> search starts here:\n";
+
+  for (auto path : cc.getSystemIncludePaths()) {
+    RenderPath(ver_sysroot, cc, path, "");
+    ver_sysroot << '\n';
+
+    RenderPath(ver_nosysroot, cc, path, "xyz-abc-mx/");
+    ver_nosysroot << '\n';
+  }
+
+  for (auto path : cc.getFrameworkPaths()) {
+    RenderPath(ver_sysroot, cc, path, "");
+    ver_sysroot << " (framework directory)\n";
+
+    RenderPath(ver_nosysroot, cc, path, "xyz-abc-mx/");
+    ver_nosysroot << " (framework directory)\n";
+  }
+
+  ver_sysroot << "End of search list.\n";
+  ver_nosysroot << "End of search list.\n";
+
+  return pasta::Compiler::Create(
+      fm, cc_path, working_dir,
+      static_cast<pasta::CompilerName>(cc.getCompiler()),
+      static_cast<pasta::TargetLanguage>(cc.getLanguage()),
+      ver_sysroot.str(),
+      ver_nosysroot.str());
+}
+
 // Enqueue actions to index zero or more compile commands / jobs.
 kj::Promise<void> Server::indexCompileCommands(
     IndexCompileCommandsContext context) {
@@ -151,42 +250,19 @@ kj::Promise<void> Server::indexCompileCommands(
   }
 
   pasta::FileManager fm(d->native_file_system);
-  auto maybe_cc = pasta::Compiler::CreateHostCompiler(
-      fm, pasta::TargetLanguage::kC);
-  auto maybe_cxx = pasta::Compiler::CreateHostCompiler(
-      fm, pasta::TargetLanguage::kCXX);
-
-  if (!maybe_cc.Succeeded()) {
-    LOG(ERROR)
-        << "Unable to create host C compiler: "
-        << maybe_cc.TakeError();
-
-    result.setSuccess(false);
-    return kj::READY_NOW;
-
-  } else if (!maybe_cxx.Succeeded()) {
-    LOG(ERROR)
-        << "Unable to create host C++ compiler: "
-        << maybe_cxx.TakeError();
-
-    result.setSuccess(false);
-    return kj::READY_NOW;
-  }
-
-  auto cc = maybe_cc.TakeValue();
-  auto cxx = maybe_cxx.TakeValue();
-  auto which_cc = [&cc, &cxx] (mx::rpc::TargetLanguage tl) {
-    switch (tl) {
-      case mx::rpc::TargetLanguage::C: return cc;
-      default:
-      case mx::rpc::TargetLanguage::CXX: return cxx;
-    }
-  };
 
   auto ic = d->GetOrCreateIndexingContext();
   for (mx::rpc::CompileCommand::Reader command : params.getCommands()) {
     mx::ProgressBarWork command_progress(ic->command_progress.get());
     IndexingCounterRes(ic->stat, kStatCompileCommand);
+
+    auto maybe_cc = CreateCompilerFromCommand(fm, command);
+    if (!maybe_cc.Succeeded()) {
+      LOG(ERROR)
+          << "Unable to create host C compiler: "
+          << maybe_cc.TakeError();
+      continue;
+    }
 
     auto argv = GetArguments(command);
 
@@ -202,7 +278,7 @@ kj::Promise<void> Server::indexCompileCommands(
     }
 
     auto cmd = maybe_cmd.TakeValue();
-    auto maybe_jobs = which_cc(command.getLanguage()).CreateJobsForCommand(cmd);
+    auto maybe_jobs = maybe_cc->CreateJobsForCommand(cmd);
     if (!maybe_jobs.Succeeded()) {
       LOG(ERROR)
           << "Could not create one or more compile jobs from command "
