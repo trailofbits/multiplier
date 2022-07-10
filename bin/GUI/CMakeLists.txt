@@ -74,6 +74,7 @@ add_executable("${exe_name}"
 
 target_link_libraries("${exe_name}" PRIVATE
   "mx-api"
+  glog::glog
   ${MX_QT}::Core
   ${MX_QT}::Widgets
 )

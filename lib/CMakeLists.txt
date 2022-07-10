@@ -140,13 +140,12 @@ target_include_directories("mx-api"
 )
 
 target_link_libraries("mx-api"
-  PUBLIC
-    glog::glog
-    gflags::gflags
   PRIVATE
     CapnProto::capnp-rpc
     ZLIB::ZLIB
     re2::re2
+    glog::glog
+    gflags::gflags
 )
 
 # Add in Weggli.
@@ -271,7 +270,6 @@ target_link_libraries("mx-util"
     $<BUILD_INTERFACE:reproc++>
     RocksDB::rocksdb
     ZLIB::ZLIB
-  PUBLIC
     glog::glog
     gflags::gflags
     CapnProto::capnp-rpc
