@@ -7,7 +7,7 @@
 #
 
 # NOTE(pag): Can't use `-` in the library name due to SQLite limitations.
-add_library("mxsqlitebridge"
+add_library("mxsqlitebridge" SHARED
   "ConnectionModule.cpp"
   "FileTable.cpp"
   "FragmentTable.cpp"
@@ -34,9 +34,7 @@ target_include_directories("mxsqlitebridge"
     ${SQLite3_INCLUDE_DIRS}
 )
 
-if(NOT BUILD_SHARED_LIBS)
-  target_compile_definitions("mxsqlitebridge" PRIVATE "-DSQLITE_CORE")
-endif()
+# target_compile_definitions("mxsqlitebridge" PRIVATE "-DSQLITE_CORE")
 
 if(MX_ENABLE_INSTALL)
   install(
