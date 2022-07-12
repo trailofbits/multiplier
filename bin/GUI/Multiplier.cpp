@@ -63,6 +63,7 @@ namespace {
 struct MainMindowMenus final {
 
   QMenu *file_menu{nullptr};
+  QAction *file_new_instance_action{nullptr};
   QAction *file_connect_action{nullptr};
   QAction *file_disconnect_action{nullptr};
   QAction *file_launch_action{nullptr};
@@ -422,8 +423,17 @@ void Multiplier::InitializeMenus(void) {
           this, &Multiplier::OnViewHistoryBrowserAction);
 
   d->menus.file_menu = menuBar()->addMenu(tr("File"));
+
+  if (d->config.gui_exe_path.size()) {
+    d->menus.file_new_instance_action = new QAction(tr("New instance"));
+    connect(d->menus.file_new_instance_action, &QAction::triggered,
+            this, &Multiplier::OnFileNewInstanceAction);
+    d->menus.file_menu->addAction(d->menus.file_new_instance_action);
+  }
+
   d->menus.file_menu->addAction(d->menus.file_connect_action);
-  if (!d->config.indexer_exe_path.empty()) {
+
+  if (d->config.indexer_exe_path.size()) {
     d->menus.file_launch_action = new QAction(tr("Launch new indexer"));
     connect(d->menus.file_launch_action, &QAction::triggered,
             this, &Multiplier::OnFileLaunchAction);
@@ -432,7 +442,7 @@ void Multiplier::InitializeMenus(void) {
 
   d->menus.file_menu->addAction(d->menus.file_disconnect_action);
 
-  if (!d->config.importer_exe_path.empty()) {
+  if (d->config.importer_exe_path.size()) {
     d->menus.file_import_action = new QAction(tr("Import build"));
     connect(d->menus.file_import_action, &QAction::triggered,
             this, &Multiplier::OnFileImportAction);
@@ -633,12 +643,48 @@ void Multiplier::OnLaunchStarted(void) {
   QTimer::singleShot(3 * 1000, this, &Multiplier::OnLaunchedIndexerReady);
 }
 
+void Multiplier::OnLaunchExited(int) {
+  d->launched_indexer->disconnect();
+  d->launched_indexer->deleteLater();
+  d->launched_indexer = nullptr;
+  d->connection_state = ConnectionState::kNotConnected;
+  UpdateUI();
+}
+
 void Multiplier::OnLaunchFailed(QProcess::ProcessError error) {
   d->launched_indexer->disconnect();
   d->launched_indexer->deleteLater();
   d->launched_indexer = nullptr;
   d->connection_state = ConnectionState::kNotConnected;
   UpdateUI();
+}
+
+void Multiplier::OnFileNewInstanceAction(void) {
+  QStringList args;
+  if (d->connection_state != ConnectionState::kNotConnected &&
+      d->connection_state != ConnectionState::kConnecting) {
+    args.push_back("--host");
+    args.push_back(d->indexer_host);
+    args.push_back("--port");
+    args.push_back(d->indexer_port);
+  }
+
+  auto instance = new QProcess;
+
+  connect<void (QProcess::*)(int)>(
+      instance, &QProcess::finished,
+      [=] (int) {
+        instance->disconnect();
+        instance->deleteLater();
+      });
+
+  connect(instance, &QProcess::errorOccurred,
+          [=] (QProcess::ProcessError) {
+            instance->disconnect();
+            instance->deleteLater();
+          });
+
+  instance->start(d->config.gui_exe_path, args);
 }
 
 void Multiplier::OnFileImportAction(void) {
@@ -679,14 +725,28 @@ void Multiplier::OnFileImportAction(void) {
 #endif
 
   auto importer = new QProcess;
-  importer->start(
-      QString::fromStdString(d->config.importer_exe_path.generic_string()),
-      args);
-  importer->waitForFinished(-1);
-  importer->deleteLater();
+
+  connect<void (QProcess::*)(int)>(
+      importer, &QProcess::finished,
+      [=] (int) {
+        importer->disconnect();
+        importer->deleteLater();
+      });
+
+  connect(importer, &QProcess::errorOccurred,
+          [=] (QProcess::ProcessError) {
+            importer->disconnect();
+            importer->deleteLater();
+          });
+
+  importer->start(d->config.importer_exe_path, args);
 }
 
 void Multiplier::OnFileLaunchAction(void) {
+  if (d->launched_indexer) {
+    return;
+  }
+
   QString workspace_dir = QFileDialog::getExistingDirectory(
       this, tr("Open Workspace Directory"),
       "/tmp", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -747,12 +807,22 @@ void Multiplier::OnFileLaunchAction(void) {
   connect(d->launched_indexer, &QProcess::started,
           this, &Multiplier::OnLaunchStarted);
 
+  connect<void (QProcess::*)(int)>(d->launched_indexer, &QProcess::finished,
+                                   this, &Multiplier::OnLaunchExited);
+
   connect(d->launched_indexer, &QProcess::errorOccurred,
           this, &Multiplier::OnLaunchFailed);
 
-  d->launched_indexer->start(
-      QString::fromStdString(d->config.indexer_exe_path.generic_string()),
-      args);
+  d->launched_indexer->start(d->config.indexer_exe_path, args);
+}
+
+void Multiplier::Connect(QString host, QString port) {
+  d->connection_state = ConnectionState::kConnecting;
+  UpdateUI();
+
+  d->indexer_host = host;
+  d->indexer_port = port;
+  OnLaunchedIndexerReady();
 }
 
 void Multiplier::OnFileConnectAction(void) {
@@ -762,12 +832,7 @@ void Multiplier::OnFileConnectAction(void) {
     return;
   }
 
-  d->connection_state = ConnectionState::kConnecting;
-  UpdateUI();
-
-  d->indexer_host = connect_settings->host;
-  d->indexer_port = connect_settings->port;
-  OnLaunchedIndexerReady();
+  Connect(connect_settings->host, connect_settings->port);
 }
 
 void Multiplier::OnFileDisconnectAction(void) {
