@@ -41,7 +41,7 @@ IndexMonitorThread::IndexMonitorThread(Index index_, QObject *parent_)
 void IndexMonitorThread::OnVersionNumberChanged(Index index) {
   emit VersionNumberChanged(std::move(index));
 
-  QTimer::singleShot(5 * 1000, this,
+  QTimer::singleShot(1000, this,
                      &IndexMonitorThread::MonitorVersionNumber);
 }
 
@@ -70,9 +70,9 @@ void IndexMonitor::CheckForVersionNumberChange(void) {
     last_version_number = new_version_number;
     emit VersionNumberChanged(index);
 
-  // Re-check in 10 seconds.
+  // Re-check in one second.
   } else {
-    QTimer::singleShot(5 * 1000, this,
+    QTimer::singleShot(1000, this,
                        &IndexMonitor::CheckForVersionNumberChange);
   }
 }

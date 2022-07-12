@@ -36,10 +36,11 @@ int main(int argc, char *argv[]) {
 
   QCommandLineParser parser;
   QCommandLineOption host_option("host");
+  host_option.setValueName("host");
   QCommandLineOption port_option("port");
+  port_option.setValueName("port");
   parser.addOption(host_option);
   parser.addOption(port_option);
-
   parser.process(application);
 
   QSplashScreen splash_screen(QPixmap(":/Icons/appicon"));
