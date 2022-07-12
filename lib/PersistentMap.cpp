@@ -222,7 +222,7 @@ void PersistentMapBase::MatchCommonPrefix(
     }
     rocksdb::Slice value = it->value();
     std::string_view key_view(key.data(), key.size());
-    std::string_view value_view(key.data(), key.size());
+    std::string_view value_view(value.data(), value.size());
     if (!cb(key_view, value_view)) {
       break;
     }
