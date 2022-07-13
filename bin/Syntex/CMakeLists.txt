@@ -7,6 +7,7 @@
 #
 
 add_library("mx-syntex"
+  "BloomFilter.h"
   "AST.cpp"
   "AST.h"
   "Grammar.cpp"

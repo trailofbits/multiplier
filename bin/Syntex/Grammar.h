@@ -12,6 +12,11 @@
 #include <optional>
 
 #include "AST.h"
+#include "BloomFilter.h"
+
+namespace mx {
+  using RawEntityId = uint64_t;
+}
 
 namespace syntex {
 
@@ -57,6 +62,9 @@ class Grammar {
 
   // Find all productions beginning with the specified non-terminal
   std::vector<Rule> MatchProductions(const NonTerminal& start_nt) const;
+
+  // Find all fragments that likely contain a set of features
+  std::vector<mx::RawEntityId> LikelyFragments(const SmallBloomFilter &desired_features) const;
 
   // Import a fragment into the grammar. This extends the persisted grammar with
   // the features from this fragment.

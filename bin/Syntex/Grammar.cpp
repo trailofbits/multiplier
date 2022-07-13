@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Grammar.h"
+#include "BloomFilter.h"
 
 #include <cassert>
 #include <iostream>
@@ -12,45 +13,55 @@
 
 #include <gflags/gflags.h>
 #include <multiplier/Index.h>
-#include <multiplier/Endian.h>
 #include <multiplier/PersistentMap.h>
 
-DEFINE_bool(print_asts, false, "Should DOT digraphs of the ASTs be printed to CERR?");
+DECLARE_bool(print_asts);
 
 namespace {
 
-// This is a very very small bloom filter that we'll use to track "features"
-// of fragments, i.e. whether or not a fragment might have a match for a
-// particular rule.
-struct SmallBloomFilter {
-  static constexpr auto kNumWords = 3u;
-
-  uint64_t words[kNumWords];
-
-  SmallBloomFilter(void) {
-    _Pragma("unroll") for (auto i = 0u; i < kNumWords; ++i) {
-      words[i] = 0;
-    }
+static unsigned short NonTerminalToUshort(const syntex::NonTerminal &nt) {
+  if (std::holds_alternative<mx::DeclKind>(nt.data)) {
+    return static_cast<unsigned short>(std::get<mx::DeclKind>(nt.data));
+  } else if (std::holds_alternative<mx::StmtKind>(nt.data)) {
+    return static_cast<unsigned short>(std::get<mx::StmtKind>(nt.data))
+          + mx::NumEnumerators(mx::DeclKind{});
+  } else if (std::holds_alternative<mx::TypeKind>(nt.data)) {
+    return static_cast<unsigned short>(std::get<mx::TypeKind>(nt.data))
+          + mx::NumEnumerators(mx::DeclKind{})
+          + mx::NumEnumerators(mx::StmtKind{});
+  } else {
+    assert(std::holds_alternative<mx::TokenKind>(nt.data));
+    return static_cast<unsigned short>(std::get<mx::TokenKind>(nt.data))
+          + mx::NumEnumerators(mx::DeclKind{})
+          + mx::NumEnumerators(mx::StmtKind{})
+          + mx::NumEnumerators(mx::TypeKind{});
   }
+}
 
-  void Add(uint64_t hash) {
-    _Pragma("unroll") for (auto i = 0u; i < kNumWords; ++i) {
-      words[i] |= 1ull << (hash & 0x3Full);
-      hash >>= 6u;
-    }
-  }
+static syntex::NonTerminal UshortToNonTerminal(unsigned short val) {
+  if (val < mx::NumEnumerators(mx::DeclKind{})) {
+    return syntex::NonTerminal(static_cast<mx::DeclKind>(val));
+  } else if (val < mx::NumEnumerators(mx::DeclKind{})
+                      + mx::NumEnumerators(mx::StmtKind{})) {
+    return syntex::NonTerminal(static_cast<mx::StmtKind>(val
+                      - mx::NumEnumerators(mx::DeclKind{})));
+  } else if (val < mx::NumEnumerators(mx::DeclKind{})
+                      + mx::NumEnumerators(mx::StmtKind{})
+                      + mx::NumEnumerators(mx::TypeKind{})) {
+    return syntex::NonTerminal(static_cast<mx::TypeKind>(val
+                      - mx::NumEnumerators(mx::DeclKind{})
+                      - mx::NumEnumerators(mx::StmtKind{})));
 
-  bool Contains(SmallBloomFilter that) const noexcept {
-    _Pragma("unroll") for (auto i = 0u; i < kNumWords; ++i) {
-      if ((words[i] & that.words[i]) != that.words[i]) {
-        return false;
-      }
-    }
-    return true;
+  } else {
+    return syntex::NonTerminal(static_cast<mx::TokenKind>(val
+                      - mx::NumEnumerators(mx::DeclKind{})
+                      - mx::NumEnumerators(mx::StmtKind{})
+                      - mx::NumEnumerators(mx::TypeKind{})));
   }
+}
+
 };
 
-}  // namespace
 namespace mx {
 
 // Serialize token data without a leading size.
@@ -97,49 +108,14 @@ struct Serializer<Reader, Writer, syntex::NonTerminal> {
   // the reason this is kept is to avoid breaking the serialization format.
 
   MX_FLATTEN static void Write(Writer &writer, syntex::NonTerminal nt) {
-    unsigned short val;
-    if (std::holds_alternative<mx::DeclKind>(nt.data)) {
-      val = static_cast<unsigned short>(std::get<mx::DeclKind>(nt.data));
-    } else if (std::holds_alternative<mx::StmtKind>(nt.data)) {
-      val = static_cast<unsigned short>(std::get<mx::StmtKind>(nt.data))
-            + mx::NumEnumerators(mx::DeclKind{});
-    } else if (std::holds_alternative<mx::TypeKind>(nt.data)) {
-      val = static_cast<unsigned short>(std::get<mx::TypeKind>(nt.data))
-            + mx::NumEnumerators(mx::DeclKind{})
-            + mx::NumEnumerators(mx::StmtKind{});
-    } else {
-      assert(std::holds_alternative<mx::TokenKind>(nt.data));
-      val = static_cast<unsigned short>(std::get<mx::TokenKind>(nt.data))
-            + mx::NumEnumerators(mx::DeclKind{})
-            + mx::NumEnumerators(mx::StmtKind{})
-            + mx::NumEnumerators(mx::TypeKind{});
-    }
-    Serializer<NullReader, Writer, unsigned short>::Write(writer, val);
+    Serializer<NullReader, Writer, unsigned short>::Write(writer,
+      NonTerminalToUshort(nt));
   }
 
   MX_FLATTEN static void Read(Reader &reader, syntex::NonTerminal &nt) {
     unsigned short val;
     Serializer<Reader, NullWriter, unsigned short>::Read(reader, val);
-
-    if (val < mx::NumEnumerators(mx::DeclKind{})) {
-      nt = syntex::NonTerminal(static_cast<mx::DeclKind>(val));
-    } else if (val < mx::NumEnumerators(mx::DeclKind{})
-                        + mx::NumEnumerators(mx::StmtKind{})) {
-      nt = syntex::NonTerminal(static_cast<mx::StmtKind>(val
-                        - mx::NumEnumerators(mx::DeclKind{})));
-    } else if (val < mx::NumEnumerators(mx::DeclKind{})
-                        + mx::NumEnumerators(mx::StmtKind{})
-                        + mx::NumEnumerators(mx::TypeKind{})) {
-      nt = syntex::NonTerminal(static_cast<mx::TypeKind>(val
-                        - mx::NumEnumerators(mx::DeclKind{})
-                        - mx::NumEnumerators(mx::StmtKind{})));
-
-    } else {
-      nt = syntex::NonTerminal(static_cast<mx::TokenKind>(val
-                        - mx::NumEnumerators(mx::DeclKind{})
-                        - mx::NumEnumerators(mx::StmtKind{})
-                        - mx::NumEnumerators(mx::TypeKind{})));
-    }
+    nt = UshortToNonTerminal(val);
   }
 
   static constexpr uint32_t SizeInBytes(void) noexcept {
@@ -181,29 +157,6 @@ struct Serializer<Reader, Writer, syntex::Rule> {
   }
 };
 
-// Serialize a small bloom filter.
-template <typename Reader, typename Writer>
-struct Serializer<Reader, Writer, SmallBloomFilter> {
-
-  static constexpr bool kIsFixedSize = true;
-
-  MX_FLATTEN static void Write(Writer &writer, const SmallBloomFilter &bf) {
-    for (auto word : bf.words) {
-      Serializer<NullReader, Writer, uint64_t>::Write(writer, word);
-    }
-  }
-
-  MX_FLATTEN static void Read(Reader &reader, SmallBloomFilter &bf) {
-    for (auto &word : bf.words) {
-      Serializer<Reader, NullWriter, uint64_t>::Read(reader, word);
-    }
-  }
-
-  static constexpr uint32_t SizeInBytes(void) noexcept {
-    return sizeof(SmallBloomFilter);
-  }
-};
-
 }  // namespace mx
 
 namespace syntex {
@@ -223,16 +176,14 @@ std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
 }
 
 // Hash a rule. This hash should be stable regardless of big/little endian.
+// NOTE: we are doing the same stuff here as boost::hash_combine
 uint64_t Rule::Hash(void) const {
-  if MX_CONSTEXPR_ENDIAN (MX_LITTLE_ENDIAN) {
-    std::string_view v(
-        reinterpret_cast<const char *>(&non_terminals.front()),
-        static_cast<size_t>(non_terminals.size()) * sizeof(NonTerminal));
-    return std::hash<std::string_view>{}(v);
-  } else {
-    abort();  // TODO(pag): Make an endian-independent hash.
+  uint64_t hash = 0x9e3779b9;
+  std::hash<unsigned short> hasher;
+  for (const NonTerminal &nt : non_terminals) {
+    hash ^= hasher(NonTerminalToUshort(nt)) + (hash << 6) + (hash >> 2);
   }
-  return 0;
+  return hash;
 }
 
 std::ostream& operator<<(std::ostream& os, const Rule& rule) {
@@ -291,6 +242,17 @@ std::vector<Rule> Grammar::MatchProductions(const NonTerminal& start_nt) const {
     return true;
   });
   return rules;
+}
+
+// Find all fragments that likely contain a set of features
+std::vector<mx::RawEntityId> Grammar::LikelyFragments(const SmallBloomFilter &desired_features) const {
+  std::vector<mx::RawEntityId> ids;
+  impl->features.ScanPrefix(mx::Empty(), [&] (mx::RawEntityId id, SmallBloomFilter bf) -> bool {
+    if (bf.Contains(desired_features))
+      ids.push_back(id);
+    return true;
+  });
+  return ids;
 }
 
 // Import a fragment into the grammar.

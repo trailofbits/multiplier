@@ -48,13 +48,21 @@ struct NonTerminal {
 };
 
 class ASTNode {
- private:
+ public:
   friend class AST;
 
-  ASTNode(void) = delete;
-
- public:
   using ChildVector = std::vector<const ASTNode *>;
+
+  ASTNode();
+  ASTNode(const mx::Decl &decl);
+  ASTNode(const mx::Stmt &stmt);
+  ASTNode(const mx::Type &type);
+  ASTNode(const mx::Token &token);
+
+  ASTNode(mx::DeclKind k, ChildVector child_vector);
+  ASTNode(mx::StmtKind k, ChildVector child_vector);
+  ASTNode(mx::TypeKind k, ChildVector child_vector);
+  ASTNode(mx::TokenKind k, std::string spelling);
 
   const enum Kind : unsigned short {
     kFragment,
@@ -76,17 +84,6 @@ class ASTNode {
   // fragment parse by jumping into the middle of the fragment parse to the
   // correct spot.
   const ASTNode *prev_of_kind{nullptr};
-
-  ASTNode(const mx::Fragment &fragment);
-  ASTNode(const mx::Decl &decl);
-  ASTNode(const mx::Stmt &stmt);
-  ASTNode(const mx::Type &type);
-  ASTNode(const mx::Token &token);
-
-  ASTNode(mx::DeclKind k, ChildVector child_vector);
-  ASTNode(mx::StmtKind k, ChildVector child_vector);
-  ASTNode(mx::TypeKind k, ChildVector child_vector);
-  ASTNode(mx::TokenKind k, std::string spelling);
 
   bool operator==(const ASTNode &that) const noexcept;
 };
@@ -138,8 +135,9 @@ class AST {
   AST(void);
 
  public:
-  static AST Build(mx::Fragment fragment);
+  static AST Build(const mx::Fragment &fragment);
 
+  const ASTNode *ConstructNode();
   const ASTNode *ConstructNode(mx::DeclKind k, ASTNode::ChildVector child_vector);
   const ASTNode *ConstructNode(mx::StmtKind k, ASTNode::ChildVector child_vector);
   const ASTNode *ConstructNode(mx::TypeKind k, ASTNode::ChildVector child_vector);

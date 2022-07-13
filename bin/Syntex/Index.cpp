@@ -20,6 +20,7 @@ DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the h
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to index.");
 DEFINE_uint64(file_id, 0, "ID of the file to index.");
 DEFINE_string(index_dir, "", "Path to the directory where the SYNTEX index will be stored.");
+DEFINE_bool(print_asts, false, "Should DOT digraphs of the ASTs be printed to CERR?");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;

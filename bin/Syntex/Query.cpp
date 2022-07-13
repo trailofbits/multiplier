@@ -16,6 +16,7 @@ DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
 DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
 DEFINE_string(index_dir, "", "Path to the directory where the SYNTEX index will be stored.");
+DEFINE_bool(print_asts, false, "Should DOT digraphs of the ASTs be printed to CERR?");
 DEFINE_string(query, "", "Use argument value as query");
 
 extern "C" int main(int argc, char *argv[]) {
@@ -33,10 +34,29 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port));
+  // Load index
+  // mx::Index index(mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port));
+  mx::Index index = mx::EntityProvider::in_memory_cache(
+      mx::EntityProvider::from_remote(
+          FLAGS_host, FLAGS_port));
 
+  // Collect fragments
+  std::unordered_map<mx::RawEntityId, mx::Fragment> fragments;
+  for (mx::File file : mx::File::in(index)) {
+    for (mx::Fragment fragment : mx::Fragment::in(file)) {
+      fragments.insert({ fragment.id(), std::move(fragment) });
+    }
+  }
+
+  // Load grammar
   syntex::Grammar grammar(FLAGS_index_dir);
-  syntex::Parse(grammar, FLAGS_query);
+
+  // Parse query
+  syntex::Parser parser(grammar, FLAGS_query);
+  parser.Parse();
+
+  // Do search
+  // parser.Query(fragments);
 
   return EXIT_SUCCESS;
 }

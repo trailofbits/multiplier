@@ -152,6 +152,7 @@ void PendingFragment::LabelParents(EntityMapper &em) {
   //            detect them here if possible. Missing things can also be an
   //            indication that we're not fully linking something to its parent
   //            decls/statements.
+
 #ifndef NDEBUG
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
     assert(!vis.not_yet_seen.count(stmt.RawStmt()));

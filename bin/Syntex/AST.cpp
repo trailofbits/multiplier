@@ -14,7 +14,7 @@
 
 namespace syntex {
 
-ASTNode::ASTNode(const mx::Fragment &)
+ASTNode::ASTNode()
     : kind(kFragment),
       kind_val(0),
       data(ChildVector()) {}
@@ -114,6 +114,11 @@ const ASTNode *AST::LastNodeOfKind(mx::TokenKind kind) {
                static_cast<unsigned>(kind)];
 }
 
+const ASTNode *AST::ConstructNode()
+{
+  return &(nodes.emplace_back());
+}
+
 const ASTNode *AST::ConstructNode(mx::DeclKind k, ASTNode::ChildVector child_vector)
 {
   ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
@@ -156,9 +161,9 @@ const ASTNode *AST::ConstructNode(mx::TokenKind k, std::string spelling)
   return ptr;
 }
 
-AST AST::Build(mx::Fragment fragment) {
+AST AST::Build(const mx::Fragment &fragment) {
   AST self;
-  ASTNode *root = &(self.nodes.emplace_back(fragment));
+  ASTNode *root = &(self.nodes.emplace_back());
 
   std::vector<mx::TokenContext> contexts;
 
