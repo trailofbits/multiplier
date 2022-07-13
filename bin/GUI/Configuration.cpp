@@ -6,58 +6,71 @@
 
 #include "Configuration.h"
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+
 #include "CodeTheme.h"
 
 #include <cstdlib>
 
-#if __has_include(<mach-o/dyld.h>)
-# include <mach-o/dyld.h>
-#else
-int _NSGetExecutablePath(char *, uint32_t *) {
-  return -1;
-}
-#endif
-
 namespace mx::gui {
 namespace {
 
-static char gExePath[PATH_MAX * 8];
-
 static void LocateIndexerAndImporter(mx::gui::Configuration &config) {
-  uint32_t path_len = sizeof(gExePath) - 1u;
-  memset(gExePath, 0, path_len + 1u);
+  QFileInfo exe_path(QCoreApplication::applicationFilePath());
+  QFileInfo indexer_path;
+  QFileInfo importer_path;
 
-  if (_NSGetExecutablePath(&(gExePath[0]), &path_len)) {
-    if (auto path = getenv("_")) {
-      auto env_path_len = static_cast<uint32_t>(strlen(path));
-      memset(gExePath, 0, path_len + 1u);
-      memcpy(gExePath, path, std::min(env_path_len, path_len));
-    }
+  if (!exe_path.isExecutable()) {
+    return;
   }
 
-  if (strstr(gExePath, ".app/Contents/MacOS/Multiplier")) {
-    std::filesystem::path exe_path(gExePath);
-    auto contents_path = exe_path.parent_path().parent_path();
-    auto indexer_path = contents_path / "bin" / "mx-index";
-    auto importer_path = contents_path / "bin" / "mx-import";
+  config.gui_exe_path = exe_path.absoluteFilePath();
 
-    std::error_code ec;
-    std::ignore = std::filesystem::status(indexer_path, ec);
-    if (ec) {
-      return;
-    }
+#ifdef __APPLE__
+  // macOS application bundle.
+  if (config.gui_exe_path.contains(
+      QLatin1String(".app/Contents/MacOS/Multiplier"))) {
 
-    std::ignore = std::filesystem::status(importer_path, ec);
-    if (ec) {
-      return;
-    }
+    QDir macos_dir = exe_path.dir();
+    indexer_path =
+        macos_dir.absoluteFilePath(QLatin1String("../bin/mx-index"));
 
-    config.indexer_exe_path = std::move(indexer_path);
-    config.importer_exe_path = std::move(importer_path);
+    importer_path =
+        macos_dir.absoluteFilePath(QLatin1String("../bin/mx-import"));
+  }
+#endif
+
+  // Install.
+  if (!indexer_path.isExecutable() &&
+      config.gui_exe_path.endsWith(QLatin1String("bin/mx-gui"))) {
+    QDir bin_dir = exe_path.dir();
+    indexer_path =
+        bin_dir.absoluteFilePath(QLatin1String("../mx-index"));
+
+    importer_path =
+        bin_dir.absoluteFilePath(QLatin1String("../mx-import"));
   }
 
-  // TODO(pag): Do something with this for Linux, perhaps. See:
-  //            https://stackoverflow.com/a/1024937
+  // Build.
+  if (!indexer_path.isExecutable() &&
+      config.gui_exe_path.endsWith(QLatin1String("bin/GUI/mx-gui"))) {
+    QDir gui_dir = exe_path.dir();
+    indexer_path =
+        gui_dir.absoluteFilePath(QLatin1String("../Index/mx-index"));
+    importer_path =
+        gui_dir.absoluteFilePath(QLatin1String("../Import/mx-import"));
+  }
+
+  if (indexer_path.isExecutable()) {
+    config.indexer_exe_path = indexer_path.absoluteFilePath();
+  }
+
+  if (importer_path.isExecutable()) {
+    config.importer_exe_path = importer_path.absoluteFilePath();
+  }
 }
 
 } // namespace

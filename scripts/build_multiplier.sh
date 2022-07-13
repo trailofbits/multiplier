@@ -8,18 +8,20 @@ SRC_DIR=$( cd "$( dirname "${SCRIPTS_DIR}" )" && pwd )
 WORKSPACE_DIR=$( cd "$( dirname "${SRC_DIR}" )" && pwd )
 
 # Update GITHUB_ORG to trailofbits repos
-# GITHUB_ORG=git@github.com:trailofbits
+GITHUB_ORG=git@github.com:trailofbits
 #
 # https://vspells.ext.bbn.com/trail-of-bits/pasta.git
-GITHUB_ORG=https://vspells.ext.bbn.com/trail-of-bits
+# GITHUB_ORG=https://vspells.ext.bbn.com/trail-of-bits
 CXX_COMMON_URL="https://github.com/lifting-bits/cxx-common/releases/download"
 CXX_COMMON_VERSION="v0.2.8"
 LLVM_VERSION="llvm-14"
+CMAKE_VERSION_MIN=3.19
 
 OS_VERSION=
 ARCH_VERSION=
 LIBRARY_VERSION=
 VCPKG_TARGET_TRIPLET=
+
 ADD_ARGS=()
 
 # Variables to build the project
@@ -54,6 +56,16 @@ function GetUbuntuOSVersion
       return 0
     ;;
   esac
+}
+
+# Get cmake version
+function CheckCMakeVersionMin
+{
+  local cmake_version=$(cmake --version | head -n1 | cut -d" " -f3)
+  if [[ "$cmake_version" < "${CMAKE_VERSION_MIN}" ]]; then
+    echo "[!] Minimum cmake required version is ${CMAKE_VERSION_MIN}. Exiting!"
+    exit 1
+  fi
 }
 
 # Get Architecture version
@@ -157,7 +169,7 @@ function InstallDependencies
       sudo_cmd="sudo"
     fi
 
-    ${sudo_cmd} apt install -yq qtcreator \
+    ${sudo_cmd} apt install -yq qtcreator gcc-10 g++-10 \
       qt5-default cargo clang lld clang-tools \
       python3-dev
     cargo install cbindgen
@@ -222,7 +234,7 @@ function ConfigureAndBuild
       "-DCMAKE_CXX_COMPILER=${CXX}" \
       $@ \
       "${WORKSPACE_DIR}/${name}"
-    cmake --build . "-j${CORE_COUNT}"
+    make install "-j${CORE_COUNT}"
   ) || return $?
   popd
 }
@@ -245,9 +257,10 @@ function BuildMultiplierOSX
 {
   if !(ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
     -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
-    -DQt5_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Q5 \
-    -DQt5Core_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Q5Core \
-    -DQt5Widgets_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Q5Widgets); then
+    -Dpasta_ROOT="${WORKSPACE_DIR}/install" \
+    -DQt5_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5 \
+    -DQt5Core_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5Core \
+    -DQt5Widgets_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5Widgets); then
     echo "[!] Failed to configure and build multiplier."
     exit 1
   fi
@@ -257,7 +270,8 @@ function BuildMultiplierOSX
 function BuildMultiplierLinux
 {
   ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
-    -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF
+    -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -Dpasta_ROOT="${WORKSPACE_DIR}/install"
 }
 
 
@@ -286,6 +300,8 @@ function main
   echo "[+] Setting workspace directory to ${WORKSPACE_DIR}"
 
   VCPKG_ROOT="${WORKSPACE_DIR}/vcpkg-install"
+
+  CheckCMakeVersionMin
 
   if ! DownloadVcpkg ${WORKSPACE_DIR}; then
     echo "[!] Failed to download vcpkg libraries"

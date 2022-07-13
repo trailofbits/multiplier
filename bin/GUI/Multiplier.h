@@ -52,6 +52,8 @@ class Multiplier final : public QMainWindow {
 
   bool eventFilter(QObject *watched, QEvent *event) Q_DECL_FINAL;
 
+  void Connect(QString host, QString port);
+
  protected:
   void paintEvent(QPaintEvent *event) Q_DECL_FINAL;
   void closeEvent(QCloseEvent *event) Q_DECL_FINAL;
@@ -80,8 +82,9 @@ class Multiplier final : public QMainWindow {
   void OnVersionNumberChanged(::mx::Index index);
   void OnLaunchStarted(void);
   void OnLaunchedIndexerReady(void);
+  void OnLaunchExited(int);
   void OnLaunchFailed(QProcess::ProcessError error);
-
+  void OnFileNewInstanceAction(void);
   void OnFileImportAction(void);
   void OnFileLaunchAction(void);
   void OnFileConnectAction(void);

@@ -5,6 +5,8 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <QApplication>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QDebug>
 #include <QFontDatabase>
 #include <QMetaType>
@@ -29,9 +31,17 @@
 #include "ReferenceBrowserView.h"
 
 int main(int argc, char *argv[]) {
-  google::ParseCommandLineFlags(&argc, &argv, false);
-  google::InitGoogleLogging(argv[0]);
   QApplication application(argc, argv);
+  application.setApplicationName("Multiplier");
+
+  QCommandLineParser parser;
+  QCommandLineOption host_option("host");
+  host_option.setValueName("host");
+  QCommandLineOption port_option("port");
+  port_option.setValueName("port");
+  parser.addOption(host_option);
+  parser.addOption(port_option);
+  parser.process(application);
 
   QSplashScreen splash_screen(QPixmap(":/Icons/appicon"));
   splash_screen.show();
@@ -219,6 +229,11 @@ int main(int argc, char *argv[]) {
 
   mx::gui::Multiplier main_window(config);
   main_window.show();
+
+  if (parser.isSet(host_option) && parser.isSet(port_option)) {
+    main_window.Connect(parser.value(host_option),
+                        parser.value(port_option));
+  }
 
   splash_screen.finish(&main_window);
 

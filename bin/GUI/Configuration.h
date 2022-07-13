@@ -7,12 +7,10 @@
 #pragma once
 
 #include <optional>
+#include <QString>
 #include <vector>
 
 #include "Event.h"
-
-// NOTE(pag): Must be after Qt includes in `Event.h`.
-#include <filesystem>
 
 namespace mx::gui {
 
@@ -157,8 +155,9 @@ struct Configuration {
   // these is the source; the modifiers/click/key constraints are ignored.
   std::vector<EventAction> immediate_actions;
 
-  std::filesystem::path indexer_exe_path;
-  std::filesystem::path importer_exe_path;
+  QString gui_exe_path;
+  QString indexer_exe_path;
+  QString importer_exe_path;
 
   Configuration(void);
 };
