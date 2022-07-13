@@ -16,7 +16,7 @@ macro(DownloadSQLite3)
   )
   FetchContent_MakeAvailable(sqlite)
 
-  add_library(SQLite3
+  add_library(SQLite3 STATIC
     "${sqlite_SOURCE_DIR}/sqlite3.c"
   )
   target_include_directories(SQLite3

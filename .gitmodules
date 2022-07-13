@@ -4,6 +4,3 @@
 [submodule "vendor/reproc/src"]
 	path = vendor/reproc/src
 	url = https://github.com/DaanDeMeyer/reproc.git
-[submodule "vendor/weggli_native/src"]
-	path = vendor/weggli_native/src
-	url = https://github.com/trailofbits/weggli-native.git

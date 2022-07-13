@@ -37,8 +37,7 @@ if(PLATFORM_MACOS)
 endif()
 
 if(MX_ENABLE_WEGGLI)
-  include("cmake/Corrosion.cmake")
-  find_program(CBINDGEN cbindgen REQUIRED HINTS "$ENV{HOME}/.cargo/bin")
+  find_package(weggli_native CONFIG REQUIRED)
 endif(MX_ENABLE_WEGGLI)
 
 if(MX_ENABLE_INSTALL)

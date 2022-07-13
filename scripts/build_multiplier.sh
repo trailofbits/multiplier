@@ -244,6 +244,10 @@ PASTA_NAME=pasta
 PASTA_REPO="${GITHUB_ORG}/${PASTA_NAME}.git"
 PASTA_BRANCH="master"
 
+WEGGLI_NATIVE_NAME=weggli-native
+WEGGLI_NATIVE_REPO="https://github.com/trailofbits/${WEGGLI_NATIVE_NAME}"
+WEGGLI_NATIVE_BRANCH="master"
+
 MULTIPLIER_NAME=multiplier
 MULTIPLIER_REPO="${GITHUB_ORG}/${MULTIPLIER_NAME}.git"
 MULTIPLIER_BRANCH="main"
@@ -313,6 +317,11 @@ function main
     exit 1
   fi
 
+  if ! GetOrUpdateRepo "${WEGGLI_NATIVE_NAME}" "${WEGGLI_NATIVE_REPO}" "${WEGGLI_NATIVE_BRANCH}"; then
+    echo "[!] Failed to clone weggli-native repository"
+    exit 1
+  fi
+
   if ! GetOrUpdateRepo "${MULTIPLIER_NAME}" "${MULTIPLIER_REPO}" "${MULTIPLIER_BRANCH}"; then
     echo "[!] Failed to clone multiplier repository"
   fi
@@ -320,6 +329,11 @@ function main
   if !(ConfigureAndBuild "${PASTA_NAME}" -DPASTA_BOOTSTRAP_MACROS=OFF \
     -DPASTA_BOOTSTRAP_TYPES=OFF -DPASTA_ENABLE_TESTING=OFF); then
     echo "[!] Failed to configure and build pasta"
+    exit 1
+  fi
+  
+  if !(ConfigureAndBuild "${WEGGLI_NATIVE_NAME}"); then
+    echo "[!] Failed to configure and build weggli-native"
     exit 1
   fi
     

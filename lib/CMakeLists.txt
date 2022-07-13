@@ -140,20 +140,19 @@ target_include_directories("mx-api"
 )
 
 target_link_libraries("mx-api"
-  PUBLIC
-    glog::glog
-    gflags::gflags
   PRIVATE
     CapnProto::capnp-rpc
     ZLIB::ZLIB
     re2::re2
+    glog::glog
+    gflags::gflags
 )
 
 # Add in Weggli.
 if(MX_ENABLE_WEGGLI)
   target_link_libraries("mx-api"
-    PRIVATE
-      $<BUILD_INTERFACE:weggli_native>
+    PUBLIC
+      weggli_native::static
   )
 else()
   target_compile_definitions("mx-api"
@@ -271,7 +270,6 @@ target_link_libraries("mx-util"
     $<BUILD_INTERFACE:reproc++>
     RocksDB::rocksdb
     ZLIB::ZLIB
-  PUBLIC
     glog::glog
     gflags::gflags
     CapnProto::capnp-rpc
@@ -282,7 +280,7 @@ target_link_libraries("mx-util"
 if(MX_ENABLE_WEGGLI)
   target_link_libraries("mx-util"
     PRIVATE
-      $<BUILD_INTERFACE:weggli_native>
+      weggli_native::static
   )
 else()
   target_compile_definitions("mx-util"
