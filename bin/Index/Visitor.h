@@ -23,13 +23,16 @@ namespace indexer {
 // one declarations and statements here because they support inter-fragment
 // referencing.
 class EntityVisitor : protected pasta::DeclVisitor,
-                      protected pasta::StmtVisitor {
+                      protected pasta::StmtVisitor,
+                      protected pasta::TypeVisitor {
  private:
   bool EnterDecl(const pasta::Decl &decl);
   bool EnterStmt(const pasta::Stmt &stmt);
+  bool EnterType(const pasta::Type &type);
   bool EnterTagDecl(const pasta::TagDecl &decl);
   bool EnterRecordDecl(const pasta::RecordDecl &decl);
   bool EnterCXXRecordDecl(const pasta::CXXRecordDecl &decl);
+  bool EnterValueDecl(const pasta::ValueDecl &decl);
   bool EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl);
   bool EnterVarDecl(const pasta::VarDecl &decl);
 
@@ -68,17 +71,30 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitInitListExpr(const pasta::InitListExpr &stmt) final;
   void VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) final;
   void VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stmt) final;
+  void VisitTypeOfExprType(const pasta::TypeOfExprType &type) final;
+  void VisitDecltypeType(const pasta::DecltypeType &type) final;
+  void VisitTypeOfType(const pasta::TypeOfType &type) final;
+  void VisitDependentAddressSpaceType(const pasta::DependentAddressSpaceType &type) final;
+  void VisitDependentBitIntType(const pasta::DependentBitIntType &type) final;
+  void VisitDependentSizedArrayType(const pasta::DependentSizedArrayType &type) final;
+  void VisitDependentSizedExtVectorType(const pasta::DependentSizedExtVectorType &type) final;
+  void VisitDependentSizedMatrixType(const pasta::DependentSizedMatrixType &type) final;
+  void VisitDependentVectorType(const pasta::DependentVectorType &type) final;
+  void VisitVariableArrayType(const pasta::VariableArrayType &type) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
+  void VisitType(const pasta::Type &type) final;
 
  protected:
   virtual bool Enter(const pasta::Decl &entity) = 0;
   virtual bool Enter(const pasta::Stmt &entity) = 0;
+  virtual bool Enter(const pasta::Type &entity) = 0;
 
  public:
   virtual ~EntityVisitor(void);
   virtual void Accept(const pasta::Decl &entity);
   virtual void Accept(const pasta::Stmt &entity);
+  virtual void Accept(const pasta::Type &entity);
 };
 
 }  // namespace indexer

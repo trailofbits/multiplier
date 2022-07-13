@@ -43,6 +43,7 @@ class EntityLabeller final : public EntityVisitor {
 
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;
+  bool Enter(const pasta::Type &entity) final;
   bool Label(const pasta::Token &entity);
 };
 
@@ -81,6 +82,25 @@ bool EntityLabeller::Enter(const pasta::Stmt &entity) {
     return false;
   }
 }
+
+bool EntityLabeller::Enter(const pasta::Type &entity) {
+  auto kind = entity.Kind();
+  mx::TypeId id;
+  id.fragment_id = fragment.fragment_id;
+  id.offset = static_cast<uint32_t>(fragment.types_to_serialize.size());
+  id.kind = mx::FromPasta(kind);
+
+  if (entity_ids.emplace(entity.RawType(), id).second) {
+
+    // NOTE(pag): Will visit in `PendingTokenRange::Build()`.
+    fragment.types_to_serialize.emplace_back(entity);
+    return true;
+
+  } else {
+    return false;
+  }
+}
+
 
 bool EntityLabeller::Label(const pasta::Token &entity) {
   auto index = entity.Index();

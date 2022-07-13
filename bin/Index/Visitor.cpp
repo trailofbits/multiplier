@@ -279,8 +279,17 @@ void EntityVisitor::VisitClassTemplateSpecializationDecl(
   }
 }
 
-bool EntityVisitor::EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl) {
+bool EntityVisitor::EnterValueDecl(const pasta::ValueDecl &decl) {
   if (EnterDecl(decl)) {
+    Accept(decl.Type());
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool EntityVisitor::EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl) {
+  if (EnterValueDecl(decl)) {
     for (const pasta::TemplateParameterList &ls : decl.TemplateParameterLists()) {
       for (const pasta::NamedDecl &param_decl : ls.Parameters()) {
         Accept(param_decl);
@@ -335,7 +344,8 @@ void EntityVisitor::VisitGCCAsmStmt(const pasta::GCCAsmStmt &stmt) {
   }
 }
 
-void EntityVisitor::VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stmt) {
+void EntityVisitor::VisitDesignatedInitExpr(
+    const pasta::DesignatedInitExpr &stmt) {
   if (EnterStmt(stmt)) {
     // NOTE(pag): Don't need to enter the fields of the designators; they're
     //            likely defined elsewhere.
@@ -346,6 +356,74 @@ void EntityVisitor::VisitDesignatedInitExpr(const pasta::DesignatedInitExpr &stm
       Accept(sub_expr);
     }
     Accept(stmt.Initializer());
+  }
+}
+
+void EntityVisitor::VisitTypeOfExprType(const pasta::TypeOfExprType &type) {
+  if (EnterType(type)) {
+    Accept(type.UnderlyingExpression());
+  }
+}
+
+void EntityVisitor::VisitDecltypeType(const pasta::DecltypeType &type) {
+  if (EnterType(type)) {
+    Accept(type.UnderlyingExpression());
+  } 
+}
+
+void EntityVisitor::VisitDependentAddressSpaceType(
+    const pasta::DependentAddressSpaceType &type) {
+  if (EnterType(type)) {
+    Accept(type.AddrSpaceExpression());
+  }
+}
+
+void EntityVisitor::VisitDependentBitIntType(
+    const pasta::DependentBitIntType &type) {
+  if (EnterType(type)) {
+    Accept(type.NumBitsExpression());
+  } 
+}
+
+void EntityVisitor::VisitDependentSizedArrayType(
+    const pasta::DependentSizedArrayType &type) {
+  if (EnterType(type)) {
+    Accept(type.SizeExpression());
+  }
+}
+
+void EntityVisitor::VisitDependentSizedExtVectorType(
+    const pasta::DependentSizedExtVectorType &type) {
+  if (EnterType(type)) {
+    Accept(type.SizeExpression());
+  }
+}
+
+void EntityVisitor::VisitDependentSizedMatrixType(
+    const pasta::DependentSizedMatrixType &type) {
+  if (EnterType(type)) {
+    Accept(type.ColumnExpression());
+    Accept(type.RowExpression());
+  }
+}
+
+void EntityVisitor::VisitDependentVectorType(
+    const pasta::DependentVectorType &type) {
+  if (EnterType(type)) {
+    Accept(type.SizeExpression());
+  }
+}
+
+void EntityVisitor::VisitVariableArrayType(
+    const pasta::VariableArrayType &type) {
+  if (EnterType(type)) {
+    Accept(type.SizeExpression());
+  }
+}
+
+void EntityVisitor::VisitTypeOfType(const pasta::TypeOfType &type) {
+  if (EnterType(type)) {
+    Accept(type.UnderlyingType());
   }
 }
 
@@ -380,6 +458,10 @@ bool EntityVisitor::EnterStmt(const pasta::Stmt &stmt) {
   }
 }
 
+bool EntityVisitor::EnterType(const pasta::Type &type) {
+  return Enter(type);
+}
+
 // Backups.
 void EntityVisitor::VisitDecl(const pasta::Decl &decl) {
   EnterDecl(decl);
@@ -389,12 +471,20 @@ void EntityVisitor::VisitStmt(const pasta::Stmt &stmt) {
   EnterStmt(stmt);
 }
 
+void EntityVisitor::VisitType(const pasta::Type &stmt) {
+  EnterType(stmt);
+}
+
 void EntityVisitor::Accept(const pasta::Decl &entity) {
   this->DeclVisitor::Accept(entity);
 }
 
 void EntityVisitor::Accept(const pasta::Stmt &entity) {
   this->StmtVisitor::Accept(entity);
+}
+
+void EntityVisitor::Accept(const pasta::Type &entity) {
+  this->TypeVisitor::Accept(entity);
 }
 
 EntityVisitor::~EntityVisitor(void) {}

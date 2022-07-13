@@ -110,6 +110,10 @@ class ParentTrackerVisitor : public EntityVisitor {
   bool Enter(const pasta::Stmt &entity) final {
     return not_yet_seen.erase(entity.RawStmt());
   }
+
+  bool Enter(const pasta::Type &entity) final {
+    return not_yet_seen.erase(entity.RawType());
+  }
 };
 
 }  // namespace
@@ -124,6 +128,10 @@ void PendingFragment::LabelParents(EntityMapper &em) {
 
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
     vis.not_yet_seen.emplace(stmt.RawStmt());
+  }
+
+  for (const pasta::Type &type : types_to_serialize) {
+    vis.not_yet_seen.emplace(type.RawType());
   }
 
   for (const pasta::Decl &decl : decls) {
