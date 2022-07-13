@@ -151,7 +151,24 @@ cmake \
 make install -j13
 ```
 
-## Step 5: Download and build Multiplier
+## Step 5: Download and build weggli-native
+
+```shell
+cd "${WORKSPACE_DIR}/src"
+git clone https://github.com/trailofbits/weggli-native
+```
+
+```shell
+cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="${WORKSPACE_DIR}/install" \
+  -S "${WORKSPACE_DIR}/src/weggli-native" \
+  -B "${WORKSPACE_DIR}/build/weggli-native"
+
+cmake --build "${WORKSPACE_DIR}/build/weggli-native" --target install
+```
+
+## Step 6: Download and build Multiplier
 
 
 ```shell
