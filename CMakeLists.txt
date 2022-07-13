@@ -37,7 +37,7 @@ if(PLATFORM_MACOS)
 endif()
 
 if(MX_ENABLE_WEGGLI)
-  find_package(weggli_native REQUIRED)
+  find_package(weggli_native CONFIG REQUIRED)
 endif(MX_ENABLE_WEGGLI)
 
 if(MX_ENABLE_INSTALL)

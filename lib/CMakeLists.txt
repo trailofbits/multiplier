@@ -152,7 +152,7 @@ target_link_libraries("mx-api"
 if(MX_ENABLE_WEGGLI)
   target_link_libraries("mx-api"
     PUBLIC
-      weggli::weggli_native-static
+      weggli_native::static
   )
 else()
   target_compile_definitions("mx-api"
@@ -280,7 +280,7 @@ target_link_libraries("mx-util"
 if(MX_ENABLE_WEGGLI)
   target_link_libraries("mx-util"
     PRIVATE
-      weggli::weggli_native-static
+      weggli_native::static
   )
 else()
   target_compile_definitions("mx-util"
