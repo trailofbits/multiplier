@@ -18,8 +18,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
-#include <gflags/gflags.h>
-#include <glog/logging.h>
 #include <memory>
 #include <multiplier/Index.h>
 #include <system_error>
