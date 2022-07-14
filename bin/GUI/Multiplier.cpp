@@ -671,7 +671,7 @@ void Multiplier::OnFileNewInstanceAction(void) {
 
   auto instance = new QProcess;
 
-  connect<void (QProcess::*)(int)>(
+  connect<void (QProcess::*)(int, QProcess::ExitStatus)>(
       instance, &QProcess::finished,
       [=] (int) {
         instance->disconnect();
@@ -726,7 +726,7 @@ void Multiplier::OnFileImportAction(void) {
 
   auto importer = new QProcess;
 
-  connect<void (QProcess::*)(int)>(
+  connect<void (QProcess::*)(int, QProcess::ExitStatus)>(
       importer, &QProcess::finished,
       [=] (int) {
         importer->disconnect();
@@ -807,7 +807,8 @@ void Multiplier::OnFileLaunchAction(void) {
   connect(d->launched_indexer, &QProcess::started,
           this, &Multiplier::OnLaunchStarted);
 
-  connect<void (QProcess::*)(int)>(d->launched_indexer, &QProcess::finished,
+  connect<void (QProcess::*)(int, QProcess::ExitStatus)>(
+                                   d->launched_indexer, &QProcess::finished,
                                    this, &Multiplier::OnLaunchExited);
 
   connect(d->launched_indexer, &QProcess::errorOccurred,
