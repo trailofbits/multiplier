@@ -36,10 +36,10 @@ static void LocateIndexerAndImporter(mx::gui::Configuration &config) {
 
     QDir macos_dir = exe_path.dir();
     indexer_path =
-        macos_dir.absoluteFilePath(QLatin1String("../bin/mx-index"));
+        QFileInfo(macos_dir.absoluteFilePath(QLatin1String("../bin/mx-index")));
 
     importer_path =
-        macos_dir.absoluteFilePath(QLatin1String("../bin/mx-import"));
+        QFileInfo(macos_dir.absoluteFilePath(QLatin1String("../bin/mx-import")));
   }
 #endif
 
@@ -48,10 +48,10 @@ static void LocateIndexerAndImporter(mx::gui::Configuration &config) {
       config.gui_exe_path.endsWith(QLatin1String("bin/mx-gui"))) {
     QDir bin_dir = exe_path.dir();
     indexer_path =
-        bin_dir.absoluteFilePath(QLatin1String("../mx-index"));
+        QFileInfo(bin_dir.absoluteFilePath(QLatin1String("../mx-index")));
 
     importer_path =
-        bin_dir.absoluteFilePath(QLatin1String("../mx-import"));
+        QFileInfo(bin_dir.absoluteFilePath(QLatin1String("../mx-import")));
   }
 
   // Build.
@@ -59,9 +59,9 @@ static void LocateIndexerAndImporter(mx::gui::Configuration &config) {
       config.gui_exe_path.endsWith(QLatin1String("bin/GUI/mx-gui"))) {
     QDir gui_dir = exe_path.dir();
     indexer_path =
-        gui_dir.absoluteFilePath(QLatin1String("../Index/mx-index"));
+        QFileInfo(gui_dir.absoluteFilePath(QLatin1String("../Index/mx-index")));
     importer_path =
-        gui_dir.absoluteFilePath(QLatin1String("../Import/mx-import"));
+        QFileInfo(gui_dir.absoluteFilePath(QLatin1String("../Import/mx-import")));
   }
 
   if (indexer_path.isExecutable()) {
