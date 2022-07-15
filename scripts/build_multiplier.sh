@@ -162,6 +162,7 @@ function InstallDependencies
   if [[ "${OSTYPE}" = "darwin"* ]]; then
     brew install qt@5 rustup python3
     cargo install cbindgen
+    export PATH=${PATH}:${HOME}/.cargo/bin
   elif [[ "${OSTYPE}" = "linux-gnu" ]]; then
     sudo_cmd=""
     if groups ${USER} | grep "\<sudo\>" &> /dev/null; then
@@ -228,8 +229,6 @@ function ConfigureAndBuild
     cmake \
       "-DCMAKE_BUILD_TYPE=${BUILD_TYPE}" \
       "-DCMAKE_INSTALL_PREFIX=${WORKSPACE_DIR}/install" \
-      "-DVCPKG_ROOT=${VCPKG_ROOT}" \
-      "-DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}" \
       "-DCMAKE_C_COMPILER=${CC}" \
       "-DCMAKE_CXX_COMPILER=${CXX}" \
       $@ \
@@ -246,7 +245,7 @@ PASTA_BRANCH="master"
 
 WEGGLI_NATIVE_NAME=weggli-native
 WEGGLI_NATIVE_REPO="https://github.com/trailofbits/${WEGGLI_NATIVE_NAME}"
-WEGGLI_NATIVE_BRANCH="master"
+WEGGLI_NATIVE_BRANCH="main"
 
 MULTIPLIER_NAME=multiplier
 MULTIPLIER_REPO="${GITHUB_ORG}/${MULTIPLIER_NAME}.git"
@@ -257,6 +256,7 @@ function BuildMultiplierOSX
 {
   if !(ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
     -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install" \
     -DQt5_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5 \
     -DQt5Core_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5Core \
@@ -271,6 +271,7 @@ function BuildMultiplierLinux
 {
   ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
     -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install"
 }
 
@@ -327,7 +328,8 @@ function main
   fi
   
   if !(ConfigureAndBuild "${PASTA_NAME}" -DPASTA_BOOTSTRAP_MACROS=OFF \
-    -DPASTA_BOOTSTRAP_TYPES=OFF -DPASTA_ENABLE_TESTING=OFF); then
+    -DPASTA_BOOTSTRAP_TYPES=OFF -DPASTA_ENABLE_TESTING=OFF \
+    -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}); then
     echo "[!] Failed to configure and build pasta"
     exit 1
   fi
