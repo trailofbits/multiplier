@@ -973,6 +973,11 @@ bool Multiplier::DoActions(EventSource source, const EventAction &ea) {
       ea.last_triggered = d->last_event;
       d->code_browser_view->OpenEntitySearch();
       return true;
+
+    case Action::kOpenWeggliSearch:
+      ea.last_triggered = d->last_event;
+      d->code_browser_view->OpenWeggliSearch();
+      return true;
   }
 
   return false;

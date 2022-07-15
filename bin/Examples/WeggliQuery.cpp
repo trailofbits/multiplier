@@ -86,7 +86,7 @@ extern "C" int main(int argc, char *argv[]) {
       for (std::string var : match.captured_variables()) {
         std::cout << var;
         sep = "\t";
-        if (auto capture = match.variable_capture(var)) {
+        if (auto capture = match.captured_tokens(var)) {
           for (mx::Token tok : *capture) {
             std::cout << sep << tok.data();
             sep = " ";

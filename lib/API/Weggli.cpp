@@ -24,88 +24,113 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(
 WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
                                              FragmentImpl::Ptr frag_)
     : query(query_),
-      ep(frag_->ep),
-      frag(std::move(frag_)) {
+      ep(frag_->ep) {
 
-  fragments.push_back(frag->fragment_id);
-  InitForFragment();
+  fragments.push_back(frag_->fragment_id);
+  (void) InitForFragment(std::move(frag_));
 }
 
-EntityId WeggliQueryResultImpl::EntityContainingOffset(unsigned offset) const {
-  auto it = offset_to_token.upper_bound(offset);
-  if (it != offset_to_token.end()) {
-    return it->second;
-  } else {
-    return kInvalidEntityId;
-  }
-}
-
-void WeggliQueryResultImpl::GetUnparsedTokens(TokenSubstitutionList nodes) {
-  for (auto node : nodes) {
-    if (std::holds_alternative<Token>(node)) {
-      auto tok = std::get<Token>(node);
-      auto tok_data = tok.data();
-
-      // Skip empty tokens and whitespace.
-      if (tok_data.empty() || tok.kind() == TokenKind::WHITESPACE) {
-        continue;
-      }
-
-      fragment_buffer.insert(fragment_buffer.end(),
-                             tok_data.begin(), tok_data.end());
-      offset_to_token.emplace(
-          static_cast<unsigned>(fragment_buffer.size()),
-          tok.id());
-      fragment_buffer.push_back(' ');
-
-    } else {
-      auto sub = std::get<mx::TokenSubstitution>(node);
-      GetUnparsedTokens(sub.before());
-    }
-  }
-}
-
-
-void WeggliQueryResultImpl::InitForFragment(void) {
+bool WeggliQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
+  frag = std::move(frag_);
   next_weggli_match = 0u;
   weggli_matches.clear();
-  fragment_buffer.clear();
-  GetUnparsedTokens(Fragment(frag).substitutions());
-
+  offset_to_index.clear();
+  frag_file_tokens = Fragment(frag).file_tokens();
   query.ForEachMatch(
-      fragment_buffer,
-      [this] (const WeggliMatchData &match) {
-    weggli_matches.emplace_back(match);
-    return true;
-  });
+      frag_file_tokens.data(),
+      [this] (WeggliMatchData match) {
+        weggli_matches.emplace_back(std::move(match));
+        return true;
+      });
+
+  if (weggli_matches.empty()) {
+    frag.reset();
+    return false;
+  }
+
+  // Create a mapping of just-after-end-of-token offset to token index, so
+  // that we can use `upper_bound` to find the token containing a matched
+  // offset.
+  unsigned offset = 0u;
+  unsigned index = 0u;
+  for (const Token &tok : frag_file_tokens) {
+    offset += tok.data().size();
+    offset_to_index.emplace(offset, index++);
+  }
+
+  assert(!offset_to_index.empty());
+  return true;
 }
 
 WeggliQueryMatch::WeggliQueryMatch(
     std::shared_ptr<const FragmentImpl> frag_,
     std::shared_ptr<const TokenReader> impl_,
     unsigned index_, unsigned num_tokens_,
-    std::unordered_map<std::string, TokenRange> var_matches_)
+    std::string_view match_data_,
+    std::vector<std::string> variables_,
+    std::vector<std::string_view> matched_data_,
+    std::vector<TokenRange> matched_tokens_)
     : TokenRange(std::move(impl_), index_, num_tokens_),
       frag(std::move(frag_)),
-      var_matches(std::move(var_matches_)) {}
+      match_data(std::move(match_data_)),
+      variables(std::move(variables_)),
+      matched_data(std::move(matched_data_)),
+      matched_tokens(std::move(matched_tokens_)) {}
 
-std::optional<TokenRange> WeggliQueryMatch::variable_capture(
+std::optional<TokenRange> WeggliQueryMatch::captured_tokens(
     const std::string &var) const {
-  auto it = var_matches.find(var);
-  if (it != var_matches.end()) {
-    return it->second;
+  if (auto index = index_of_captured_variable(var)) {
+    return matched_tokens[index.value() - 1u];
+  }
+  return std::nullopt;
+}
+
+// Return the captured tokens for a given indexed capture group.
+std::optional<TokenRange> WeggliQueryMatch::captured_tokens(
+    size_t capture_index) const {
+  if (!capture_index) {
+    return *this;
+  } else if (auto real_index = capture_index - 1u;
+             real_index < matched_tokens.size()) {
+    return matched_tokens[real_index];
   } else {
     return std::nullopt;
   }
 }
 
-// Return a list of matched variables.
-std::vector<std::string> WeggliQueryMatch::captured_variables(void) const {
-  std::vector<std::string> ret;
-  for (const auto &[var, _] : var_matches) {
-    ret.emplace_back(var);
+// Return the captured data for a given named capture group.
+std::optional<std::string_view> WeggliQueryMatch::captured_data(
+    const std::string &var) const {
+if (auto index = index_of_captured_variable(var)) {
+    return matched_data[index.value() - 1u];
   }
-  return ret;
+  return std::nullopt;
+}
+
+// Return the captured data for a given indexed capture group.
+std::optional<std::string_view> WeggliQueryMatch::captured_data(
+    size_t capture_index) const {
+  if (!capture_index) {
+    return match_data;
+  } else if (auto real_index = capture_index - 1u;
+             real_index < matched_data.size()) {
+    return matched_data[real_index];
+  } else {
+    return std::nullopt;
+  }
+}
+
+// Return the index of a captured variable.
+std::optional<size_t> WeggliQueryMatch::index_of_captured_variable(
+    const std::string &var) const {
+  size_t i = 1u;  // Index `0` is reserved for the whole capture.
+  for (const auto &matched_var : variables) {
+    if (matched_var == var) {
+      return i;
+    }
+    ++i;
+  }
+  return std::nullopt;
 }
 
 WeggliQueryResult::WeggliQueryResult(
@@ -122,13 +147,16 @@ void WeggliQueryResultIterator::Advance(void) {
     // Reset the caches of data in the fragment, and the mapping of offsets
     // to token ids.
     if (!impl->frag) {
-      impl->frag = impl->ep->FragmentFor(impl->ep, impl->fragments[index]);
-      if (!impl->frag) {
+      auto frag = impl->ep->FragmentFor(impl->ep, impl->fragments[index]);
+      if (!frag) {
         ++index;
         continue;
       }
 
-      impl->InitForFragment();
+      if (!impl->InitForFragment(std::move(frag))) {
+        ++index;
+        continue;
+      }
     }
 
     auto match_index = impl->next_weggli_match++;
@@ -138,25 +166,67 @@ void WeggliQueryResultIterator::Advance(void) {
       continue;
     }
 
-    const WeggliMatchData &match = impl->weggli_matches[match_index];
+    WeggliMatchData &match = impl->weggli_matches[match_index];
 
-    TokenRange range = impl->frag->TokenRangeFor(
-        impl->frag,
-        impl->EntityContainingOffset(match.begin_offset),
-        impl->EntityContainingOffset(match.end_offset));
+    auto frag_data = impl->frag_file_tokens.data();
 
-    std::unordered_map<std::string, TokenRange> var_matches;
-    for (const auto &[var, range] : match.variables) {
-      var_matches.emplace(
-          var,
-          impl->frag->TokenRangeFor(
-              impl->frag,
-              impl->EntityContainingOffset(range.first),
-              impl->EntityContainingOffset(range.second)));
+    assert(match.begin_offset <= match.end_offset);
+    assert(match.end_offset <= frag_data.size());
+
+    auto offset_to_index_end = impl->offset_to_index.end();
+    auto begin_token_index_it =
+        impl->offset_to_index.upper_bound(match.begin_offset);
+    auto end_token_index_it =
+        impl->offset_to_index.upper_bound(match.end_offset - 1u);
+
+    // This shouldn't be possible, the match should always fall inside of the
+    // buffer.
+    if (begin_token_index_it == offset_to_index_end ||
+        end_token_index_it == offset_to_index_end) {
+      assert(false);
+      return;
+    }
+
+    assert(begin_token_index_it->second <= end_token_index_it->second);
+
+    TokenRange range = impl->frag_file_tokens.slice(
+        begin_token_index_it->second, end_token_index_it->second + 1u);
+
+    std::string_view match_data = frag_data.substr(
+        match.begin_offset, match.end_offset - match.begin_offset + 1);
+
+    std::vector<TokenRange> matched_tokens;
+    std::vector<std::string_view> matched_data;
+
+    for (auto sub_match : match.matches) {
+      assert(sub_match.first <= sub_match.second);
+      matched_data.emplace_back(frag_data.substr(
+          sub_match.first,
+          sub_match.second - sub_match.first));
+
+      begin_token_index_it = impl->offset_to_index.upper_bound(
+          sub_match.first);
+      end_token_index_it = impl->offset_to_index.upper_bound(
+          sub_match.second - 1u);
+
+      // This shouldn't be possible, the match should always fall inside of the
+      // buffer.
+      if (begin_token_index_it == offset_to_index_end ||
+          end_token_index_it == offset_to_index_end) {
+        assert(false);
+        return;
+      }
+
+      matched_tokens.emplace_back(impl->frag_file_tokens.slice(
+          begin_token_index_it->second, end_token_index_it->second + 1u));
     }
 
     result.emplace(impl->frag, std::move(range.impl), range.index,
-                   range.num_tokens, std::move(var_matches));
+                   range.num_tokens,
+                   std::move(match_data),
+                   std::move(match.variables),
+                   std::move(matched_data),
+                   std::move(matched_tokens));
     return;
   }
 }

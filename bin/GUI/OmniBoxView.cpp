@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QFont>
 #include <QFormLayout>
 #include <QGridLayout>
@@ -27,6 +28,7 @@
 #include <iostream>
 #include <multiplier/Index.h>
 #include <multiplier/Re2.h>
+#include <multiplier/Weggli.h>
 #include <string>
 
 #include "CodeSearchResults.h"
@@ -127,8 +129,19 @@ struct OmniBoxView::PrivateData {
   QWidget *regex_results{nullptr};
   RegexQuery regex_query;
 
+  QWidget *weggli_box{nullptr};
+  QGridLayout *weggli_layout{nullptr};
+  QLineEdit *weggli_input{nullptr};
+  QComboBox *weggli_lang{nullptr};
+  QPushButton *weggli_button{nullptr};
+  QPushButton *weggli_to_tab_button{nullptr};
+  QPushButton *weggli_to_dock_button{nullptr};
+  QWidget *weggli_results{nullptr};
+  WeggliQuery weggli_query;
+
   unsigned symbol_counter{0};
   unsigned regex_counter{0};
+  unsigned weggli_counter{0};
 
   std::unordered_map<RawEntityId, std::filesystem::path> file_id_to_path;
 
@@ -273,10 +286,65 @@ void OmniBoxView::InitializeWidgets(void) {
   connect(this, &OmniBoxView::OpenDock,
           &d->multiplier, &Multiplier::OnOpenDock);
 
-  d->content->hide();
+  // ---------------------------------------------------------------------------
+  // Weggli search
+  d->weggli_box = new QWidget;
+  d->weggli_layout = new QGridLayout;
+  d->weggli_input = new QLineEdit;
+  d->weggli_lang = new QComboBox;
+  d->weggli_button = new QPushButton(tr("Query"));
+  d->weggli_to_tab_button = new QPushButton(tr("⍐ tab"));
+  d->weggli_to_dock_button = new QPushButton(tr("⍇ dock"));
+
+  d->weggli_input->setFont(input_font);
+  d->weggli_button->setFont(button_font);
+  d->weggli_lang->setFont(button_font);
+  d->weggli_to_tab_button->setFont(button_font);
+  d->weggli_to_dock_button->setFont(button_font);
+
+  d->weggli_box->setLayout(d->weggli_layout);
+  d->weggli_layout->addWidget(d->weggli_button, 0, 0, 1, 1, Qt::AlignTop);
+  d->weggli_layout->addWidget(d->weggli_lang, 0, 2, 1, 1, Qt::AlignTop);
+  d->weggli_layout->addWidget(d->weggli_to_tab_button, 0, 3, 1, 1, Qt::AlignTop);
+  d->weggli_layout->addWidget(d->weggli_to_dock_button, 0, 4, 1, 1, Qt::AlignTop);
+  d->weggli_layout->addWidget(d->weggli_input, 0, 1, 1, 1, Qt::AlignTop);
+  d->weggli_layout->setRowStretch(0, 0);
+  d->weggli_layout->setRowStretch(1, 1);
+  d->content->addTab(d->weggli_box, tr("Weggli Search"));
+  d->weggli_button->setDisabled(true);
+  d->weggli_to_dock_button->setDisabled(true);
+  d->weggli_to_tab_button->setDisabled(true);
+  d->weggli_lang->addItem("C", QVariant(false));
+  d->weggli_lang->addItem("C++", QVariant(true));
+  d->weggli_lang->setDisabled(false);
+
+  d->weggli_layout->installEventFilter(&d->multiplier);
+
+  connect(d->weggli_input, &QLineEdit::textChanged,
+          this, &OmniBoxView::BuildWeggli);
+
+  connect(d->weggli_input, &QLineEdit::returnPressed,
+          this, &OmniBoxView::RunWeggli);
+
+  connect(d->weggli_button, &QPushButton::pressed,
+          this, &OmniBoxView::RunWeggli);
+
+  connect(d->weggli_to_dock_button, &QPushButton::pressed,
+          this, &OmniBoxView::OnOpenWeggliResultsInDock);
+
+  connect(d->weggli_to_tab_button, &QPushButton::pressed,
+          this, &OmniBoxView::OnOpenWeggliResultsInTab);
+
+  connect(this, &OmniBoxView::OpenTab,
+          &d->multiplier, &Multiplier::OnOpenTab);
+
+  connect(this, &OmniBoxView::OpenDock,
+          &d->multiplier, &Multiplier::OnOpenDock);
 
   // ---------------------------------------------------------------------------
   // Generic
+
+  d->content->hide();
 
   connect(this, &OmniBoxView::TokenPressEvent,
           &d->multiplier, &Multiplier::ActOnTokenPressEvent);
@@ -289,6 +357,11 @@ void OmniBoxView::Clear(void) {
   d->regex_input->setText(QString());
   d->regex_counter++;
   ClearRegexResults();
+
+  d->weggli_button->setDisabled(true);
+  d->weggli_input->setText(QString());
+  d->weggli_counter++;
+  ClearWeggliResults();
 
   d->symbol_button->setDisabled(true);
   d->symbol_input->setText(QString());
@@ -318,6 +391,23 @@ void OmniBoxView::ClearRegexResults(void) {
     d->regex_to_tab_button->setDisabled(true);
     update();
   }
+}
+
+void OmniBoxView::ClearWeggliResults(void) {
+  if (d->weggli_results) {
+    d->weggli_layout->removeWidget(d->weggli_results);
+    d->weggli_results->disconnect();
+    d->weggli_results->deleteLater();
+    d->weggli_results = nullptr;
+    d->weggli_to_dock_button->setDisabled(true);
+    d->weggli_to_tab_button->setDisabled(true);
+    update();
+  }
+}
+
+void OmniBoxView::OpenWeggliSearch(void) {
+  d->content->setCurrentWidget(d->weggli_box);
+  d->weggli_input->setFocus();
 }
 
 void OmniBoxView::OpenRegexSearch(void) {
@@ -698,6 +788,122 @@ void OmniBoxView::OnOpenRegexResultsInDock(void) {
   update();
 }
 
+void OmniBoxView::BuildWeggli(const QString &text) {
+  if (text.isEmpty()) {
+    d->weggli_query = WeggliQuery();
+    d->weggli_button->setDisabled(true);
+
+  } else {
+    auto arr = text.toUtf8();
+    d->weggli_query = WeggliQuery(
+        std::string(arr.data(), static_cast<size_t>(arr.size())),
+        d->weggli_lang->itemData(
+            d->weggli_lang->currentIndex(), Qt::UserRole).toBool());
+    d->weggli_button->setDisabled(!d->weggli_query.IsValid());
+  }
+}
+
+void OmniBoxView::RunWeggli(void) {
+  if (!d->weggli_query.IsValid()) {
+    return;
+  }
+
+  d->weggli_counter++;
+
+  ClearWeggliResults();
+  d->weggli_results = new QLabel(tr("Querying..."));
+  d->weggli_layout->addWidget(d->weggli_results, 1, 0, 1, 5,
+                              Qt::AlignmentFlag::AlignHCenter |
+                              Qt::AlignmentFlag::AlignVCenter);
+
+  auto runnable = new WeggliQueryThread(
+      d->multiplier.Index(), d->weggli_query, d->weggli_counter);
+  runnable->setAutoDelete(true);
+
+  connect(runnable, &WeggliQueryThread::FoundFragments,
+          this, &OmniBoxView::OnFoundFragmentsWithWeggli);
+
+  QThreadPool::globalInstance()->start(runnable);
+}
+
+void OmniBoxView::OnFoundFragmentsWithWeggli(WeggliQueryResultIterator *list_,
+                                            unsigned counter) {
+  std::unique_ptr<WeggliQueryResultIterator> list(list_);
+  if (d->weggli_counter != counter) {
+    return;
+  }
+
+  ClearWeggliResults();
+
+  const CodeTheme &theme = d->multiplier.CodeTheme();
+  theme.BeginTokens();
+
+  auto model = new CodeSearchResultsModel(d->multiplier);
+  auto table = new CodeSearchResultsView(model);
+
+  connect(table, &CodeSearchResultsView::TokenPressEvent,
+          &d->multiplier, &Multiplier::ActOnTokenPressEvent);
+
+  for (auto j = 1; *list != IteratorEnd{}; ++*list, ++j) {
+    const WeggliQueryMatch &match = **list;
+    if (!d->weggli_results) {
+      d->weggli_results = table;
+      d->weggli_to_dock_button->setEnabled(true);
+      d->weggli_to_tab_button->setEnabled(true);
+      d->weggli_layout->addWidget(d->weggli_results, 1, 0, 1, 5);
+    }
+    model->AddResult(match);
+  }
+
+  theme.EndTokens();
+
+  if (!d->weggli_results) {
+    d->weggli_results = new QLabel(tr("No matches"));
+    d->weggli_layout->addWidget(d->weggli_results, 1, 0, 1, 5,
+                               Qt::AlignmentFlag::AlignHCenter |
+                               Qt::AlignmentFlag::AlignVCenter);
+  }
+  update();
+}
+
+void OmniBoxView::OnOpenWeggliResultsInTab(void) {
+  if (!d->weggli_results) {
+    return;
+  }
+
+  TitleNamePrompt dialog(tr("Set tab name"), this);
+  if (dialog.exec() != QDialog::Accepted) {
+    return;
+  }
+
+  d->weggli_layout->removeWidget(d->weggli_results);
+  d->weggli_results->setParent(nullptr);
+  emit OpenTab(dialog.NewName(), d->weggli_results);
+  d->weggli_results = nullptr;
+  d->weggli_to_dock_button->setDisabled(true);
+  d->weggli_to_tab_button->setDisabled(true);
+  update();
+}
+
+void OmniBoxView::OnOpenWeggliResultsInDock(void) {
+  if (!d->weggli_results) {
+    return;
+  }
+
+  TitleNamePrompt dialog(tr("Set dock name"), this);
+  if (dialog.exec() != QDialog::Accepted) {
+    return;
+  }
+
+  d->weggli_layout->removeWidget(d->weggli_results);
+  d->weggli_results->setParent(nullptr);
+  emit OpenDock(dialog.NewName(), d->weggli_results);
+  d->weggli_results = nullptr;
+  d->weggli_to_dock_button->setDisabled(true);
+  d->weggli_to_tab_button->setDisabled(true);
+  update();
+}
+
 struct SymbolSearchThread::PrivateData {
   const Index index;
   const FileLocationCache &file_cache;
@@ -756,6 +962,31 @@ RegexQueryThread::RegexQueryThread(const Index &index_,
 void RegexQueryThread::run(void) {
   emit FoundFragments(
       new RegexQueryResultIterator(d->index.query_fragments(d->query).begin()),
+      d->counter);
+}
+
+struct WeggliQueryThread::PrivateData {
+  const Index index;
+  const WeggliQuery query;
+  const unsigned counter;
+
+  inline PrivateData(const Index &index_, const WeggliQuery &query_,
+                     unsigned counter_)
+      : index(index_),
+        query(query_),
+        counter(counter_) {}
+};
+
+WeggliQueryThread::~WeggliQueryThread(void) {}
+
+WeggliQueryThread::WeggliQueryThread(const Index &index_,
+                                     const WeggliQuery &query_,
+                                     unsigned counter_)
+    : d(std::make_unique<PrivateData>(index_, query_, counter_)) {}
+
+void WeggliQueryThread::run(void) {
+  emit FoundFragments(
+      new WeggliQueryResultIterator(d->index.query_fragments(d->query).begin()),
       d->counter);
 }
 

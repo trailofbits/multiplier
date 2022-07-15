@@ -59,8 +59,6 @@ class RegexQueryResultImpl final {
 
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImpl::Ptr frag_);
 
-  EntityId EntityContainingOffset(unsigned offset) const;
-
   bool InitForFragment(FragmentImpl::Ptr frag_);
   bool InitForFragment(RawEntityId frag_id);
 

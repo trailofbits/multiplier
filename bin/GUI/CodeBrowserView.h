@@ -57,6 +57,7 @@ class CodeBrowserView final : public QWidget {
 
   // Return the omnibox.
   OmniBoxView *OmniBox(void);
+  void OpenWeggliSearch(void);
   void OpenRegexSearch(void);
   void OpenEntitySearch(void);
 

@@ -216,6 +216,7 @@ enum class Action : int {
 
   kOpenEntitySearch,
   kOpenRegexSearch,
+  kOpenWeggliSearch,
 };
 
 struct EventAction {

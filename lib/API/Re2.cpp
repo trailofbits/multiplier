@@ -38,15 +38,6 @@ RegexQueryResultImpl::RegexQueryResultImpl(
   (void) InitForFragment(std::move(frag_));
 }
 
-EntityId RegexQueryResultImpl::EntityContainingOffset(unsigned offset) const {
-  auto it = offset_to_index.upper_bound(offset);
-  if (it != offset_to_index.end()) {
-    return it->second;
-  } else {
-    return kInvalidEntityId;
-  }
-}
-
 bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   frag = std::move(frag_);
   Fragment hl_frag(frag);
@@ -55,7 +46,6 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   offset_to_index.clear();
   next_match_index = 0u;
   frag_file_tokens = hl_frag.file_tokens();
-  offset_to_index.clear();
 
   // Do the regex search on fragments token first.
   query.ForEachMatch(

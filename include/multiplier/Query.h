@@ -9,7 +9,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <vector>
 
 #include "Fragment.h"
@@ -49,9 +48,14 @@ class WeggliQueryMatch : public TokenRange {
 
   // Fragment with the match
   std::shared_ptr<const FragmentImpl> frag;
+  
+  // The whole match.
+  std::string_view match_data;
 
   // Map variables with token range.
-  std::unordered_map<std::string, TokenRange> var_matches;
+  std::vector<std::string> variables;
+  std::vector<std::string_view> matched_data;
+  std::vector<TokenRange> matched_tokens;
 
   WeggliQueryMatch(void) = delete;
 
@@ -60,13 +64,36 @@ class WeggliQueryMatch : public TokenRange {
       std::shared_ptr<const FragmentImpl> frag_,
       std::shared_ptr<const TokenReader> impl_,
       unsigned index_, unsigned num_tokens_,
-      std::unordered_map<std::string, TokenRange> var_matches_);
+      std::string_view match_data_,
+      std::vector<std::string> variables_,
+      std::vector<std::string_view> matched_data_,
+      std::vector<TokenRange> matched_tokens_);
 
-  // Return the match results for a specific meta-variable.
-  std::optional<TokenRange> variable_capture(const std::string &var) const;
+  // Return the captured tokens for a given named capture group.
+  std::optional<TokenRange> captured_tokens(const std::string &var) const;
+
+  // Return the captured data for a given named capture group.
+  std::optional<std::string_view> captured_data(const std::string &var) const;
+
+  // Return the captured tokens for a given indexed capture group.
+  std::optional<TokenRange> captured_tokens(size_t capture_index) const;
+
+  // Return the captured data for a given indexed capture group.
+  std::optional<std::string_view> captured_data(size_t capture_index) const;
 
   // Return a list of matched variables.
-  std::vector<std::string> captured_variables(void) const;
+  inline const std::vector<std::string> &captured_variables(void) const & {
+    return variables;
+  }
+
+  // Return the index of a captured variable.
+  std::optional<size_t> index_of_captured_variable(
+    const std::string &var) const;
+
+  // Return the number of capture groups.
+  inline size_t num_captures(void) const {
+    return 1u + matched_tokens.size();
+  }
 };
 
 class WeggliQueryResultIterator {

@@ -117,17 +117,43 @@ public:
       llvm::raw_string_ostream os{str};
       llvm::json::OStream j{os};
       j.object([&]() {
-        for (auto variable : matches[cur].captured_variables()) {
-          j.attributeObject(variable, [&]() {
-            auto tokens{matches[cur].variable_capture(variable)};
-            assert(tokens.has_value());
-            j.attributeArray("tokens", [&]() {
-              for (auto token : *tokens) {
-                j.value(static_cast<std::uint64_t>(token.id()));
+        j.attributeObject("named", [&] {
+          for (auto variable : matches[cur].captured_variables()) {
+            j.attributeObject(variable, [&] {
+              auto tokens{matches[cur].captured_tokens(variable)};
+              auto data{matches[cur].captured_data(variable)};
+              if (data) {
+                j.attribute("data", std::string(data->data(), data->size()));
               }
+              j.attributeArray("tokens", [&]() {
+                if (tokens) {
+                  for (auto token : *tokens) {
+                    j.value(static_cast<std::uint64_t>(token.id()));
+                  }
+                }
+              });
             });
-          });
-        }
+          }
+        });
+
+        j.attributeArray("indexed", [&] {
+          for (auto i{0U}; i < matches[cur].num_captures(); ++i) {
+            auto tokens{matches[cur].captured_tokens(i)};
+            auto data{matches[cur].captured_data(i)};
+            j.object([&] {
+              if (data) {
+                j.attribute("data", std::string(data->data(), data->size()));
+              }
+              j.attributeArray("tokens", [&]() {
+                if (tokens) {
+                  for (auto token : *tokens) {
+                    j.value(static_cast<std::uint64_t>(token.id()));
+                  }
+                }
+              });
+            });
+          }
+        });
       });
 
       sqlite3_result_text(ctx, str.data(), str.size(), SQLITE_TRANSIENT);

@@ -178,10 +178,17 @@ int main(int argc, char *argv[]) {
   });
 
   config.actions.emplace_back(mx::gui::EventAction{
-    .description = "F should open the regex search.",
+    .description = "F should open the RE2 search.",
     .match_key = Qt::Key_F,
     .match_sources = ~mx::gui::EventSources(),
     .do_action = mx::gui::Action::kOpenRegexSearch,
+  });
+
+  config.actions.emplace_back(mx::gui::EventAction{
+    .description = "W should open the Weggli search.",
+    .match_key = Qt::Key_W,
+    .match_sources = ~mx::gui::EventSources(),
+    .do_action = mx::gui::Action::kOpenWeggliSearch,
   });
 
   config.actions.emplace_back(mx::gui::EventAction{

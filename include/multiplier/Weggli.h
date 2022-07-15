@@ -10,7 +10,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <vector>
 #include <tuple>
 
@@ -20,11 +19,12 @@ class WeggliQueryImpl;
 class Index;
 
 struct WeggliMatchData final {
-  // raw offset of the query matches captured by Weggli.
+  // Raw offsets of the query matches captured by Weggli.
   unsigned begin_offset{~0u};
   unsigned end_offset{0u};
 
-  std::unordered_map<std::string, std::pair<unsigned, unsigned>> variables;
+  std::vector<std::string> variables;
+  std::vector<std::pair<unsigned, unsigned>> matches;
 };
 
 class WeggliQuery final {
@@ -42,10 +42,10 @@ class WeggliQuery final {
   WeggliQuery(void) = default;
   explicit WeggliQuery(std::string query, bool is_cpp);
 
-  ~WeggliQuery();
+  ~WeggliQuery(void);
 
   void ForEachMatch(std::string_view source,
-                    std::function<bool(const WeggliMatchData &)> cb) const;
+                    std::function<bool(WeggliMatchData)> cb) const;
 
   bool IsValid(void) const;
 

@@ -34,8 +34,9 @@ static bool VariableMatchesCallback(
   }
 
   auto match = static_cast<WeggliMatchData *>(data);
-  match->variables.try_emplace(
-      name, static_cast<unsigned>(start), static_cast<unsigned>(end));
+  match->variables.emplace_back(name);
+  match->matches.emplace_back(static_cast<unsigned>(start),
+                              static_cast<unsigned>(end));
   return true;
 }
 
@@ -48,8 +49,8 @@ static bool WeggliCallback(const struct QueryResult *result, void *data) {
   weggli_iter_match_captures(result, CaptureMatchesCallback, &match);
   weggli_iter_match_variables(result, VariableMatchesCallback, &match);
   if (match.begin_offset < match.end_offset) {
-    auto cb = reinterpret_cast<std::function<bool(const WeggliMatchData &)> *>(data);
-    return (*cb)(match);
+    auto cb = reinterpret_cast<std::function<bool(WeggliMatchData)> *>(data);
+    return (*cb)(std::move(match));
 
   } else {
     return true;
@@ -89,13 +90,14 @@ WeggliQuery::~WeggliQuery(void) {}
 
 void WeggliQuery::ForEachMatch(
     std::string_view source,
-    std::function<bool(const WeggliMatchData &)> cb) const {
+    std::function<bool(WeggliMatchData)> cb) const {
 
   if (!impl || !impl->qtree || source.empty()) {
     return;
   }
 
-  auto matches = weggli_matches(impl->qtree, source.data(), impl->is_cpp);
+  auto matches = weggli_matches(impl->qtree, source.data(), source.size(),
+                                impl->is_cpp);
   if (!matches) {
     return;
   }
@@ -128,7 +130,7 @@ WeggliQuery::WeggliQuery(std::string, bool)
 WeggliQuery::~WeggliQuery(void) {}
 
 void WeggliQuery::ForEachMatch(
-    std::string_view, std::function<bool(const WeggliMatchData &)>) const {}
+    std::string_view, std::function<bool(WeggliMatchData)>) const {}
 
 bool WeggliQuery::IsValid(void) const {
   return false;

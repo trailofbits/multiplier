@@ -18,6 +18,7 @@
 
 namespace mx {
 class RegexQueryMatch;
+class WeggliQueryMatch;
 namespace gui {
 
 class CodeSearchResultsModel;
@@ -54,6 +55,7 @@ class CodeSearchResultsModel final : public QAbstractTableModel {
   std::unique_ptr<CodeSearchResultsModelImpl> d;
 
   void AddHeader(const RegexQueryMatch &match);
+  void AddHeader(const WeggliQueryMatch &match);
 
  public:
   friend class CodeSearchResultsItemDelegate;
@@ -66,6 +68,7 @@ class CodeSearchResultsModel final : public QAbstractTableModel {
                                   QObject *parent_=nullptr);
 
   void AddResult(const RegexQueryMatch &match);
+  void AddResult(const WeggliQueryMatch &match);
 
   int columnCount(const QModelIndex &parent) const Q_DECL_FINAL;
   int rowCount(const QModelIndex &parent) const Q_DECL_FINAL;

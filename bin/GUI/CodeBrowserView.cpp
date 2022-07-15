@@ -259,6 +259,12 @@ OmniBoxView *CodeBrowserView::OmniBox(void) {
   return d->omnibox;
 }
 
+void CodeBrowserView::OpenWeggliSearch(void) {
+  d->content->setCurrentWidget(d->omnibox);
+  d->omnibox->raise();
+  d->omnibox->OpenWeggliSearch();
+}
+
 void CodeBrowserView::OpenRegexSearch(void) {
   d->content->setCurrentWidget(d->omnibox);
   d->omnibox->raise();

@@ -29,6 +29,7 @@
 #include <cassert>
 #include <multiplier/Index.h>
 #include <multiplier/Re2.h>
+#include <multiplier/Weggli.h>
 #include <variant>
 #include <vector>
 
@@ -65,6 +66,10 @@ struct RowData {
 
   explicit RowData(CodeSearchResultsModelImpl &d,
                    const RegexQueryMatch &, unsigned file_index_,
+                   unsigned frag_index_);
+
+  explicit RowData(CodeSearchResultsModelImpl &d,
+                   const WeggliQueryMatch &, unsigned file_index_,
                    unsigned frag_index_);
 
   std::pair<unsigned, unsigned> Tokens(CodeSearchResultsModelImpl &d);
@@ -267,6 +272,65 @@ RowData::RowData(CodeSearchResultsModelImpl &d,
     captured_data = capture.value();
 
     const ptrdiff_t len_utf8 = captured_data.data() - begin_utf8;
+    assert(0 <= len_utf8);
+
+    capture_sub_range.first =
+        QString::fromUtf8(begin_utf8, static_cast<int>(len_utf8)).size();
+
+    capture_sub_range.second =
+        QString::fromUtf8(capture->data(),
+                          static_cast<int>(capture->size())).size();
+
+    if (auto captured_tokens = match.captured_tokens(i)) {
+      const std::string_view tok_data = captured_tokens->data();
+      const ptrdiff_t tok_len_utf8 = tok_data.data() - begin_utf8;
+
+      token_sub_range.first =
+          QString::fromUtf8(begin_utf8, static_cast<int>(tok_len_utf8)).size();
+
+      token_sub_range.second =
+          QString::fromUtf8(tok_data.data(),
+                            static_cast<int>(tok_data.size())).size();
+
+    } else if (!capture->empty()) {
+      assert(false);
+      token_sub_range.first = capture_sub_range.first;
+      token_sub_range.second = capture_sub_range.second;
+    }
+  }
+}
+
+RowData::RowData(CodeSearchResultsModelImpl &d,
+                 const WeggliQueryMatch &match, unsigned file_index_,
+                 unsigned frag_index_)
+    : file_index(file_index_),
+      frag_index(frag_index_) {
+
+  VariantId first_vid = EntityId(match.front().id()).Unpack();
+  VariantId last_vid = EntityId(match.back().id()).Unpack();
+
+  assert(std::holds_alternative<FileTokenId>(first_vid));
+  assert(std::holds_alternative<FileTokenId>(last_vid));
+
+  file_tokens_begin = std::get<FileTokenId>(first_vid).offset;
+  file_tokens_end = std::get<FileTokenId>(last_vid).offset + 1u;
+
+  const char *begin_utf8 = match.TokenRange::data().data();
+  for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
+
+    auto &capture_sub_range = d.capture_sub_ranges.emplace_back(0, 0);
+    auto &token_sub_range = d.token_sub_ranges.emplace_back(0, 0);
+    auto &captured_data = d.captured_data.emplace_back();
+
+    auto capture = match.captured_data(i);
+    if (!capture) {
+      continue;
+    }
+
+    captured_data = capture.value();
+
+    const ptrdiff_t len_utf8 = captured_data.data() - begin_utf8;
+    assert(0 <= len_utf8);
 
     capture_sub_range.first =
         QString::fromUtf8(begin_utf8, static_cast<int>(len_utf8)).size();
@@ -327,18 +391,57 @@ QSize CodeSearchResultsItemDelegate::sizeHint(
     return size;
   }
 
+  // The begin/end indices of tokens in `CodeSearchResultsModelImpl::code`
+  // for all the matched tokens.
   RowData &result = d->rows[static_cast<size_t>(row)];
-  TokenList file_tokens = d->files[result.file_index].tokens();
-  QFontMetricsF font_metrics(d->font);
+  auto [begin_index, end_index] = result.Tokens(*d);
+  auto capture_offset = row * d->num_columns;
+  auto capture_index = static_cast<unsigned>(col);
+  auto [num_chars_to_skip, num_chars_to_print] =
+      d->token_sub_ranges[static_cast<unsigned>(capture_offset + col)];
+
+  QFont font = d->font;
+  QFontMetricsF font_metrics(font);
+  CodeSearchResultsConfiguration &config =
+      d->multiplier.Configuration().code_search_results;
+
   qreal curr_width = 0;
   qreal width = 0;
   qreal num_lines = 1;
 
-  for (auto i = result.file_tokens_begin; i < result.file_tokens_end; ++i) {
-    auto v = file_tokens[i].data();
-    auto x = -1;
-    for (QChar ch : QString::fromUtf8(v.data(), static_cast<int>(v.size()))) {
-      auto ascii_ch = v[++x];
+  int num_skipped_chars = 0;
+  int num_printed_chars = 0;
+  auto c = 0u;
+  for (unsigned i = begin_index; i < end_index; ++i) {
+
+    // Recalculate font metrics; bold/italic might take more or less space.
+    if (config.highlight_syntax) {
+      font.setItalic(d->code.italic[i]);
+      font.setUnderline(d->code.underline[i]);
+      font.setWeight(d->code.bold[i] ? QFont::DemiBold : QFont::Normal);
+      font_metrics = QFontMetricsF(font);
+    }
+
+    auto j = d->code.start_of_token[i];
+    const auto max_j = d->code.start_of_token[i + 1u];
+
+    for (; j < max_j && num_printed_chars < num_chars_to_print; ++j, ++c) {
+
+      // If we're in the Nth column, then we only want to show the tokens
+      // and matched data for the Nth capture group, but all of our info
+      // relating printed characters to capture indices is based on the entire
+      // match, so we might need to skip open some stuff.
+      if (num_skipped_chars++ < num_chars_to_skip) {
+        continue;
+      }
+
+      // If we're not in skipping mode, then we need to count how many
+      // characters have been rendered, because if we're in the Nth column,
+      // then we will want to limit ourselves to rendering just the token
+      // data associated with the Nth capture group.
+      ++num_printed_chars;
+
+      const QChar ch = d->code.data[j];
       switch (ch.unicode()) {
         case QChar::Tabulation:
         case QChar::Space:
@@ -364,10 +467,10 @@ QSize CodeSearchResultsItemDelegate::sizeHint(
   QSize contents_size = QSizeF(width, font_metrics.height() * num_lines).toSize();
   QStyle *style = opt.widget ? opt.widget->style() : qApp->style();
   size = style->sizeFromContents(QStyle::ContentsType::CT_ItemViewItem,
-                                 &opt, size /* empty */, opt.widget);
+                                 &opt, contents_size, opt.widget);
 
-  size.setWidth(size.width() + contents_size.width());
-  size.setHeight(contents_size.height());
+//  size.setWidth(size.width() + contents_size.width());
+//  size.setHeight(contents_size.height());
   return size;
 }
 
@@ -636,7 +739,11 @@ void CodeSearchResultsModel::AddHeader(const RegexQueryMatch &match) {
   insertColumns(0, d->num_columns);
 
   for (auto i = 0u; i < num_captures; ++i) {
-    d->headers.push_back(QString::number(i));
+    if (!i) {
+      d->headers.push_back(tr("Match"));  // The whole match.
+    } else {
+      d->headers.push_back(QString::number(i));
+    }
   }
 
   for (const std::string &var : match.captured_variables()) {
@@ -649,12 +756,74 @@ void CodeSearchResultsModel::AddHeader(const RegexQueryMatch &match) {
   endInsertColumns();
 }
 
+void CodeSearchResultsModel::AddHeader(const WeggliQueryMatch &match) {
+  auto num_captures = match.num_captures();
+
+  beginInsertColumns(QModelIndex(), 0, static_cast<int>(num_captures - 1));
+  d->num_columns = 1u;
+  d->headers.push_back(tr("Match"));
+  for (const std::string &var : match.captured_variables()) {
+    if (!var.empty() && var[0] == '$') {
+      d->headers.push_back(QString::fromStdString(var.substr(1)));
+    } else {
+      d->headers.push_back(QString::fromStdString(var));
+    }
+    ++d->num_columns;
+  }
+  insertColumns(0, d->num_columns);
+
+  emit headerDataChanged(Qt::Orientation::Vertical, 0, d->num_columns - 1);
+  endInsertColumns();
+}
+
 void CodeSearchResultsModel::AddResult(const RegexQueryMatch &match) {
   if (d->mode == ModelMode::kNoData) {
     d->mode = ModelMode::kRegex;
     AddHeader(match);
 
   } else if (d->mode != ModelMode::kRegex) {
+    return;
+  }
+
+  beginInsertRows(QModelIndex(), d->num_rows, d->num_rows);
+
+  Fragment frag = Fragment::containing(match);
+  File file = File::containing(match);
+
+  unsigned file_index;
+  unsigned frag_index;
+
+  if (auto file_index_it = d->file_indexes.find(file.id());
+      file_index_it != d->file_indexes.end()) {
+    file_index = file_index_it->second;
+  } else {
+    file_index = static_cast<unsigned>(d->files.size());
+    d->file_indexes.emplace(file.id(), file_index);
+    d->files.emplace_back(std::move(file));
+  }
+
+  if (auto frag_index_it = d->fragment_indexes.find(frag.id());
+      frag_index_it != d->fragment_indexes.end()) {
+    frag_index = frag_index_it->second;
+  } else {
+    frag_index = static_cast<unsigned>(d->fragments.size());
+    d->fragment_indexes.emplace(frag.id(), frag_index);
+    d->fragments.emplace_back(std::move(frag));
+  }
+
+  d->rows.emplace_back(*d, match, file_index, frag_index);
+  ++d->num_rows;
+  endInsertRows();
+
+  emit AddedRows();
+}
+
+void CodeSearchResultsModel::AddResult(const WeggliQueryMatch &match) {
+  if (d->mode == ModelMode::kNoData) {
+    d->mode = ModelMode::kWeggli;
+    AddHeader(match);
+
+  } else if (d->mode != ModelMode::kWeggli) {
     return;
   }
 

@@ -22,6 +22,8 @@ class FileLocationCache;
 class Index;
 class RegexQuery;
 class RegexQueryResultIterator;
+class WeggliQuery;
+class WeggliQueryResultIterator;
 namespace gui {
 
 class Multiplier;
@@ -36,6 +38,7 @@ class OmniBoxView final : public QWidget {
   void InitializeWidgets(void);
   void ClearSymbolResults(void);
   void ClearRegexResults(void);
+  void ClearWeggliResults(void);
 
   void FillRow(QTreeWidgetItem *item, const NamedDecl &decl) const;
 
@@ -44,6 +47,7 @@ class OmniBoxView final : public QWidget {
 
   OmniBoxView(Multiplier &multiplier, QWidget *parent = nullptr);
   void Clear(void);
+  void OpenWeggliSearch(void);
   void OpenRegexSearch(void);
   void OpenEntitySearch(void);
 
@@ -69,13 +73,20 @@ class OmniBoxView final : public QWidget {
   void OnOpenRegexResultsInTab(void);
   void OnOpenRegexResultsInDock(void);
 
+  void BuildWeggli(const QString &text);
+  void RunWeggli(void);
+  void OnFoundFragmentsWithWeggli(WeggliQueryResultIterator *list,
+                                  unsigned counter);
+  void OnOpenWeggliResultsInTab(void);
+  void OnOpenWeggliResultsInDock(void);
+
  signals:
   void OpenTab(QString title, QWidget *widget);
   void OpenDock(QString title, QWidget *widget);
   void TokenPressEvent(EventSource source, EventLocations loc_ids);
 };
 
-// Downloads the file list in the background.
+// Downloads the symbol search results in the background.
 class SymbolSearchThread final : public QObject, public QRunnable {
   Q_OBJECT
 
@@ -96,7 +107,7 @@ class SymbolSearchThread final : public QObject, public QRunnable {
                     unsigned counter);
 };
 
-// Downloads the file list in the background.
+// Downloads the regex search results in the background.
 class RegexQueryThread final : public QObject, public QRunnable {
   Q_OBJECT
 
@@ -113,6 +124,25 @@ class RegexQueryThread final : public QObject, public QRunnable {
 
  signals:
   void FoundFragments(RegexQueryResultIterator *list, unsigned counter);
+};
+
+// Downloads the Weggli search results in the background.
+class WeggliQueryThread final : public QObject, public QRunnable {
+  Q_OBJECT
+
+  struct PrivateData;
+  std::unique_ptr<PrivateData> d;
+
+  void run(void) Q_DECL_FINAL;
+
+ public:
+  virtual ~WeggliQueryThread(void);
+
+  explicit WeggliQueryThread(const Index &index_, const WeggliQuery &query_,
+                            unsigned counter_);
+
+ signals:
+  void FoundFragments(WeggliQueryResultIterator *list, unsigned counter);
 };
 
 }  // namespace gui

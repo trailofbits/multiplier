@@ -26,8 +26,8 @@ class WeggliQueryResultImpl final {
 
   // Buffer of fragment data.
   FragmentImpl::Ptr frag;
-  std::string fragment_buffer;
-  std::map<unsigned, EntityId> offset_to_token;
+  TokenRange frag_file_tokens;
+  std::map<unsigned, unsigned> offset_to_index;
   std::vector<WeggliMatchData> weggli_matches;
   unsigned next_weggli_match{0};
 
@@ -37,8 +37,6 @@ class WeggliQueryResultImpl final {
   using Response =
       capnp::Response<mx::rpc::Multiplier::WeggliQueryFragmentsResults>;
 
-  EntityId EntityContainingOffset(unsigned offset) const;
-
   ~WeggliQueryResultImpl(void) noexcept;
 
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
@@ -46,9 +44,7 @@ class WeggliQueryResultImpl final {
 
   WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImpl::Ptr frag_);
 
-  void GetUnparsedTokens(TokenSubstitutionList nodes);
-
-  void InitForFragment(void);
+  bool InitForFragment(FragmentImpl::Ptr frag_);
 };
 
 }  // namespace mx
