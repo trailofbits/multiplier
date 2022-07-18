@@ -4737,7 +4737,7 @@ void SerializeObjCObjectType(EntityMapper &es, mx::ast::Type::Builder b, const p
   b.setVal328(e.IsSugared());
   b.setVal329(e.IsUnspecialized());
   b.setVal330(e.IsUnspecializedAsWritten());
-  b.setVal331(es.EntityId(e.StripObjCKindOfTypeAndQualifieds()));
+  b.setVal331(es.EntityId(e.StripObjCKindOfTypeAndQualifiers()));
 }
 
 void SerializeObjCInterfaceType(EntityMapper &es, mx::ast::Type::Builder b, const pasta::ObjCInterfaceType &e) {
@@ -4784,7 +4784,7 @@ void SerializeObjCObjectPointerType(EntityMapper &es, mx::ast::Type::Builder b, 
   b.setVal321(e.IsUnspecialized());
   b.setVal322(e.IsUnspecializedAsWritten());
   do {
-    auto v333 = e.Qualifieds();
+    auto v333 = e.Qualifiers();
     auto sv333 = b.initVal333(static_cast<unsigned>(v333.size()));
     auto i333 = 0u;
     for (const auto &e333 : v333) {
@@ -4792,7 +4792,7 @@ void SerializeObjCObjectPointerType(EntityMapper &es, mx::ast::Type::Builder b, 
       ++i333;
     }
   } while (false);
-  b.setVal332(es.EntityId(e.StripObjCKindOfTypeAndQualifieds()));
+  b.setVal332(es.EntityId(e.StripObjCKindOfTypeAndQualifiers()));
   do {
     auto v334 = e.Protocols();
     auto sv334 = b.initVal334(static_cast<unsigned>(v334.size()));
@@ -4897,15 +4897,6 @@ void SerializeFunctionProtoType(EntityMapper &es, mx::ast::Type::Builder b, cons
     b.setVal322(false);
   }
   b.setVal315(es.EntityId(e.Desugar()));
-  do {
-    auto v318 = e.Exceptions();
-    auto sv318 = b.initVal318(static_cast<unsigned>(v318.size()));
-    auto i318 = 0u;
-    for (const auto &e318 : v318) {
-      sv318.set(i318, es.EntityId(e318));
-      ++i318;
-    }
-  } while (false);
   auto t317 = e.EllipsisToken();
   b.setVal317(es.EntityId(t317));
   auto v331 = e.ExceptionSpecDeclaration();
@@ -4937,12 +4928,12 @@ void SerializeFunctionProtoType(EntityMapper &es, mx::ast::Type::Builder b, cons
     b.setVal325(false);
   }
   do {
-    auto v319 = e.ParameterTypes();
-    auto sv319 = b.initVal319(static_cast<unsigned>(v319.size()));
-    auto i319 = 0u;
-    for (const auto &e319 : v319) {
-      sv319.set(i319, es.EntityId(e319));
-      ++i319;
+    auto v318 = e.ParameterTypes();
+    auto sv318 = b.initVal318(static_cast<unsigned>(v318.size()));
+    auto i318 = 0u;
+    for (const auto &e318 : v318) {
+      sv318.set(i318, es.EntityId(e318));
+      ++i318;
     }
   } while (false);
   b.setVal339(static_cast<unsigned char>(mx::FromPasta(e.ReferenceQualifier())));
@@ -4964,12 +4955,12 @@ void SerializeFunctionProtoType(EntityMapper &es, mx::ast::Type::Builder b, cons
   b.setVal345(e.IsTemplateVariadic());
   b.setVal346(e.IsVariadic());
   do {
-    auto v333 = e.ExceptionTypes();
-    auto sv333 = b.initVal333(static_cast<unsigned>(v333.size()));
-    auto i333 = 0u;
-    for (const auto &e333 : v333) {
-      sv333.set(i333, es.EntityId(e333));
-      ++i333;
+    auto v319 = e.ExceptionTypes();
+    auto sv319 = b.initVal319(static_cast<unsigned>(v319.size()));
+    auto i319 = 0u;
+    for (const auto &e319 : v319) {
+      sv319.set(i319, es.EntityId(e319));
+      ++i319;
     }
   } while (false);
 }
@@ -5028,7 +5019,7 @@ void SerializeDependentAddressSpaceType(EntityMapper &es, mx::ast::Type::Builder
   (void) e;
   SerializeType(es, b, e);
   b.setVal308(es.EntityId(e.Desugar()));
-  b.setVal309(es.EntityId(e.AddrSpaceExpression()));
+  b.setVal309(es.EntityId(e.AddressSpaceExpression()));
   auto t315 = e.AttributeToken();
   b.setVal315(es.EntityId(t315));
   b.setVal310(e.IsSugared());

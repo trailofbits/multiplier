@@ -178,7 +178,7 @@ static const std::unordered_set<std::string> gEntityClassNames{
 // itself (`pasta/bin/BootstrapTypes/Globals.cpp`, `kConditionalNullptr`)
 // to check the conditions that would be asserted, and if those conditions
 // aren't satisfied, then return `std::nullopt`.
-static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
+static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Expr", "ClassifyLValue"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsBoundMemberFunction"},  // Calls `clang::Expr::ClassifyImpl`.
   {"Expr", "IsModifiableLvalue"},  // Calls `clang::Expr::ClassifyImpl`.
@@ -243,6 +243,9 @@ static const std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"CXXRecordDecl", "DefaultedDestructorIsDeleted"},
   {"CXXRecordDecl", "DefaultedMoveConstructorIsDeleted"},
   {"Type", "ObjCSubstitutions"},
+
+  // These are redundant.
+  {"FunctionProtoType", "Exceptions"},
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
@@ -3668,6 +3671,20 @@ int main(int argc, char *argv[]) {
         << " INCLUDE_AST_H SERIALIZE_H SERIALIZE_CPP VISITOR_INC USE_INC DOCS_MD"
         << std::endl;
     return EXIT_FAILURE;
+  }
+
+  // Expand the blacklist from the `MethodsToIngore.txt` file in the
+  // `bin/Bootstrap` source directory.
+  std::ifstream blacklist(
+      std::filesystem::path(__FILE__).parent_path() / "MethodsToIgnore.txt");
+  std::pair<std::string, std::string> class_method;
+  for (std::string line; std::getline(blacklist, line);) {
+    if (class_method.first.empty()) {
+      class_method.first = std::move(line);
+    } else {
+      class_method.second = std::move(line);
+      kMethodBlackList.emplace(std::move(class_method));
+    }
   }
 
   pasta::InitPasta initializer;

@@ -1994,7 +1994,7 @@ Available enumerations:
 * `INCOMPLETE_TYPE`
 * `CONST_QUALIFIED`
 * `CONST_QUALIFIED_FIELD`
-* `CONST_ADDR_SPACE`
+* `CONST_ADDRESS_SPACE`
 * `ARRAY_TYPE`
 * `NO_SETTER_PROPERTY`
 * `MEMBER_FUNCTION`
@@ -5923,7 +5923,7 @@ Available enumerations:
 * `NO_SETTER_PROPERTY`
 * `CONST_QUALIFIED`
 * `CONST_QUALIFIED_FIELD`
-* `CONST_ADDR_SPACE`
+* `CONST_ADDRESS_SPACE`
 * `ARRAY_TYPE`
 * `INCOMPLETE_TYPE`
 
@@ -7720,7 +7720,7 @@ Available enumerations:
 * `POST_DEC`
 * `PRE_INCREMENT`
 * `PRE_DEC`
-* `ADDR_OF`
+* `ADDRESS_OF`
 * `DEREF`
 * `PLUS`
 * `MINUS`
@@ -7750,7 +7750,7 @@ Available enumerations:
 * `STRUCT`
 * `UNION`
 * `MEMBER_POINTER`
-* `ADDR_LABEL_DIFF`
+* `ADDRESS_LABEL_DIFF`
 
 </details>
 
@@ -12539,7 +12539,7 @@ This table also includes all of the fields contained in [`Type`](#Type).
 | `is_sugared` | `INTEGER` | :heavy_check_mark: | |
 | `is_unspecialized` | `INTEGER` | :heavy_check_mark: | |
 | `is_unspecialized_as_written` | `INTEGER` | :heavy_check_mark: | |
-| `strip_obj_c_kind_of_type_and_qualifieds` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `strip_obj_c_kind_of_type_and_qualifiers` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
 
 This table also includes all of the fields contained in [`Type`](#Type).
 
@@ -12573,7 +12573,7 @@ This table also includes all of the fields contained in [`ObjCObjectType`](#ObjC
 | `is_sugared` | `INTEGER` | :heavy_check_mark: | |
 | `is_unspecialized` | `INTEGER` | :heavy_check_mark: | |
 | `is_unspecialized_as_written` | `INTEGER` | :heavy_check_mark: | |
-| `strip_obj_c_kind_of_type_and_qualifieds` | `INTEGER` | :heavy_check_mark: | [`ObjCObjectPointerType`](#ObjCObjectPointerType) |
+| `strip_obj_c_kind_of_type_and_qualifiers` | `INTEGER` | :heavy_check_mark: | [`ObjCObjectPointerType`](#ObjCObjectPointerType) |
 
 This table also includes all of the fields contained in [`Type`](#Type).
 
@@ -12772,7 +12772,7 @@ This table also includes all of the fields contained in [`Type`](#Type).
 | Name | Type | `NOT NULL` | References |
 | --- | --- | --- | --- |
 | `desugar` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
-| `addr_space_expression` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `address_space_expression` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
 | `attribute_token` | `INTEGER` | :heavy_check_mark: | |
 | `is_sugared` | `INTEGER` | :heavy_check_mark: | |
 
@@ -18035,7 +18035,7 @@ These tables can only be queried on `parent_id`.
 </details>
 
 
-<details><summary><a name="ObjCObjectPointerTypeQualifieds"></a>ObjCObjectPointerTypeQualifieds</summary>
+<details><summary><a name="ObjCObjectPointerTypeQualifiers"></a>ObjCObjectPointerTypeQualifiers</summary>
 
 * Parent type: [`ObjCObjectPointerType`](#ObjCObjectPointerType)
 * Value type: `INTEGER`
@@ -18049,15 +18049,6 @@ These tables can only be queried on `parent_id`.
 * Parent type: [`ObjCObjectPointerType`](#ObjCObjectPointerType)
 * Value type: `INTEGER`
 * References: [`ObjCProtocolDecl`](#ObjCProtocolDecl)
-
-</details>
-
-
-<details><summary><a name="FunctionProtoTypeExceptions"></a>FunctionProtoTypeExceptions</summary>
-
-* Parent type: [`FunctionProtoType`](#FunctionProtoType)
-* Value type: `INTEGER`
-* References: [`Type`](#Type)
 
 </details>
 

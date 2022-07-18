@@ -144,6 +144,14 @@ void PendingFragment::LabelParents(EntityMapper &em) {
     }
   }
 
+  // NOTE(pag): If this assertion is hit, then it suggests that the manually-
+  //            written traversals in `Visitor.cpp` are missing something that
+  //            the automatically generated visitors created from
+  //            `Visitor.inc.h` have found. Missing things is not the end of the
+  //            world, but it suggests a blindspot, hence we want to loudly
+  //            detect them here if possible. Missing things can also be an
+  //            indication that we're not fully linking something to its parent
+  //            decls/statements.
 #ifndef NDEBUG
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
     assert(!vis.not_yet_seen.count(stmt.RawStmt()));

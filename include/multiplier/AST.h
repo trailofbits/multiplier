@@ -3358,7 +3358,7 @@ enum class ExprisModifiableLvalueResult : unsigned char {
   INCOMPLETE_TYPE,
   CONST_QUALIFIED,
   CONST_QUALIFIED_FIELD,
-  CONST_ADDR_SPACE,
+  CONST_ADDRESS_SPACE,
   ARRAY_TYPE,
   NO_SETTER_PROPERTY,
   MEMBER_FUNCTION,
@@ -9777,7 +9777,7 @@ enum class ModifiableType : unsigned char {
   NO_SETTER_PROPERTY,
   CONST_QUALIFIED,
   CONST_QUALIFIED_FIELD,
-  CONST_ADDR_SPACE,
+  CONST_ADDRESS_SPACE,
   ARRAY_TYPE,
   INCOMPLETE_TYPE,
 };
@@ -12337,7 +12337,7 @@ enum class UnaryOperatorKind : unsigned char {
   POST_DEC,
   PRE_INCREMENT,
   PRE_DEC,
-  ADDR_OF,
+  ADDRESS_OF,
   DEREF,
   PLUS,
   MINUS,
@@ -12375,7 +12375,7 @@ enum class APValueKind : unsigned char {
   STRUCT,
   UNION,
   MEMBER_POINTER,
-  ADDR_LABEL_DIFF,
+  ADDRESS_LABEL_DIFF,
 };
 
 APValueKind FromPasta(pasta::APValueKind pasta_val);
@@ -32777,7 +32777,7 @@ class ObjCObjectType : public Type {
   bool is_sugared(void) const;
   bool is_unspecialized(void) const;
   bool is_unspecialized_as_written(void) const;
-  Type strip_obj_c_kind_of_type_and_qualifieds(void) const;
+  Type strip_obj_c_kind_of_type_and_qualifiers(void) const;
 };
 
 using ObjCInterfaceTypeRange = DerivedEntityRange<TypeIterator, ObjCInterfaceType>;
@@ -32882,8 +32882,8 @@ class ObjCObjectPointerType : public Type {
   bool is_sugared(void) const;
   bool is_unspecialized(void) const;
   bool is_unspecialized_as_written(void) const;
-  std::vector<ObjCProtocolDecl> qualifieds(void) const;
-  ObjCObjectPointerType strip_obj_c_kind_of_type_and_qualifieds(void) const;
+  std::vector<ObjCProtocolDecl> qualifiers(void) const;
+  ObjCObjectPointerType strip_obj_c_kind_of_type_and_qualifiers(void) const;
   std::vector<ObjCProtocolDecl> protocols(void) const;
 };
 
@@ -33254,7 +33254,6 @@ class FunctionProtoType : public FunctionType {
 
   std::optional<CanThrowResult> can_throw(void) const;
   Type desugar(void) const;
-  std::vector<Type> exceptions(void) const;
   Token ellipsis_token(void) const;
   std::optional<FunctionDecl> exception_spec_declaration(void) const;
   std::optional<FunctionDecl> exception_spec_template(void) const;
@@ -33499,7 +33498,7 @@ class DependentAddressSpaceType : public Type {
   }
 
   Type desugar(void) const;
-  Expr addr_space_expression(void) const;
+  Expr address_space_expression(void) const;
   Token attribute_token(void) const;
   bool is_sugared(void) const;
 };
@@ -59154,7 +59153,7 @@ inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
 const char *EnumeratorName(DeclUseSelector);
 
 enum class StmtUseSelector : unsigned short {
-  ADDR_SPACE_EXPRESSION,
+  ADDRESS_SPACE_EXPRESSION,
   ALIGNMENT,
   ALIGNMENT_EXPRESSION,
   ALLOCATE,
@@ -59456,7 +59455,7 @@ enum class TypeUseSelector : unsigned short {
   SIGNATURE_AS_WRITTEN,
   SINGLE_STEP_DESUGARED_TYPE,
   STRIP_OBJ_C_KIND_OF_TYPE,
-  STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIEDS,
+  STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIERS,
   SUPER_CLASS_TYPE,
   SUPER_RECEIVER_TYPE,
   SUPER_TYPE,

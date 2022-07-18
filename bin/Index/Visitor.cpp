@@ -91,14 +91,30 @@ void EntityVisitor::VisitParmVarDecl(const pasta::ParmVarDecl &decl) {
     if (!decl.HasUninstantiatedDefaultArgument() &&
         !decl.HasUnparsedDefaultArgument()) {
       if (auto init_expr = decl.DefaultArgument()) {
-        Accept(*init_expr);
+        Accept(init_expr.value());
+      }
+      if (auto tpl_init_expr = decl.UninstantiatedDefaultArgument()) {
+        Accept(tpl_init_expr.value());
       }
     }
   }
 }
 
-void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
+void EntityVisitor::VisitNonTypeTemplateParmDecl(
+    const pasta::NonTypeTemplateParmDecl &decl) {
   if (EnterDeclaratorDecl(decl)) {
+    if (auto init_expr = decl.DefaultArgument()) {
+      Accept(init_expr.value());
+    }
+    if (auto type_constraint = decl.PlaceholderTypeConstraint()) {
+      Accept(type_constraint.value());
+    }
+  }
+}
+
+bool EntityVisitor::EnterFunctionDecl(const pasta::FunctionDecl &decl) {
+  if (EnterDeclaratorDecl(decl)) {
+    Accept(decl.Type());
     VisitDeclContext(decl);
     for (const pasta::ParmVarDecl &param : decl.Parameters()) {
       Accept(param);
@@ -106,16 +122,23 @@ void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
     if (auto body = decl.Body()) {
       Accept(body.value());
     }
+    return true;
+  } else {
+    return false;
   }
+}
+
+void EntityVisitor::VisitFunctionDecl(const pasta::FunctionDecl &decl) {
+  (void) EnterFunctionDecl(decl);
 }
 
 void EntityVisitor::VisitFieldDecl(const pasta::FieldDecl &decl) {
   if (EnterDeclaratorDecl(decl)) {
     if (auto bit_width = decl.BitWidth()) {
-      Accept(*bit_width);
+      Accept(bit_width.value());
     }
     if (auto init = decl.InClassInitializer()) {
-      Accept(*init);
+      Accept(init.value());
     }
   }
 }
@@ -128,7 +151,7 @@ void EntityVisitor::VisitRecordDecl(const pasta::RecordDecl &decl) {
 void EntityVisitor::VisitEnumConstantDecl(const pasta::EnumConstantDecl &decl) {
   if (EnterDecl(decl)) {
     if (auto init = decl.InitializerExpression()) {
-      Accept(*init);
+      Accept(init.value());
     }
   }
 }
@@ -181,6 +204,36 @@ void EntityVisitor::VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) {
   }
 }
 
+void EntityVisitor::VisitCXXNewExpr(const pasta::CXXNewExpr &expr) {
+  if (EnterStmt(expr)) {
+    if (auto size = expr.ArraySize()) {
+      Accept(size.value());
+    }
+    if (auto cons = expr.ConstructExpression()) {
+      Accept(cons.value());
+    }
+    if (auto init = expr.Initializer()) {
+      Accept(init.value());
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXTypeidExpr(const pasta::CXXTypeidExpr &expr) {
+  if (EnterStmt(expr)) {
+    if (auto op = expr.ExpressionOperand()) {
+      Accept(op.value());
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXUuidofExpr(const pasta::CXXUuidofExpr &expr) {
+  if (EnterStmt(expr)) {
+    if (auto op = expr.ExpressionOperand()) {
+      Accept(op.value());
+    }
+  }
+}
+
 void EntityVisitor::VisitVarTemplateSpecializationDecl(
     const pasta::VarTemplateSpecializationDecl &decl) {
   if (EnterVarDecl(decl)) {
@@ -196,6 +249,15 @@ void EntityVisitor::VisitVarTemplateSpecializationDecl(
       if (auto arg_decl = arg.AsDeclaration()) {
         Accept(*arg_decl);
       }
+    }
+  }
+}
+
+void EntityVisitor::VisitCXXDestructorDecl(
+    const pasta::CXXDestructorDecl &decl) {
+  if (EnterFunctionDecl(decl)) {
+    if (auto this_expr = decl.OperatorDeleteThisArgument()) {
+      Accept(this_expr.value());
     }
   }
 }
@@ -302,7 +364,11 @@ bool EntityVisitor::EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl) {
 }
 
 void EntityVisitor::VisitDeclaratorDecl(const pasta::DeclaratorDecl &decl) {
-  EnterDeclaratorDecl(decl);
+  if (EnterDeclaratorDecl(decl)) {
+    if (auto req = decl.TrailingRequiresClause()) {
+      Accept(req.value());
+    }
+  }
 }
 
 void EntityVisitor::VisitLambdaExpr(const pasta::LambdaExpr &stmt) {
@@ -374,7 +440,7 @@ void EntityVisitor::VisitDecltypeType(const pasta::DecltypeType &type) {
 void EntityVisitor::VisitDependentAddressSpaceType(
     const pasta::DependentAddressSpaceType &type) {
   if (EnterType(type)) {
-    Accept(type.AddrSpaceExpression());
+    Accept(type.AddressSpaceExpression());
   }
 }
 
@@ -424,6 +490,24 @@ void EntityVisitor::VisitVariableArrayType(
 void EntityVisitor::VisitTypeOfType(const pasta::TypeOfType &type) {
   if (EnterType(type)) {
     Accept(type.UnderlyingType());
+  }
+}
+
+void EntityVisitor::VisitFunctionProtoType(
+    const pasta::FunctionProtoType &type) {
+  if (EnterType(type)) {
+    for (const pasta::Type &param_type : type.ParameterTypes()) {
+      Accept(param_type);
+    }
+    for (const pasta::Type &exc_type : type.Exceptions()) {
+      Accept(exc_type);
+    }
+    if (auto noexcept_expr = type.NoexceptExpression()) {
+      Accept(noexcept_expr.value());
+    }
+    
+    // NOTE(pag): `ExceptionSpecDeclaration` and `ExceptionSpecTemplate`
+    //            are *not* visited because they are not children.
   }
 }
 

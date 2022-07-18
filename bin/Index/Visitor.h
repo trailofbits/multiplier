@@ -35,6 +35,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   bool EnterValueDecl(const pasta::ValueDecl &decl);
   bool EnterDeclaratorDecl(const pasta::DeclaratorDecl &decl);
   bool EnterVarDecl(const pasta::VarDecl &decl);
+  bool EnterFunctionDecl(const pasta::FunctionDecl &decl);
 
   void VisitDeclContext(const pasta::DeclContext &dc);
   void VisitTranslationUnitDecl(const pasta::TranslationUnitDecl &decl) final;
@@ -53,6 +54,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitFriendDecl(const pasta::FriendDecl &decl) final;
   void VisitVarDecl(const pasta::VarDecl &decl) final;
   void VisitParmVarDecl(const pasta::ParmVarDecl &decl) final;
+  void VisitNonTypeTemplateParmDecl(const pasta::NonTypeTemplateParmDecl &decl) final;
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final;
   void VisitFieldDecl(const pasta::FieldDecl &decl) final;
   void VisitRecordDecl(const pasta::RecordDecl &decl) final;
@@ -64,6 +66,7 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitSizeOfPackExpr(const pasta::SizeOfPackExpr &stmt) final;
   void VisitVarTemplateSpecializationDecl(const pasta::VarTemplateSpecializationDecl &decl) final;
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final;
+  void VisitCXXDestructorDecl(const pasta::CXXDestructorDecl &decl) final;
   void VisitTagDecl(const pasta::TagDecl &decl) final;
   void VisitClassTemplateSpecializationDecl(const pasta::ClassTemplateSpecializationDecl &decl) final;
   void VisitDeclaratorDecl(const pasta::DeclaratorDecl &decl) final;
@@ -81,6 +84,10 @@ class EntityVisitor : protected pasta::DeclVisitor,
   void VisitDependentSizedMatrixType(const pasta::DependentSizedMatrixType &type) final;
   void VisitDependentVectorType(const pasta::DependentVectorType &type) final;
   void VisitVariableArrayType(const pasta::VariableArrayType &type) final;
+  void VisitFunctionProtoType(const pasta::FunctionProtoType &type) final;
+  void VisitCXXNewExpr(const pasta::CXXNewExpr &expr) final;
+  void VisitCXXTypeidExpr(const pasta::CXXTypeidExpr &expr) final;
+  void VisitCXXUuidofExpr(const pasta::CXXUuidofExpr &expr) final;
   void VisitDecl(const pasta::Decl &decl) final;
   void VisitStmt(const pasta::Stmt &stmt) final;
   void VisitType(const pasta::Type &type) final;

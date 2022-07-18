@@ -3644,7 +3644,7 @@ ExprisModifiableLvalueResult FromPasta(pasta::ExprisModifiableLvalueResult e) {
     case 6: return ExprisModifiableLvalueResult::INCOMPLETE_TYPE;
     case 7: return ExprisModifiableLvalueResult::CONST_QUALIFIED;
     case 8: return ExprisModifiableLvalueResult::CONST_QUALIFIED_FIELD;
-    case 9: return ExprisModifiableLvalueResult::CONST_ADDR_SPACE;
+    case 9: return ExprisModifiableLvalueResult::CONST_ADDRESS_SPACE;
     case 10: return ExprisModifiableLvalueResult::ARRAY_TYPE;
     case 11: return ExprisModifiableLvalueResult::NO_SETTER_PROPERTY;
     case 12: return ExprisModifiableLvalueResult::MEMBER_FUNCTION;
@@ -3667,7 +3667,7 @@ const char *EnumeratorName(ExprisModifiableLvalueResult e) {
     case ExprisModifiableLvalueResult::INCOMPLETE_TYPE: return "INCOMPLETE_TYPE";
     case ExprisModifiableLvalueResult::CONST_QUALIFIED: return "CONST_QUALIFIED";
     case ExprisModifiableLvalueResult::CONST_QUALIFIED_FIELD: return "CONST_QUALIFIED_FIELD";
-    case ExprisModifiableLvalueResult::CONST_ADDR_SPACE: return "CONST_ADDR_SPACE";
+    case ExprisModifiableLvalueResult::CONST_ADDRESS_SPACE: return "CONST_ADDRESS_SPACE";
     case ExprisModifiableLvalueResult::ARRAY_TYPE: return "ARRAY_TYPE";
     case ExprisModifiableLvalueResult::NO_SETTER_PROPERTY: return "NO_SETTER_PROPERTY";
     case ExprisModifiableLvalueResult::MEMBER_FUNCTION: return "MEMBER_FUNCTION";
@@ -10881,7 +10881,7 @@ ModifiableType FromPasta(pasta::ModifiableType e) {
     case 5: return ModifiableType::NO_SETTER_PROPERTY;
     case 6: return ModifiableType::CONST_QUALIFIED;
     case 7: return ModifiableType::CONST_QUALIFIED_FIELD;
-    case 8: return ModifiableType::CONST_ADDR_SPACE;
+    case 8: return ModifiableType::CONST_ADDRESS_SPACE;
     case 9: return ModifiableType::ARRAY_TYPE;
     case 10: return ModifiableType::INCOMPLETE_TYPE;
     default: __builtin_unreachable();
@@ -10898,7 +10898,7 @@ const char *EnumeratorName(ModifiableType e) {
     case ModifiableType::NO_SETTER_PROPERTY: return "NO_SETTER_PROPERTY";
     case ModifiableType::CONST_QUALIFIED: return "CONST_QUALIFIED";
     case ModifiableType::CONST_QUALIFIED_FIELD: return "CONST_QUALIFIED_FIELD";
-    case ModifiableType::CONST_ADDR_SPACE: return "CONST_ADDR_SPACE";
+    case ModifiableType::CONST_ADDRESS_SPACE: return "CONST_ADDRESS_SPACE";
     case ModifiableType::ARRAY_TYPE: return "ARRAY_TYPE";
     case ModifiableType::INCOMPLETE_TYPE: return "INCOMPLETE_TYPE";
     default: return "<invalid>";
@@ -14234,7 +14234,7 @@ UnaryOperatorKind FromPasta(pasta::UnaryOperatorKind e) {
     case 1: return UnaryOperatorKind::POST_DEC;
     case 2: return UnaryOperatorKind::PRE_INCREMENT;
     case 3: return UnaryOperatorKind::PRE_DEC;
-    case 4: return UnaryOperatorKind::ADDR_OF;
+    case 4: return UnaryOperatorKind::ADDRESS_OF;
     case 5: return UnaryOperatorKind::DEREF;
     case 6: return UnaryOperatorKind::PLUS;
     case 7: return UnaryOperatorKind::MINUS;
@@ -14254,7 +14254,7 @@ const char *EnumeratorName(UnaryOperatorKind e) {
     case UnaryOperatorKind::POST_DEC: return "POST_DEC";
     case UnaryOperatorKind::PRE_INCREMENT: return "PRE_INCREMENT";
     case UnaryOperatorKind::PRE_DEC: return "PRE_DEC";
-    case UnaryOperatorKind::ADDR_OF: return "ADDR_OF";
+    case UnaryOperatorKind::ADDRESS_OF: return "ADDRESS_OF";
     case UnaryOperatorKind::DEREF: return "DEREF";
     case UnaryOperatorKind::PLUS: return "PLUS";
     case UnaryOperatorKind::MINUS: return "MINUS";
@@ -14283,7 +14283,7 @@ APValueKind FromPasta(pasta::APValueKind e) {
     case 10: return APValueKind::STRUCT;
     case 11: return APValueKind::UNION;
     case 12: return APValueKind::MEMBER_POINTER;
-    case 13: return APValueKind::ADDR_LABEL_DIFF;
+    case 13: return APValueKind::ADDRESS_LABEL_DIFF;
     default: __builtin_unreachable();
   }
 }
@@ -14303,7 +14303,7 @@ const char *EnumeratorName(APValueKind e) {
     case APValueKind::STRUCT: return "STRUCT";
     case APValueKind::UNION: return "UNION";
     case APValueKind::MEMBER_POINTER: return "MEMBER_POINTER";
-    case APValueKind::ADDR_LABEL_DIFF: return "ADDR_LABEL_DIFF";
+    case APValueKind::ADDRESS_LABEL_DIFF: return "ADDRESS_LABEL_DIFF";
     default: return "<invalid>";
   }
 }
@@ -26143,7 +26143,7 @@ bool ObjCObjectType::is_unspecialized_as_written(void) const {
   return self.getVal330();
 }
 
-Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifieds(void) const {
+Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
   auto self = fragment->NthType(offset_);
   EntityId id(self.getVal331());
   return fragment->TypeFor(fragment, id, false).value();
@@ -26276,7 +26276,7 @@ bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
   return self.getVal322();
 }
 
-std::vector<ObjCProtocolDecl> ObjCObjectPointerType::qualifieds(void) const {
+std::vector<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const {
   auto self = fragment->NthType(offset_);
   auto list = self.getVal333();
   std::vector<ObjCProtocolDecl> vec;
@@ -26292,7 +26292,7 @@ std::vector<ObjCProtocolDecl> ObjCObjectPointerType::qualifieds(void) const {
   return vec;
 }
 
-ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifieds(void) const {
+ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
   auto self = fragment->NthType(offset_);
   EntityId id(self.getVal332());
   return ObjCObjectPointerType::from(fragment->TypeFor(fragment, id, false).value()).value();
@@ -26609,20 +26609,6 @@ Type FunctionProtoType::desugar(void) const {
   return fragment->TypeFor(fragment, id, false).value();
 }
 
-std::vector<Type> FunctionProtoType::exceptions(void) const {
-  auto self = fragment->NthType(offset_);
-  auto list = self.getVal318();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto t318 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t318.value()));
-    }
-  }
-  return vec;
-}
-
 Token FunctionProtoType::ellipsis_token(void) const {
   auto self = fragment->NthType(offset_);
   if (auto tok = fragment->TokenFor(fragment, self.getVal317())) {
@@ -26669,13 +26655,13 @@ std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
 
 std::vector<Type> FunctionProtoType::parameter_types(void) const {
   auto self = fragment->NthType(offset_);
-  auto list = self.getVal319();
+  auto list = self.getVal318();
   std::vector<Type> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t319 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t319.value()));
+    if (auto t318 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t318.value()));
     }
   }
   return vec;
@@ -26747,13 +26733,13 @@ bool FunctionProtoType::is_variadic(void) const {
 
 std::vector<Type> FunctionProtoType::exception_types(void) const {
   auto self = fragment->NthType(offset_);
-  auto list = self.getVal333();
+  auto list = self.getVal319();
   std::vector<Type> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t333 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t333.value()));
+    if (auto t319 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t319.value()));
     }
   }
   return vec;
@@ -26936,7 +26922,7 @@ Type DependentAddressSpaceType::desugar(void) const {
   return fragment->TypeFor(fragment, id, false).value();
 }
 
-Expr DependentAddressSpaceType::addr_space_expression(void) const {
+Expr DependentAddressSpaceType::address_space_expression(void) const {
   auto self = fragment->NthType(offset_);
   EntityId id(self.getVal309());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
@@ -54309,7 +54295,7 @@ const char *EnumeratorName(DeclUseSelector sel) {
 
 const char *EnumeratorName(StmtUseSelector sel) {
   switch (sel) {
-    case StmtUseSelector::ADDR_SPACE_EXPRESSION: return "ADDR_SPACE_EXPRESSION";
+    case StmtUseSelector::ADDRESS_SPACE_EXPRESSION: return "ADDRESS_SPACE_EXPRESSION";
     case StmtUseSelector::ALIGNMENT: return "ALIGNMENT";
     case StmtUseSelector::ALIGNMENT_EXPRESSION: return "ALIGNMENT_EXPRESSION";
     case StmtUseSelector::ALLOCATE: return "ALLOCATE";
@@ -54603,7 +54589,7 @@ const char *EnumeratorName(TypeUseSelector sel) {
     case TypeUseSelector::SIGNATURE_AS_WRITTEN: return "SIGNATURE_AS_WRITTEN";
     case TypeUseSelector::SINGLE_STEP_DESUGARED_TYPE: return "SINGLE_STEP_DESUGARED_TYPE";
     case TypeUseSelector::STRIP_OBJ_C_KIND_OF_TYPE: return "STRIP_OBJ_C_KIND_OF_TYPE";
-    case TypeUseSelector::STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIEDS: return "STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIEDS";
+    case TypeUseSelector::STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIERS: return "STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIERS";
     case TypeUseSelector::SUPER_CLASS_TYPE: return "SUPER_CLASS_TYPE";
     case TypeUseSelector::SUPER_RECEIVER_TYPE: return "SUPER_RECEIVER_TYPE";
     case TypeUseSelector::SUPER_TYPE: return "SUPER_TYPE";
