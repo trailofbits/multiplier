@@ -62,6 +62,13 @@ endif()
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+if(PLATFORM_MACOS)
+  set(CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
+elseif(PLATFORM_LINUX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+endif()
+
 if(MX_ENABLE_VAST)
   find_package(vast CONFIG REQUIRED)
   find_package(MLIR CONFIG REQUIRED)
