@@ -45,7 +45,7 @@ endforeach()
 add_custom_command(
   OUTPUT
     ${copied_headers}
-  
+
   COMMAND "${CMAKE_COMMAND}" -E make_directory "${binary_include_dir}"
   ${copy_headers_commands}
 
@@ -88,7 +88,7 @@ add_library("mx-api"
     ${copied_headers}
 
     "${MX_BOOTSTRAP_LIB_API_AST_CPP}"  # Auto-generated
-    
+
     "API/API.cpp"
     "API/API.h"
     "API/CachingEntityProvider.cpp"
@@ -116,13 +116,13 @@ add_library("mx-api"
     "API/Use.h"
     "API/Weggli.cpp"
     "API/Weggli.h"
-    
+
     "Compress.cpp"
     "Types.cpp"
     "Weggli.cpp"
     "Re2.cpp"
     "Re2.h"
-    
+
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
 )
@@ -146,8 +146,6 @@ target_link_libraries("mx-api"
     CapnProto::capnp-rpc
     ZLIB::ZLIB
     re2::re2
-    glog::glog
-    gflags::gflags
 )
 
 # Add in Weggli.
@@ -243,7 +241,7 @@ add_library("mx-util"
     "Weggli.cpp"
     "Re2.cpp"
     "SQLiteStore.cpp"
-    
+
     ${MX_RPC_SOURCES}
     ${MX_AST_SOURCES}
 )
@@ -326,7 +324,7 @@ target_include_directories("mx-util"
 )
 
 if(MX_ENABLE_INSTALL)
-  
+
   # NOTE(pag): `mx-util` is *not* installed, just `mx-api`.
   install(
     TARGETS
