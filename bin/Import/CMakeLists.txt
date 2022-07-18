@@ -24,13 +24,17 @@ add_executable("${exe_name}"
 set_target_properties("${exe_name}"
   PROPERTIES
     LINKER_LANGUAGE
-      CXX)
+      CXX
+)
 
 target_link_libraries("${exe_name}"
   PRIVATE
-    "mx-util"
+    mx-util
     pasta::pasta
 )
+
+add_executable("${PROJECT_NAME}::import" ALIAS "${exe_name}")
+set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
 if(IRENE_ENABLE_INSTALL)
   install(

@@ -255,12 +255,9 @@ MULTIPLIER_BRANCH="main"
 function BuildMultiplierOSX
 {
   if !(ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
-    -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
-    -Dpasta_ROOT="${WORKSPACE_DIR}/install" \
-    -DQt5_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5 \
-    -DQt5Core_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5Core \
-    -DQt5Widgets_DIR:PATH=$(brew --prefix)/opt/qt@5/lib/cmake/Qt5Widgets); then
+    -Dpasta_ROOT="${WORKSPACE_DIR}/install"); then
     echo "[!] Failed to configure and build multiplier."
     exit 1
   fi
@@ -270,7 +267,7 @@ function BuildMultiplierOSX
 function BuildMultiplierLinux
 {
   ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
-    -DMX_ENABLE_GUI=ON -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
+    -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install"
 }

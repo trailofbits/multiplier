@@ -15,6 +15,7 @@
 #include <clang/AST/PrettyPrinter.h>
 
 #include <multiplier/AST.h>
+#include <multiplier/PASTA.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>

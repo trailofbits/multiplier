@@ -6,6 +6,8 @@
 
 #include "PendingFragment.h"
 
+#include <multiplier/PASTA.h>
+
 #include "Util.h"
 
 namespace indexer {

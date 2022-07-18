@@ -27,6 +27,7 @@
 #include <multiplier/Action.h>
 #include <multiplier/AST.h>
 #include <multiplier/Executor.h>
+#include <multiplier/PASTA.h>
 #include <multiplier/Result.h>
 #include <multiplier/Subprocess.h>
 #include <multiplier/Types.h>

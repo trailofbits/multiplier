@@ -189,7 +189,6 @@ cmake \
   "-DCMAKE_CXX_COMPILER=${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/llvm/clang++" \
   -DMX_ENABLE_BOOTSTRAP=OFF \
   -DMX_ENABLE_VAST=OFF \
-  -DMX_ENABLE_GUI=OFF \
   -DMX_ENABLE_WEGGLI=ON \
   "${WORKSPACE_DIR}/src/multiplier"
 

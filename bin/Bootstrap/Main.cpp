@@ -585,13 +585,15 @@ class CodeGenerator {
   std::map<std::string, UseList> token_use_ids;
   std::map<std::string, UseList> attr_use_ids;
 
-  std::ofstream schema_os;  // `lib/AST.capnp`
-  std::ofstream lib_cpp_os;  // `lib/AST.cpp`
+  std::ofstream schema_os;  // `lib/Common/AST.capnp`
+  std::ofstream lib_cpp_os;  // `lib/AST/AST.cpp`
   std::ofstream include_h_os;  // `include/multiplier/AST.h`
   std::stringstream late_include_h_os;
   std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
   std::ofstream serialize_inc_os;  // `include/multiplier/Visitor.inc.h`
+  std::ofstream lib_pasta_cpp_os;  // `lib/Util/PASTA.cpp`
+  std::ofstream lib_pasta_h_os;  // `include/Multiplier/PASTA.h`
   std::stringstream late_serialize_inc_os;
   std::ofstream docs_md_os; // `docs/sqlite.md`
   std::stringstream late_docs_md_os;
@@ -690,15 +692,15 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   // have the same initializer values as Clang does, but in Multiplier, we use
   // default initializers (starting from 0 to `num_enumerators`), and so we need
   // a `switch` to do the mapping.
-  lib_cpp_os
+  lib_pasta_cpp_os
       << enum_name << " FromPasta(pasta::" << enum_name << " e) {\n"
       << "  switch (static_cast<";
   if (!strcmp(itype, "bool")) {
-    lib_cpp_os << "int";  // Avoid switching on `bool` types.
+    lib_pasta_cpp_os << "int";  // Avoid switching on `bool` types.
   } else {
-    lib_cpp_os << itype;
+    lib_pasta_cpp_os << itype;
   }
-  lib_cpp_os << ">(e)) {\n";
+  lib_pasta_cpp_os << ">(e)) {\n";
 
   std::unordered_set<std::string> seen_initializers;
   std::string initializer;
@@ -741,10 +743,10 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       snake_name = "whitespace";
       enum_case = "WHITESPACE";
 
-      lib_cpp_os
+      lib_pasta_cpp_os
           << "    case " << initializer << ": return TokenKind::IDENTIFIER;\n";
     } else {
-      lib_cpp_os
+      lib_pasta_cpp_os
           << "    case " << initializer << ": return "
           << enum_name << "::" << enum_case << ";\n";
     }
@@ -845,10 +847,12 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     }
   }
 
-  lib_cpp_os
+  lib_pasta_cpp_os
       << "    default: __builtin_unreachable();\n"
       << "  }\n"  // End of `switch`.
-      << "}\n\n"  // End of `FromPasta`
+      << "}\n\n";  // End of `FromPasta`
+
+  lib_cpp_os
       << "const char *EnumeratorName(" << enum_name << " e) {\n"
       << "  switch (e) {\n"
       << name_cases_ss.str()
@@ -856,9 +860,12 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "  }\n"  // End of `switch`.
       << "}\n\n";  // End of `EnumeratorName`
 
+  lib_pasta_h_os
+      << "enum class " << enum_name << " : " << types.first << ";\n"
+      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
+
   include_h_os
       << "};\n\n"
-      << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n"
       << "inline static const char *EnumerationName(" << enum_name << ") {\n"
       << "  return \"" << enum_name << "\";\n"
       << "}\n\n"
@@ -2968,6 +2975,17 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Fragment.h\"\n\n"
       << "namespace mx {\n";
 
+  lib_pasta_cpp_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#include <multiplier/PASTA.h>\n\n"
+      << "#include <multiplier/AST.h>\n\n"
+      << "namespace mx {\n";
+
   serialize_inc_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
       << "// All rights reserved.\n"
@@ -3153,6 +3171,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include \"Serialize.h\"\n\n"
+      << "#include <multiplier/PASTA.h>\n"
       << "#include <multiplier/RPC.capnp.h>\n"
       << "#include <pasta/AST/Attr.h>\n"
       << "#include <pasta/AST/Decl.h>\n"
@@ -3182,7 +3201,16 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <vector>\n\n"
       << "#include \"Iterator.h\"\n"
       << "#include \"Types.h\"\n"
-      << "#include \"Use.h\"\n\n"
+      << "#include \"Use.h\"\n\n";
+
+  lib_pasta_h_os
+      << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+      << "// All rights reserved.\n"
+      << "//\n"
+      << "// This source code is licensed in accordance with the terms specified in\n"
+      << "// the LICENSE file found in the root directory of this source tree.\n\n"
+      << "// Auto-generated file; do not modify!\n\n"
+      << "#pragma once\n\n"
       << "namespace pasta {\n";
 
   docs_md_os
@@ -3250,7 +3278,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   for (const pasta::EnumDecl &tag : enums) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
       serialize_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
-      include_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
+      lib_pasta_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
     } else {
       std::cerr << "??? " << tag.Name() << "\n";
     }
@@ -3258,8 +3286,10 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   serialize_h_os
       << "}  // namespace pasta\n"
       << "namespace indexer {\n";
-  include_h_os
+  lib_pasta_h_os
       << "}  // namespace pasta\n"
+      << "namespace mx {\n";
+  include_h_os
       << "namespace mx {\n\n"
       << "class AttrIterator;\n"
       << "class DeclIterator;\n"
@@ -3514,6 +3544,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   lib_cpp_os
       << "#endif\n";
 
+  lib_pasta_h_os << "}  // namespace mx\n";
+  lib_pasta_cpp_os << "}  // namespace mx\n";
   lib_cpp_os << "}  // namespace mx\n";
   include_h_os << "}  // namespace mx\n";
   serialize_h_os << "}  // namespace indexer\n";
@@ -3537,6 +3569,7 @@ void CodeGenerator::RunOnUseSet(
     const std::map<std::string, UseList> &use_set,
     const char *sel_name) {
 
+  lib_pasta_h_os << "enum class " << sel_name << " : unsigned short;\n";
   include_h_os << "enum class " << sel_name << " : unsigned short {\n";
   lib_cpp_os
       << "const char *EnumeratorName(" << sel_name << " sel) {\n"
@@ -3661,14 +3694,17 @@ CodeGenerator::CodeGenerator(char *argv[])
       serialize_h_os(argv[6], std::ios::trunc | std::ios::out),
       serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out),
       serialize_inc_os(argv[8], std::ios::trunc | std::ios::out),
-      docs_md_os(argv[9], std::ios::trunc | std::ios::out) {}
+      lib_pasta_cpp_os(argv[9], std::ios::trunc | std::ios::out),
+      lib_pasta_h_os(argv[10], std::ios::trunc | std::ios::out),
+      docs_md_os(argv[11], std::ios::trunc | std::ios::out) {}
 
 int main(int argc, char *argv[]) {
-  if (10 != argc) {
+  if (12 != argc) {
     std::cerr
         << "Usage: " << argv[0]
         << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_AST_CAPNP LIB_AST_CPP"
-        << " INCLUDE_AST_H SERIALIZE_H SERIALIZE_CPP VISITOR_INC USE_INC DOCS_MD"
+        << " INCLUDE_AST_H SERIALIZE_H SERIALIZE_CPP VISITOR_INC USE_INC "
+        << " PASTA_CPP PASTA_H DOCS_MD"
         << std::endl;
     return EXIT_FAILURE;
   }

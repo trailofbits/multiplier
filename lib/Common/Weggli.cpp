@@ -9,7 +9,6 @@
 #ifndef MX_DISABLE_WEGGLI
 
 #include <weggli.h>
-#include "API/API.h"
 
 namespace mx {
 namespace {
