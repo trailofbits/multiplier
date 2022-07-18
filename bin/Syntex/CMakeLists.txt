@@ -20,6 +20,7 @@ target_link_libraries("mx-syntex"
   PRIVATE
     "mx-api"
     "mx-util"
+    glog::glog
 )
 
 add_executable("syntex-index" "Index.cpp")

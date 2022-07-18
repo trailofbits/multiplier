@@ -35,28 +35,16 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   // Load index
-  // mx::Index index(mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port));
   mx::Index index = mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_remote(
-          FLAGS_host, FLAGS_port));
-
-  // Collect fragments
-  std::unordered_map<mx::RawEntityId, mx::Fragment> fragments;
-  for (mx::File file : mx::File::in(index)) {
-    for (mx::Fragment fragment : mx::Fragment::in(file)) {
-      fragments.insert({ fragment.id(), std::move(fragment) });
-    }
-  }
-
+      mx::EntityProvider::from_remote(FLAGS_host, FLAGS_port));
   // Load grammar
   syntex::Grammar grammar(FLAGS_index_dir);
 
   // Parse query
   syntex::Parser parser(grammar, FLAGS_query);
-  parser.Parse();
 
   // Do search
-  // parser.Query(fragments);
+  parser.Query(index);
 
   return EXIT_SUCCESS;
 }

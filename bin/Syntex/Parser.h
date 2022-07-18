@@ -91,15 +91,14 @@ class Item {
   }
 
   const ASTNode *ResultingNode(AST &ast) {
-    if (std::holds_alternative<mx::DeclKind>(cur->data)) {
-      return ast.ConstructNode(std::get<mx::DeclKind>(cur->data), child_vector);
-    } else if (std::holds_alternative<mx::StmtKind>(cur->data)) {
-      return ast.ConstructNode(std::get<mx::StmtKind>(cur->data), child_vector);
-    } else if (std::holds_alternative<mx::TypeKind>(cur->data)) {
-      return ast.ConstructNode(std::get<mx::TypeKind>(cur->data), child_vector);
-    } else {
-      assert(false);
-    }
+    const ASTNode *node;
+    cur->Visit(Visitor {
+      [&] (mx::DeclKind kind)  { node = ast.ConstructNode(kind, child_vector); },
+      [&] (mx::StmtKind kind)  { node = ast.ConstructNode(kind, child_vector); },
+      [&] (mx::TypeKind kind)  { node = ast.ConstructNode(kind, child_vector); },
+      [&] (mx::TokenKind)      { assert(false); abort();                       },
+    });
+    return node;
   }
 };
 
@@ -130,9 +129,7 @@ private:
 public:
   Parser(const Grammar &grammar, std::string_view input);
 
-  void Parse();
-
-  void Query(const std::unordered_map<mx::RawEntityId, mx::Fragment> &mx_fragments);
+  void Query(const mx::Index &index);
 };
 
 } // namespace syntex

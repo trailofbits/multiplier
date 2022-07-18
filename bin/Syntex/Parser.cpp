@@ -439,19 +439,22 @@ Parser::Parser(const Grammar &grammar, std::string_view input)
   : m_grammar(grammar), m_input(input) {}
 
 void Parser::MatchRule(std::vector<Fragment> &result, Item item, size_t position) {
-  if (item.AtEnd())
+  if (item.AtEnd()) {
     // Try to match the result as a new prefix
     MatchPrefix(result, Fragment(item.BloomFilter(),
                                     item.ResultingNode(m_ast), position));
-  else
+  } else {
     // Otherwise see if we can move forward with this rule
-    for (auto& frag : ParsesAtIndex(position))
-      if (NodeToNonTerminal(frag.node) == item.Cur())
+    for (auto& frag : ParsesAtIndex(position)) {
+      if (frag.node->Kind() == item.Cur()) {
         MatchRule(result, item.Forward(frag), frag.next);
+      }
+    }
+  }
 }
 
 void Parser::MatchPrefix(std::vector<Fragment> &result, Fragment frag) {
-  for (auto &rule : m_grammar.MatchProductions(NodeToNonTerminal(frag.node))) {
+  for (auto &rule : m_grammar.MatchProductions(frag.node->Kind())) {
     // Find all possible ways we can match this grammar rule
     MatchRule(result, Item(rule).Forward(frag), frag.next);
   }
@@ -487,71 +490,31 @@ const std::vector<Fragment> &Parser::ParsesAtIndex(size_t index) {
   return result;
 }
 
-void Parser::Parse() {
-  // Add a root node to the AST
-  auto root = m_ast.ConstructNode();
-
-  // Start computing parses at index 0
-  auto fragments = ParsesAtIndex(0);
-
-  // Print fragments at index 0
-  std::cout << "-------------------\n";
-  for (auto &frag : fragments) {
+void Parser::Query(const mx::Index &index) {
+  // Iterate parses at index 0
+  for (auto &frag : ParsesAtIndex(0)) {
     // Skip partial fragments
     if (frag.next != m_input.size())
       continue;
-    // Add the node as a child of the root
-    std::get<ASTNode::ChildVector>(
-      const_cast<ASTNode *>(root)->data).emplace_back(frag.node);
-    std::cout << "  " << NodeToNonTerminal(frag.node) << "\n";
-    // Find all mx fragments that might match this query fragment
-    for (auto mx_frag : m_grammar.LikelyFragments(frag.BloomFilter())) {
-      std::cout << "    |-> Likely in fragment " << mx_frag << "\n";
-    }
-  }
-  std::cout << "-------------------\n";
 
-  // Print query AST to cerr
-  // m_ast.PrintDOT(std::cerr);
-}
-
-void Parser::Query(const std::unordered_map<mx::RawEntityId, mx::Fragment> &mx_fragments) {
-  for (auto &frag : ParsesAtIndex(0)) {
     // We don't care about partial fragments (for now)
     if (frag.next != m_input.size())
       continue;
 
+    size_t likely_count = 0, actual_count = 0;
+
     // Find all mx fragments that might match this query fragment
     for (auto mx_frag_id : m_grammar.LikelyFragments(frag.BloomFilter())) {
+      ++likely_count;
+
       // Find mx fragment object for it
-      auto it = mx_fragments.find(mx_frag_id);
-      assert(it != mx_fragments.end());
+      auto mx_frag = index.fragment(mx_frag_id).value();
 
       // Create syntex AST for fragment
-      auto mx_frag_ast = AST::Build(it->second);
+      auto mx_frag_ast = AST::Build(mx_frag);
 
       // Find likely matching AST node
-      const ASTNode *likely_node;
-
-      switch (frag.node->kind) {
-        default:
-        case ASTNode::kFragment:
-          assert(false);
-          abort();
-          break;
-        case ASTNode::kDeclKind:
-          likely_node = mx_frag_ast.LastNodeOfKind(static_cast<mx::DeclKind>(frag.node->kind_val));
-          break;
-        case ASTNode::kStmtKind:
-          likely_node = mx_frag_ast.LastNodeOfKind(static_cast<mx::StmtKind>(frag.node->kind_val));
-          break;
-        case ASTNode::kTypeKind:
-          likely_node = mx_frag_ast.LastNodeOfKind(static_cast<mx::TypeKind>(frag.node->kind_val));
-          break;
-        case ASTNode::kTokenKind:
-          likely_node = mx_frag_ast.LastNodeOfKind(static_cast<mx::TokenKind>(frag.node->kind_val));
-          break;
-      }
+      const ASTNode *likely_node = mx_frag_ast.LastNodeOfKind(frag.node->Kind());
 
       bool in_mx_frag = false;
       for (; likely_node; likely_node = likely_node->prev_of_kind) {
@@ -563,8 +526,11 @@ void Parser::Query(const std::unordered_map<mx::RawEntityId, mx::Fragment> &mx_f
 
       if (in_mx_frag) {
         std::cout << "Found in fragment " << mx_frag_id << "\n";
+        ++actual_count;
       }
     }
+
+    std::cout << "Bloom filter ratio " << (double) actual_count / likely_count << "\n";
   }
 }
 

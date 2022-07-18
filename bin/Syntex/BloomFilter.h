@@ -14,7 +14,7 @@ namespace syntex {
 // of fragments, i.e. whether or not a fragment might have a match for a
 // particular rule.
 struct SmallBloomFilter {
-  static constexpr auto kNumWords = 3u;
+  static constexpr auto kNumWords = 4u;
 
   uint64_t words[kNumWords];
 

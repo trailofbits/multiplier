@@ -9,8 +9,9 @@
 #include <cassert>
 #include <deque>
 #include <string>
-#include <variant>
 #include <vector>
+#include <multiplier/AST.h>
+#include <multiplier/Index.h>
 
 namespace mx {
 class Decl;
@@ -29,55 +30,95 @@ namespace syntex {
 class AST;
 class Parser;
 
-struct NonTerminal {
-  std::variant<std::monostate,
-                mx::DeclKind,
-                mx::StmtKind,
-                mx::TypeKind,
-                mx::TokenKind> data;
+class NonTerminal {
+private:
+  unsigned short val;
 
-  NonTerminal() {}
-  NonTerminal(mx::DeclKind k) : data(k) {}
-  NonTerminal(mx::StmtKind k) : data(k) {}
-  NonTerminal(mx::TypeKind k) : data(k) {}
-  NonTerminal(mx::TokenKind k) : data(k) {}
+  NonTerminal(unsigned short val_) : val(val_) {}
 
-  bool operator==(const NonTerminal& other) const {
-    return data == other.data;
+public:
+  NonTerminal(mx::DeclKind kind)
+    : val(static_cast<unsigned short>(kind)) {}
+
+  NonTerminal(mx::StmtKind kind)
+    : val(static_cast<unsigned short>(kind)
+        + mx::NumEnumerators(mx::DeclKind{})) {}
+
+  NonTerminal(mx::TypeKind kind)
+    : val(static_cast<unsigned short>(kind)
+        + mx::NumEnumerators(mx::DeclKind{})
+        + mx::NumEnumerators(mx::StmtKind{})) {}
+
+  NonTerminal(mx::TokenKind kind)
+    : val(static_cast<unsigned short>(kind)
+        + mx::NumEnumerators(mx::DeclKind{})
+        + mx::NumEnumerators(mx::StmtKind{})
+        + mx::NumEnumerators(mx::TypeKind{})) {}
+
+  template<typename T>
+  void Visit(T visitor) const {
+    if (val < mx::NumEnumerators(mx::DeclKind{})) {
+      visitor(static_cast<mx::DeclKind>(val));
+    } else if (val < mx::NumEnumerators(mx::DeclKind{})
+                      + mx::NumEnumerators(mx::StmtKind{})) {
+      visitor(static_cast<mx::StmtKind>(val
+              - mx::NumEnumerators(mx::DeclKind{})));
+    } else if (val < mx::NumEnumerators(mx::DeclKind{})
+                      + mx::NumEnumerators(mx::StmtKind{})
+                      + mx::NumEnumerators(mx::TypeKind{})) {
+      visitor(static_cast<mx::TypeKind>(val
+              - mx::NumEnumerators(mx::DeclKind{})
+              - mx::NumEnumerators(mx::StmtKind{})));
+    } else {
+      visitor(static_cast<mx::TokenKind>(val
+              - mx::NumEnumerators(mx::DeclKind{})
+              - mx::NumEnumerators(mx::StmtKind{})
+              - mx::NumEnumerators(mx::TypeKind{})));
+    }
+  }
+
+  bool IsToken() const  {
+    return val >= mx::NumEnumerators(mx::DeclKind{})
+                + mx::NumEnumerators(mx::StmtKind{})
+                + mx::NumEnumerators(mx::TypeKind{});
+  }
+
+  mx::TokenKind AsToken() const {
+    assert(IsToken());
+    return static_cast<mx::TokenKind>(val
+                - mx::NumEnumerators(mx::DeclKind{})
+                - mx::NumEnumerators(mx::StmtKind{})
+                - mx::NumEnumerators(mx::TypeKind{}));
+  }
+
+  bool operator==(const NonTerminal &other) const {
+    return val == other.val;
+  }
+
+  static NonTerminal Deserialize(unsigned short val) {
+    return val;
+  }
+
+  unsigned short Serialize() const {
+    return val;
   }
 };
+
+std::ostream& operator<<(std::ostream &, const NonTerminal &);
+
+template<typename ... F>
+struct Visitor : F ... {
+    using F::operator() ...;
+};
+
+template<class... F> Visitor(F...) -> Visitor<F...>;
+
 
 class ASTNode {
  public:
   friend class AST;
 
-  using ChildVector = std::vector<const ASTNode *>;
-
-  ASTNode();
-  ASTNode(const mx::Decl &decl);
-  ASTNode(const mx::Stmt &stmt);
-  ASTNode(const mx::Type &type);
-  ASTNode(const mx::Token &token);
-
-  ASTNode(mx::DeclKind k, ChildVector child_vector);
-  ASTNode(mx::StmtKind k, ChildVector child_vector);
-  ASTNode(mx::TypeKind k, ChildVector child_vector);
-  ASTNode(mx::TokenKind k, std::string spelling);
-
-  const enum Kind : unsigned short {
-    kFragment,
-    kDeclKind,
-    kStmtKind,
-    kTypeKind,
-    kTokenKind,
-  } kind;
-
-  // Underlying value of a `mx::DeclKind`, `mx::StmtKind`, or `mx::TokenKind`.
-  unsigned short kind_val;
-
-  mutable std::variant<std::string, ChildVector> data;
-
-  // Next node sharing the same `kind` and `kind_val` in the AST. This is
+  // Next node sharing the same `kind` in the AST. This is
   // useful when unifying two parses, i.e. a fragment parse, created with
   // `AST::Build(fragment)`, and a parse of a syntax query. We can start with
   // nodes in the query, and then try to unify them top-down with nodes in the
@@ -85,43 +126,36 @@ class ASTNode {
   // correct spot.
   const ASTNode *prev_of_kind{nullptr};
 
+  ASTNode(NonTerminal kind, std::vector<const ASTNode *> child_vector);
+  ASTNode(mx::TokenKind kind, std::string spelling);
+
+  ~ASTNode();
+
+  const NonTerminal Kind() const {
+    return kind;
+  }
+
+  const std::vector<const ASTNode *> &ChildVector() const {
+    assert(!kind.IsToken());
+    return child_vector;
+  };
+
+  const std::string &Spelling() const {
+    assert(kind.IsToken());
+    return spelling;
+  }
+
   bool operator==(const ASTNode &that) const noexcept;
+
+ private:
+  NonTerminal kind;
+
+  union {
+    mutable std::vector<const ASTNode *> child_vector;
+    std::string spelling;
+  };
 };
 
-
-std::ostream& operator<<(std::ostream& os, const NonTerminal& nt);
-
-static NonTerminal NodeToNonTerminal(const ASTNode *node) {
-  switch (node->kind) {
-    default:
-    case ASTNode::kFragment:
-      assert(false);
-      abort();
-      break;
-    case ASTNode::kDeclKind:
-      return NonTerminal(static_cast<mx::DeclKind>(node->kind_val));
-    case ASTNode::kStmtKind:
-      return NonTerminal(static_cast<mx::StmtKind>(node->kind_val));
-    case ASTNode::kTypeKind:
-      return NonTerminal(static_cast<mx::TypeKind>(node->kind_val));
-    case ASTNode::kTokenKind:
-      return NonTerminal(static_cast<mx::TokenKind>(node->kind_val));
-  }
-}
-
-/*
-
-static bool NodeIsComma(const ASTNode *node) {
-  return node->kind == ASTNode::kTokenKind &&
-         node->kind_val == static_cast<unsigned short>(mx::TokenKind::COMMA);
-}
-
-static bool NodeIsSemicolon(const ASTNode *node) {
-  return node->kind == ASTNode::kTokenKind &&
-         node->kind_val == static_cast<unsigned short>(mx::TokenKind::SEMI);
-}
-
-*/
 
 // An AST.
 class AST {
@@ -131,27 +165,23 @@ class AST {
 
   std::deque<ASTNode> nodes;
   std::vector<const ASTNode *> index;
+  std::vector<const ASTNode *> root;
 
   AST(void);
 
  public:
-  static AST Build(const mx::Fragment &fragment);
+  // Used to "hop into" the middle of the
+  const ASTNode *LastNodeOfKind(NonTerminal kind);
 
-  const ASTNode *ConstructNode();
-  const ASTNode *ConstructNode(mx::DeclKind k, ASTNode::ChildVector child_vector);
-  const ASTNode *ConstructNode(mx::StmtKind k, ASTNode::ChildVector child_vector);
-  const ASTNode *ConstructNode(mx::TypeKind k, ASTNode::ChildVector child_vector);
+  const ASTNode *ConstructNode(NonTerminal kind, std::vector<const ASTNode *> child_vector);
   const ASTNode *ConstructNode(mx::TokenKind k, std::string spelling);
 
-  inline const ASTNode *Root(void) const noexcept {
-    return &(nodes.front());
+  const std::vector<const ASTNode *> &Root(void) const {
+    return root;
   }
 
-  // Used to "hop into" the middle of the
-  const ASTNode *LastNodeOfKind(mx::DeclKind kind);
-  const ASTNode *LastNodeOfKind(mx::StmtKind kind);
-  const ASTNode *LastNodeOfKind(mx::TypeKind kind);
-  const ASTNode *LastNodeOfKind(mx::TokenKind kind);
+  // Build an AST from a multiplier fragment
+  static AST Build(const mx::Fragment &fragment);
 
   void PrintDOT(std::ostream &os) const;
 };

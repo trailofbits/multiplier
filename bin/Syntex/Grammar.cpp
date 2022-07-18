@@ -8,6 +8,7 @@
 #include "BloomFilter.h"
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <unordered_set>
 
@@ -16,51 +17,6 @@
 #include <multiplier/PersistentMap.h>
 
 DECLARE_bool(print_asts);
-
-namespace {
-
-static unsigned short NonTerminalToUshort(const syntex::NonTerminal &nt) {
-  if (std::holds_alternative<mx::DeclKind>(nt.data)) {
-    return static_cast<unsigned short>(std::get<mx::DeclKind>(nt.data));
-  } else if (std::holds_alternative<mx::StmtKind>(nt.data)) {
-    return static_cast<unsigned short>(std::get<mx::StmtKind>(nt.data))
-          + mx::NumEnumerators(mx::DeclKind{});
-  } else if (std::holds_alternative<mx::TypeKind>(nt.data)) {
-    return static_cast<unsigned short>(std::get<mx::TypeKind>(nt.data))
-          + mx::NumEnumerators(mx::DeclKind{})
-          + mx::NumEnumerators(mx::StmtKind{});
-  } else {
-    assert(std::holds_alternative<mx::TokenKind>(nt.data));
-    return static_cast<unsigned short>(std::get<mx::TokenKind>(nt.data))
-          + mx::NumEnumerators(mx::DeclKind{})
-          + mx::NumEnumerators(mx::StmtKind{})
-          + mx::NumEnumerators(mx::TypeKind{});
-  }
-}
-
-static syntex::NonTerminal UshortToNonTerminal(unsigned short val) {
-  if (val < mx::NumEnumerators(mx::DeclKind{})) {
-    return syntex::NonTerminal(static_cast<mx::DeclKind>(val));
-  } else if (val < mx::NumEnumerators(mx::DeclKind{})
-                      + mx::NumEnumerators(mx::StmtKind{})) {
-    return syntex::NonTerminal(static_cast<mx::StmtKind>(val
-                      - mx::NumEnumerators(mx::DeclKind{})));
-  } else if (val < mx::NumEnumerators(mx::DeclKind{})
-                      + mx::NumEnumerators(mx::StmtKind{})
-                      + mx::NumEnumerators(mx::TypeKind{})) {
-    return syntex::NonTerminal(static_cast<mx::TypeKind>(val
-                      - mx::NumEnumerators(mx::DeclKind{})
-                      - mx::NumEnumerators(mx::StmtKind{})));
-
-  } else {
-    return syntex::NonTerminal(static_cast<mx::TokenKind>(val
-                      - mx::NumEnumerators(mx::DeclKind{})
-                      - mx::NumEnumerators(mx::StmtKind{})
-                      - mx::NumEnumerators(mx::TypeKind{})));
-  }
-}
-
-};
 
 namespace mx {
 
@@ -98,31 +54,6 @@ struct Serializer<Reader, Writer, syntex::Terminal> {
   }
 };
 
-// Serialize a non-terminal. We need this for prefix (i.e. left corner) scans.
-template <typename Reader, typename Writer>
-struct Serializer<Reader, Writer, syntex::NonTerminal> {
-
-  static constexpr bool kIsFixedSize = true;
-
-  // FIXME: maybe serialize the discriminant too instead of this encoding,
-  // the reason this is kept is to avoid breaking the serialization format.
-
-  MX_FLATTEN static void Write(Writer &writer, syntex::NonTerminal nt) {
-    Serializer<NullReader, Writer, unsigned short>::Write(writer,
-      NonTerminalToUshort(nt));
-  }
-
-  MX_FLATTEN static void Read(Reader &reader, syntex::NonTerminal &nt) {
-    unsigned short val;
-    Serializer<Reader, NullWriter, unsigned short>::Read(reader, val);
-    nt = UshortToNonTerminal(val);
-  }
-
-  static constexpr uint32_t SizeInBytes(void) noexcept {
-    return 2;
-  }
-};
-
 // Serialize a rule, without any leading entry count.
 template <typename Reader, typename Writer>
 struct Serializer<Reader, Writer, syntex::Rule> {
@@ -135,7 +66,7 @@ struct Serializer<Reader, Writer, syntex::Rule> {
 
     writer.EnterVariableSizedComposite(size);
     for (auto& nt : rule.non_terminals) {
-      Serializer<NullReader, Writer, syntex::NonTerminal>::Write(writer, nt);
+      Serializer<NullReader, Writer, unsigned short>::Write(writer, nt.Serialize());
     }
     writer.ExitComposite();
   }
@@ -146,9 +77,9 @@ struct Serializer<Reader, Writer, syntex::Rule> {
 
     out.non_terminals.reserve(size);
     for (auto i = 0u; i < size; ++i) {
-      syntex::NonTerminal nt;
-      Serializer<Reader, NullWriter, syntex::NonTerminal>::Read(reader, nt);
-      out.non_terminals.push_back(nt);
+      unsigned short val;
+      Serializer<Reader, NullWriter, unsigned short>::Read(reader, val);
+      out.non_terminals.push_back(syntex::NonTerminal::Deserialize(val));
     }
   }
 
@@ -162,26 +93,21 @@ struct Serializer<Reader, Writer, syntex::Rule> {
 namespace syntex {
 
 std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
-  if (std::holds_alternative<mx::DeclKind>(nt.data)) {
-    os << "DeclKind::" << EnumeratorName(std::get<mx::DeclKind>(nt.data));
-  } else if (std::holds_alternative<mx::StmtKind>(nt.data)) {
-    os << "StmtKind::" << EnumeratorName(std::get<mx::StmtKind>(nt.data));
-  } else if (std::holds_alternative<mx::TypeKind>(nt.data)) {
-    os << "TypeKind::" << EnumeratorName(std::get<mx::TypeKind>(nt.data));
-  } else {
-    assert(std::holds_alternative<mx::TokenKind>(nt.data));
-    os << "TokenKind::" << EnumeratorName(std::get<mx::TokenKind>(nt.data));
-  }
+  nt.Visit(Visitor {
+    [&] (mx::DeclKind kind)  { os << "DeclKind::" << EnumeratorName(kind);   },
+    [&] (mx::StmtKind kind)  { os << "StmtKind::" << EnumeratorName(kind);   },
+    [&] (mx::TypeKind kind)  { os << "TypeKind::" << EnumeratorName(kind);   },
+    [&] (mx::TokenKind kind) { os << "TokenKind::" << EnumeratorName(kind);  },
+  });
   return os;
 }
 
-// Hash a rule. This hash should be stable regardless of big/little endian.
-// NOTE: we are doing the same stuff here as boost::hash_combine
+// This is the 64-bit variant FNV-1a by Glenn Fowler, et al
 uint64_t Rule::Hash(void) const {
-  uint64_t hash = 0x9e3779b9;
-  std::hash<unsigned short> hasher;
+  uint64_t hash = 0xcbf29ce484222325ULL;
   for (const NonTerminal &nt : non_terminals) {
-    hash ^= hasher(NonTerminalToUshort(nt)) + (hash << 6) + (hash >> 2);
+      hash ^= nt.Serialize();
+      hash *= 0x100000001b3ULL;
   }
   return hash;
 }
@@ -237,7 +163,7 @@ std::optional<mx::TokenKind> Grammar::ClassifyIdent(std::string_view spelling) c
 // Find all productions beginning with the specified non-terminal
 std::vector<Rule> Grammar::MatchProductions(const NonTerminal& start_nt) const {
   std::vector<Rule> rules;
-  impl->productions.ScanPrefix(start_nt, [&] (Rule rule) -> bool {
+  impl->productions.ScanPrefix(start_nt.Serialize(), [&] (Rule rule) -> bool {
     rules.push_back(std::move(rule));
     return true;
   });
@@ -257,16 +183,28 @@ std::vector<mx::RawEntityId> Grammar::LikelyFragments(const SmallBloomFilter &de
 
 // Import a fragment into the grammar.
 void Grammar::Import(const mx::Fragment &fragment) {
+/*
+  std::cout << "Importing fragment " << fragment.id() << "\n";
+*/
+
   auto ast = AST::Build(fragment);
+
+/*
+  // Debug graphs
+  std::stringstream name;
+  name << "dot/ast_" << fragment.id() << ".dot";
+  std::fstream fs(name.str(), std::fstream::out | std::fstream::trunc);
+  ast.PrintDOT(fs);
+  fs.close();
+
+*/
 
   // TODO(pag): Eventually remove; nifty for debugging.
   if (FLAGS_print_asts) {
     ast.PrintDOT(std::cerr);
   }
 
-  std::vector<const ASTNode *> nodes;
-  nodes.emplace_back(ast.Root());
-
+  std::vector<const ASTNode *> nodes(ast.Root());
   SmallBloomFilter fragment_features;
 
   // Make a production rule for every node and its children.
@@ -276,12 +214,8 @@ void Grammar::Import(const mx::Fragment &fragment) {
 
     // This is a token kind node, and represents a terminal. We want to map
     // the contents of the token to the actual kind of the token.
-    if (std::holds_alternative<std::string>(node->data)) {
-      assert(node->kind == ASTNode::kTokenKind);
-      Terminal term;
-      term.data = std::get<std::string>(node->data);
-      impl->tokens.Set(std::move(term),
-                       static_cast<mx::TokenKind>(node->kind_val));
+    if (node->Kind().IsToken()) {
+      impl->tokens.Set({ node->Spelling() }, node->Kind().AsToken());
 
     // This is an internal or root node. E.g. given the following:
     //
@@ -293,27 +227,20 @@ void Grammar::Import(const mx::Fragment &fragment) {
     // then you have matched an `A`. This "backward" syntax enables us to prefix
     // scan for left corners (`B` in this case) and find all rules starting with
     // `B`.
-    } else if (std::holds_alternative<ASTNode::ChildVector>(node->data)) {
-      assert(node->kind != ASTNode::kTokenKind);
-
-      auto &children = std::get<ASTNode::ChildVector>(node->data);
-      const auto num_children = children.size();
+    } else {
+      auto &children = node->ChildVector();
+      size_t num_children = children.size();
+      assert(num_children >= 1);
 
       // Add the child nodes to the work list.
       nodes.insert(nodes.end(), children.begin(), children.end());
 
-      if (node->kind == ASTNode::kFragment) {
-        continue;
-      }
-
-
+      // Create list of non-terminals for the rule
       std::vector<NonTerminal> non_terminals;
       non_terminals.reserve(num_children + 1);
-      // Rule body
-      for (auto i = 0u; i < num_children; ++i)
-        non_terminals.push_back(NodeToNonTerminal(children[i]));
-      // Rule head
-      non_terminals.push_back(NodeToNonTerminal(node));
+      for (auto i = 0u; i < num_children; ++i)      // Rule body
+        non_terminals.push_back(children[i]->Kind());
+      non_terminals.push_back(node->Kind());        // Rule head
 
       // Avoid creating cyclic CFGs
       bool allow_production = true;

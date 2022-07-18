@@ -7,76 +7,42 @@
 #include "AST.h"
 
 #include <cstdint>
-#include <optional>
 #include <ostream>
 #include <sstream>
+#include <iostream>
 #include <multiplier/Index.h>
 
 namespace syntex {
 
-ASTNode::ASTNode()
-    : kind(kFragment),
-      kind_val(0),
-      data(ChildVector()) {}
 
-ASTNode::ASTNode(const mx::Decl &decl)
-    : kind(kDeclKind),
-      kind_val(static_cast<unsigned short>(decl.kind())),
-      data(ChildVector()) {}
+ASTNode::ASTNode(NonTerminal kind_, std::vector<const ASTNode *> child_vector_)
+    : kind(kind_), child_vector(std::move(child_vector_)) {}
 
-ASTNode::ASTNode(const mx::Stmt &stmt)
-    : kind(kStmtKind),
-      kind_val(static_cast<unsigned short>(stmt.kind())),
-      data(ChildVector()) {}
+ASTNode::ASTNode(mx::TokenKind kind_, std::string spelling)
+    : kind(kind_), spelling(std::move(spelling)) {}
 
-ASTNode::ASTNode(const mx::Type &type)
-    : kind(kTypeKind),
-      kind_val(static_cast<unsigned short>(type.kind())),
-      data(ChildVector()) {}
-
-ASTNode::ASTNode(const mx::Token &tok)
-    : kind(kTokenKind),
-      kind_val(static_cast<unsigned short>(tok.kind())),
-      data(std::string(tok.data().data(), tok.data().size())) {}
-
-ASTNode::ASTNode(mx::DeclKind k, ChildVector child_vector)
-    : kind(kDeclKind),
-      kind_val(static_cast<unsigned short>(k)),
-      data(std::move(child_vector)) {}
-
-ASTNode::ASTNode(mx::StmtKind k, ChildVector child_vector)
-    : kind(kStmtKind),
-      kind_val(static_cast<unsigned short>(k)),
-      data(std::move(child_vector)) {}
-
-ASTNode::ASTNode(mx::TypeKind k, ChildVector child_vector)
-    : kind(kTypeKind),
-      kind_val(static_cast<unsigned short>(k)),
-      data(std::move(child_vector)) {}
-
-ASTNode::ASTNode(mx::TokenKind k, std::string spelling)
-    : kind(kTokenKind),
-      kind_val(static_cast<unsigned short>(k)),
-      data(std::move(spelling)) {}
+ASTNode::~ASTNode() {
+  // Destruct correct union variant
+  if (kind.IsToken()) {
+    spelling.std::string::~string();
+  } else {
+    child_vector.std::vector<const ASTNode *>::~vector();
+  }
+}
 
 bool ASTNode::operator==(const ASTNode &that) const noexcept {
-
-  if (kind != that.kind || kind_val != that.kind_val) {
+  if (kind != that.kind) {
     return false;
   }
 
-  if (kind == kTokenKind) {
-    return std::get<std::string>(data) == std::get<std::string>(that.data);
+  if (kind.IsToken()) {
+    return spelling == that.spelling;
   } else {
-    const ChildVector &this_children = std::get<ChildVector>(data);
-    const ChildVector &that_children = std::get<ChildVector>(that.data);
-    auto num_children = this_children.size();
-    if (num_children != that_children.size()) {
+    if (child_vector.size() != that.child_vector.size()) {
       return false;
     }
-
-    for (auto i = 0u; i < num_children; ++i) {
-      if (!(*(this_children[i]) == *(that_children[i]))) {
+    for (auto i = 0u; i < child_vector.size(); ++i) {
+      if (*child_vector[i] != *that.child_vector[i]) {
         return false;
       }
     }
@@ -92,70 +58,24 @@ AST::AST(void) {
                mx::NumEnumerators(mx::TokenKind{}));
 }
 
-const ASTNode *AST::LastNodeOfKind(mx::DeclKind kind) {
-  return index[static_cast<unsigned>(kind)];
+const ASTNode *AST::LastNodeOfKind(NonTerminal kind) {
+  return index[kind.Serialize()];
 }
 
-const ASTNode *AST::LastNodeOfKind(mx::StmtKind kind) {
-  return index[mx::NumEnumerators(mx::DeclKind{}) +
-               static_cast<unsigned>(kind)];
-}
-
-const ASTNode *AST::LastNodeOfKind(mx::TypeKind kind) {
-  return index[mx::NumEnumerators(mx::DeclKind{}) +
-               mx::NumEnumerators(mx::StmtKind{}) +
-               static_cast<unsigned>(kind)];
-}
-
-const ASTNode *AST::LastNodeOfKind(mx::TokenKind kind) {
-  return index[mx::NumEnumerators(mx::DeclKind{}) +
-               mx::NumEnumerators(mx::StmtKind{}) +
-               mx::NumEnumerators(mx::TypeKind{}) +
-               static_cast<unsigned>(kind)];
-}
-
-const ASTNode *AST::ConstructNode()
+const ASTNode *AST::ConstructNode(NonTerminal kind, std::vector<const ASTNode *> child_vector)
 {
-  return &(nodes.emplace_back());
-}
-
-const ASTNode *AST::ConstructNode(mx::DeclKind k, ASTNode::ChildVector child_vector)
-{
-  ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
-  auto kind_val = static_cast<unsigned>(k);
+  assert(!kind.IsToken());
+  ASTNode *ptr = &nodes.emplace_back(kind, std::move(child_vector));
+  auto kind_val = kind.Serialize();
   ptr->prev_of_kind = index[kind_val];
   index[kind_val] = ptr;
   return ptr;
 }
 
-const ASTNode *AST::ConstructNode(mx::StmtKind k, ASTNode::ChildVector child_vector)
+const ASTNode *AST::ConstructNode(mx::TokenKind kind, std::string spelling)
 {
-  ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
-  auto kind_val = mx::NumEnumerators(mx::DeclKind{}) +
-                  static_cast<unsigned>(k);
-  ptr->prev_of_kind = index[kind_val];
-  index[kind_val] = ptr;
-  return ptr;
-}
-
-const ASTNode *AST::ConstructNode(mx::TypeKind k, ASTNode::ChildVector child_vector)
-{
-  ASTNode *ptr = &nodes.emplace_back(k, std::move(child_vector));
-  auto kind_val = mx::NumEnumerators(mx::DeclKind{}) +
-                  mx::NumEnumerators(mx::StmtKind{}) +
-                  static_cast<unsigned>(k);
-  ptr->prev_of_kind = index[kind_val];
-  index[kind_val] = ptr;
-  return ptr;
-}
-
-const ASTNode *AST::ConstructNode(mx::TokenKind k, std::string spelling)
-{
-  ASTNode *ptr = &nodes.emplace_back(k, std::move(spelling));
-  auto kind_val = mx::NumEnumerators(mx::DeclKind{}) +
-                  mx::NumEnumerators(mx::StmtKind{}) +
-                  mx::NumEnumerators(mx::TypeKind{}) +
-                  static_cast<unsigned>(k);
+  ASTNode *ptr = &nodes.emplace_back(kind, std::move(spelling));
+  auto kind_val = ptr->kind.Serialize();
   ptr->prev_of_kind = index[kind_val];
   index[kind_val] = ptr;
   return ptr;
@@ -163,11 +83,11 @@ const ASTNode *AST::ConstructNode(mx::TokenKind k, std::string spelling)
 
 AST AST::Build(const mx::Fragment &fragment) {
   AST self;
-  ASTNode *root = &(self.nodes.emplace_back());
 
   std::vector<mx::TokenContext> contexts;
 
   for (mx::Token tok : mx::Token::in(fragment)) {
+    // Skip whitespaces
     switch (tok.kind()) {
       case mx::TokenKind::UNKNOWN:
       case mx::TokenKind::WHITESPACE:
@@ -180,91 +100,55 @@ AST AST::Build(const mx::Fragment &fragment) {
         break;
     }
 
-    const ASTNode *curr = root;
 
     contexts.clear();
-    for (auto context = mx::TokenContext::of(tok); context;
-         context = context->parent()) {
-      if (!context->is_alias()) {
-        contexts.emplace_back(*context);
+    for (auto c = mx::TokenContext::of(tok); c; c = c->parent()) {
+      if (!c->is_alias()) {
+        contexts.emplace_back(*c);
       }
     }
 
-    for (auto c_it = contexts.rbegin(), c_end = contexts.rend();
-         c_it != c_end; ++c_it) {
-      const mx::TokenContext &c = *c_it;
-      std::optional<ASTNode> dummy;
-      const ASTNode **last_ptr = nullptr;
+    auto *curr_children = &self.root;
 
-      // Declarations.
-      if (auto decl = mx::Decl::from(c)) {
-        dummy.emplace(*decl);
-        last_ptr = &(self.index[dummy->kind_val]);
+    for (auto it = contexts.rbegin(), end = contexts.rend(); it != end; ++it) {
+      // NOTE: always overwritten, just need some random initializer
+      // to keep C++ happy
+      NonTerminal kind(mx::TokenKind::UNKNOWN);
 
-      // Statements.
-      } else if (auto stmt = mx::Stmt::from(c)) {
+      if (auto decl = mx::Decl::from(*it)) {
+        // Declarations.
+        kind = NonTerminal(decl->kind());
+      } else if (auto stmt = mx::Stmt::from(*it)) {
+        // Statements.
         switch (stmt->kind()) {
           case mx::StmtKind::IMPLICIT_CAST_EXPR:
           case mx::StmtKind::DECL_REF_EXPR:
             continue;  // Skip these; they are spam.
           default:
-            dummy.emplace(*stmt);
-            last_ptr =
-                &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
-                             dummy->kind_val]);
+            kind = NonTerminal(stmt->kind());
             break;
         }
-
-      // Types.
-      } else if (auto type = mx::Type::from(c)) {
-        dummy.emplace(*type);
-        last_ptr = &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
-                                mx::NumEnumerators(mx::StmtKind{}) +
-                                dummy->kind_val]);
-
+      } else if (auto type = mx::Type::from(*it)) {
+        // Types.
+        kind = NonTerminal(type->kind());
       } else {
         continue;
       }
 
-      ASTNode::ChildVector &curr_children =
-          std::get<ASTNode::ChildVector>(curr->data);
-
-      // Need to add a new branch.
-      if (curr_children.empty()) {
-        auto next_curr = &(self.nodes.emplace_back(std::move(*dummy)));
-        next_curr->prev_of_kind = *last_ptr;
-        *last_ptr = next_curr;
-        curr_children.emplace_back(next_curr);
-        curr = next_curr;
-        continue;
+      if (curr_children->empty() || curr_children->back()->kind != kind) {
+        // Need to add a new branch or the last thing doesn't match.
+        auto next = self.ConstructNode(kind, {});
+        curr_children->push_back(next);
+        curr_children = &next->child_vector;
+      } else {
+        // The last thing matches, use it.
+        curr_children = &curr_children->back()->child_vector;
       }
-
-      // The last thing doesn't match.
-      const ASTNode *last_child = curr_children.back();
-      if (last_child->kind != dummy->kind ||
-          last_child->kind_val != dummy->kind_val) {
-        auto next_curr = &(self.nodes.emplace_back(std::move(*dummy)));
-        next_curr->prev_of_kind = *last_ptr;
-        *last_ptr = next_curr;
-        curr_children.emplace_back(next_curr);
-        curr = next_curr;
-        continue;
-      }
-
-      // The last thing matches, use it.
-      curr = last_child;
     }
 
     // Add the token.
-    ASTNode *tok_node = &(self.nodes.emplace_back(tok));
-    const ASTNode **last_tok_ptr =
-        &(self.index[mx::NumEnumerators(mx::DeclKind{}) +
-                     mx::NumEnumerators(mx::StmtKind{}) +
-                     mx::NumEnumerators(mx::TypeKind{}) +
-                     tok_node->kind_val]);
-    tok_node->prev_of_kind = *last_tok_ptr;
-    *last_tok_ptr = tok_node;
-    std::get<ASTNode::ChildVector>(curr->data).emplace_back(tok_node);
+    curr_children->push_back(self.ConstructNode(
+      tok.kind(), std::string(tok.data().data(), tok.data().size())));
   }
 
   return self;
@@ -297,57 +181,64 @@ static std::string Data(const std::string &data) {
 }  // namespace
 
 void AST::PrintDOT(std::ostream &os) const {
-  os
-      << "digraph {\n"
-      << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
+  os << "digraph {\n"
+     << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
+
+  // Root node
+  os << "root [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" "
+     << "border=\"1\"><TR><TD bgcolor=\"darksalmon\"> </TD></TR></TABLE>>];\n";
+  for (const ASTNode *child : root) {
+    os << "root -> x" << std::hex << reinterpret_cast<uintptr_t>(child)
+       << std::dec << ";\n";
+  }
+
   for (const ASTNode &node : nodes) {
     os << "x" << std::hex << reinterpret_cast<uintptr_t>(&node) << std::dec
        << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" "
        << "border=\"1\"><TR><TD";
 
-    switch (node.kind) {
-      case ASTNode::kFragment:
-        os
-          << " bgcolor=\"darksalmon\"> </TD></TR></TABLE>>];\n";
-        break;
 
-      case ASTNode::kDeclKind:
-        os
-          << " bgcolor=\"aquamarine\">"
-          << mx::EnumeratorName(static_cast<mx::DeclKind>(node.kind_val))
-          << "</TD></TR></TABLE>>];\n";
-        break;
-      case ASTNode::kStmtKind:
-        os
-          << " bgcolor=\"darkolivegreen3\">"
-          << mx::EnumeratorName(static_cast<mx::StmtKind>(node.kind_val))
-          << "</TD></TR></TABLE>>];\n";
-        break;
-      case ASTNode::kTypeKind:
-        os
-          << " bgcolor=\"goldenrod\">"
-          << mx::EnumeratorName(static_cast<mx::TypeKind>(node.kind_val))
-          << "</TD></TR></TABLE>>];\n";
-        break;
-      case ASTNode::kTokenKind:
-        os
-          << " bgcolor=\"cornsilk2\">"
-          << mx::EnumeratorName(static_cast<mx::TokenKind>(node.kind_val))
-          << "</TD></TR><TR><TD bgcolor=\"antiquewhite\">"
-          << Data(std::get<std::string>(node.data))
-          << "</TD></TR></TABLE>>];\n";
-        break;
-
-    }
-
-    if (std::holds_alternative<ASTNode::ChildVector>(node.data)) {
-      for (const ASTNode *child : std::get<ASTNode::ChildVector>(node.data)) {
+    auto PrintChildren = [&] () {
+      for (const ASTNode *child : node.child_vector) {
         os << "x" << std::hex << reinterpret_cast<uintptr_t>(&node)
            << " -> x" << std::hex << reinterpret_cast<uintptr_t>(child)
            << std::dec << ";\n";
       }
-    }
+    };
+
+    node.kind.Visit(Visitor {
+      [&] (mx::DeclKind kind)  {
+        os
+          << " bgcolor=\"aquamarine\">"
+          << mx::EnumeratorName(kind)
+          << "</TD></TR></TABLE>>];\n";
+        PrintChildren();
+      },
+      [&] (mx::StmtKind kind) {
+        os
+          << " bgcolor=\"darkolivegreen3\">"
+          << mx::EnumeratorName(kind)
+          << "</TD></TR></TABLE>>];\n";
+        PrintChildren();
+      },
+      [&] (mx::TypeKind kind) {
+        os
+          << " bgcolor=\"goldenrod\">"
+          << mx::EnumeratorName(kind)
+          << "</TD></TR></TABLE>>];\n";
+        PrintChildren();
+      },
+      [&] (mx::TokenKind kind) {
+        os
+          << " bgcolor=\"cornsilk2\">"
+          << mx::EnumeratorName(kind)
+          << "</TD></TR><TR><TD bgcolor=\"antiquewhite\">"
+          << Data(node.spelling)
+          << "</TD></TR></TABLE>>];\n";
+      },
+    });
   }
+
   os << "}\n";
 }
 
