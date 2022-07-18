@@ -6,6 +6,8 @@
 
 #include "Weggli.h"
 
+#include <cassert>
+
 #include "Fragment.h"
 
 namespace mx {
