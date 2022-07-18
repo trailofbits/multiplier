@@ -77,6 +77,8 @@ set(api_headers
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/Use.h"
+  "${source_include_dir}/Re2.h"
+  "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
 
