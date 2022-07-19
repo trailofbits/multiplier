@@ -65,7 +65,7 @@ add_library("mx-api"
 
 target_link_libraries("mx-api"
   PUBLIC
-    mx-common
+    "mx-common"
 )
 
 set_target_properties("mx-api"

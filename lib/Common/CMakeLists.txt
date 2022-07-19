@@ -81,16 +81,16 @@ add_dependencies("mx-common"
 
 target_link_libraries("mx-common"
   PUBLIC
-    $<BUILD_INTERFACE:CapnProto::capnp-rpc>
+    "CapnProto::capnp-rpc"
   PRIVATE
-    $<BUILD_INTERFACE:re2::re2>
-    $<BUILD_INTERFACE:ZLIB::ZLIB>
+    "re2::re2"
+    "ZLIB::ZLIB"
 )
 
 if(MX_ENABLE_WEGGLI)
   target_link_libraries("mx-common"
     PRIVATE
-      $<BUILD_INTERFACE:weggli_native::static>
+      "weggli_native::static"
   )
 else()
   target_compile_definitions("mx-common"
