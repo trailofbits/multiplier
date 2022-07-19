@@ -32,10 +32,6 @@ list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 include("cmake/system.cmake")
 include("cmake/llvm.cmake")
 
-if(PLATFORM_MACOS)
-  include("cmake/macdeployqt.cmake")
-endif()
-
 if(MX_ENABLE_WEGGLI)
   find_package(weggli_native CONFIG REQUIRED)
 endif(MX_ENABLE_WEGGLI)
@@ -113,7 +109,9 @@ endif()
 
 # The remaining arguments to `mx-bootstrap` are the paths to the files that will
 # be generated based on analyzing the types/classes in the `pasta` namespace.
-set(MX_BOOTSTRAP_LIB_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/AST.capnp")
+set(MX_BOOTSTRAP_LIB_COMMON_AST_CAPNP "${PROJECT_SOURCE_DIR}/lib/Common/AST.capnp")
+set(MX_BOOTSTRAP_LIB_UTIL_PASTA_CPP "${PROJECT_SOURCE_DIR}/lib/Util/PASTA.cpp")
+set(MX_BOOTSTRAP_INCLUDE_PASTA_H "${PROJECT_SOURCE_DIR}/include/multiplier/PASTA.h")
 set(MX_BOOTSTRAP_LIB_API_AST_CPP "${PROJECT_SOURCE_DIR}/lib/API/AST.cpp")
 set(MX_BOOTSTRAP_INCLUDE_AST_H "${PROJECT_SOURCE_DIR}/include/multiplier/AST.h")
 set(MX_BOOTSTRAP_INDEX_SERIALIZE_H "${PROJECT_SOURCE_DIR}/bin/Index/Serialize.h")

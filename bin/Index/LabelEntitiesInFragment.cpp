@@ -5,7 +5,8 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <glog/logging.h>
-#include <multiplier/AST.h>
+
+#include <multiplier/PASTA.h>
 
 #include "PendingFragment.h"
 #include "Util.h"

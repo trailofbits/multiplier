@@ -7,6 +7,7 @@
 
 #include <type_traits>
 
+#include <multiplier/PASTA.h>
 #include <pasta/AST/Stmt.h>
 
 #include "Context.h"

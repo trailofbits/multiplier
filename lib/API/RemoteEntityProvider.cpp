@@ -15,7 +15,7 @@
 #include <thread>
 #include <set>
 
-#include "../Re2.h"
+#include "../Common/Re2.h"
 
 namespace mx {
 namespace {

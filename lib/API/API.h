@@ -18,8 +18,8 @@
 #include <optional>
 #include <string>
 
-#include "AST.capnp.h"
-#include "RPC.capnp.h"
+#include <multiplier/AST.capnp.h>
+#include <multiplier/RPC.capnp.h>
 
 namespace mx {
 

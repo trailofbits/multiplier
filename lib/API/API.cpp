@@ -22,7 +22,7 @@
 #include "Token.h"
 #include "Use.h"
 #include "Weggli.h"
-#include "../Re2.h"
+#include "../Common/Re2.h"
 
 namespace mx {
 

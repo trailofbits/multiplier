@@ -11,8 +11,8 @@
 #include "File.h"
 #include "Fragment.h"
 
-#include "../Re2.h"
-#include <iostream>
+#include "../Common/Re2.h"
+
 namespace mx {
 
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
