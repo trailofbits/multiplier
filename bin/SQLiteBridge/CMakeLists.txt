@@ -27,8 +27,6 @@ target_link_libraries("mxsqlitebridge"
     LLVMSupport
 )
 
-add_library("${PROJECT_NAME}::sqlitebridge" ALIAS "mxsqlitebridge")
-
 target_include_directories("mxsqlitebridge"
   PRIVATE
     ${SQLite3_INCLUDE_DIRS}

@@ -86,8 +86,6 @@ target_compile_definitions("mx-api"
   PRIVATE
     "MX_ENABLE_API")
 
-add_library("${PROJECT_NAME}::api" ALIAS "mx-api")
-
 target_include_directories("mx-api"
   PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"

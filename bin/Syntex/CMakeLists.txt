@@ -24,7 +24,6 @@ target_link_libraries("syntex-index"
 
 # TODO: Add syntex-query.
 
-add_executable("${PROJECT_NAME}::syntex-index" ALIAS "syntex-index")
 set_target_properties("syntex-index" PROPERTIES LINKER_LANGUAGE CXX)
 
 if(MX_ENABLE_INSTALL)

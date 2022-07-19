@@ -28,7 +28,6 @@ function(define_example exe_name source_file)
       "mx-example-index"
   )
 
-  add_executable("${PROJECT_NAME}::${exe_name}" ALIAS "${exe_name}")
   set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
   if(MX_ENABLE_INSTALL)

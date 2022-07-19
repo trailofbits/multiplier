@@ -126,8 +126,6 @@ set_target_properties("mx-common"
       cxx_std_20
 )
 
-add_library("${PROJECT_NAME}::common" ALIAS "mx-common")
-
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS

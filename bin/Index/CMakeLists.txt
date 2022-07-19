@@ -82,7 +82,6 @@ if(MX_ENABLE_VAST)
   )
 endif()
 
-add_executable("${PROJECT_NAME}::index" ALIAS "${exe_name}")
 set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
 
 if(MX_ENABLE_INSTALL)

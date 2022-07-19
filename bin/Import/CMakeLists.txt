@@ -33,10 +33,7 @@ target_link_libraries("${exe_name}"
     pasta::pasta
 )
 
-add_executable("${PROJECT_NAME}::import" ALIAS "${exe_name}")
-set_target_properties("${exe_name}" PROPERTIES LINKER_LANGUAGE CXX)
-
-if(IRENE_ENABLE_INSTALL)
+if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "${exe_name}"
