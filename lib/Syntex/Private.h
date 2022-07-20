@@ -130,8 +130,6 @@ public:
     return spelling;
   }
 
-  bool operator==(const ASTNode &that) const noexcept;
-
 private:
   NodeKind kind;
 
@@ -279,23 +277,58 @@ public:
 // Partial parse
 //
 
-struct PartialParse {
+class ParseNode {
+private:
   SmallBloomFilter bf;
-  const ASTNode *node;
+
   size_t next;
 
-  PartialParse(const ASTNode *node_, size_t next_)
-      : node(node_), next(next_) {}
+  NodeKind kind;
 
-  PartialParse(SmallBloomFilter bf_, const ASTNode *node_, size_t next_)
-      : bf(bf_), node(node_), next(next_) {}
+  union {
+    std::vector<const ParseNode *> child_vector;
+    std::string spelling;
+  };
+
+public:
+  ParseNode(SmallBloomFilter bf_, size_t next_, NodeKind kind_, std::vector<const ParseNode *> child_vector_)
+    : bf(bf_), next(next_), kind(kind_), child_vector(std::move(child_vector_)) {
+    assert(!kind.IsToken());
+  }
+
+  ParseNode(size_t next_, NodeKind kind_, std::string spelling_)
+      : next(next_), kind(kind_), spelling(std::move(spelling_)) {
+    assert(kind.IsToken());
+  }
+
+  ~ParseNode() {
+    if (kind.IsToken()) {
+      spelling.std::string::~string();
+    } else {
+      child_vector.std::vector<const ParseNode *>::~vector();
+    }
+  }
 
   const SmallBloomFilter &BloomFilter() const {
     return bf;
   }
 
-  const ASTNode *Node() const {
-    return node;
+  size_t Next() const {
+    return next;
+  }
+
+  NodeKind Kind() const {
+    return kind;
+  }
+
+  const std::vector<const ParseNode *> &ChildVector() const {
+    assert(!kind.IsToken());
+    return child_vector;
+  }
+
+  const std::string &Spelling() const {
+    assert(kind.IsToken());
+    return spelling;
   }
 };
 
@@ -303,11 +336,13 @@ struct PartialParse {
 // Parser state
 //
 
+class QueryImpl;
+
 class Item {
 private:
   SmallBloomFilter bf;
   const NodeKind *cur, *end;
-  std::vector<const ASTNode *> child_vector;
+  std::vector<const ParseNode *> child_vector;
 
   Item(SmallBloomFilter bf_, const NodeKind *cur_, const NodeKind *end_)
       : bf(bf_),
@@ -335,60 +370,54 @@ public:
     return *cur;
   }
 
-  Item Forward(const PartialParse &partial_parse) {
+  Item Forward(const ParseNode *node) {
     assert(cur < end);
     Item new_item(bf, cur + 1, end);
     // Add the partial parse's bloom filter to the new item
-    new_item.bf.Add(partial_parse.BloomFilter());
+    new_item.bf.Add(node->BloomFilter());
     // Add partial parse's result to the new item
     new_item.child_vector.insert(
         new_item.child_vector.end(),
         child_vector.begin(),
         child_vector.end());
-    new_item.child_vector.push_back(partial_parse.Node());
+    new_item.child_vector.push_back(node);
     return new_item;
   }
 
-  const ASTNode *ResultingNode(AST &ast) {
-    const ASTNode *node;
-    cur->Visit(Visitor {
-        [&] (mx::DeclKind kind)  { node = ast.ConstructNode(kind, child_vector); },
-        [&] (mx::StmtKind kind)  { node = ast.ConstructNode(kind, child_vector); },
-        [&] (mx::TypeKind kind)  { node = ast.ConstructNode(kind, child_vector); },
-        [&] (mx::TokenKind)      { assert(false); abort();                       },
-    });
-    return node;
-  }
+  const ParseNode *Result(class QueryImpl &query, size_t next) const;
 };
 
 //
 // Wrapper around parsing functions
 //
 
+class Query;
+
 class QueryImpl {
 private:
+  friend class Query;
+  friend class Item;
+
   // GrammarImpl to be processed
   const GrammarImpl &m_grammar;
 
   // Input string
   std::string_view m_input;
 
-  // Resulting AST
-  AST m_ast;
+  // Arena to allocate parse nodes from
+  std::deque<ParseNode> m_nodes;
 
   // Partial parses for each source location
-  std::unordered_map<size_t, std::vector<PartialParse>> m_parses;
+  std::unordered_map<size_t, std::vector<const ParseNode *>> m_parses;
 
-  void MatchRule(std::vector<PartialParse> &result, Item item, size_t position);
+  void MatchRule(std::vector<const ParseNode *> &result, Item item, size_t position);
 
-  void MatchPrefix(std::vector<PartialParse> &result, PartialParse partial_parse);
+  void MatchPrefix(std::vector<const ParseNode *> &result, const ParseNode *node);
 
-  const std::vector<PartialParse> &ParsesAtIndex(size_t index);
+  const std::vector<const ParseNode *> &ParsesAtIndex(size_t index);
 
 public:
   explicit QueryImpl(const GrammarImpl &grammar, std::string_view input);
-
-  void Query(const mx::Index &index);
 };
 
 } // namespace syntex

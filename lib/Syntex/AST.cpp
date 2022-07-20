@@ -33,27 +33,6 @@ ASTNode::~ASTNode() {
   }
 }
 
-bool ASTNode::operator==(const ASTNode &that) const noexcept {
-  if (kind != that.kind) {
-    return false;
-  }
-
-  if (kind.IsToken()) {
-    return spelling == that.spelling;
-  } else {
-    if (child_vector.size() != that.child_vector.size()) {
-      return false;
-    }
-    for (auto i = 0u; i < child_vector.size(); ++i) {
-      if (*child_vector[i] != *that.child_vector[i]) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
 AST::AST(void) {
   index.resize(mx::NumEnumerators(mx::DeclKind{}) +
                mx::NumEnumerators(mx::StmtKind{}) +

@@ -11,6 +11,11 @@
 
 namespace syntex {
 
+const ParseNode *Item::Result(class QueryImpl &query, size_t next) const {
+  assert(!cur->IsToken());
+  return &query.m_nodes.emplace_back(bf, next, *cur, child_vector);
+}
+
 template<typename F>
 void Tokenize(F callback, std::string_view input, size_t index) {
   size_t end = index;
@@ -436,96 +441,116 @@ FractionalConstant:
 QueryImpl::QueryImpl(const GrammarImpl &grammar, std::string_view input)
   : m_grammar(grammar), m_input(input) {}
 
-void QueryImpl::MatchRule(std::vector<PartialParse> &result, Item item, size_t position) {
+void QueryImpl::MatchRule(std::vector<const ParseNode *> &result, Item item, size_t position) {
   if (item.AtEnd()) {
     // Try to match the result as a new prefix
-    MatchPrefix(result, PartialParse(item.BloomFilter(),
-                                    item.ResultingNode(m_ast), position));
+    MatchPrefix(result, item.Result(*this, position));
   } else {
     // Otherwise see if we can move forward with this rule
-    for (auto& frag : ParsesAtIndex(position)) {
-      if (frag.node->Kind() == item.Cur()) {
-        MatchRule(result, item.Forward(frag), frag.next);
+    for (const ParseNode *node : ParsesAtIndex(position)) {
+      if (node->Kind() == item.Cur()) {
+        MatchRule(result, item.Forward(node), node->Next());
       }
     }
   }
 }
 
-void QueryImpl::MatchPrefix(std::vector<PartialParse> &result, PartialParse partial_parse) {
-  for (auto &rule : m_grammar.MatchProductions(partial_parse.node->Kind())) {
+void QueryImpl::MatchPrefix(std::vector<const ParseNode *> &result, const ParseNode *node) {
+  for (const Rule &rule : m_grammar.MatchProductions(node->Kind())) {
     // Find all possible ways we can match this grammar rule
-    MatchRule(result, Item(rule).Forward(partial_parse), partial_parse.next);
+    MatchRule(result, Item(rule).Forward(node), node->Next());
   }
 
   // Add the input fragment itself
-  result.push_back(partial_parse);
+  result.push_back(node);
 }
 
-const std::vector<PartialParse> &QueryImpl::ParsesAtIndex(size_t index) {
+const std::vector<const ParseNode *> &QueryImpl::ParsesAtIndex(size_t index) {
   // Lookup memoized parses at this index
   auto parse = m_parses.find(index);
   if (parse != m_parses.end())
     return parse->second;
 
   // And only do computation if the lookup found nothing
-  std::vector<PartialParse> &result = m_parses[index];
+  std::vector<const ParseNode *> &result = m_parses[index];
 
   // Match a prefix for all tokens
   Tokenize([&] (mx::TokenKind kind, std::string_view spelling, size_t next) {
     // First match as the default token kind
-    MatchPrefix(result, PartialParse(
-      m_ast.ConstructNode(kind, std::string(spelling)), next));
+    MatchPrefix(result, &m_nodes.emplace_back(next, kind, std::string(spelling)));
 
     // Then try checking for keywords
     if (kind == mx::TokenKind::IDENTIFIER) {
       auto kw = m_grammar.ClassifyIdent(spelling);
       if (kw.has_value())
-        MatchPrefix(result, PartialParse(
-          m_ast.ConstructNode(*kw, std::string(spelling)), next));
+        MatchPrefix(result, &m_nodes.emplace_back(next, *kw, std::string(spelling)));
     }
   }, m_input, index);
 
   return result;
 }
 
-void QueryImpl::Query(const mx::Index &index) {
-  // Iterate parses at index 0
-  for (auto &partial_parse : ParsesAtIndex(0)) {
-    // Skip parse if it doesn't cover the entire query
-    if (partial_parse.next != m_input.size())
-      continue;
+bool MatchQuery(const ASTNode *tree, const ParseNode *query) {
+  if (tree->Kind() != query->Kind()) {
+    return false;
+  }
 
-    // Find all fragments that might match this parse
-    for (auto id : m_grammar.LikelyFragments(partial_parse.BloomFilter())) {
-      // Load fragment object for it
-      auto frag = index.fragment(id).value();
+  if (tree->Kind().IsToken()) {
+    return tree->Spelling() == query->Spelling();
+  } else {
+    auto &cv1 = tree->ChildVector();
+    auto &cv2 = query->ChildVector();
 
-      // Create AST for fragment
-      auto frag_ast = AST::Build(frag);
-
-      // Find likely matching AST node
-      const ASTNode *likely_node = frag_ast.LastNodeOfKind(partial_parse.node->Kind());
-
-      bool in_mx_frag = false;
-      for (; likely_node; likely_node = likely_node->prev_of_kind) {
-        if (*likely_node == *partial_parse.node) {
-          in_mx_frag = true;
-          break;
-        }
-      }
-
-      if (in_mx_frag) {
-        std::cout << "Found in fragment " << id << "\n";
+    if (cv1.size() != cv2.size()) {
+      return false;
+    }
+    for (auto i = 0u; i < cv1.size(); ++i) {
+      if (!MatchQuery(cv1[i], cv2[i])) {
+        return false;
       }
     }
   }
+
+  return true;
 }
 
 Query::Query(const Grammar &grammar, std::string_view query)
   : impl(std::make_shared<QueryImpl>(*grammar.impl, query)) {}
 
-void Query::Execute(const mx::Index &index) {
-  impl->Query(index);
+std::vector<QueryMatch> Query::Execute(const mx::Index &index) {
+  std::vector<QueryMatch> matches;
+
+  // Iterate parses at index 0
+  for (const ParseNode *parse_node : impl->ParsesAtIndex(0)) {
+    // Skip parse_node if it doesn't cover the entire query
+    if (parse_node->Next() != impl->m_input.size())
+      continue;
+
+    // Find all fragments that might match this parse_node
+    for (auto id : impl->m_grammar.LikelyFragments(parse_node->BloomFilter())) {
+      // Load fragment object for it
+      auto frag = index.fragment(id).value();
+      // Create AST for fragment
+      auto frag_ast = AST::Build(frag);
+
+      // Find likely matching AST parse_node
+      const ASTNode *ast_node = frag_ast.LastNodeOfKind(parse_node->Kind());
+
+      bool found = false;
+      for (; ast_node; ast_node = ast_node->prev_of_kind) {
+        if (MatchQuery(ast_node, parse_node)) {
+          found = true;
+          break;
+        }
+      }
+
+      if (found) {
+        matches.push_back(std::move(frag));
+      }
+    }
+  }
+
+  return matches;
 }
 
 } // namespace syntex

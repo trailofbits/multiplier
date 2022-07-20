@@ -6,14 +6,10 @@
 
 #pragma once
 #include <memory>
+#include <vector>
 #include <filesystem>
-
-namespace mx {
-
-class Index;
-class Fragment;
-
-}
+#include <multiplier/AST.h>
+#include <multiplier/Index.h>
 
 namespace syntex {
 
@@ -34,14 +30,30 @@ public:
   void Import(const mx::Fragment &fragment);
 };
 
+class QueryMatch {
+  friend class Query;
+
+private:
+  mx::Fragment fragment;
+
+  QueryMatch(mx::Fragment fragment_)
+      : fragment(std::move(fragment_)) {}
+
+public:
+  const mx::Fragment &Fragment() const {
+    return fragment;
+  }
+};
+
 class Query {
 private:
   std::shared_ptr<QueryImpl> impl;
   Query() = delete;
+
 public:
   explicit Query(const Grammar &grammar, std::string_view query);
 
-  void Execute(const mx::Index &index);
+  std::vector<QueryMatch> Execute(const mx::Index &index);
 };
 
 }

@@ -42,7 +42,9 @@ extern "C" int main(int argc, char *argv[]) {
   syntex::Query query(grammar, FLAGS_query);
 
   // Do search
-  query.Execute(index);
+  for (auto match : query.Execute(index)) {
+    std::cout << "Found pattern in fragment " << match.Fragment().id() << "\n";
+  }
 
   return EXIT_SUCCESS;
 }
