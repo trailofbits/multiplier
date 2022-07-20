@@ -31,15 +31,14 @@ public:
 };
 
 class QueryMatch {
-  friend class Query;
-
 private:
   mx::Fragment fragment;
-
-  QueryMatch(mx::Fragment fragment_)
-      : fragment(std::move(fragment_)) {}
+  mx::VariantEntity entity;
 
 public:
+  QueryMatch(mx::Fragment fragment_, mx::VariantEntity entity_)
+      : fragment(std::move(fragment_)), entity(std::move(entity_)) {}
+
   const mx::Fragment &Fragment() const {
     return fragment;
   }

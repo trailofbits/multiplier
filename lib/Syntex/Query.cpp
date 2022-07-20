@@ -545,7 +545,7 @@ std::vector<QueryMatch> Query::Execute(const mx::Index &index) {
       }
 
       if (found) {
-        matches.push_back(std::move(frag));
+        matches.emplace_back(std::move(frag), ast_node->Entity());
       }
     }
   }

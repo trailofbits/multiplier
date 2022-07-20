@@ -18,11 +18,11 @@ std::ostream& operator<<(std::ostream& os, const NodeKind& nt) {
     return os;
 }
 
-ASTNode::ASTNode(NodeKind kind_, std::vector<const ASTNode *> child_vector_)
-: kind(kind_), child_vector(std::move(child_vector_)) {}
+ASTNode::ASTNode(NodeKind kind_, mx::VariantEntity entity_, std::vector<const ASTNode *> child_vector_)
+: kind(kind_), entity(std::move(entity_)), child_vector(std::move(child_vector_)) {}
 
-ASTNode::ASTNode(mx::TokenKind kind_, std::string spelling)
-    : kind(kind_), spelling(std::move(spelling)) {}
+ASTNode::ASTNode(mx::TokenKind kind_, mx::VariantEntity entity_, std::string spelling)
+    : kind(kind_), entity(std::move(entity_)), spelling(std::move(spelling)) {}
 
 ASTNode::~ASTNode() {
   // Destruct correct union variant
@@ -44,23 +44,48 @@ const ASTNode *AST::LastNodeOfKind(NodeKind kind) {
   return index[kind.Serialize()];
 }
 
-const ASTNode *AST::ConstructNode(NodeKind kind, std::vector<const ASTNode *> child_vector)
+const ASTNode *AST::ConstructNode(NodeKind kind, mx::VariantEntity entity, std::vector<const ASTNode *> child_vector)
 {
   assert(!kind.IsToken());
-  ASTNode *ptr = &nodes.emplace_back(kind, std::move(child_vector));
+  ASTNode *ptr = &nodes.emplace_back(kind, std::move(entity), std::move(child_vector));
   auto kind_val = kind.Serialize();
   ptr->prev_of_kind = index[kind_val];
   index[kind_val] = ptr;
   return ptr;
 }
 
-const ASTNode *AST::ConstructNode(mx::TokenKind kind, std::string spelling)
+const ASTNode *AST::ConstructNode(mx::TokenKind kind, mx::VariantEntity entity, std::string spelling)
 {
-  ASTNode *ptr = &nodes.emplace_back(kind, std::move(spelling));
+  ASTNode *ptr = &nodes.emplace_back(kind, std::move(entity), std::move(spelling));
   auto kind_val = ptr->kind.Serialize();
   ptr->prev_of_kind = index[kind_val];
   index[kind_val] = ptr;
   return ptr;
+}
+
+std::optional<std::pair<NodeKind, mx::VariantEntity>> ProcessContext(const mx::TokenContext &ctx) {
+  // NOTE: always overwritten, just need some random initializer
+  // to keep C++ happy
+  NodeKind kind(mx::TokenKind::UNKNOWN);
+
+  if (auto decl = mx::Decl::from(ctx)) {
+    // Declarations.
+    return {{ decl->kind(), *decl }};
+  } else if (auto stmt = mx::Stmt::from(ctx)) {
+    // Statements.
+    switch (stmt->kind()) {
+      case mx::StmtKind::IMPLICIT_CAST_EXPR:
+      case mx::StmtKind::DECL_REF_EXPR:
+        return {}; // Skip these.
+      default:
+        return {{ stmt->kind(), *stmt }};
+    }
+  } else if (auto type = mx::Type::from(ctx)) {
+    // Types.
+    return {{ type->kind(), *type }};
+  } else {
+    return {};
+  }
 }
 
 AST AST::Build(const mx::Fragment &fragment) {
@@ -93,33 +118,13 @@ AST AST::Build(const mx::Fragment &fragment) {
     auto *curr_children = &self.root;
 
     for (auto it = contexts.rbegin(), end = contexts.rend(); it != end; ++it) {
-      // NOTE: always overwritten, just need some random initializer
-      // to keep C++ happy
-      NodeKind kind(mx::TokenKind::UNKNOWN);
-
-      if (auto decl = mx::Decl::from(*it)) {
-        // Declarations.
-        kind = NodeKind(decl->kind());
-      } else if (auto stmt = mx::Stmt::from(*it)) {
-        // Statements.
-        switch (stmt->kind()) {
-          case mx::StmtKind::IMPLICIT_CAST_EXPR:
-          case mx::StmtKind::DECL_REF_EXPR:
-            continue;  // Skip these; they are spam.
-          default:
-            kind = NodeKind(stmt->kind());
-            break;
-        }
-      } else if (auto type = mx::Type::from(*it)) {
-        // Types.
-        kind = NodeKind(type->kind());
-      } else {
+      auto val = ProcessContext(*it);
+      if (!val.has_value())
         continue;
-      }
 
-      if (curr_children->empty() || curr_children->back()->kind != kind) {
+      if (curr_children->empty() || curr_children->back()->Kind() != val->first) {
         // Need to add a new branch or the last thing doesn't match.
-        auto next = self.ConstructNode(kind, {});
+        auto next = self.ConstructNode(val->first, val->second, {});
         curr_children->push_back(next);
         curr_children = &next->child_vector;
       } else {
@@ -130,7 +135,7 @@ AST AST::Build(const mx::Fragment &fragment) {
 
     // Add the token.
     curr_children->push_back(self.ConstructNode(
-      tok.kind(), std::string(tok.data().data(), tok.data().size())));
+      tok.kind(), tok, std::string(tok.data().data(), tok.data().size())));
   }
 
   return self;

@@ -111,8 +111,8 @@ public:
   // correct spot.
   const ASTNode *prev_of_kind{nullptr};
 
-  ASTNode(NodeKind kind, std::vector<const ASTNode *> child_vector);
-  ASTNode(mx::TokenKind kind, std::string spelling);
+  ASTNode(NodeKind kind, mx::VariantEntity entity, std::vector<const ASTNode *> child_vector);
+  ASTNode(mx::TokenKind kind, mx::VariantEntity entity, std::string spelling);
 
   ~ASTNode();
 
@@ -125,6 +125,10 @@ public:
     return child_vector;
   };
 
+  const mx::VariantEntity &Entity() const {
+    return entity;
+  }
+
   const std::string &Spelling() const {
     assert(kind.IsToken());
     return spelling;
@@ -132,6 +136,7 @@ public:
 
 private:
   NodeKind kind;
+  mx::VariantEntity entity;
 
   union {
     mutable std::vector<const ASTNode *> child_vector;
@@ -144,7 +149,6 @@ private:
 class AST {
 private:
   friend class ASTNode;
-  friend class QueryImpl;
 
   std::deque<ASTNode> nodes;
   std::vector<const ASTNode *> index;
@@ -152,13 +156,14 @@ private:
 
   AST(void);
 
+  const ASTNode *ConstructNode(NodeKind kind, mx::VariantEntity entity, std::vector<const ASTNode *> child_vector);
+  const ASTNode *ConstructNode(mx::TokenKind k, mx::VariantEntity entity, std::string spelling);
+
 public:
   // Used to "hop into" the middle of the
   const ASTNode *LastNodeOfKind(NodeKind kind);
 
-  const ASTNode *ConstructNode(NodeKind kind, std::vector<const ASTNode *> child_vector);
-  const ASTNode *ConstructNode(mx::TokenKind k, std::string spelling);
-
+  // Nodes at the root of this AST
   const std::vector<const ASTNode *> &Root(void) const {
     return root;
   }
