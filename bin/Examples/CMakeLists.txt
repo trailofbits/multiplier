@@ -62,6 +62,7 @@ define_example("mx-print-sourceir" "PrintSourceIR.cpp")
 define_example("mx-weggli-query" "WeggliQuery.cpp")
 define_example("mx-regex-query" "RegexQuery.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
+define_example("mx-find-divergent-candidates" "FindDivergentCandidates.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
 
 target_link_libraries("mx-dump-json"
