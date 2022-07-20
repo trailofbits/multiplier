@@ -4,19 +4,22 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "AST.h"
-
-#include <cstdint>
-#include <ostream>
-#include <sstream>
-#include <iostream>
-#include <multiplier/Index.h>
+#include "Private.h"
 
 namespace syntex {
 
+std::ostream& operator<<(std::ostream& os, const NodeKind& nt) {
+    nt.Visit(Visitor {
+            [&] (mx::DeclKind kind)  { os << "DeclKind::" << EnumeratorName(kind);   },
+            [&] (mx::StmtKind kind)  { os << "StmtKind::" << EnumeratorName(kind);   },
+            [&] (mx::TypeKind kind)  { os << "TypeKind::" << EnumeratorName(kind);   },
+            [&] (mx::TokenKind kind) { os << "TokenKind::" << EnumeratorName(kind);  },
+    });
+    return os;
+}
 
 ASTNode::ASTNode(NodeKind kind_, std::vector<const ASTNode *> child_vector_)
-    : kind(kind_), child_vector(std::move(child_vector_)) {}
+: kind(kind_), child_vector(std::move(child_vector_)) {}
 
 ASTNode::ASTNode(mx::TokenKind kind_, std::string spelling)
     : kind(kind_), spelling(std::move(spelling)) {}
@@ -154,6 +157,8 @@ AST AST::Build(const mx::Fragment &fragment) {
   return self;
 }
 
+#ifndef NDEBUG
+
 namespace {
 
 static std::string Data(const std::string &data) {
@@ -241,5 +246,7 @@ void AST::PrintDOT(std::ostream &os) const {
 
   os << "}\n";
 }
+
+#endif
 
 }  // namespace syntex

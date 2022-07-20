@@ -4,15 +4,11 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <cstdlib>
+#include <iostream>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
 #include <multiplier/Index.h>
-#include <sstream>
-#include <vector>
-
-#include "Grammar.h"
+#include <Syntex.h>
 
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");

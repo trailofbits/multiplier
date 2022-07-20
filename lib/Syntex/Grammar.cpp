@@ -4,21 +4,33 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "Grammar.h"
-#include "BloomFilter.h"
-
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <unordered_set>
-
-#include <gflags/gflags.h>
-#include <multiplier/Index.h>
-#include <multiplier/PersistentMap.h>
-
-DECLARE_bool(print_asts);
+#include "Syntex.h"
+#include "Private.h"
 
 namespace mx {
+
+// Serialize a small bloom filter.
+template <typename Reader, typename Writer>
+struct Serializer<Reader, Writer, syntex::SmallBloomFilter> {
+
+  static constexpr bool kIsFixedSize = true;
+
+  MX_FLATTEN static void Write(Writer &writer, const syntex::SmallBloomFilter &bf) {
+    for (auto word : bf.words) {
+      Serializer<NullReader, Writer, uint64_t>::Write(writer, word);
+    }
+  }
+
+  MX_FLATTEN static void Read(Reader &reader, syntex::SmallBloomFilter &bf) {
+    for (auto &word : bf.words) {
+      Serializer<Reader, NullWriter, uint64_t>::Read(reader, word);
+    }
+  }
+
+  static constexpr uint32_t SizeInBytes(void) noexcept {
+    return sizeof(syntex::SmallBloomFilter);
+  }
+};
 
 // Serialize token data without a leading size.
 template <typename Reader, typename Writer>
@@ -31,7 +43,7 @@ struct Serializer<Reader, Writer, syntex::Terminal> {
     assert(0 < size);
     writer.EnterVariableSizedComposite(size);
 
-    // NOTE(pag): Induction variable based `for` loop so that a a byte counting
+    // NOTE(pag): Induction variable based `for` loop so that a byte counting
     //            writer can elide the `for` loop entirely and count `size`.
     for (auto ch : tok.data) {
       Serializer<NullReader, Writer, char>::Write(writer, ch);
@@ -92,16 +104,6 @@ struct Serializer<Reader, Writer, syntex::Rule> {
 
 namespace syntex {
 
-std::ostream& operator<<(std::ostream& os, const NodeKind& nt) {
-  nt.Visit(Visitor {
-    [&] (mx::DeclKind kind)  { os << "DeclKind::" << EnumeratorName(kind);   },
-    [&] (mx::StmtKind kind)  { os << "StmtKind::" << EnumeratorName(kind);   },
-    [&] (mx::TypeKind kind)  { os << "TypeKind::" << EnumeratorName(kind);   },
-    [&] (mx::TokenKind kind) { os << "TokenKind::" << EnumeratorName(kind);  },
-  });
-  return os;
-}
-
 // This is the 64-bit variant FNV-1a by Glenn Fowler, et al
 uint64_t Rule::Hash(void) const {
   uint64_t hash = 0xcbf29ce484222325ULL;
@@ -121,40 +123,9 @@ std::ostream& operator<<(std::ostream& os, const Rule& rule) {
   return os;
 }
 
-class GrammarImpl {
- public:
-  // Maps terminals, e.g. identifier values, to their token kinds.
-  mx::PersistentMap<0, Terminal, mx::TokenKind> tokens;
-
-  // Set of all rules, in `body_0 ... body_n head` form. This allows for
-  // easy left-corner scanning of rules. That is, if we have `body_0`, then
-  // we can do a prefix scan for all production rules beginning with `body_0`.
-  mx::PersistentSet<1, Rule> productions;
-
-  // Tells us which fragments are likely to contain which syntax features.
-  // The idea here is that as we import a fragment into the grammar, we build
-  // up the grammar rules for all levels of the fragment AST. We can hash each
-  // of these rules, and set bits in a fragment-specific Bloom filter. When
-  // we want to do a search, e.g. "we want to find feature X and Y", we make the
-  // bloom filter for X and we make it for Y, then compose them (bitwise OR) and
-  // then exhaustively scan all fragment bloom filters to get a likely set of
-  // fragments to do a deeper, tree-based match.
-  mx::PersistentMap<2, mx::RawEntityId, SmallBloomFilter> features;
-
-  inline GrammarImpl(std::filesystem::path grammar_dir)
-      : tokens(grammar_dir),
-        productions(grammar_dir),
-        features(grammar_dir) {}
-};
-
-Grammar::~Grammar(void) {}
-
-Grammar::Grammar(std::filesystem::path grammar_dir)
-    : impl(std::make_shared<GrammarImpl>(std::move(grammar_dir))) {}
-
 // Determine the kind of an identifier based on its spelling
-std::optional<mx::TokenKind> Grammar::ClassifyIdent(std::string_view spelling) const {
-  auto kind = impl->tokens.TryGet({ std::string(spelling) });
+std::optional<mx::TokenKind> GrammarImpl::ClassifyIdent(std::string_view spelling) const {
+  auto kind = tokens.TryGet({ std::string(spelling) });
   if (kind.has_value() && *kind != mx::TokenKind::IDENTIFIER) {
     return kind.value();
   } else {
@@ -163,9 +134,9 @@ std::optional<mx::TokenKind> Grammar::ClassifyIdent(std::string_view spelling) c
 }
 
 // Find all productions beginning with the specified non-terminal
-std::vector<Rule> Grammar::MatchProductions(const NodeKind& start_nt) const {
+std::vector<Rule> GrammarImpl::MatchProductions(const NodeKind& start_nt) const {
   std::vector<Rule> rules;
-  impl->productions.ScanPrefix(start_nt.Serialize(), [&] (Rule rule) -> bool {
+  productions.ScanPrefix(start_nt.Serialize(), [&] (Rule rule) -> bool {
     rules.push_back(std::move(rule));
     return true;
   });
@@ -173,9 +144,9 @@ std::vector<Rule> Grammar::MatchProductions(const NodeKind& start_nt) const {
 }
 
 // Find all fragments that likely contain a set of features
-std::vector<mx::RawEntityId> Grammar::LikelyFragments(const SmallBloomFilter &desired_features) const {
+std::vector<mx::RawEntityId> GrammarImpl::LikelyFragments(const SmallBloomFilter &desired_features) const {
   std::vector<mx::RawEntityId> ids;
-  impl->features.ScanPrefix(mx::Empty(), [&] (mx::RawEntityId id, SmallBloomFilter bf) -> bool {
+  features.ScanPrefix(mx::Empty(), [&] (mx::RawEntityId id, SmallBloomFilter bf) -> bool {
     if (bf.Contains(desired_features))
       ids.push_back(id);
     return true;
@@ -184,11 +155,7 @@ std::vector<mx::RawEntityId> Grammar::LikelyFragments(const SmallBloomFilter &de
 }
 
 // Import a fragment into the grammar.
-void Grammar::Import(const mx::Fragment &fragment) {
-/*
-  std::cout << "Importing fragment " << fragment.id() << "\n";
-*/
-
+void GrammarImpl::Import(const mx::Fragment &fragment) {
   auto ast = AST::Build(fragment);
 
 /*
@@ -201,11 +168,6 @@ void Grammar::Import(const mx::Fragment &fragment) {
 
 */
 
-  // TODO(pag): Eventually remove; nifty for debugging.
-  if (FLAGS_print_asts) {
-    ast.PrintDOT(std::cerr);
-  }
-
   std::vector<const ASTNode *> nodes(ast.Root());
   SmallBloomFilter fragment_features;
 
@@ -217,7 +179,7 @@ void Grammar::Import(const mx::Fragment &fragment) {
     // This is a token kind node, and represents a terminal. We want to map
     // the contents of the token to the actual kind of the token.
     if (node->Kind().IsToken()) {
-      impl->tokens.Set({ node->Spelling() }, node->Kind().AsToken());
+      tokens.Set({ node->Spelling() }, node->Kind().AsToken());
 
     // This is an internal or root node. E.g. given the following:
     //
@@ -248,8 +210,8 @@ void Grammar::Import(const mx::Fragment &fragment) {
       // Avoid creating cyclic CFGs
       bool allow_production = true;
       if (num_children == 1) {
-        std::vector<NodeKind> queue = {non_terminals.back() };
-        while (queue.size() > 0) {
+        std::vector<NodeKind> queue = { non_terminals.back() };
+        while (!queue.empty()) {
           auto nt = queue.back();
           queue.pop_back();
           // Check for cycle
@@ -271,12 +233,19 @@ void Grammar::Import(const mx::Fragment &fragment) {
         // Add our rule feature to the fragment's feature set.
         fragment_features.Add(rule.Hash());
         // Persist, i.e. "learn" our grammar rule.
-        impl->productions.Insert(std::move(rule));
+        productions.Insert(std::move(rule));
       }
     }
   }
 
-  impl->features.Set(fragment.id(), fragment_features);
+  features.Set(fragment.id(), fragment_features);
+}
+
+Grammar::Grammar(std::filesystem::path grammar_dir)
+  : impl(std::make_shared<GrammarImpl>(grammar_dir)) {}
+
+void Grammar::Import(const mx::Fragment &fragment) {
+  impl->Import(fragment);
 }
 
 }  // namespace syntex

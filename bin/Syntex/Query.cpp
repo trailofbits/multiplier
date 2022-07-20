@@ -4,13 +4,11 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <iostream>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <iostream>
 #include <multiplier/Index.h>
-#include <sstream>
-
-#include "Parser.h"
+#include <Syntex.h>
 
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
@@ -41,10 +39,10 @@ extern "C" int main(int argc, char *argv[]) {
   syntex::Grammar grammar(FLAGS_index_dir);
 
   // Parse query
-  syntex::Parser parser(grammar, FLAGS_query);
+  syntex::Query query(grammar, FLAGS_query);
 
   // Do search
-  parser.Query(index);
+  query.Execute(index);
 
   return EXIT_SUCCESS;
 }

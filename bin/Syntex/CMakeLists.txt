@@ -6,23 +6,6 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-add_library("mx-syntex"
-  "BloomFilter.h"
-  "AST.cpp"
-  "AST.h"
-  "Grammar.cpp"
-  "Grammar.h"
-  "Parser.cpp"
-  "Parser.h"
-)
-
-target_link_libraries("mx-syntex"
-  PRIVATE
-    "mx-api"
-    "mx-util"
-    glog::glog
-)
-
 add_executable("syntex-index" "Index.cpp")
 
 target_link_libraries("syntex-index"
