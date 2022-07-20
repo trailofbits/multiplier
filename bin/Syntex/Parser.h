@@ -47,10 +47,10 @@ struct Fragment {
 class Item {
  private:
   SmallBloomFilter bf;
-  const NonTerminal *cur, *end;
+  const NodeKind *cur, *end;
   std::vector<const ASTNode *> child_vector;
 
-  Item(SmallBloomFilter bf_, const NonTerminal *cur_, const NonTerminal *end_)
+  Item(SmallBloomFilter bf_, const NodeKind *cur_, const NodeKind *end_)
     : bf(bf_),
       cur(cur_),
       end(end_) {}
@@ -72,7 +72,7 @@ class Item {
     return cur == end;
   }
 
-  const NonTerminal &Cur() const {
+  const NodeKind &Cur() const {
     return *cur;
   }
 

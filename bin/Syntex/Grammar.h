@@ -32,13 +32,13 @@ struct Terminal {
 // `B C A`.
 
 struct Rule {
-  std::vector<NonTerminal> non_terminals;
+  std::vector<NodeKind> non_terminals;
 
   // For serialization
   Rule() {}
 
   // Actual constructor
-  Rule(std::vector<NonTerminal> non_terminals_)
+  Rule(std::vector<NodeKind> non_terminals_)
       : non_terminals(non_terminals_) {}
 
   uint64_t Hash(void) const;
@@ -61,7 +61,7 @@ class Grammar {
   std::optional<mx::TokenKind> ClassifyIdent(std::string_view spelling) const;
 
   // Find all productions beginning with the specified non-terminal
-  std::vector<Rule> MatchProductions(const NonTerminal& start_nt) const;
+  std::vector<Rule> MatchProductions(const NodeKind& start_nt) const;
 
   // Find all fragments that likely contain a set of features
   std::vector<mx::RawEntityId> LikelyFragments(const SmallBloomFilter &desired_features) const;

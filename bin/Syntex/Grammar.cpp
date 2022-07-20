@@ -79,7 +79,7 @@ struct Serializer<Reader, Writer, syntex::Rule> {
     for (auto i = 0u; i < size; ++i) {
       unsigned short val;
       Serializer<Reader, NullWriter, unsigned short>::Read(reader, val);
-      out.non_terminals.push_back(syntex::NonTerminal::Deserialize(val));
+      out.non_terminals.push_back(syntex::NodeKind::Deserialize(val));
     }
   }
 
@@ -92,7 +92,7 @@ struct Serializer<Reader, Writer, syntex::Rule> {
 
 namespace syntex {
 
-std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
+std::ostream& operator<<(std::ostream& os, const NodeKind& nt) {
   nt.Visit(Visitor {
     [&] (mx::DeclKind kind)  { os << "DeclKind::" << EnumeratorName(kind);   },
     [&] (mx::StmtKind kind)  { os << "StmtKind::" << EnumeratorName(kind);   },
@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream& os, const NonTerminal& nt) {
 // This is the 64-bit variant FNV-1a by Glenn Fowler, et al
 uint64_t Rule::Hash(void) const {
   uint64_t hash = 0xcbf29ce484222325ULL;
-  for (const NonTerminal &nt : non_terminals) {
+  for (const NodeKind &nt : non_terminals) {
       hash ^= nt.Serialize();
       hash *= 0x100000001b3ULL;
   }
@@ -114,8 +114,9 @@ uint64_t Rule::Hash(void) const {
 
 std::ostream& operator<<(std::ostream& os, const Rule& rule) {
   auto it = rule.non_terminals.begin();
-  while (it < rule.non_terminals.end() - 1)
+  while (it < rule.non_terminals.end() - 1) {
     os << *it++ << " ";
+  }
   os << "-> " << *it;
   return os;
 }
@@ -154,14 +155,15 @@ Grammar::Grammar(std::filesystem::path grammar_dir)
 // Determine the kind of an identifier based on its spelling
 std::optional<mx::TokenKind> Grammar::ClassifyIdent(std::string_view spelling) const {
   auto kind = impl->tokens.TryGet({ std::string(spelling) });
-  if (kind.has_value() && *kind != mx::TokenKind::IDENTIFIER)
+  if (kind.has_value() && *kind != mx::TokenKind::IDENTIFIER) {
     return kind.value();
-  else
+  } else {
     return {};
+  }
 }
 
 // Find all productions beginning with the specified non-terminal
-std::vector<Rule> Grammar::MatchProductions(const NonTerminal& start_nt) const {
+std::vector<Rule> Grammar::MatchProductions(const NodeKind& start_nt) const {
   std::vector<Rule> rules;
   impl->productions.ScanPrefix(start_nt.Serialize(), [&] (Rule rule) -> bool {
     rules.push_back(std::move(rule));
@@ -236,16 +238,17 @@ void Grammar::Import(const mx::Fragment &fragment) {
       nodes.insert(nodes.end(), children.begin(), children.end());
 
       // Create list of non-terminals for the rule
-      std::vector<NonTerminal> non_terminals;
+      std::vector<NodeKind> non_terminals;
       non_terminals.reserve(num_children + 1);
-      for (auto i = 0u; i < num_children; ++i)      // Rule body
+      for (auto i = 0u; i < num_children; ++i) {    // Rule body
         non_terminals.push_back(children[i]->Kind());
+      }
       non_terminals.push_back(node->Kind());        // Rule head
 
       // Avoid creating cyclic CFGs
       bool allow_production = true;
       if (num_children == 1) {
-        std::vector<NonTerminal> queue = { non_terminals.back() };
+        std::vector<NodeKind> queue = {non_terminals.back() };
         while (queue.size() > 0) {
           auto nt = queue.back();
           queue.pop_back();
@@ -255,9 +258,11 @@ void Grammar::Import(const mx::Fragment &fragment) {
             break;
           }
           // Queue result of trivial productions
-          for (auto& cur : MatchProductions(nt))
-            if (cur.non_terminals.size() == 2)
+          for (auto& cur : MatchProductions(nt)) {
+            if (cur.non_terminals.size() == 2) {
               queue.push_back(cur.non_terminals.back());
+            }
+          }
         }
       }
 

@@ -30,26 +30,26 @@ namespace syntex {
 class AST;
 class Parser;
 
-class NonTerminal {
+class NodeKind {
 private:
   unsigned short val;
 
-  NonTerminal(unsigned short val_) : val(val_) {}
+  NodeKind(unsigned short val_) : val(val_) {}
 
 public:
-  NonTerminal(mx::DeclKind kind)
+  NodeKind(mx::DeclKind kind)
     : val(static_cast<unsigned short>(kind)) {}
 
-  NonTerminal(mx::StmtKind kind)
+  NodeKind(mx::StmtKind kind)
     : val(static_cast<unsigned short>(kind)
         + mx::NumEnumerators(mx::DeclKind{})) {}
 
-  NonTerminal(mx::TypeKind kind)
+  NodeKind(mx::TypeKind kind)
     : val(static_cast<unsigned short>(kind)
         + mx::NumEnumerators(mx::DeclKind{})
         + mx::NumEnumerators(mx::StmtKind{})) {}
 
-  NonTerminal(mx::TokenKind kind)
+  NodeKind(mx::TokenKind kind)
     : val(static_cast<unsigned short>(kind)
         + mx::NumEnumerators(mx::DeclKind{})
         + mx::NumEnumerators(mx::StmtKind{})
@@ -91,11 +91,11 @@ public:
                 - mx::NumEnumerators(mx::TypeKind{}));
   }
 
-  bool operator==(const NonTerminal &other) const {
+  bool operator==(const NodeKind &other) const {
     return val == other.val;
   }
 
-  static NonTerminal Deserialize(unsigned short val) {
+  static NodeKind Deserialize(unsigned short val) {
     return val;
   }
 
@@ -104,7 +104,7 @@ public:
   }
 };
 
-std::ostream& operator<<(std::ostream &, const NonTerminal &);
+std::ostream& operator<<(std::ostream &, const NodeKind &);
 
 template<typename ... F>
 struct Visitor : F ... {
@@ -126,12 +126,12 @@ class ASTNode {
   // correct spot.
   const ASTNode *prev_of_kind{nullptr};
 
-  ASTNode(NonTerminal kind, std::vector<const ASTNode *> child_vector);
+  ASTNode(NodeKind kind, std::vector<const ASTNode *> child_vector);
   ASTNode(mx::TokenKind kind, std::string spelling);
 
   ~ASTNode();
 
-  const NonTerminal Kind() const {
+  const NodeKind Kind() const {
     return kind;
   }
 
@@ -148,7 +148,7 @@ class ASTNode {
   bool operator==(const ASTNode &that) const noexcept;
 
  private:
-  NonTerminal kind;
+  NodeKind kind;
 
   union {
     mutable std::vector<const ASTNode *> child_vector;
@@ -171,9 +171,9 @@ class AST {
 
  public:
   // Used to "hop into" the middle of the
-  const ASTNode *LastNodeOfKind(NonTerminal kind);
+  const ASTNode *LastNodeOfKind(NodeKind kind);
 
-  const ASTNode *ConstructNode(NonTerminal kind, std::vector<const ASTNode *> child_vector);
+  const ASTNode *ConstructNode(NodeKind kind, std::vector<const ASTNode *> child_vector);
   const ASTNode *ConstructNode(mx::TokenKind k, std::string spelling);
 
   const std::vector<const ASTNode *> &Root(void) const {

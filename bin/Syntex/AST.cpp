@@ -15,7 +15,7 @@
 namespace syntex {
 
 
-ASTNode::ASTNode(NonTerminal kind_, std::vector<const ASTNode *> child_vector_)
+ASTNode::ASTNode(NodeKind kind_, std::vector<const ASTNode *> child_vector_)
     : kind(kind_), child_vector(std::move(child_vector_)) {}
 
 ASTNode::ASTNode(mx::TokenKind kind_, std::string spelling)
@@ -58,11 +58,11 @@ AST::AST(void) {
                mx::NumEnumerators(mx::TokenKind{}));
 }
 
-const ASTNode *AST::LastNodeOfKind(NonTerminal kind) {
+const ASTNode *AST::LastNodeOfKind(NodeKind kind) {
   return index[kind.Serialize()];
 }
 
-const ASTNode *AST::ConstructNode(NonTerminal kind, std::vector<const ASTNode *> child_vector)
+const ASTNode *AST::ConstructNode(NodeKind kind, std::vector<const ASTNode *> child_vector)
 {
   assert(!kind.IsToken());
   ASTNode *ptr = &nodes.emplace_back(kind, std::move(child_vector));
@@ -113,11 +113,11 @@ AST AST::Build(const mx::Fragment &fragment) {
     for (auto it = contexts.rbegin(), end = contexts.rend(); it != end; ++it) {
       // NOTE: always overwritten, just need some random initializer
       // to keep C++ happy
-      NonTerminal kind(mx::TokenKind::UNKNOWN);
+      NodeKind kind(mx::TokenKind::UNKNOWN);
 
       if (auto decl = mx::Decl::from(*it)) {
         // Declarations.
-        kind = NonTerminal(decl->kind());
+        kind = NodeKind(decl->kind());
       } else if (auto stmt = mx::Stmt::from(*it)) {
         // Statements.
         switch (stmt->kind()) {
@@ -125,12 +125,12 @@ AST AST::Build(const mx::Fragment &fragment) {
           case mx::StmtKind::DECL_REF_EXPR:
             continue;  // Skip these; they are spam.
           default:
-            kind = NonTerminal(stmt->kind());
+            kind = NodeKind(stmt->kind());
             break;
         }
       } else if (auto type = mx::Type::from(*it)) {
         // Types.
-        kind = NonTerminal(type->kind());
+        kind = NodeKind(type->kind());
       } else {
         continue;
       }
