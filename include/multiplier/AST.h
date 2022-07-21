@@ -30467,6 +30467,7 @@ class Type {
   Type with_restrict(void) const;
   Type with_volatile(void) const;
   Type without_local_fast_qualifiers(void) const;
+  TokenRange tokens(void) const;
 };
 
 using TemplateTypeParmTypeRange = DerivedEntityRange<TypeIterator, TemplateTypeParmType>;

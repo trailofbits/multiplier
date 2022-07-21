@@ -18283,6 +18283,11 @@ Type Type::without_local_fast_qualifiers(void) const {
   return fragment->TypeFor(fragment, id, false).value();
 }
 
+TokenRange Type::tokens(void) const {
+  auto self = fragment->NthType(offset_);
+  return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal6());
+}
+
 std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const TokenContext &c) {
   return from(c.as_type());
 }
