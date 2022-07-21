@@ -82,10 +82,26 @@ set_target_properties("mx-util"
 )
 
 target_include_directories("mx-util"
-  PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_BINARY_DIR}/include
-    ${PROJECT_BINARY_DIR}/lib
   PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
+if(MX_ENABLE_INSTALL)
+  install(
+    TARGETS
+      "mx-util"
+    EXPORT "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${CMAKE_INSTALL_BINDIR}"
+    LIBRARY
+      DESTINATION
+        "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE
+      DESTINATION
+        "${CMAKE_INSTALL_LIBDIR}"
+    PUBLIC_HEADER
+      DESTINATION
+        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
+  )
+endif(MX_ENABLE_INSTALL)
