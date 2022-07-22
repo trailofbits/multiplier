@@ -14,19 +14,6 @@ DEFINE_uint64(file_id, 0, "ID of the file from which to check for potential cand
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to check for potential candidates of divergent representations");
 DEFINE_bool(show_locations, false, "Show the locations of candidates?");
 
-static bool IsVarDeclInLoop(const mx::VarDecl var) {
-  auto parent_stmt = var.parent_statement();
-  while (parent_stmt) {
-    if (parent_stmt->kind() == mx::StmtKind::FOR_STMT || 
-        parent_stmt->kind() == mx::StmtKind::WHILE_STMT ||
-        parent_stmt->kind() == mx::StmtKind::DO_STMT) {
-      return true;
-    }
-    parent_stmt = parent_stmt->parent_statement();
-  }
-  return false;
-}
-
 static void FindDivergentCandidates(const mx::Fragment fragment) {
   /* 
     Get all statements in a fragment, iterate through them.
