@@ -147,6 +147,8 @@ extern "C" int main(int argc, char *argv[]) {
       << "digraph {\n"
       << "  node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
 
+  std::map<mx::RawEntityId, std::vector<const char *>> grouped_uses;
+
   for (auto [user_id, uses] : user_uses) {
     auto [kind, color] = KindAndColor(user_id);
     if (FLAGS_entity_id == user_id) {
@@ -158,9 +160,19 @@ extern "C" int main(int argc, char *argv[]) {
         << color << "\"><TR><TD>" << user_id << "</TD></TR><TR><TD>"
         << kind << "</TD></TR></TABLE>>];\n";
 
+    grouped_uses.clear();
     for (auto [used_id, use_kind] : uses) {
-      std::cout << "e" << user_id << " -> e"
-                << used_id << " [label=\"" << use_kind << "\"];\n";
+      grouped_uses[used_id].push_back(use_kind);
+    }
+
+    for (const auto &[used_id, use_kinds] : grouped_uses) {
+      std::cout << "e" << user_id << " -> e" << used_id << " [label=<";
+      auto sep = "";
+      for (const char *use_kind : use_kinds) {
+        std::cout << sep << use_kind;
+        sep = "<BR />";
+      }
+      std::cout << ">];\n";
     }
   }
 
