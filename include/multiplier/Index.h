@@ -176,8 +176,6 @@ class EntityProvider {
                           std::vector<RawEntityId> &ids_out) = 0;
 };
 
-class NotAnEntity {};
-
 using VariantEntity = std::variant<Decl, Stmt, Type, Attr,
                                    Token, TokenSubstitution,
                                    Designator, Fragment, File,

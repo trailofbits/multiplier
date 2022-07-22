@@ -8,6 +8,7 @@
 
 #include <bitset>
 #include <new>
+#include <variant>
 
 #include "Iterator.h"
 
@@ -17,11 +18,13 @@ class Attr;
 class CXXBaseSpecifier;
 class Decl;
 class EntityProvider;
+class File;
 class FragmentImpl;
 class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
 class Token;
+class TokenSubstitution;
 class Type;
 
 using UseSelectorSet = std::bitset<256>;
@@ -44,6 +47,13 @@ inline static const char *EnumerationName(UseKind) {
 inline static constexpr unsigned NumEnumerators(UseKind) {
   return 6u;
 }
+
+class NotAnEntity {};
+
+using VariantUse = std::variant<Decl, Stmt, Type, Attr,
+                                CXXBaseSpecifier, TemplateArgument,
+                                TemplateParameterList, Designator,
+                                NotAnEntity>;
 
 // Base for uses. Uses represent AST methods that return a specific entity
 // ID.
@@ -73,9 +83,11 @@ class UseBase {
   UseBase(CXXBaseSpecifier decl, UseSelectorSet selectors_);
   UseBase(TemplateArgument decl, UseSelectorSet selectors_);
   UseBase(TemplateParameterList decl, UseSelectorSet selectors_);
+  UseBase(Designator designator, UseSelectorSet selectors_);
 
   ~UseBase(void);
 
+  VariantUse entity(void) const;
   std::optional<Decl> as_declaration(void) const;
   std::optional<Stmt> as_statement(void) const;
   std::optional<Type> as_type(void) const;
@@ -113,6 +125,10 @@ class Use : public UseBase {
   template <typename... S>
   inline bool has_any_selector(Selector sel0, S... selN) const noexcept {
     return has_selector(sel0) || (has_selector(selN) || ...);
+  }
+
+  inline static mx::EnumerationRange<Selector> all_selectors(void) noexcept {
+    return mx::EnumerationRange<Selector>();
   }
 };
 
