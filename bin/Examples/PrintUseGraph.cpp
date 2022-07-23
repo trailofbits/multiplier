@@ -15,7 +15,6 @@
 #include "Index.h"
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the uses of");
-DEFINE_bool(highlight_user, false, "Should we print the fragment with the user highlighted?");
 DEFINE_uint32(length, 2, "Length of paths to print");
 DEFINE_bool(ignore_types, false, "Should we skip types? They can add a lot of stuff.");
 

@@ -15,9 +15,7 @@
 #include "Index.h"
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the uses of");
-DEFINE_bool(highlight_user, false, "Should we print the fragment with the user highlighted?");
 DEFINE_uint32(length, 2, "Length of paths to print");
-DEFINE_bool(ignore_types, false, "Should we skip types? They can add a lot of stuff.");
 
 using UseEdge = std::pair<mx::RawEntityId, const char *>;
 
@@ -49,11 +47,27 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = InitExample(false);
 
-  std::map<mx::RawEntityId, std::set<mx::RawEntityId>> user_references;
+  std::map<mx::RawEntityId, std::set<UseEdge>> user_references;
   std::map<mx::RawEntityId, unsigned> work_list;
   std::map<mx::RawEntityId, unsigned> next_work_list;
 
   next_work_list[FLAGS_entity_id] = FLAGS_length;
+
+  auto add_edge = [&] (mx::RawEntityId from_id, mx::RawEntityId to_id,
+                       const char *kind, unsigned path_len) {
+    user_references[from_id].emplace(to_id, kind);
+
+    auto &next_path_len = next_work_list[from_id];
+    next_path_len = std::max(path_len - 1u, next_path_len);
+  };
+
+  auto add_back_edge = [&] (mx::RawEntityId from_id, mx::RawEntityId to_id,
+                            const char *kind, unsigned path_len) {
+    user_references[to_id].emplace(from_id, kind);
+
+    auto &next_path_len = next_work_list[from_id];
+    next_path_len = std::max(path_len - 1u, next_path_len);
+  };
 
   while (!next_work_list.empty()) {
     work_list.clear();
@@ -69,21 +83,34 @@ extern "C" int main(int argc, char *argv[]) {
 
       mx::VariantEntity ent = index.entity(user_id);
       if (std::holds_alternative<mx::Decl>(ent)) {
-        for (mx::Reference ref : std::get<mx::Decl>(ent).references()) {
-          mx::Stmt ref_stmt = ref.statement();
-          user_references[ref_stmt.id()].insert(user_id);
+        mx::Decl decl = std::get<mx::Decl>(ent);
 
-          auto &next_path_len = next_work_list[ref_stmt.id()];
-          next_path_len = std::max(path_len - 1u, next_path_len);
+        for (mx::Reference ref : decl.references()) {
+          add_edge(ref.statement().id(), user_id, "reference", path_len);
+        }
+
+        if (auto parent_decl = decl.parent_declaration()) {
+          add_back_edge(parent_decl->id(), user_id, "parent", path_len);
+        }
+
+        if (auto parent_stmt = decl.parent_statement()) {
+          add_back_edge(parent_stmt->id(), user_id, "parent", path_len);
         }
 
       } else if (std::holds_alternative<mx::Stmt>(ent)) {
-        if (auto dre = mx::DeclRefExpr::from(std::get<mx::Stmt>(ent))) {
-          auto decl = dre->declaration();
-          user_references[decl.id()].insert(user_id);
+        mx::Stmt stmt = std::get<mx::Stmt>(ent);
 
-          auto &next_path_len = next_work_list[decl.id()];
-          next_path_len = std::max(path_len - 1u, next_path_len);
+        if (auto dre = mx::DeclRefExpr::from(stmt)) {
+          add_back_edge(dre->declaration().id(), user_id, "declaration",
+                        path_len);
+        }
+
+        if (auto parent_decl = stmt.parent_declaration()) {
+          add_back_edge(parent_decl->id(), user_id, "parent", path_len);
+        }
+
+        if (auto parent_stmt = stmt.parent_statement()) {
+          add_back_edge(parent_stmt->id(), user_id, "parent", path_len);
         }
       }
     }
@@ -92,6 +119,8 @@ extern "C" int main(int argc, char *argv[]) {
   std::cout
       << "digraph {\n"
       << "  node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
+
+  std::map<mx::RawEntityId, std::vector<const char *>> grouped_uses;
 
   for (auto [user_id, uses] : user_references) {
     auto [kind, color] = KindAndColor(user_id);
@@ -104,8 +133,20 @@ extern "C" int main(int argc, char *argv[]) {
         << color << "\"><TR><TD>" << user_id << "</TD></TR><TR><TD>"
         << kind << "</TD></TR></TABLE>>];\n";
 
-    for (auto used_id : uses) {
-      std::cout << "e" << user_id << " -> e" << used_id << ";\n";
+
+    grouped_uses.clear();
+    for (auto [used_id, use_kind] : uses) {
+      grouped_uses[used_id].push_back(use_kind);
+    }
+
+    for (const auto &[used_id, use_kinds] : grouped_uses) {
+      std::cout << "e" << user_id << " -> e" << used_id << " [label=<";
+      auto sep = "";
+      for (const char *use_kind : use_kinds) {
+        std::cout << sep << use_kind;
+        sep = "<BR />";
+      }
+      std::cout << ">];\n";
     }
   }
 
