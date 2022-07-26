@@ -11193,10 +11193,14 @@ Expr AssumeAlignedAttr::alignment(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-Expr AssumeAlignedAttr::offset(void) const {
+std::optional<Expr> AssumeAlignedAttr::offset(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
-  return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
+  if (!self.getVal13()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal17());
+    return Expr::from(fragment->StmtFor(fragment, id));
+  }
 }
 
 std::string_view AssumeAlignedAttr::spelling(void) const {
@@ -44194,15 +44198,19 @@ std::optional<unsigned> EnumDecl::odr_hash(void) const {
   }
 }
 
-Type EnumDecl::promotion_type(void) const {
+std::optional<Type> EnumDecl::promotion_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal86());
-  return fragment->TypeFor(fragment, id, false).value();
+  if (!self.getVal106()) {
+    return std::nullopt;
+  } else {
+    EntityId id(self.getVal86());
+    return fragment->TypeFor(fragment, id);
+  }
 }
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal106()) {
+  if (!self.getVal107()) {
     return std::nullopt;
   } else {
     EntityId id(self.getVal91());
@@ -44217,37 +44225,37 @@ TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
 
 bool EnumDecl::is_closed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal107();
+  return self.getVal108();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal108();
+  return self.getVal109();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal109();
+  return self.getVal110();
 }
 
 bool EnumDecl::is_complete(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal110();
+  return self.getVal111();
 }
 
 bool EnumDecl::is_fixed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal111();
+  return self.getVal112();
 }
 
 bool EnumDecl::is_scoped(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal112();
+  return self.getVal113();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal113();
+  return self.getVal114();
 }
 
 UnresolvedUsingTypenameDeclContainingDeclRange UnresolvedUsingTypenameDecl::containing(const Decl &decl) {

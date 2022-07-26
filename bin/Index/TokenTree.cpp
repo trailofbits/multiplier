@@ -938,6 +938,15 @@ TokenInfo *TokenTreeImpl::HandleBeginningOfFile(
 
 TokenInfo *TokenTreeImpl::HandleEndOfFile(TokenInfo *prev, TokenInfo *curr,
                                           std::stringstream &) {
+  // TODO(kumarak): The eof marker token is seen with the file token that is
+  //                not paired with the begin file marker token causing the
+  //                check to fail. This is temporary avoidance of error. Discuss
+  //                how to fix it.
+  if (substitutions.size() < 2) {
+    LOG(ERROR) << "EndOfFileMarker token is seen that is not "
+               << "paired. Previous TokenInfo will be set to null!";
+    return nullptr;
+  }
 
   // Would be strange to start with an end-of-file marker, as it means we'd
   // be straddling two files, but taking nothing of value from the first file.

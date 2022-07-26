@@ -1650,7 +1650,15 @@ void SerializeAssumeAlignedAttr(EntityMapper &es, mx::ast::Attr::Builder b, cons
   (void) e;
   SerializeInheritableAttr(es, b, e);
   b.setVal8(es.EntityId(e.Alignment()));
-  b.setVal17(es.EntityId(e.Offset()));
+  auto v17 = e.Offset();
+  if (v17) {
+    auto id17 = es.EntityId(v17.value());
+    b.setVal17(id17);
+    b.setVal13(id17 != mx::kInvalidEntityId);
+  } else {
+    b.setVal17(mx::kInvalidEntityId);
+    b.setVal13(false);
+  }
   auto v9 = e.Spelling();
   std::string s9(v9.data(), v9.size());
   b.setVal9(s9);
@@ -10931,24 +10939,32 @@ void SerializeEnumDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::
   } else {
     b.setVal105(false);
   }
-  b.setVal86(es.EntityId(e.PromotionType()));
+  auto v86 = e.PromotionType();
+  if (v86) {
+    auto id86 = es.EntityId(v86.value());
+    b.setVal86(id86);
+    b.setVal106(id86 != mx::kInvalidEntityId);
+  } else {
+    b.setVal86(mx::kInvalidEntityId);
+    b.setVal106(false);
+  }
   auto v91 = e.TemplateInstantiationPattern();
   if (v91) {
     auto id91 = es.EntityId(v91.value());
     b.setVal91(id91);
-    b.setVal106(id91 != mx::kInvalidEntityId);
+    b.setVal107(id91 != mx::kInvalidEntityId);
   } else {
     b.setVal91(mx::kInvalidEntityId);
-    b.setVal106(false);
+    b.setVal107(false);
   }
   b.setVal85(static_cast<unsigned char>(mx::FromPasta(e.TemplateSpecializationKind())));
-  b.setVal107(e.IsClosed());
-  b.setVal108(e.IsClosedFlag());
-  b.setVal109(e.IsClosedNonFlag());
-  b.setVal110(e.IsComplete());
-  b.setVal111(e.IsFixed());
-  b.setVal112(e.IsScoped());
-  b.setVal113(e.IsScopedUsingClassTag());
+  b.setVal108(e.IsClosed());
+  b.setVal109(e.IsClosedFlag());
+  b.setVal110(e.IsClosedNonFlag());
+  b.setVal111(e.IsComplete());
+  b.setVal112(e.IsFixed());
+  b.setVal113(e.IsScoped());
+  b.setVal114(e.IsScopedUsingClassTag());
 }
 
 void SerializeUnresolvedUsingTypenameDecl(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::UnresolvedUsingTypenameDecl &e) {
