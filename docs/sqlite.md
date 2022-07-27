@@ -9507,7 +9507,7 @@ This table also includes all of the fields contained in [`InheritableAttr`](#Inh
 | Name | Type | `NOT NULL` | References |
 | --- | --- | --- | --- |
 | `alignment` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
-| `offset` | `INTEGER` | :heavy_check_mark: | [`Expr`](#Expr) |
+| `offset` | `INTEGER` | :x: | [`Expr`](#Expr) |
 | `spelling` | `TEXT` | :heavy_check_mark: | |
 
 This table also includes all of the fields contained in [`InheritableAttr`](#InheritableAttr).
@@ -17495,7 +17495,7 @@ This table also includes all of the fields contained in [`ClassTemplateSpecializ
 | `instantiated_from_member_enum` | `INTEGER` | :x: | [`EnumDecl`](#EnumDecl) |
 | `integer_type` | `INTEGER` | :x: | [`Type`](#Type) |
 | `odr_hash` | `INTEGER` | :x: | [`unsigned`](#unsigned) |
-| `promotion_type` | `INTEGER` | :heavy_check_mark: | [`Type`](#Type) |
+| `promotion_type` | `INTEGER` | :x: | [`Type`](#Type) |
 | `template_instantiation_pattern` | `INTEGER` | :x: | [`EnumDecl`](#EnumDecl) |
 | `template_specialization_kind` | `INTEGER` | :heavy_check_mark: | [`TemplateSpecializationKind`](#TemplateSpecializationKind) |
 | `is_closed` | `INTEGER` | :heavy_check_mark: | |
