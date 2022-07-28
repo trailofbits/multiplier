@@ -48,6 +48,8 @@ namespace {
 
 static std::mutex gCompileJobListLock;
 
+static constexpr size_t kCommandsBatchSize = 256;
+
 using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
 
 struct Command {
@@ -359,11 +361,29 @@ static mx::rpc::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
   return static_cast<mx::rpc::IncludePathLocation>(mx::FromPasta(ipl));
 }
 
-kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
+template <typename Iter, typename C>
+static void ForEachInterval(Iter begin, Iter end,
+                            size_t interval_size, C cb) {
+  auto to = begin;
+  while (to != end) {
+    auto from = to;
+    size_t counter = static_cast<size_t>(std::distance(from, end));
+    if (counter > interval_size) {
+      counter = interval_size;
+    }
+    std::advance(to, counter);
+    cb(from, to);
+  }
+}
+
+kj::Promise<void> Importer::Build(capnp::EzRpcClient &client, mx::rpc::Multiplier::Client &builder) {
   mx::Executor exe;
   auto promises = kj::heapArrayBuilder<kj::Promise<void>>(d->commands.size());
 
   for (auto &[cwd, commands] : d->commands) {
+
+    auto promises_array_size = (commands.size() + kCommandsBatchSize - 1u) / kCommandsBatchSize;
+    auto promises_commands = kj::heapArrayBuilder<kj::Promise<void>>(promises_array_size);
 
     // Change the current working directory to match that of the commands.
     // This is a process-wide operation.
@@ -376,95 +396,100 @@ kj::Promise<void> Importer::Build(mx::rpc::Multiplier::Client &client) {
       continue;
     }
 
-    // Now re-build a host file system, and let it observe the changed working
-    // directory.
     auto host_fs = pasta::FileSystem::CreateNative();
     pasta::FileManager fm(host_fs);
-    CompileJobList jobs;
 
-    // Run all commands relevant to just this working directory.
-    for (Command &command : commands) {
-      exe.EmplaceAction<BuildCommandAction>(fm, command, jobs);
-    }
-    exe.Start();
-    exe.Wait();
-
-    if (jobs.empty()) {
-      continue;
-    }
-
-    auto request = client.indexCompileCommandsRequest();
-    auto commands_builder = request.initCommands(
-        static_cast<unsigned>(jobs.size()));
-
-    // If we've got any messages, then send them out. The granularity is likely
-    // to be small because we don't expect many files to operate in the same
-    // working directory, though if they do, then at least we still have the
-    // benefit of the N-way split from the executor.
-    auto i = 0u;
-    for (const auto &[cc_, job_] : jobs) {
-      const pasta::Compiler &cc = cc_;
-      const pasta::CompileJob &job = job_;
-
-      mx::rpc::CompileCommand::Builder cb = commands_builder[i++];
-      cb.setSourcePath(
-          job.SourceFile().Path().lexically_normal().generic_string());
-      cb.setCompilerPath(
-          cc.ExecutablePath().lexically_normal().generic_string());
-      cb.setWorkingDirectory(
-          job.WorkingDirectory().lexically_normal().generic_string());
-      cb.setSystemRootDirectory(
-          job.SystemRootDirectory().lexically_normal().generic_string());
-      cb.setSystemRootIncludeDirectory(
-          job.SystemRootIncludeDirectory().lexically_normal().generic_string());
-      cb.setResourceDirectory(
-          job.ResourceDirectory().lexically_normal().generic_string());
-      cb.setInstallationDirectory(
-          cc.InstallationDirectory().lexically_normal().generic_string());
-
-      auto system_includes = cc.SystemIncludeDirectories();
-      auto user_includes = cc.UserIncludeDirectories();
-      auto frameworks = cc.FrameworkDirectories();
-
-      auto j = 0u;
-      auto paths = cb.initSystemIncludePaths(
-          static_cast<unsigned>(system_includes.size()));
-      for (const auto &ip : system_includes) {
-        mx::rpc::IncludePath::Builder ipb = paths[j++];
-        ipb.setDirectory(ip.Path().lexically_normal().generic_string());
-        ipb.setLocation(FromPasta(ip.Location()));
+    typedef decltype(commands.begin()) iter_t;
+    ForEachInterval(commands.begin(), commands.end(),
+                    kCommandsBatchSize,
+                    [&](iter_t from, iter_t to) {
+      CompileJobList jobs;
+      for (iter_t &it = from; it != to; it++) {
+        exe.EmplaceAction<BuildCommandAction>(fm, *it, jobs);
       }
 
-      j = 0u;
-      paths = cb.initUserIncludePaths(
-          static_cast<unsigned>(user_includes.size()));
-      for (const auto &ip : user_includes) {
-        mx::rpc::IncludePath::Builder ipb = paths[j++];
-        ipb.setDirectory(ip.Path().lexically_normal().generic_string());
-        ipb.setLocation(FromPasta(ip.Location()));
+      exe.Start();
+      exe.Wait();
+      if (jobs.empty()) {
+        return;
       }
 
-      j = 0u;
-      paths = cb.initFrameworkPaths(
-          static_cast<unsigned>(frameworks.size()));
-      for (const auto &ip : frameworks) {
-        mx::rpc::IncludePath::Builder ipb = paths[j++];
-        ipb.setDirectory(ip.Path().lexically_normal().generic_string());
-        ipb.setLocation(FromPasta(ip.Location()));
+      auto request = builder.indexCompileCommandsRequest();
+      auto commands_builder = request.initCommands(
+          static_cast<unsigned>(jobs.size()));
+
+      // If we've got any messages, then send them out. The granularity is likely
+      // to be small because we don't expect many files to operate in the same
+      // working directory, though if they do, then at least we still have the
+      // benefit of the N-way split from the executor.
+      auto i = 0u;
+      for (const auto &[cc_, job_] : jobs) {
+        const pasta::Compiler &cc = cc_;
+        const pasta::CompileJob &job = job_;
+
+        mx::rpc::CompileCommand::Builder cb = commands_builder[i++];
+        cb.setSourcePath(
+            job.SourceFile().Path().lexically_normal().generic_string());
+        cb.setCompilerPath(
+            cc.ExecutablePath().lexically_normal().generic_string());
+        cb.setWorkingDirectory(
+            job.WorkingDirectory().lexically_normal().generic_string());
+        cb.setSystemRootDirectory(
+            job.SystemRootDirectory().lexically_normal().generic_string());
+        cb.setSystemRootIncludeDirectory(
+            job.SystemRootIncludeDirectory().lexically_normal().generic_string());
+        cb.setResourceDirectory(
+            job.ResourceDirectory().lexically_normal().generic_string());
+        cb.setInstallationDirectory(
+            cc.InstallationDirectory().lexically_normal().generic_string());
+
+        auto system_includes = cc.SystemIncludeDirectories();
+        auto user_includes = cc.UserIncludeDirectories();
+        auto frameworks = cc.FrameworkDirectories();
+
+        auto j = 0u;
+        auto paths = cb.initSystemIncludePaths(
+            static_cast<unsigned>(system_includes.size()));
+        for (const auto &ip : system_includes) {
+          mx::rpc::IncludePath::Builder ipb = paths[j++];
+          ipb.setDirectory(ip.Path().lexically_normal().generic_string());
+          ipb.setLocation(FromPasta(ip.Location()));
+        }
+
+        j = 0u;
+        paths = cb.initUserIncludePaths(
+            static_cast<unsigned>(user_includes.size()));
+        for (const auto &ip : user_includes) {
+          mx::rpc::IncludePath::Builder ipb = paths[j++];
+          ipb.setDirectory(ip.Path().lexically_normal().generic_string());
+          ipb.setLocation(FromPasta(ip.Location()));
+        }
+
+        j = 0u;
+        paths = cb.initFrameworkPaths(
+            static_cast<unsigned>(frameworks.size()));
+        for (const auto &ip : frameworks) {
+          mx::rpc::IncludePath::Builder ipb = paths[j++];
+          ipb.setDirectory(ip.Path().lexically_normal().generic_string());
+          ipb.setLocation(FromPasta(ip.Location()));
+        }
+
+        auto &args = job.Arguments();
+        auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));
+        j = 0u;
+        for (auto arg : args) {
+          args_list.set(j++, arg);
+        }
+
+        cb.setLanguage(FromPasta(cc.TargetLanguage()));
+        cb.setCompiler(FromPasta(cc.Name()));
       }
 
-      auto &args = job.Arguments();
-      auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));
-      j = 0u;
-      for (auto arg : args) {
-        args_list.set(j++, arg);
-      }
+      promises_commands.add(request.send().ignoreResult());
+    });
 
-      cb.setLanguage(FromPasta(cc.TargetLanguage()));
-      cb.setCompiler(FromPasta(cc.Name()));
-    }
-
-    promises.add(request.send().ignoreResult());
+    // Add list of promises to the final list before waiting for the scope
+    promises.add(kj::joinPromises(promises_commands.finish()));
   }
 
   return kj::joinPromises(promises.finish());

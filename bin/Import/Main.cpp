@@ -101,7 +101,7 @@ extern "C" int main(int argc, char *argv[]) {
   capnp::EzRpcClient client(FLAGS_host + ':' + FLAGS_port);
   mx::rpc::Multiplier::Client multiplier = client.getMain<mx::rpc::Multiplier>();
 
-  importer.Build(multiplier).wait(client.getWaitScope());
+  importer.Build(client, multiplier).wait(client.getWaitScope());
 
   return EXIT_SUCCESS;
 }
