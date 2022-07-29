@@ -43,6 +43,10 @@ FilePathList Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
+std::vector<RawEntityId> Index::fragments(RawEntityId file_id) const {
+  return impl->ListFragmentsInFile(impl, file_id);
+}
+
 std::optional<File> Index::file(FileId id) const {
   if (auto ptr = impl->FileFor(impl, id.file_id)) {
     return File(std::move(ptr));
