@@ -232,10 +232,11 @@ RawEntityId File::id(void) const noexcept {
   return EntityId(FileId{impl->file_id});
 }
 
-std::vector<RawEntityId> File::fragment_ids() const {
+std::vector<RawEntityId> File::fragment_ids(void) const {
   auto fragment_ids = impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
-  for (auto &fragment_id : fragment_ids)
+  for (auto &fragment_id : fragment_ids) {
     fragment_id = EntityId(FragmentId(fragment_id));
+  }
   return fragment_ids;
 }
 
