@@ -213,9 +213,6 @@ class Index {
   // in the returned list of fetched files will be `start_at`.
   FilePathList file_paths(void) const;
 
-  // Get a list of fragment ids in the specified file
-  std::vector<RawEntityId> fragments(RawEntityId file_id) const;
-
   // Download a file by its unique ID.
   std::optional<File> file(FileId id) const;
   std::optional<File> file(RawEntityId id) const;

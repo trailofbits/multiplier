@@ -232,6 +232,13 @@ RawEntityId File::id(void) const noexcept {
   return EntityId(FileId{impl->file_id});
 }
 
+std::vector<RawEntityId> File::fragment_ids() const {
+  auto fragment_ids = impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
+  for (auto &fragment_id : fragment_ids)
+    fragment_id = EntityId(FragmentId(fragment_id));
+  return fragment_ids;
+}
+
 // Return the file tokens for the file.
 TokenList File::tokens(void) const noexcept {
   auto tokens = impl->TokenReader(impl);

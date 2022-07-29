@@ -200,6 +200,9 @@ class File {
   // Return the entity ID of this file.
   RawEntityId id(void) const noexcept;
 
+  // Return the list of fragment ids in the file
+  std::vector<RawEntityId> fragment_ids() const;
+
   // Return the file tokens for the file.
   TokenList tokens(void) const noexcept;
 
