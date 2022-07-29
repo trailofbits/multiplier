@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <memory>
 
+#include <capnp/ez-rpc.h>
+
 #include <multiplier/RPC.capnp.h>
 
 namespace llvm {
@@ -31,7 +33,7 @@ class Importer {
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
 
-  kj::Promise<void> Build(mx::rpc::Multiplier::Client &builder);
+  kj::Promise<void> Build(capnp::EzRpcClient &client, mx::rpc::Multiplier::Client &builder);
 };
 
 }  // namespace importer

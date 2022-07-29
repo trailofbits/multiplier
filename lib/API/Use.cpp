@@ -389,6 +389,12 @@ UseBase::UseBase(Attr entity, UseSelectorSet selectors_)
       offset(entity.offset_),
       kind(UseKind::ATTRIBUTE) {}
 
+UseBase::UseBase(Designator entity, UseSelectorSet selectors_)
+    : selectors(std::move(selectors_)),
+      fragment(std::move(entity.fragment)),
+      offset(entity.offset_),
+      kind(UseKind::DESIGNATOR) {}
+
 UseBase::UseBase(CXXBaseSpecifier entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
@@ -405,6 +411,65 @@ UseBase::UseBase(TemplateParameterList entity, UseSelectorSet selectors_)
     : fragment(std::move(entity.fragment)),
       offset(entity.offset_),
       kind(UseKind::TEMPLATE_PARAMETER_LIST) {}
+
+VariantUse UseBase::entity(void) const {
+  if (!fragment) {
+    return NotAnEntity{};
+  }
+
+  switch (kind) {
+    case UseKind::DECLARATION:
+      if (offset < fragment->num_decls) {
+        return Decl(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::STATEMENT:
+      if (offset < fragment->num_stmts) {
+        return Stmt(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::TYPE:
+      if (offset < fragment->num_types) {
+        return Type(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::CXX_BASE_SPECIFIER:
+      if (offset < fragment->num_pseudos) {
+        return CXXBaseSpecifier(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::TEMPLATE_ARGUMENT:
+      if (offset < fragment->num_pseudos) {
+        return TemplateArgument(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::TEMPLATE_PARAMETER_LIST:
+      if (offset < fragment->num_pseudos) {
+        return TemplateParameterList(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::DESIGNATOR:
+      if (offset < fragment->num_pseudos) {
+        return Designator(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::ATTRIBUTE:
+      if (offset < fragment->num_attrs) {
+        return Attr(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+  }
+
+  return NotAnEntity{};
+}
 
 std::optional<Decl> UseBase::as_declaration(void) const {
   if (kind == UseKind::DECLARATION && fragment && offset < fragment->num_decls) {
