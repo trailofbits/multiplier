@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <thread>
 #include <set>
+#include <pthread.h>
 
 #include "../Common/Re2.h"
 
@@ -71,7 +72,7 @@ RemoteEntityProvider::RemoteEntityProvider(std::string host, std::string port)
 RemoteEntityProvider::ClientConnection &RemoteEntityProvider::Connection(
     const Ptr &self) {
   auto &id = tClientIndex;
-  std::unique_ptr<ClientConnection> *cc = nullptr;
+  ClientConnection **cc = nullptr;
   {
     std::unique_lock<std::mutex> locker(tls_connections_lock);
     if (!id) {
@@ -85,8 +86,7 @@ RemoteEntityProvider::ClientConnection &RemoteEntityProvider::Connection(
   }
 
   if (!*cc) {
-    *cc = std::make_unique<ClientConnection>(host_port);
-
+    *cc = new ClientConnection(host_port);
     capnp::Request<mx::rpc::Multiplier::HelloParams,
                    mx::rpc::Multiplier::HelloResults> hello_req =
         (*cc)->client.helloRequest();
