@@ -58,13 +58,13 @@ target_compile_definitions("mx-util"
 target_link_libraries("mx-util"
   PUBLIC
     "mx-common"
+    "glog::glog"
     $<BUILD_INTERFACE:concurrentqueue>
-    $<BUILD_INTERFACE:glog::glog>
     $<BUILD_INTERFACE:gflags::gflags>
     $<BUILD_INTERFACE:SQLite::SQLite3>
   PRIVATE
     $<BUILD_INTERFACE:reproc++>
-    $<BUILD_INTERFACE:RocksDB::rocksdb>
+    "RocksDB::rocksdb"
 )
 
 set_target_properties("mx-util"

@@ -44,7 +44,7 @@ class RemoteEntityProvider final : public EntityProvider {
   unsigned version_number;
 
   // Thread-local connections.
-  std::deque<std::unique_ptr<ClientConnection>> tls_connections;
+  std::deque<ClientConnection *> tls_connections;
   std::mutex tls_connections_lock;
 
   // Cap'n Proto doesn't allow connections to be used in separate threads. This
