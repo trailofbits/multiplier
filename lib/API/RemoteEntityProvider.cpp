@@ -14,7 +14,6 @@
 #include <stdexcept>
 #include <thread>
 #include <set>
-#include <pthread.h>
 
 #include "../Common/Re2.h"
 
