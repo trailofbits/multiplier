@@ -3504,6 +3504,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#undef MX_VISIT_ENTITY_LIST\n"
       << "#undef MX_VISIT_OPTIONAL_ENTITY\n"
       << "#undef MX_VISIT_OPTIONAL_ENTITY_LIST\n"
+      << "#undef MX_VISIT_DECL_CONTEXT\n"
       << "#undef MX_VISIT_PSEUDO\n"
       << "#undef MX_VISIT_PSEUDO_LIST\n"
       << "#undef MX_VISIT_OPTIONAL_PSEUDO\n"
