@@ -50,10 +50,18 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
             continue;
             break;
         }
-        /* Determine whether the variable is declared outside the loop. */
+
         mx::Expr sub_expr = unary_op->sub_expression();
         if (auto decl_ref = mx::DeclRefExpr::from(sub_expr)) {
           mx::ValueDecl decl = decl_ref->declaration();
+          /* Determine whether the variable is a 32-bit signed integer. */
+          auto decl_type = decl.type().canonical_type();
+          auto decl_builtin = mx::BuiltinType::from(decl_type);
+          if (!decl_builtin) { continue; }
+          auto decl_type_kind = decl_builtin->builtin_kind();
+          if (decl_type_kind != mx::BuiltinTypeKind::INT) { continue; }
+
+          /* Determine whether the variable is declared outside the loop. */
           if (stmt.contains(decl.token())) {
             continue;
           }
@@ -64,8 +72,8 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
            */
           bool mem_access = false;
           bool used_out_of_loop = false;
-          mx::ArraySubscriptExpr *example_mem_access;
-          mx::Stmt *outside_loop_use;
+          std::vector<mx::ArraySubscriptExpr> mem_accesses;
+          std::vector<mx::Stmt> outside_uses;
 
           for (const mx::Reference ref : decl.references()) {
             mx::Stmt ref_stmt = ref.statement();
@@ -76,14 +84,12 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
                 parent = parent->parent_statement();
               }
               if (auto array_access = mx::ArraySubscriptExpr::from(parent)) {
-                // TODO: Did I just throw in a use-after-free for good luck?
-                example_mem_access = &(*array_access);
+                mem_accesses.push_back(*array_access);
                 mem_access = true;
                 continue;
               }
               if (!stmt.contains(*parent)) {
-                // TODO: Did I just throw in a use-after-free for good luck?
-                outside_loop_use = &(*parent);
+                outside_uses.push_back(*parent);
                 used_out_of_loop = true;
               }
             }
@@ -98,11 +104,11 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
                   << std::endl;
             std::cout
                   << "memory access: "
-                  << example_mem_access->tokens().data()
+                  << mem_accesses.front().tokens().data()
                   << std::endl;
             std::cout
                   << "example use outside loop: "
-                  << outside_loop_use->tokens().data()
+                  << outside_uses.front().tokens().data()
                   << std::endl;
           }
         }
