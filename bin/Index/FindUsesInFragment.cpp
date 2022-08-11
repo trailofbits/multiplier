@@ -8,7 +8,6 @@
 #include <pasta/AST/Forward.h>
 #include <type_traits>
 
-#include "Context.h"
 #include "EntityMapper.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"

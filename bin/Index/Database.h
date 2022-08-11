@@ -16,10 +16,6 @@
 namespace mx {
 enum class DeclCategory : unsigned char;
 }  // namespace mx
-namespace sqlite {
-class Connection;
-class Statement;
-}  // namespace sqlite
 namespace indexer {
 
 class DatabaseImpl;

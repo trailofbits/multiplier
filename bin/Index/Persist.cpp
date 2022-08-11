@@ -548,9 +548,8 @@ void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
 void PersistFragment(IndexingContext &context, pasta::AST &ast,
-                     NameMangler &mangler,
-                     EntityIdMap &entity_ids, FileIdMap &file_ids,
-                     const pasta::TokenRange &tokens,
+                     NameMangler &mangler, EntityIdMap &entity_ids,
+                     FileIdMap &file_ids, const pasta::TokenRange &tokens,
                      PendingFragment frag) {
 
   capnp::MallocMessageBuilder message;

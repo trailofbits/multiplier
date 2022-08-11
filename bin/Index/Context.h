@@ -11,14 +11,17 @@
 #include <cstdint>
 #include <filesystem>
 #include <kj/array.h>
+#include <map>
 #include <memory>
 #include <multiplier/PersistentMap.h>
 #include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <mutex>
+#include <pasta/Util/File.h>
 #include <pasta/Util/FileManager.h>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <iostream>
 #include <set>
 
@@ -89,6 +92,13 @@ enum CounterType : unsigned {
 
 class IndexingContext;
 class CodeGenerator;
+
+struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
+struct FileIdMap final : public std::unordered_map<pasta::File, mx::RawEntityId> {};
+struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {};
+using TypeKey = std::pair<const void *, uint32_t>;
+struct TypeIdMap final : public std::map<TypeKey, mx::EntityId> {};
+struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
 
 template <typename T>
 struct alignas(64) NextId {
