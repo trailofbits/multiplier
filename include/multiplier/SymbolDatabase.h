@@ -49,4 +49,4 @@ class SymbolDatabase {
   void Flush(void);
 };
 
-} // namespace indexer
+} // namespace mx

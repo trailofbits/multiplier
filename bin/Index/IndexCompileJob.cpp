@@ -34,7 +34,23 @@
 #include "Util.h"
 
 namespace indexer {
+
+struct EntityIdMap;
+struct FileIdMap;
+struct TypeIdMap;
+struct PendingFragment;
+struct PseudoOffsetMap;
+
 namespace {
+
+// A declaration, the index of the first token to be saved associated with
+// the decl, and the (inclusive) index of the last token associated with
+// this token.
+using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
+
+// A group of declarations with overlapping `DeclRange`s, along with the
+// minimum and maximum (inclusive) indices of the tokens.
+using DeclGroupRange = std::tuple<std::vector<pasta::Decl>, uint64_t, uint64_t>;
 
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
@@ -52,7 +68,7 @@ class TLDFinder final : public pasta::DeclVisitor {
       : tlds(tlds_) {}
 
   void VisitDeclContext(const pasta::DeclContext &dc) {;
-    for (const auto &decl : dc.AlreadyLoadedDeclarations()) {
+    for (const pasta::Decl &decl : dc.AlreadyLoadedDeclarations()) {
       Accept(decl);
     }
   }
@@ -85,7 +101,8 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitClassTemplateDecl(const pasta::ClassTemplateDecl &decl) final {
     if (seen_specs.emplace(decl.CanonicalDeclaration()).second) {
-      for (auto spec : decl.Specializations()) {
+      for (const pasta::ClassTemplateSpecializationDecl &spec :
+               decl.Specializations()) {
 
         // We should observe the explicit specializations and instantiations
         // separately.
@@ -107,7 +124,7 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitFunctionTemplateDecl(const pasta::FunctionTemplateDecl &decl) final {
     if (seen_specs.emplace(decl.CanonicalDeclaration()).second) {
-      for (auto spec : decl.Specializations()) {
+      for (const pasta::FunctionDecl &spec : decl.Specializations()) {
 
         // We should observe the explicit specializations and instantiations
         // separately.
@@ -124,7 +141,8 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
-    for (auto params : decl.TemplateParameterLists()) {
+    for (const pasta::TemplateParameterList &params :
+             decl.TemplateParameterLists()) {
       if (params.NumParameters() || params.HasUnexpandedParameterPack()) {
         return;
       }
@@ -178,8 +196,10 @@ static bool TokenIsInContextOfDecl(const pasta::Token &tok,
 // declaration's range of tokens?
 static bool CanElideTokenFromTLD(pasta::Token tok) {
   switch (tok.Role()) {
+    case pasta::TokenRole::kInvalid:
     case pasta::TokenRole::kBeginOfFileMarker:
     case pasta::TokenRole::kEndOfFileMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
       return true;
 
     case pasta::TokenRole::kFileToken:
@@ -194,9 +214,12 @@ static bool CanElideTokenFromTLD(pasta::Token tok) {
         default:
           return false;
       }
-    default:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kIntermediateMacroExpansionToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
       return false;
   }
+  return false;
 }
 
 // Do some minor stuff to find begin/ending tokens.
@@ -228,7 +251,9 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
   return {begin_tok_index, end_tok_index};
 }
 
-// Find the range of tokens of this decl.
+// Find the range of tokens of this decl. The range is returned as an inclusive
+// [begin_index, end_index]` pair, and is expanded to cover leading/trailing
+// macro expansions, and contracted to try to elide leading/trailing whitespace.
 static std::pair<uint64_t, uint64_t> FindDeclRange(
     const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok,
     std::string_view main_file_path) {
@@ -242,35 +267,65 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   CHECK_LT(end_tok_index, max_tok_index);
 
   // Now adjust for macros at the beginning and ending. If we find macro
-  // expansion ranges, then the ranges returns
-  tok = range[begin_tok_index];
-  bool in_macro = false;
-  while (tok.Role() == pasta::TokenRole::kMacroExpansionToken) {
-    tok = range[--begin_tok_index];
-    in_macro = true;
-  }
-  if (!in_macro) {
-    // Strip leading whitespace and comments.
-    while (begin_tok_index < end_tok_index &&
-           CanElideTokenFromTLD(range[begin_tok_index])) {
-      ++begin_tok_index;
+  // expansion ranges, then the expand until we find the beginning of the
+  // range.
+  bool done = false;
+  while (!done && begin_tok_index < end_tok_index) {
+    tok = range[begin_tok_index];
+    switch (tok.Role()) {
+      case pasta::TokenRole::kInvalid:
+        assert(false);
+        done = true;
+        break;
+      case pasta::TokenRole::kFileToken:
+        if (CanElideTokenFromTLD(tok)) {
+          ++end_tok_index;
+        } else {
+          done = true;
+        }
+        break;
+      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+        done = true;
+        break;
+      case pasta::TokenRole::kBeginOfFileMarker:
+      case pasta::TokenRole::kEndOfFileMarker:
+      case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        ++begin_tok_index;
+        break;
+      case pasta::TokenRole::kIntermediateMacroExpansionToken:
+      case pasta::TokenRole::kFinalMacroExpansionToken:
+        --begin_tok_index;
+        break;
     }
   }
 
-  // Now adjust for macros at the beginning and ending. If we find macro
-  // expansion ranges, then the ranges returns
-  tok = range[end_tok_index];
-  in_macro = false;
-  while (tok.Role() == pasta::TokenRole::kMacroExpansionToken) {
-    tok = range[++end_tok_index];
-    in_macro = true;
-  }
-
-  if (!in_macro) {
-    // Strip trailing whitespace and comments.
-    while (end_tok_index > begin_tok_index &&
-           CanElideTokenFromTLD(range[end_tok_index])) {
-      --end_tok_index;
+  done = false;
+  while (!done && end_tok_index < max_tok_index) {
+    tok = range[end_tok_index];
+    switch (tok.Role()) {
+      case pasta::TokenRole::kInvalid:
+        assert(false);
+        done = true;
+        break;
+      case pasta::TokenRole::kFileToken:
+        if (CanElideTokenFromTLD(tok)) {
+          --end_tok_index;
+        } else {
+          done = true;
+        }
+        break;
+      case pasta::TokenRole::kEndOfMacroExpansionMarker:
+        done = true;
+        break;
+      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      case pasta::TokenRole::kBeginOfFileMarker:
+      case pasta::TokenRole::kEndOfFileMarker:
+        --end_tok_index;
+        break;
+      case pasta::TokenRole::kIntermediateMacroExpansionToken:
+      case pasta::TokenRole::kFinalMacroExpansionToken:
+        ++begin_tok_index;
+        break;
     }
   }
 
@@ -333,85 +388,15 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
   }
 }
 
-}  // namespace
-
-IndexCompileJobAction::~IndexCompileJobAction(void) {}
-
-IndexCompileJobAction::IndexCompileJobAction(
-    std::shared_ptr<IndexingContext> context_,
-    pasta::FileManager file_manager_,
-    pasta::CompileJob job_)
-    : context(std::move(context_)),
-      file_manager(std::move(file_manager_)),
-      job(std::move(job_)) {}
-
-// Look through all files referenced by the AST get their unique IDs. If this
-// is the first time seeing a file, then tokenize the file.
-void IndexCompileJobAction::MaybePersistFile(
-    mx::WorkerId worker_id, pasta::File file) {
-  if (!file.WasParsed()) {
-    return;
-  }
-
-  auto maybe_data = file.Data();
-  auto file_path = file.Path();
-  if (!maybe_data.Succeeded()) {
-    LOG(ERROR)
-        << "Unable to get data for file '" << file_path.generic_string()
-        << ": " << maybe_data.TakeError().message();
-  }
-
-  auto file_hash = FileHash(maybe_data.TakeValue());
-  auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
-      worker_id, file_path, file_hash);
-  if (is_new_file_id) {
-    PersistFile(worker_id, *context, file_id, file_hash, file);
-  }
-
-  file_ids.emplace(file, file_id);
-  file_hashes.emplace(file, std::move(file_hash));
-}
-
-// Build and index the AST.
-void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
-  std::optional<mx::ProgressBarWork> parsing_progress_tracker(
-      context->ast_progress.get());
-
-  auto main_file_path =
-      job.SourceFile().Path().lexically_normal().generic_string();
-  auto maybe_ast = job.Run();
-  if (!maybe_ast.Succeeded()) {
-    LOG(ERROR)
-        << "Error building AST for command " << job.Arguments().Join()
-        << " on main file " << main_file_path
-        << "; error was: " << maybe_ast.TakeError();
-    return;
-  }
-
-  pasta::AST ast = maybe_ast.TakeValue();
-  parsing_progress_tracker.reset();
-
-  {
-    mx::ProgressBarWork progress_tracker(context->file_progress.get());
-    auto parsed_files = ast.ParsedFiles();
-    for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
-         it != end; ++it) {
-      MaybePersistFile(worker_id, std::move(*it));
-    }
-  }
-
-  std::optional<mx::ProgressBarWork> partitioning_progress_tracker(
-      context->partitioning_progress.get());
-
-  using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
-  using DeclGroupRange = std::tuple<std::vector<pasta::Decl>, uint64_t, uint64_t>;
-
+// Sort the top-level declarations so that syntactically overlapping
+// declarations are in the correct order, and are side-by-side in the output
+// vector.
+static std::vector<DeclRange> SortTLDs(pasta::TokenRange tok_range,
+                                       std::string_view main_file_path,
+                                       std::vector<pasta::Decl> tlds) {
   std::vector<DeclRange> decl_ranges;
   decl_ranges.reserve(8192u);
 
-  // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
-  pasta::TokenRange tok_range = ast.Tokens();
-  std::vector<pasta::Decl> tlds = FindTLDs(ast.TranslationUnit());
   for (pasta::Decl decl : tlds) {
     if (decl.Kind() == pasta::DeclKind::kEmpty) {
       continue;
@@ -479,24 +464,39 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
                      }
                    });
 
-  partitioning_progress_tracker.reset();
+  return decl_ranges;
+}
+
+// Try to accumulate the nearby top-level declarations whose token ranges
+// overlap with `decl` into `decls_for_chunk`. For example, this process
+// will accumulate three `VarDecl`s into `decls_for_chunk` in the following
+// case:
+//
+//      int optind, opterr, optopt;
+//
+// This also happens when multiplier declarations are defined by macros,
+// as well as for template specializations.
+//
+// TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
+static std::vector<DeclGroupRange> PartitionTLDs(
+    mx::ProgressBar *partition_progress_bar, std::string_view main_file_path,
+    const pasta::AST &ast) {
+
+  mx::ProgressBarWork partitioning_progress_tracker(partition_progress_bar);
+
+  std::vector<DeclRange> decl_ranges = SortTLDs(
+      ast.Tokens(), main_file_path, FindTLDs(ast.TranslationUnit()));
 
   std::vector<DeclGroupRange> decl_group_ranges;
+  decl_group_ranges.reserve(decl_ranges.size());
+
   for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
     auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
+    auto any_used = decl.IsUsed();
 
     std::vector<pasta::Decl> decls_for_group;
     decls_for_group.push_back(decl);
 
-    // Try to accumulate the nearby top-level declarations whose token ranges
-    // overlap with `decl` into `decls_for_chunk`. For example, this process
-    // will accumulate three `VarDecl`s into `decls_for_chunk` in the following
-    // case:
-    //
-    //      int optind, opterr, optopt;
-    //
-    // This also happens when multiplier declarations are defined by macros,
-    // as well as for template specializations.
     for (; i < max_i; ++i) {
       if (std::get<1>(decl_ranges[i]) <= end_index) {
         auto next_decl = std::get<0>(decl_ranges[i]);
@@ -509,6 +509,9 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
               << " is repeated in top-level decl list for job on file "
               << " on main job file " << main_file_path;
         } else {
+          if (!any_used) {
+            any_used = next_decl.IsUsed();
+          }
           decls_for_group.push_back(std::move(next_decl));
         }
 
@@ -521,27 +524,42 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
       }
     }
 
-    decl_group_ranges.emplace_back(
-        std::move(decls_for_group), begin_index, end_index);
+    // Only keep groups of used declarations.
+    if (any_used) {
+      decl_group_ranges.emplace_back(
+          std::move(decls_for_group), begin_index, end_index);
+    }
   }
 
-  EntityIdMap entity_ids;
+  return decl_group_ranges;
+}
 
-  // Create code chunks in reverse order that we see them in the AST. The hope
-  // is that this will reduce contention in trying to create fragment IDs for
-  // the redundant declarations that are likely to appear early in ASTs, i.e.
-  // in `#include`d headers.
-  std::optional<mx::ProgressBarWork> identification_progress_tracker(
-      context->identification_progress.get());
+// Create fragments in reverse order that we see them in the AST. The hope
+// is that this will reduce contention in trying to create fragment IDs for
+// the redundant declarations that are likely to appear early in ASTs, i.e.
+// in `#include`d headers.
+static std::vector<PendingFragment> CreatePendingFragments(
+    mx::ProgressBar *identification_progress_bar, mx::WorkerId worker_id,
+    IndexingContext &context, EntityIdMap &entity_ids, FileHashMap &file_hashes,
+    const pasta::TokenRange &tok_range,
+    std::vector<DeclGroupRange> decl_group_ranges) {
+
+  mx::ProgressBarWork identification_progress_tracker(
+      identification_progress_bar);
+
   std::vector<PendingFragment> pending_fragments;
+  pending_fragments.reserve(decl_group_ranges.size());
+
   for (auto it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-    auto [decls_for_group, begin_index, end_index] = std::move(*it);
+    std::vector<pasta::Decl> decls_for_group = std::move(std::get<0u>(*it));
+    uint64_t begin_index = std::get<1u>(*it);
+    uint64_t end_index = std::get<2u>(*it);
 
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
-    auto [code_id, is_new] = context->GetOrCreateFragmentId(
+    auto [code_id, is_new] = context.GetOrCreateFragmentId(
         worker_id,
         CodeHash(file_hashes, decls_for_group, tok_range,
                  begin_index, end_index),
@@ -569,7 +587,92 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
       pending_fragments.emplace_back(std::move(pending_fragment));
     }
   }
-  identification_progress_tracker.reset();
+
+  return pending_fragments;
+}
+
+}  // namespace
+
+IndexCompileJobAction::~IndexCompileJobAction(void) {}
+
+IndexCompileJobAction::IndexCompileJobAction(
+    std::shared_ptr<IndexingContext> context_,
+    pasta::FileManager file_manager_,
+    pasta::CompileJob job_)
+    : context(std::move(context_)),
+      file_manager(std::move(file_manager_)),
+      job(std::move(job_)) {}
+
+// Look through all files referenced by the AST get their unique IDs. If this
+// is the first time seeing a file, then tokenize the file.
+void IndexCompileJobAction::MaybePersistFile(
+    mx::WorkerId worker_id, pasta::File file) {
+  if (!file.WasParsed()) {
+    return;
+  }
+
+  pasta::Result<std::string_view, std::error_code> maybe_data = file.Data();
+  std::filesystem::path file_path = file.Path();
+  if (!maybe_data.Succeeded()) {
+    LOG(ERROR)
+        << "Unable to get data for file '" << file_path.generic_string()
+        << ": " << maybe_data.TakeError().message();
+  }
+
+  std::string file_hash = FileHash(maybe_data.TakeValue());
+  auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
+      worker_id, file_path, file_hash);
+  if (is_new_file_id) {
+    PersistFile(*context, file_id, file_hash, file);
+  }
+
+  file_ids.emplace(file, file_id);
+  file_hashes.emplace(std::move(file), std::move(file_hash));
+}
+
+void IndexCompileJobAction::PersistParsedFiles(const pasta::AST &ast,
+                                               mx::WorkerId worker_id) {
+  mx::ProgressBarWork progress_tracker(context->file_progress.get());
+  auto parsed_files = ast.ParsedFiles();
+  for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
+       it != end; ++it) {
+    const pasta::File &parsed_file = *it;
+    MaybePersistFile(worker_id, parsed_file);
+  }
+}
+
+// Build and index the AST.
+void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
+  std::optional<mx::ProgressBarWork> parsing_progress_tracker(
+      context->ast_progress.get());
+  IndexingCounterRes cj_counter(context->stat, kStatCompileJob);
+
+  std::string main_file_path =
+      job.SourceFile().Path().lexically_normal().generic_string();
+  pasta::Result<pasta::AST, std::string> maybe_ast = job.Run();
+  if (!maybe_ast.Succeeded()) {
+    LOG(ERROR)
+        << "Error building AST for command " << job.Arguments().Join()
+        << " on main file " << main_file_path
+        << "; error was: " << maybe_ast.TakeError();
+    return;
+  }
+
+  IndexingCounterRes ast_counter(context->stat, kStatAST);
+  pasta::AST ast = maybe_ast.TakeValue();
+  parsing_progress_tracker.reset();
+  PersistParsedFiles(ast, worker_id);
+
+  std::vector<DeclGroupRange> decl_group_ranges = PartitionTLDs(
+      context->partitioning_progress.get(), main_file_path, ast);
+
+  pasta::TokenRange tok_range = ast.Tokens();
+
+  EntityIdMap entity_ids;
+
+  std::vector<PendingFragment> pending_fragments = CreatePendingFragments(
+      context->identification_progress.get(), worker_id, *context,
+      entity_ids, file_hashes, tok_range, std::move(decl_group_ranges));
 
   // Serialize the new code chunks.
   mx::ProgressBarWork fragment_progress_tracker(

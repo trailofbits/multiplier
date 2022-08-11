@@ -136,8 +136,13 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
     // Mix in generic token/structure/context information.
     switch (token.Role()) {
+      case pasta::TokenRole::kIntermediateMacroExpansionToken:
+        fs.AddInteger(static_cast<uint16_t>(token.Kind()));
+        fs.AddString(llvm::StringRef(token.Data()));
+        break;
+
       case pasta::TokenRole::kFileToken:
-      case pasta::TokenRole::kMacroExpansionToken:
+      case pasta::TokenRole::kFinalMacroExpansionToken:
         for (auto context = token.Context(); context;
              context = context->Parent()) {
           switch (context->Kind()) {

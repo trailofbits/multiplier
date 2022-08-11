@@ -546,11 +546,10 @@ void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntity
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(mx::WorkerId worker_id, IndexingContext &context, pasta::AST &ast,
-                     NameMangler &mangler,
+void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
+                     pasta::AST &ast, NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
-                     const pasta::TokenRange &tokens,
-                     PendingFragment frag) {
+                     const pasta::TokenRange &tokens, PendingFragment frag) {
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
