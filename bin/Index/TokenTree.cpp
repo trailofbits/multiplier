@@ -393,12 +393,18 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
 
     switch (tok.Role()) {
       case pasta::TokenRole::kInvalid:
-      case pasta::TokenRole::kPrintedToken:
         LOG(FATAL)
             << "Invalid or unexpected tokens in range";
         break;
 
-      case pasta::TokenRole::kMacroExpansionToken: {
+      case pasta::TokenRole::kIntermediateMacroExpansionToken: {
+//        auto &info = tokens_alloc.emplace_back();
+//        info.parsed_tok = std::move(tok);
+//        info.category = TokenInfo::kMacroExpansionToken;
+        continue;
+      }
+
+      case pasta::TokenRole::kFinalMacroExpansionToken: {
         auto &info = tokens_alloc.emplace_back();
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMacroExpansionToken;
@@ -406,15 +412,15 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
-        auto num_added = 0u;
-        for (pasta::FileToken ft : tok.MacroUseTokens()) {
-          auto &sub_info = tokens_alloc.emplace_back();
-          sub_info.file_tok = std::move(ft);
-          sub_info.category = TokenInfo::kMacroUseToken;
-          ++num_added;
-        }
+//        auto num_added = 0u;
+//        for (pasta::FileToken ft : tok.MacroUseTokens()) {
+//          auto &sub_info = tokens_alloc.emplace_back();
+//          sub_info.file_tok = std::move(ft);
+//          sub_info.category = TokenInfo::kMacroUseToken;
+//          ++num_added;
+//        }
         ++macro_depth;
-        CHECK_LT(0u, num_added);
+//        CHECK_LT(0u, num_added);
         auto &info = tokens_alloc.emplace_back();
         info.file_tok = tok.FileLocation();
         info.parsed_tok = std::move(tok);
@@ -1025,9 +1031,9 @@ TokenInfo *TokenTreeImpl::HandleMarkerToken(TokenInfo *prev, TokenInfo *curr,
   CHECK(curr->parsed_tok.has_value());
   switch (auto role = curr->parsed_tok->Role()) {
     case pasta::TokenRole::kInvalid:
-    case pasta::TokenRole::kPrintedToken:
     case pasta::TokenRole::kFileToken:
-    case pasta::TokenRole::kMacroExpansionToken:
+    case pasta::TokenRole::kIntermediateMacroExpansionToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
       DCHECK(false);
       err << "Unexpected token role " << int(role)
           << " when handling marker token";
