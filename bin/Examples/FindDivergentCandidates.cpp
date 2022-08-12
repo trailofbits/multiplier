@@ -12,20 +12,18 @@
 
 DEFINE_uint64(file_id, 0, "ID of the file from which to check for potential candidates of divergent representations");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to check for potential candidates of divergent representations");
-DEFINE_bool(show_locations, false, "Show the locations of candidates?");
 
+/* Find candidate divergent representations within a fragment.
+ * Looks variables that are:
+ * - Declared outside of a loop
+ * - Incremented inside of a loop
+ * - Used to access memory by indexing into an array
+ * - Used elsewhere outside of the loop
+ * 
+ * Variables that meet these conditions may be optimized by the compiler into 
+ * divergent representations.
+ */
 static void FindDivergentCandidates(const mx::Fragment fragment) {
-  /* 
-    Get all statements in a fragment, iterate through them.
-    For reach statement,
-    - Determine if statement is a loop. If not, continue.
-    - Determine whether a variable is incremented in fragment. If not, continue.
-    - For each incremented variable, 
-      + Determine if it is defined/declared outside of the loop statement. If 
-        not, continue.
-      + Determine if it is used to index into an array.
-      + Determine if it is used elsewhere outside of the loop.
-  */
   for (mx::Stmt stmt : mx::Stmt::in(fragment)) {
     /* Determine whether a statement is a loop. */
     mx::StmtKind kind = stmt.kind();
