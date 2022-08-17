@@ -53,13 +53,12 @@ static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
 static void FindFileRange(TokenTree tt, const pasta::File &file,
                           pasta::FileToken *min, pasta::FileToken *max,
                           unsigned &num_subs) {
-  if (tt.File() != file) {
-    return;
-  }
 
   for (auto node : tt) {
     if (auto ft = node.FileToken()) {
-      DCHECK(pasta::File::Containing(*ft) == file);
+      if (pasta::File::Containing(*ft) != file) {
+        continue;
+      }
       if (ft->Index() < min->Index()) {
         *min = *ft;
       }
@@ -525,6 +524,19 @@ void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntity
   context.PutSerializedFile(worker_id, file_id, CompressedMessage("file", message));
 }
 
+// Return the file containing this fragment.
+static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
+                                               const PendingFragment &frag) {
+  for (auto i = frag.begin_index; i <= frag.end_index; ++i) {
+    auto file_tok = tokens[i].FileLocation();
+    if (file_tok) {
+      return pasta::File::Containing(file_tok.value());
+    }
+  }
+
+  return std::nullopt;
+}
+
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
 // deduplication and indexing. It roughly corresponds to a sequence of one-or-
 // more syntactically overlapping "top-level declarations." For us, a top-level
@@ -551,6 +563,22 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens, PendingFragment frag) {
 
+  const mx::RawEntityId fragment_id = frag.fragment_id;
+  const pasta::Decl &leader_decl = frag.decls[0];
+  const uint64_t begin_index = frag.begin_index;
+  const uint64_t end_index = frag.end_index;
+
+  auto maybe_file = FragmentFile(tokens, frag);
+  if (!maybe_file) {
+    auto main_file_path = ast.MainFile().Path().generic_string();
+    LOG(ERROR)
+        << "Unable to locate file containing "
+        << DeclToString(leader_decl)
+        << PrefixedLocation(leader_decl, " at or near ")
+        << " on main job file " << main_file_path;
+    return;
+  }
+
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
@@ -566,17 +594,12 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // Serialize all discovered entities.
   frag.Serialize(em, fb);
 
-  const mx::RawEntityId fragment_id = frag.fragment_id;
-  const pasta::Decl &leader_decl = frag.decls[0];
-  const uint64_t begin_index = frag.begin_index;
-  const uint64_t end_index = frag.end_index;
-
   // Derive the macro substitution tree.
   mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
       tokens, frag.begin_index, frag.end_index);
   if (!maybe_tt.Succeeded()) {
     auto main_file_path = ast.MainFile().Path().generic_string();
-    LOG_IF(ERROR, false)
+    LOG(ERROR)
         << maybe_tt.TakeError() << " for top-level declaration "
         << DeclToString(leader_decl)
         << PrefixedLocation(leader_decl, " at or near ")
@@ -592,7 +615,7 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   //
   // TODO(pag): Handle sub-ranges for x-macros? Probably should have something
   //            more robust that handles discontinuous ranges, just in case.
-  pasta::File file = token_tree.File();
+  pasta::File file = std::move(maybe_file.value());
   pasta::FileTokenRange file_tokens = file.Tokens();
   pasta::FileToken min_token = file_tokens[file_tokens.Size() - 1u];
   pasta::FileToken max_token = file_tokens[0];
