@@ -39,7 +39,8 @@ class NameMangler;
 // that expands into two separate top-level declarations. We don't want to
 // break this macro expansion into two, as in the original source file it
 // represents a single logical thing.
-struct PendingFragment {
+class PendingFragment {
+ public:
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::RawEntityId fragment_id;
