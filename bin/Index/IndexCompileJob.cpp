@@ -38,7 +38,7 @@ namespace indexer {
 struct EntityIdMap;
 struct FileIdMap;
 struct TypeIdMap;
-struct PendingFragment;
+class PendingFragment;
 struct PseudoOffsetMap;
 
 namespace {
@@ -194,7 +194,7 @@ static bool TokenIsInContextOfDecl(const pasta::Token &tok,
 
 // Can we elide this token from the beginning or end of a top-level
 // declaration's range of tokens?
-static bool CanElideTokenFromTLD(pasta::Token tok) {
+static bool CanElideTokenFromTLD(const pasta::Token &tok) {
   switch (tok.Role()) {
     case pasta::TokenRole::kInvalid:
     case pasta::TokenRole::kBeginOfFileMarker:
@@ -270,7 +270,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   // expansion ranges, then the expand until we find the beginning of the
   // range.
   bool done = false;
-  while (!done && begin_tok_index < end_tok_index) {
+  while (!done && 0u < begin_tok_index && begin_tok_index < end_tok_index) {
     tok = range[begin_tok_index];
     switch (tok.Role()) {
       case pasta::TokenRole::kInvalid:
@@ -279,7 +279,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         break;
       case pasta::TokenRole::kFileToken:
         if (CanElideTokenFromTLD(tok)) {
-          ++end_tok_index;
+          ++begin_tok_index;
         } else {
           done = true;
         }
@@ -300,12 +300,12 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   }
 
   done = false;
-  while (!done && end_tok_index < max_tok_index) {
+  while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
     tok = range[end_tok_index];
     switch (tok.Role()) {
       case pasta::TokenRole::kInvalid:
         assert(false);
-        done = true;
+        --end_tok_index;
         break;
       case pasta::TokenRole::kFileToken:
         if (CanElideTokenFromTLD(tok)) {
@@ -324,7 +324,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         break;
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-        ++begin_tok_index;
+        ++end_tok_index;
         break;
     }
   }
@@ -467,6 +467,14 @@ static std::vector<DeclRange> SortTLDs(pasta::TokenRange tok_range,
   return decl_ranges;
 }
 
+// TODO(pag,kumarak): Add support for detecting that some of the containing
+//                    statements have errors.
+//
+//                    Need to use `Stmt::ContainsErrors`.
+static bool StatementsHaveErrors(const pasta::Decl &) {
+  return false;
+}
+
 // Try to accumulate the nearby top-level declarations whose token ranges
 // overlap with `decl` into `decls_for_chunk`. For example, this process
 // will accumulate three `VarDecl`s into `decls_for_chunk` in the following
@@ -491,8 +499,11 @@ static std::vector<DeclGroupRange> PartitionTLDs(
   decl_group_ranges.reserve(decl_ranges.size());
 
   for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
-    auto [decl, begin_index, end_index] = std::move(decl_ranges[i++]);
-    auto any_used = decl.IsUsed();
+    DeclRange range = std::move(decl_ranges[i++]);
+    pasta::Decl decl = std::move(std::get<0u>(range));
+    uint64_t begin_index = std::get<1u>(range);
+    uint64_t end_index = std::get<2u>(range);
+    size_t num_errors = StatementsHaveErrors(decl);
 
     std::vector<pasta::Decl> decls_for_group;
     decls_for_group.push_back(decl);
@@ -509,9 +520,7 @@ static std::vector<DeclGroupRange> PartitionTLDs(
               << " is repeated in top-level decl list for job on file "
               << " on main job file " << main_file_path;
         } else {
-          if (!any_used) {
-            any_used = next_decl.IsUsed();
-          }
+          num_errors += StatementsHaveErrors(next_decl);
           decls_for_group.push_back(std::move(next_decl));
         }
 
@@ -524,11 +533,10 @@ static std::vector<DeclGroupRange> PartitionTLDs(
       }
     }
 
-    // Only keep groups of used declarations.
-    if (any_used) {
-      decl_group_ranges.emplace_back(
-          std::move(decls_for_group), begin_index, end_index);
-    }
+    CHECK_EQ(num_errors, 0u);
+
+    decl_group_ranges.emplace_back(
+        std::move(decls_for_group), begin_index, end_index);
   }
 
   return decl_group_ranges;
@@ -550,12 +558,14 @@ static std::vector<PendingFragment> CreatePendingFragments(
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
-  for (auto it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
+  for (std::vector<DeclGroupRange>::reverse_iterator
+		  it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-    std::vector<pasta::Decl> decls_for_group = std::move(std::get<0u>(*it));
-    uint64_t begin_index = std::get<1u>(*it);
-    uint64_t end_index = std::get<2u>(*it);
+	DeclGroupRange &group = *it;
+    std::vector<pasta::Decl> decls_for_group = std::move(std::get<0u>(group));
+    uint64_t begin_index = std::get<1u>(group);
+    uint64_t end_index = std::get<2u>(group);
 
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
