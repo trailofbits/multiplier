@@ -288,11 +288,11 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
         done = true;
         break;
-      case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
         ++begin_tok_index;
         break;
+      case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
         --begin_tok_index;
@@ -320,11 +320,11 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
       case pasta::TokenRole::kBeginOfFileMarker:
-      case pasta::TokenRole::kEndOfFileMarker:
         --end_tok_index;
         break;
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
+      case pasta::TokenRole::kEndOfFileMarker:
         ++end_tok_index;
         break;
     }

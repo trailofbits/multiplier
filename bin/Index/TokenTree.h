@@ -88,9 +88,6 @@ class TokenTree {
  public:
   ~TokenTree(void);
 
-  // Return the file associated with the tokens of this substitution.
-  ::pasta::File File(void) const;
-
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static mx::Result<TokenTree, std::string>
