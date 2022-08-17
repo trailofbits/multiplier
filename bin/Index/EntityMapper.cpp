@@ -214,4 +214,14 @@ uint32_t EntityMapper::PseudoId(const pasta::Designator &pseudo) const {
   }
 }
 
+mx::RawEntityId EntityMapper::EntityIdOfType(const void *type, uint32_t quals) const {
+  TypeKey type_key(type, quals);
+  assert(type_key.first != nullptr);
+  if (auto it = type_ids.find(type_key); it != type_ids.end()) {
+    return it->second.Pack();
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
 }  // namespace indexer

@@ -94,9 +94,27 @@ if(MX_ENABLE_VAST)
     PRIVATE
       ${MX_BEGIN_FORCE_LOAD_GROUP}
       vast::vast
-      MLIRDLTI
-      MLIRStandard
-      MLIRLLVMIR
+      vast::MLIRMeta
+      MLIRDialect
+      MLIRMLProgramDialect
+      MLIROpenMPDialect
+      MLIRTosaDialect
+
+      MLIRBufferizationTransformOps
+      MLIRSparseTensorTransforms
+      MLIROpenACCDialect
+      MLIRLLVMIRTransforms
+      MLIRROCDLDialect
+      MLIRAsyncDialect
+      MLIRSCFTransformOps
+      MLIREmitCDialect
+      MLIRNVGPUDialect
+      MLIRShapeDialect
+      MLIRAMDGPUDialect
+      MLIRShapeOpsTransforms
+      MLIRLinalgTransformOps
+      MLIRSPIRVDialect
+      MLIRTensorInferTypeOpInterfaceImpl
       ${MX_END_FORCE_LOAD_GROUP}
   )
 endif()

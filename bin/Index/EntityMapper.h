@@ -60,6 +60,8 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::Attr &entity) const;
   mx::RawEntityId EntityId(const pasta::Macro &entity) const;
 
+  mx::RawEntityId EntityIdOfType(const void *type, uint32_t quals=0u) const;
+
   uint32_t PseudoId(const pasta::TemplateArgument &pseudo) const;
   uint32_t PseudoId(const pasta::TemplateParameterList &pseudo) const;
   uint32_t PseudoId(const pasta::CXXBaseSpecifier &pseudo) const;

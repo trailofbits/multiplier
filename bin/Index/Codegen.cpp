@@ -18,6 +18,7 @@ VAST_RELAX_WARNINGS
 #include <mlir/IR/Dialect.h>
 #include <mlir/IR/MLIRContext.h>
 #include <mlir/InitAllDialects.h>
+#include <mlir/IR/OperationSupport.h>
 VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
@@ -25,17 +26,49 @@ VAST_UNRELAX_WARNINGS
 #include <map>
 
 #include <vast/Util/Common.hpp>
-#include <vast/Translation/Context.hpp>
-#include <vast/Translation/HighLevelVisitor.hpp>
+#include <vast/Translation/CodeGenContext.hpp>
+#include <vast/Translation/CodeGenVisitor.hpp>
+#include "CodegenVisitor.hpp"
 
 #include <vast/Dialect/Dialects.hpp>
 #include <vast/Translation/CodeGen.hpp>
+
+#include "CodegenMetaGenerator.h"
+
 #endif  // MX_ENABLE_SOURCEIR
 
 #include "Context.h"
 #include "EntityMapper.h"
 
 namespace indexer {
+
+#ifdef MX_ENABLE_SOURCEIR
+class CodeGeneratorVisitor {
+ public:
+
+  template<typename Derived>
+  using VisitorConfig =  vast::hl::CodeGenFallBackVisitorMixin<
+      Derived, vast::hl::DefaultCodeGenVisitorMixin, FallBackVisitor >;
+
+  using Visitor = vast::hl::CodeGenVisitor<VisitorConfig, MetaGenerator>;
+
+  CodeGeneratorVisitor(const pasta::AST &ast, mlir::MLIRContext *mctx, const EntityMapper &em)
+    : meta(ast, mctx, em), codegen(mctx, meta) {}
+
+  void append_to_module(clang::Decl *decl) {
+    codegen.append_to_module(decl);
+  }
+
+  vast::OwningModuleRef freeze() {
+    return codegen.freeze();
+  }
+
+  MetaGenerator meta;
+  vast::hl::CodeGenBase<Visitor> codegen;
+};
+
+#endif
+
 
 class CodeGeneratorImpl {
  public:
@@ -46,8 +79,7 @@ class CodeGeneratorImpl {
 
   CodeGeneratorImpl(void) {
     registry.insert<vast::hl::HighLevelDialect,
-                    mlir::StandardOpsDialect,
-                    mlir::DLTIDialect>();
+                    vast::meta::MetaDialect>();
   }
 #endif  // MX_ENABLE_SOURCEIR
 };
@@ -62,6 +94,7 @@ void CodeGenerator::Disable(void) {
 CodeGenerator::~CodeGenerator(void) {}
 
 std::string CodeGenerator::GenerateSourceIRFromTLDs(
+    const pasta::AST &ast,
     mx::RawEntityId fragment_id,
     const EntityMapper &em,
     const std::vector<pasta::Decl> &decls,
@@ -73,55 +106,34 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   (void) num_decls;
 
   std::string ret;
-
 #ifdef MX_ENABLE_SOURCEIR
   if (impl->disabled || decls.empty()) {
     return ret;
   }
 
+  //clang::Decl *first_decl = const_cast<clang::Decl *>(decls[0].RawDecl());
+  //clang::ASTContext &ast_context = first_decl->getASTContext();
+
+  auto flags = mlir::OpPrintingFlags();
+  flags.enableDebugInfo(true);
+
   mlir::MLIRContext context(impl->registry);
-  mlir::Builder builder(&context);
-
-  context.loadDialect<vast::hl::HighLevelDialect>();
-  context.loadDialect<mlir::StandardOpsDialect>();
-  context.loadDialect<mlir::DLTIDialect>();
-
-  clang::Decl *first_decl = const_cast<clang::Decl *>(decls[0].RawDecl());
-  clang::ASTContext &ast_context = first_decl->getASTContext();
-
-  mx::FragmentId id(fragment_id);
-  auto loc = mlir::OpaqueLoc::get(
-      reinterpret_cast<void *>(mx::EntityId(id).Pack()), &context);
-  vast::OwningModuleRef mod = {mlir::ModuleOp::create(loc)};
-  vast::hl::TranslationContext tctx(context, ast_context, mod);
-
-  llvm::ScopedHashTableScope type_def_scope(tctx.type_defs);
-  llvm::ScopedHashTableScope type_dec_scope(tctx.type_decls);
-  llvm::ScopedHashTableScope enum_dec_scope(tctx.enum_decls);
-  llvm::ScopedHashTableScope enum_constant_scope(tctx.enum_constants);
-  llvm::ScopedHashTableScope func_scope(tctx.functions);
-  llvm::ScopedHashTableScope glob_scope(tctx.vars);
+  CodeGeneratorVisitor codegen(ast, &context, em);
 
   try {
-    vast::hl::CodeGenVisitor visitor(tctx);
-    for (auto i = 0u; i < num_decls; ++i) {
-      const pasta::Decl &decl = decls[i];
-      vast::ValueOrStmt hl_decl =
-          visitor.Visit(const_cast<clang::Decl *>(decl.RawDecl()));
-      if (std::holds_alternative<vast::Value>(hl_decl)) {
-        vast::Value val = std::get<vast::Value>(hl_decl);
-        if (mx::RawEntityId id = em.EntityId(decl)) {
-          val.setLoc(mlir::OpaqueLoc::get(reinterpret_cast<void *>(id), &context));
-        }
-      }
+    for (const pasta::Decl &decl : decls) {
+      codegen.append_to_module(const_cast<clang::Decl *>(decl.RawDecl()));
     }
   } catch (std::exception &e) {
     LOG(ERROR) << e.what();
     return ret;
   }
 
+  auto mod = codegen.freeze();
+  // NOTE: Remove it before final PR
   llvm::raw_string_ostream os(ret);
-  mod->print(os);
+  mod->print(os, flags);
+  std::cerr << os.str();
 #endif
 
   return ret;
