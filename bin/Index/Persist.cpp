@@ -517,10 +517,10 @@ void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
   i = 0u;
   auto ublb = fb.initEolOffsets(static_cast<unsigned>(
       eol_offset_to_line_num.size()));
-  for (auto [eol_offset, line_num] : eol_offset_to_line_num) {
+  for (auto eol_offset_line_num : eol_offset_to_line_num) {
     mx::rpc::UpperBound::Builder ubb = ublb[i++];
-    ubb.setOffset(eol_offset);
-    ubb.setVal(line_num);
+    ubb.setOffset(eol_offset_line_num.first);
+    ubb.setVal(eol_offset_line_num.second);
   }
 
   context.PutSerializedFile(file_id, CompressedMessage("file", message));
@@ -577,7 +577,7 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast,
       tokens, frag.begin_index, frag.end_index);
   if (!maybe_tt.Succeeded()) {
     auto main_file_path = ast.MainFile().Path().generic_string();
-    LOG(ERROR)
+    LOG_IF(ERROR, false)
         << maybe_tt.TakeError() << " for top-level declaration "
         << DeclToString(leader_decl)
         << PrefixedLocation(leader_decl, " at or near ")
