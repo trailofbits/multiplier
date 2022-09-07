@@ -321,8 +321,10 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
       case pasta::TokenRole::kFinalMacroExpansionToken: {
         DCHECK_LT(0, macro_depth);
-        DCHECK(!tok.FileLocation());
         auto &info = tokens_alloc.emplace_back();
+        if (auto file_tok = tok.FileLocation()) {
+          info.file_tok = std::move(file_tok);
+        }
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMacroExpansionToken;
         break;
