@@ -39,9 +39,7 @@
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
 
-DECLARE_string(system_compiler);
-DECLARE_string(sysroot_dir);
-DECLARE_string(resource_dir);
+#include "Util.h"
 
 namespace importer {
 namespace {
@@ -171,6 +169,9 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
                               command.name, command.lang, cc_version_sysroot,
                               cc_version_no_sysroot);
 
+  // Fall back to using the host compiler from which Multiplier was built. This
+  // isn't ideal, as this might not be meaningful in an environment onto which
+  // Multiplier was installed, such as via a disk image.
   if (!maybe_cc.Succeeded()) {
     auto error = maybe_cc.TakeError();
     maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
@@ -380,6 +381,27 @@ kj::Promise<void> Importer::Build(capnp::EzRpcClient &client, mx::rpc::Multiplie
   mx::Executor exe;
   auto promises = kj::heapArrayBuilder<kj::Promise<void>>(d->commands.size());
 
+  // Try to locate `include/multiplier/Builtins.h`, which we use to help us
+  // provide actual source for possibly missing builtin declarations.
+  //
+  //    <prefix>/bin/mx-gui
+  //      -> <prefix>/include/multiplier/Builtins.h
+  //
+  //    .../Contents/MacOS/Multiplier
+  //      -> .../Contents/include/multiplier/Builtins.h
+  std::optional<std::filesystem::path> maybe_builtin_path;
+  if (auto maybe_exe_path = ExecutablePath();
+      maybe_exe_path && maybe_exe_path->has_parent_path()) {
+    if (auto bin_path = maybe_exe_path->parent_path(); bin_path.has_parent_path()) {
+      auto prefix_path = bin_path.parent_path();
+      auto builtin_path = prefix_path / "include" / "multiplier" / "Builtins.h";
+      std::error_code ec;
+      if (std::filesystem::exists(builtin_path, ec) && !ec) {
+        maybe_builtin_path.emplace(std::move(builtin_path));
+      }
+    }
+  }
+
   for (auto &[cwd, commands] : d->commands) {
 
     auto promises_array_size = (commands.size() + kCommandsBatchSize - 1u) / kCommandsBatchSize;
@@ -475,10 +497,21 @@ kj::Promise<void> Importer::Build(capnp::EzRpcClient &client, mx::rpc::Multiplie
         }
 
         auto &args = job.Arguments();
-        auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));
+        auto num_args = static_cast<unsigned>(args.Size());
+        if (maybe_builtin_path) {
+          num_args += 2u;
+        }
+
+        auto args_list = cb.initArguments(num_args);
         j = 0u;
         for (auto arg : args) {
           args_list.set(j++, arg);
+        }
+
+        // Add in the builtins include path.
+        if (maybe_builtin_path) {
+          args_list.set(j++, "-include");
+          args_list.set(j++, maybe_builtin_path->generic_string().c_str());
         }
 
         cb.setLanguage(FromPasta(cc.TargetLanguage()));

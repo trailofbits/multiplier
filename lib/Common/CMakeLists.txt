@@ -56,6 +56,8 @@ add_custom_target("copy_headers"
 )
 
 set(common_headers
+  "${source_include_dir}/Builtins.h"
+  "${source_include_dir}/X86Builtins.inc"
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Types.h"

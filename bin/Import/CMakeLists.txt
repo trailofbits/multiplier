@@ -19,6 +19,9 @@ add_executable("${exe_name}"
   "Importer.cpp"
   
   "Main.cpp"
+  
+  "Util.h"
+  "Util.cpp"
 )
 
 set_target_properties("${exe_name}"
