@@ -44,7 +44,6 @@ set(generated_files
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
   "${MX_BOOTSTRAP_LIB_UTIL_PASTA_CPP}"
   "${MX_BOOTSTRAP_INCLUDE_PASTA_H}"
-  "${MX_BOOTSTRAP_SQLITE_DOCS_MD}"
 )
 
 # Run `mx-bootstrap` to auto-generate the files.
