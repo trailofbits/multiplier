@@ -133,11 +133,9 @@ VariantEntity Index::entity(EntityId eid) const {
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
       if (id.offset < frag_ptr->num_decls) {
         Decl decl(std::move(frag_ptr), id.offset);
-        if (decl.id() == eid) {
-          return decl;
-        } else {
-          assert(false);
-        }
+
+        assert(decl.id() == eid);
+        return decl;
       }
     }
 
@@ -148,11 +146,9 @@ VariantEntity Index::entity(EntityId eid) const {
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
       if (id.offset < frag_ptr->num_stmts) {
         Stmt stmt(std::move(frag_ptr), id.offset);
-        if (stmt.id() == eid) {
-          return stmt;
-        } else {
-          assert(false);
-        }
+
+        assert (stmt.id() == eid);
+        return stmt;
       }
     }
 
@@ -163,11 +159,9 @@ VariantEntity Index::entity(EntityId eid) const {
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
       if (id.offset < frag_ptr->num_types) {
         Type type(std::move(frag_ptr), id.offset);
-        if (type.id() == eid) {
-          return type;
-        } else {
-          assert(false);
-        }
+
+        assert (type.id() == eid);
+        return type;
       }
     }
 
@@ -178,11 +172,9 @@ VariantEntity Index::entity(EntityId eid) const {
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
       if (id.offset < frag_ptr->num_attrs) {
         Attr attr(std::move(frag_ptr), id.offset);
-        if (attr.id() == eid) {
-          return attr;
-        } else {
-          assert(false);
-        }
+
+        assert (attr.id() == eid);
+        return attr;
       }
     }
 
@@ -194,11 +186,9 @@ VariantEntity Index::entity(EntityId eid) const {
       auto tok_reader = frag_ptr->TokenReader(frag_ptr);
       if (id.offset < tok_reader->NumTokens()) {
         Token tok(std::move(tok_reader), id.offset);
-        if (tok.id() == eid) {
-          return tok;
-        } else {
-          assert(false);
-        }
+
+        assert (tok.id() == eid);
+        return tok;
       }
     }
 
@@ -219,11 +209,9 @@ VariantEntity Index::entity(EntityId eid) const {
       auto tok_reader = file_ptr->TokenReader(file_ptr);
       if (id.offset < tok_reader->NumTokens()) {
         Token tok(std::move(tok_reader), id.offset);
-        if (tok.id() == eid) {
-          return tok;
-        } else {
-          assert(false);
-        }
+
+        assert (tok.id() == eid);
+        return tok;
       }
     }
   
