@@ -174,7 +174,6 @@ class Fragment {
   static Fragment containing(const Stmt &);
   static Fragment containing(const Type &);
   static Fragment containing(const Attr &);
-  static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const TokenSubstitution &);
   static Fragment containing(const UseBase &);
