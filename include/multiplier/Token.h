@@ -291,12 +291,15 @@ class TokenList : public TokenRange {
 // substitution. There can be one-or-more `before` tokens (e.g. function-like
 // macro expansions, file inclusions) and zero-or-more `after` tokens.
 class TokenSubstitution {
+ protected:
+  std::shared_ptr<const FragmentImpl> impl;
+
  private:
   friend class Fragment;
+  friend class File;
   friend class Index;
   friend class TokenSubstitutionListIterator;
 
-  std::shared_ptr<const FragmentImpl> impl;
   unsigned offset;
   TokenSubstitutionKind kind_;
 

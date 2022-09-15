@@ -179,6 +179,12 @@ class File {
   // Return the file containing a specific fragment.
   static File containing(const Fragment &fragment);
 
+  // Return the file containing a specific token substitution.
+  static File containing(const TokenSubstitution &entity);
+
+  // Return the file containing a specific designator.
+  static File containing(const Designator &entity);
+
   // Return the file containing the fragment containing a specific entity.
   static File containing(const Decl &entity);
 
