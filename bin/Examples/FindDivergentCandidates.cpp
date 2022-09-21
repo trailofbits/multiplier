@@ -123,8 +123,8 @@ extern "C" int main(int argc, char *argv[]) {
   ss
     << "Usage: " << argv[0]
     << " [--host HOST] [--port PORT]"
-		<< " [--fragment_id ID | --file_id ID]\n"
-		<< " [--show_locations SHOW_LOCATIONS]\n";
+    << " [--fragment_id ID | --file_id ID]\n"
+    << " [--show_locations SHOW_LOCATIONS]\n";
     
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);

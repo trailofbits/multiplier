@@ -103,7 +103,7 @@ std::optional<TokenRange> WeggliQueryMatch::captured_tokens(
 // Return the captured data for a given named capture group.
 std::optional<std::string_view> WeggliQueryMatch::captured_data(
     const std::string &var) const {
-	if (auto index = index_of_captured_variable(var)) {
+  if (auto index = index_of_captured_variable(var)) {
     return matched_data[index.value() - 1u];
   }
   return std::nullopt;
