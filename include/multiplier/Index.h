@@ -225,7 +225,7 @@ class Index {
   std::optional<Fragment> fragment_containing(EntityId) const;
 
   // Return an entity given its ID.
-  VariantEntity entity(EntityId) const;
+  VariantEntity entity(EntityId eid) const;
 
   // Return an entity given its ID.
   template <typename T>

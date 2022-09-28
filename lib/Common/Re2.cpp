@@ -5,8 +5,9 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Re2.h"
-
 #include <cassert>
+
+#ifndef MX_DISABLE_RE2
 
 namespace mx {
 
@@ -80,3 +81,48 @@ bool RegexQuery::IsValid(void) const {
 }
 
 }  // namespace mx
+
+#else
+
+namespace mx {
+
+// NOTE(pag): `RE2::FindAndConsume` is a variadic function taking additional
+//            arguments per sub-match, hence the requirement for enclosing
+//            `pattern_` in a match group with `(` and `)`.
+RegexQueryImpl::RegexQueryImpl(std::string pattern_)
+    : pattern("(" + pattern_ + ")") {}
+
+void RegexQueryImpl::ForEachMatch(
+    std::string_view contents,
+    std::function<bool(std::string_view /* match */,
+                       unsigned /* begin_offset */,
+                       unsigned /* end_offset */)> cb) {}
+
+RegexQuery::RegexQuery(std::string pattern)
+    : impl(std::make_shared<RegexQueryImpl>(std::move(pattern))) {}
+
+RegexQuery::~RegexQuery(void) {}
+
+void RegexQuery::ForEachMatch(
+    std::string_view source,
+    std::function<bool(
+        std::string_view /* match */,
+        unsigned /* begin_offset */,
+        unsigned /* end_offset */)> cb) const {}
+
+// Returns the underlying pattern.
+std::string_view RegexQuery::Pattern(void) const {
+    return {};
+}
+
+// Returns `true` if we successfully compiled this regular expression.
+bool RegexQuery::IsValid(void) const {
+  return false;
+}
+
+}  // namespace mx
+
+
+
+#endif   // MX_DISABLE_RE2
+

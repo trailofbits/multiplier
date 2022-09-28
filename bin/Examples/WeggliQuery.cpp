@@ -47,7 +47,7 @@ extern "C" int main(int argc, char *argv[]) {
   ss
     << "Usage: " << argv[0]
     << " [--host HOST] [--port PORT]\n"
-    << " --query QUERY_STRING";
+    << " --query QUERY_STRING [--print_matches PRINT_MATCHES]";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);

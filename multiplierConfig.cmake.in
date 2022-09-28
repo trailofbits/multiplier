@@ -10,6 +10,8 @@
 
 set(MX_ENABLE_WEGGLI @MX_ENABLE_WEGGLI@)
 
+set(MX_ENABLE_RE2 @MX_ENABLE_RE2@)
+
 if(NOT TARGET @PROJECT_NAME@::mx-api)
   if(NOT TARGET Threads::Threads)
     find_package(Threads REQUIRED)
@@ -23,7 +25,7 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
     find_package(ZLIB REQUIRED)
   endif()
 
-  if(NOT TARGET re2::re2)
+  if(MX_ENABLE_RE2 AND NOT TARGET re2::re2)
     find_package(re2 CONFIG REQUIRED)
   endif()
 

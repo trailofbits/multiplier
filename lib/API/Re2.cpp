@@ -11,6 +11,8 @@
 #include "File.h"
 #include "Fragment.h"
 
+#ifndef MX_DISABLE_RE2
+
 #include "../Common/Re2.h"
 
 namespace mx {
@@ -301,3 +303,103 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
 }
 
 }  // namespace mx
+
+#else
+namespace mx {
+
+RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
+
+RegexQueryResultImpl::RegexQueryResultImpl(
+    const RegexQuery &query_, EntityProvider::Ptr ep_, Response response)
+    : query(query_),
+      ep(std::move(ep_)) {}
+
+RegexQueryResultImpl::RegexQueryResultImpl(
+    const RegexQuery &query_, FragmentImpl::Ptr frag_)
+    : query(query_),
+      ep(frag_->ep) {}
+
+bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
+  return false;
+}
+
+bool RegexQueryResultImpl::InitForFragment(RawEntityId frag_id) {
+  return false;
+}
+
+std::optional<RegexQueryMatch>
+RegexQueryResultImpl::GetNextMatchInFragment(void) {
+    return std::nullopt;
+}
+
+void RegexQueryResultIterator::Advance(void) {}
+
+RegexQueryMatch::~RegexQueryMatch(void) {}
+
+RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
+                                 std::string_view data_range /* file data */,
+                                 std::shared_ptr<const FragmentImpl> frag_,
+                                 const RegexQuery &query_)
+    : TokenRange(std::move(range_)),
+      frag(std::move(frag_)),
+      query(query_.impl) {}
+
+// Translate a data capture into a token range capture.
+std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
+    std::string_view capture) const {
+  return std::nullopt;
+}
+
+// Return the index of a capture variable.
+std::optional<size_t> RegexQueryMatch::index_of_captured_variable(
+    const std::string &var) const {
+  return std::nullopt;
+}
+
+// Return the captured tokens for a given named capture group.
+std::optional<TokenRange> RegexQueryMatch::captured_tokens(
+    const std::string &var) const {
+  return std::nullopt;
+}
+
+// Return the captured data for a given named capture group.
+std::optional<std::string_view> RegexQueryMatch::captured_data(
+    const std::string &var) const {
+  return std::nullopt;
+}
+
+// Return the captured tokens for a given indexed capture group.
+std::optional<TokenRange> RegexQueryMatch::captured_tokens(
+    size_t index) const {
+  return std::nullopt;
+}
+
+// Return the captured data for a given indexed capture group.
+std::optional<std::string_view> RegexQueryMatch::captured_data(
+    size_t capture_index) const {
+  return std::nullopt;
+}
+
+// Return the number of capture groups.
+size_t RegexQueryMatch::num_captures(void) const {
+  return 0;
+}
+
+// Return a list of matched variables.
+std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
+  return {};
+}
+
+RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
+    : impl(std::move(impl_)),
+      num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
+
+RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
+  return RegexQuery(match.query);
+}
+
+}  // namespace mx
+
+
+#endif   // MX_DISABLE_RE2
+
