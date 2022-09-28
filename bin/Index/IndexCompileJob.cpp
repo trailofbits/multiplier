@@ -251,6 +251,33 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
   return {begin_tok_index, end_tok_index};
 }
 
+static bool ShouldEndInSemiColon(const pasta::Decl &decl) {
+  switch (decl.Kind()) {
+    case pasta::DeclKind::kVar: {
+
+    }
+    case pasta::DeclKind::kFriend:
+    case pasta::DeclKind::kRecord:
+    case pasta::DeclKind::kCXXRecord:
+    case pasta::DeclKind::kEnum:
+    case pasta::DeclKind::kUsing:
+    case pasta::DeclKind::kUsingDirective:
+    case pasta::DeclKind::kUsingEnum:
+    case pasta::DeclKind::kClassTemplate:
+    case pasta::DeclKind::kClassTemplatePartialSpecialization:
+    case pasta::DeclKind::kClassTemplateSpecialization:
+      return true;
+    case pasta::DeclKind::kFunction:
+      break;
+
+    case pasta::DeclKind::kCXXConstructor:
+    case pasta::DeclKind::kCXXDestructor:
+    case pasta::DeclKind::kCXXConversion:
+    case pasta::DeclKind::kCXXMethod:
+    case pasta::DeclKind::kCXXConversion:
+  }
+}
+
 // Find the range of tokens of this decl. The range is returned as an inclusive
 // [begin_index, end_index]` pair, and is expanded to cover leading/trailing
 // macro expansions, and contracted to try to elide leading/trailing whitespace.
