@@ -312,120 +312,27 @@ RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, EntityProvider::Ptr ep_, Response response)
     : query(query_),
-      ep(std::move(ep_)) {
-
-  auto fragment_ids_reader = response.getFragmentIds();
-  fragment_ids.reserve(fragment_ids_reader.size());
-
-  for (RawEntityId frag_id : fragment_ids_reader) {
-    fragment_ids.emplace_back(frag_id);
-  }
-}
+      ep(std::move(ep_)) {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, FragmentImpl::Ptr frag_)
     : query(query_),
-      ep(frag_->ep) {
-  fragment_ids.push_back(frag_->fragment_id);
-  (void) InitForFragment(std::move(frag_));
-}
+      ep(frag_->ep) {}
 
 bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
-  frag = std::move(frag_);
-  Fragment hl_frag(frag);
-
-  matches.clear();
-  offset_to_index.clear();
-  next_match_index = 0u;
-  frag_file_tokens = hl_frag.file_tokens();
-
-  // Do the regex search on fragments token first.
-  query.ForEachMatch(
-      frag_file_tokens.data(),
-      [this] (std::string_view match, unsigned begin, unsigned end) {
-    matches.emplace_back(match, begin, end);
-    return true;
-  });
-
-  if (matches.empty()) {
-    frag.reset();
-    return false;
-  }
-
-  // Create a mapping of just-after-end-of-token offset to token index, so
-  // that we can use `upper_bound` to find the token containing a matched
-  // offset.
-  unsigned offset = 0u;
-  unsigned index = 0u;
-  for (const Token &tok : frag_file_tokens) {
-    offset += tok.data().size();
-    offset_to_index.emplace(offset, index++);
-  }
-
-  assert(!offset_to_index.empty());
-
-  return true;
+  return false;
 }
 
 bool RegexQueryResultImpl::InitForFragment(RawEntityId frag_id) {
-  return InitForFragment(ep->FragmentFor(ep, frag_id));
+  return false;
 }
 
 std::optional<RegexQueryMatch>
 RegexQueryResultImpl::GetNextMatchInFragment(void) {
-  // Get the next match result.
-  const unsigned match_index = next_match_index++;
-  if (match_index >= matches.size()) {
-    frag.reset();
     return std::nullopt;
-  }
-
-  // NOTE(pag): `match` covers `[begin_offset, end_offset)` of the file token
-  //            buffer produced by `impl->frag_file_tokens.data()`.
-  auto [match, begin_offset, end_offset] = matches[match_index];
-  assert(begin_offset < end_offset);
-
-  auto begin_token_index_it = offset_to_index.upper_bound(begin_offset);
-  auto end_token_index_it = offset_to_index.upper_bound(end_offset - 1u);
-
-  // This shouldn't be possible, the match should always fall inside of the
-  // buffer.
-  if (begin_token_index_it == offset_to_index.end() ||
-      end_token_index_it == offset_to_index.end()) {
-    assert(false);
-    frag.reset();
-    return std::nullopt;
-  }
-
-  assert(begin_token_index_it->second <= end_token_index_it->second);
-
-  return RegexQueryMatch(
-      frag_file_tokens.slice(begin_token_index_it->second,
-                             end_token_index_it->second + 1u),
-      match, frag, query);
 }
 
-void RegexQueryResultIterator::Advance(void) {
-  result.reset();
-
-  while (index < num_matches) {
-
-    // We don't yet have any matches for `index`, so go compute them.
-    if (!impl->frag) {
-      if (!impl->InitForFragment(impl->fragment_ids[index])) {
-        ++index;
-        continue;
-      }
-    }
-
-    impl->GetNextMatchInFragment().swap(result);
-    if (result) {
-      return;
-    }
-
-    ++index;
-  }
-}
+void RegexQueryResultIterator::Advance(void) {}
 
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
@@ -446,25 +353,25 @@ std::optional<TokenRange> RegexQueryMatch::TranslateCapture(
 // Return the index of a capture variable.
 std::optional<size_t> RegexQueryMatch::index_of_captured_variable(
     const std::string &var) const {
-    return std::nullopt;
+  return std::nullopt;
 }
 
 // Return the captured tokens for a given named capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(
     const std::string &var) const {
-    return std::nullopt;
+  return std::nullopt;
 }
 
 // Return the captured data for a given named capture group.
 std::optional<std::string_view> RegexQueryMatch::captured_data(
     const std::string &var) const {
-    return std::nullopt;
+  return std::nullopt;
 }
 
 // Return the captured tokens for a given indexed capture group.
 std::optional<TokenRange> RegexQueryMatch::captured_tokens(
     size_t index) const {
-    return std::nullopt;
+  return std::nullopt;
 }
 
 // Return the captured data for a given indexed capture group.
@@ -480,8 +387,7 @@ size_t RegexQueryMatch::num_captures(void) const {
 
 // Return a list of matched variables.
 std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
-  std::vector<std::string> ret;
-  return ret;
+  return {};
 }
 
 RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
