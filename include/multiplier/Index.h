@@ -176,10 +176,9 @@ class EntityProvider {
                           std::vector<RawEntityId> &ids_out) = 0;
 };
 
-using VariantEntity = std::variant<Decl, Stmt, Type, Attr,
+using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
                                    Token, TokenSubstitution,
-                                   Designator, Fragment, File,
-                                   NotAnEntity>;
+                                   Designator, Fragment, File>;
 
 // Access to the indexed code.
 class Index {

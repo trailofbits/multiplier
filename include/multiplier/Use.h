@@ -48,12 +48,11 @@ inline static constexpr unsigned NumEnumerators(UseKind) {
   return 6u;
 }
 
-class NotAnEntity {};
+using NotAnEntity = std::monostate;
 
-using VariantUse = std::variant<Decl, Stmt, Type, Attr,
+using VariantUse = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
                                 CXXBaseSpecifier, TemplateArgument,
-                                TemplateParameterList, Designator,
-                                NotAnEntity>;
+                                TemplateParameterList, Designator>;
 
 // Base for uses. Uses represent AST methods that return a specific entity
 // ID.
