@@ -67,7 +67,7 @@ define_example("mx-regex-query" "RegexQuery.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
 define_example("mx-find-divergent-candidates" "FindDivergentCandidates.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
-define_example("mx-taint-return-value" "TaintReturnValue.cpp")
+define_example("mx-taint-entity" "TaintEntity.cpp")
 
 target_link_libraries("mx-dump-json"
   PRIVATE
