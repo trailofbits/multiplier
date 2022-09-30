@@ -56,12 +56,11 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
   mx::Fragment frag = std::get<mx::Fragment>(index.entity(frag_id));
 
-  std::vector<mx::RawEntityId> decl_ids;
+  std::vector<mx::RawEntityId> strong_decl_ids;
   std::vector<mx::RawEntityId> weak_decl_ids;
   std::vector<mx::RawEntityId> curr_decl_ids;
 
   for (mx::Token tok : frag.parsed_tokens()) {
-//    std::cout << tok.data();
     auto seen_type = false;
     for (auto tc = mx::TokenContext::of(tok); tc; tc = tc->parent()) {
       if (std::optional<mx::Type> ty = tc->as_type()) {
@@ -69,11 +68,9 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
         // E.g. `tok(foo_s) -> type(struct foo_s)`
         if (auto tag_ty = mx::TagType::from(ty)) {
-//          std::cout << " -> TAG(" << tag_ty->declaration().name() << ")";
           curr_decl_ids.emplace_back(tag_ty->declaration().id());
 
         } else if (auto typedef_ty = mx::TypedefType::from(ty)) {
-//          std::cout << " -> TYPEDEF(" << typedef_ty->declaration().name() << ")";
           curr_decl_ids.emplace_back(typedef_ty->declaration().id());
 
         // We ascended the token contexts and saw something like:
@@ -84,7 +81,6 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
         // a definition of `foo` or any other decls seen along the way, only
         // a declaration of them, so we move them to the weak decls list.
         } else if (ty->is_any_pointer_type()) {
-//          std::cout << " -> POINTER";
           weak_decl_ids.insert(weak_decl_ids.end(), curr_decl_ids.begin(),
                                curr_decl_ids.end());
           curr_decl_ids.clear();
@@ -92,63 +88,105 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
       // E.g. `tok(var) -> decl(var) -> ...` in `int var;`.
       } else if (std::optional<mx::Decl> decl = tc->as_declaration()) {
-        if (auto nd = mx::NamedDecl::from(decl)) {
-//          std::cout << " -> DECL(" << nd->name() << ")";
-          decl_ids.emplace_back(nd->id());  // Strong.
+
+        // A usage of a field, enum constant, or typedef requires a strong
+        // definition.
+        if (mx::FieldDecl::from(decl) ||
+            mx::EnumConstantDecl::from(decl) ||
+            mx::TypedefNameDecl::from(decl)) {
+          strong_decl_ids.emplace_back(decl->id());
+
+        } else {
+          weak_decl_ids.emplace_back(decl->id());
         }
+
       } else if (std::optional<mx::Stmt> stmt = tc->as_statement()) {
         if (auto ref_decl = stmt->referenced_declaration()) {
-          if (auto nd = mx::NamedDecl::from(ref_decl)) {
-//            std::cout << " -> STMT_REF(" << nd->name() << ")";
-            decl_ids.emplace_back(nd->id());  // Strong.
+
+          // These can be forward-declared.
+          if (mx::FunctionDecl::from(ref_decl) ||
+              mx::VarDecl::from(ref_decl)) {
+            weak_decl_ids.emplace_back(ref_decl->id());
+
+          } else if (mx::FieldDecl::from(ref_decl) ||
+                     mx::EnumConstantDecl::from(ref_decl) ||
+                     mx::TypedefNameDecl::from(ref_decl) ||
+                     mx::DeclRefExpr::from(stmt) ||
+                     mx::MemberExpr::from(stmt)) {
+            strong_decl_ids.emplace_back(ref_decl->id());
+
+          } else {
+            weak_decl_ids.emplace_back(ref_decl->id());
           }
         }
       }
     }
-//    std::cout << '\n';
 
-    decl_ids.insert(decl_ids.end(), curr_decl_ids.begin(), curr_decl_ids.end());
+    strong_decl_ids.insert(strong_decl_ids.end(), curr_decl_ids.begin(),
+                           curr_decl_ids.end());
     curr_decl_ids.clear();
   }
-//  std::cout << '\n';
 
-  std::sort(decl_ids.begin(), decl_ids.end());
-  auto it = std::unique(decl_ids.begin(), decl_ids.end());
-  decl_ids.erase(it, decl_ids.end());
+  // Sort and unique the strong and weak dependencies.
+  std::sort(strong_decl_ids.begin(), strong_decl_ids.end());
+  auto it = std::unique(strong_decl_ids.begin(), strong_decl_ids.end());
+  strong_decl_ids.erase(it, strong_decl_ids.end());
 
   std::sort(weak_decl_ids.begin(), weak_decl_ids.end());
   it = std::unique(weak_decl_ids.begin(), weak_decl_ids.end());
   weak_decl_ids.erase(it, weak_decl_ids.end());
 
-  // A deps connection requires a definition.
-  for (mx::RawEntityId id : decl_ids) {
-    mx::Decl decl = std::get<mx::Decl>(index.entity(id));
-    if (auto def = decl.definition()) {
-      decl = std::move(def.value());
-    }
-
-    auto strong_frag_id = mx::Fragment::containing(decl).id().Pack();
-    if (frag_id != strong_frag_id &&
-        deps.emplace(frag_id, strong_frag_id).second) {
-      wl.push_back(strong_frag_id);
-    }
-  }
-
-  // A weak connection only requires a declaration; go get the first non-
-  // definition declaration.
-  for (mx::RawEntityId id : weak_decl_ids) {
+  // A strong connection requires a definition.
+  for (mx::RawEntityId id : strong_decl_ids) {
     mx::Decl decl = std::get<mx::Decl>(index.entity(id));
     for (mx::Decl redecl : decl.redeclarations()) {
-      if (!redecl.is_definition()) {
+      if (redecl.is_definition()) {
         decl = redecl;
         break;
       }
     }
 
+    auto strong_frag_id = mx::Fragment::containing(decl).id().Pack();
+    if (frag_id != strong_frag_id) {
+      deps.emplace(frag_id, strong_frag_id);
+      wl.push_back(strong_frag_id);
+    }
+  }
+
+  // A weak connection requires a declaration, and ideally also brings in
+  // a definition.
+  for (mx::RawEntityId id : weak_decl_ids) {
+
+    // We've already added it as a strong declaration; skip it.
+    if (std::find(strong_decl_ids.begin(), strong_decl_ids.end(), id) !=
+        strong_decl_ids.end()) {
+      continue;
+    }
+
+    mx::Decl decl = std::get<mx::Decl>(index.entity(id));
+    mx::Decl def = decl;
+    for (mx::Decl redecl : decl.redeclarations()) {
+      if (redecl.is_definition()) {
+        def = redecl;
+      } else {
+        decl = redecl;
+      }
+    }
+
+    auto strong_frag_id = mx::Fragment::containing(def).id().Pack();
     auto weak_frag_id = mx::Fragment::containing(decl).id().Pack();
-    if (frag_id != weak_frag_id) {
+    if (strong_frag_id == frag_id || weak_frag_id == frag_id) {
+      continue;
+    }
+
+    wl.push_back(strong_frag_id);
+    if (strong_frag_id != weak_frag_id) {
+      deps.emplace(strong_frag_id, weak_frag_id);
       deps.emplace(frag_id, weak_frag_id);
       wl.push_back(weak_frag_id);
+
+    } else {
+      deps.emplace(frag_id, weak_frag_id);
     }
   }
 }
@@ -168,14 +206,13 @@ struct DAG {
       return depth;
     }
 
-    // NOTE(pag): We pre-initialize the depth of the initial/target fragment
-    //            with `1`, and everything should come after it. So this is
-    //            a safe forcing function for that.
-    depth = 2u;
-
     // First get a non-recursive estimate.
     for (mx::RawEntityId parent_id : parents) {
       depth = std::max(dag[parent_id].depth + 1u, depth);
+    }
+
+    if (!depth) {
+      depth = 1u;
     }
 
     // Next, get a better version via recursion.
@@ -208,24 +245,27 @@ extern "C" int main(int argc, char *argv[]) {
   SeenSet seen;
   WorkList wl;
   DepGraph deps;
+  std::unordered_map<mx::RawEntityId, DAG> dag;
 
   auto initial_frag_id = mx::Fragment::containing(entity.value()).id().Pack();
   wl.push_back(initial_frag_id);
 
   // Collect the strong fragments that we need.
-  while (!wl.empty()) {
-    mx::RawEntityId frag_id = wl.back();
-    wl.pop_back();
+  for (auto i = 0u; i < wl.size(); ++i) {
+    mx::RawEntityId frag_id = wl[i];
     if (seen.emplace(frag_id).second) {
+      dag.emplace(frag_id, frag_id);
       CollectEntities(index, frag_id, wl, deps);
     }
   }
 
-  // Make sure every seen node is represented with a DAG.
-  std::unordered_map<mx::RawEntityId, DAG> dag;
-  for (auto frag_id : seen) {
-    dag.emplace(frag_id, frag_id);
-  }
+//  // Ensure presence.
+//  for (auto [from_frag_id, to_frag_id] : deps) {
+//    seen.emplace(from_frag_id);
+//    seen.emplace(to_frag_id);
+//    dag.emplace(from_frag_id, from_frag_id);
+//    dag.emplace(to_frag_id, to_frag_id);
+//  }
 
   // Convert the edges of `deps` into parent-child relations in a (hopefully)
   // DAG.
@@ -241,16 +281,15 @@ extern "C" int main(int argc, char *argv[]) {
     }
   }
 
-  // Pre-initialize the initial fragment to have depth 1. It is what we want
-  // to have appear last in our file.
-  dag[initial_frag_id].depth = 1u;
-
   // Sort the fragments in reverse order of their depth.
   std::vector<mx::RawEntityId> frags;
-  frags.insert(frags.end(), seen.begin(), seen.end());
+  for (mx::RawEntityId frag_id : seen) {
+    frags.push_back(frag_id);
+    dag[frag_id].Depth(dag);
+  }
   std::sort(frags.begin(), frags.end(),
             [&dag] (mx::RawEntityId a, mx::RawEntityId b) {
-              return dag[b].Depth(dag) < dag[a].Depth(dag);
+              return dag[b].depth < dag[a].depth;
             });
 
   std::cerr
