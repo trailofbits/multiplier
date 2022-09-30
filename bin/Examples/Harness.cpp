@@ -250,8 +250,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::vector<mx::RawEntityId> frags;
   frags.insert(frags.end(), seen.begin(), seen.end());
 
-  // Sketchy loop to go and try to make the fragments into a reasonable
-  // depth order.
+  // Sketchy loop to encourage the fragments into a proper topological order.
   for (auto i = 0u; i < 10; ++i) {
     std::sort(frags.begin(), frags.end(),
               [&dag] (mx::RawEntityId a, mx::RawEntityId b) {
@@ -272,46 +271,6 @@ extern "C" int main(int argc, char *argv[]) {
       }
     }
   }
-
-//  seen.clear();
-//  wl.clear();
-//  std::vector<mx::RawEntityId> frags;
-//
-//  // Topologically sort the strong fragments.
-//  wl.push_back(initial_frag_id);
-//  for (auto w = 0u; w < wl.size(); ++w) {
-//    mx::RawEntityId frag_id = wl[w];
-//    auto frag_depth = dag[frag_id]->depth;
-//    if (seen.emplace(frag_id).second) {
-//      frags.push_back(frag_id);
-//      for (auto reached_frag_id : dag[frag_id]->strong_children) {
-//        auto &reached_depth = dag[reached_frag_id];
-//        reached_depth = std::max();
-//      }
-//      wl.insert(wl.end(), dag[frag_id]->strong_children.begin(),
-//                dag[frag_id]->strong_children.end());
-//    }
-//  }
-//
-//  // Topologically sort the weak fragments reachable from the strong
-//  // fragments.
-//  for (size_t i = 0u, max_i = frags.size(); i < max_i; ++i) {
-//    wl = dag[frags[i]]->weak_children;
-//
-//    for (auto w = 0u; w < wl.size(); ++w) {
-//      mx::RawEntityId frag_id = wl[w];
-//      if (seen.emplace(frag_id).second) {
-//        frags.push_back(frag_id);
-//        wl.insert(wl.end(), dag[frag_id]->weak_children.begin(),
-//                  dag[frag_id]->weak_children.end());
-//      }
-//    }
-//  }
-//
-//  // `frags` was in topological order, with the target decl being in `frags[0]`.
-//  // The suffix of `frags` has all the weak fragments. We need to reverse
-//  // `frags` so that we can print out weakest to strongest to goal frag.
-//  std::reverse(frags.begin(), frags.end());
 
   for (mx::RawEntityId frag_id : frags) {
     mx::Fragment frag = std::get<mx::Fragment>(index.entity(frag_id));
