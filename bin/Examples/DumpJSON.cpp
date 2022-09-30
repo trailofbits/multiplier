@@ -36,7 +36,7 @@ static llvm::json::Array UnparsedTokens(mx::TokenSubstitutionList list) {
 llvm::json::Object UnparsedToken(mx::Token token) {
   llvm::json::Object obj;
   obj["data"] = token.data().data();
-  obj["id"] = static_cast<uint64_t>(token.id());
+  obj["id"] = token.id().Pack();
   obj["kind"] = static_cast<unsigned>(token.kind());
 
   mx::VariantId vid = token.id().Unpack();
@@ -48,7 +48,7 @@ llvm::json::Object UnparsedToken(mx::Token token) {
 
   } else if (std::holds_alternative<mx::FragmentTokenId>(vid)) {
     auto ft = std::get<mx::FragmentTokenId>(vid);
-    obj["fragment_id"] = ft.fragment_id;
+    obj["fragment_id"] = mx::EntityId(mx::FragmentId(ft.fragment_id)).Pack();
     obj["fragment_offset"] = ft.offset;
     obj["type"] = "fragment_token";
   }
@@ -77,10 +77,11 @@ static void OutputSourceIR(const mx::Fragment &frag,
                            const std::filesystem::path &output_dir) {
   if (auto mlir = frag.source_ir(); mlir) {
     llvm::json::Object obj;
-    obj["id"] = static_cast<uint64_t>(frag.id());
+    obj["id"] = frag.id().Pack();
     obj["source_ir"] = llvm::StringRef(mlir->data(), mlir->size());
 
-    std::string file_name = "mlir.fragment." + std::to_string(frag.id()) + ".json";
+    std::string file_name =
+        "mlir.fragment." + std::to_string(frag.id().Pack()) + ".json";
     llvm::json::Value val(std::move(obj));
     std::ofstream file_os((output_dir / file_name).generic_string(),
                           std::ios::trunc | std::ios::out);
@@ -112,7 +113,7 @@ static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
   llvm::json::Array fragment_ids;
 
   for(mx::Fragment frag : mx::Fragment::in(file)) {
-    fragment_ids.push_back(frag.id());
+    fragment_ids.push_back(frag.id().Pack());
 
     for (mx::Token token : mx::Token::in(frag)) {
       llvm::json::Object tok;

@@ -85,7 +85,7 @@ Fragment Fragment::containing(const Reference &ref) {
 }
 
 // Return the ID of this fragment.
-RawEntityId Fragment::id(void) const noexcept {
+EntityId Fragment::id(void) const noexcept {
   return EntityId(FragmentId{impl->fragment_id});
 }
 

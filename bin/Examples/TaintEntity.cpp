@@ -12,7 +12,6 @@
 #include "Index.h"
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
-DEFINE_bool(unparsed, false, "Show original source code?");
 DEFINE_string(entity_name, "", "Name of the function to search for");
 
 #define FG_BLACK 30
@@ -73,11 +72,10 @@ static UserDAG *AddPathToDAG(const UsePath &entry, SeenEntityMap &seen);
 
 // Preferentially use the definition for a declaration.
 static mx::Decl PreferDefinition(const mx::Decl &decl) {
-  if (auto def = decl.definition()) {
-    return *def;
-  } else {
-    return decl;
+  for (auto redecl : decl.redeclarations()) {
+    return redecl;  // First redecl is a definition.
   }
+  return decl;
 }
 
 // If the path entry is derived from something, then add the use for this
@@ -114,8 +112,7 @@ UserDAG *AddPathToDAG(const UsePath &entry, SeenEntityMap &seen) {
 
 // Figure out if we've already seen `entry`, and if so, then record the
 // provenance to `entry` in the prior record (if any).
-inline static bool AlreadySeen(const UsePath &entry,
-                               SeenEntityMap &seen) {
+inline static bool AlreadySeen(const UsePath &entry, SeenEntityMap &seen) {
   auto res = seen.emplace(entry.entity_id, nullptr);
 
   // We just added this entry, i.e. we've not seen it yet.
@@ -162,7 +159,6 @@ static std::optional<mx::ValueDecl> FindEntity(const mx::Index &index) {
   return std::nullopt;
 }
 
-
 static void TaintTrackFunc(const mx::FunctionDecl &taint_source,
                            const UsePath &prev, SeenEntityMap &seen);
 
@@ -174,19 +170,20 @@ static void ReportTaintedChild(const mx::Stmt &parent, const mx::Stmt &child) {
   for (mx::Token tok : parent.tokens().file_tokens()) {
     if (child_toks.index_of(tok)) {
       std::cerr
-          << ESC(FG_RED) ESC(ATTR_BRIGHT) << tok.data() << ESC(ATTR_RESET);
+          << ESC(ATTR_BRIGHT) ESC(FG_RED) << tok.data() << ESC(ATTR_RESET);
     } else {
-      std::cerr << ESC(ATTR_DIM) << tok.data() << ESC(ATTR_RESET);
+      std::cerr
+          << ESC(FG_YELLOW) << tok.data() << ESC(ATTR_RESET);
     }
   }
   std::cerr << ESC(ATTR_RESET);
 }
 
 static void ReportUnhandledAssign(
-    const mx::Stmt &assign, const mx::Expr &lhs, const mx::Expr &taint_source) {
+    const mx::Stmt &assign, const mx::Stmt &lhs, const mx::Stmt &taint_source) {
   std::cerr
       << ESC(ATTR_BRIGHT) "Unhandled assignment "
-      << mx::EnumeratorName(lhs.kind())
+      << mx::EnumeratorName(lhs.kind()) << " at " << lhs.id()
       << ":" ESC(ATTR_RESET) << "\n";
 
   auto lhs_toks = lhs.tokens().file_tokens();
@@ -211,10 +208,20 @@ static void ReportUnhandledAssign(
   std::cerr << ESC(ATTR_RESET) "\n\n";
 }
 
+// This is a dereference of something, e.g. `foo[tainted]`, this is where
+// our analysis bottoms out.
+static void TaintTrackDeref(const mx::Stmt &op, const UsePath &prev,
+                            SeenEntityMap &seen) {
+  const UsePath entry{&prev, op.id()};
+  AddPathToDAG(entry, seen);
+}
+
+
 // If we have an operator `op` like `lhs = taint_source`, then try to taint
 // the uses of `lhs`.
 static void TaintTrackAssign(const mx::Stmt &assign,
-                             mx::Expr lhs, mx::Expr taint_source,
+                             const mx::Stmt &lhs,
+                             const mx::Stmt &taint_source,
                              const UsePath &prev, SeenEntityMap &seen) {
 
   const UsePath entry{&prev, assign.id()};
@@ -241,9 +248,9 @@ static void TaintTrackAssign(const mx::Stmt &assign,
 // If `taint_source` is an operand in the binary operator `op` then try to
 // see if the binary operator is an assignment or accumulation, and then taint
 // the left hand side.
-static bool TaintTrackBinOp(const mx::Expr &op, mx::BinaryOperatorKind opcode,
-                            const mx::Expr &lhs, const mx::Expr &rhs,
-                            const mx::Expr &taint_source,
+static bool TaintTrackBinOp(const mx::Stmt &op, mx::BinaryOperatorKind opcode,
+                            const mx::Stmt &lhs, const mx::Stmt &rhs,
+                            const mx::Stmt &taint_source,
                             const UsePath &prev, SeenEntityMap &seen) {
 
   switch (opcode) {
@@ -279,13 +286,37 @@ static bool TaintTrackBinOp(const mx::Expr &op, mx::BinaryOperatorKind opcode,
     return true;
   }
 
-  TaintTrackAssign(op, lhs, std::move(taint_source), prev, seen);
+  TaintTrackAssign(op, lhs, taint_source, prev, seen);
   return true;
+}
+
+static bool TaintTrackUnaryOp(const mx::UnaryOperator &op,
+                              const mx::Stmt &taint_source,
+                              const UsePath &prev, SeenEntityMap &seen) {
+  switch (op.opcode()) {
+    case mx::UnaryOperatorKind::DEREF:
+      TaintTrackDeref(op, prev, seen);
+      return true;
+
+    case mx::UnaryOperatorKind::ADDRESS_OF:
+      std::cerr
+          << ESC(ATTR_BRIGHT) "Unhandled address of tainted value at "
+          << op.id() << ":" ESC(ATTR_RESET) "\n";
+      ReportTaintedChild(op, taint_source);
+      std::cerr << "\n\n";
+      return true;
+
+    // Tell the caller to keep ascending to the parent statement to treat it
+    // as tainted.
+    default:
+      return false;
+  }
 }
 
 // If `taint_source` is an argument to `call`, then try to taint the parameter
 // of the function.
-static void TaintTrackCallArg(mx::CallExpr call, mx::Expr taint_source,
+static void TaintTrackCallArg(const mx::CallExpr &call,
+                              const mx::Stmt &taint_source,
                               const UsePath &prev, SeenEntityMap &seen) {
 
   const UsePath entry{&prev, taint_source.id()};
@@ -297,7 +328,7 @@ static void TaintTrackCallArg(mx::CallExpr call, mx::Expr taint_source,
   if (!callee) {
     std::cerr
         << ESC(ATTR_BRIGHT) "Unhandled call expression with no callee "
-           "declaration:" ESC(ATTR_RESET) "\n";
+           "declaration at " << call.id() << ":" ESC(ATTR_RESET) "\n";
     ReportTaintedChild(call, taint_source);
     std::cerr << "\n\n";
     return;
@@ -308,7 +339,7 @@ static void TaintTrackCallArg(mx::CallExpr call, mx::Expr taint_source,
   if (!called_func) {
     std::cerr
         << ESC(ATTR_BRIGHT) "Unhandled call expression with non-function "
-           "callee:" ESC(ATTR_RESET) "\n";
+           "callee at " << call.id() << ":" ESC(ATTR_RESET) "\n";
     ReportTaintedChild(call, taint_source);
     std::cerr << "\n\n";
     return;
@@ -319,8 +350,10 @@ static void TaintTrackCallArg(mx::CallExpr call, mx::Expr taint_source,
   std::optional<mx::Decl> def = called_func->definition();
   if (!def) {
     std::cerr
-        << ESC(ATTR_BRIGHT) "Tainted argument escapes into library function:"
-           ESC(ATTR_RESET) "\n";
+        << ESC(ATTR_BRIGHT) "Tainted argument escapes into library function "
+        << called_func->name() << " ("
+        << called_func->id() << ") at "
+        << call.id() << ":" ESC(ATTR_RESET) "\n";
     ReportTaintedChild(call, taint_source);
     std::cerr << "\n\n";
     return;
@@ -341,27 +374,31 @@ static void TaintTrackCallArg(mx::CallExpr call, mx::Expr taint_source,
     }
 
     // Found the parameter associated with this call argument.
-    TaintTrackVarOrVarLike(std::move(params[arg_num]), entry, seen);
+    TaintTrackVarOrVarLike(params[arg_num], entry, seen);
     return;
   }
 
   std::cerr
       << ESC(ATTR_BRIGHT) "Tainted argument cannot be matched with "
-         "function parameter:" ESC(ATTR_RESET) "\n";
+         "function parameter at "
+      << call.id() << "; function " << called_func->name() << " ("
+      << called_func->id() << ") ";
+
+  if (called_func->is_variadic()) {
+    std::cerr << "is variadic";
+  } else {
+    std::cerr
+        << ESC(ATTR_UNDERLINE) "isn't variadic"
+           ESC(ATTR_RESET) ESC(ATTR_BRIGHT);
+  }
+
+  std::cerr << ":" ESC(ATTR_RESET) "\n";
   ReportTaintedChild(call, taint_source);
   std::cerr << "\n\n";
 }
 
-// This is a dereference of something, e.g. `foo[tainted]`, this is where
-// our analysis bottoms out.
-static void TaintTrackDeref(const mx::Expr &op, const UsePath &prev,
-                            SeenEntityMap &seen) {
-  const UsePath entry{&prev, op.id()};
-  AddPathToDAG(entry, seen);
-}
-
 // If we find `return taint_source`, then taint the function.
-static void TaintTrackReturn(mx::ReturnStmt ret, const UsePath &prev,
+static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
                              SeenEntityMap &seen) {
   const UsePath entry{&prev, ret.id()};
   if (auto func = mx::FunctionDecl::containing(ret)) {
@@ -378,18 +415,35 @@ static void TaintTrackExpr(const mx::Expr &taint_source,
     return;
   }
 
-  mx::Expr child = taint_source;
-  for (mx::Expr parent : mx::Expr::containing(taint_source)) {
+  mx::Stmt child = taint_source;
+  for (mx::Stmt parent : mx::Stmt::containing(taint_source)) {
     switch (parent.kind()) {
+      // E.g. `if (a < tainted_source)`. Here we just want to ignore the tainted
+      // control-flow.
+      case mx::StmtKind::IF_STMT:
+      case mx::StmtKind::DO_STMT:
+      case mx::StmtKind::WHILE_STMT:
+      case mx::StmtKind::FOR_STMT:
+      case mx::StmtKind::SWITCH_STMT:
+      case mx::StmtKind::COMPOUND_STMT:
+      case mx::StmtKind::CASE_STMT:
+      case mx::StmtKind::DEFAULT_STMT:
+        return;
+
       // E.g. DECL_REF_EXPR.
       default:
         break;
+
+      // Something like `return taint_source;`.
+      case mx::StmtKind::RETURN_STMT:
+        TaintTrackReturn(parent, entry, seen);
+        return;
 
       // Something like `foo->bar = taint_source;`.
       case mx::StmtKind::COMPOUND_ASSIGN_OPERATOR:
         if (auto assign = mx::CompoundAssignOperator::from(parent)) {
           (void) TaintTrackBinOp(
-              parent, assign->opcode(), assign->lhs(), assign->rhs(),
+              *assign, assign->opcode(), assign->lhs(), assign->rhs(),
               child, entry, seen);
         }
         return;
@@ -403,7 +457,7 @@ static void TaintTrackExpr(const mx::Expr &taint_source,
       // Something like `foo = taint_source()`, `foo += taint_source()`.
       case mx::StmtKind::BINARY_OPERATOR:
         if (auto binop = mx::BinaryOperator::from(parent);
-            TaintTrackBinOp(parent, binop->opcode(), binop->lhs(), binop->rhs(),
+            TaintTrackBinOp(*binop, binop->opcode(), binop->lhs(), binop->rhs(),
                             child, entry, seen)) {
           return;
         }
@@ -411,11 +465,11 @@ static void TaintTrackExpr(const mx::Expr &taint_source,
 
       // Something like `*taint_source()`.
       case mx::StmtKind::UNARY_OPERATOR:
-        if (mx::UnaryOperator::from(parent)->opcode() ==
-                mx::UnaryOperatorKind::DEREF) {
-          TaintTrackDeref(parent, entry, seen);
+        if (auto unop = mx::UnaryOperator::from(parent);
+            TaintTrackUnaryOp(*unop, child, entry, seen)) {
+          return;
         }
-        return;
+        break;
 
       // Something like `foo[taint_source()]`.
       //
@@ -430,12 +484,6 @@ static void TaintTrackExpr(const mx::Expr &taint_source,
     child = parent;
   }
 
-  // Something like `return taint_source;`.
-  if (auto ret = mx::ReturnStmt::containing(child)) {
-    TaintTrackReturn(*ret, entry, seen);
-    return;
-  }
-
   // Look for `type var = taint_source;`.
   if (auto parent_var = mx::VarDecl::from(child.parent_declaration())) {
     TaintTrackVarOrVarLike(*parent_var, entry, seen);
@@ -443,23 +491,24 @@ static void TaintTrackExpr(const mx::Expr &taint_source,
   }
 
   std::cerr
-      << ESC(ATTR_BRIGHT) "Unable to propagate taint through expression:"
-         ESC(ATTR_RESET) "\n";
+      << ESC(ATTR_BRIGHT) "Unable to propagate taint through expression at "
+      << child.id() << ":" ESC(ATTR_RESET) "\n";
   ReportTaintedChild(child, taint_source);
   std::cerr << "\n\n";
 }
 
 // If `call` is a call to `taint_source`, then try to propagate the taints of
 // the call to where the call is used.
-static void TaintTrackCallRet(mx::CallExpr call, const mx::Stmt &taint_source,
-                              mx::FunctionDecl tainted_func,
+static void TaintTrackCallRet(const mx::CallExpr &call,
+                              const mx::Stmt &taint_source,
+                              const mx::FunctionDecl &tainted_func,
                               const UsePath &prev, SeenEntityMap &seen) {
 
   std::optional<mx::Decl> callee = call.callee_declaration();
   if (!callee) {
     std::cerr
         << ESC(ATTR_BRIGHT) "Unhandled call expression with no callee "
-           "declaration:" ESC(ATTR_RESET) "\n";
+           "declaration at " << call.id() << ":" ESC(ATTR_RESET) "\n";
     ReportTaintedChild(call, taint_source);
     std::cerr << "\n\n";
     return;
@@ -468,7 +517,7 @@ static void TaintTrackCallRet(mx::CallExpr call, const mx::Stmt &taint_source,
   if (PreferDefinition(*callee).id() != PreferDefinition(tainted_func).id()) {
     std::cerr
         << ESC(ATTR_BRIGHT) "Not tainting call using tainted function, "
-           "but not calling it:" ESC(ATTR_RESET) "\n";
+           "but not calling it at " << call.id() << ":" ESC(ATTR_RESET) "\n";
     ReportTaintedChild(call, taint_source);
     std::cerr << "\n\n";
     return;
@@ -509,8 +558,8 @@ void TaintTrackVarOrVarLike(const mx::Decl &taint_source,
         TaintTrackExpr(*expr, entry, seen);
       } else {
         std::cerr
-            << ESC(ATTR_BRIGHT) "Not tainting non-expression use:"
-               ESC(ATTR_RESET) "\n";
+            << ESC(ATTR_BRIGHT) "Not tainting non-expression use at "
+            << stmt.id() << ":" ESC(ATTR_RESET) "\n";
         ReportTaintedChild(stmt, stmt);
         std::cerr << "\n\n";
         return;
@@ -574,7 +623,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--entity_id ID | --entity_name STR]\n";
+    << " [--host HOST] [--port PORT] [--entity_id ID | --entity_name NAME]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -599,10 +648,16 @@ extern "C" int main(int argc, char *argv[]) {
     TaintTrackVarOrVarLike(*entity, root, seen);
   }
 
-  std::cout << "digraph {\n";
+  auto code = EXIT_FAILURE;
+
   for (const auto &[id, entry] : seen) {
     if (!entry) {
       continue;
+    }
+
+    if (code == EXIT_FAILURE) {
+      std::cout << "digraph {\n";
+      code = EXIT_SUCCESS;
     }
 
     auto [kind, color] = KindAndColor(id);
@@ -640,7 +695,21 @@ extern "C" int main(int argc, char *argv[]) {
       std::cout << "e" << id << " -> e" << next->entity_id << ";\n";
     }
   }
-  std::cout << "}\n";
 
-  return EXIT_SUCCESS;
+  if (code == EXIT_SUCCESS) {
+    std::cout << "}\n";
+
+
+    std::cerr
+        << ESC(ATTR_BRIGHT) ESC(FG_MAGENTA)
+           "Tainted data reached a memory dereferences."
+           ESC(ATTR_RESET) "\n";
+    return code;
+  }
+
+  std::cerr
+      << ESC(ATTR_BRIGHT) ESC(FG_CYAN)
+         "Tainted data didn't reach any memory dereferences."
+         ESC(ATTR_RESET) "\n";
+  return code;
 }
