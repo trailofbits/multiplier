@@ -20,8 +20,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--file_id FILE_ID]\n"
-    << " --name SYMBOL_NAME";
+    << " [--host HOST] [--port PORT] --name SYMBOL_NAME";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);

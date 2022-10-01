@@ -65,5 +65,4 @@ TokenSubstitutionList TokenSubstitution::after(void) const {
   return TokenSubstitutionList(std::move(ret), num_nodes);
 }
 
-
 }  // namespace mx
