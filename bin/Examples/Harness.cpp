@@ -12,7 +12,7 @@
 
 #include "Index.h"
 
-DEFINE_uint64(entity_id, 0, "ID of the entity to harness");
+DEFINE_uint64(entity_id, mx::kInvalidEntityId, "ID of the entity to harness");
 DEFINE_string(entity_name, "", "Name of the entity to harness");
 
 using SeenSet = std::set<mx::RawEntityId>;
@@ -20,8 +20,11 @@ using WorkList = std::vector<mx::RawEntityId>;
 using DepGraph = std::set<std::pair<mx::RawEntityId, mx::RawEntityId>>;
 
 // Go and find the entity to be harnessed.
-static std::optional<mx::Decl> FindEntity(const mx::Index &index) {
+static std::optional<mx::Decl> FindEntity(const mx::Index &index,
+                                          std::string_view name,
+                                          mx::RawEntityId id) {
   if (!FLAGS_entity_name.empty()) {
+    std::string name_s(name.data(), name.size());
     for (mx::DeclCategory cat : {mx::DeclCategory::FUNCTION,
                                  mx::DeclCategory::INSTANCE_METHOD,
                                  mx::DeclCategory::CLASS_METHOD,
@@ -31,14 +34,14 @@ static std::optional<mx::Decl> FindEntity(const mx::Index &index) {
                                  mx::DeclCategory::CLASS_MEMBER,
                                  mx::DeclCategory::INSTANCE_MEMBER,
                                  mx::DeclCategory::ENUMERATOR}) {
-      for (mx::NamedDecl nd : index.query_entities(FLAGS_entity_name, cat)) {
-        if (nd.name() == FLAGS_entity_name) {
+      for (mx::NamedDecl nd : index.query_entities(name_s, cat)) {
+        if (nd.name() == name) {
           return nd;
         }
       }
     }
-  } else if (FLAGS_entity_id) {
-    mx::VariantEntity maybe_entity = index.entity(FLAGS_entity_id);
+  } else if (id != mx::kInvalidEntityId) {
+    mx::VariantEntity maybe_entity = index.entity(id);
     if (std::holds_alternative<mx::Decl>(maybe_entity)) {
       auto decl = std::get<mx::Decl>(maybe_entity);
       if (auto def = decl.definition()) {
@@ -58,20 +61,69 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
   std::vector<mx::RawEntityId> strong_decl_ids;
   std::vector<mx::RawEntityId> weak_decl_ids;
-  std::vector<mx::RawEntityId> curr_decl_ids;
+  std::vector<mx::RawEntityId> pending_decl_ids;
 
   for (mx::Token tok : frag.parsed_tokens()) {
-    auto seen_type = false;
     for (auto tc = mx::TokenContext::of(tok); tc; tc = tc->parent()) {
+
       if (std::optional<mx::Type> ty = tc->as_type()) {
-        seen_type = true;
 
-        // E.g. `tok(foo_s) -> type(struct foo_s)`
+        // E.g. `tok(foo_s) -> type(struct foo_s)`. We can't yet decide if a
+        // tag is a strong or weak dependency, because it might be `tag x;`
+        // which needs to be strong, or `tag *x;` which can be weak.
         if (auto tag_ty = mx::TagType::from(ty)) {
-          curr_decl_ids.emplace_back(tag_ty->declaration().id());
+          pending_decl_ids.emplace_back(tag_ty->declaration().id());
 
+        // Typedefs always need strong declarations, even if we have
+        // `typedef_name *foo;` because we need to see what the typedef is.
+        //
+        // However, a typedef itself may include a forward declaration, and so
+        // for that thing, we need to decide if we need a strong or weak
+        // declaration, and so we defer that to the pending decls.
         } else if (auto typedef_ty = mx::TypedefType::from(ty)) {
-          curr_decl_ids.emplace_back(typedef_ty->declaration().id());
+          mx::TypedefNameDecl td = typedef_ty->declaration();
+          strong_decl_ids.emplace_back(td.id());
+
+          // If we have something like:
+          //
+          //    typedef struct foo_s foo;
+          //
+          // Then in the following, we only need a weak link to `struct foo_s`:
+          //
+          //    foo *bar;
+          //
+          // But in the following, we need a strong link to `struct foo_s`:
+          //
+          //    foo bar;
+          //
+          // So we defer to the pending list to figure that out. In practice,
+          // it's perfectly okay for a typedef to be defined in terms of a
+          // forward-declared tag type, but if we need the size of the typedef,
+          // then we also need the size of the tag type.
+          auto dty = td.underlying_type().desugared_type();
+          if (auto dtag_ty = mx::TagType::from(dty)) {
+            std::cout << "// " << tok.data() << " -> " << typedef_ty->declaration().name() << " -> " << dtag_ty->declaration().name() << '\n';
+            pending_decl_ids.emplace_back(dtag_ty->declaration().id());
+          }
+
+        // If we have a constant array type, then the calculation of the size
+        // of the array could introduce strong dependencies.
+        } else if (auto arr_ty = mx::ConstantArrayType::from(ty)) {
+
+          if (auto size = arr_ty->size_expression()) {
+            if (auto size_decl = size->referenced_declaration()) {
+              strong_decl_ids.emplace_back(size_decl->id());
+            }
+          }
+
+          // Clang has issues recording the size expression of constant arrays.
+          // So here we'll try to special case that an opportunistically look
+          // for symbols with matching names.
+          if (tok.kind() == mx::TokenKind::IDENTIFIER) {
+            if (auto ent = FindEntity(index, tok.data(), mx::kInvalidEntityId)) {
+              strong_decl_ids.emplace_back(ent->id());
+            }
+          }
 
         // We ascended the token contexts and saw something like:
         //
@@ -81,9 +133,9 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
         // a definition of `foo` or any other decls seen along the way, only
         // a declaration of them, so we move them to the weak decls list.
         } else if (ty->is_any_pointer_type()) {
-          weak_decl_ids.insert(weak_decl_ids.end(), curr_decl_ids.begin(),
-                               curr_decl_ids.end());
-          curr_decl_ids.clear();
+          weak_decl_ids.insert(weak_decl_ids.end(), pending_decl_ids.begin(),
+                               pending_decl_ids.end());
+          pending_decl_ids.clear();
         }
 
       // E.g. `tok(var) -> decl(var) -> ...` in `int var;`.
@@ -122,9 +174,9 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
       }
     }
 
-    strong_decl_ids.insert(strong_decl_ids.end(), curr_decl_ids.begin(),
-                           curr_decl_ids.end());
-    curr_decl_ids.clear();
+    strong_decl_ids.insert(strong_decl_ids.end(), pending_decl_ids.begin(),
+                           pending_decl_ids.end());
+    pending_decl_ids.clear();
   }
 
   // Sort and unique the strong and weak dependencies.
@@ -179,6 +231,10 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
       continue;
     }
 
+    // If we have a separate definition and declaration, and if we only need
+    // to maintain a weak link then we want a strong link between this fragment
+    // and the (forward) declaration, and then a strong link between the
+    // definition and the declaration. This organization helps to break cycles.
     wl.push_back(strong_frag_id);
     if (strong_frag_id != weak_frag_id) {
       deps.emplace(strong_frag_id, weak_frag_id);
@@ -236,7 +292,8 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = InitExample();
 
-  std::optional<mx::Decl> entity = FindEntity(index);
+  std::optional<mx::Decl> entity = FindEntity(
+      index, FLAGS_entity_name, FLAGS_entity_id);
   if (!entity) {
     std::cerr << "Unable to locate entity by id or name.\n";
     return EXIT_FAILURE;
@@ -258,14 +315,6 @@ extern "C" int main(int argc, char *argv[]) {
       CollectEntities(index, frag_id, wl, deps);
     }
   }
-
-//  // Ensure presence.
-//  for (auto [from_frag_id, to_frag_id] : deps) {
-//    seen.emplace(from_frag_id);
-//    seen.emplace(to_frag_id);
-//    dag.emplace(from_frag_id, from_frag_id);
-//    dag.emplace(to_frag_id, to_frag_id);
-//  }
 
   // Convert the edges of `deps` into parent-child relations in a (hopefully)
   // DAG.
@@ -303,6 +352,9 @@ extern "C" int main(int argc, char *argv[]) {
     for (mx::Decl d : index.fragment(frag_id)->top_level_declarations()) {
       if (auto nd = mx::NamedDecl::from(d)) {
         std::cerr << nd->name();
+        if (d.is_definition()) {
+          std::cerr << " (def)";
+        }
         break;
       }
     }
