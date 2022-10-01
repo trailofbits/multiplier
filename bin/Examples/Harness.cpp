@@ -23,24 +23,23 @@ using DepGraph = std::set<std::pair<mx::RawEntityId, mx::RawEntityId>>;
 static std::optional<mx::Decl> FindEntity(const mx::Index &index,
                                           std::string_view name,
                                           mx::RawEntityId id) {
-  if (!FLAGS_entity_name.empty()) {
+  if (!name.empty()) {
     std::string name_s(name.data(), name.size());
     for (mx::DeclCategory cat : mx::EnumerationRange<mx::DeclCategory>()) {
       for (mx::NamedDecl nd : index.query_entities(name_s, cat)) {
         if (nd.name() == name) {
-          return nd;
+          if (auto def = nd.definition()) {
+            return def;
+          } else {
+            return nd;
+          }
         }
       }
     }
   } else if (id != mx::kInvalidEntityId) {
     mx::VariantEntity maybe_entity = index.entity(id);
     if (std::holds_alternative<mx::Decl>(maybe_entity)) {
-      auto decl = std::get<mx::Decl>(maybe_entity);
-      if (auto def = decl.definition()) {
-        return def.value();
-      } else {
-        return decl;
-      }
+      return std::get<mx::Decl>(maybe_entity);
     }
   }
   return std::nullopt;
@@ -215,6 +214,12 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
   // A strong connection requires a definition.
   for (mx::RawEntityId id : strong_decl_ids) {
     mx::Decl decl = std::get<mx::Decl>(index.entity(id));
+
+    // A strong connection back into our own fragment, ignore it.
+    if (mx::Fragment::containing(decl).id() == frag_id) {
+      continue;
+    }
+
     for (mx::Decl redecl : decl.redeclarations()) {
       if (redecl.is_definition()) {
         decl = redecl;
@@ -240,6 +245,12 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
     }
 
     mx::Decl decl = std::get<mx::Decl>(index.entity(id));
+
+    // A weak connection back into our own fragment, ignore it.
+    if (mx::Fragment::containing(decl).id() == frag_id) {
+      continue;
+    }
+
     mx::Decl def = decl;
     for (mx::Decl redecl : decl.redeclarations()) {
       if (redecl.is_definition()) {
