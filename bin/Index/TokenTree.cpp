@@ -1088,11 +1088,11 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return err.str();
   }
 
-  // Fill in things like whitespace gaps between file tokens. This doesn't
-  // do any tracking of substitutions.
-  if (!impl->FillMissingFileTokens(err)) {
-    return err.str();
-  }
+//  // Fill in things like whitespace gaps between file tokens. This doesn't
+//  // do any tracking of substitutions.
+//  if (!impl->FillMissingFileTokens(err)) {
+//    return err.str();
+//  }
 
   Substitution *sub = impl->BuildSubstitutions(err);
   if (!sub) {
