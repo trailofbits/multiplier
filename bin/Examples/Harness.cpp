@@ -25,15 +25,7 @@ static std::optional<mx::Decl> FindEntity(const mx::Index &index,
                                           mx::RawEntityId id) {
   if (!FLAGS_entity_name.empty()) {
     std::string name_s(name.data(), name.size());
-    for (mx::DeclCategory cat : {mx::DeclCategory::FUNCTION,
-                                 mx::DeclCategory::INSTANCE_METHOD,
-                                 mx::DeclCategory::CLASS_METHOD,
-                                 mx::DeclCategory::PARAMETER_VARIABLE,
-                                 mx::DeclCategory::LOCAL_VARIABLE,
-                                 mx::DeclCategory::GLOBAL_VARIABLE,
-                                 mx::DeclCategory::CLASS_MEMBER,
-                                 mx::DeclCategory::INSTANCE_MEMBER,
-                                 mx::DeclCategory::ENUMERATOR}) {
+    for (mx::DeclCategory cat : mx::EnumerationRange<mx::DeclCategory>()) {
       for (mx::NamedDecl nd : index.query_entities(name_s, cat)) {
         if (nd.name() == name) {
           return nd;
@@ -64,6 +56,12 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
   std::vector<mx::RawEntityId> pending_decl_ids;
 
   for (mx::Token tok : frag.parsed_tokens()) {
+    if (tok.kind() != mx::TokenKind::IDENTIFIER) {
+      continue;
+    }
+
+    bool in_const_array_size = false;
+    bool found_entities = false;
     for (auto tc = mx::TokenContext::of(tok); tc; tc = tc->parent()) {
 
       if (std::optional<mx::Type> ty = tc->as_type()) {
@@ -72,7 +70,11 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
         // tag is a strong or weak dependency, because it might be `tag x;`
         // which needs to be strong, or `tag *x;` which can be weak.
         if (auto tag_ty = mx::TagType::from(ty)) {
-          pending_decl_ids.emplace_back(tag_ty->declaration().id());
+          mx::TagDecl td = tag_ty->declaration();
+          if (td.name() == tok.data()) {
+            pending_decl_ids.emplace_back(td.id());
+            found_entities = true;
+          }
 
         // Typedefs always need strong declarations, even if we have
         // `typedef_name *foo;` because we need to see what the typedef is.
@@ -82,6 +84,11 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
         // declaration, and so we defer that to the pending decls.
         } else if (auto typedef_ty = mx::TypedefType::from(ty)) {
           mx::TypedefNameDecl td = typedef_ty->declaration();
+          if (td.name() != tok.data()) {
+            continue;
+          }
+
+          found_entities = true;
           strong_decl_ids.emplace_back(td.id());
 
           // If we have something like:
@@ -102,7 +109,6 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
           // then we also need the size of the tag type.
           auto dty = td.underlying_type().desugared_type();
           if (auto dtag_ty = mx::TagType::from(dty)) {
-            std::cout << "// " << tok.data() << " -> " << typedef_ty->declaration().name() << " -> " << dtag_ty->declaration().name() << '\n';
             pending_decl_ids.emplace_back(dtag_ty->declaration().id());
           }
 
@@ -110,18 +116,12 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
         // of the array could introduce strong dependencies.
         } else if (auto arr_ty = mx::ConstantArrayType::from(ty)) {
 
+          in_const_array_size = true;
+
           if (auto size = arr_ty->size_expression()) {
             if (auto size_decl = size->referenced_declaration()) {
               strong_decl_ids.emplace_back(size_decl->id());
-            }
-          }
-
-          // Clang has issues recording the size expression of constant arrays.
-          // So here we'll try to special case that an opportunistically look
-          // for symbols with matching names.
-          if (tok.kind() == mx::TokenKind::IDENTIFIER) {
-            if (auto ent = FindEntity(index, tok.data(), mx::kInvalidEntityId)) {
-              strong_decl_ids.emplace_back(ent->id());
+              found_entities = true;
             }
           }
 
@@ -140,6 +140,12 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
       // E.g. `tok(var) -> decl(var) -> ...` in `int var;`.
       } else if (std::optional<mx::Decl> decl = tc->as_declaration()) {
+        auto nd = mx::NamedDecl::from(decl);
+        if (!nd || nd->name() != tok.data()) {
+          continue;
+        }
+
+        found_entities = true;
 
         // A usage of a field, enum constant, or typedef requires a strong
         // definition.
@@ -153,24 +159,42 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
         }
 
       } else if (std::optional<mx::Stmt> stmt = tc->as_statement()) {
-        if (auto ref_decl = stmt->referenced_declaration()) {
-
-          // These can be forward-declared.
-          if (mx::FunctionDecl::from(ref_decl) ||
-              mx::VarDecl::from(ref_decl)) {
-            weak_decl_ids.emplace_back(ref_decl->id());
-
-          } else if (mx::FieldDecl::from(ref_decl) ||
-                     mx::EnumConstantDecl::from(ref_decl) ||
-                     mx::TypedefNameDecl::from(ref_decl) ||
-                     mx::DeclRefExpr::from(stmt) ||
-                     mx::MemberExpr::from(stmt)) {
-            strong_decl_ids.emplace_back(ref_decl->id());
-
-          } else {
-            weak_decl_ids.emplace_back(ref_decl->id());
-          }
+        auto ref_decl = stmt->referenced_declaration();
+        if (!ref_decl) {
+          continue;
         }
+
+        auto nd = mx::NamedDecl::from(ref_decl);
+        if (!nd || nd->name() != tok.data()) {
+          continue;
+        }
+
+        found_entities = true;
+
+        // These can be forward-declared.
+        if (mx::FunctionDecl::from(ref_decl) ||
+            mx::VarDecl::from(ref_decl)) {
+          weak_decl_ids.emplace_back(ref_decl->id());
+
+        } else if (mx::FieldDecl::from(ref_decl) ||
+                   mx::EnumConstantDecl::from(ref_decl) ||
+                   mx::TypedefNameDecl::from(ref_decl) ||
+                   mx::DeclRefExpr::from(stmt) ||
+                   mx::MemberExpr::from(stmt)) {
+          strong_decl_ids.emplace_back(ref_decl->id());
+
+        } else {
+          weak_decl_ids.emplace_back(ref_decl->id());
+        }
+      }
+    }
+
+    // Clang has issues recording the size expression of constant arrays.
+    // So here we'll try to special case that an opportunistically look
+    // for symbols with matching names.
+    if (in_const_array_size && !found_entities) {
+      if (auto ent = FindEntity(index, tok.data(), mx::kInvalidEntityId)) {
+        strong_decl_ids.emplace_back(ent->id());
       }
     }
 
@@ -227,6 +251,8 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
     auto strong_frag_id = mx::Fragment::containing(def).id().Pack();
     auto weak_frag_id = mx::Fragment::containing(decl).id().Pack();
+
+    // E.g. `typedef struct foo_s` { struct foo_s *x; ... } foo;`
     if (strong_frag_id == frag_id || weak_frag_id == frag_id) {
       continue;
     }
