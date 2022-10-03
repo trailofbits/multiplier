@@ -15,6 +15,7 @@
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 #include <iostream>
@@ -52,11 +53,32 @@ struct TokenInfo {
   };
 
   TokenInfo *next{nullptr};
+  TokenInfo *root{nullptr};
 
   std::optional<pasta::Token> parsed_tok;
   std::optional<pasta::FileToken> file_tok;
   std::optional<pasta::MacroToken> macro_tok;
   Category category{kFileToken};
+};
+
+struct TokenSet {
+  TokenSet *root;
+
+  // First token info associated with this set.
+  TokenInfo *info{nullptr};
+
+  // File token associated with any parsed token in this set.
+  std::optional<pasta::FileToken> file_tok;
+
+  TokenSet(void)
+      : root(this) {}
+
+  TokenSet *Root(void) {
+    if (this != root) {
+      root = root->Root();
+    }
+    return root;
+  }
 };
 
 // Represents a token substitution. This can be due to a macro expansion, or
@@ -187,11 +209,34 @@ class TokenTreeImpl {
   Substitution *BuildSubstitutions(std::stringstream &err);
 
   Substitution *CreateSubstitution(Substitution::Kind kind);
+
+  // Try to unify tokens in the token list back to the same file token.
+  void UnifyTokens(TokenInfo *first);
 };
 
-static std::string TokData(std::string_view data) {
+template <typename T>
+static std::string TokData(const T &tok) {
+  switch (tok.Kind()) {
+    case pasta::TokenKind::kComment:
+      return "&lt;comment&gt;";
+    case pasta::TokenKind::kUnknown:
+      return "&lt;unk&gt;";
+    case pasta::TokenKind::kCharacterConstant:
+    case pasta::TokenKind::kUtf8CharacterConstant:
+    case pasta::TokenKind::kUtf16CharacterConstant:
+    case pasta::TokenKind::kUtf32CharacterConstant:
+    case pasta::TokenKind::kWideCharacterConstant:
+    case pasta::TokenKind::kStringLiteral:
+    case pasta::TokenKind::kUtf8StringLiteral:
+    case pasta::TokenKind::kUtf16StringLiteral:
+    case pasta::TokenKind::kUtf32StringLiteral:
+    case pasta::TokenKind::kWideStringLiteral:
+      return "&lt;str&gt;";
+    default:
+      break;
+  }
   std::stringstream ss;
-  for (auto ch : data) {
+  for (auto ch : tok.Data()) {
     switch (ch) {
       case '<': ss << "&lt;"; break;
       case '>': ss << "&gt;"; break;
@@ -237,52 +282,27 @@ void Substitution::PrintDOT(std::ostream &os) const {
      << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"><TR>";
 
   auto has_any = false;
-  auto dump_ft = [&] (TokenInfo *info) {
-    if (auto tk = info->file_tok->Kind();
-        tk == pasta::TokenKind::kComment || tk == pasta::TokenKind::kUnknown) {
-      // Skip.
-    } else if (tk == pasta::TokenKind::kCharacterConstant ||
-               tk == pasta::TokenKind::kUtf8CharacterConstant ||
-               tk == pasta::TokenKind::kUtf16CharacterConstant ||
-               tk == pasta::TokenKind::kUtf32CharacterConstant ||
-               tk == pasta::TokenKind::kWideCharacterConstant ||
-               tk == pasta::TokenKind::kStringLiteral ||
-               tk == pasta::TokenKind::kUtf8StringLiteral ||
-               tk == pasta::TokenKind::kUtf16StringLiteral ||
-               tk == pasta::TokenKind::kUtf32StringLiteral ||
-               tk == pasta::TokenKind::kWideStringLiteral) {
 
-      os << "<TD>&lt;str&gt;</TD>";
-      has_any = true;
-
-    } else {
-      os << "<TD>" << TokData(info->file_tok->Data()) << "</TD>";
-      has_any = true;
+  auto dump_tok = [&] (TokenInfo *info) {
+    os << "<TD><TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"0\">";
+    if (info->file_tok) {
+      os << "<TR><TD>FK=" << info->file_tok->KindName() << "</TD></TR>";
     }
-  };
+    os << "<TR><TD>PK=" << info->parsed_tok->KindName() << "</TD></TR>";
+    if (info->root) {
+//
+//      if (info->root->parsed_tok) {
+//        os << "<TR><TD>PT=" << info->root->parsed_tok->Index() << "</TD></TR>";
+//      }
 
-  auto dump_pt = [&] (TokenInfo *info) {
-    if (auto tk = info->parsed_tok->Kind();
-        tk == pasta::TokenKind::kComment || tk == pasta::TokenKind::kUnknown) {
-      // Skip.
-    } else if (tk == pasta::TokenKind::kCharacterConstant ||
-               tk == pasta::TokenKind::kUtf8CharacterConstant ||
-               tk == pasta::TokenKind::kUtf16CharacterConstant ||
-               tk == pasta::TokenKind::kUtf32CharacterConstant ||
-               tk == pasta::TokenKind::kWideCharacterConstant ||
-               tk == pasta::TokenKind::kStringLiteral ||
-               tk == pasta::TokenKind::kUtf8StringLiteral ||
-               tk == pasta::TokenKind::kUtf16StringLiteral ||
-               tk == pasta::TokenKind::kUtf32StringLiteral ||
-               tk == pasta::TokenKind::kWideStringLiteral) {
-
-      os << "<TD>&lt;str&gt;</TD>";
-      has_any = true;
-
-    } else {
-      os << "<TD>" << TokData(info->parsed_tok->Data()) << "</TD>";
-      has_any = true;
+      if (info->root->file_tok) {
+        os << "<TR><TD>FT=" << info->root->file_tok->Index() << "</TD></TR>";
+      }
     }
+
+    os << "<TR><TD><B>" << TokData(info->parsed_tok.value()) << "</B></TD></TR>";
+    os << "</TABLE></TD>";
+    has_any = true;
   };
 
   auto i = 0;
@@ -293,11 +313,9 @@ void Substitution::PrintDOT(std::ostream &os) const {
         case TokenInfo::kFileToken:
         case TokenInfo::kMacroUseToken:
         case TokenInfo::kMissingFileToken:
-          dump_ft(info);
-          continue;
         case TokenInfo::kMacroStepToken:
         case TokenInfo::kMacroExpansionToken:
-          dump_pt(info);
+          dump_tok(info);
           continue;
         case TokenInfo::kMarkerToken:
         default:
@@ -388,6 +406,9 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           info.category = TokenInfo::kMacroStepToken;
         }
         info.macro_tok = tok.MacroLocation();
+        if (!info.file_tok && info.macro_tok) {
+          info.file_tok = info.macro_tok->FileLocation();
+        }
         info.parsed_tok = std::move(tok);
         break;
       }
@@ -399,6 +420,9 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           info.file_tok = std::move(file_tok);
         }
         info.macro_tok = tok.MacroLocation();
+        if (!info.file_tok && info.macro_tok) {
+          info.file_tok = info.macro_tok->FileLocation();
+        }
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMacroExpansionToken;
         break;
@@ -1053,8 +1077,73 @@ Substitution *TokenTreeImpl::BuildSubstitutions(std::stringstream &err) {
   std::vector<Substitution *> subs;
 
   TokenInfo *prev = nullptr;
-  TokenInfo *curr = &(tokens_alloc.front());
-  return BuildSubstitutions(prev, curr, err);
+  TokenInfo * const first = &(tokens_alloc.front());
+  TokenInfo *curr = first;  // NOTE(pag): Updated by reference.
+  if (auto sub = BuildSubstitutions(prev, curr, err)) {
+    UnifyTokens(first);
+    return sub;
+  }
+
+  return nullptr;
+}
+
+// Try to unify tokens in the token list back to the same file token.
+void TokenTreeImpl::UnifyTokens(TokenInfo *first) {
+  std::unordered_map<const void *, TokenSet> parsed_sets;
+
+  for (TokenInfo *curr = first; curr; curr = curr->next) {
+    assert(curr->parsed_tok.has_value());
+    if (!curr->parsed_tok) {
+      continue;
+    }
+
+    TokenSet &parsed_set = parsed_sets[curr->parsed_tok->RawToken()];
+    if (!parsed_set.info) {
+      parsed_set.info = curr;
+    }
+    if (!parsed_set.file_tok) {
+      parsed_set.file_tok = curr->file_tok;
+    }
+
+    std::optional<pasta::Token> derived_loc =
+        curr->parsed_tok->DerivedLocation();
+    if (!derived_loc) {
+      continue;
+    }
+
+    TokenSet *prev_set = parsed_sets[derived_loc->RawToken()].Root();
+    if (prev_set == &parsed_set) {
+      continue;
+    }
+
+    // The previous set might point out-of-fragment, e.g. to inside of a
+    // `#define`.
+    if (!prev_set->info) {
+      prev_set->info = curr;
+    }
+    if (!prev_set->file_tok) {
+      prev_set->file_tok = curr->file_tok;
+    }
+    if (!prev_set->file_tok) {
+      prev_set->file_tok = derived_loc->FileLocation();
+    }
+
+    parsed_set.Root()->root = prev_set;  // Unify.
+  }
+
+  for (TokenInfo *curr = first; curr; curr = curr->next) {
+    assert(curr->parsed_tok.has_value());
+    if (!curr->parsed_tok) {
+      continue;
+    }
+
+    TokenSet *root_set = parsed_sets[curr->parsed_tok->RawToken()].Root();
+    assert(root_set->info != nullptr);
+    assert(!curr->file_tok || (curr->file_tok && root_set->file_tok));
+    curr->root = root_set->info;
+    assert(curr->root != nullptr);
+    curr->file_tok = root_set->file_tok;
+  }
 }
 
 TokenTree::~TokenTree(void) {}
