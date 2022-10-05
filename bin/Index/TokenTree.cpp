@@ -887,6 +887,10 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
     pasta::MacroNode node, std::stringstream &err) {
   switch (node.Kind()) {
+    case pasta::MacroNodeKind::kInvalid:
+      DCHECK(false);
+      err << "Invalid substitution kind";
+      return nullptr;
     case pasta::MacroNodeKind::kToken:
       return BuildMacroSubstitutions(
           prev, curr, sub, pasta::MacroToken::From(node), err);
@@ -909,8 +913,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
       return BuildMacroSubstitutions(
           prev, curr, sub, pasta::MacroDefinition::From(node), err);
     default:
-      err
-          << "Unexpected/unsupported substitution kind";
+      err << "Unexpected/unsupported substitution kind";
       return nullptr;
   }
 }
