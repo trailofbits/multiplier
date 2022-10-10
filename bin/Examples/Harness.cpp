@@ -19,6 +19,27 @@ using SeenSet = std::set<mx::RawEntityId>;
 using WorkList = std::vector<mx::RawEntityId>;
 using DepGraph = std::set<std::pair<mx::RawEntityId, mx::RawEntityId>>;
 
+// Sometimes we see two separate definitions of an entity, e.g.
+//
+// `typedef void CURL;` and `typedef struct { ... } CURL;` where the former
+// is an opaque, exported type, and the latter is the internal type. We want
+// to find the internal version.
+static mx::Decl LongestDefinition(mx::Decl decl) {
+  size_t num_toks = 0u;
+
+  for (mx::Decl redecl : decl.redeclarations()) {
+    if (decl.is_definition()) {
+      if (auto redecl_num_toks = redecl.tokens().size();
+          redecl_num_toks > num_toks) {
+        decl = redecl;
+        num_toks = redecl_num_toks;
+      }
+    }
+  }
+
+  return decl;
+}
+
 // Go and find the entity to be harnessed.
 static std::optional<mx::Decl> FindEntity(const mx::Index &index,
                                           std::string_view name,
@@ -28,11 +49,7 @@ static std::optional<mx::Decl> FindEntity(const mx::Index &index,
     for (mx::DeclCategory cat : mx::EnumerationRange<mx::DeclCategory>()) {
       for (mx::NamedDecl nd : index.query_entities(name_s, cat)) {
         if (nd.name() == name) {
-          if (auto def = nd.definition()) {
-            return def;
-          } else {
-            return nd;
-          }
+          return LongestDefinition(nd);
         }
       }
     }
@@ -220,12 +237,7 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
       continue;
     }
 
-    for (mx::Decl redecl : decl.redeclarations()) {
-      if (redecl.is_definition()) {
-        decl = redecl;
-        break;
-      }
-    }
+    decl = LongestDefinition(decl);
 
     auto strong_frag_id = mx::Fragment::containing(decl).id().Pack();
     if (frag_id != strong_frag_id) {
@@ -251,11 +263,9 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
       continue;
     }
 
-    mx::Decl def = decl;
-    for (mx::Decl redecl : decl.redeclarations()) {
-      if (redecl.is_definition()) {
-        def = redecl;
-      } else {
+    mx::Decl def = LongestDefinition(decl);
+    for (mx::Decl redecl : def.redeclarations()) {
+      if (!redecl.is_definition()) {
         decl = redecl;
       }
     }
