@@ -175,7 +175,7 @@ static void DumpRecordDeclToJSON(llvm::json::Object &obj, mx::RecordDecl decl,
     fields_a.push_back(std::move(field_v));
   }
 
-  if (!fields_a.empty()) {
+  if (decl.is_definition() || !fields_a.empty()) {
     llvm::json::Value fields_v(std::move(fields_a));
     obj["fields"] = std::move(fields_v);
   }
