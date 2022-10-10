@@ -175,8 +175,10 @@ static void DumpRecordDeclToJSON(llvm::json::Object &obj, mx::RecordDecl decl,
     fields_a.push_back(std::move(field_v));
   }
 
-  llvm::json::Value fields_v(std::move(fields_a));
-  obj["fields"] = std::move(fields_v);
+  if (!fields_a.empty()) {
+    llvm::json::Value fields_v(std::move(fields_a));
+    obj["fields"] = std::move(fields_v);
+  }
 }
 
 static void DumpEnumDeclToJSON(llvm::json::Object &obj, mx::EnumDecl decl,
@@ -219,6 +221,7 @@ static void DumpFunctionDeclToJSON(llvm::json::Object &obj,
 
   llvm::json::Value params_v(std::move(params_a));
   obj["parameters"] = std::move(params_v);
+  obj["is_variadic"] = decl.is_variadic();
 }
 
 void DumpDeclToJSON(llvm::json::Object &obj, mx::Decl decl,
