@@ -79,11 +79,12 @@ static void DumpArrayTypeToJSON(llvm::json::Object &obj,
 template <typename T>
 static void DumpIndirectTypeToJSON(llvm::json::Object &obj,
                                    T type, WorkList &wl) {
-  llvm::json::Object type_o;
-  DumpTypeToJSON(type_o, type.underlying_type(), wl);
+  DumpTypeToJSON(obj, type.underlying_type(), wl);
+}
 
-  llvm::json::Value type_v(std::move(type_o));
-  obj["underlying_type"] = std::move(type_v);
+static void DumpElaboratedTypeToJSON(llvm::json::Object &obj,
+                                     mx::ElaboratedType type, WorkList &wl) {
+  DumpTypeToJSON(obj, type.named_type(), wl);
 }
 
 void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
@@ -141,6 +142,9 @@ void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
 
   } else if (auto td6 = mx::TypeOfType::from(type)) {
     DumpIndirectTypeToJSON(obj, std::move(td6.value()), wl);
+
+  } else if (auto el = mx::ElaboratedType::from(type)) {
+    DumpElaboratedTypeToJSON(obj, std::move(el.value()), wl);
   }
 }
 
