@@ -15,7 +15,7 @@
 #include <sstream>
 
 DECLARE_bool(help);
-DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?ß");
+DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?");
 DECLARE_string(host);
 DECLARE_string(port);
 DEFINE_string(query, "", "Query pattern to be searched");
@@ -47,7 +47,7 @@ extern "C" int main(int argc, char *argv[]) {
   ss
     << "Usage: " << argv[0]
     << " [--host HOST] [--port PORT]\n"
-    << " --query QUERY_STRING";
+    << " --query QUERY_STRING [--print_matches PRINT_MATCHES]";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -61,15 +61,20 @@ extern "C" int main(int argc, char *argv[]) {
 
   if (FLAGS_query.empty()) {
     std::cerr
-        << "Must specify query string to be searched for.";
+        << "Must specify query string to be searched for.\n";
     return EXIT_FAILURE;
   }
 
-  auto query_string = FLAGS_query;
+  mx::WeggliQuery query(FLAGS_query, FLAGS_c_plus_plus);
+  if (!query.IsValid()) {
+    std::cerr
+        << "Invalid weggli query.\n";
+    return EXIT_FAILURE;
+  }
+
   mx::Index index(mx::EntityProvider::from_remote(
       FLAGS_host, FLAGS_port));
 
-  mx::WeggliQuery query(FLAGS_query, FLAGS_c_plus_plus);
   for (mx::WeggliQueryMatch match : index.query_fragments(query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
     mx::File file = mx::File::containing(frag);

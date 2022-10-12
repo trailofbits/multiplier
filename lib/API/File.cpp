@@ -171,6 +171,18 @@ File File::containing(const Fragment &fragment) {
   return File(ep->FileFor(ep, fragment.impl->FileContaingFirstToken()));
 }
 
+// Return the file containing a specific fragment.
+File File::containing(const TokenSubstitution &entity) {
+  const auto &ep = entity.impl->ep;
+  return File(ep->FileFor(ep, entity.impl->FileContaingFirstToken()));
+}
+
+// Return the file containing a specific token substitution.
+File File::containing(const Designator &entity) {
+  const auto &ep = entity.fragment->ep;
+  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+}
+
 // Return the file containing the fragment containing a specific entity.
 File File::containing(const Decl &entity) {
   const auto &ep = entity.fragment->ep;

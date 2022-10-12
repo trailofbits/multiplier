@@ -33,7 +33,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--file_id FILE_ID]\n"
+    << " [--host HOST] [--port PORT] [--fragment_id ID]\n"
     << " --query QUERY_STRING";
 
   google::SetUsageMessage(ss.str());

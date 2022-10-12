@@ -149,7 +149,7 @@ const std::string &NameManglerImpl::GetMangledNameRec(
                true)
         .Default(false);
     if (!mangled_name.empty() && is_main) {
-      mangled_name_os << " (" << tu << ")";
+      mangled_name_os << " tu:" << tu;
       mangled_name_os.flush();
     }
   }

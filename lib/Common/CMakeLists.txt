@@ -83,9 +83,20 @@ target_link_libraries("mx-common"
   PUBLIC
     "CapnProto::capnp-rpc"
   PRIVATE
-    "re2::re2"
     "ZLIB::ZLIB"
 )
+
+if(MX_ENABLE_RE2)
+  target_link_libraries("mx-common"
+    PRIVATE
+    	"re2::re2"
+  )
+else()
+  target_compile_definitions("mx-common"
+    PUBLIC
+      "MX_DISABLE_RE2")
+endif()
+
 
 if(MX_ENABLE_WEGGLI)
   target_link_libraries("mx-common"

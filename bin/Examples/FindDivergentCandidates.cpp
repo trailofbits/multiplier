@@ -109,6 +109,14 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
                   << "example use outside loop: "
                   << outside_uses.front().tokens().data()
                   << std::endl;
+
+            if (FLAGS_show_locations) {
+              std::cout << std::endl;
+              if (auto toks = decl.tokens()) {
+                RenderFragment(std::cout, fragment, toks, "\t", true);
+              }
+              std::cout << std::endl;
+            }
           }
         }
       }
@@ -122,7 +130,9 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--file_id ID]\n";
+    << " [--host HOST] [--port PORT]"
+    << " [--fragment_id ID | --file_id ID]\n"
+    << " [--show_locations SHOW_LOCATIONS]\n";
     
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);

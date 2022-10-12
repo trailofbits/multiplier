@@ -59,6 +59,10 @@ Fragment Fragment::containing(const Attr &entity) {
   return Fragment(entity.fragment);
 }
 
+Fragment Fragment::containing(const Designator &entity) {
+  return Fragment(entity.fragment);
+}
+
 std::optional<Fragment> Fragment::containing(const Token &entity) {
   if (auto frag = dynamic_cast<const PackedFragmentImpl *>(entity.impl.get())) {
     std::shared_ptr<const FragmentImpl> ptr(entity.impl, frag);
@@ -81,7 +85,7 @@ Fragment Fragment::containing(const Reference &ref) {
 }
 
 // Return the ID of this fragment.
-RawEntityId Fragment::id(void) const noexcept {
+EntityId Fragment::id(void) const noexcept {
   return EntityId(FragmentId{impl->fragment_id});
 }
 

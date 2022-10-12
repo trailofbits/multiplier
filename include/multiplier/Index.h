@@ -176,10 +176,9 @@ class EntityProvider {
                           std::vector<RawEntityId> &ids_out) = 0;
 };
 
-using VariantEntity = std::variant<Decl, Stmt, Type, Attr,
+using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
                                    Token, TokenSubstitution,
-                                   Designator, Fragment, File,
-                                   NotAnEntity>;
+                                   Designator, Fragment, File>;
 
 // Access to the indexed code.
 class Index {
@@ -225,7 +224,7 @@ class Index {
   std::optional<Fragment> fragment_containing(EntityId) const;
 
   // Return an entity given its ID.
-  VariantEntity entity(EntityId) const;
+  VariantEntity entity(EntityId eid) const;
 
   // Return an entity given its ID.
   template <typename T>

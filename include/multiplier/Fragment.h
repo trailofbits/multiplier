@@ -174,13 +174,14 @@ class Fragment {
   static Fragment containing(const Stmt &);
   static Fragment containing(const Type &);
   static Fragment containing(const Attr &);
+  static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const TokenSubstitution &);
   static Fragment containing(const UseBase &);
   static Fragment containing(const Reference &);
 
   // Return the entity ID of this fragment.
-  RawEntityId id(void) const noexcept;
+  EntityId id(void) const noexcept;
 
   // The range of file tokens in this fragment.
   TokenRange file_tokens(void) const;
@@ -190,7 +191,7 @@ class Fragment {
   TokenList parsed_tokens(void) const;
 
   // Return the list of token substitutions. The original file tokens can be
-  // recovered by choosing `.before()` on all substitution objets.
+  // recovered by choosing `.before()` on all substitution objects.
   TokenSubstitutionList substitutions(void) const;
 
   // Return the list of top-level declarations in this fragment.

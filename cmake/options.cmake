@@ -18,5 +18,6 @@ option(MX_ENABLE_SANITIZERS "Set to true to enable sanitizers on the build binar
 option(MX_ENABLE_BOOTSTRAP "Set to ON to enable re-bootstrapping of some auto-generated files." OFF)
 option(MX_ENABLE_INSTALL "Set to ON to enable the install target" ON)
 option(MX_ENABLE_WEGGLI "Set to OFF to disable Weggli integration" ON)
+option(MX_ENABLE_RE2 "Set to OFF to disable RE2 integration" ON)
 option(MX_ENABLE_VAST "Set to OFF to disable VAST SourceIR generation" ON)
 option(MX_DOWNLOAD_SQLITE "Set to OFF to use a system-available SQLite install instead of downloading a new copy" ON)

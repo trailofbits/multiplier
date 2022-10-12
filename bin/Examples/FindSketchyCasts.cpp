@@ -14,6 +14,59 @@ DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to check for call e
 DEFINE_uint64(file_id, 0, "ID of the file from which to check for call expressions with implicit integer casts");
 DEFINE_uint64(entity_id, 0, "ID of the entity from which to check for uses in call expressions with implicit integer casts");
 DEFINE_bool(show_locations, false, "Show the locations of users?");
+DEFINE_bool(highlight_use, false, "Highlight the use within its fragment?");
+DEFINE_bool(show_implicit, false, "Show implicit casts?");
+DEFINE_bool(show_explicit, false, "Show explicit casts?");
+DEFINE_bool(show_sign_changing, false, "Show sign-changing casts?");
+DEFINE_bool(show_sign_down_cast, false, "Show sign down-casts? E.g. int to short.");
+
+static constexpr mx::BuiltinTypeKind kSketchyKinds[][2] = {
+    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::INT},
+    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::S_CHAR},
+
+    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::INT},
+    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::S_CHAR},
+
+    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::S_CHAR},
+
+    {mx::BuiltinTypeKind::U_SHORT, mx::BuiltinTypeKind::S_CHAR},
+};
+
+static constexpr mx::BuiltinTypeKind kSignDownCastKinds[][2] = {
+    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::INT},
+    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::S_CHAR},
+
+    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::INT},
+    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::S_CHAR},
+
+    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::S_CHAR},
+
+    {mx::BuiltinTypeKind::SHORT, mx::BuiltinTypeKind::S_CHAR},
+};
+
+static constexpr mx::BuiltinTypeKind kSignChangingKinds[][2] = {
+    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::LONG_LONG},
+    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::U_LONG_LONG},
+    {mx::BuiltinTypeKind::U_LONG_LONG, mx::BuiltinTypeKind::LONG},
+    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::U_LONG_LONG},
+    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::LONG_LONG},
+    {mx::BuiltinTypeKind::LONG_LONG, mx::BuiltinTypeKind::U_LONG},
+    {mx::BuiltinTypeKind::U_LONG, mx::BuiltinTypeKind::LONG},
+    {mx::BuiltinTypeKind::LONG, mx::BuiltinTypeKind::U_LONG},
+    {mx::BuiltinTypeKind::U_INT, mx::BuiltinTypeKind::INT},
+    {mx::BuiltinTypeKind::INT, mx::BuiltinTypeKind::U_INT},
+    {mx::BuiltinTypeKind::U_SHORT, mx::BuiltinTypeKind::SHORT},
+    {mx::BuiltinTypeKind::SHORT, mx::BuiltinTypeKind::U_SHORT},
+    {mx::BuiltinTypeKind::U_CHAR, mx::BuiltinTypeKind::S_CHAR},
+    {mx::BuiltinTypeKind::S_CHAR, mx::BuiltinTypeKind::U_CHAR},
+};
+
 
 // Checks whether any arguments passed the provided call expression are used
 // as an implicit cast, specifically, from an unsigned long to a signed int
@@ -29,61 +82,107 @@ DEFINE_bool(show_locations, false, "Show the locations of users?");
 // attempt to identify more instances of the vulnerable code pattern:
 // https://pwning.systems/posts/php_filter_var_shenanigans/
 static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
-  for (auto argument : call_expr.arguments()) {
-    if (auto cast_expr = mx::ImplicitCastExpr::from(argument)) {
-      if (cast_expr->is_part_of_explicit_cast() ||
-          cast_expr->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
+  for (mx::Expr argument : call_expr.arguments()) {
+    if (std::optional<mx::CastExpr> cast_expr = mx::CastExpr::from(argument)) {
+      if (cast_expr->cast_kind() != mx::CastKind::INTEGRAL_CAST) {
         continue;
       }
-      auto source_type = cast_expr->sub_expression().type()->canonical_type();
-      auto dest_type = cast_expr->type();
 
-      auto source_builtin = mx::BuiltinType::from(source_type);
-      auto dest_builtin = mx::BuiltinType::from(dest_type);
+      if (auto implicit = mx::ImplicitCastExpr::from(argument)) {
+        if (!FLAGS_show_implicit &&
+            !(FLAGS_show_explicit && implicit->is_part_of_explicit_cast())) {
+          continue;
+        }
+      } else if (mx::ExplicitCastExpr::from(argument)) {
+        if (!FLAGS_show_explicit) {
+          continue;
+        }
+      } else {
+        continue;
+      }
+
+      mx::Type source_type =
+          cast_expr->sub_expression().type()->canonical_type();
+      std::optional<mx::Type> dest_type = cast_expr->type();
+
+      // Make sure the source and dest types are builtins.
+      std::optional<mx::BuiltinType> source_builtin =
+          mx::BuiltinType::from(source_type);
+      std::optional<mx::BuiltinType> dest_builtin =
+          mx::BuiltinType::from(dest_type);
       if (!source_builtin || !dest_builtin) {
         continue;
       }
 
-      auto source_type_kind = source_builtin->builtin_kind();
-      auto dest_type_kind = dest_builtin->builtin_kind();
+      mx::BuiltinTypeKind source_type_kind = source_builtin->builtin_kind();
+      mx::BuiltinTypeKind dest_type_kind = dest_builtin->builtin_kind();
 
-      // TODO(wunused): generalize the sketchy casts we care about.
-      if (source_type_kind != mx::BuiltinTypeKind::U_LONG ||
-          dest_type_kind != mx::BuiltinTypeKind::INT) {
-        continue;
+      const char *kind = "None";
+
+      // Check to see if we found a sketchy downcast.
+      for (auto [from_kind, to_kind] : kSketchyKinds) {
+        if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+          kind = "Sketchy";
+          goto found;
+        }
       }
+
+      if (FLAGS_show_sign_down_cast) {
+        for (auto [from_kind, to_kind] : kSignDownCastKinds) {
+          if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+            kind = "Sign down-cast";
+            goto found;
+          }
+        }
+      }
+
+      if (FLAGS_show_sign_changing) {
+        for (auto [from_kind, to_kind] : kSignChangingKinds) {
+          if (source_type_kind == from_kind && dest_type_kind == to_kind) {
+            kind = "Sign change";
+            goto found;
+          }
+        }
+      }
+
+      // Didn't find.
+      continue;
+
+    found:
 
       mx::Fragment fragment = mx::Fragment::containing(call_expr);
       mx::File file = mx::File::containing(fragment);
 
       if (FLAGS_show_locations) {
-        auto file = mx::File::containing(mx::Fragment::containing(call_expr));
-        std::cout << file_paths[file.id()].generic_string();
+        std::cout << "Location: " << file_paths[file.id()].generic_string();
         if (auto tok = call_expr.tokens()[0]) {
           if (auto line_col = tok.location(location_cache)) {
             std::cout << ':' << line_col->first << ':' << line_col->second;
           }
         }
-        std::cout << std::endl;
+        std::cout << '\n';
       }
 
       std::cout
-          << "file ID: " << file.id() << '\t'
-          << "frag ID: " << fragment.id() << '\t'
-          << "entity ID: " << cast_expr->id() << '\t'
-          << mx::EnumeratorName(source_builtin->builtin_kind())
-          << " -> "
-          << mx::EnumeratorName(dest_builtin->builtin_kind()) << '\t'
-          << cast_expr->tokens().data()
-          << std::endl;
+          << "File ID: " << file.id()
+          << "\nFrag ID: " << fragment.id()
+          << "\nEntity ID: " << cast_expr->id()
+          << "\nKind: " << kind << " ("
+          << mx::EnumeratorName(source_type_kind)
+          << " to "
+          << mx::EnumeratorName(dest_type_kind)
+          << ")\nCall: " << call_expr.tokens().file_tokens().data()
+          << "\nArgument: " << cast_expr->tokens().data()
+          << '\n';
 
-      if (FLAGS_show_locations) {
+      if (FLAGS_highlight_use) {
         std::cout << std::endl;
         if (auto toks = call_expr.tokens()) {
           RenderFragment(std::cout, fragment, toks, "\t", true);
         }
         std::cout << std::endl;
       }
+      std::cout << '\n';
     }
   }
 }
@@ -98,11 +197,19 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--fragment_id ID | --file_id ID]\n";
+    << " [--host HOST] [--port PORT] [--fragment_id ID | --file_id ID | --entity_id ID]\n"
+    << " [--show_locations] [--highlight_use]\n"
+    << " [--show_implicit] [--show_explicit]\n"
+    << " [--show_sign_changing] [--show_sign_down_cast]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
+
+  if (!FLAGS_show_implicit && !FLAGS_show_explicit) {
+    std::cerr << "One or both of --show_implicit or --show_explicit should be used\n";
+    return EXIT_FAILURE;
+  }
 
   mx::Index index = InitExample(FLAGS_show_locations);
 
