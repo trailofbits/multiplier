@@ -667,7 +667,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     return;
   }
 
-  std::ofstream os(base_dir + "/entities/" + enum_name + ".h", std::ios::trunc | std::ios::out);
+  std::ofstream os(base_dir + "/Entities/" + enum_name + ".h", std::ios::trunc | std::ios::out);
   os
     << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
     << "// All rights reserved.\n"
@@ -678,7 +678,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     << "#pragma once\n\n"
     << "#include <cstdint>\n\n"
     << "namespace mx {\n";
-  include_h_os << "#include \"entities/" << enum_name << ".h\"\n";
+  include_h_os << "#include \"Entities/" << enum_name << ".h\"\n";
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
@@ -1567,7 +1567,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
-  std::ofstream os(base_dir + "/entities/" + class_name + ".h", std::ios::trunc | std::ios::out);
+  std::ofstream os(base_dir + "/Entities/" + class_name + ".h", std::ios::trunc | std::ios::out);
   os
     << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
     << "// All rights reserved.\n"
@@ -1585,7 +1585,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     << "#include \"../Types.h\"\n"
     << "#include \"../Token.h\"\n"
     << "#include \"../Use.h\"\n\n";
-  include_h_os << "#include \"entities/" << class_name << ".h\"\n";
+  include_h_os << "#include \"Entities/" << class_name << ".h\"\n";
 
   const char *nth_entity_reader = nullptr;
   const char *end_serializer = nullptr;
@@ -3393,7 +3393,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 void CodeGenerator::RunOnUseSet(
     const std::map<std::string, UseList> &use_set,
     const char *sel_name) {
-  std::ofstream os(base_dir + "/entities/" + sel_name + ".h");
+  std::ofstream os(base_dir + "/Entities/" + sel_name + ".h");
 
   lib_pasta_h_os << "enum class " << sel_name << " : unsigned short;\n";
   os

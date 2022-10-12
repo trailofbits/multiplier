@@ -16,7 +16,7 @@
 #include "Use.h"
 #include "Fragment.h"
 #include "Query.h"
-#include "entities/NamedDecl.h"
+#include "Entities/NamedDecl.h"
 
 namespace mx {
 

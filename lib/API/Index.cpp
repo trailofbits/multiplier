@@ -6,9 +6,9 @@
 
 #include "File.h"
 #include "Fragment.h"
-#include <multiplier/entities/Attr.h>
-#include <multiplier/entities/Designator.h>
-#include <multiplier/entities/Type.h>
+#include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Type.h>
 
 #include <cassert>
 

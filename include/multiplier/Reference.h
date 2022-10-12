@@ -8,7 +8,7 @@
 
 #include <optional>
 
-#include "entities/Stmt.h"
+#include "Entities/Stmt.h"
 
 namespace mx {
 

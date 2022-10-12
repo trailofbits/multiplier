@@ -11,8 +11,8 @@
 #include "Fragment.h"
 #include "Re2.h"
 #include "Weggli.h"
-#include <multiplier/entities/Designator.h>
-#include <multiplier/entities/Type.h>
+#include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Type.h>
 
 namespace mx {
 
