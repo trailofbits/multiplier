@@ -1,0 +1,77 @@
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#pragma once
+
+#include <cstdint>
+#include <filesystem>
+#include <memory>
+#include <optional>
+#include <vector>
+
+#include "../Iterator.h"
+#include "../Types.h"
+#include "../Token.h"
+#include "../Use.h"
+
+#include "StmtUseSelector.h"
+
+namespace mx {
+class Expr;
+class NamedDecl;
+class TemplateParameterList;
+#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
+class TemplateParameterList {
+ protected:
+  friend class Attr;
+  friend class AttrIterator;
+  friend class Decl;
+  friend class DeclIterator;
+  friend class File;
+  friend class Fragment;
+  friend class FragmentImpl;
+  friend class Index;
+  friend class ReferenceIterator;
+  friend class ReferenceIteratorImpl;
+  friend class Stmt;
+  friend class StmtIterator;
+  friend class TokenContext;
+  friend class Type;
+  friend class TypeIterator;
+  friend class UseBase;
+  friend class UseIteratorImpl;
+  template <typename> friend class UseIterator;
+
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset_;
+
+ public:
+  TemplateParameterList(TemplateParameterList &&) noexcept = default;
+  TemplateParameterList(const TemplateParameterList &) = default;
+  TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
+  TemplateParameterList &operator=(const TemplateParameterList &) = default;
+
+  inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : fragment(std::move(fragment_)),
+        offset_(offset__) {}
+
+  unsigned num_parameters(void) const;
+  unsigned num_required_parameters(void) const;
+  unsigned depth(void) const;
+  bool has_unexpanded_parameter_pack(void) const;
+  bool has_parameter_pack(void) const;
+  std::optional<Expr> requires_clause(void) const;
+  Token template_keyword_token(void) const;
+  Token left_angle_token(void) const;
+  Token right_angle_token(void) const;
+  TokenRange tokens(void) const;
+  std::vector<NamedDecl> parameters(void) const;
+};
+
+#endif
+} // namespace mx

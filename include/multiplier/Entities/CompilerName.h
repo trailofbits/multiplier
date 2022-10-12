@@ -1,0 +1,33 @@
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#pragma once
+
+#include <cstdint>
+
+namespace mx {
+enum class CompilerName : unsigned char {
+  UNKNOWN,
+  CLANG,
+  APPLE_CLANG,
+  CLANG_CL,
+  CL,
+  GNU,
+};
+
+inline static const char *EnumerationName(CompilerName) {
+  return "CompilerName";
+}
+
+inline static constexpr unsigned NumEnumerators(CompilerName) {
+  return 6;
+}
+
+const char *EnumeratorName(CompilerName);
+
+} // namespace mx
