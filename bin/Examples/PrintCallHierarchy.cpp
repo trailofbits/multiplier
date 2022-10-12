@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
 DEFINE_bool(show_locations, false, "Show the file locations of the entities");

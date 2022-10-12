@@ -5,6 +5,9 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Fragment.h"
+#include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Type.h>
 
 #include <cassert>
 
@@ -85,7 +88,7 @@ Fragment Fragment::containing(const Reference &ref) {
 }
 
 // Return the ID of this fragment.
-RawEntityId Fragment::id(void) const noexcept {
+EntityId Fragment::id(void) const noexcept {
   return EntityId(FragmentId{impl->fragment_id});
 }
 

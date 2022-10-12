@@ -12,9 +12,11 @@
 #include <string_view>
 #include <vector>
 
-#include "AST.h"  // Auto-generated, brings in `Iterator.h` and `Use.h`.
+#include "Iterator.h"
+#include "Use.h"
 #include "Fragment.h"
 #include "Query.h"
+#include "Entities/NamedDecl.h"
 
 namespace mx {
 

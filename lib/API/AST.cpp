@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include "Fragment.h"
+#include <multiplier/AST.h>
 
 namespace mx {
 const char *EnumeratorName(DeclKind e) {

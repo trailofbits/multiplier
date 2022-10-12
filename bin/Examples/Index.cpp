@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DECLARE_bool(help);
 DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");

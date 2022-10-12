@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(file_id, 0, "ID of the file from which to check for potential candidates of divergent representations");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to check for potential candidates of divergent representations");
@@ -109,6 +110,14 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
                   << "example use outside loop: "
                   << outside_uses.front().tokens().data()
                   << std::endl;
+
+            if (FLAGS_show_locations) {
+              std::cout << std::endl;
+              if (auto toks = decl.tokens()) {
+                RenderFragment(std::cout, fragment, toks, "\t", true);
+              }
+              std::cout << std::endl;
+            }
           }
         }
       }

@@ -28,7 +28,7 @@ set(util_headers
   "${source_include_dir}/WorkerPool.h"
 
   # Auto-generated.
-  "${MX_BOOTSTRAP_INCLUDE_AST_H}"
+  "${MX_BOOTSTRAP_INCLUDE_DIR}/AST.h"
   "${MX_BOOTSTRAP_INCLUDE_PASTA_H}"
 )
 
@@ -104,4 +104,5 @@ if(MX_ENABLE_INSTALL)
       DESTINATION
         "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
   )
+  install(DIRECTORY "${MX_BOOTSTRAP_INCLUDE_DIR}" TYPE INCLUDE)
 endif(MX_ENABLE_INSTALL)

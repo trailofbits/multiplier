@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
 DEFINE_bool(unparsed, false, "Show original source code?");

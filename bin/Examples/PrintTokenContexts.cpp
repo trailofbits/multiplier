@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(fragment_id, 0, "ID of the fragment to print");
 
@@ -42,6 +43,13 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Index index = InitExample();
   
   auto fragment = index.fragment(FLAGS_fragment_id);
+  if (!fragment) {
+    mx::VariantEntity var_ent = index.entity(FLAGS_fragment_id);
+    if (std::holds_alternative<mx::Fragment>(var_ent)) {
+      fragment = std::get<mx::Fragment>(var_ent);
+    }
+  }
+
   if (!fragment) {
     std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
     return EXIT_FAILURE;
