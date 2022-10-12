@@ -8,6 +8,7 @@
 #include "File.h"
 #include "Fragment.h"
 #include "Use.h"
+#include <multiplier/entities/TokenKind.h>
 
 #include <cassert>
 

@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DECLARE_bool(help);
 DECLARE_string(host);

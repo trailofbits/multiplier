@@ -7,6 +7,7 @@
 #include "Fragment.h"
 
 #include "File.h"
+#include <multiplier/entities/TokenKind.h>
 
 namespace mx {
 

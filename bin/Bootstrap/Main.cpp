@@ -2906,7 +2906,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#include \"Fragment.h\"\n\n"
+      << "#include \"Fragment.h\"\n"
+      << "#include <multiplier/AST.h>\n\n"
       << "namespace mx {\n";
 
   lib_pasta_cpp_os

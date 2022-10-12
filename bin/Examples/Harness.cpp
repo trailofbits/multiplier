@@ -11,6 +11,7 @@
 #include <unordered_map>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, mx::kInvalidEntityId, "ID of the entity to harness");
 DEFINE_string(entity_name, "", "Name of the entity to harness");

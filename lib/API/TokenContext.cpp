@@ -5,6 +5,9 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Fragment.h"
+#include <multiplier/entities/Attr.h>
+#include <multiplier/entities/Designator.h>
+#include <multiplier/entities/Type.h>
 
 #include <cassert>
 

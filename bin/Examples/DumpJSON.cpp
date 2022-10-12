@@ -17,6 +17,7 @@
 #include <llvm/Support/raw_ostream.h>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint32(tab_width, 4, "Number of spaces in a tab");
 

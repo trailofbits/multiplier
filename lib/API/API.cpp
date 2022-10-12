@@ -23,6 +23,10 @@
 #include "Use.h"
 #include "Weggli.h"
 #include "../Common/Re2.h"
+#include <multiplier/entities/Attr.h>
+#include <multiplier/entities/Type.h>
+#include <multiplier/entities/VarDecl.h>
+#include <multiplier/entities/TokenKind.h>
 
 namespace mx {
 

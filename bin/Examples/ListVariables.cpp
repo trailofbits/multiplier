@@ -9,6 +9,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/Index.h>
+#include <multiplier/entities/VarDecl.h>
 #include <sstream>
 
 DECLARE_bool(help);
