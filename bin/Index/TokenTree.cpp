@@ -369,6 +369,7 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
   for (auto i = begin_index; i <= end_index; ++i) {
     pasta::Token tok = range[i];
     switch (tok.Role()) {
+      default:
       case pasta::TokenRole::kInvalid:
         DLOG(FATAL)
             << "Invalid or unexpected token in range";
@@ -382,7 +383,7 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMarkerToken;
         ++macro_depth;
-        break;
+        continue;
       }
 
       case pasta::TokenRole::kEndOfMacroExpansionMarker: {
@@ -393,7 +394,7 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         info.category = TokenInfo::kMarkerToken;
         --macro_depth;
         DCHECK_LE(0, macro_depth);
-        break;
+        continue;
       }
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
@@ -410,7 +411,7 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           info.file_tok = info.macro_tok->FileLocation();
         }
         info.parsed_tok = std::move(tok);
-        break;
+        continue;
       }
 
       case pasta::TokenRole::kFinalMacroExpansionToken: {
@@ -425,7 +426,7 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         }
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMacroExpansionToken;
-        break;
+        continue;
       }
 
       case pasta::TokenRole::kBeginOfFileMarker:
@@ -435,7 +436,7 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         info.file_tok = tok.FileLocation();
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMarkerToken;
-        break;
+        continue;
       }
 
       case pasta::TokenRole::kFileToken: {
@@ -446,20 +447,15 @@ void TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         DCHECK_EQ(info.file_tok->Data(), tok.Data());
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kFileToken;
-        break;
+        continue;
       }
     }
   }
 
-  // Link them all together.
-  auto it = tokens_alloc.begin();
-  auto end = tokens_alloc.end();
-  if (it != end) {
-    TokenInfo *prev = &*it;
-    for (++it; it != end; ++it) {
-      TokenInfo *curr = &*it;
-      prev->next = curr;
-      prev = curr;
+  // Link all of the tokens together.
+  if (auto num_toks = tokens_alloc.size()) {
+    for (auto i = 1ull; i < num_toks; ++i) {
+      tokens_alloc[i - 1ull].next = &(tokens_alloc[i]);
     }
   }
 }
