@@ -11,6 +11,8 @@ string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 set(source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}")
 set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 
+file(GLOB entity_headers CONFIGURE_DEPENDS "${source_include_dir}/entities/*.h")
+
 set(api_headers
   "${source_include_dir}/AST.h"
   "${source_include_dir}/File.h"
@@ -24,6 +26,7 @@ set(api_headers
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Use.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
+  ${entity_headers}
 )
 
 add_library("mx-api"

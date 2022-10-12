@@ -575,6 +575,7 @@ struct UseList {
 
 class CodeGenerator {
  private:
+  std::string base_dir; // `include/multiplier/`
   std::vector<ClassHierarchy *> roots;
 
   std::unordered_set<std::string> enum_names;
@@ -588,7 +589,6 @@ class CodeGenerator {
   std::ofstream schema_os;  // `lib/Common/AST.capnp`
   std::ofstream lib_cpp_os;  // `lib/AST/AST.cpp`
   std::ofstream include_h_os;  // `include/multiplier/AST.h`
-  std::stringstream late_include_h_os;
   std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
   std::ofstream serialize_inc_os;  // `include/multiplier/Visitor.inc.h`
@@ -638,18 +638,20 @@ class CodeGenerator {
   void RunOnUseSet(const std::map<std::string, UseList> &set,
                    const char *sel_name);
 
-  void RunOnOptional(ClassHierarchy *cls, SpecificEntityStorage &storage,
+  void RunOnOptional(std::ostream& os, ClassHierarchy *cls, SpecificEntityStorage &storage,
                      const std::optional<pasta::RecordDecl> &record,
                      const std::string &class_name, const std::string &api_name,
                      const std::string &method_name,
-                     const char *nth_entity_reader);
+                     const char *nth_entity_reader,
+                     std::set<std::string>& fwd_decls, std::set<std::string>& needed_decls);
 
-  void RunOnVector(SpecificEntityStorage &storage,
+  void RunOnVector(std::ostream& os, SpecificEntityStorage &storage,
                    const std::optional<pasta::RecordDecl> &record,
                    const std::string &class_name, const std::string &api_name,
                    const std::string &method_name,
                    const char *nth_entity_reader,
-                   bool optional);
+                   bool optional, std::set<std::string>& fwd_decls,
+                   std::set<std::string>& needed_decls);
 
  public:
   CodeGenerator(char *argv[]);
@@ -664,6 +666,19 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       enum_name == "PPKeywordKind") {
     return;
   }
+
+  std::ofstream os(base_dir + "/entities/" + enum_name + ".h", std::ios::trunc | std::ios::out);
+  os
+    << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+    << "// All rights reserved.\n"
+    << "//\n"
+    << "// This source code is licensed in accordance with the terms specified in\n"
+    << "// the LICENSE file found in the root directory of this source tree.\n\n"
+    << "// Auto-generated file; do not modify!\n\n"
+    << "#pragma once\n\n"
+    << "#include <cstdint>\n\n"
+    << "namespace mx {\n";
+  include_h_os << "#include \"entities/" << enum_name << ".h\"\n";
 
   auto enumerators = enum_decl.Enumerators();
   auto num_enumerators = enumerators.size();
@@ -680,7 +695,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     types.second = "UInt16";
   }
 
-  include_h_os << "enum class " << enum_name << " : " << types.first << " {\n";
+  os << "enum class " << enum_name << " : " << types.first << " {\n";
   serialize_inc_os << "MX_BEGIN_ENUM_CLASS(" << enum_name << ", " << types.first << ")\n";
 
   // Generate a `switch` to convert from PASTA, as PASTA's version of enums
@@ -714,7 +729,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
     ap_val.print(initializer_ss, ap_val.isSigned());
     initializer_ss.flush();
     if (!seen_initializers.emplace(initializer).second) {
-      include_h_os << "  // Skipped repeat pasta::" << orig_val_name << "\n";
+      os << "  // Skipped repeat pasta::" << orig_val_name << "\n";
       continue;
     }
 
@@ -746,8 +761,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
           << enum_name << "::" << enum_case << ";\n";
     }
 
-    include_h_os
-        << "  " << enum_case << ",\n";
+    os << "  " << enum_case << ",\n";
 
     name_cases_ss
         << "    case " << enum_name << "::" << enum_case << ": return \""
@@ -777,8 +791,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       auto snake_name = CapitalCaseToSnakeCase(val_name);
       auto enum_case = SnakeCaseToEnumCase(snake_name);
 
-      include_h_os
-          << "  " << enum_case << ",\n";
+      os << "  " << enum_case << ",\n";
 
       name_cases_ss
           << "    case " << enum_name << "::" << enum_case << ": return \""
@@ -801,8 +814,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       auto snake_name = CapitalCaseToSnakeCase(val_name);
       auto enum_case = SnakeCaseToEnumCase(snake_name);
 
-      include_h_os
-          << "  " << enum_case << ",\n";
+      os << "  " << enum_case << ",\n";
 
       name_cases_ss
           << "    case " << enum_name << "::" << enum_case << ": return \""
@@ -826,8 +838,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       auto snake_name = CapitalCaseToSnakeCase(val_name);
       auto enum_case = SnakeCaseToEnumCase(snake_name);
 
-      include_h_os
-          << "  " << enum_case << ",\n";
+      os << "  " << enum_case << ",\n";
 
       name_cases_ss
           << "    case " << enum_name << "::" << enum_case << ": return \""
@@ -855,7 +866,7 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << "enum class " << enum_name << " : " << types.first << ";\n"
       << enum_name << " FromPasta(pasta::" << enum_name << " pasta_val);\n\n";
 
-  include_h_os
+  os
       << "};\n\n"
       << "inline static const char *EnumerationName(" << enum_name << ") {\n"
       << "  return \"" << enum_name << "\";\n"
@@ -864,7 +875,8 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       << ") {\n"
       << "  return " << i << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(" << enum_name << ");\n\n";
+      << "const char *EnumeratorName(" << enum_name << ");\n\n"
+      << "} // namespace mx\n";
 
   serialize_inc_os << "MX_END_ENUM_CLASS(" << enum_name << ")\n\n";
 
@@ -915,11 +927,12 @@ NamesFor(unsigned meth_id) {
 }
 
 void CodeGenerator::RunOnOptional(
-    ClassHierarchy *cls, SpecificEntityStorage &storage,
+    std::ostream& os, ClassHierarchy *cls, SpecificEntityStorage &storage,
     const std::optional<pasta::RecordDecl> &record,
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name,
-    const char *nth_entity_reader) {
+    const char *nth_entity_reader, std::set<std::string>& fwd_decls,
+    std::set<std::string>& needed_decls) {
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
   std::string capn_element_name;
@@ -955,8 +968,8 @@ void CodeGenerator::RunOnOptional(
   // E.g. `optional<vector<CXXBaseSpecifier>>`, `optional<vector<FriendDecl>>`.
   } else if (*element_name == "vector") {
     if (auto sub_record = GetTemplateParameterRecord(record)) {
-      RunOnVector(storage, sub_record, class_name, api_name, method_name,
-                  nth_entity_reader, true);
+      RunOnVector(os, storage, sub_record, class_name, api_name, method_name,
+                  nth_entity_reader, true, fwd_decls, needed_decls);
       return;
     }
 
@@ -992,7 +1005,7 @@ void CodeGenerator::RunOnOptional(
   auto [ip_getter_name, ip_setter_name, ip_init_name] =
       NamesFor(is_present_i);
 
-  include_h_os
+  os
       << "  std::optional<" << cxx_element_name << "> "
       << api_name << "(void) const;\n";
 
@@ -1080,6 +1093,7 @@ void CodeGenerator::RunOnOptional(
   // Reference types.
   } else if (gEntityClassNames.count(element_name.value())) {
 
+    fwd_decls.insert(cxx_element_name);
     serializer = "MX_VISIT_OPTIONAL_ENTITY";
 
     serialize_cpp_os
@@ -1100,36 +1114,42 @@ void CodeGenerator::RunOnOptional(
 
     // Tokens are more like pseudo-entities but whatever.
     if (*element_name == "Token" || *element_name == "FileToken") {
+      needed_decls.insert("TokenUseSelector");
       token_use_ids[api_name].SetId(cls, i);
       selector << "TokenUseSelector";
       lib_cpp_os
           << "    return fragment->TokenFor(fragment, id);\n";
 
     } else if (*element_name == "Decl") {
+      needed_decls.insert("DeclUseSelector");
       decl_use_ids[api_name].SetId(cls, i);
       selector << "DeclUseSelector";
       lib_cpp_os
           << "    return fragment->DeclFor(fragment, id);\n";
 
     } else if (*element_name == "Stmt") {
+      needed_decls.insert("StmtUseSelector");
       stmt_use_ids[api_name].SetId(cls, i);
       selector << "StmtUseSelector";
       lib_cpp_os
           << "    return fragment->StmtFor(fragment, id);\n";
 
     } else if (*element_name == "Type") {
+      needed_decls.insert("TypeUseSelector");
       type_use_ids[api_name].SetId(cls, i);
       selector << "TypeUseSelector";
       lib_cpp_os
           << "    return fragment->TypeFor(fragment, id);\n";
 
     } else if (*element_name == "Attr") {
+      needed_decls.insert("AttrUseSelector");
       attr_use_ids[api_name].SetId(cls, i);
       selector << "AttrUseSelector";
       lib_cpp_os
           << "    return fragment->AttrFor(fragment, id);\n";
 
     } else if (gDeclNames.count(element_name.value())) {
+      needed_decls.insert("DeclUseSelector");
       decl_use_ids[api_name].SetId(cls, i);
       selector << "DeclUseSelector";
       lib_cpp_os
@@ -1137,6 +1157,7 @@ void CodeGenerator::RunOnOptional(
           << "::from(fragment->DeclFor(fragment, id));\n";
 
     } else if (gStmtNames.count(element_name.value())) {
+      needed_decls.insert("StmtUseSelector");
       stmt_use_ids[api_name].SetId(cls, i);
       selector << "StmtUseSelector";
       lib_cpp_os
@@ -1144,6 +1165,7 @@ void CodeGenerator::RunOnOptional(
           << "::from(fragment->StmtFor(fragment, id));\n";
 
     } else if (gTypeNames.count(element_name.value())) {
+      needed_decls.insert("TypeUseSelector");
       type_use_ids[api_name].SetId(cls, i);
       selector << "TypeUseSelector";
       lib_cpp_os
@@ -1151,6 +1173,7 @@ void CodeGenerator::RunOnOptional(
           << "::from(fragment->TypeFor(fragment, id));\n";
 
     } else if (gAttrNames.count(element_name.value())) {
+      needed_decls.insert("AttrUseSelector");
       attr_use_ids[api_name].SetId(cls, i);
       selector << "AttrUseSelector";
       lib_cpp_os
@@ -1167,6 +1190,7 @@ void CodeGenerator::RunOnOptional(
   // Pseudo-entities.
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
 
+    fwd_decls.insert(cxx_element_name);
     serializer = "MX_VISIT_OPTIONAL_PSEUDO";
 
     serialize_cpp_os
@@ -1186,6 +1210,7 @@ void CodeGenerator::RunOnOptional(
     assert(!cxx_underlying_name.empty());
 
     if (is_enum) {
+      needed_decls.insert(cxx_element_name);
       serializer = "MX_VISIT_OPTIONAL_ENUM";
     } else if (is_bool) {
       serializer = "MX_VISIT_OPTIONAL_BOOL";
@@ -1218,13 +1243,14 @@ void CodeGenerator::RunOnOptional(
       << ")\n";
 }
 
-void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
+void CodeGenerator::RunOnVector(std::ostream& os, SpecificEntityStorage &storage,
                                 const std::optional<pasta::RecordDecl> &record,
                                 const std::string &class_name,
                                 const std::string &api_name,
                                 const std::string &method_name,
                                 const char *nth_entity_reader,
-                                bool optional) {
+                                bool optional, std::set<std::string>& fwd_decls,
+                                std::set<std::string>& needed_decls) {
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
   std::string capn_element_name;
@@ -1279,7 +1305,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
   auto [opt_getter_name, opt_setter_name, opt_init_name] = NamesFor(opt_i);
 
   if (optional) {
-    include_h_os
+    os
         << "  std::optional<std::vector<" << cxx_element_name << ">> "
         << api_name << "(void) const;\n";
 
@@ -1287,7 +1313,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
         << "std::optional<std::vector<" << cxx_element_name << ">> ";
 
   } else {
-    include_h_os
+    os
         << "  std::vector<" << cxx_element_name << "> "
         << api_name << "(void) const;\n";
 
@@ -1378,6 +1404,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
   // Reference types.
   } else if (gEntityClassNames.count(*element_name)) {
 
+    fwd_decls.insert(cxx_element_name);
     static const char *_serializer[] = {"MX_VISIT_ENTITY_LIST", "MX_VISIT_OPTIONAL_ENTITY_LIST"};
     serializer = _serializer;
 
@@ -1454,6 +1481,7 @@ void CodeGenerator::RunOnVector(SpecificEntityStorage &storage,
   // Not reference types, need to serialize offsets.
   } else {
 
+    fwd_decls.insert(cxx_element_name);
     static const char *_serializer[] = {"MX_VISIT_PSEUDO_LIST", "MX_VISIT_OPTIONAL_PSEUDO_LIST"};
     serializer = _serializer;
 
@@ -1502,8 +1530,14 @@ MethodListPtr CodeGenerator::RunOnClass(
     ClassHierarchy *cls, MethodListPtr parent_methods) {
   auto seen_methods = std::make_shared<MethodList>(*parent_methods);
   auto class_name = cls->record.Name();
+  std::set<std::string> forward_decls;
+  std::set<std::string> needed_decls;
+  std::stringstream class_os;
+  std::stringstream late_class_os;
 
   std::cerr << "Running on " << class_name << '\n';
+
+  forward_decls.insert(class_name);
 
   const auto is_decl = gDeclNames.count(class_name);
   const auto is_stmt = gStmtNames.count(class_name);
@@ -1533,6 +1567,26 @@ MethodListPtr CodeGenerator::RunOnClass(
     return parent_methods;
   }
 
+  std::ofstream os(base_dir + "/entities/" + class_name + ".h", std::ios::trunc | std::ios::out);
+  os
+    << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+    << "// All rights reserved.\n"
+    << "//\n"
+    << "// This source code is licensed in accordance with the terms specified in\n"
+    << "// the LICENSE file found in the root directory of this source tree.\n\n"
+    << "// Auto-generated file; do not modify!\n\n"
+    << "#pragma once\n\n"
+    << "#include <cstdint>\n"
+    << "#include <filesystem>\n"
+    << "#include <memory>\n"
+    << "#include <optional>\n"
+    << "#include <vector>\n\n"
+    << "#include \"../Iterator.h\"\n"
+    << "#include \"../Types.h\"\n"
+    << "#include \"../Token.h\"\n"
+    << "#include \"../Use.h\"\n\n";
+  include_h_os << "#include \"entities/" << class_name << ".h\"\n";
+
   const char *nth_entity_reader = nullptr;
   const char *end_serializer = nullptr;
 
@@ -1558,7 +1612,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "\n#endif\n\n";
 
   if (is_decl) {
-    include_h_os
+    needed_decls.insert("DeclKind");
+    class_os
         << "using " << class_name
         << "Range = DerivedEntityRange<DeclIterator, " << class_name
         << ">;\n"
@@ -1592,7 +1647,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthDecl";
   } else if (is_stmt) {
-    include_h_os
+    needed_decls.insert("StmtKind");
+    class_os
         << "using " << class_name
         << "Range = DerivedEntityRange<StmtIterator, " << class_name
         << ">;\n"
@@ -1623,7 +1679,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     nth_entity_reader = "NthStmt";
   
   } else if (is_type) {
-    include_h_os
+    needed_decls.insert("TypeKind");
+    class_os
         << "using " << class_name
         << "Range = DerivedEntityRange<TypeIterator, " << class_name
         << ">;\n"
@@ -1655,7 +1712,8 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   // Attributes. Treated like entities because they have a class hierarchy.
   } else if (is_attr) {
-    include_h_os
+    needed_decls.insert("AttrKind");
+    class_os
         << "using " << class_name
         << "Range = DerivedEntityRange<AttrIterator, " << class_name
         << ">;\n"
@@ -1706,7 +1764,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     nth_entity_reader = "NthPseudo";
   }
 
-  include_h_os
+  class_os
       << "class " << class_name;
 
 //  std::stringstream dummy_ss;
@@ -1717,17 +1775,19 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   if (cls->base) {
     std::string base_name = cls->base->record.Name();
+    needed_decls.insert(base_name);
 
     // Inheritance.
-    include_h_os
+    class_os
         << " : public " << base_name << " {\n"
         << " private:\n"
-        << FriendOf(include_h_os, class_name, "FragmentImpl");
+        << FriendOf(class_os, class_name, "FragmentImpl");
 
     // Derived classes are friends with all of their parents.
     for (auto parent = cls->base; parent; parent = parent->base) {
-      include_h_os
-          << FriendOf(include_h_os, class_name, parent->record.Name());
+      forward_decls.insert(parent->record.Name());
+      class_os
+          << FriendOf(class_os, class_name, parent->record.Name());
     }
 
     // Parent class serialization.
@@ -1739,10 +1799,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  MX_VISIT_BASE(" << class_name << ", " << base_name << ")\n";
     }
 
-    include_h_os
+    class_os
         << " public:\n";
 
-    late_include_h_os
+    late_class_os
         << "static_assert(sizeof(" << class_name
         << ") == sizeof(" << base_name << "));\n\n";
 
@@ -1815,26 +1875,26 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n";
     }
 
-    include_h_os
+    class_os
         << " {\n"
         << " protected:\n"
-        << FriendOf(include_h_os, class_name, "Attr")
-        << FriendOf(include_h_os, class_name, "AttrIterator")
-        << FriendOf(include_h_os, class_name, "Decl")
-        << FriendOf(include_h_os, class_name, "DeclIterator")
-        << FriendOf(include_h_os, class_name, "File")
-        << FriendOf(include_h_os, class_name, "Fragment")
-        << FriendOf(include_h_os, class_name, "FragmentImpl")
-        << FriendOf(include_h_os, class_name, "Index")
-        << FriendOf(include_h_os, class_name, "ReferenceIterator")
-        << FriendOf(include_h_os, class_name, "ReferenceIteratorImpl")
-        << FriendOf(include_h_os, class_name, "Stmt")
-        << FriendOf(include_h_os, class_name, "StmtIterator")
-        << FriendOf(include_h_os, class_name, "TokenContext")
-        << FriendOf(include_h_os, class_name, "Type")
-        << FriendOf(include_h_os, class_name, "TypeIterator")
-        << FriendOf(include_h_os, class_name, "UseBase")
-        << FriendOf(include_h_os, class_name, "UseIteratorImpl")
+        << FriendOf(class_os, class_name, "Attr")
+        << FriendOf(class_os, class_name, "AttrIterator")
+        << FriendOf(class_os, class_name, "Decl")
+        << FriendOf(class_os, class_name, "DeclIterator")
+        << FriendOf(class_os, class_name, "File")
+        << FriendOf(class_os, class_name, "Fragment")
+        << FriendOf(class_os, class_name, "FragmentImpl")
+        << FriendOf(class_os, class_name, "Index")
+        << FriendOf(class_os, class_name, "ReferenceIterator")
+        << FriendOf(class_os, class_name, "ReferenceIteratorImpl")
+        << FriendOf(class_os, class_name, "Stmt")
+        << FriendOf(class_os, class_name, "StmtIterator")
+        << FriendOf(class_os, class_name, "TokenContext")
+        << FriendOf(class_os, class_name, "Type")
+        << FriendOf(class_os, class_name, "TypeIterator")
+        << FriendOf(class_os, class_name, "UseBase")
+        << FriendOf(class_os, class_name, "UseIteratorImpl")
         << "  template <typename> friend class UseIterator;\n\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset_;\n\n"
@@ -1849,7 +1909,10 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "        offset_(offset__) {}\n\n";
 
     if (class_name == "Decl") {
-      include_h_os
+      forward_decls.insert("ReferenceRange");
+      needed_decls.insert("DeclUseSelector");
+      forward_decls.insert("Stmt");
+      class_os
           << "  inline static std::optional<Decl> from(const Decl &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
@@ -1890,7 +1953,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("previous_declaration");  // Disable this.
 
     } else if (class_name == "Stmt") {
-      include_h_os
+      needed_decls.insert("DeclUseSelector");
+      class_os
           << "  inline static std::optional<Stmt> from(const Stmt &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
@@ -1938,7 +2002,8 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("end_token");  // Disable this.
 
     } else if (class_name == "Type") {
-      include_h_os
+      needed_decls.insert("TypeUseSelector");
+      class_os
           << "  inline static std::optional<Type> from(const Type &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
@@ -1955,7 +2020,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << " public:\n";
     
     } else if (class_name == "Attr") {
-      include_h_os
+      needed_decls.insert("AttrUseSelector");
+      class_os
           << "  inline static std::optional<Attr> from(const Attr &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
@@ -1980,15 +2046,11 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else {
     std::cerr << class_name << " is not an entity class?\n";
     abort();
-//    include_h_os
-//        << " {\n"
-//        << " protected:\n"
-//        << "  std::shared_ptr<ast::" << class_name << "> data;\n\n";
   }
 
   if (is_decl || is_stmt || is_type || is_attr) {
 
-    include_h_os
+    class_os
         << "  inline static " << class_name
         << "Range in(const Fragment &frag) {\n"
         << "    return in_internal(frag);\n"
@@ -2009,14 +2071,14 @@ MethodListPtr CodeGenerator::RunOnClass(
       if (is_concrete) {
         auto snake_name = CapitalCaseToSnakeCase(class_name);
         snake_name = snake_name.substr(0u, snake_name.size() - 5u);
-        include_h_os
+        class_os
             << "  inline static constexpr DeclKind static_kind(void) {\n"
             << "    return DeclKind::"
             << SnakeCaseToEnumCase(snake_name) << ";\n"
             << "  }\n\n";
       }
 
-      include_h_os
+      class_os
           << "  static " << class_name
           << "ContainingDeclRange containing(const Decl &decl);\n"
           << "  static " << class_name
@@ -2050,14 +2112,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       if (is_concrete) {
         auto snake_name = CapitalCaseToSnakeCase(class_name);
-        include_h_os
+        class_os
             << "  inline static constexpr StmtKind static_kind(void) {\n"
             << "    return StmtKind::" << SnakeCaseToEnumCase(snake_name)
             << ";\n"
             << "  }\n\n";
       }
 
-      include_h_os
+      class_os
           << "  static " << class_name
           << "ContainingStmtRange containing(const Decl &decl);\n"
           << "  static " << class_name
@@ -2092,7 +2154,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto snake_name = CapitalCaseToSnakeCase(class_name);
         snake_name = snake_name.substr(0u, snake_name.size() - 5u);
 
-        include_h_os
+        class_os
             << "  inline static constexpr TypeKind static_kind(void) {\n"
             << "    return TypeKind::"
             << SnakeCaseToEnumCase(snake_name) << ";\n"
@@ -2104,7 +2166,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         auto snake_name = CapitalCaseToSnakeCase(class_name);
         snake_name = snake_name.substr(0u, snake_name.size() - 5u);
 
-        include_h_os
+        class_os
             << "  inline static constexpr AttrKind static_kind(void) {\n"
             << "    return AttrKind::" 
             << SnakeCaseToEnumCase(snake_name) << ";\n"
@@ -2113,7 +2175,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     if (is_decl && class_name != "Decl") {
-      include_h_os
+      class_os
           << "  static std::optional<" << class_name
           << "> from(const TokenContext &c);\n";
       lib_cpp_os
@@ -2123,7 +2185,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n";
 
     } else if (is_stmt && class_name != "Stmt") {
-      include_h_os
+      class_os
           << "  static std::optional<" << class_name
           << "> from(const TokenContext &c);\n";
 
@@ -2134,7 +2196,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n";
 
     } else if (is_type && class_name != "Type") {
-      include_h_os
+      class_os
           << "  static std::optional<" << class_name
           << "> from(const TokenContext &c);\n";
 
@@ -2145,7 +2207,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "}\n\n";
 
     } else if (is_attr && class_name != "Attr") {
-      include_h_os
+      class_os
           << "  static std::optional<" << class_name
           << "> from(const TokenContext &c);\n";
 
@@ -2161,7 +2223,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   // parents.
   for (auto parent = cls->base; parent; parent = parent->base) {
     auto grand_parent_class_name = parent->record.Name();
-    include_h_os
+    class_os
         << "  static std::optional<" << class_name << "> from(const "
         << grand_parent_class_name << " &parent);\n\n"
         << "  inline static std::optional<" << class_name << "> from(const std::optional<"
@@ -2275,29 +2337,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n";
   }
 
-//  // Create implicit conversion operators for all derived clsses.
-//  std::vector<ClassHierarchy *> children_work_list = cls->derived;
-//  while (!children_work_list.empty()) {
-//    auto grand_child_cls = children_work_list.back();
-//    children_work_list.pop_back();
-//    children_work_list.insert(children_work_list.end(),
-//                              grand_child_cls->derived.begin(),
-//                              grand_child_cls->derived.end());
-//
-//    std::string grand_child_class_name = grand_child_cls->record.Name();
-//
-//    include_h_os
-//        << "  friend class " << grand_child_class_name << ";\n"
-//        << "  inline " << class_name << "(const "
-//        << grand_child_class_name << " &child);\n";
-//
-//    late_include_h_os
-//        << "inline " << class_name << "::" << class_name << "(const "
-//        << grand_child_class_name << " &child)\n"
-//        << "    : fragment(child.fragment),\n"
-//        << "      offset_(child.offset_) {}\n\n";
-//  }
-
   auto methods = cls->record.Methods();
   assert(methods);
   for (pasta::CXXMethodDecl method : *methods) {
@@ -2402,7 +2441,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << nth_entity_reader << ", TokenUseSelector::"
             << SnakeCaseToEnumCase(snake_name) << ")\n";
 
-        include_h_os
+        class_os
             << "  Token " << api_name << "(void) const;\n";
 
         lib_cpp_os
@@ -2433,7 +2472,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         serialize_inc_os
             << "  MX_VISIT_TOKEN_RANGE(" << class_name << ", " << api_name << ")\n";
 
-        include_h_os
+        class_os
             << "  TokenRange " << api_name << "(void) const;\n";
 
         lib_cpp_os
@@ -2465,7 +2504,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
-        include_h_os
+        class_os
             << "  std::string_view " << api_name << "(void) const;\n";
 
         lib_cpp_os
@@ -2494,7 +2533,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
-        include_h_os
+        class_os
             << "  std::string_view " << api_name << "(void) const;\n";
 
         lib_cpp_os
@@ -2514,21 +2553,6 @@ MethodListPtr CodeGenerator::RunOnClass(
       } else if (record_name == "ArgumentVector") {
         std::cerr << "!!! ArgumentVector\n";
         abort();
-//        const auto i = storage.AddMethod("List(Text)");
-//        auto [getter_name, setter_name, init_name] = NamesFor(i);
-//
-//        include_h_os
-//            << "  std::vector<std::string_view> "
-//            << api_name << "(void) const;\n";
-//
-//        serialize_cpp_os
-//            << "  const auto &v" << i << " = e." << method_name << "();\n"
-//            << "  auto b" << i << " = b." << init_name
-//            << "(static_cast<unsigned>(v" << i << ".Size()));\n"
-//            << "  auto i" << i << " = 0u;\n"
-//            << "  for (const auto &arg : v" << i << ") {\n"
-//            << "    b" << i << ".set(i" << i << "++, arg);\n"
-//            << "  }\n";
 
       // Probably `std::filesystem::path`.
       } else if (record_name == "path") {
@@ -2541,7 +2565,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
-        include_h_os
+        class_os
             << "  std::filesystem::path " << api_name << "(void) const;\n";
 
         lib_cpp_os
@@ -2563,13 +2587,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       // the union tag, and the size of the union is the size of its largest
       // member, so the extra `bool` just means 1 bit of overhead.
       } else if (record_name == "optional") {
-        RunOnOptional(cls, storage, record, class_name, api_name, method_name,
-                      nth_entity_reader);
+        RunOnOptional(class_os, cls, storage, record, class_name, api_name, method_name,
+                      nth_entity_reader, forward_decls, needed_decls);
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
-        RunOnVector(storage, record, class_name, api_name, method_name,
-                    nth_entity_reader, false);
+        RunOnVector(class_os, storage, record, class_name, api_name, method_name,
+                    nth_entity_reader, false, forward_decls, needed_decls);
 
       // E.g. something that returns a `Decl`, `Stmt`, etc.
       } else if (gEntityClassNames.count(record_name)) {
@@ -2579,8 +2603,9 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         const auto i = storage.AddMethod("UInt64");
         auto [getter_name, setter_name, init_name] = NamesFor(i);
+        forward_decls.insert(record_name);
 
-        include_h_os
+        class_os
             << "  " << record_name << " " << api_name
             << "(void) const;\n";
 
@@ -2673,7 +2698,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
             << record_name << ", " << nth_entity_reader << ")\n";
 
-        include_h_os
+        class_os
             << "  " << record_name << " " << api_name
             << "(void) const;\n";
 
@@ -2691,16 +2716,6 @@ MethodListPtr CodeGenerator::RunOnClass(
       } else if (gNotReferenceTypes.count(record_name)) {
         std::cerr << "unhandled record " << record_name << "\n";
         abort();
-//        const auto i = storage.AddMethod(record_name);
-//        auto [getter_name, setter_name, init_name] = NamesFor(i);
-//
-//        include_h_os
-//            << "  " << record_name << " " << api_name
-//            << "(void) const;\n";
-//
-//        serialize_cpp_os
-//            << "  Serialize" << record_name << "(es, b." << init_name
-//            << "(), e." << method_name << "());\n";
       }
 
     // Handle enumerations return types.
@@ -2713,12 +2728,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         const auto i = storage.AddMethod(types.second);
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
+        needed_decls.insert(enum_name);
         serialize_inc_os
             << "  MX_VISIT_ENUM(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
             << enum_name << ", " << nth_entity_reader << ")\n";
 
-        include_h_os
+        class_os
             << "  " << enum_name << " " << api_name
             << "(void) const;\n";
 
@@ -2768,7 +2784,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << cxx_int_type << ", " << nth_entity_reader << ")\n";
       }
 
-      include_h_os
+      class_os
           << "  " << cxx_int_type << " " << api_name
           << "(void) const;\n";
 
@@ -2802,7 +2818,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << ", " << i << ", MX_APPLY_METHOD, AlreadyLoadedDeclarations, Decl, "
           << nth_entity_reader << ")\n";
 
-      include_h_os
+      class_os
           << "  std::vector<Decl> " << api_name << "(void) const;\n";
 
       lib_cpp_os
@@ -2835,7 +2851,22 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
   }
 
-  include_h_os << "};\n\n";
+  class_os << "};\n\n";
+
+  for(auto needed : needed_decls) {
+    os << "#include \"" << needed << ".h\"\n";
+  }
+  os << "\nnamespace mx {\n";
+  for(auto fwd : forward_decls) {
+    os << "class " << fwd << ";\n";
+  }
+  os
+    << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
+    << class_os.str()
+    << late_class_os.str()
+    << "#endif\n"
+    << "} // namespace mx\n";
+
   serialize_cpp_os << "}\n\n";
 
   serialize_inc_os
@@ -3099,15 +3130,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#pragma once\n\n"
-      << "#include <cstdint>\n"
-      << "#include <filesystem>\n"
-      << "#include <memory>\n"
-      << "#include <optional>\n"
-      << "#include <vector>\n\n"
-      << "#include \"Iterator.h\"\n"
-      << "#include \"Types.h\"\n"
-      << "#include \"Use.h\"\n\n";
+      << "#pragma once\n\n";
 
   lib_pasta_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -3149,20 +3172,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   lib_pasta_h_os
       << "}  // namespace pasta\n"
       << "namespace mx {\n";
-  include_h_os
-      << "namespace mx {\n\n"
-      << "class AttrIterator;\n"
-      << "class DeclIterator;\n"
-      << "class FragmentImpl;\n"
-      << "class FileImpl;\n"
-      << "class ReferenceRange;\n"
-      << "class StmtIterator;\n"
-      << "class Token;\n"
-      << "class TokenContext;\n"
-      << "class TokenContextIterator;\n"
-      << "class TokenRange;\n"
-      << "class TypeIterator;\n"
-      << "class UseBase;\n\n";
 
   std::vector<std::string> class_names;
 
@@ -3183,19 +3192,12 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     }
   }
 
-  for (const pasta::CXXRecordDecl &record : tokens) {
-    include_h_os
-        << "class " << record.Name() << ";\n";
-  }
-
   serialize_h_os
       << "class EntityMapper;\n";
 
   // Forward declarations.
   for (const pasta::CXXRecordDecl &record : decls) {
     std::string name = record.Name();
-    include_h_os
-        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
         << "(EntityMapper &, mx::ast::Decl::Builder, const pasta::"
@@ -3204,8 +3206,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   for (const pasta::CXXRecordDecl &record : stmts) {
     auto name = record.Name();
-    include_h_os
-        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
         << "(EntityMapper &, mx::ast::Stmt::Builder, const pasta::"
@@ -3214,8 +3214,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   for (const pasta::CXXRecordDecl &record : types) {
     auto name = record.Name();
-    include_h_os
-        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
         << "(EntityMapper &, mx::ast::Type::Builder, const pasta::"
@@ -3224,8 +3222,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 
   for (const pasta::CXXRecordDecl &record : attrs) {
     auto name = record.Name();
-    include_h_os
-        << "class " << name << ";\n";
     serialize_h_os
         << "void Serialize" << name
         << "(EntityMapper &, mx::ast::Attr::Builder, const pasta::"
@@ -3241,9 +3237,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
           << name << " &);\n";
     }
   }
-
-  include_h_os
-      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
 
   lib_cpp_os
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
@@ -3386,18 +3379,12 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   RunOnUseSet(token_use_ids, "TokenUseSelector");
   RunOnUseSet(attr_use_ids, "AttrUseSelector");
 
-  include_h_os << late_include_h_os.str();
-
-  include_h_os
-      << "#endif\n";
-
   lib_cpp_os
       << "#endif\n";
 
   lib_pasta_h_os << "}  // namespace mx\n";
   lib_pasta_cpp_os << "}  // namespace mx\n";
   lib_cpp_os << "}  // namespace mx\n";
-  include_h_os << "}  // namespace mx\n";
   serialize_h_os << "}  // namespace indexer\n";
   serialize_cpp_os << "}  // namespace indexer\n";
 }
@@ -3405,9 +3392,20 @@ void CodeGenerator::RunOnClassHierarchies(void) {
 void CodeGenerator::RunOnUseSet(
     const std::map<std::string, UseList> &use_set,
     const char *sel_name) {
+  std::ofstream os(base_dir + "/entities/" + sel_name + ".h");
 
   lib_pasta_h_os << "enum class " << sel_name << " : unsigned short;\n";
-  include_h_os << "enum class " << sel_name << " : unsigned short {\n";
+  os
+    << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
+    << "// All rights reserved.\n"
+    << "//\n"
+    << "// This source code is licensed in accordance with the terms specified in\n"
+    << "// the LICENSE file found in the root directory of this source tree.\n\n"
+    << "// Auto-generated file; do not modify!\n\n"
+    << "#pragma once\n\n"
+    << "#include <cstdint>\n\n"
+    << "namespace mx {\n"
+    << "enum class " << sel_name << " : unsigned short {\n";
   lib_cpp_os
       << "const char *EnumeratorName(" << sel_name << " sel) {\n"
       << "  switch (sel) {\n";
@@ -3418,8 +3416,7 @@ void CodeGenerator::RunOnUseSet(
   for (const auto &[api_name, use_list] : use_set) {
     const auto enum_name = SnakeCaseToEnumCase(api_name);
 
-    include_h_os
-        << "  " << enum_name << ",\n";
+    os << "  " << enum_name << ",\n";
 
     lib_cpp_os
         << "    case " << sel_name << "::"
@@ -3435,7 +3432,7 @@ void CodeGenerator::RunOnUseSet(
       << "  }\n"
       << "}\n\n";
 
-  include_h_os
+  os
       << "};\n\n"
       << "inline static const char *EnumerationName(" << sel_name << ") {\n"
       << "  return \"" << sel_name << "\";\n"
@@ -3443,7 +3440,8 @@ void CodeGenerator::RunOnUseSet(
       << "inline static constexpr unsigned NumEnumerators(" << sel_name << ") {\n"
       << "  return " << use_set.size() << ";\n"
       << "}\n\n"
-      << "const char *EnumeratorName(" << sel_name << ");\n\n";
+      << "const char *EnumeratorName(" << sel_name << ");\n\n"
+      << "} // namespace mx\n";
 }
 
 void CodeGenerator::RunOnClasses(void) {
@@ -3525,9 +3523,10 @@ int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
 }
 
 CodeGenerator::CodeGenerator(char *argv[])
-    : schema_os(argv[3], std::ios::trunc | std::ios::out),
+    : base_dir(argv[5]),
+      schema_os(argv[3], std::ios::trunc | std::ios::out),
       lib_cpp_os(argv[4], std::ios::trunc | std::ios::out),
-      include_h_os(argv[5], std::ios::trunc | std::ios::out),
+      include_h_os(std::string(argv[5]) + "/AST.h", std::ios::trunc | std::ios::out),
       serialize_h_os(argv[6], std::ios::trunc | std::ios::out),
       serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out),
       serialize_inc_os(argv[8], std::ios::trunc | std::ios::out),
