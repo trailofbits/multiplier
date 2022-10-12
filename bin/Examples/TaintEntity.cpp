@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
 DEFINE_string(entity_name, "", "Name of the function to search for");

@@ -13,6 +13,7 @@
 #include <variant>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the uses of");
 DEFINE_uint32(length, 2, "Length of paths to print");

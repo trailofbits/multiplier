@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include "Fragment.h"
+#include <multiplier/AST.h>
 
 namespace mx {
 namespace {

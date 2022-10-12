@@ -6,6 +6,8 @@
 
 #include "Fragment.h"
 #include "File.h"
+#include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Type.h>
 
 #include <cassert>
 

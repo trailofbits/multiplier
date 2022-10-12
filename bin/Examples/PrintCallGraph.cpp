@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Index.h"
+#include <multiplier/AST.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
 DEFINE_uint64(reachable_from_entity_id, 0, "ID of the entity from which `--entity_id` must be reachable");

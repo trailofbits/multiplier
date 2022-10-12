@@ -1,0 +1,31 @@
+// Copyright (c) 2022-present, Trail of Bits, Inc.
+// All rights reserved.
+//
+// This source code is licensed in accordance with the terms specified in
+// the LICENSE file found in the root directory of this source tree.
+
+// Auto-generated file; do not modify!
+
+#pragma once
+
+#include <cstdint>
+
+namespace mx {
+enum class InlineVariableDefinitionKind : unsigned char {
+  NONE,
+  WEAK,
+  WEAK_UNKNOWN,
+  STRONG,
+};
+
+inline static const char *EnumerationName(InlineVariableDefinitionKind) {
+  return "InlineVariableDefinitionKind";
+}
+
+inline static constexpr unsigned NumEnumerators(InlineVariableDefinitionKind) {
+  return 4;
+}
+
+const char *EnumeratorName(InlineVariableDefinitionKind);
+
+} // namespace mx
