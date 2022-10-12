@@ -9,165 +9,245 @@
 #include <glog/logging.h>
 #include <fstream>
 #include <sstream>
+#include <set>
+#include <vector>
+#include <unordered_map>
 
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 
 #include "Index.h"
 
-DEFINE_string(output_dir, "", "Path to the directory into which all output will be dumped");
+DEFINE_uint32(tab_width, 4, "Number of spaces in a tab");
 
-static llvm::json::Object UnparsedToken(mx::Token tok);
-static llvm::json::Object UnparsedSubstitution(mx::TokenSubstitution sub);
+using SeenSet = std::set<mx::RawEntityId>;
+using WorkList = std::vector<mx::Decl>;
 
-static llvm::json::Array UnparsedTokens(mx::TokenSubstitutionList list) {
-  llvm::json::Array tokens;
-  for (std::variant<mx::Token, mx::TokenSubstitution> val : list) {
-    if (std::holds_alternative<mx::Token>(val)) {
-      tokens.emplace_back(UnparsedToken(std::get<mx::Token>(val)));
-    } else {
-      tokens.emplace_back(
-          UnparsedSubstitution(std::get<mx::TokenSubstitution>(val)));
+// Sometimes we see two separate definitions of an entity, e.g.
+//
+// `typedef void CURL;` and `typedef struct { ... } CURL;` where the former
+// is an opaque, exported type, and the latter is the internal type. We want
+// to find the internal version.
+static mx::Decl LongestDefinition(mx::Decl decl) {
+  size_t num_toks = 0u;
+
+  for (mx::Decl redecl : decl.redeclarations()) {
+    if (decl.is_definition()) {
+      if (auto redecl_num_toks = redecl.tokens().size();
+          redecl_num_toks > num_toks) {
+        decl = redecl;
+        num_toks = redecl_num_toks;
+      }
     }
   }
-  return tokens;
+
+  return decl;
 }
 
-llvm::json::Object UnparsedToken(mx::Token token) {
-  llvm::json::Object obj;
-  obj["data"] = token.data().data();
-  obj["id"] = token.id().Pack();
-  obj["kind"] = static_cast<unsigned>(token.kind());
+static void DumpDeclToJSON(llvm::json::Object &obj, mx::Decl decl,
+                           WorkList &wl);
+static void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
+                           WorkList &wl);
 
-  mx::VariantId vid = token.id().Unpack();
-  if (std::holds_alternative<mx::FileTokenId>(vid)) {
-    auto ft = std::get<mx::FileTokenId>(vid);
-    obj["file_id"] = ft.file_id;
-    obj["file_offset"] = ft.offset;
-    obj["type"] = "file_token";
-
-  } else if (std::holds_alternative<mx::FragmentTokenId>(vid)) {
-    auto ft = std::get<mx::FragmentTokenId>(vid);
-    obj["fragment_id"] = mx::EntityId(mx::FragmentId(ft.fragment_id)).Pack();
-    obj["fragment_offset"] = ft.offset;
-    obj["type"] = "fragment_token";
-  }
-  return obj;
+static void DumpBuiltinTypeToJSON(llvm::json::Object &obj,
+                                  mx::BuiltinType type,
+                                  WorkList &) {
+  obj["builtin_kind"] = mx::EnumeratorName(type.builtin_kind());
 }
 
-llvm::json::Object UnparsedSubstitution(mx::TokenSubstitution sub) {
-  llvm::json::Object obj;
-  switch (sub.kind()) {
-    case mx::TokenSubstitutionKind::FUNCTION_LIKE_MACRO_EXPANSION:
-      obj["kind"] = "FUNCTION_LIKE_MACRO_EXPANSION";
-      break;
-    case mx::TokenSubstitutionKind::MACRO_EXPANSION:
-      obj["kind"] = "MACRO_EXPANSION";
-      break;
-    case mx::TokenSubstitutionKind::INCLUDE_EXPANSION:
-      obj["kind"] = "INCLUDE_EXPANSION";
-      break;
+static void DumpPointerTypeToJSON(llvm::json::Object &obj,
+                                  mx::PointerType type,
+                                  WorkList &wl) {
+  llvm::json::Object pointee_o;
+  if (auto pt = type.pointee_type()) {
+    DumpTypeToJSON(pointee_o, std::move(pt.value()), wl);
   }
-  obj["before"] = UnparsedTokens(sub.before());
-  obj["after"] = UnparsedTokens(sub.after());
-  return obj;
+  llvm::json::Value pointee_v(std::move(pointee_o));
+  obj["pointee_type"] = std::move(pointee_v);
 }
 
-static void OutputSourceIR(const mx::Fragment &frag,
-                           const std::filesystem::path &output_dir) {
-  if (auto mlir = frag.source_ir(); mlir) {
-    llvm::json::Object obj;
-    obj["id"] = frag.id().Pack();
-    obj["source_ir"] = llvm::StringRef(mlir->data(), mlir->size());
+static void DumpArrayTypeToJSON(llvm::json::Object &obj,
+                                mx::ArrayType type,
+                                WorkList &wl) {
+  llvm::json::Object elem_o;
+  DumpTypeToJSON(elem_o, type.element_type(), wl);
 
-    std::string file_name =
-        "mlir.fragment." + std::to_string(frag.id().Pack()) + ".json";
-    llvm::json::Value val(std::move(obj));
-    std::ofstream file_os((output_dir / file_name).generic_string(),
-                          std::ios::trunc | std::ios::out);
+  llvm::json::Value elem_v(std::move(elem_o));
+  obj["element_type"] = std::move(elem_v);
+}
 
-    std::string file_data;
-    llvm::raw_string_ostream file_data_os(file_data);
-    file_data_os << std::move(val);
-    file_os << file_data;
+template <typename T>
+static void DumpIndirectTypeToJSON(llvm::json::Object &obj,
+                                   T type, WorkList &wl) {
+  DumpTypeToJSON(obj, type.underlying_type(), wl);
+}
+
+static void DumpElaboratedTypeToJSON(llvm::json::Object &obj,
+                                     mx::ElaboratedType type, WorkList &wl) {
+  DumpTypeToJSON(obj, type.named_type(), wl);
+}
+
+void DumpTypeToJSON(llvm::json::Object &obj, mx::Type type,
+                    WorkList &wl) {
+
+  llvm::json::Array qualifiers_a;
+
+  if (type.is_const_qualified()) {
+    qualifiers_a.push_back("const");
+  }
+  if (type.is_volatile_qualified()) {
+    qualifiers_a.push_back("volatile");
+  }
+  if (type.is_restrict_qualified()) {
+    qualifiers_a.push_back("restrict");
+  }
+
+  if (!qualifiers_a.empty()) {
+    llvm::json::Value qualifiers_v(std::move(qualifiers_a));
+    obj["qualifiers"] = std::move(qualifiers_v);
+  }
+
+  obj["kind"] = mx::EnumeratorName(type.kind());
+
+  if (auto builtin = mx::BuiltinType::from(type)) {
+    DumpBuiltinTypeToJSON(obj, std::move(builtin.value()), wl);
+
+  } else if (auto ptr = mx::PointerType::from(type)) {
+    DumpPointerTypeToJSON(obj, std::move(ptr.value()), wl);
+
+  } else if (auto arr = mx::ArrayType::from(type)) {
+    DumpArrayTypeToJSON(obj, std::move(arr.value()), wl);
+
+  } else if (auto tag = mx::TagType::from(type)) {
+    mx::Decl ref_decl = LongestDefinition(tag->declaration());
+    obj["decl_id"] = std::to_string(ref_decl.id().Pack());
+    wl.emplace_back(std::move(ref_decl));
+
+  } else if (auto td = mx::TypedefType::from(type)) {
+    mx::Decl ref_decl = LongestDefinition(td->declaration());
+    obj["decl_id"] = std::to_string(ref_decl.id().Pack());
+    wl.emplace_back(std::move(ref_decl));
+
+  } else if (auto td2 = mx::MacroQualifiedType::from(type)) {
+    DumpIndirectTypeToJSON(obj, std::move(td2.value()), wl);
+
+  } else if (auto td3 = mx::DecltypeType::from(type)) {
+    DumpIndirectTypeToJSON(obj, std::move(td3.value()), wl);
+
+  } else if (auto td4 = mx::UsingType::from(type)) {
+    DumpIndirectTypeToJSON(obj, std::move(td4.value()), wl);
+
+  } else if (auto td5 = mx::UnaryTransformType::from(type)) {
+    DumpIndirectTypeToJSON(obj, std::move(td5.value()), wl);
+
+  } else if (auto td6 = mx::TypeOfType::from(type)) {
+    DumpIndirectTypeToJSON(obj, std::move(td6.value()), wl);
+
+  } else if (auto el = mx::ElaboratedType::from(type)) {
+    DumpElaboratedTypeToJSON(obj, std::move(el.value()), wl);
   }
 }
 
-static void OutputFileInfo(mx::File file, std::filesystem::path file_path) {
-  std::filesystem::path output_dir =
-      FLAGS_output_dir + "/." + file_path.generic_string();
-  output_dir = output_dir.lexically_normal();
-  std::error_code ec;
-  std::filesystem::create_directories(output_dir, ec);
-  if (ec) {
-    LOG(ERROR)
-        << "Skipping producing json for " << file_path << ": " << ec.message();
-    return;
+static void DumpVarDeclToJSON(llvm::json::Object &obj, mx::VarDecl decl,
+                              WorkList &wl) {
+  llvm::json::Object type_o;
+  DumpTypeToJSON(type_o, decl.type(), wl);
+  llvm::json::Value type_v(std::move(type_o));
+  obj["type"] = std::move(type_v);
+}
+
+static void DumpFieldDeclToJSON(llvm::json::Object &obj, mx::FieldDecl decl,
+                                WorkList &wl) {
+  llvm::json::Object type_o;
+  DumpTypeToJSON(type_o, decl.type(), wl);
+  llvm::json::Value type_v(std::move(type_o));
+  obj["type"] = std::move(type_v);
+}
+
+static void DumpRecordDeclToJSON(llvm::json::Object &obj, mx::RecordDecl decl,
+                                 WorkList &wl) {
+  llvm::json::Array fields_a;
+  for (mx::FieldDecl field : decl.fields()) {
+    llvm::json::Object field_o;
+    DumpDeclToJSON(field_o, field, wl);
+
+    llvm::json::Value field_v(std::move(field_o));
+    fields_a.push_back(std::move(field_v));
   }
 
-  LOG(INFO)
-      << "Saving JSON output related to file " << file_path << " to "
-      << output_dir;
+  if (decl.is_definition() || !fields_a.empty()) {
+    llvm::json::Value fields_v(std::move(fields_a));
+    obj["fields"] = std::move(fields_v);
+  }
+}
 
-  llvm::json::Array tokens;
-  llvm::json::Array fragment_ids;
+static void DumpEnumDeclToJSON(llvm::json::Object &obj, mx::EnumDecl decl,
+                               WorkList &wl) {
+  if (std::optional<mx::Type> it = decl.integer_type()) {
+    llvm::json::Object type_o;
+    DumpTypeToJSON(type_o, std::move(it.value()), wl);
 
-  for(mx::Fragment frag : mx::Fragment::in(file)) {
-    fragment_ids.push_back(frag.id().Pack());
+    llvm::json::Value type_v(std::move(type_o));
+    obj["integer_type"] = std::move(type_v);
+  }
+}
 
-    for (mx::Token token : mx::Token::in(frag)) {
-      llvm::json::Object tok;
-      tok["data"] = token.data().data();
-      tok["id"] = static_cast<uint64_t>(token.id());
-      tok["kind"] = static_cast<unsigned>(token.kind());
-      tokens.emplace_back(std::move(tok));
-    }
+static void DumpTypedefNameDeclToJSON(llvm::json::Object &obj,
+                                      mx::TypedefNameDecl decl,
+                                      WorkList &wl) {
+  llvm::json::Object type_o;
+  DumpTypeToJSON(type_o, decl.underlying_type(), wl);
 
+  llvm::json::Value type_v(std::move(type_o));
+  obj["underlying_type"] = std::move(type_v);
+}
 
-    llvm::json::Object obj;
-    obj["id"] = static_cast<uint64_t>(frag.id());
-    obj["tokens"] = std::move(tokens);
-    obj["unparsed_tokens"] = UnparsedTokens(frag.substitutions());
+static void DumpFunctionDeclToJSON(llvm::json::Object &obj,
+                                   mx::FunctionDecl decl,
+                                   WorkList &wl) {
+  llvm::json::Object ret_type_o;
+  DumpTypeToJSON(ret_type_o, decl.return_type(), wl);
+  llvm::json::Value ret_type_v(std::move(ret_type_o));
+  obj["return_type"] = std::move(ret_type_v);
 
-    std::string file_name = "source.fragment." + std::to_string(frag.id()) + ".json";
+  llvm::json::Array params_a;
+  for (mx::ParmVarDecl param : decl.parameters()) {
+    llvm::json::Object param_o;
+    DumpDeclToJSON(param_o, param, wl);
 
-    llvm::json::Value val(std::move(obj));
-    std::ofstream file_os((output_dir / file_name).generic_string(),
-                          std::ios::trunc | std::ios::out);
-
-    std::string file_data;
-    llvm::raw_string_ostream file_data_os(file_data);
-    file_data_os << std::move(val);
-    file_os << file_data;
-
-    OutputSourceIR(frag, output_dir);
+    llvm::json::Value param_v(std::move(param_o));
+    params_a.push_back(std::move(param_v));
   }
 
-  for (mx::Token token : mx::Token::in(file)) {
-    llvm::json::Object tok;
-    tok["data"] = token.data().data();
-    tok["id"] = static_cast<uint64_t>(token.id());
-    tok["kind"] = static_cast<unsigned>(token.kind());
-    tokens.emplace_back(std::move(tok));
+  llvm::json::Value params_v(std::move(params_a));
+  obj["parameters"] = std::move(params_v);
+  obj["is_variadic"] = decl.is_variadic();
+}
+
+void DumpDeclToJSON(llvm::json::Object &obj, mx::Decl decl,
+                    WorkList &wl) {
+  if (auto nd = mx::NamedDecl::from(decl)) {
+    std::string name_s(nd->name().data(), nd->name().size());
+    obj["name"] = std::move(name_s);
   }
 
-  {
-    std::string file_name = "file." + std::to_string(file.id()) + ".json";
+  if (auto func = mx::FunctionDecl::from(decl)) {
+    DumpFunctionDeclToJSON(obj, std::move(func.value()), wl);
 
-    llvm::json::Object obj;
-    obj["path"] = file_path.generic_string();
-    obj["id"] = file.id();
-    obj["fragments"] = std::move(fragment_ids);
-    obj["tokens"] = std::move(tokens);
+  } else if (auto var = mx::VarDecl::from(decl)) {
+    DumpVarDeclToJSON(obj, std::move(var.value()), wl);
 
-    llvm::json::Value val(std::move(obj));
-    std::ofstream file_os((output_dir / file_name).generic_string(),
-                          std::ios::trunc | std::ios::out);
+  } else if (auto field = mx::FieldDecl::from(decl)) {
+    DumpFieldDeclToJSON(obj, std::move(field.value()), wl);
 
-    std::string file_data;
-    llvm::raw_string_ostream file_data_os(file_data);
-    file_data_os << std::move(val);
-    file_os << file_data;
+  } else if (auto record = mx::RecordDecl::from(decl)) {
+    DumpRecordDeclToJSON(obj, std::move(record.value()), wl);
+
+  } else if (auto ed = mx::EnumDecl::from(decl)) {
+    DumpEnumDeclToJSON(obj, std::move(ed.value()), wl);
+
+  } else if (auto td = mx::TypedefNameDecl::from(decl)) {
+    DumpTypedefNameDeclToJSON(obj, std::move(td.value()), wl);
   }
 }
 
@@ -175,24 +255,64 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] --output_dir DIR\n";
+    << " [--host HOST] [--port PORT]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InitGoogleLogging(argv[0]);
 
-  mx::Index index = InitExample();
+  mx::Index index = InitExample(true);
 
-  if (FLAGS_output_dir.empty()) {
-    std::cerr << "--output_dir must not be empty";
-    return EXIT_FAILURE;
-  }
+  SeenSet seen;
+  WorkList wl;
 
-  for (auto [path, id] : index.file_paths()) {
-    if (auto maybe_file = index.file(id)) {
-      OutputFileInfo(std::move(*maybe_file), std::move(path));
+  mx::FileLocationConfiguration config;
+  config.tab_width = FLAGS_tab_width;
+
+  mx::FileLocationCache cache(config);
+
+  // Go find all functions.
+  for (mx::File file : mx::File::in(index)) {
+    for (mx::Fragment frag : mx::Fragment::in(file)) {
+      for (mx::FunctionDecl func : mx::FunctionDecl::in(frag)) {
+        wl.emplace_back(LongestDefinition(func));
+      }
     }
   }
+
+  llvm::outs() << "{\n";
+  auto sep = "";
+
+  while (!wl.empty()) {
+    mx::Decl decl = std::move(wl.back());
+    wl.pop_back();
+
+    if (seen.emplace(decl.id()).second) {
+      llvm::outs() << sep;
+      sep = ",\n";
+
+      mx::Fragment frag = mx::Fragment::containing(decl);
+      mx::File file = mx::File::containing(frag);
+      auto file_path = file_paths.find(file.id());
+
+      llvm::outs() << '"' << decl.id().Pack() << "\": ";
+
+      llvm::json::Object obj;
+      obj["kind"] = mx::EnumeratorName(decl.kind());
+      obj["file"] = file_path->second.generic_string();
+      if (auto line_col = decl.token().nearest_location(cache)) {
+        obj["line"] = line_col->first;
+        obj["column"] = line_col->second;
+      }
+
+      DumpDeclToJSON(obj, std::move(decl), wl);
+
+      llvm::json::Value val(std::move(obj));
+      llvm::outs() << std::move(val);
+    }
+  }
+
+  llvm::outs() << "\n}";
 
   return EXIT_SUCCESS;
 }
