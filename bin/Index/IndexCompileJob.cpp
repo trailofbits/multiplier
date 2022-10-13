@@ -300,6 +300,8 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   // We should always at least hit the end of file marker token first.
   CHECK_LT(end_tok_index, max_tok_index);
 
+  LOG(ERROR) << "Baseline range: [" << begin_tok_index << ", " << end_tok_index << "]\n";
+
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the expand until we find the beginning of the
   // range.
@@ -307,6 +309,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   while (!done && 0u < begin_tok_index && begin_tok_index < end_tok_index) {
     tok = range[begin_tok_index];
     switch (tok.Role()) {
+      default:
       case pasta::TokenRole::kInvalid:
         assert(false);
         done = true;
@@ -319,13 +322,14 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         }
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      case pasta::TokenRole::kBeginOfFileMarker:
         done = true;
         break;
       case pasta::TokenRole::kEndOfFileMarker:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
         ++begin_tok_index;
+        done = true;
         break;
-      case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
         --begin_tok_index;
@@ -333,10 +337,14 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
     }
   }
 
+
+  LOG(ERROR) << "Baseline range after adjusting begin: [" << begin_tok_index << ", " << end_tok_index << "]\n";
+
   done = false;
   while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
     tok = range[end_tok_index];
     switch (tok.Role()) {
+      default:
       case pasta::TokenRole::kInvalid:
         assert(false);
         --end_tok_index;
@@ -349,26 +357,33 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         }
         break;
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      case pasta::TokenRole::kEndOfFileMarker:
         done = true;
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
       case pasta::TokenRole::kBeginOfFileMarker:
         --end_tok_index;
+        done = true;
         break;
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-      case pasta::TokenRole::kEndOfFileMarker:
         ++end_tok_index;
         break;
     }
   }
 
+  LOG(ERROR) << "Baseline range after adjusting end: [" << begin_tok_index << ", " << end_tok_index << "]\n";
+
   // Expand to trailing semicolon.
   if ((end_tok_index + 1u) < max_tok_index) {
-    if (range[end_tok_index].Kind() == pasta::TokenKind::kSemi) {
+    pasta::Token last_tok = range[end_tok_index + 1u];
+    if (last_tok.Kind() == pasta::TokenKind::kSemi &&
+        last_tok.Role() == pasta::TokenRole::kFileToken) {
       ++end_tok_index;
     }
   }
+
+  LOG(ERROR) << "Baseline range after semicolon adjust: [" << begin_tok_index << ", " << end_tok_index << "]\n";
 
   return {begin_tok_index, end_tok_index};
 }
