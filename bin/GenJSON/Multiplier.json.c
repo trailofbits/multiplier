@@ -39,6 +39,7 @@
 #define MX_VISIT_ENUM_LIST(IGN0, FIELD, IGN1, IGN2, IGN3, ENUM, ...) { "type": "enum", "name": #FIELD, "enum": #ENUM, "list": true },
 #define MX_VISIT_ENTITY_LIST(IGN0, FIELD, IGN1, IGN2, IGN3, ENTITY, ...) { "type": "entity", "name": #FIELD, "entity": #ENTITY, "list": true },
 #define MX_VISIT_PSEUDO_LIST(IGN0, FIELD, IGN1, IGN2, IGN3, ENTITY, ...) { "type": "pseudo", "name": #FIELD, "entity": #ENTITY, "list": true },
+#define MX_VISIT_DECL_CONTEXT(IGN0, FIELD, IGN1, IGN2, IGN3, ENTITY, ...) { "type": "decl_context", "name": #FIELD, "entity": #ENTITY },
 
 #define MX_VISIT_OPTIONAL_BOOL_LIST(IGN0, FIELD, ...) { "type": "bool", "name": #FIELD, "list": true, "optional": true },
 #define MX_VISIT_OPTIONAL_INT_LIST(IGN0, FIELD, ...) { "type": "int", "name": #FIELD, "list": true, "optional": true },
