@@ -301,8 +301,6 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   // We should always at least hit the end of file marker token first.
   CHECK_LT(end_tok_index, max_tok_index);
 
-  LOG(ERROR) << "Baseline range: [" << begin_tok_index << ", " << end_tok_index << "]\n";
-
   // Now adjust for macros at the beginning and ending. If we find macro
   // expansion ranges, then the expand until we find the beginning of the
   // range.
@@ -338,9 +336,6 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
     }
   }
 
-
-  LOG(ERROR) << "Baseline range after adjusting begin: [" << begin_tok_index << ", " << end_tok_index << "]\n";
-
   done = false;
   while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
     tok = range[end_tok_index];
@@ -373,8 +368,6 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
     }
   }
 
-  LOG(ERROR) << "Baseline range after adjusting end: [" << begin_tok_index << ", " << end_tok_index << "]\n";
-
   // Expand to trailing semicolon.
   if ((end_tok_index + 1u) < max_tok_index) {
     pasta::Token last_tok = range[end_tok_index + 1u];
@@ -383,8 +376,6 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
       ++end_tok_index;
     }
   }
-
-  LOG(ERROR) << "Baseline range after semicolon adjust: [" << begin_tok_index << ", " << end_tok_index << "]\n";
 
   return {begin_tok_index, end_tok_index};
 }

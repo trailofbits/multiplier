@@ -28,7 +28,8 @@ enum class TypeKind : unsigned char;
 enum class TokenSubstitutionKind : unsigned char {
   MACRO_EXPANSION,
   FUNCTION_LIKE_MACRO_EXPANSION,
-  INCLUDE_EXPANSION
+  INCLUDE_EXPANSION,
+  SUBSTITUTION,
 };
 
 using RawEntityId = uint64_t;

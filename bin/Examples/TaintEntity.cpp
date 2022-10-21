@@ -50,20 +50,10 @@ struct UsePath {
 };
 
 struct UserDAG {
-//  UserDAG *root{nullptr};
   unsigned depth{0};
   std::vector<UserDAG *> users;
   std::vector<UserDAG *> uses;
   mx::RawEntityId entity_id{mx::kInvalidEntityId};
-
-//  // Union-find path compression.
-//  UserDAG *Root(void) {
-//    if (this != root) {
-//      root = root->Root();
-//    }
-//
-//    return root;
-//  }
 };
 
 using SeenEntityMap = std::unordered_map<mx::RawEntityId,
@@ -71,10 +61,12 @@ using SeenEntityMap = std::unordered_map<mx::RawEntityId,
 
 static UserDAG *AddPathToDAG(const UsePath &entry, SeenEntityMap &seen);
 
-// Preferentially use the definition for a declaration.
+// Preferentially use the first redeclaration as the "canonical" version of
+// any given decl. Every redecl presents the redecl list in the same order,
+// and definitions are ordered before declarations.
 static mx::Decl PreferDefinition(const mx::Decl &decl) {
   for (auto redecl : decl.redeclarations()) {
-    return redecl;  // First redecl is a definition.
+    return redecl;
   }
   return decl;
 }
@@ -103,7 +95,6 @@ UserDAG *AddPathToDAG(const UsePath &entry, SeenEntityMap &seen) {
   if (!use) {
     use.reset(new UserDAG);
     use->entity_id = entry.entity_id;
-//    use->root = use.get();
   }
 
   LinkUseToDAG(entry, use.get(), seen);
