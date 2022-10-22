@@ -869,6 +869,8 @@ bool TokenTreeImpl::TryInventMissingSubstitutions(
     return false;
   }
 
+  StripWhitespace(missing_nodes);
+
   Substitution *new_exp = nullptr;
   std::cerr << indent << "Inventing missing substitution\n";
   Substitution *new_sub = CreateSubstitution(Substitution::kSubstitution);
@@ -899,6 +901,13 @@ bool TokenTreeImpl::AddNodeAndMissingPrefixes(
     return true;
   }
 
+  if (curr->file_tok) {
+    std::cerr
+        << indent << "left corner of substitution ("
+        << curr->file_tok->Index() << "): "
+        << curr->file_tok->Data() << '\n';
+  }
+
   if (TryFillBetweenFileTokens(prev, curr, sub->before_body, sub->after_body,
                                nodes)) {
     nodes.emplace_back(std::move(curr_node));
@@ -907,6 +916,10 @@ bool TokenTreeImpl::AddNodeAndMissingPrefixes(
 
   // Try to go and find the next file token in this area.
   if (TryInventMissingSubstitutions(sub, prev, curr_node, next_index, nodes)) {
+    curr_node = nodes.back();
+    nodes.pop_back();
+    AddNodeAndMissingPrefixes(sub, prev, std::move(curr_node), next_index,
+                              nodes, err);
     return true;
   }
 
