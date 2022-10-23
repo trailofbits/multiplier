@@ -308,6 +308,18 @@ static TokenInfo *RightCornerOfUse(Substitution::Node node) {
   return nullptr;
 }
 
+static TokenInfo *RightCornerOfUse(
+    const std::vector<Substitution::Node> &before) {
+  auto it = before.rbegin();
+  auto end = before.rend();
+  for (; it != end; ++it) {
+    if (auto rc = ::indexer::RightCornerOfUse(*it)) {
+      return rc;
+    }
+  }
+  return nullptr;
+}
+
 static TokenInfo *RightCornerOfExpansionOrUse(Substitution::Node node) {
   if (std::holds_alternative<TokenInfo *>(node)) {
     return std::get<TokenInfo *>(node);
@@ -366,14 +378,7 @@ TokenInfo *Substitution::LeftCornerOfUse(void) const {
 }
 
 TokenInfo *Substitution::RightCornerOfUse(void) const {
-  auto it = before.rbegin();
-  auto end = before.rend();
-  for (; it != end; ++it) {
-    if (auto rc = ::indexer::RightCornerOfUse(*it)) {
-      return rc;
-    }
-  }
-  return nullptr;
+  return ::indexer::RightCornerOfUse(before);
 }
 
 TokenInfo *Substitution::RightCornerOfExpansionOrUse(void) const {
@@ -1551,6 +1556,29 @@ bool TokenTreeImpl::FillMissingFileTokens(Substitution *sub,
 
     if (auto next_prev = RightCornerOfUse(new_nodes.back())) {
       prev = next_prev;
+
+    // The way we invent substitutions can sometimes result in nothing expanding
+    // into something. This typically happens where there's a trailing
+    // `__VA_ARGS__` in an argument list.
+    } else if (auto new_rc = RightCornerOfUse(new_nodes);
+               new_rc && prev == new_rc && new_rc->file_tok &&
+               new_rc->file_tok->Data() == "__VA_ARGS__") {
+      std::cerr << indent << "Added empty node that follows __VA_ARGS__";
+      auto nested_sub = std::get<Substitution *>(new_nodes.back());
+      new_nodes.pop_back();
+      assert(std::holds_alternative<Substitution *>(new_nodes.back()));
+      assert(nested_sub->before.empty());
+      assert(nested_sub->after != nullptr);
+      assert(!nested_sub->after->after);
+      auto nested_va_args = std::get<Substitution *>(new_nodes.back());
+      nested_va_args->after->before.insert(
+          nested_va_args->after->before.end(),
+          nested_sub->after->before.begin(), nested_sub->after->before.end());
+
+    // This isn't ideal, so in a debug build we want to know about it, but in
+    // a release build, at least something not too unreasonable will happen.
+    } else {
+      assert(false);
     }
   }
 
