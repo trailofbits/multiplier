@@ -881,15 +881,23 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           auto ft_data = ft.Data();
           if (ft_data == "__VA_OPT__") {
             collect_parens = true;
-            seen_pound = false;  // Might be internal to parens.
 //          } else if (ft_data == "include" || ft_data == "include_next" ||
 //                     ft_data == "import") {
 //            std::cerr << indent << "Found include/include_next/import\n";
 //            nodes.resize(size_at_hash);
 //            goto exit_loop;
-          } else {
-            curr_i = (i + 1u);  // Stop before next iteration.
+//          } else if (ft_data == "if" || ft_data == "ifdef" ||
+//                     ft_data == "ifndef" || ft_data == "elif" ||
+//                     ft_data == "else" || ft_data == "endif" ||
+//                     ft_data == "define" || ft_data == "undef" ||
+//                     ft_data == "pragma" || ft_data == "error" ||
+//                     ft_data == "include" || ft_data == "include_next" ||
+//                     ft_data == "__include_macros" || ) {
+//          } else {
+//            curr_i = (i + 1u);  // Stop before next iteration.
           }
+          std::cerr << indent << "Disabling pound on " << ft_data << "\n";
+          seen_pound = false;
         }
         goto keep_going;
       case pasta::TokenKind::kUnknown:
