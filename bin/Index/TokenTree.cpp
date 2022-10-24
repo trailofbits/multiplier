@@ -400,19 +400,55 @@ TokenInfo *Substitution::RightCornerOfExpansionOrUse(void) const {
 }
 
 void Substitution::Print(std::ostream &os) const {
+  if (before.empty()) {
+    assert(!after);
+  }
+
+  auto tok_data = [] (TokenInfo *info) -> std::string_view {
+    std::string_view a, b, c;
+    if (info->parsed_tok) {
+      a = info->parsed_tok->Data();
+    }
+    if (info->macro_tok) {
+      b = info->macro_tok->Data();
+    }
+    if (info->file_tok) {
+      c = info->file_tok->Data();
+    }
+
+    assert((a.empty() || b.empty()) || a == b);
+    assert((a.empty() || c.empty()) || a == c);
+    assert((b.empty() || c.empty()) || b == c);
+
+    if (!a.empty()) {
+      return a;
+    } else if (!b.empty()) {
+      return b;
+    } else if (!c.empty()) {
+      return c;
+    } else {
+      assert(false);
+      return {};
+    }
+  };
+
   for (auto ent : before) {
     if (std::holds_alternative<TokenInfo *>(ent)) {
       auto info = std::get<TokenInfo *>(ent);
       switch (info->category) {
         case TokenInfo::kFileToken:
-          std::cerr << info->file_tok->Data();
+          std::cerr << tok_data(info);
           continue;
         case TokenInfo::kMacroUseToken:
+          std::cerr << "\033[4m" << tok_data(info) << "\033[0m";
+          continue;
         case TokenInfo::kMissingFileToken:
-          std::cerr << "\033[4m" << info->file_tok->Data() << "\033[0m";
+          std::cerr << "\033[4m" << tok_data(info) << "\033[0m";
           continue;
         case TokenInfo::kMacroStepToken:
+        case TokenInfo::kMacroExpansionToken:
         case TokenInfo::kMarkerToken:
+          std::cerr << "\033[5m" << tok_data(info) << "\033[0m";
         default:
           continue;
       }
@@ -859,20 +895,20 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
       case pasta::TokenKind::kUnknown:
       case pasta::TokenKind::kEndOfFile:
       case pasta::TokenKind::kEndOfDirective:
-        if (seen_pound) {
-          bool line_cont = false;
-          for (auto c : ft.Data()) {
-            if (c == '\\') {
-              line_cont = true;
-            } else if (line_cont && (c == ' ' || c == '\t')) {
-              continue;
-            } else if (!line_cont && (c == '\n' || c == '\r')) {
-              goto exit_loop;
-            } else {
-              line_cont = false;
-            }
-          }
-        }
+//        if (seen_pound) {
+//          bool line_cont = false;
+//          for (auto c : ft.Data()) {
+//            if (c == '\\') {
+//              line_cont = true;
+//            } else if (line_cont && (c == ' ' || c == '\t')) {
+//              continue;
+//            } else if (!line_cont && (c == '\n' || c == '\r')) {
+//              goto exit_loop;
+//            } else {
+//              line_cont = false;
+//            }
+//          }
+//        }
         goto keep_going;
       default:
         if (seen_pound) {
@@ -992,11 +1028,6 @@ bool TokenTreeImpl::TryInventMissingSubstitutions(
   std::cerr << indent << "Inventing missing substitution\n";
   Substitution *new_sub = CreateSubstitution(Substitution::kSubstitution);
 
-  if (std::holds_alternative<Substitution *>(curr_node)) {
-    auto arg_sub = std::get<Substitution *>(curr_node);
-//    assert(arg_sub->kind != Substitution::kMacroArgument);
-  }
-
   new_exp->parent = new_sub;
   new_exp->before.emplace_back(std::move(curr_node));
 
@@ -1110,6 +1141,11 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
   auto num_j_args = 0u;
   auto changed = true;
 
+  TokenInfo *i_rc = nullptr;
+  TokenInfo *j_lc = nullptr;
+  Substitution *i_arg = nullptr;
+  Substitution *j_arg = nullptr;
+
   while (i < max_i && j < max_j) {
     if (!changed) {
       break;
@@ -1120,12 +1156,12 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
     Substitution::Node node_j = pre_exp->before[j];
 
     const auto i_is_tok = std::holds_alternative<TokenInfo *>(node_i);
-    TokenInfo * const i_rc = RightCornerOfExpansionOrUse(node_i);
-    Substitution * const i_arg = MacroArgument(node_i);
+    i_rc = RightCornerOfExpansionOrUse(node_i);
+    i_arg = MacroArgument(node_i);
 
     const auto j_is_tok = std::holds_alternative<TokenInfo *>(node_j);
-    TokenInfo * const j_lc = LeftCornerOfUse(node_j);
-    Substitution * const j_arg = MacroArgument(node_j);
+    j_lc = LeftCornerOfUse(node_j);
+    j_arg = MacroArgument(node_j);
 
     std::cerr
         << indent << "i=" << i << " j=" << j << " i_is_tok=" << i_is_tok
@@ -1237,12 +1273,24 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
     }
   }
 
+  // Trailing arguments from the pre-expansion.
+  if (!changed && i_rc && j_lc &&
+      i_rc->macro_tok->TokenKind() == pasta::TokenKind::kRParenthesis &&
+      j_lc->macro_tok->TokenKind() == pasta::TokenKind::kComma) {
+    ++i;
+    for (; j < max_j; ++j) {
+      changed = true;
+      new_nodes.emplace_back(pre_exp->before[j]);
+    }
+  }
+
   std::cerr
       << indent << "i=" << i << " j=" << j << " i_max=" << max_i
       << " j_max=" << max_j << '\n';
 
   if (!changed || i != max_i || j != max_j) {
     substitutions_alloc.front().PrintDOT(std::cerr);
+    assert(false);
     err << "Unable to complete merge";
     return false;
   }
@@ -1636,7 +1684,14 @@ bool TokenTreeImpl::FillMissingFileTokens(Substitution *sub,
     }
   }
 
-  if (sub != &(substitutions_alloc.front())) {
+  // TODO(pag): Technically, we could test the following:
+  //
+  //              if (sub != &(substitutions_alloc.front())) {
+  //
+  //            That would mean that if there is an include inside of an `enum`,
+  //            for instance, and then if the included file had a bunch of
+  //            leading/trailing whitespace/comments, then we'd elide those.
+  if (sub->kind != Substitution::kFileBody) {
     StripWhitespace(new_nodes);
   }
 
