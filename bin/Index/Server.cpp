@@ -61,7 +61,7 @@ class ServerImpl final {
   mx::Executor executor;
 
   // Workspace directory.
-  std::filesystem::path workspace_dir;
+  std::filesystem::path db_path;
 
   // Should we show progress bars?
   const bool show_progress_bars;
@@ -93,10 +93,10 @@ class ServerImpl final {
 // Initialize the server.
 ServerImpl::ServerImpl(ServerOptions &options)
     : executor(options.executor_options),
-      workspace_dir(options.workspace_dir),
+      db_path(options.db_path),
       show_progress_bars(options.show_progress_bars),
       generate_sourceir(options.generate_sourceir),
-      server_context(options.workspace_dir),
+      server_context(options.db_path),
       native_file_system(pasta::FileSystem::CreateNative()) {}
 
 // Get or create an indexing context. If there are concurrent indexing

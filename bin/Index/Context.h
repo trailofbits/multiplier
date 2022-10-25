@@ -207,7 +207,7 @@ class ServerContext {
 
   ~ServerContext(void);
 
-  explicit ServerContext(std::filesystem::path workspace_dir_);
+  explicit ServerContext(std::filesystem::path db_path);
 
   // Return the set of redeclarations of an entity.
   std::vector<mx::RawEntityId> FindRedeclarations(mx::EntityId eid);

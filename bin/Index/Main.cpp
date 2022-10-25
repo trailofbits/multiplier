@@ -35,10 +35,9 @@ DEFINE_int32(num_workers, -1, "Number of worker threads to use for parallel jobs
 DEFINE_bool(show_progress, false, "Show indexing progress bars");
 
 // Directory where stuff (RocksDB k/v stores, SQLite database) is stored.
-DEFINE_string(workspace_dir, "",
-              "Path to the workspace into which semi-permanent indexer data "
-              "should be stored. Defaults to the current working directory "
-              "of `mx-index`.");
+DEFINE_string(db_path, "mx-index.db",
+              "Path to the database file into which semi-permanent indexer data "
+              "should be stored. Defaults mx-index.db.");
 
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
 
@@ -52,52 +51,6 @@ DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level decl
 //DEFINE_bool(disable_async_writes, false,
 //            "Disable asynchronous writes to the underlying storage engine "
 //            "(e.g. the file system) containing the SQLite database?");
-
-namespace {
-
-// Try to get the workspace directory.
-static mx::Result<std::filesystem::path, std::string> TryGetWorkspaceDir(
-    std::filesystem::path path) {
-  std::error_code ec;
-  std::stringstream err;
-  if (path.empty()) {
-    path = std::filesystem::current_path(ec);
-    if (ec) {
-      err << "Unable to determine the current working directory: "
-          << ec.message();
-      return err.str();
-    }
-  }
-
-  if (!std::filesystem::is_directory(path)) {
-    if (!std::filesystem::create_directory(path, ec)) {
-      err << "Unable to create directory '" << path.generic_string()
-          << "' for workspace: " << ec.message();
-      return err.str();
-    }
-  }
-
-  std::filesystem::directory_iterator it(path, ec);
-  if (ec) {
-    err << "Specified directory '" << path.generic_string()
-        << "' for workspace is not iterable: " << ec.message();
-    return err.str();
-  }
-  // Make sure we can list the directory.
-  for (auto entry : it) {
-    if (ec) {
-      err << "Specified directory '" << path.generic_string()
-          << "' for workspace is not iterable: " << ec.message();
-      return err.str();
-    } else {
-      break;
-    }
-  }
-
-  return path;
-}
-
-}  // namespace
 
 extern "C" int main(int argc, char *argv[]) {
   pasta::InitPasta init_pasta;
@@ -127,14 +80,8 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto workspace_dir = TryGetWorkspaceDir(FLAGS_workspace_dir);
-  if (!workspace_dir.Succeeded()) {
-    std::cerr << workspace_dir.TakeError();
-    return EXIT_FAILURE;
-  }
-
   indexer::ServerOptions options;
-  options.workspace_dir = workspace_dir.TakeValue();
+  options.db_path = FLAGS_db_path;
   options.show_progress_bars = FLAGS_show_progress;
   options.executor_options.num_workers = FLAGS_num_workers;
   options.generate_sourceir = FLAGS_generate_sourceir;

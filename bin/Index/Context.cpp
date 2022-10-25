@@ -25,8 +25,8 @@
 
 namespace indexer {
 
-ServerContext::ServerContext(std::filesystem::path workspace_dir_)
-    : db(workspace_dir_ / "server.sqlite"),
+ServerContext::ServerContext(std::filesystem::path db_path)
+    : db(db_path),
       meta_to_value(db),
       file_id_to_path(db),
       file_id_to_serialized_file(db),

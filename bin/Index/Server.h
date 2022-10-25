@@ -21,7 +21,7 @@ struct ServerOptions {
   //indexer::StorageOptions storage_options;
 
   // Directory where data is stored.
-  std::filesystem::path workspace_dir;
+  std::filesystem::path db_path;
 
   // Whether or not to show progress bars.
   bool show_progress_bars;
