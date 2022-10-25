@@ -2166,6 +2166,39 @@ void TokenTreeImpl::FindSubstitutionBounds(void) {
       continue;
     }
   }
+
+  for (Substitution &sub : substitutions_alloc) {
+    if (sub.kind != Substitution::kMacroExpansion ||
+        !sub.before_body || !sub.after_body) {
+      continue;
+    }
+
+    auto bi = sub.before_body->file_tok->Index();
+    auto ai = sub.after_body->file_tok->Index();
+
+    // Restrict child substitutions.
+    for (Substitution::Node &node : sub.before) {
+      if (!std::holds_alternative<Substitution *>(node)) {
+        continue;
+      }
+
+      Substitution *nested_sub = std::get<Substitution *>(node);
+      if (!nested_sub->before_body || !nested_sub->after_body) {
+        continue;
+      }
+
+      auto sbi = nested_sub->before_body->file_tok->Index();
+      auto sai = nested_sub->after_body->file_tok->Index();
+
+      if (bi <= sbi && ai <= sai) {
+        nested_sub->after_body = sub.after_body;
+      }
+
+      if (sbi < bi && sai <= ai) {
+        nested_sub->before_body = sub.before_body;
+      }
+    }
+  }
 }
 
 // Build the initial tree of substitutions.
