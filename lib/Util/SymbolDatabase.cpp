@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/SQLiteStore.h>
+#include <multiplier/SymbolDatabase.h>
 
 #include <glog/logging.h>
 
@@ -21,9 +22,7 @@
 #include <blockingconcurrentqueue.h>
 #pragma GCC diagnostic pop
 
-#include "Database.h"
-
-namespace indexer {
+namespace mx {
 
 struct ExitSignal {};
 struct FlushSignal {};
@@ -36,7 +35,7 @@ using QueueItem = std::variant<SymbolToInsert, FlushSignal, ExitSignal>;
 // It also maintains the the list of active writers per table and uses it to write
 // to the table.
 //
-class DatabaseImpl {
+class SymbolDatabaseImpl {
  public:
   friend class Database;
 
@@ -51,17 +50,17 @@ class DatabaseImpl {
   std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
       insert_symbol_stmt;
 
-  DatabaseImpl(sqlite::Connection& db);
+  SymbolDatabaseImpl(sqlite::Connection& db);
 
-  ~DatabaseImpl(void);
+  ~SymbolDatabaseImpl(void);
 };
 
-DatabaseImpl::~DatabaseImpl(void) {
+SymbolDatabaseImpl::~SymbolDatabaseImpl(void) {
   insertion_queue.enqueue(ExitSignal{});
   bulk_insertion_thread.join();
 }
 
-DatabaseImpl::DatabaseImpl(sqlite::Connection& db)
+SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
     : db(db) {
 
   for (auto i = 0u; i < kNumCategories; ++i) {
@@ -158,23 +157,23 @@ DatabaseImpl::DatabaseImpl(sqlite::Connection& db)
   // db->Execute(entities_fts_table.str());
 }
 
-Database::Database(sqlite::Connection& db)
-    : d(std::make_shared<DatabaseImpl>(db)) {}
+SymbolDatabase::SymbolDatabase(sqlite::Connection& db)
+    : d(std::make_shared<SymbolDatabaseImpl>(db)) {}
 
-Database::~Database(void) {}
+SymbolDatabase::~SymbolDatabase(void) {}
 
-void Database::Flush(void) {
+void SymbolDatabase::Flush(void) {
   d->insertion_queue.enqueue(FlushSignal{});
 }
 
-void Database::StoreSymbolName(mx::RawEntityId entity_id,
+void SymbolDatabase::StoreSymbolName(mx::RawEntityId entity_id,
                                mx::DeclCategory category,
                                std::string symbol) {
   d->insertion_queue.enqueue(
       SymbolToInsert(entity_id, category, std::move(symbol)));
 }
 
-std::vector<mx::RawEntityId> Database::QueryEntities(
+std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
     const std::string &name, mx::DeclCategory category) {
 
   auto table_id = static_cast<unsigned>(category);

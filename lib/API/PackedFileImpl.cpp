@@ -18,6 +18,13 @@ PackedFileImpl::PackedFileImpl(
       reader(package.Reader<rpc::File>()),
       num_tokens(reader.getTokenKinds().size()) {}
 
+PackedFileImpl::PackedFileImpl(
+    RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader& reader_)
+    : FileImpl(id_, std::move(ep_)),
+      package(reader_),
+      reader(package.Reader<rpc::File>()),
+      num_tokens(reader.getTokenKinds().size()) {}
+
 // Return the data of the file.
 std::string_view PackedFileImpl::Data(void) const {
   auto data = reader.getData();

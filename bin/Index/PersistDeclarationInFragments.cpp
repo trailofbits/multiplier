@@ -11,7 +11,6 @@
 #include <pasta/AST/Stmt.h>
 
 #include "Context.h"
-#include "Database.h"
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Util.h"
@@ -132,7 +131,7 @@ void PendingFragment::PersistDeclarationSymbols(
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {
       
-      context.server_context.database.StoreSymbolName(
+      context.server_context.storage.database.StoreSymbolName(
           em.EntityId(decl), mx::FromPasta(decl.Category()),
           ContextualSymbolName(nd.value()));
     }

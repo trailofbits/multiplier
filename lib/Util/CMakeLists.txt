@@ -43,6 +43,7 @@ add_library("mx-util"
     "ProgressBar.cpp"
     "Signal.cpp"
     "Subprocess.cpp"
+    "SymbolDatabase.cpp"
     "WorkerPool.cpp"
     "SQLiteStore.cpp"
 

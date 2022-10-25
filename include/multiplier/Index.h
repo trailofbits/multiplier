@@ -85,6 +85,8 @@ class EntityProvider {
   // Create an in-memory caching entity provider.
   static Ptr in_memory_cache(Ptr next, unsigned timeout_s=1u);
 
+  static Ptr from_database(std::filesystem::path path);
+
  private:
   friend class CachingEntityProvider;
   friend class Decl;

@@ -29,6 +29,22 @@ PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
   num_tokens = reader.getTokenKinds().size();
 }
 
+PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
+                                       EntityProvider::Ptr ep_,
+                                       const capnp::Data::Reader& reader_)
+    : FragmentImpl(id_, std::move(ep_)),
+      package(reader_),
+      reader(package.Reader<rpc::Fragment>()) {
+
+  // For bounds checking.
+  num_decls = reader.getDeclarations().size();
+  num_stmts = reader.getStatements().size();
+  num_types = reader.getTypes().size();
+  num_attrs = reader.getAttributes().size();
+  num_pseudos = reader.getOthers().size();
+  num_tokens = reader.getTokenKinds().size();
+}
+
 // Return the ID of the file containing the first token.
 //
 // NOTE(pag): This returns the raw, unpacked file id.

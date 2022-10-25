@@ -87,7 +87,7 @@ void WeggliSearchAction::Run(mx::Executor, mx::WorkerId) {
 
   while (true) {
     mx::RawEntityId file_id = context->local_next_file_id.fetch_add(1ull);
-    if (file_id >= context->server_context.next_file_id.load()) {
+    if (file_id >= context->server_context.storage.next_file_id.load()) {
       break;
     }
     QuerySyntaxInFile(file_id);

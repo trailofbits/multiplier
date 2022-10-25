@@ -82,6 +82,7 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
   virtual ~PackedFileImpl(void) noexcept;
 
   PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_, Response response_);
+  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader& reader_);
 
   inline PackedFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_)
       : PackedFileImpl(id_.file_id, std::move(ep_), std::move(response_)) {}

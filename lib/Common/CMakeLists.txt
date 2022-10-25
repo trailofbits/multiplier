@@ -64,6 +64,7 @@ set(common_headers
 
 add_library("mx-common" STATIC
   "Compress.cpp"
+  "IndexStorage.cpp"
   "Re2.cpp"
   "Re2.h"
   "Types.cpp"
