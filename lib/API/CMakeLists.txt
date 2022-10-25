@@ -37,6 +37,8 @@ add_library("mx-api"
     
     "API.cpp"
     "API.h"
+    "Compress.cpp"
+    "Compress.h"
     "CachingEntityProvider.cpp"
     "CachingEntityProvider.h"
     "FileList.cpp"

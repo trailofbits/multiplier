@@ -6,8 +6,11 @@
 
 #include "SQLiteEntityProvider.h"
 #include "API.h"
-#include "multiplier/Index.h"
-#include "multiplier/Types.h"
+#include "Compress.h"
+#include "Re2.h"
+#include <multiplier/Index.h>
+#include <multiplier/Re2.h>
+#include <multiplier/Types.h>
 #include <multiplier/SQLiteStore.h>
 #include <memory>
 #include <multiplier/IndexStorage.h>
@@ -45,7 +48,7 @@ FilePathList SQLiteEntityProvider::ListFiles(const Ptr &) {
       [=, &res] (mx::RawEntityId file_id, std::string file_path) {
         DCHECK_NE(file_id, mx::kInvalidEntityId);
         DCHECK(!file_path.empty());
-        res.insert({file_path, file_id});
+        res.emplace(file_path, file_id);
         return true;
       });
 
@@ -107,14 +110,136 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(const Ptr 
   return FragmentImpl::Ptr(std::move(ret), ret_ptr);
 }
 
-std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &, const WeggliQuery &) {
-  // TODO(frabert)
-  return {};
+std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &self, const WeggliQuery &query_tree) {
+  std::map<unsigned, unsigned> eol_offset_to_line_num;
+  std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
+  for(RawEntityId file_id = kMinEntityIdIncrement;
+        file_id < d->storage.next_file_id;
+        ++file_id) {
+    // Get the contents of the file. We may fail, which is OK, and generally
+    // implies a bad file id. There can be small gaps in the file ID space, which
+    // otherwise mostly occupies the range `[1, N)`.
+    auto maybe_contents = d->storage.GetSerializedFile(file_id);
+    if (!maybe_contents) {
+      continue;  // Bad file ID. This is expected for the way we get them.
+    }
+
+    WithUncompressedMessageImpl(
+      "file", maybe_contents.value(),
+      [=, this, &eol_offset_to_line_num, &line_results] (capnp::MessageReader &reader) {
+    mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
+    std::string_view file_contents(file.getData().cStr(),
+                                   file.getData().size());
+
+    eol_offset_to_line_num.clear();
+    for (mx::rpc::UpperBound::Reader ubr : file.getEolOffsets()) {
+      eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
+    }
+
+    query_tree.ForEachMatch(
+        file_contents,
+        [=, this, &line_results] (const mx::WeggliMatchData &match) -> bool {
+          unsigned prev_line = 0;
+          for (auto i = match.begin_offset; i < match.end_offset; ++i) {
+            auto line_it = eol_offset_to_line_num.upper_bound(i);
+            if (line_it != eol_offset_to_line_num.end()) {
+              auto line = line_it->second;
+              if (line != prev_line) {
+                prev_line = line;
+                line_results.emplace(file_id, line);
+              }
+            }
+          }
+          return true;
+        });
+    });
+  }
+
+  std::vector<mx::RawEntityId> fragment_ids;
+  fragment_ids.reserve(128u);
+  // Convert the file file:line pairs into overlapping fragment IDs.
+  for (auto prefix : line_results) {
+    d->storage.file_fragment_lines.ScanPrefix(
+        prefix,
+        [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
+          if (fragment_ids.empty() || fragment_ids.back() != id) {
+            fragment_ids.push_back(id);
+          }
+          return true;
+        });
+  }
+  // Keep only unique fragment ids.
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
+
+  return std::make_shared<WeggliQueryResultImpl>(query_tree, self, fragment_ids);
 }
 
-std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &, const RegexQuery &) {
-  // TODO(frabert)
-  return {};
+std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &self, const RegexQuery &regex) {
+  std::map<unsigned, unsigned> offset_to_line_num;
+  std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
+  for(RawEntityId file_id = kMinEntityIdIncrement;
+        file_id < d->storage.next_file_id;
+        ++file_id) {
+    // Get the contents of the file. We may fail, which is OK, and generally
+    // implies a bad file id. There can be small gaps in the file ID space, which
+    // otherwise mostly occupies the range `[1, N)`.
+    auto maybe_contents = d->storage.GetSerializedFile(file_id);
+    if (!maybe_contents) {
+      continue;  // Bad file ID. This is expected for the way we get them.
+    }
+
+    WithUncompressedMessageImpl(
+        "file", maybe_contents.value(),
+        [=, this, &offset_to_line_num, &line_results] (capnp::MessageReader &reader) {
+      mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
+      std::string_view file_contents(file.getData().cStr(),
+                                     file.getData().size());
+
+      offset_to_line_num.clear();
+      for (mx::rpc::UpperBound::Reader ubr : file.getEolOffsets()) {
+        offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
+      }
+
+      regex.ForEachMatch(
+          file_contents,
+          [=, this, &line_results] (std::string_view, unsigned begin, unsigned end) -> bool {
+            unsigned prev_line = 0;
+            for (auto i = begin; i < end; ++i) {
+              auto line_it = offset_to_line_num.upper_bound(i);
+              if (line_it != offset_to_line_num.end()) {
+                auto line = line_it->second;
+                if (line != prev_line) {
+                  prev_line = line;
+                  line_results.emplace(file_id, line);
+                }
+              }
+            }
+            return true;
+          });
+    });
+  }
+
+  std::vector<mx::RawEntityId> fragment_ids;
+  fragment_ids.reserve(128u);
+  // Convert the file file:line pairs into overlapping fragment IDs.
+  for (auto prefix : line_results) {
+    d->storage.file_fragment_lines.ScanPrefix(
+        prefix,
+        [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
+          if (fragment_ids.empty() || fragment_ids.back() != id) {
+            fragment_ids.push_back(id);
+          }
+          return true;
+        });
+  }
+  // Keep only unique fragment ids.
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
+
+  return std::make_shared<RegexQueryResultImpl>(regex, self, fragment_ids);
 }
 
 std::vector<RawEntityId> SQLiteEntityProvider::Redeclarations(const Ptr &, RawEntityId id) {

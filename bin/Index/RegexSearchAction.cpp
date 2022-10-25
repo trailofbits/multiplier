@@ -31,7 +31,7 @@ void RegexSearchAction::QueryExprInFile(mx::RawEntityId file_id) {
   // Get the contents of the file. We may fail, which is OK, and generally
   // implies a bad file id. There can be small gaps in the file ID space, which
   // otherwise mostly occupies the range `[1, N)`.
-  auto maybe_contents = context->GetSerializedFile(file_id);
+  auto maybe_contents = context->server_context.storage.GetSerializedFile(file_id);
   if (!maybe_contents) {
     return;  // Bad file ID. This is expected for the way we get them.
   }

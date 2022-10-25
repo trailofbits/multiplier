@@ -207,9 +207,6 @@ class SearchingContext {
   // found.
   std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
   std::mutex line_results_lock;
-
-  std::optional<std::string>
-  GetSerializedFile(mx::RawEntityId file_id);
 };
 
 }  // namespace indexer

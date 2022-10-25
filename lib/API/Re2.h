@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Fragment.h"
+#include "multiplier/Types.h"
 
 #include <map>
 #include <multiplier/Re2.h>
@@ -56,6 +57,10 @@ class RegexQueryResultImpl final {
   RegexQueryResultImpl(
       const RegexQuery &re_, EntityProvider::Ptr ep_,
       Response response_);
+
+  RegexQueryResultImpl(
+      const RegexQuery &re_, EntityProvider::Ptr ep_,
+      const std::vector<RawEntityId>& fragment_ids);
 
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImpl::Ptr frag_);
 

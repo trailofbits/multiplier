@@ -137,4 +137,9 @@ std::vector<mx::RawEntityId> IndexStorage::FindRedeclarations(
 
   return all_ids;
 }
+
+std::optional<std::string>
+IndexStorage::GetSerializedFile(mx::RawEntityId file_id) {
+  return file_id_to_serialized_file.TryGet(file_id);
+}
 } // namespace mx

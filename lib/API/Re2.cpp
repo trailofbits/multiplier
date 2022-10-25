@@ -10,6 +10,7 @@
 
 #include "File.h"
 #include "Fragment.h"
+#include "multiplier/Types.h"
 
 #ifndef MX_DISABLE_RE2
 
@@ -31,6 +32,12 @@ RegexQueryResultImpl::RegexQueryResultImpl(
     fragment_ids.emplace_back(frag_id);
   }
 }
+
+RegexQueryResultImpl::RegexQueryResultImpl(
+    const RegexQuery &query_, EntityProvider::Ptr ep_, const std::vector<RawEntityId>& fragment_ids)
+    : query(query_),
+      fragment_ids(fragment_ids),
+      ep(std::move(ep_)) {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, FragmentImpl::Ptr frag_)

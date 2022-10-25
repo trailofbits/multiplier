@@ -180,5 +180,8 @@ class IndexStorage final {
 
   // Return the set of redeclarations of an entity.
   std::vector<mx::RawEntityId> FindRedeclarations(mx::EntityId eid);
+  
+  std::optional<std::string>
+  GetSerializedFile(mx::RawEntityId file_id);
 };
 } // namespace mx

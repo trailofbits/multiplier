@@ -274,9 +274,4 @@ SearchingContext::SearchingContext(ServerContext &server_context_)
 
 SearchingContext::~SearchingContext(void) {}
 
-std::optional<std::string>
-SearchingContext::GetSerializedFile(mx::RawEntityId file_id) {
-  return server_context.storage.file_id_to_serialized_file.TryGet(file_id);
-}
-
 }  // namespace indexer
