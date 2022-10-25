@@ -26,21 +26,21 @@
 namespace indexer {
 
 ServerContext::ServerContext(std::filesystem::path workspace_dir_)
-    : workspace_dir(std::move(workspace_dir_)),
-      meta_to_value(workspace_dir),
-      file_id_to_path(workspace_dir),
-      file_id_to_serialized_file(workspace_dir),
-      file_fragment_ids(workspace_dir),
-      file_fragment_lines(workspace_dir),
-      file_hash_to_file_id(workspace_dir),
-      code_hash_to_fragment_id(workspace_dir),
-      fragment_id_to_serialized_fragment(workspace_dir),
-      entity_redecls(workspace_dir),
-      entity_id_to_mangled_name(workspace_dir),
-      mangled_name_to_entity_id(workspace_dir),
-      entity_id_use_to_fragment_id(workspace_dir),
-      entity_id_reference(workspace_dir),
-      database(workspace_dir) {
+    : db(workspace_dir_ / "server.sqlite"),
+      meta_to_value(db),
+      file_id_to_path(db),
+      file_id_to_serialized_file(db),
+      file_fragment_ids(db),
+      file_fragment_lines(db),
+      file_hash_to_file_id(db),
+      code_hash_to_fragment_id(db),
+      fragment_id_to_serialized_fragment(db),
+      entity_redecls(db),
+      entity_id_to_mangled_name(db),
+      mangled_name_to_entity_id(db),
+      entity_id_use_to_fragment_id(db),
+      entity_id_reference(db),
+      database(db) {
 
   // Clients all default-initialize their version numbers to `0`, so we default
   // the server to `1` so that clients are always out-of-date.

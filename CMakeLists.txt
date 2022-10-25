@@ -54,7 +54,6 @@ find_package(glog CONFIG REQUIRED)
 find_package(Z3 4.8 CONFIG REQUIRED)
 find_llvm(llvm)
 find_package(Clang CONFIG REQUIRED)
-find_package(RocksDB CONFIG REQUIRED)
 
 if(MX_DOWNLOAD_SQLITE)
   DownloadSQLite3()

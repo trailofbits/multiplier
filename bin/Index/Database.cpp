@@ -40,7 +40,7 @@ class DatabaseImpl {
  public:
   friend class Database;
 
-  sqlite::Connection db;
+  sqlite::Connection& db;
 
   std::thread bulk_insertion_thread;
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
@@ -51,7 +51,7 @@ class DatabaseImpl {
   std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
       insert_symbol_stmt;
 
-  DatabaseImpl(std::filesystem::path path);
+  DatabaseImpl(sqlite::Connection& db);
 
   ~DatabaseImpl(void);
 };
@@ -61,8 +61,8 @@ DatabaseImpl::~DatabaseImpl(void) {
   bulk_insertion_thread.join();
 }
 
-DatabaseImpl::DatabaseImpl(std::filesystem::path path)
-    : db(path) {
+DatabaseImpl::DatabaseImpl(sqlite::Connection& db)
+    : db(db) {
 
   for (auto i = 0u; i < kNumCategories; ++i) {
     std::stringstream entities_symbols_table;
@@ -79,7 +79,7 @@ DatabaseImpl::DatabaseImpl(std::filesystem::path path)
     insert_symbol_stmt[i] = db.Prepare(insert_query.str());
   }
 
-  auto bulk_inserter = [this] (void) {
+  auto bulk_inserter = [this, &db] (void) {
     for (bool should_exit = false; !should_exit; ) {
       QueueItem item;
 
@@ -158,8 +158,8 @@ DatabaseImpl::DatabaseImpl(std::filesystem::path path)
   // db->Execute(entities_fts_table.str());
 }
 
-Database::Database(std::filesystem::path workspace_dir)
-    : d(std::make_shared<DatabaseImpl>(workspace_dir / "server.sqlite")) {}
+Database::Database(sqlite::Connection& db)
+    : d(std::make_shared<DatabaseImpl>(db)) {}
 
 Database::~Database(void) {}
 

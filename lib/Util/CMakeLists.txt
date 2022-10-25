@@ -64,7 +64,6 @@ target_link_libraries("mx-util"
     $<BUILD_INTERFACE:SQLite::SQLite3>
   PRIVATE
     $<BUILD_INTERFACE:reproc++>
-    "RocksDB::rocksdb"
 )
 
 set_target_properties("mx-util"

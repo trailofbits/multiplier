@@ -11,8 +11,9 @@ include(FetchContent)
 macro(DownloadSQLite3)
   FetchContent_Declare(
     sqlite
-    URL      https://sqlite.org/2022/sqlite-amalgamation-3380500.zip
-    URL_HASH SHA3_256=bfad5c42b767520a546251b9876e4a4b127fb651c437b968b149070e09252807
+    URL      https://sqlite.org/2022/sqlite-amalgamation-3390400.zip
+    URL_HASH SHA3_256=96894cf2c57f76ccbeda41aa6ff0ce1f6b093deced8335801d38ddb34ec9690e
+    DOWNLOAD_EXTRACT_TIMESTAMP FALSE
   )
   FetchContent_MakeAvailable(sqlite)
 
@@ -26,7 +27,8 @@ macro(DownloadSQLite3)
   target_compile_definitions(SQLite3
     PRIVATE
       "-DSQLITE_ENABLE_FTS5"
-      "-DSQLITE_ENABLE_RTREE")
+      "-DSQLITE_ENABLE_RTREE"
+      "-DSQLITE_THREADSAFE=2")
   set_target_properties(SQLite3
     PROPERTIES
       C_VISIBILITY_PRESET   default
@@ -34,7 +36,7 @@ macro(DownloadSQLite3)
   )
   add_library(SQLite::SQLite3 ALIAS SQLite3)
 
-  set(SQLite3_VERSION "3.38.5")
+  set(SQLite3_VERSION "3.39.4")
   set(SQLite3_INCLUDE_DIRS "${sqlite_SOURCE_DIR}")
   set(SQLite3_LIBRARIES SQLite::SQLite3)
   set(SQLite3_FOUND TRUE)

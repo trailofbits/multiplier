@@ -13,28 +13,28 @@
 #include <string_view>
 
 #include "Serialize.h"
+#include "SQLiteStore.h"
 
-namespace rocksdb {
-class ColumnFamilyHandle;
-class DB;
-}  // namespace rocksdb
 namespace mx {
 
 class PersistentMapBase {
  private:
-  std::shared_ptr<rocksdb::DB> impl;
-  rocksdb::ColumnFamilyHandle *cf_handle;
+  sqlite::Connection& db;
+  std::shared_ptr<sqlite::Statement> set_stmt;
+  std::shared_ptr<sqlite::Statement> get_stmt;
+  std::shared_ptr<sqlite::Statement> get_or_set_stmt;
+  std::shared_ptr<sqlite::Statement> prefix_stmt;
 
   PersistentMapBase(void) = delete;
 
  public:
   ~PersistentMapBase(void);
-  PersistentMapBase(std::filesystem::path workspace_dir);
+  PersistentMapBase(sqlite::Connection& db, uint8_t id);
 
   void Set(std::string_view key, std::string_view val) const;
-  bool LazyGetOrSet(std::string_view key, std::string *val) const;
-  bool GetOrSet(std::string_view key, std::string *val) const;
-  bool TryGet(std::string_view key, std::string *val) const;
+  bool LazyGetOrSet(std::string_view key, std::string_view& val) const;
+  bool GetOrSet(std::string_view key, std::string_view& val) const;
+  bool TryGet(std::string_view key, std::string_view& val) const;
   void MatchCommonPrefix(
       std::string key_prefix,
       std::function<bool(std::string_view, std::string_view)> cb) const;
@@ -58,8 +58,7 @@ class PersistentSet {
   PersistentMapBase impl;
 
  public:
-  PersistentSet(std::filesystem::path workspace_dir)
-      : impl(std::move(workspace_dir)) {}
+  PersistentSet(sqlite::Connection& db) : impl(db, kId) {}
 
   void Insert(Keys... keys) const {
     K key(std::forward<Keys>(keys)...);
@@ -148,8 +147,7 @@ class PersistentMap {
   PersistentMapBase impl;
 
  public:
-  PersistentMap(std::filesystem::path workspace_dir)
-      : impl(std::move(workspace_dir)) {}
+  PersistentMap(sqlite::Connection& db) : impl(db, kId) {}
 
   V GetOrSet(K key, V val) const {
     ByteCountingWriter counting_writer;
@@ -168,8 +166,10 @@ class PersistentMap {
     KeySerializer::Write(key_writer, key);
     ValueSerializer::Write(val_writer, val);
 
-    if (!impl.GetOrSet(key_data, &val_data)) {
-      SerializedValueReader reader(val_data);
+    std::string_view val_data_view{val_data};
+
+    if (!impl.GetOrSet(key_data, val_data_view)) {
+      SerializedValueReader reader(val_data_view);
       ValueDeserializer::Read(reader, val);
     }
 
@@ -207,8 +207,8 @@ class PersistentMap {
     writer.WriteI8(kId);
     KeySerializer::Write(writer, key);
 
-    std::string val_data;
-    if (!impl.TryGet(key_data, &val_data)) {
+    std::string_view val_data;
+    if (!impl.TryGet(key_data, val_data)) {
       return std::nullopt;
     }
 
@@ -230,24 +230,26 @@ class PersistentMap {
     writer.WriteI8(kId);
     KeySerializer::Write(writer, key);
 
-    std::string val_data;
+    std::string_view val_data_view;
 
     V val;
-    if (impl.TryGet(key_data, &val_data)) {
-      SerializedValueReader reader(val_data);
+    if (impl.TryGet(key_data, val_data_view)) {
+      SerializedValueReader reader(val_data_view);
       ValueDeserializer::Read(reader, val);
       return val;
     }
 
     val = callback();
 
+    std::string val_data{val_data_view};
     counting_writer.num_bytes = 0u;
     ValueCountingSerializer::Write(counting_writer, val);
     val_data.resize(counting_writer.num_bytes);
     UnsafeByteWriter val_writer(val_data);
     ValueSerializer::Write(val_writer, val);
-    if (!impl.GetOrSet(key_data, &val_data)) {
-      SerializedValueReader reader(val_data);
+    val_data_view = val_data;
+    if (!impl.GetOrSet(key_data, val_data_view)) {
+      SerializedValueReader reader(val_data_view);
       ValueDeserializer::Read(reader, val);
     }
 

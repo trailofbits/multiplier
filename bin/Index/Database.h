@@ -32,7 +32,7 @@ class Database {
   std::shared_ptr<DatabaseImpl> d;
 
  public:
-  Database(std::filesystem::path workspace_dir);
+  Database(sqlite::Connection& db);
 
   ~Database(void);
 

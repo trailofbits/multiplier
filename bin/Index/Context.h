@@ -98,7 +98,7 @@ struct alignas(64) NextId {
 // State that lives at least as long as the server itself.
 class ServerContext {
  public:
-  const std::filesystem::path workspace_dir;
+  sqlite::Connection db;
 
   mx::PersistentMap<kMetaNameToId, MetadataName, uint64_t> meta_to_value;
 

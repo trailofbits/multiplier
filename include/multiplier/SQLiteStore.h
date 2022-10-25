@@ -29,7 +29,8 @@ class Statement;
 
 class Error : public std::runtime_error {
  public:
-  Error(const std::string& msg) :runtime_error("[SQLite Error] " + msg) {};
+  Error(const std::string& msg) : runtime_error("[SQLite Error] " + msg) {}
+  Error(const std::string& msg, sqlite3* db);
 };
 
 class QueryResult {
@@ -53,9 +54,10 @@ class QueryResult {
       using arg_t = std::decay_t<decltype(arg)>;
       if constexpr (std::is_integral_v<arg_t>) {
         arg = static_cast<arg_t>(getInt64(idx));
-      } else if (std::is_same_v<std::string, arg_t> ||
-          std::is_same_v<std::string_view, arg_t>) {
+      } else if (std::is_same_v<std::string, arg_t>) {
         arg = getText(idx);
+      } else if (std::is_same_v<std::string_view, arg_t>) {
+        arg = getBlob(idx);
       } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
         ;
       } else {
@@ -78,6 +80,7 @@ class QueryResult {
   int64_t getInt64(int32_t idx);
 
   std::string getText(int32_t idx);
+  std::string_view getBlob(int32_t idx);
 
   std::shared_ptr<Statement> stmt;
 };
@@ -104,6 +107,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
       throw Error(msg);
     }
     size_t i = 0;
+    reset();
     bind_many(i, args...);
   }
 
@@ -136,6 +140,10 @@ class Statement : public std::enable_shared_from_this<Statement> {
   void bind(const size_t i, const char* &value);
 
   void bind(const size_t i, const std::string &value);
+
+  void bind(const size_t i, const std::string_view &value);
+
+  void reset();
 
   template<typename T>
   void bind_many(size_t i, T& value) {
