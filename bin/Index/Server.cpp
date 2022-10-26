@@ -26,6 +26,7 @@
 #include <set>
 #include <sstream>
 #include <mutex>
+#include <deque>
 #include <vector>
 
 #include "Context.h"
@@ -108,7 +109,7 @@ ServerImpl::GetOrCreateIndexingContext(void) {
   if (ic) {
     return ic;
   } else {
-    ic = std::make_shared<IndexingContext>(server_context, executor);
+    ic = std::make_shared<IndexingContext>(db_path, executor);
     if (show_progress_bars) {
       ic->InitializeProgressBars();
     }
@@ -299,7 +300,7 @@ kj::Promise<void> Server::indexCompileCommands(
 
 // Say hello to the server.
 kj::Promise<void> Server::hello(HelloContext context) {
-  unsigned version_number = d->server_context.storage.version_number.load();
+  unsigned version_number = d->server_context->version_number.load();
   auto result = context.initResults();
   result.setVersionNumber(version_number);
   return kj::READY_NOW;
@@ -308,10 +309,10 @@ kj::Promise<void> Server::hello(HelloContext context) {
 // Download a list of file info (file id, path).
 kj::Promise<void> Server::downloadFileList(
     DownloadFileListContext context) {
-  unsigned version_number = d->server_context.storage.version_number.load();
+  unsigned version_number = d->server_context->version_number.load();
 
   std::vector<std::pair<mx::RawEntityId, std::string>> paths;
-  d->server_context.storage.file_id_to_path.ScanPrefix(
+  d->server_context->file_id_to_path.ScanPrefix(
       mx::Empty{},
       [=, &paths] (mx::RawEntityId file_id, std::string file_path) {
         DCHECK_NE(file_id, mx::kInvalidEntityId);
@@ -340,11 +341,11 @@ kj::Promise<void> Server::downloadFile(DownloadFileContext context) {
   mx::rpc::Multiplier::DownloadFileParams::Reader params =
       context.getParams();
 
-  unsigned version_number = d->server_context.storage.version_number.load();
+  unsigned version_number = d->server_context->version_number.load();
 
   mx::RawEntityId file_id = params.getId();
   std::optional<std::string> maybe_contents =
-      d->server_context.storage.file_id_to_serialized_file.TryGet(file_id);
+      d->server_context->file_id_to_serialized_file.TryGet(file_id);
   if (!maybe_contents) {
     std::stringstream err;
     err << "Invalid file id " << file_id;
@@ -378,7 +379,7 @@ kj::Promise<void> Server::downloadFragment(DownloadFragmentContext context) {
   mx::RawEntityId fragment_id = params.getId();
 
   std::optional<std::string> maybe_contents =
-      d->server_context.storage.fragment_id_to_serialized_fragment.TryGet(fragment_id);
+      d->server_context->fragment_id_to_serialized_fragment.TryGet(fragment_id);
   if (!maybe_contents) {
     err << "Invalid fragment id " << fragment_id << "; missing data";
     LOG(ERROR) << err.str();
@@ -405,7 +406,7 @@ kj::Promise<void> Server::weggliQueryFragments(
       context.getParams();
 
   auto result = context.initResults();
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
 
   std::string syntax_string(params.getQuery().cStr(), params.getQuery().size());
   if (syntax_string.empty()) {
@@ -413,14 +414,13 @@ kj::Promise<void> Server::weggliQueryFragments(
     return kj::READY_NOW;
   }
 
-  auto sc = std::make_shared<SearchingContext>(d->server_context);
-
   const bool is_cpp = params.getIsCpp();
 
   // Run N parallel search actions on every file.
   mx::ExecutorOptions opts;
   opts.num_workers = static_cast<int>(d->executor.NumWorkers());
   mx::Executor executor(opts);
+  auto sc = std::make_shared<SearchingContext>(d->db_path, executor);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
     executor.EmplaceAction<WeggliSearchAction>(sc, syntax_string, is_cpp);
@@ -432,7 +432,7 @@ kj::Promise<void> Server::weggliQueryFragments(
 
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
-    d->server_context.storage.file_fragment_lines.ScanPrefix(
+    d->server_context->file_fragment_lines.ScanPrefix(
         prefix,
         [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
           if (fragment_ids.empty() || fragment_ids.back() != id) {
@@ -475,7 +475,7 @@ kj::Promise<void> Server::regexQueryFragments(
       context.getParams();
 
   auto result = context.initResults();
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
 
   std::string pattern(params.getRegex().cStr(), params.getRegex().size());
   if (pattern.empty()) {
@@ -483,10 +483,10 @@ kj::Promise<void> Server::regexQueryFragments(
     return kj::READY_NOW;
   }
 
-  auto sc = std::make_shared<SearchingContext>(d->server_context);
   mx::ExecutorOptions opts;
   opts.num_workers = static_cast<int>(d->executor.NumWorkers());
   mx::Executor executor(opts);
+  auto sc = std::make_shared<SearchingContext>(d->db_path, executor);
   executor.Start();
   for (auto i = 0; i < opts.num_workers; ++i) {
     executor.EmplaceAction<RegexSearchAction>(sc, pattern);
@@ -498,7 +498,7 @@ kj::Promise<void> Server::regexQueryFragments(
 
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
-    d->server_context.storage.file_fragment_lines.ScanPrefix(
+    d->server_context->file_fragment_lines.ScanPrefix(
         prefix,
         [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
           if (fragment_ids.empty() || fragment_ids.back() != id) {
@@ -551,12 +551,12 @@ kj::Promise<void> Server::findRedeclarations(FindRedeclarationsContext context) 
   }
 
   std::vector<mx::RawEntityId> redecl_ids =
-      d->server_context.storage.FindRedeclarations(eid);
+      d->server_context->FindRedeclarations(eid);
 
   mx::rpc::Multiplier::FindRedeclarationsResults::Builder result =
       context.initResults();
 
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
   auto rib = result.initRedeclarationIds(
       static_cast<unsigned>(redecl_ids.size()));
   auto i = 0u;
@@ -577,13 +577,13 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
   mx::rpc::Multiplier::FindUsesResults::Builder result =
       context.initResults();
 
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
 
   std::vector<mx::RawEntityId> fragment_ids;
   fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
-    d->server_context.storage.entity_id_use_to_fragment_id.ScanPrefix(
+    d->server_context->entity_id_use_to_fragment_id.ScanPrefix(
         eid,
         [&fragment_ids] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids.push_back(frag_id);
@@ -623,13 +623,13 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
   mx::rpc::Multiplier::FindReferencesResults::Builder result =
       context.initResults();
 
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
 
   std::vector<mx::RawEntityId> fragment_ids;
   fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
-    d->server_context.storage.entity_id_reference.ScanPrefix(
+    d->server_context->entity_id_reference.ScanPrefix(
         eid,
         [&fragment_ids] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids.push_back(frag_id);
@@ -667,7 +667,7 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
   mx::rpc::Multiplier::FindFileFragmentsResults::Builder result =
       context.initResults();
 
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
 
   mx::RawEntityId file_id = params.getFileId();
 
@@ -675,7 +675,7 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
   fragment_ids.reserve(128u);
 
   // Collect the fragments associated with this file.
-  d->server_context.storage.file_fragment_ids.ScanPrefix(
+  d->server_context->file_fragment_ids.ScanPrefix(
       file_id,
       [file_id, &fragment_ids] (mx::RawEntityId found_file_id,
                                 mx::RawEntityId fragment_id) {
@@ -706,14 +706,14 @@ kj::Promise<void> Server::findSymbols(FindSymbolsContext context) {
   mx::rpc::Multiplier::FindSymbolsResults::Builder result =
       context.getResults();
 
-  result.setVersionNumber(d->server_context.storage.version_number.load());
+  result.setVersionNumber(d->server_context->version_number.load());
 
   std::string symbol(params.getQuery().cStr(), params.getQuery().size());
   mx::DeclCategory category = static_cast<mx::DeclCategory>(
       params.getCategory());
 
   std::vector<mx::RawEntityId> entity_ids =
-      d->server_context.storage.database.QueryEntities(
+      d->server_context->database.QueryEntities(
           symbol, category);
 
   // Sort the redeclaration IDs to that they are always in the same order,

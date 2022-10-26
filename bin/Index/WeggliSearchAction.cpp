@@ -28,12 +28,12 @@
 
 namespace indexer {
 
-void WeggliSearchAction::QuerySyntaxInFile(mx::RawEntityId file_id) {
+void WeggliSearchAction::QuerySyntaxInFile(mx::WorkerId worker_id, mx::RawEntityId file_id) {
 
   // Get the contents of the file. We may fail, which is OK, and generally
   // implies a bad file id. There can be small gaps in the file ID space, which
   // otherwise mostly occupies the range `[1, N)`.
-  auto maybe_contents = context->server_context.storage.GetSerializedFile(file_id);
+  auto maybe_contents = context->server_context[worker_id]->GetSerializedFile(file_id);
   if (!maybe_contents) {
     return;  // Bad file ID. This is expected for the way we get them.
   }
@@ -78,7 +78,7 @@ WeggliSearchAction::WeggliSearchAction(
     : context(std::move(context_)),
       query_tree(std::move(syntax), is_cpp) {}
 
-void WeggliSearchAction::Run(mx::Executor, mx::WorkerId) {
+void WeggliSearchAction::Run(mx::Executor, mx::WorkerId worker_id) {
   if (!query_tree.IsValid()) {
     DLOG(ERROR)
         << "Query is not valid";
@@ -87,10 +87,10 @@ void WeggliSearchAction::Run(mx::Executor, mx::WorkerId) {
 
   while (true) {
     mx::RawEntityId file_id = context->local_next_file_id.fetch_add(1ull);
-    if (file_id >= context->server_context.storage.next_file_id.load()) {
+    if (file_id >= context->server_context[worker_id]->next_file_id.load()) {
       break;
     }
-    QuerySyntaxInFile(file_id);
+    QuerySyntaxInFile(worker_id, file_id);
   }
 }
 

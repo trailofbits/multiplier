@@ -79,13 +79,26 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
   }
 
   auto bulk_inserter = [this, &db] (void) {
+    sqlite::Connection local_db{db.GetFilename()};
+    std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
+      local_insert_symbol_stmt;
+
+    for (auto i = 0u; i < kNumCategories; ++i) {
+      std::stringstream insert_query;
+      insert_query
+          << "insert or ignore into entities_symbols_"
+          << i << " (rowid, symbol) values (?1, ?2)";
+
+      local_insert_symbol_stmt[i] = local_db.Prepare(insert_query.str());
+    }
+
     for (bool should_exit = false; !should_exit; ) {
       QueueItem item;
 
       // Go get the first thing.
       insertion_queue.wait_dequeue(item);
 
-      db.Begin();
+      local_db.Begin();
 
       unsigned transaction_size = 0u;
       bool should_flush = false;
@@ -113,9 +126,9 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
             auto i = static_cast<unsigned>(std::get<1>(arg));
             ++num_symbols[i];
             ++transaction_size;
-            insert_symbol_stmt[i]->BindValues(
+            local_insert_symbol_stmt[i]->BindValues(
                 std::get<0>(arg), std::move(std::get<2>(arg)));
-            insert_symbol_stmt[i]->Execute();
+            local_insert_symbol_stmt[i]->Execute();
 
           } else {
             LOG(FATAL)
@@ -141,7 +154,7 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
         }
       }
 
-      db.Commit();
+      local_db.Commit();
     }
   };
 

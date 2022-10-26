@@ -22,8 +22,10 @@
 #include <unordered_map>
 #include <iostream>
 #include <set>
+#include <deque>
 
 #include "Codegen.h"
+#include "multiplier/SQLiteStore.h"
 
 namespace mx {
 class Executor;
@@ -57,6 +59,10 @@ class ServerContext {
   mx::IndexStorage storage;
 
   void Flush(void);
+
+  inline mx::IndexStorage* operator->() {
+    return &storage;
+  }
 
   ~ServerContext(void);
 
@@ -108,7 +114,7 @@ class IndexingCounterRes {
 // underway.
 class IndexingContext {
  public:
-  ServerContext &server_context;
+  std::deque<ServerContext> server_context;
 
   IndexingCounter stat;
 
@@ -133,14 +139,6 @@ class IndexingContext {
 
   const unsigned num_workers;
 
-  // Version number to assign to all created fragments.
-  //
-  // NOTE(pag): This is explicitly out-of-data w.r.t. the backing storage. The
-  //            purpose is to save an older version number so that when a client
-  //            requests a fragment, we can see if we need to fixup the
-  //            canonical declarations of things.
-  const unsigned version_number;
-
   // Worker-local next counters for IDs.
   std::vector<NextId<mx::RawEntityId>> local_next_file_id;
   std::vector<NextId<mx::RawEntityId>> local_next_small_fragment_id;
@@ -148,7 +146,7 @@ class IndexingContext {
 
   CodeGenerator codegen;
 
-  explicit IndexingContext(ServerContext &server_context_,
+  explicit IndexingContext(std::filesystem::path db_path,
                            const mx::Executor &exe_);
 
   ~IndexingContext(void);
@@ -168,36 +166,36 @@ class IndexingContext {
       uint64_t num_tokens);
 
   // Save the serialized contents of a file as a token list.
-  void PutSerializedFile(mx::RawEntityId file_id, std::string);
+  void PutSerializedFile(mx::WorkerId worker_id_, mx::RawEntityId file_id, std::string);
 
   // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(mx::RawEntityId id, std::string);
+  void PutSerializedFragment(mx::WorkerId worker_id_, mx::RawEntityId id, std::string);
 
   // Link fragment declarations.
-  void LinkDeclarations(mx::RawEntityId a, mx::RawEntityId b);
+  void LinkDeclarations(mx::WorkerId worker_id_, mx::RawEntityId a, mx::RawEntityId b);
 
   // Link the mangled name of something to its entity ID.
-  void LinkMangledName(const std::string &name, mx::RawEntityId eid);
+  void LinkMangledName(mx::WorkerId worker_id_, const std::string &name, mx::RawEntityId eid);
 
   // Link an entity to the fragment that uses the entity.
-  void LinkUseInFragment(mx::RawEntityId use, mx::RawEntityId user);
+  void LinkUseInFragment(mx::WorkerId worker_id_, mx::RawEntityId use, mx::RawEntityId user);
 
   // Link a direct reference to an entity from another entity.
-  void LinkReferenceInFragment(mx::RawEntityId use, mx::RawEntityId user);
+  void LinkReferenceInFragment(mx::WorkerId worker_id_, mx::RawEntityId use, mx::RawEntityId user);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out
   // which fragments overlap which lines.
-  void PutFragmentLineCoverage(mx::RawEntityId file_id,
+  void PutFragmentLineCoverage(mx::WorkerId worker_id_, mx::RawEntityId file_id,
                                mx::RawEntityId fragment_id,
                                unsigned start_line, unsigned end_line);
 };
 
 class SearchingContext {
  public:
-  ServerContext &server_context;
+  std::deque<ServerContext> server_context;
 
-  explicit SearchingContext(ServerContext &server_context_);
+  explicit SearchingContext(std::filesystem::path db_path, mx::Executor ex);
   virtual ~SearchingContext(void);
 
   // Next file ID for any `SearchingAction` to look at.

@@ -23,15 +23,15 @@
 #include "Context.h"
 #include "Compress.h"
 #include "Util.h"
+#include "multiplier/Action.h"
 
 namespace indexer {
 
-void RegexSearchAction::QueryExprInFile(mx::RawEntityId file_id) {
-
+void RegexSearchAction::QueryExprInFile(mx::WorkerId worker_id, mx::RawEntityId file_id) {
   // Get the contents of the file. We may fail, which is OK, and generally
   // implies a bad file id. There can be small gaps in the file ID space, which
   // otherwise mostly occupies the range `[1, N)`.
-  auto maybe_contents = context->server_context.storage.GetSerializedFile(file_id);
+  auto maybe_contents = context->server_context[worker_id]->GetSerializedFile(file_id);
   if (!maybe_contents) {
     return;  // Bad file ID. This is expected for the way we get them.
   }
@@ -76,7 +76,7 @@ RegexSearchAction::RegexSearchAction(
     : context(std::move(context_)),
       regex(std::move(pattern)) {}
 
-void RegexSearchAction::Run(mx::Executor, mx::WorkerId) {
+void RegexSearchAction::Run(mx::Executor, mx::WorkerId worker_id) {
   if (!regex.IsValid()) {
     DLOG(ERROR)
         << "Regex expression is not valid";
@@ -85,10 +85,10 @@ void RegexSearchAction::Run(mx::Executor, mx::WorkerId) {
 
   while (true) {
     mx::RawEntityId file_id = context->local_next_file_id.fetch_add(1ull);
-    if (file_id >= context->server_context.storage.next_file_id.load()) {
+    if (file_id >= context->server_context[worker_id]->next_file_id.load()) {
       break;
     }
-    QueryExprInFile(file_id);
+    QueryExprInFile(worker_id, file_id);
   }
 }
 

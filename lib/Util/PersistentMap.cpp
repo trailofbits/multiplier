@@ -86,6 +86,7 @@ bool PersistentMapBase::TryGet(std::string_view key, std::string_view& val) cons
     auto res = get_stmt->GetResult();
     res.Columns(stored_key, val);
     CHECK_EQ(stored_key, key);
+    CHECK(!get_stmt->ExecuteStep());
     return true;
   }
 
