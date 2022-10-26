@@ -169,6 +169,16 @@ class Statement : public std::enable_shared_from_this<Statement> {
   unsigned num_params;
 };
 
+class Transaction {
+ public:
+  Transaction(Connection& db);
+  void lock();
+  void unlock();
+
+ private:
+  Connection& db;
+};
+
 class Connection {
  public:
 
@@ -190,7 +200,7 @@ class Connection {
   std::shared_ptr<Statement> Prepare(const std::string &stmt);
 
   // Begin transactions to the database
-  void Begin(void);
+  void Begin(bool exclusive = false);
 
   // Commit transactions to the database
   void Commit(void);

@@ -18,6 +18,7 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+#include <mutex>
 
 #include "Codegen.h"
 #include "NameMangler.h"
@@ -31,15 +32,11 @@ ServerContext::ServerContext(std::filesystem::path db_path)
 
   // Clients all default-initialize their version numbers to `0`, so we default
   // the server to `1` so that clients are always out-of-date.
-  storage.version_number.store(static_cast<unsigned>(storage.meta_to_value.GetOrSet(
-      mx::MetadataName::kIndexingVersion, 1u)));
+  storage.version_number.store_if_empty(1u);
 
-  storage.next_file_id.store(storage.meta_to_value.GetOrSet(
-      mx::MetadataName::kNextFileId, mx::kMinEntityIdIncrement));
-  storage.next_small_fragment_id.store(storage.meta_to_value.GetOrSet(
-      mx::MetadataName::kNextSmallCodeId, mx::kMaxBigFragmentId));
-  storage.next_big_fragment_id.store(storage.meta_to_value.GetOrSet(
-      mx::MetadataName::kNextBigCodeId, mx::kMinEntityIdIncrement));
+  storage.next_file_id.store_if_empty(mx::kMinEntityIdIncrement);
+  storage.next_small_fragment_id.store_if_empty(mx::kMaxBigFragmentId);
+  storage.next_big_fragment_id.store_if_empty(mx::kMinEntityIdIncrement);
 }
 
 ServerContext::~ServerContext(void) {
@@ -47,10 +44,6 @@ ServerContext::~ServerContext(void) {
 }
 
 void ServerContext::Flush(void) {
-  storage.meta_to_value.Set(mx::MetadataName::kIndexingVersion, storage.version_number.load());
-  storage.meta_to_value.Set(mx::MetadataName::kNextFileId, storage.next_file_id.load());
-  storage.meta_to_value.Set(mx::MetadataName::kNextSmallCodeId, storage.next_small_fragment_id.load());
-  storage.meta_to_value.Set(mx::MetadataName::kNextBigCodeId, storage.next_big_fragment_id.load());
   storage.database.Flush();
 }
 
@@ -109,15 +102,16 @@ void IndexingContext::InitializeProgressBars(void) {
 // Get or create a file ID for the file at `file_path` with contents
 // `contents_hash`.
 std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFileId(
-    mx::WorkerId worker_id_, std::filesystem::path file_path,
+    mx::WorkerId worker_id, std::filesystem::path file_path,
     const std::string &contents_hash) {
+  sqlite::Transaction tx{server_context[worker_id].db};
+  std::scoped_lock<sqlite::Transaction> lock{tx};
 
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   auto &maybe_id = this->local_next_file_id[worker_id].id;
   mx::RawEntityId created_id = mx::kInvalidEntityId;
   if (!maybe_id.has_value()) {
     created_id = server_context[worker_id]->next_file_id.fetch_add(
-        mx::kMinEntityIdIncrement);;
+        mx::kMinEntityIdIncrement);
   } else {
     created_id = std::move(maybe_id.value());
     maybe_id = {};
@@ -142,10 +136,10 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFileId(
 // Get or create a code ID for the top-level declarations that hash to
 // `code_hash`.
 std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
-    mx::WorkerId worker_id_, const std::string &code_hash,
+    mx::WorkerId worker_id, const std::string &code_hash,
     uint64_t num_tokens) {
-
-  const auto worker_id = static_cast<unsigned>(worker_id_);
+  sqlite::Transaction tx{server_context[worker_id].db};
+  std::scoped_lock<sqlite::Transaction> lock{tx};
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   if (num_tokens >= mx::kNumTokensInBigFragment) {
@@ -198,23 +192,20 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
 }
 
 // Save the tokenized contents of a file.
-void IndexingContext::PutSerializedFile(mx::WorkerId worker_id_, mx::RawEntityId id, std::string data) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
+void IndexingContext::PutSerializedFile(mx::WorkerId worker_id, mx::RawEntityId id, std::string data) {
   server_context[worker_id]->file_id_to_serialized_file.Set(id, std::move(data));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
-void IndexingContext::PutSerializedFragment(mx::WorkerId worker_id_,
+void IndexingContext::PutSerializedFragment(mx::WorkerId worker_id,
                                             mx::RawEntityId id,
                                             std::string data) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   server_context[worker_id]->fragment_id_to_serialized_fragment.Set(id, std::move(data));
 }
 
 // Link fragment declarations.
-void IndexingContext::LinkDeclarations(mx::WorkerId worker_id_,
+void IndexingContext::LinkDeclarations(mx::WorkerId worker_id,
                                        mx::RawEntityId a, mx::RawEntityId b) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   if (a != b && a != mx::kInvalidEntityId && b != mx::kInvalidEntityId) {
     server_context[worker_id]->entity_redecls.Insert(a, b);
     server_context[worker_id]->entity_redecls.Insert(b, a);
@@ -222,10 +213,9 @@ void IndexingContext::LinkDeclarations(mx::WorkerId worker_id_,
 }
 
 // Link the mangled name of something to its entity ID.
-void IndexingContext::LinkMangledName(mx::WorkerId worker_id_,
+void IndexingContext::LinkMangledName(mx::WorkerId worker_id,
                                       const std::string &name,
                                       mx::RawEntityId eid) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   if (!name.empty() && eid != mx::kInvalidEntityId) {
     server_context[worker_id]->entity_id_to_mangled_name.Insert(eid, name);
     server_context[worker_id]->mangled_name_to_entity_id.Insert(name, eid);
@@ -233,20 +223,18 @@ void IndexingContext::LinkMangledName(mx::WorkerId worker_id_,
 }
 
 // Link an entity to the fragment that uses the entity.
-void IndexingContext::LinkUseInFragment(mx::WorkerId worker_id_,
+void IndexingContext::LinkUseInFragment(mx::WorkerId worker_id,
                                         mx::RawEntityId use,
                                         mx::RawEntityId user) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
     server_context[worker_id]->entity_id_use_to_fragment_id.Insert(use, user);
   }
 }
 
 // Link a direct reference to an entity from another entity.
-void IndexingContext::LinkReferenceInFragment(mx::WorkerId worker_id_,
+void IndexingContext::LinkReferenceInFragment(mx::WorkerId worker_id,
                                               mx::RawEntityId use,
                                               mx::RawEntityId user) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
     server_context[worker_id]->entity_id_reference.Insert(use, user);
   }
@@ -261,10 +249,9 @@ void IndexingContext::LinkReferenceInFragment(mx::WorkerId worker_id_,
 // TODO(pag): Eventually implement an async writer for `PersistentMap` and
 //            `PersistentSet` using a RocksDB `WriteBatch`.
 void IndexingContext::PutFragmentLineCoverage(
-    mx::WorkerId worker_id_,
+    mx::WorkerId worker_id,
     mx::RawEntityId file_id, mx::RawEntityId fragment_id,
     unsigned start_line, unsigned end_line) {
-  const auto worker_id = static_cast<unsigned>(worker_id_);
   server_context[worker_id]->file_fragment_ids.Insert(file_id, fragment_id);
   for (auto i = start_line; i <= end_line; ++i) {
     server_context[worker_id]->file_fragment_lines.Insert(file_id, i, fragment_id);

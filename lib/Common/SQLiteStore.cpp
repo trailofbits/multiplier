@@ -305,8 +305,21 @@ void Connection::Commit(void) {
   Execute("commit transaction");
 }
 
-void Connection::Begin(void) {
-  Execute("begin transaction");
+void Connection::Begin(bool exclusive) {
+  if(exclusive) {
+    Execute("begin exclusive transaction");
+  } else {
+    Execute("begin transaction");
+  }
+}
+
+Transaction::Transaction(Connection& db) : db(db) {}
+void Transaction::lock() {
+  db.Begin(true);
+}
+
+void Transaction::unlock() {
+  db.Commit();
 }
 
 } // namespace sqlite

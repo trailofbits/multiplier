@@ -17,7 +17,7 @@ template<size_t key, typename T>
 class PersistentAtomicStorage {
  private:
   sqlite::Connection &db;
-  std::shared_ptr<sqlite::Statement> load_stmt, store_stmt, fetch_add_stmt;
+  std::shared_ptr<sqlite::Statement> load_stmt, store_stmt, fetch_add_stmt, store_if_empty_stmt;
 
  public:
   PersistentAtomicStorage(sqlite::Connection& db) : db(db) {
@@ -25,6 +25,7 @@ class PersistentAtomicStorage {
     load_stmt = db.Prepare("SELECT value FROM atomic_storage WHERE key = ?1");
     store_stmt = db.Prepare("INSERT OR REPLACE INTO atomic_storage(key, value) VALUES (?1, ?2)");
     fetch_add_stmt = db.Prepare("INSERT INTO atomic_storage(key, value) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET value=(value + ?2) RETURNING (value - ?2)");
+    store_if_empty_stmt = db.Prepare("INSERT OR IGNORE INTO atomic_storage(key, value) VALUES (?1, ?2)");
   }
 
   T load() {
@@ -44,6 +45,11 @@ class PersistentAtomicStorage {
     store_stmt->Execute();
   }
 
+  void store_if_empty(const T& value) {
+    store_if_empty_stmt->BindValues(std::uint64_t{key}, value);
+    store_if_empty_stmt->Execute();
+  }
+
   T fetch_add(const T& value) {
     fetch_add_stmt->BindValues(std::uint64_t{key}, value);
     fetch_add_stmt->ExecuteStep();
@@ -60,6 +66,7 @@ class PersistentAtomicStorage {
 
   PersistentAtomicStorage& operator=(const T& value) {
     store(value);
+    return *this;
   }
 };
 
