@@ -33,7 +33,7 @@ class PersistentAtomicStorage {
         auto res = load_stmt->GetResult();
         T value;
         res.Columns(value);
-        CHECK(!load_stmt->ExecuteStep());
+        load_stmt->ExecuteStep();
         return value;
     }
     return {};
@@ -46,11 +46,11 @@ class PersistentAtomicStorage {
 
   T fetch_add(const T& value) {
     fetch_add_stmt->BindValues(std::uint64_t{key}, value);
-    CHECK(fetch_add_stmt->ExecuteStep());
+    fetch_add_stmt->ExecuteStep();
     auto res = fetch_add_stmt->GetResult();
     T new_value;
     res.Columns(new_value);
-    CHECK(!fetch_add_stmt->ExecuteStep());
+    fetch_add_stmt->ExecuteStep();
     return new_value;
   }
 

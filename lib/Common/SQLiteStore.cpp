@@ -8,7 +8,6 @@
 #include <iostream>
 #include <thread>
 #include <sqlite3.h>
-#include <glog/logging.h>
 
 #include <multiplier/SQLiteStore.h>
 

@@ -7,7 +7,6 @@
 #include "Compress.h"
 
 #include <capnp/message.h>
-#include <glog/logging.h>
 #include <kj/io.h>
 #include <multiplier/Compress.h>
 #include <iostream>
@@ -22,7 +21,6 @@ std::string CompressedMessage(
   capnp::writePackedMessage(os, message);
   kj::ArrayPtr<kj::byte> packed_data = os.getArray();
   auto packed_size = packed_data.size();
-  CHECK_LE(packed_size, old_size);
 
   std::string_view packed_data_sv(
       reinterpret_cast<const char *>(packed_data.begin()), packed_size);
@@ -37,9 +35,6 @@ std::string CompressedMessage(
     output.push_back('\1');
 
   } else {
-    LOG(ERROR)
-        << "Unable to compress " << what << ": "
-        << maybe_compressed.TakeError().message();
   use_uncompressed:
     output.reserve(packed_size + 1u);
     output.insert(output.end(), packed_data_sv.begin(), packed_data_sv.end());
@@ -52,16 +47,12 @@ std::string CompressedMessage(
 void WithUncompressedMessageImpl(
     const char *what, std::string data,
     std::function<void(capnp::PackedMessageReader &)> cb) {
-  CHECK(!data.empty());
   auto begin = reinterpret_cast<const char *>(data.c_str());
   auto tag = data.back();
   data.pop_back();
   std::string_view untagged_data(begin, data.size());
   if (tag) {  // Compressed and packed.
     auto maybe_uncompressed = mx::TryUncompress(untagged_data);
-    CHECK(maybe_uncompressed.Succeeded())
-        << "Unable to uncompress " << what << ": "
-        << maybe_uncompressed.TakeError().message();
 
     data = maybe_uncompressed.TakeValue();
   }

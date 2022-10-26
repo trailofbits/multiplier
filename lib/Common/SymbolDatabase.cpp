@@ -7,8 +7,6 @@
 #include <multiplier/SQLiteStore.h>
 #include <multiplier/SymbolDatabase.h>
 
-#include <glog/logging.h>
-
 #include <array>
 #include <cstdint>
 #include <deque>
@@ -131,8 +129,8 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
             local_insert_symbol_stmt[i]->Execute();
 
           } else {
-            LOG(FATAL)
-                << "Unknown data kind";
+            //LOG(FATAL)
+            //    << "Unknown data kind";
           }
         }, item);
 
@@ -223,7 +221,7 @@ std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
   try {
     auto stmt = d->db.Prepare(select_query.str());
     if (!stmt) {
-      LOG(ERROR) << "Failed to prepare query statement";
+      //LOG(ERROR) << "Failed to prepare query statement";
       return entity_ids;
     }
 
@@ -236,7 +234,7 @@ std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
     }
 
   } catch (sqlite::Error &e) {
-    LOG(ERROR) << "Failed to get symbol from database " << e.what();
+    //LOG(ERROR) << "Failed to get symbol from database " << e.what();
   }
 
   return entity_ids;

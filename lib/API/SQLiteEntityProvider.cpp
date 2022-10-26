@@ -46,8 +46,6 @@ FilePathList SQLiteEntityProvider::ListFiles(const Ptr &) {
   d->storage.file_id_to_path.ScanPrefix(
       mx::Empty{},
       [=, &res] (mx::RawEntityId file_id, std::string file_path) {
-        DCHECK_NE(file_id, mx::kInvalidEntityId);
-        DCHECK(!file_path.empty());
         res.emplace(file_path, file_id);
         return true;
       });
@@ -64,7 +62,6 @@ std::vector<RawEntityId> SQLiteEntityProvider::ListFragmentsInFile(const Ptr &, 
       file_id,
       [file_id, &fragment_ids] (mx::RawEntityId found_file_id,
                                 mx::RawEntityId fragment_id) {
-        DCHECK_EQ(file_id, found_file_id);
         fragment_ids.push_back(fragment_id);
         return file_id == found_file_id;
       });

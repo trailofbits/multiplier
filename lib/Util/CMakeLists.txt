@@ -39,13 +39,10 @@ add_library("mx-util"
     "Action.cpp"
     "BloomFilter.cpp"
     "Executor.cpp"
-    "PersistentMap.cpp"
     "ProgressBar.cpp"
     "Signal.cpp"
     "Subprocess.cpp"
-    "SymbolDatabase.cpp"
     "WorkerPool.cpp"
-    "SQLiteStore.cpp"
 
     # Auto-generated
     "${MX_BOOTSTRAP_LIB_UTIL_PASTA_CPP}"
@@ -62,7 +59,6 @@ target_link_libraries("mx-util"
     "glog::glog"
     $<BUILD_INTERFACE:concurrentqueue>
     $<BUILD_INTERFACE:gflags::gflags>
-    $<BUILD_INTERFACE:SQLite::SQLite3>
   PRIVATE
     $<BUILD_INTERFACE:reproc++>
 )

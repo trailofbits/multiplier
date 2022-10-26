@@ -6,7 +6,6 @@
 
 #include <multiplier/PersistentMap.h>
 
-#include <glog/logging.h>
 #include <mutex>
 #include <string>
 #include <string_view>
@@ -70,12 +69,11 @@ void PersistentMapBase::MatchCommonPrefix(
 bool PersistentMapBase::GetOrSet(std::string_view key,
                                  std::string_view& val) const {
   get_or_set_stmt->BindValues(key, val);
-  CHECK(get_or_set_stmt->ExecuteStep());
+  get_or_set_stmt->ExecuteStep();
   auto res = get_or_set_stmt->GetResult();
   std::string_view stored_key, stored_value;
   res.Columns(stored_key, stored_value);
-  CHECK_EQ(stored_key, key);
-  CHECK(!get_or_set_stmt->ExecuteStep());
+  get_or_set_stmt->ExecuteStep();
   return stored_value != val;
 }
 
@@ -85,8 +83,7 @@ bool PersistentMapBase::TryGet(std::string_view key, std::string_view& val) cons
     std::string_view stored_key;
     auto res = get_stmt->GetResult();
     res.Columns(stored_key, val);
-    CHECK_EQ(stored_key, key);
-    CHECK(!get_stmt->ExecuteStep());
+    get_stmt->ExecuteStep();
     return true;
   }
 

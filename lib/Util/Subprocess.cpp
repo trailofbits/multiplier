@@ -7,7 +7,6 @@
 #include <multiplier/Subprocess.h>
 
 #include <gflags/gflags.h>
-#include <glog/logging.h>
 
 #include <reproc++/drain.hpp>
 #include <reproc++/reproc.hpp>
