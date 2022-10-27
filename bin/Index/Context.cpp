@@ -73,9 +73,12 @@ IndexingContext::IndexingContext(std::filesystem::path db_path,
   for(size_t i = 0; i < num_workers; ++i) {
     server_context.emplace_back(db_path);
   }
+  server_context[0]->version_number.fetch_add(1);
 }
 
-IndexingContext::~IndexingContext(void) {}
+IndexingContext::~IndexingContext(void) {
+  server_context[0]->version_number.fetch_add(1);
+}
 
 void IndexingContext::InitializeProgressBars(void) {
   command_progress.reset(new mx::ProgressBar("1) Command interpretation",

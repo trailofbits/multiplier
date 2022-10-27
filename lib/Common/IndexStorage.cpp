@@ -69,11 +69,11 @@ std::vector<mx::RawEntityId> IndexStorage::FindRedeclarations(
     case mx::DeclKind::PARM_VAR:
     case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
     case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      entity_id_to_mangled_name.ScanPrefix(
+      entity_id_to_mangled_name.GetByField<0>(
           next_new_ids[0],
           [&next_new_ids, this] (mx::RawEntityId, std::string mangled_name) {
 
-            mangled_name_to_entity_id.ScanPrefix(
+            mangled_name_to_entity_id.GetByField<0>(
                 std::move(mangled_name),
                 [&next_new_ids] (std::string, mx::RawEntityId new_id) {
                   next_new_ids.push_back(new_id);
@@ -114,7 +114,7 @@ std::vector<mx::RawEntityId> IndexStorage::FindRedeclarations(
 
       all_ids.push_back(new_id);
 
-      entity_redecls.ScanPrefix(
+      entity_redecls.GetByField<0>(
           new_id,
           [&next_new_ids] (mx::RawEntityId, mx::RawEntityId other_id) {
             next_new_ids.push_back(other_id);

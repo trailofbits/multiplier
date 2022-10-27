@@ -16,37 +16,14 @@
 namespace mx {
 PersistentMapBase::~PersistentMapBase(void) {}
 
-static constexpr const char* table_names[] = {
-  "MetaNameToId",
-  "FileIdToPath",
-  "FileIdToHash",
-  "FileIdToSerializedFile",
-  "FileIdToFragmentId",
-  "FileIdAndLineNumberToFragmentId",
-  "FileHashToFileId",
-  "FragmentHashToFragmentId",
-  "FragmentIdToSerializedFragment",
-  "FragmentIdToVersionNumber",
-  "EntityIdRedecls",
-  "EntityIdToMangledName",
-  "MangledNameToEntityId",
-  "EntityIdUseToFragmentId",
-  "EntityIdReference",
-};
-
 PersistentMapBase::PersistentMapBase(sqlite::Connection& db, uint8_t id) : db(db) {
-  auto create_stmt = db.Prepare("CREATE TABLE IF NOT EXISTS " + std::string(table_names[id]) + "(key BLOB UNIQUE, value BLOB, PRIMARY KEY(key))");
+  auto create_stmt = db.Prepare("CREATE TABLE IF NOT EXISTS " + std::string(table_names[id]) + "(key, value, PRIMARY KEY(key))");
   create_stmt->Execute();
 
   set_stmt = db.Prepare("INSERT OR REPLACE INTO " + std::string(table_names[id]) + "(key, value) VALUES (?1, ?2)");
   get_stmt = db.Prepare("SELECT key, value FROM " + std::string(table_names[id]) + " WHERE key = ?1");
   get_or_set_stmt = db.Prepare("INSERT INTO " + std::string(table_names[id]) + "(key, value) VALUES(?1, ?2) ON CONFLICT DO UPDATE SET value=value RETURNING key, value");
   prefix_stmt = db.Prepare("SELECT key, value FROM " + std::string(table_names[id]) + " WHERE key >= ?1 ORDER BY key ASC");
-}
-
-void PersistentMapBase::Set(std::string_view key, std::string_view val) const {
-  set_stmt->BindValues(key, val);
-  set_stmt->Execute();
 }
 
 void PersistentMapBase::MatchCommonPrefix(
@@ -64,30 +41,6 @@ void PersistentMapBase::MatchCommonPrefix(
       break;
     }
   }
-}
-
-bool PersistentMapBase::GetOrSet(std::string_view key,
-                                 std::string_view& val) const {
-  get_or_set_stmt->BindValues(key, val);
-  get_or_set_stmt->ExecuteStep();
-  auto res = get_or_set_stmt->GetResult();
-  std::string_view stored_key, stored_value;
-  res.Columns(stored_key, stored_value);
-  get_or_set_stmt->ExecuteStep();
-  return stored_value != val;
-}
-
-bool PersistentMapBase::TryGet(std::string_view key, std::string_view& val) const {
-  get_stmt->BindValues(key);
-  if(get_stmt->ExecuteStep()) {
-    std::string_view stored_key;
-    auto res = get_stmt->GetResult();
-    res.Columns(stored_key, val);
-    get_stmt->ExecuteStep();
-    return true;
-  }
-
-  return false;
 }
 
 }  // namespace mx

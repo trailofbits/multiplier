@@ -119,6 +119,8 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   void Close() noexcept;
 
+  void Reset();
+
  private:
   friend class QueryResult;
 

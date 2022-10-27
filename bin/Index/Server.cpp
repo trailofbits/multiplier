@@ -312,8 +312,7 @@ kj::Promise<void> Server::downloadFileList(
   unsigned version_number = d->server_context->version_number.load();
 
   std::vector<std::pair<mx::RawEntityId, std::string>> paths;
-  d->server_context->file_id_to_path.ScanPrefix(
-      mx::Empty{},
+  d->server_context->file_id_to_path.Scan(
       [=, &paths] (mx::RawEntityId file_id, std::string file_path) {
         DCHECK_NE(file_id, mx::kInvalidEntityId);
         DCHECK(!file_path.empty());
@@ -432,7 +431,7 @@ kj::Promise<void> Server::weggliQueryFragments(
 
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
-    d->server_context->file_fragment_lines.ScanPrefix(
+    d->server_context->file_fragment_lines.GetByPrefix(
         prefix,
         [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
           if (fragment_ids.empty() || fragment_ids.back() != id) {
@@ -498,7 +497,7 @@ kj::Promise<void> Server::regexQueryFragments(
 
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : sc->line_results) {
-    d->server_context->file_fragment_lines.ScanPrefix(
+    d->server_context->file_fragment_lines.GetByPrefix(
         prefix,
         [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
           if (fragment_ids.empty() || fragment_ids.back() != id) {
@@ -583,7 +582,7 @@ kj::Promise<void> Server::findUses(FindUsesContext context) {
   fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
-    d->server_context->entity_id_use_to_fragment_id.ScanPrefix(
+    d->server_context->entity_id_use_to_fragment_id.GetByField<0>(
         eid,
         [&fragment_ids] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids.push_back(frag_id);
@@ -629,7 +628,7 @@ kj::Promise<void> Server::findReferences(FindReferencesContext context) {
   fragment_ids.reserve(16u);
 
   for (mx::RawEntityId eid : params.getRedeclarationIds()) {
-    d->server_context->entity_id_reference.ScanPrefix(
+    d->server_context->entity_id_reference.GetByField<0>(
         eid,
         [&fragment_ids] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids.push_back(frag_id);
@@ -675,7 +674,7 @@ kj::Promise<void> Server::findFileFragments(FindFileFragmentsContext context) {
   fragment_ids.reserve(128u);
 
   // Collect the fragments associated with this file.
-  d->server_context->file_fragment_ids.ScanPrefix(
+  d->server_context->file_fragment_ids.GetByField<0>(
       file_id,
       [file_id, &fragment_ids] (mx::RawEntityId found_file_id,
                                 mx::RawEntityId fragment_id) {

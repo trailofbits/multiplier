@@ -116,6 +116,10 @@ void Statement::Close() noexcept {
   }
 }
 
+void Statement::Reset() {
+  sqlite3_reset(prepared_stmt.get());
+}
+
 void Statement::Execute(void) {
   auto ret = tryExecuteStep();
   if (SQLITE_DONE != ret) {

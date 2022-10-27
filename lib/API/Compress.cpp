@@ -53,7 +53,9 @@ void WithUncompressedMessageImpl(
   std::string_view untagged_data(begin, data.size());
   if (tag) {  // Compressed and packed.
     auto maybe_uncompressed = mx::TryUncompress(untagged_data);
-
+    if(!maybe_uncompressed.Succeeded()) {
+      return;
+    }
     data = maybe_uncompressed.TakeValue();
   }
 

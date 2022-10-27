@@ -11,11 +11,30 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <sstream>
+#include <utility>
 
 #include "Serialize.h"
 #include "SQLiteStore.h"
 
 namespace mx {
+static constexpr const char* table_names[] = {
+  "MetaNameToId",
+  "FileIdToPath",
+  "FileIdToHash",
+  "FileIdToSerializedFile",
+  "FileIdToFragmentId",
+  "FileIdAndLineNumberToFragmentId",
+  "FileHashToFileId",
+  "FragmentHashToFragmentId",
+  "FragmentIdToSerializedFragment",
+  "FragmentIdToVersionNumber",
+  "EntityIdRedecls",
+  "EntityIdToMangledName",
+  "MangledNameToEntityId",
+  "EntityIdUseToFragmentId",
+  "EntityIdReference",
+};
 
 class PersistentMapBase {
  private:
@@ -26,15 +45,44 @@ class PersistentMapBase {
   std::shared_ptr<sqlite::Statement> prefix_stmt;
 
   PersistentMapBase(void) = delete;
-
  public:
   ~PersistentMapBase(void);
   PersistentMapBase(sqlite::Connection& db, uint8_t id);
 
-  void Set(std::string_view key, std::string_view val) const;
-  bool LazyGetOrSet(std::string_view key, std::string_view& val) const;
-  bool GetOrSet(std::string_view key, std::string_view& val) const;
-  bool TryGet(std::string_view key, std::string_view& val) const;
+  template<typename K, typename V>
+  void Set(const K& key, const V& val) const {
+    set_stmt->BindValues(key, val);
+    set_stmt->Execute();
+  }
+
+  template<typename K, typename V>
+  bool GetOrSet(const K& key, V& val) const {
+    get_or_set_stmt->BindValues(key, val);
+    get_or_set_stmt->ExecuteStep();
+    auto res = get_or_set_stmt->GetResult();
+    K stored_key;
+    V stored_value;
+    res.Columns(stored_key, stored_value);
+    get_or_set_stmt->ExecuteStep();
+    bool inserted = stored_value != val;
+    val = stored_value;
+    return inserted;
+  }
+
+  template<typename K, typename V>
+  bool TryGet(const K& key, V& val) const {
+    get_stmt->BindValues(key);
+    if(get_stmt->ExecuteStep()) {
+      K stored_key;
+      auto res = get_stmt->GetResult();
+      res.Columns(stored_key, val);
+      get_stmt->ExecuteStep();
+      return true;
+    }
+
+    return false;
+  }
+
   void MatchCommonPrefix(
       std::string key_prefix,
       std::function<bool(std::string_view, std::string_view)> cb) const;
@@ -43,83 +91,147 @@ class PersistentMapBase {
 template <uint8_t kId, typename... Keys>
 class PersistentSet {
  private:
-  using K = std::tuple<Keys...>;
-  using KeyCountingSerializer = Serializer<NullReader, ByteCountingWriter, K>;
-  using KeySerializer = Serializer<NullReader, UnsafeByteWriter, K>;
+  sqlite::Connection& db;
+  std::shared_ptr<sqlite::Statement> insert_stmt, test_stmt, scan_stmt;
+  std::array<std::shared_ptr<sqlite::Statement>, sizeof...(Keys)> get_stmts;
+  std::array<std::shared_ptr<sqlite::Statement>, sizeof...(Keys)> get_by_prefix_stmts;
 
-#ifndef NDEBUG
-  using SerializedKeyReader = ByteRangeReader;
-#else
-  using SerializedKeyReader = UnsafeByteReader;
-#endif
+  template <size_t I, typename K, typename C, size_t... Is>
+  void GetByFieldImpl(const K& key, C callback, std::index_sequence<Is...>) const {
+    get_stmts[I]->BindValues(key);
+    while(get_stmts[I]->ExecuteStep()) {
+      auto res = get_stmts[I]->GetResult();
+      std::tuple<Keys...> elem;
+      res.Columns(std::get<Is>(elem)...);
+      if(!callback(std::get<Is>(elem)...)) {
+        break;
+      }
+    }
+    get_stmts[I]->Reset();
+  }
 
-  using KeyDeserializer = Serializer<SerializedKeyReader, NullWriter, K>;
+  template <typename C, typename... Ks, size_t... Is1, size_t... Is2>
+  void GetByPrefixImpl(const std::tuple<Ks...> prefix, C callback, std::index_sequence<Is1...>, std::index_sequence<Is2...>) const {
+    size_t I = sizeof...(Ks) - 1;
+    get_by_prefix_stmts[I]->BindValues(std::get<Is1>(prefix)...);
+    while(get_stmts[I]->ExecuteStep()) {
+      auto res = get_stmts[I]->GetResult();
+      std::tuple<Keys...> elem;
+      res.Columns(std::get<Is2>(elem)...);
+      if(!callback(std::get<Is2>(elem)...)) {
+        break;
+      }
+    }
+    get_by_prefix_stmts[I]->Reset();
+  }
 
-  PersistentMapBase impl;
+  template <typename C, size_t... Is>
+  void ScanImpl(C callback, std::index_sequence<Is...>) const {
+    while(scan_stmt->ExecuteStep()) {
+      auto res = scan_stmt->GetResult();
+      std::tuple<Keys...> elem;
+      res.Columns(std::get<Is>(elem)...);
+      if(!callback(std::get<Is>(elem)...)) {
+        break;
+      }
+    }
+    scan_stmt->Reset();
+  }
 
  public:
-  PersistentSet(sqlite::Connection& db) : impl(db, kId) {}
+  PersistentSet(sqlite::Connection& db) : db(db) {
+    std::stringstream table_desc;
+    for(size_t i = 0; i < sizeof...(Keys); ++i) {
+      table_desc << "key" << i;
+      if(i != sizeof...(Keys) - 1) {
+        table_desc << ", ";
+      }
+    }
+
+    std::stringstream ss;
+    ss << "CREATE TABLE IF NOT EXISTS " << table_names[kId] << "(";
+    for(size_t i = 0; i < sizeof...(Keys); ++i) {
+      ss << "key" << i << ", ";
+    }
+    ss << "PRIMARY KEY(" << table_desc.str() << "))";
+    db.Execute(ss.str());
+
+    ss = {};
+    ss << "INSERT OR IGNORE INTO " << table_names[kId] << '(' << table_desc.str() << ") VALUES(";
+    for(size_t i = 0; i < sizeof...(Keys); ++i) {
+      ss << "?" << (i + 1);
+      if(i != sizeof...(Keys) - 1) {
+        ss << ", ";
+      }
+    }
+    ss << ")";
+
+    insert_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT (";
+    for(size_t i = 0; i < sizeof...(Keys); ++i) {
+      ss << "?" << (i + 1);
+      if(i != sizeof...(Keys) - 1) {
+        ss << ", ";
+      }
+    }
+    ss << ") IN " << table_names[kId];
+
+    test_stmt = db.Prepare(ss.str());
+
+    for(size_t i = 0; i < sizeof...(Keys); ++i) {
+      ss = {};
+      ss << "SELECT " << table_desc.str() << " FROM " << table_names[kId] << " WHERE key" << i << " = ?1";
+      get_stmts[i] = db.Prepare(ss.str());
+    }
+
+    for(size_t i = 0; i < sizeof...(Keys); ++i) {
+      ss = {};
+      ss << "SELECT " << table_desc.str() << " FROM " << table_names[kId] << " WHERE ";
+      for(size_t j = 0; j <= i; j++) {
+        ss << "key" << j << " = ?" << (j + 1);
+        if(j != i) {
+          ss << " AND ";
+        }
+      }
+      get_by_prefix_stmts[i] = db.Prepare(ss.str());
+    }
+
+    ss = {};
+    ss << "SELECT " << table_desc.str() << " FROM " << table_names[kId];
+    scan_stmt = db.Prepare(ss.str());
+  }
 
   void Insert(Keys... keys) const {
-    K key(std::forward<Keys>(keys)...);
-
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    KeyCountingSerializer::Write(counting_writer, key);
-    const auto key_size = counting_writer.num_bytes;
-    std::string key_data(key_size, char{});
-    UnsafeByteWriter writer(key_data);
-
-    writer.WriteI8(kId);
-    KeySerializer::Write(writer, key);
-
-    impl.Set(key_data, {});
+    insert_stmt->BindValues(keys...);
+    insert_stmt->Execute();
   }
 
   bool Test(Keys... keys) const {
-    K key(std::forward<Keys>(keys)...);
-
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    KeyCountingSerializer::Write(counting_writer, key);
-    const auto key_size = counting_writer.num_bytes;
-    std::string key_data(key_size, char{});
-    UnsafeByteWriter writer(key_data);
-
-    writer.WriteI8(kId);
-    KeySerializer::Write(writer, key);
-
-    return impl.TryGet(key, &key_data);
+    int res;
+    test_stmt->BindValues(keys...);
+    test_stmt->ExecuteStep();
+    auto r = test_stmt->GetResult();
+    r.Columns(res);
+    test_stmt->ExecuteStep();
+    return res;
   }
 
-  template <typename P, typename C>
-  void ScanPrefix(P prefix, C callback) const {
-    using PrefixCountingSerializer =
-        Serializer<NullReader, ByteCountingWriter, P>;
+  template <size_t I, typename C,
+    typename K = typename std::tuple_element<I, std::tuple<Keys...>>::type>
+  void GetByField(const K& key, C callback) const {
+    GetByFieldImpl<I>(key, callback, std::make_index_sequence<sizeof...(Keys)>());
+  }
 
-    using PrefixSerializer = Serializer<NullReader, UnsafeByteWriter, P>;
+  template <typename C, typename... Ks>
+  void GetByPrefix(const std::tuple<Ks...>& prefix, C callback) const {
+    GetByPrefixImpl(prefix, callback, std::make_index_sequence<sizeof...(Ks)>(), std::make_index_sequence<sizeof...(Keys)>());
+  }
 
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    PrefixCountingSerializer::Write(counting_writer, prefix);
-    const auto prefix_size = counting_writer.num_bytes;
-    std::string prefix_data(prefix_size, char{});
-    UnsafeByteWriter writer(prefix_data);
-
-    writer.WriteI8(kId);
-    PrefixSerializer::Write(writer, prefix);
-
-    impl.MatchCommonPrefix(
-        std::move(prefix_data),
-        [cb = std::move(callback)] (std::string_view key_data,
-                                    std::string_view) -> bool {
-          K key;
-          SerializedKeyReader key_reader(key_data);
-          key_reader.Skip(sizeof(kId));
-          KeyDeserializer::Read(key_reader, key);
-
-          return std::apply(cb, std::move(key));
-        });
+  template <typename C>
+  void Scan(C callback) const {
+    ScanImpl(callback, std::make_index_sequence<sizeof...(Keys)>());
   }
 };
 
@@ -127,22 +239,6 @@ class PersistentSet {
 template <uint8_t kId, typename K, typename V>
 class PersistentMap {
  private:
-  using KeyCountingSerializer = Serializer<NullReader, ByteCountingWriter, K>;
-  using ValueCountingSerializer = Serializer<NullReader, ByteCountingWriter, V>;
-
-  using KeySerializer = Serializer<NullReader, UnsafeByteWriter, K>;
-  using ValueSerializer = Serializer<NullReader, UnsafeByteWriter, V>;
-
-#ifndef NDEBUG
-  using SerializedKeyReader = ByteRangeReader;
-  using SerializedValueReader = ByteRangeReader;
-#else
-  using SerializedKeyReader = UnsafeByteReader;
-  using SerializedValueReader = UnsafeByteReader;
-#endif
-
-  using KeyDeserializer = Serializer<SerializedKeyReader, NullWriter, K>;
-  using ValueDeserializer = Serializer<SerializedValueReader, NullWriter, V>;
 
   PersistentMapBase impl;
 
@@ -150,143 +246,30 @@ class PersistentMap {
   PersistentMap(sqlite::Connection& db) : impl(db, kId) {}
 
   V GetOrSet(K key, V val) const {
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    KeyCountingSerializer::Write(counting_writer, key);
-    const auto key_size = counting_writer.num_bytes;
-    counting_writer.num_bytes = 0u;
-    ValueCountingSerializer::Write(counting_writer, val);
-    const auto val_size = counting_writer.num_bytes;
-    std::string key_data(key_size, char{});
-    std::string val_data(val_size, char{});
-    UnsafeByteWriter key_writer(key_data);
-    UnsafeByteWriter val_writer(val_data);
-
-    key_writer.WriteI8(kId);
-    KeySerializer::Write(key_writer, key);
-    ValueSerializer::Write(val_writer, val);
-
-    std::string_view val_data_view{val_data};
-
-    if (!impl.GetOrSet(key_data, val_data_view)) {
-      SerializedValueReader reader(val_data_view);
-      ValueDeserializer::Read(reader, val);
-    }
-
+    impl.GetOrSet(key, val);
     return val;
   }
 
   void Set(K key, V val) const {
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    KeyCountingSerializer::Write(counting_writer, key);
-    const auto key_size = counting_writer.num_bytes;
-    counting_writer.num_bytes = 0u;
-    ValueCountingSerializer::Write(counting_writer, val);
-    const auto val_size = counting_writer.num_bytes;
-    std::string data(key_size + val_size, char{});
-    UnsafeByteWriter writer(data);
-
-    writer.WriteI8(kId);
-    KeySerializer::Write(writer, key);
-    ValueSerializer::Write(writer, val);
-
-    std::string_view k(data.data(), key_size);
-    std::string_view v(&(data[key_size]), val_size);
-    impl.Set(k, v);
+    impl.Set(key, val);
   }
 
   std::optional<V> TryGet(K key) const {
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    KeyCountingSerializer::Write(counting_writer, key);
-    const auto key_size = counting_writer.num_bytes;
-    std::string key_data(key_size, char{});
-    UnsafeByteWriter writer(key_data);
-
-    writer.WriteI8(kId);
-    KeySerializer::Write(writer, key);
-
-    std::string_view val_data;
-    if (!impl.TryGet(key_data, val_data)) {
+    V val;
+    if(impl.TryGet(key, val)) {
+      return val;
+    } else {
       return std::nullopt;
     }
-
-    V val;
-    SerializedValueReader reader(val_data);
-    ValueDeserializer::Read(reader, val);
-    return val;
-  }
-
-  template <typename C>
-  V LazyGetOrSet(K key, C callback) const {
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    KeyCountingSerializer::Write(counting_writer, key);
-    const auto key_size = counting_writer.num_bytes;
-    std::string key_data(key_size, char{});
-    UnsafeByteWriter writer(key_data);
-
-    writer.WriteI8(kId);
-    KeySerializer::Write(writer, key);
-
-    std::string_view val_data_view;
-
-    V val;
-    if (impl.TryGet(key_data, val_data_view)) {
-      SerializedValueReader reader(val_data_view);
-      ValueDeserializer::Read(reader, val);
-      return val;
-    }
-
-    val = callback();
-
-    std::string val_data{val_data_view};
-    counting_writer.num_bytes = 0u;
-    ValueCountingSerializer::Write(counting_writer, val);
-    val_data.resize(counting_writer.num_bytes);
-    UnsafeByteWriter val_writer(val_data);
-    ValueSerializer::Write(val_writer, val);
-    val_data_view = val_data;
-    if (!impl.GetOrSet(key_data, val_data_view)) {
-      SerializedValueReader reader(val_data_view);
-      ValueDeserializer::Read(reader, val);
-    }
-
-    return val;
   }
 
   template <typename P, typename C>
-  void ScanPrefix(P prefix, C callback) const {
-    using PrefixCountingSerializer =
-        Serializer<NullReader, ByteCountingWriter, P>;
-
-    using PrefixSerializer = Serializer<NullReader, UnsafeByteWriter, P>;
-
-    ByteCountingWriter counting_writer;
-    counting_writer.Skip(sizeof(kId));
-    PrefixCountingSerializer::Write(counting_writer, prefix);
-    const auto prefix_size = counting_writer.num_bytes;
-    std::string prefix_data(prefix_size, char{});
-    UnsafeByteWriter writer(prefix_data);
-
-    writer.WriteI8(kId);
-    PrefixSerializer::Write(writer, prefix);
-
+  void ScanPrefix(const P& prefix, C callback) const {
     impl.MatchCommonPrefix(
-        std::move(prefix_data),
+        prefix,
         [cb = std::move(callback)] (std::string_view key_data,
                                     std::string_view val_data) -> bool {
-          K key;
-          V val;
-          SerializedKeyReader key_reader(key_data);
-          key_reader.Skip(sizeof(kId));
-          KeyDeserializer::Read(key_reader, key);
-
-          SerializedValueReader val_reader(val_data);
-          ValueDeserializer::Read(val_reader, val);
-
-          return cb(std::move(key), std::move(val));
+          return cb(key_data, val_data);
         });
   }
 };

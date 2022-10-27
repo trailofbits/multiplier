@@ -28,8 +28,7 @@ enum : char {
   kEntityIdToMangledName,
   kMangledNameToEntityId,
   kEntityIdUseToFragmentId,
-  kEntityIdReference,
-  kVersionNumber
+  kEntityIdReference
 };
 
 enum MetadataName : char {
@@ -70,7 +69,7 @@ class IndexStorage final {
   // during this time, but we don't want to commit to those results, just in
   // case there are more redeclarations that come in betwween the client request
   // and finishing indexing.
-  mx::atomic<kVersionNumber, unsigned> version_number;
+  mx::atomic<kIndexingVersion, unsigned> version_number;
 
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.

@@ -13,12 +13,14 @@
 #include <multiplier/Types.h>
 #include <multiplier/SQLiteStore.h>
 #include <memory>
+#include <mutex>
 #include <multiplier/IndexStorage.h>
 
 namespace mx {
 
 class SQLiteEntityProvider::Impl {
  public:
+  std::mutex mtx;
   sqlite::Connection db;
   IndexStorage storage;
 
@@ -32,6 +34,7 @@ SQLiteEntityProvider::~SQLiteEntityProvider() noexcept {}
 void SQLiteEntityProvider::ClearCache() {}
 
 unsigned SQLiteEntityProvider::VersionNumber(void) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   return d->storage.version_number;
 }
 
@@ -42,11 +45,11 @@ unsigned SQLiteEntityProvider::VersionNumber(const Ptr &) {
 void SQLiteEntityProvider::VersionNumberChanged(unsigned) {}
 
 FilePathList SQLiteEntityProvider::ListFiles(const Ptr &) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   FilePathList res;
-  d->storage.file_id_to_path.ScanPrefix(
-      mx::Empty{},
+  d->storage.file_id_to_path.Scan(
       [=, &res] (mx::RawEntityId file_id, std::string file_path) {
-        res.emplace(file_path, file_id);
+        res.emplace(file_path, EntityId(FileId(file_id)));
         return true;
       });
 
@@ -54,11 +57,12 @@ FilePathList SQLiteEntityProvider::ListFiles(const Ptr &) {
 }
 
 std::vector<RawEntityId> SQLiteEntityProvider::ListFragmentsInFile(const Ptr &, RawEntityId file_id) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   std::vector<mx::RawEntityId> fragment_ids;
   fragment_ids.reserve(128u);
 
   // Collect the fragments associated with this file.
-  d->storage.file_fragment_ids.ScanPrefix(
+  d->storage.file_fragment_ids.GetByField<0>(
       file_id,
       [file_id, &fragment_ids] (mx::RawEntityId found_file_id,
                                 mx::RawEntityId fragment_id) {
@@ -69,6 +73,7 @@ std::vector<RawEntityId> SQLiteEntityProvider::ListFragmentsInFile(const Ptr &, 
 }
 
 std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(const Ptr &self, RawEntityId file_id) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   std::optional<std::string> maybe_contents =
       d->storage.file_id_to_serialized_file.TryGet(file_id);
   if (!maybe_contents) {
@@ -90,6 +95,7 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(const Ptr &self, R
 }
 
 std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(const Ptr &self, RawEntityId fragment_id) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   std::optional<std::string> maybe_contents =
       d->storage.fragment_id_to_serialized_fragment.TryGet(fragment_id);
   if (!maybe_contents) {
@@ -108,6 +114,7 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(const Ptr 
 }
 
 std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &self, const WeggliQuery &query_tree) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   std::map<unsigned, unsigned> eol_offset_to_line_num;
   std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
   for(RawEntityId file_id = kMinEntityIdIncrement;
@@ -156,7 +163,7 @@ std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &se
   fragment_ids.reserve(128u);
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : line_results) {
-    d->storage.file_fragment_lines.ScanPrefix(
+    d->storage.file_fragment_lines.GetByPrefix(
         prefix,
         [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
           if (fragment_ids.empty() || fragment_ids.back() != id) {
@@ -174,6 +181,7 @@ std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &se
 }
 
 std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &self, const RegexQuery &regex) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   std::map<unsigned, unsigned> offset_to_line_num;
   std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
   for(RawEntityId file_id = kMinEntityIdIncrement;
@@ -222,7 +230,7 @@ std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &sel
   fragment_ids.reserve(128u);
   // Convert the file file:line pairs into overlapping fragment IDs.
   for (auto prefix : line_results) {
-    d->storage.file_fragment_lines.ScanPrefix(
+    d->storage.file_fragment_lines.GetByPrefix(
         prefix,
         [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
           if (fragment_ids.empty() || fragment_ids.back() != id) {
@@ -240,6 +248,7 @@ std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(const Ptr &sel
 }
 
 std::vector<RawEntityId> SQLiteEntityProvider::Redeclarations(const Ptr &, RawEntityId id) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   mx::EntityId eid{id};
   mx::VariantId vid = eid.Unpack();
 
@@ -253,12 +262,13 @@ std::vector<RawEntityId> SQLiteEntityProvider::Redeclarations(const Ptr &, RawEn
 void SQLiteEntityProvider::FillUses(const Ptr &self, RawEntityId eid,
                                     std::vector<RawEntityId> &redecl_ids_out,
                                     std::vector<RawEntityId> &fragment_ids_out) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   fragment_ids_out.clear();
   fragment_ids_out.reserve(16u);
 
   redecl_ids_out = Redeclarations(self, eid);
   for (mx::RawEntityId eid : redecl_ids_out) {
-    d->storage.entity_id_use_to_fragment_id.ScanPrefix(
+    d->storage.entity_id_use_to_fragment_id.GetByField<0>(
         eid,
         [&fragment_ids_out] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids_out.push_back(frag_id);
@@ -279,7 +289,7 @@ void SQLiteEntityProvider::FillReferences(const Ptr &self, RawEntityId eid,
 
   redecl_ids_out = Redeclarations(self, eid);
   for (mx::RawEntityId eid : redecl_ids_out) {
-    d->storage.entity_id_reference.ScanPrefix(
+    d->storage.entity_id_reference.GetByField<0>(
         eid,
         [&fragment_ids_out] (mx::RawEntityId, mx::RawEntityId frag_id) {
           fragment_ids_out.push_back(frag_id);
@@ -295,6 +305,7 @@ void SQLiteEntityProvider::FillReferences(const Ptr &self, RawEntityId eid,
 void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
                                       mx::DeclCategory category,
                                       std::vector<RawEntityId> &entity_ids) {
+  std::scoped_lock<std::mutex> lock(d->mtx);
   entity_ids = d->storage.database.QueryEntities(
       symbol, category);
 
