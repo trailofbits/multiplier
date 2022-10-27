@@ -13,8 +13,7 @@
 #include <sstream>
 
 DECLARE_bool(help);
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 DEFINE_uint64(fragment_id, 0, "ID of the fragment from which to print variable names");
 DEFINE_uint64(file_id, 0, "ID of the file from which to print variable names");
 //DEFINE_bool(list_variables, false, "Should we list the variables inside of functions?");
@@ -50,7 +49,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--fragment_id ID | --file_id ID] [--show_locations SHOW_LOCATIONS]\n";
+    << " [--db DATABASE] [--fragment_id ID | --file_id ID] [--show_locations SHOW_LOCATIONS]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -61,9 +60,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_remote(
-          FLAGS_host, FLAGS_port)));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
   if (FLAGS_show_locations) {
     for (auto [path, id] : index.file_paths()) {

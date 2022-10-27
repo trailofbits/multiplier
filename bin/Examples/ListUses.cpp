@@ -18,7 +18,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] --entity_id ID"
+    << " [--db DATABASE] --entity_id ID"
 		<< " [--show_locations SHOW_LOCATIONS] [--highlight_user HIGHLIGHT_USER]\n";
 
   google::SetUsageMessage(ss.str());

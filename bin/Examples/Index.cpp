@@ -13,8 +13,7 @@
 #include <multiplier/AST.h>
 
 DECLARE_bool(help);
-DEFINE_string(host, "localhost", "Hostname of mx-server. Use 'unix' for a UNIX domain socket.");
-DEFINE_string(port, "50051", "Port of mx-server. Use a path and 'unix' for the host for a UNIX domain socket.");
+DEFINE_string(db, "", "Database file");
 
 std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
 mx::FileLocationCache location_cache;
@@ -25,9 +24,7 @@ mx::Index InitExample(bool fill_locations) {
     exit(EXIT_FAILURE);
   }
 
-  mx::Index index(mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_remote(
-          FLAGS_host, FLAGS_port)));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
   if (fill_locations) {
     for (auto [path, id] : index.file_paths()) {

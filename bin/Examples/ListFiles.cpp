@@ -12,14 +12,13 @@
 #include <sstream>
 
 DECLARE_bool(help);
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT]\n";
+    << " [--db file]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -30,8 +29,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
   for (auto [path, id] : index.file_paths()) {
     std::cout << id << '\t' << path.generic_string() << std::endl;
   }
