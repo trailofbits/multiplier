@@ -65,7 +65,6 @@ set(common_headers
 add_library("mx-common" STATIC
   "Compress.cpp"
   "IndexStorage.cpp"
-  "PersistentMap.cpp"
   "Re2.cpp"
   "Re2.h"
   "SQLiteStore.cpp"

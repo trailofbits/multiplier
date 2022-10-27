@@ -36,58 +36,6 @@ static constexpr const char* table_names[] = {
   "EntityIdReference",
 };
 
-class PersistentMapBase {
- private:
-  sqlite::Connection& db;
-  std::shared_ptr<sqlite::Statement> set_stmt;
-  std::shared_ptr<sqlite::Statement> get_stmt;
-  std::shared_ptr<sqlite::Statement> get_or_set_stmt;
-  std::shared_ptr<sqlite::Statement> prefix_stmt;
-
-  PersistentMapBase(void) = delete;
- public:
-  ~PersistentMapBase(void);
-  PersistentMapBase(sqlite::Connection& db, uint8_t id);
-
-  template<typename K, typename V>
-  void Set(const K& key, const V& val) const {
-    set_stmt->BindValues(key, val);
-    set_stmt->Execute();
-  }
-
-  template<typename K, typename V>
-  bool GetOrSet(const K& key, V& val) const {
-    get_or_set_stmt->BindValues(key, val);
-    get_or_set_stmt->ExecuteStep();
-    auto res = get_or_set_stmt->GetResult();
-    K stored_key;
-    V stored_value;
-    res.Columns(stored_key, stored_value);
-    get_or_set_stmt->ExecuteStep();
-    bool inserted = stored_value != val;
-    val = stored_value;
-    return inserted;
-  }
-
-  template<typename K, typename V>
-  bool TryGet(const K& key, V& val) const {
-    get_stmt->BindValues(key);
-    if(get_stmt->ExecuteStep()) {
-      K stored_key;
-      auto res = get_stmt->GetResult();
-      res.Columns(stored_key, val);
-      get_stmt->ExecuteStep();
-      return true;
-    }
-
-    return false;
-  }
-
-  void MatchCommonPrefix(
-      std::string key_prefix,
-      std::function<bool(std::string_view, std::string_view)> cb) const;
-};
-
 template <uint8_t kId, typename... Keys>
 class PersistentSet {
  private:
@@ -111,7 +59,8 @@ class PersistentSet {
   }
 
   template <typename C, typename... Ks, size_t... Is1, size_t... Is2>
-  void GetByPrefixImpl(const std::tuple<Ks...> prefix, C callback, std::index_sequence<Is1...>, std::index_sequence<Is2...>) const {
+  void GetByPrefixImpl(const std::tuple<Ks...> prefix, C callback,
+      std::index_sequence<Is1...>, std::index_sequence<Is2...>) const {
     size_t I = sizeof...(Ks) - 1;
     get_by_prefix_stmts[I]->BindValues(std::get<Is1>(prefix)...);
     while(get_stmts[I]->ExecuteStep()) {
@@ -182,7 +131,9 @@ class PersistentSet {
 
     for(size_t i = 0; i < sizeof...(Keys); ++i) {
       ss = {};
-      ss << "SELECT " << table_desc.str() << " FROM " << table_names[kId] << " WHERE key" << i << " = ?1";
+      ss << "SELECT " << table_desc.str()
+         << " FROM " << table_names[kId]
+         << " WHERE key" << i << " = ?1";
       get_stmts[i] = db.Prepare(ss.str());
     }
 
@@ -226,7 +177,9 @@ class PersistentSet {
 
   template <typename C, typename... Ks>
   void GetByPrefix(const std::tuple<Ks...>& prefix, C callback) const {
-    GetByPrefixImpl(prefix, callback, std::make_index_sequence<sizeof...(Ks)>(), std::make_index_sequence<sizeof...(Keys)>());
+    GetByPrefixImpl(prefix, callback,
+      std::make_index_sequence<sizeof...(Ks)>(),
+      std::make_index_sequence<sizeof...(Keys)>());
   }
 
   template <typename C>
@@ -239,38 +192,57 @@ class PersistentSet {
 template <uint8_t kId, typename K, typename V>
 class PersistentMap {
  private:
-
-  PersistentMapBase impl;
+  sqlite::Connection& db;
+  std::shared_ptr<sqlite::Statement> set_stmt, get_stmt, get_or_set_stmt;
 
  public:
-  PersistentMap(sqlite::Connection& db) : impl(db, kId) {}
+  PersistentMap(sqlite::Connection& db) : db(db) {
+    std::stringstream ss;
+    ss << "CREATE TABLE IF NOT EXISTS " << table_names[kId] << "(key, value, PRIMARY KEY(key))";
+    db.Execute(ss.str());
+
+    ss = {};
+    ss << "INSERT OR REPLACE INTO " << table_names[kId] << "(key, value) VALUES (?1, ?2)";
+    set_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT key, value FROM " << table_names[kId] << " WHERE key = ?1";
+    get_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "INSERT INTO " << table_names[kId]
+       << "(key, value) VALUES(?1, ?2) ON CONFLICT DO UPDATE SET value=value RETURNING key, value";
+    get_or_set_stmt = db.Prepare(ss.str());
+  }
 
   V GetOrSet(K key, V val) const {
-    impl.GetOrSet(key, val);
-    return val;
+    get_or_set_stmt->BindValues(key, val);
+    get_or_set_stmt->ExecuteStep();
+    auto res = get_or_set_stmt->GetResult();
+    K stored_key;
+    V stored_value;
+    res.Columns(stored_key, stored_value);
+    get_or_set_stmt->ExecuteStep();
+    return stored_value;
   }
 
   void Set(K key, V val) const {
-    impl.Set(key, val);
+    set_stmt->BindValues(key, val);
+    set_stmt->Execute();
   }
 
   std::optional<V> TryGet(K key) const {
-    V val;
-    if(impl.TryGet(key, val)) {
-      return val;
-    } else {
-      return std::nullopt;
+    get_stmt->BindValues(key);
+    if(get_stmt->ExecuteStep()) {
+      K stored_key;
+      V stored_value;
+      auto res = get_stmt->GetResult();
+      res.Columns(stored_key, stored_value);
+      get_stmt->ExecuteStep();
+      return stored_value;
     }
-  }
 
-  template <typename P, typename C>
-  void ScanPrefix(const P& prefix, C callback) const {
-    impl.MatchCommonPrefix(
-        prefix,
-        [cb = std::move(callback)] (std::string_view key_data,
-                                    std::string_view val_data) -> bool {
-          return cb(key_data, val_data);
-        });
+    return std::nullopt;
   }
 };
 

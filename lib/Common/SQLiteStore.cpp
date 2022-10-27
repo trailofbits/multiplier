@@ -66,7 +66,7 @@ int64_t QueryResult::getInt64(int32_t idx) {
 
 std::string QueryResult::getText(int32_t idx) {
   auto prepared_stmt = stmt->prepareStatement();
-  auto ptr = reinterpret_cast<const char*>(sqlite3_column_text(prepared_stmt, idx));
+  auto ptr = reinterpret_cast<const char*>(sqlite3_column_blob(prepared_stmt, idx));
   auto len = sqlite3_column_bytes(prepared_stmt, idx);
   return std::string(ptr, len);
 }
