@@ -186,6 +186,7 @@ class Connection {
 
   // Uses sqlite3_open to open the database at the specified path
   Connection(const std::filesystem::path &filename,
+             bool readonly = false,
              const int busyTimeouts = 0);
 
   // non-copyable
