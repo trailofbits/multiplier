@@ -560,7 +560,31 @@ void Substitution::PrintDOT(std::ostream &os) const {
   if (InBefore(this)) {
     os << " color=\"brown\"";
   }
-  os << "><TR>";
+  os << "><TR><TD colspan=\"" << before.size() << "\">";
+  switch (kind) {
+    case kFileBody: os << "file body"; break;
+    case kMacroArgument: os << "macro arg"; break;
+    case kMacroUse: os << "macro use"; break;
+    case kMacroExpansion: os << "macro exp"; break;
+    case kVAOptUse: os << "va opt use"; break;
+    case kVAOptArgument: os << "va opt arg"; break;
+    case kVAOptExpansion: os << "va opt exp"; break;
+    case kSubstitutionBefore: os << "sub before"; break;
+    case kSubstitutionAfter: os << "sub after"; break;
+    case kInclusion: os << "include"; break;
+    case kDefinition: os << "define"; break;
+    case kDirective: os << "directive"; break;
+  }
+  os << "</TD></TR><TR>";
+
+  if (before_body && before_body->file_tok &&
+      after_body && after_body->file_tok) {
+    os << "<TD colspan=\"" << (before.size() / 2u) << "\">"
+       << before_body->file_tok->Index()
+       << "</TD><TD colspan=\"" << ((before.size() + 1u) / 2u) << "\">"
+       << after_body->file_tok->Index()
+       << "</TD></TR><TR>";
+  }
 
   auto has_any = false;
 
@@ -1179,13 +1203,13 @@ static std::optional<unsigned> NextFromSameFile(
     pasta::File next_file = pasta::File::Containing(next->file_tok.value());
 
     if (sub_bb &&
-        ((sub_bb->Index() >= next->file_tok->Index()) ||
+        ((sub_bb->Index() > next->file_tok->Index()) ||
          (next_file != pasta::File::Containing(sub_bb.value())))) {
       continue;
     }
 
     if (sub_ab &&
-        ((sub_ab->Index() <= next->file_tok->Index()) ||
+        ((sub_ab->Index() < next->file_tok->Index()) ||
          (next_file != pasta::File::Containing(sub_ab.value())))) {
       continue;
     }
@@ -1204,16 +1228,24 @@ Substitution *TokenTreeImpl::TryInventMissingSubstitutions(
     Substitution *sub, TokenInfo *prev, Substitution::Node curr_node,
     unsigned next_index) {
 
-  if (!prev->file_tok) {
-    return nullptr;
-  }
-
   std::optional<unsigned> next_i = NextFromSameFile(sub, next_index);
-  if (!next_i || next_i.value() >= sub->before.size()) {
+  if (!next_i) {
+    std::cerr << indent << "No next token in same file\n";
+    return nullptr;
+  } else if (next_i.value() >= sub->before.size()) {
+    std::cerr << indent << "Out-of-bounds token in same file: next_i="
+        << next_i.value() << " before.size=" << sub->before.size() << '\n';
     return nullptr;
   }
 
   TokenInfo *next = LeftCornerOfUse(sub->before[next_i.value()]);
+  if (!next || !next->file_tok) {
+    return nullptr;
+  }
+
+  std::cerr
+      << indent << "Next in same file (" << next->file_tok->Index() << "): "
+      << next->file_tok->Data() << '\n';
 
   std::vector<Substitution::Node> missing_nodes;
   if (!TryFillBetweenFileTokens(sub, prev, next, missing_nodes)) {
@@ -2062,8 +2094,7 @@ bool TokenTreeImpl::FillMissingFileTokens(Substitution *sub,
         }
 
       } else {
-//        std::cerr << indent << "  didn't add intermediate nodes\n";
-//        return false;
+        std::cerr << indent << "  didn't add intermediate nodes\n";
         new_nodes.emplace_back(std::move(node));
       }
     } else {
