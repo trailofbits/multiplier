@@ -10,7 +10,6 @@
 #include <capnp/message.h>
 #include <cstdint>
 #include <filesystem>
-#include <kj/array.h>
 #include <memory>
 #include <multiplier/PersistentMap.h>
 #include <multiplier/ProgressBar.h>

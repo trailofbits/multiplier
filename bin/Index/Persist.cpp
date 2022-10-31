@@ -11,7 +11,6 @@
 #include <capnp/message.h>
 #include <fstream>
 #include <glog/logging.h>
-#include <kj/string-tree.h>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/ProgressBar.h>
