@@ -108,6 +108,11 @@ class Substitution {
     kMacroParameterUse,
     kMacroParameterSubstitution,
 
+    kStringifyBefore,
+    kStringifyAfter,
+    kConcatenateBefore,
+    kConcatenateAfter,
+
     // An inclusion of a file nested inside of a top-level declaration, and so
     // the inclusion manifests as a kind of macro expansion.
     kInclusion,
@@ -585,6 +590,10 @@ void Substitution::PrintDOT(std::ostream &os) const {
     case kSubstitutionAfter: os << "sub after"; break;
     case kMacroParameterUse: os << "param use"; break;
     case kMacroParameterSubstitution: os << "param sub"; break;
+    case kStringifyBefore: os << "string use"; break;
+    case kStringifyAfter: os << "string sub"; break;
+    case kConcatenateBefore: os << "concat use"; break;
+    case kConcatenateAfter: os << "concat sub"; break;
     case kInclusion: os << "include"; break;
     case kDefinition: os << "define"; break;
     case kDirective: os << "directive"; break;
@@ -2583,24 +2592,53 @@ static bool TokenIsParamName(
   return params.count(param_name);
 }
 
+static std::vector<std::vector<Substitution::Node>> FindArguments(
+    Substitution *sub) {
+  std::vector<std::vector<Substitution::Node>> ret;
+
+  return ret;
+}
+
 void TokenTreeImpl::FinalizeParameters(
     Substitution *sub,
     const std::unordered_map<std::string,
                              std::vector<Substitution::Node>> &params) {
 
-  auto no_params = params.empty();
+  const bool no_params = params.empty();
   std::string param_name;
 
   std::unordered_map<std::string, std::vector<Substitution::Node>> next_params;
   std::vector<Substitution::Node> param_toks;
 
+  auto i = 0u;
   for (Substitution::Node &node : sub->before) {
     if (std::holds_alternative<TokenInfo *>(node)) {
+      TokenInfo *tok = std::get<TokenInfo *>(node);
+
+      // Try to re-label this substitution when specific operators are used.
+      if (sub->kind == Substitution::kSubstitutionBefore && sub->after &&
+          tok->file_tok) {
+        switch (tok->file_tok->Kind()) {
+          case pasta::TokenKind::kHash:
+            if (!i) {
+              sub->kind = Substitution::kStringifyBefore;
+              sub->after->kind = Substitution::kStringifyAfter;
+            }
+            break;
+          case pasta::TokenKind::kHashHash:
+            if (i) {
+              sub->kind = Substitution::kConcatenateBefore;
+              sub->after->kind = Substitution::kConcatenateAfter;
+            }
+            break;
+          default: break;
+        }
+      }
+
       if (no_params) {
         continue;
       }
 
-      TokenInfo *tok = std::get<TokenInfo *>(node);
       if (!TokenIsParamName(tok, param_name, params)) {
         continue;
       }
@@ -2621,6 +2659,9 @@ void TokenTreeImpl::FinalizeParameters(
     } else if (std::holds_alternative<Substitution *>(node)) {
       Substitution *nested_sub = std::get<Substitution *>(node);
 
+      // Some parameters will have already have been recognized as substitutions
+      // by `TryInventMissingSubstitutions`. Here, we try to recognize and
+      // re-label them as such.
       if (nested_sub->after &&
           nested_sub->after->kind == Substitution::kSubstitutionAfter &&
           nested_sub->kind == Substitution::kSubstitutionBefore &&
@@ -2638,6 +2679,8 @@ void TokenTreeImpl::FinalizeParameters(
     } else {
       assert(false);
     }
+
+    ++i;
   }
 
   if (!sub->after) {
