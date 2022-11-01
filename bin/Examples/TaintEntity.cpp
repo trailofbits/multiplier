@@ -50,20 +50,11 @@ struct UsePath {
 };
 
 struct UserDAG {
-//  UserDAG *root{nullptr};
   unsigned depth{0};
+  bool is_alarming{false};
   std::vector<UserDAG *> users;
   std::vector<UserDAG *> uses;
   mx::RawEntityId entity_id{mx::kInvalidEntityId};
-
-//  // Union-find path compression.
-//  UserDAG *Root(void) {
-//    if (this != root) {
-//      root = root->Root();
-//    }
-//
-//    return root;
-//  }
 };
 
 using SeenEntityMap = std::unordered_map<mx::RawEntityId,
@@ -214,7 +205,8 @@ static void ReportUnhandledAssign(
 static void TaintTrackDeref(const mx::Stmt &op, const UsePath &prev,
                             SeenEntityMap &seen) {
   const UsePath entry{&prev, op.id()};
-  AddPathToDAG(entry, seen);
+  UserDAG *dag = AddPathToDAG(entry, seen);
+  dag->is_alarming = true;
 }
 
 
@@ -314,6 +306,108 @@ static bool TaintTrackUnaryOp(const mx::UnaryOperator &op,
   }
 }
 
+// If `taint_source` is a tainted expression, then try to propagate the
+// taints to where the expression is used.
+static void TaintTrackExpr(const mx::Expr &taint_source,
+                           const UsePath &prev, SeenEntityMap &seen);
+
+struct LibraryModel {
+  std::string_view func_name;
+  unsigned arg_index;
+  bool (*propagate_taint)(const mx::CallExpr &, const mx::FunctionDecl &,
+                          const mx::ParmVarDecl &, const mx::Stmt &,
+                          unsigned, const UsePath &, SeenEntityMap &);
+};
+
+static bool AlarmOnLibraryArgument(
+    const mx::CallExpr &, const mx::FunctionDecl &, const mx::ParmVarDecl &,
+    const mx::Stmt &, unsigned, const UsePath &prev, SeenEntityMap &seen) {
+  UserDAG *dag = AddPathToDAG(prev, seen);
+  dag->is_alarming = true;
+  return true;
+}
+
+static bool TaintLibraryReturnValue(const mx::CallExpr &call,
+                                    const mx::FunctionDecl &called_func,
+                                    const mx::ParmVarDecl &param,
+                                    const mx::Stmt &tainted_arg,
+                                    unsigned param_index,
+                                    const UsePath &prev, SeenEntityMap &seen) {
+  TaintTrackExpr(call, prev, seen);
+  return true;
+}
+
+
+static bool Ignore(const mx::CallExpr &, const mx::FunctionDecl &,
+                   const mx::ParmVarDecl &, const mx::Stmt &, unsigned ,
+                   const UsePath &, SeenEntityMap &) {
+  return true;
+}
+
+static const LibraryModel kLibraryModels[] = {
+    {"memcpy", 0u, TaintLibraryReturnValue},
+    {"memcpy", 0u, AlarmOnLibraryArgument},
+    {"memcpy", 1u, AlarmOnLibraryArgument},
+    {"memcpy", 2u, AlarmOnLibraryArgument},
+
+    {"strchr", 0u, TaintLibraryReturnValue},
+    {"strstr", 0u, TaintLibraryReturnValue},
+
+    {"strlen", 0u, AlarmOnLibraryArgument},
+
+    {"strcpy", 0u, TaintLibraryReturnValue},
+    {"strcpy", 0u, AlarmOnLibraryArgument},
+    {"strcpy", 1u, AlarmOnLibraryArgument},
+
+    {"__builtin___strcpy_chk", 0u, TaintLibraryReturnValue},
+    {"__builtin___strcpy_chk", 0u, AlarmOnLibraryArgument},
+    {"__builtin___strcpy_chk", 1u, AlarmOnLibraryArgument},
+
+    {"memmove", 0u, TaintLibraryReturnValue},
+    {"memmove", 0u, AlarmOnLibraryArgument},
+    {"memmove", 1u, AlarmOnLibraryArgument},
+    {"memmove", 2u, AlarmOnLibraryArgument},
+
+    {"__builtin___memmove_chk", 0u, TaintLibraryReturnValue},
+    {"__builtin___memmove_chk", 0u, AlarmOnLibraryArgument},
+    {"__builtin___memmove_chk", 1u, AlarmOnLibraryArgument},
+    {"__builtin___memmove_chk", 2u, AlarmOnLibraryArgument},
+
+    {"__builtin_object_size", 0u, Ignore},
+
+    {"malloc", 0u, AlarmOnLibraryArgument},
+    {"calloc", 1u, AlarmOnLibraryArgument},
+    {"__builtin_bswap16", 0u, TaintLibraryReturnValue},
+    {"__builtin_bswap32", 0u, TaintLibraryReturnValue},
+    {"__builtin_bswap64", 0u, TaintLibraryReturnValue},
+    {"ntoh", 0u, TaintLibraryReturnValue},
+    {"hton", 0u, TaintLibraryReturnValue},
+};
+
+static void ModelLibraryFunction(const mx::CallExpr &call,
+                                 const mx::FunctionDecl &called_func,
+                                 const mx::ParmVarDecl &param,
+                                 const mx::Stmt &tainted_arg,
+                                 unsigned param_index,
+                                 const UsePath &prev, SeenEntityMap &seen) {
+  std::string_view func_name = called_func.name();
+  for (const LibraryModel &model : kLibraryModels) {
+    if (model.arg_index == param_index && model.func_name == func_name &&
+        model.propagate_taint(call, called_func, param, tainted_arg,
+                              param_index, prev, seen)) {
+      return;
+    }
+  }
+
+  std::cerr
+      << ESC(ATTR_BRIGHT) "Tainted argument escapes into library function "
+      << called_func.name() << " ("
+      << called_func.id() << ") at "
+      << call.id() << ":" ESC(ATTR_RESET) "\n";
+  ReportTaintedChild(call, tainted_arg);
+  std::cerr << "\n\n";
+}
+
 // If `taint_source` is an argument to `call`, then try to taint the parameter
 // of the function.
 static void TaintTrackCallArg(const mx::CallExpr &call,
@@ -346,21 +440,11 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
     return;
   }
 
-  // Can't see into the definition of the callee, so we can't propagate taints
-  // to that argument.
-  std::optional<mx::Decl> def = called_func->definition();
-  if (!def) {
-    std::cerr
-        << ESC(ATTR_BRIGHT) "Tainted argument escapes into library function "
-        << called_func->name() << " ("
-        << called_func->id() << ") at "
-        << call.id() << ":" ESC(ATTR_RESET) "\n";
-    ReportTaintedChild(call, taint_source);
-    std::cerr << "\n\n";
-    return;
-  }
+  std::vector<mx::ParmVarDecl> params = called_func->parameters();
 
+  // Go try to match the argument to a parameter.
   auto arg_num = 0u;
+  auto matched = false;
   for (mx::Expr arg : call.arguments()) {
     if (arg.id() != taint_source.id()) {
       ++arg_num;
@@ -368,34 +452,48 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
     }
 
     // TODO(pag): Taint `va_arg` macro use when variadic arguments are used.
-    std::optional<mx::FunctionDecl> func_def = mx::FunctionDecl::from(def);
-    std::vector<mx::ParmVarDecl> params = func_def->parameters();
     if (arg_num >= params.size()) {
       break;
     }
 
     // Found the parameter associated with this call argument.
-    TaintTrackVarOrVarLike(params[arg_num], entry, seen);
+    matched = true;
+    break;
+  }
+
+  // Didn't match the argument to a parameter.
+  if (!matched) {
+    std::cerr
+        << ESC(ATTR_BRIGHT) "Tainted argument cannot be matched with "
+           "function parameter at "
+        << call.id() << "; function " << called_func->name() << " ("
+        << called_func->id() << ") ";
+
+    if (called_func->is_variadic()) {
+      std::cerr << "is variadic";
+    } else {
+      std::cerr
+          << ESC(ATTR_UNDERLINE) "isn't variadic"
+             ESC(ATTR_RESET) ESC(ATTR_BRIGHT);
+    }
+
+    std::cerr << ":" ESC(ATTR_RESET) "\n";
+    ReportTaintedChild(call, taint_source);
+    std::cerr << "\n\n";
     return;
   }
 
-  std::cerr
-      << ESC(ATTR_BRIGHT) "Tainted argument cannot be matched with "
-         "function parameter at "
-      << call.id() << "; function " << called_func->name() << " ("
-      << called_func->id() << ") ";
+  // Can't see into the definition of the callee, so we can't propagate taints
+  // to that argument.
+  std::optional<mx::Decl> def = called_func->definition();
 
-  if (called_func->is_variadic()) {
-    std::cerr << "is variadic";
+  if (std::optional<mx::FunctionDecl> func_def = mx::FunctionDecl::from(def)) {
+    TaintTrackVarOrVarLike(func_def->parameters()[arg_num], entry, seen);
+
   } else {
-    std::cerr
-        << ESC(ATTR_UNDERLINE) "isn't variadic"
-           ESC(ATTR_RESET) ESC(ATTR_BRIGHT);
+    ModelLibraryFunction(call, called_func.value(), params[arg_num],
+                         taint_source, arg_num, entry, seen);
   }
-
-  std::cerr << ":" ESC(ATTR_RESET) "\n";
-  ReportTaintedChild(call, taint_source);
-  std::cerr << "\n\n";
 }
 
 // If we find `return taint_source`, then taint the function.
@@ -409,7 +507,7 @@ static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
 
 // If `taint_source` is a tainted expression, then try to propagate the
 // taints to where the expression is used.
-static void TaintTrackExpr(const mx::Expr &taint_source,
+void TaintTrackExpr(const mx::Expr &taint_source,
                            const UsePath &prev, SeenEntityMap &seen) {
   const UsePath entry{&prev, taint_source.id()};
   if (AlreadySeen(entry, seen)) {
@@ -657,11 +755,16 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     if (code == EXIT_FAILURE) {
-      std::cout << "digraph {\n";
+      std::cout
+          << "digraph {\n"
+          << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
       code = EXIT_SUCCESS;
     }
 
     auto [kind, color] = KindAndColor(id);
+    if (entry->is_alarming) {
+      color = "red";
+    }
     std::cout
         << "e" << id
         << " [label=<<TABLE border=\"1\" cellpadding=\"1\" cellspacing=\"0\" bgcolor=\""
