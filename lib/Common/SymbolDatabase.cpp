@@ -64,14 +64,14 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
   for (auto i = 0u; i < kNumCategories; ++i) {
     std::stringstream entities_symbols_table;
     entities_symbols_table
-        << "create table if not exists entities_symbols_"
-        << i << " (symbol TEXT)";
+        << "create table if not exists 'mx::entities_symbols_"
+        << i << "' (symbol TEXT)";
     db.Execute(entities_symbols_table.str());
 
     std::stringstream insert_query;
     insert_query
-        << "insert or ignore into entities_symbols_"
-        << i << " (rowid, symbol) values (?1, ?2)";
+        << "insert or ignore into 'mx::entities_symbols_"
+        << i << "' (rowid, symbol) values (?1, ?2)";
 
     insert_symbol_stmt[i] = db.Prepare(insert_query.str());
   }
@@ -84,8 +84,8 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
     for (auto i = 0u; i < kNumCategories; ++i) {
       std::stringstream insert_query;
       insert_query
-          << "insert or ignore into entities_symbols_"
-          << i << " (rowid, symbol) values (?1, ?2)";
+          << "insert or ignore into 'mx::entities_symbols_"
+          << i << "' (rowid, symbol) values (?1, ?2)";
 
       local_insert_symbol_stmt[i] = local_db.Prepare(insert_query.str());
     }
@@ -212,7 +212,7 @@ std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
   std::stringstream select_query;
   select_query
       << "select rowid, symbol "
-      << "from entities_symbols_" << table_id << " "
+      << "from 'mx::entities_symbols_" << table_id << "' "
       << "where symbol like '%' || ?1 || '%'";
 
   // select_query

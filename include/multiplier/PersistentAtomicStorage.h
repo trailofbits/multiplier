@@ -21,11 +21,11 @@ class PersistentAtomicStorage {
 
  public:
   PersistentAtomicStorage(sqlite::Connection& db) : db(db) {
-    db.Execute("CREATE TABLE IF NOT EXISTS atomic_storage(key INTEGER PRIMARY KEY, value INTEGER)");
-    load_stmt = db.Prepare("SELECT value FROM atomic_storage WHERE key = ?1");
-    store_stmt = db.Prepare("INSERT OR REPLACE INTO atomic_storage(key, value) VALUES (?1, ?2)");
-    fetch_add_stmt = db.Prepare("INSERT INTO atomic_storage(key, value) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET value=(value + ?2) RETURNING (value - ?2)");
-    store_if_empty_stmt = db.Prepare("INSERT OR IGNORE INTO atomic_storage(key, value) VALUES (?1, ?2)");
+    db.Execute("CREATE TABLE IF NOT EXISTS 'mx::atomic_storage'(key INTEGER PRIMARY KEY, value INTEGER)");
+    load_stmt = db.Prepare("SELECT value FROM 'mx::atomic_storage' WHERE key = ?1");
+    store_stmt = db.Prepare("INSERT OR REPLACE INTO 'mx::atomic_storage'(key, value) VALUES (?1, ?2)");
+    fetch_add_stmt = db.Prepare("INSERT INTO 'mx::atomic_storage'(key, value) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET value=(value + ?2) RETURNING (value - ?2)");
+    store_if_empty_stmt = db.Prepare("INSERT OR IGNORE INTO 'mx::atomic_storage'(key, value) VALUES (?1, ?2)");
   }
 
   T load() {

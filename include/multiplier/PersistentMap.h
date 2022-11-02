@@ -19,21 +19,21 @@
 
 namespace mx {
 static constexpr const char* table_names[] = {
-  "MetaNameToId",
-  "FileIdToPath",
-  "FileIdToHash",
-  "FileIdToSerializedFile",
-  "FileIdToFragmentId",
-  "FileIdAndLineNumberToFragmentId",
-  "FileHashToFileId",
-  "FragmentHashToFragmentId",
-  "FragmentIdToSerializedFragment",
-  "FragmentIdToVersionNumber",
-  "EntityIdRedecls",
-  "EntityIdToMangledName",
-  "MangledNameToEntityId",
-  "EntityIdUseToFragmentId",
-  "EntityIdReference",
+  "'mx::MetaNameToId'",
+  "'mx::FileIdToPath'",
+  "'mx::FileIdToHash'",
+  "'mx::FileIdToSerializedFile'",
+  "'mx::FileIdToFragmentId'",
+  "'mx::FileIdAndLineNumberToFragmentId'",
+  "'mx::FileHashToFileId'",
+  "'mx::FragmentHashToFragmentId'",
+  "'mx::FragmentIdToSerializedFragment'",
+  "'mx::FragmentIdToVersionNumber'",
+  "'mx::EntityIdRedecls'",
+  "'mx::EntityIdToMangledName'",
+  "'mx::MangledNameToEntityId'",
+  "'mx::EntityIdUseToFragmentId'",
+  "'mx::EntityIdReference'",
 };
 
 template <uint8_t kId, typename... Keys>
