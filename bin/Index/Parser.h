@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string_view>
+#include <unordered_map>
 
 namespace llvm {
 namespace object {
@@ -26,6 +27,8 @@ class Module;
 
 namespace indexer {
 
+using EnvVariableMap = std::unordered_map<std::string, std::string>;
+
 class Importer;
 
 class Parser {
@@ -38,7 +41,7 @@ class Parser {
         importer(importer_) {}
 
   // Parse a memory buffer as a binary/object of some form.
-  bool Parse(const llvm::MemoryBuffer &buffer);
+  bool Parse(const llvm::MemoryBuffer &buffer, const EnvVariableMap &envp);
 
  private:
   // Parse a binary.
@@ -73,7 +76,8 @@ class Parser {
 
   // Parse a `compile_commands.json`-type file.
   bool ParseCompileCommandsJSON(std::string_view file_name,
-                                llvm::json::Value &json);
+                                llvm::json::Value &json,
+                                const EnvVariableMap &envp);
 };
 
 }  // namespace indexer
