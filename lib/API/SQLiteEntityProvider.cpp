@@ -23,7 +23,9 @@ struct Context {
   sqlite::Connection db;
   IndexStorage storage;
 
-  Context(std::filesystem::path path) : db(path, /*readonly=*/true), storage(db) {}
+  Context(std::filesystem::path path)
+      : db(path, /*readonly=*/true),
+        storage(db) {}
 };
 
 class SQLiteEntityProvider::Impl {
@@ -32,9 +34,10 @@ class SQLiteEntityProvider::Impl {
   std::mutex mtx;
   std::unordered_map<std::thread::id, Context> contexts;
 
-  Impl(std::filesystem::path path) : db_path(path) {}
+  Impl(std::filesystem::path path)
+      : db_path(path) {}
 
-  IndexStorage& GetStorage() {
+  IndexStorage &GetStorage(void) {
     std::scoped_lock<std::mutex> lock(mtx);
     auto cur_id = std::this_thread::get_id();
     if(contexts.find(cur_id) == contexts.end()) {
@@ -46,9 +49,10 @@ class SQLiteEntityProvider::Impl {
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
   : d(std::make_unique<Impl>(path)) {}
-SQLiteEntityProvider::~SQLiteEntityProvider() noexcept {}
 
-void SQLiteEntityProvider::ClearCache() {}
+SQLiteEntityProvider::~SQLiteEntityProvider(void) noexcept {}
+
+void SQLiteEntityProvider::ClearCache(void) {}
 
 unsigned SQLiteEntityProvider::VersionNumber(void) {
   return d->GetStorage().version_number;
