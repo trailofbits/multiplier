@@ -30,13 +30,13 @@ class Importer {
  public:
   ~Importer(void);
   explicit Importer(std::filesystem::path cwd_,
-    pasta::FileManager& fm,
+    pasta::FileManager &fm,
     std::shared_ptr<IndexingContext> context);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
 
-  void Import(mx::Executor& executor);
+  void Import(mx::Executor &executor);
 };
 
 }  // namespace indexer
