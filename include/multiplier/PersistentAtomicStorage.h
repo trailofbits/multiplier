@@ -17,10 +17,14 @@ template<size_t key, typename T>
 class PersistentAtomicStorage {
  private:
   sqlite::Connection &db;
-  std::shared_ptr<sqlite::Statement> load_stmt, store_stmt, fetch_add_stmt, store_if_empty_stmt;
+  std::shared_ptr<sqlite::Statement> load_stmt;
+  std::shared_ptr<sqlite::Statement> store_stmt;
+  std::shared_ptr<sqlite::Statement> fetch_add_stmt;
+  std::shared_ptr<sqlite::Statement> store_if_empty_stmt;
 
  public:
-  PersistentAtomicStorage(sqlite::Connection& db) : db(db) {
+  PersistentAtomicStorage(sqlite::Connection &db)
+      : db(db) {
     db.Execute("CREATE TABLE IF NOT EXISTS 'mx::atomic_storage'(key INTEGER PRIMARY KEY, value INTEGER)");
     load_stmt = db.Prepare("SELECT value FROM 'mx::atomic_storage' WHERE key = ?1");
     store_stmt = db.Prepare("INSERT OR REPLACE INTO 'mx::atomic_storage'(key, value) VALUES (?1, ?2)");
@@ -28,7 +32,7 @@ class PersistentAtomicStorage {
     store_if_empty_stmt = db.Prepare("INSERT OR IGNORE INTO 'mx::atomic_storage'(key, value) VALUES (?1, ?2)");
   }
 
-  T load() {
+  T load(void) {
     load_stmt->BindValues(std::uint64_t{key});
     if(load_stmt->ExecuteStep()) {
         auto res = load_stmt->GetResult();
@@ -40,17 +44,17 @@ class PersistentAtomicStorage {
     return {};
   }
 
-  void store(const T& value) {
+  void store(const T &value) {
     store_stmt->BindValues(std::uint64_t{key}, value);
     store_stmt->Execute();
   }
 
-  void store_if_empty(const T& value) {
+  void store_if_empty(const T &value) {
     store_if_empty_stmt->BindValues(std::uint64_t{key}, value);
     store_if_empty_stmt->Execute();
   }
 
-  T fetch_add(const T& value) {
+  T fetch_add(const T &value) {
     fetch_add_stmt->BindValues(std::uint64_t{key}, value);
     fetch_add_stmt->ExecuteStep();
     auto res = fetch_add_stmt->GetResult();
@@ -60,11 +64,11 @@ class PersistentAtomicStorage {
     return new_value;
   }
 
-  operator T() {
+  operator T(void) {
     return load();
   }
 
-  PersistentAtomicStorage& operator=(const T& value) {
+  PersistentAtomicStorage &operator=(const T &value) {
     store(value);
     return *this;
   }
@@ -73,4 +77,4 @@ class PersistentAtomicStorage {
 template<size_t key, typename T>
 using atomic = PersistentAtomicStorage<key, T>;
 
-}
+}  // namespace mx
