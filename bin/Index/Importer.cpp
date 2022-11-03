@@ -81,7 +81,8 @@ class BuildCommandAction final : public mx::Action {
  public:
   virtual ~BuildCommandAction(void) = default;
 
-  inline BuildCommandAction(pasta::FileManager &fm_, Command &command_, std::shared_ptr<IndexingContext> ctx)
+  inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
+                            std::shared_ptr<IndexingContext> ctx)
       : fm(fm_),
         command(command_),
         ctx(ctx) {}
@@ -99,7 +100,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   }
   new_args.emplace_back("-Wno-missing-sysroot");
   new_args.emplace_back("-Wno-unknown-warning-option");
-  new_args.emplace_back("-E");
   new_args.emplace_back("-P");
   new_args.emplace_back("-v");
   new_args.emplace_back("-dD");
@@ -121,7 +121,9 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   new_args.emplace_back(command.working_dir + "/xyz");
   auto ret2 = mx::Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
-  if (!ret2.Succeeded()) {
+
+  // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
+  if (!ret2.Succeeded() && output_no_sysroot.empty()) {
     return ret2.TakeError();
   }
 
@@ -138,8 +140,11 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
     return;
   }
 
+  // The build command action adds these jobs to the indexing executor, which
+  // is different than `exe`, because `exe` operates (and waits), for things
+  // to finish with the current working directory changed.
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
-    exe.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
+    ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
 }
 
@@ -282,8 +287,6 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
   // E.g. from CMake, Blight.
   if (auto commands_str = o.getString("command")) {
-    DLOG(INFO) << "JSON object looks like it's from CMake/Blight";
-
     auto args_str = commands_str->str();
     auto &command = commands.emplace_back(args_str);
     if (command.vec.Size()) {
@@ -313,7 +316,6 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   // E.g. from Bear (Build ear).
   } else if (auto arguments_list = o.getArray("arguments");
              arguments_list && !arguments_list->empty()) {
-    DLOG(INFO) << "JSON object looks like it's from Bear";
 
     auto lang = pasta::TargetLanguage::kC;
     std::stringstream ss;
@@ -374,6 +376,7 @@ static void ForEachInterval(Iter begin, Iter end,
 }
 
 void Importer::Import(mx::Executor &exe) {
+  mx::Executor per_path_exe;
   for (auto &[cwd, commands] : d->commands) {
 
     // Change the current working directory to match that of the commands.
@@ -387,14 +390,25 @@ void Importer::Import(mx::Executor &exe) {
       continue;
     }
 
-    typedef decltype(commands.begin()) iter_t;
-    ForEachInterval(commands.begin(), commands.end(),
-                    kCommandsBatchSize,
-                    [&](iter_t from, iter_t to) {
-      for (iter_t &it = from; it != to; it++) {
-        exe.EmplaceAction<BuildCommandAction>(d->fm, *it, d->ctx);
-      }
-    });
+    for (const Command &cmd : commands) {
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
+    }
+
+    per_path_exe.Start();
+    per_path_exe.Wait();
+
+//    typedef decltype(commands.begin()) iter_t;
+//    ForEachInterval(commands.begin(), commands.end(),
+//                    kCommandsBatchSize,
+//                    [&](iter_t from, iter_t to) {
+//
+//      for (iter_t &it = from; it != to; it++) {
+//        per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, *it, d->ctx);
+//      }
+//
+//      per_path_exe.Start();
+//      per_path_exe.Wait();
+//    });
   }
 }
 

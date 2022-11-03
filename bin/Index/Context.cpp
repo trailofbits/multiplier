@@ -47,26 +47,10 @@ void ServerContext::Flush(void) {
   storage.database.Flush();
 }
 
-void IndexingCounter::ResetAll(void) {
-  for(auto id = 0u; id < kStatSourceIRFragment + 1u; id++) {
-    counter[id].store(mx::kInvalidEntityId);
-  }
-}
-
-void IndexingCounter::PrintAll(void) {
-  const char *id_name[6] = {
-      "StatCompileCommand", "StatCompileJob", "StatAST",
-      "StatCodeFragment", "StatUniqueCodeFragment",
-      "StatSourceIRFragment"
-  };
-  for(auto id = 0u; id < kStatSourceIRFragment + 1u; id++) {
-    std::cerr << id_name[id] << " : " <<  counter[id].load() << "\n";
-  }
-}
-
 IndexingContext::IndexingContext(std::filesystem::path db_path,
                                  const mx::Executor &exe_)
     : num_workers(exe_.NumWorkers()),
+      executor(exe_),
       local_next_file_id(num_workers),
       local_next_small_fragment_id(num_workers),
       local_next_big_fragment_id(num_workers) {

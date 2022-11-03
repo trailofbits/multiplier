@@ -376,7 +376,6 @@ void IndexCompileJobAction::MaybePersistFile(
 void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   std::optional<mx::ProgressBarWork> parsing_progress_tracker(
       context->ast_progress.get());
-  IndexingCounterRes cj_counter(context->stat, kStatCompileJob);
 
   auto main_file_path =
       job.SourceFile().Path().lexically_normal().generic_string();
@@ -389,7 +388,6 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
     return;
   }
 
-  IndexingCounterRes ast_counter(context->stat, kStatAST);
   pasta::AST ast = maybe_ast.TakeValue();
   parsing_progress_tracker.reset();
 
@@ -541,7 +539,6 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
 
     auto [decls_for_group, begin_index, end_index] = std::move(*it);
 
-    IndexingCounterRes chunk_counter(context->stat, kStatCodeFragment);
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateFragmentId(

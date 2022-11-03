@@ -34,15 +34,6 @@ enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
-enum CounterType : unsigned {
-  kStatCompileCommand = 0u,
-  kStatCompileJob,
-  kStatAST,
-  kStatCodeFragment,
-  kStatUniqueCodeFragment,
-  kStatSourceIRFragment
-};
-
 class IndexingContext;
 class CodeGenerator;
 
@@ -68,54 +59,11 @@ class ServerContext {
   explicit ServerContext(std::filesystem::path db_path);
 };
 
-// Indexing Context counter
-class IndexingCounter {
- public:
-  virtual ~IndexingCounter() {
-    PrintAll();
-  }
-
-  explicit IndexingCounter(void) {
-    ResetAll();
-  }
-
-  uint64_t Increament(CounterType id) {
-    if (id < kStatSourceIRFragment + 1) {
-      return counter[id].fetch_add(mx::kMinEntityIdIncrement);
-    }
-    return 0ull;
-  }
-
-  uint64_t Decrement(CounterType id) {
-    if (id < kStatSourceIRFragment + 1) {
-      return counter[id].fetch_sub(mx::kMinEntityIdIncrement);
-    }
-    return 0ull;
-  }
-
-  private :
-
-  void ResetAll(void);
-  void PrintAll(void);
-
-  std::atomic<uint64_t> counter[kStatSourceIRFragment + 1];
-};
-
-class IndexingCounterRes {
- public:
-  inline explicit IndexingCounterRes(
-      IndexingCounter &stat_, CounterType id) {
-    stat_.Increament(id);
-  }
-};
-
 // State that needs to live only as long as there are active indexing jobs
 // underway.
 class IndexingContext {
  public:
   std::deque<ServerContext> server_context;
-
-  IndexingCounter stat;
 
   // Tracks progress in parsing compile commands and turning them into compile
   // jobs.
@@ -137,6 +85,8 @@ class IndexingContext {
   std::unique_ptr<mx::ProgressBar> file_progress;
 
   const unsigned num_workers;
+
+  mx::Executor executor;
 
   // Worker-local next counters for IDs.
   std::vector<NextId<mx::RawEntityId>> local_next_file_id;
