@@ -80,7 +80,7 @@ class BuildCommandAction final : public mx::Action {
   InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
-                       mx::Executor& exe);
+                       mx::Executor &exe);
 
  public:
   virtual ~BuildCommandAction(void) = default;
@@ -129,7 +129,7 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc,
-                                         mx::Executor& exe) {
+                                         mx::Executor &exe) {
   auto maybe_jobs = cc.CreateJobsForCommand(cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
@@ -201,16 +201,16 @@ struct Importer::PrivateData {
   std::unordered_map<std::string, std::vector<Command>> commands;
 
   std::filesystem::path cwd;
-  pasta::FileManager& fm;
+  pasta::FileManager &fm;
   std::shared_ptr<IndexingContext> ctx;
 
-  inline PrivateData(std::filesystem::path cwd_, pasta::FileManager& fm, std::shared_ptr<IndexingContext> ctx)
+  inline PrivateData(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<IndexingContext> ctx)
       : cwd(std::move(cwd_)), fm(fm), ctx(ctx) {}
 };
 
 Importer::~Importer(void) {}
 
-Importer::Importer(std::filesystem::path cwd_, pasta::FileManager& fm, std::shared_ptr<IndexingContext> ctx)
+Importer::Importer(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<IndexingContext> ctx)
     : d(std::make_unique<Importer::PrivateData>(std::move(cwd_), fm, ctx)) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
@@ -364,7 +364,7 @@ static void ForEachInterval(Iter begin, Iter end,
   }
 }
 
-void Importer::Import(mx::Executor& exe) {
+void Importer::Import(mx::Executor &exe) {
   for (auto &[cwd, commands] : d->commands) {
 
     // Change the current working directory to match that of the commands.
