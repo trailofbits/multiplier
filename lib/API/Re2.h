@@ -60,7 +60,7 @@ class RegexQueryResultImpl final {
 
   RegexQueryResultImpl(
       const RegexQuery &re_, EntityProvider::Ptr ep_,
-      const std::vector<RawEntityId>& fragment_ids);
+      const std::vector<RawEntityId> &fragment_ids);
 
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImpl::Ptr frag_);
 
