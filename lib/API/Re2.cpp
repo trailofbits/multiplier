@@ -34,7 +34,8 @@ RegexQueryResultImpl::RegexQueryResultImpl(
 }
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_, const std::vector<RawEntityId>& fragment_ids)
+    const RegexQuery &query_, EntityProvider::Ptr ep_,
+    const std::vector<RawEntityId> &fragment_ids)
     : query(query_),
       fragment_ids(fragment_ids),
       ep(std::move(ep_)) {}
