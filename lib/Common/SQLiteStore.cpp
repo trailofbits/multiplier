@@ -109,14 +109,14 @@ sqlite3_stmt *Statement::prepareStatement(void){
   return prepared_stmt.get();
 }
 
-void Statement::Close() noexcept {
+void Statement::Close(void) noexcept {
   if (prepared_stmt) {
     sqlite3_finalize(prepared_stmt.get());
     prepared_stmt.reset();
   }
 }
 
-void Statement::Reset() {
+void Statement::Reset(void) {
   sqlite3_reset(prepared_stmt.get());
 }
 
@@ -153,12 +153,11 @@ QueryResult Statement::GetResult(void) {
   return QueryResult(shared_from_this());
 }
 
-
 int Statement::tryExecuteStep(void) {
   return sqlite3_step(prepared_stmt.get());
 }
 
-void Statement::reset() {
+void Statement::reset(void) {
   sqlite3_clear_bindings(prepared_stmt.get());
   sqlite3_reset(prepared_stmt.get());
 }
@@ -245,7 +244,7 @@ Connection::Connection(const std::filesystem::path &db_name,
 
 };
 
-void Connection::Close() noexcept {
+void Connection::Close(void) noexcept {
   while (stmts.empty()) {
     auto stmt = stmts.back();
     stmt->Close();
@@ -321,12 +320,14 @@ void Connection::Begin(bool exclusive) {
   }
 }
 
-Transaction::Transaction(Connection &db) : db(db) {}
-void Transaction::lock() {
+Transaction::Transaction(Connection &db)
+    : db(db) {}
+
+void Transaction::lock(void) {
   db.Begin(true);
 }
 
-void Transaction::unlock() {
+void Transaction::unlock(void) {
   db.Commit();
 }
 
