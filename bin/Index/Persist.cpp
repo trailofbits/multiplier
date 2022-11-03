@@ -537,6 +537,19 @@ static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
   return std::nullopt;
 }
 
+// Return the file containing this fragment.
+static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
+                                               const PendingFragment &frag) {
+  for (auto i = frag.begin_index; i <= frag.end_index; ++i) {
+    auto file_tok = tokens[i].FileLocation();
+    if (file_tok) {
+      return pasta::File::Containing(file_tok.value());
+    }
+  }
+
+  return std::nullopt;
+}
+
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
 // deduplication and indexing. It roughly corresponds to a sequence of one-or-
 // more syntactically overlapping "top-level declarations." For us, a top-level
