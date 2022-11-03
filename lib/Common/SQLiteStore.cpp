@@ -13,7 +13,7 @@
 
 namespace sqlite {
 
-Error::Error(const std::string& msg, sqlite3* db)
+Error::Error(const std::string &msg, sqlite3 *db)
   : runtime_error("[SQLite Error] " + msg + ": " + std::string(sqlite3_errmsg(db))) {};
 
 QueryResult::QueryResult(Connection &conn, const std::string &query)
@@ -44,7 +44,7 @@ bool QueryResult::Columns(std::vector<std::string> &row) {
     auto col_size = sqlite3_column_bytes(prepared_stmt, i);
 
     if (col_val) {
-      ret.push_back(std::string(reinterpret_cast<const char*>(col_val), col_size));
+      ret.push_back(std::string(reinterpret_cast<const char *>(col_val), col_size));
     } else {
       ret.push_back("");
     }
@@ -66,14 +66,14 @@ int64_t QueryResult::getInt64(int32_t idx) {
 
 std::string QueryResult::getText(int32_t idx) {
   auto prepared_stmt = stmt->prepareStatement();
-  auto ptr = reinterpret_cast<const char*>(sqlite3_column_blob(prepared_stmt, idx));
+  auto ptr = reinterpret_cast<const char *>(sqlite3_column_blob(prepared_stmt, idx));
   auto len = sqlite3_column_bytes(prepared_stmt, idx);
   return std::string(ptr, len);
 }
 
 std::string_view QueryResult::getBlob(int32_t idx) {
   auto prepared_stmt = stmt->prepareStatement();
-  auto ptr = reinterpret_cast<const char*>(sqlite3_column_blob(prepared_stmt, idx));
+  auto ptr = reinterpret_cast<const char *>(sqlite3_column_blob(prepared_stmt, idx));
   auto len = sqlite3_column_bytes(prepared_stmt, idx);
   return std::string_view(ptr, len);
 }
@@ -84,18 +84,18 @@ Statement::Statement(Connection &conn, const std::string &stmt)
   conn.stmts.emplace_back(this);
 
   auto getPrepareStatement = [this](void) -> std::shared_ptr<sqlite3_stmt> {
-    sqlite3_stmt* stmt;
+    sqlite3_stmt *stmt;
     char *tail;
     auto ret = sqlite3_prepare_v2(db.GetHandler(), query.c_str(),
                                   static_cast<int>(query.size()),
-                                  &stmt, const_cast<const char**>(&tail));
+                                  &stmt, const_cast<const char **>(&tail));
     if (SQLITE_OK != ret) {
       assert(0);
       throw Error("Failed to prepare statement");
     }
 
     return std::shared_ptr<sqlite3_stmt>(
-        stmt, [](sqlite3_stmt* stmt) { sqlite3_finalize(stmt); });
+        stmt, [](sqlite3_stmt *stmt) { sqlite3_finalize(stmt); });
   };
 
   prepared_stmt = getPrepareStatement();
@@ -188,7 +188,7 @@ void Statement::bind(const size_t i, const std::nullptr_t &value) {
   sqlite3_bind_null(prepared_stmt.get(), i + 1);
 }
 
-void Statement::bind(const size_t i, const char* &value) {
+void Statement::bind(const size_t i, const char *&value) {
   sqlite3_bind_text(prepared_stmt.get(), i + 1,
                     value, strlen(value), SQLITE_TRANSIENT);
 }
@@ -208,7 +208,7 @@ Connection::Connection(const std::filesystem::path &db_name,
                        const int busyTimeouts)
                       : dbFilename(db_name)
 {
-  sqlite3* db_handle;
+  sqlite3 *db_handle;
   int ro_flag = readonly
     ? SQLITE_OPEN_READONLY
     : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
@@ -287,7 +287,7 @@ void Connection::SetBusyTimeout(const int32_t timeout) {
   }
 }
 
-void Connection::Execute(const std::string& query) {
+void Connection::Execute(const std::string &query) {
   char *error_msg;
   if (sqlite3_exec(GetHandler(), query.c_str(),
                    nullptr, nullptr, &error_msg)) {
@@ -300,11 +300,11 @@ std::shared_ptr<Statement> Connection::Prepare(const std::string &query) {
   return std::move(stmt);
 }
 
-QueryResult Connection::ExecuteAndGet(const std::string& stmt) {
+QueryResult Connection::ExecuteAndGet(const std::string &stmt) {
   return QueryResult(*this, stmt);
 }
 
-void Connection::Deleter::operator()(sqlite3* db) {
+void Connection::Deleter::operator()(sqlite3 *db) {
   const int ret = sqlite3_close(db);
   assert(SQLITE_OK == ret);
 }
@@ -321,7 +321,7 @@ void Connection::Begin(bool exclusive) {
   }
 }
 
-Transaction::Transaction(Connection& db) : db(db) {}
+Transaction::Transaction(Connection &db) : db(db) {}
 void Transaction::lock() {
   db.Begin(true);
 }
