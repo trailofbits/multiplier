@@ -17,8 +17,7 @@
 #include <unordered_map>
 
 DECLARE_bool(help);
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?");
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_uint32(tab_size, 4, "Size of tabs in spaces");
@@ -67,7 +66,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT]\n"
+    << " [--db DATABASE]\n"
     << " --query QUERY_STRING";
 
   google::SetUsageMessage(ss.str());
@@ -91,9 +90,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index = mx::EntityProvider::in_memory_cache(
-      mx::EntityProvider::from_remote(
-          FLAGS_host, FLAGS_port));
+  mx::Index index = mx::EntityProvider::from_database(FLAGS_db);
 
   mx::FileLocationConfiguration config;
   if (FLAGS_tab_size) {

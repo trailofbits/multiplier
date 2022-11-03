@@ -20,25 +20,25 @@ namespace sqlite {
 class Connection;
 class Statement;
 }  // namespace sqlite
-namespace indexer {
+namespace mx {
 
-class DatabaseImpl;
+class SymbolDatabaseImpl;
 
 // Database defines the interface for inserting/reading the symbol entries
 // from sqlite database. It creates a database reader for querying the
 // symbol. The database writer gets instantiated during storing the entities.
-class Database {
+class SymbolDatabase {
  private:
-  std::shared_ptr<DatabaseImpl> d;
+  std::shared_ptr<SymbolDatabaseImpl> d;
 
  public:
-  Database(std::filesystem::path workspace_dir);
+  SymbolDatabase(sqlite::Connection& db);
 
-  ~Database(void);
+  ~SymbolDatabase(void);
 
   // non-copyable
-  Database(const Database &) = delete;
-  Database &operator=(const Database &) = delete;
+  SymbolDatabase(const SymbolDatabase &) = delete;
+  SymbolDatabase &operator=(const SymbolDatabase &) = delete;
 
   void StoreSymbolName(mx::RawEntityId entity_id, mx::DeclCategory category,
                        std::string data);

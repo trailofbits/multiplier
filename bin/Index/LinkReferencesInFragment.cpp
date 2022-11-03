@@ -86,7 +86,7 @@ static bool MayHaveRemoteRedeclarations(const pasta::Decl &decl) {
 }  // namespace
 
 void PendingFragment::LinkReferences(
-    IndexingContext &context, EntityMapper &em) {
+    mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em) {
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
     if (stmt.Kind() == pasta::StmtKind::kImplicitCastExpr) {
       continue;
@@ -95,7 +95,7 @@ void PendingFragment::LinkReferences(
       auto used_decl = std::move(ref_decl.value());
       if (MayHaveRemoteRedeclarations(used_decl)) {
         auto used_decl_id = em.EntityId(used_decl);
-        context.LinkReferenceInFragment(used_decl_id, fragment_id);
+        context.LinkReferenceInFragment(worker_id, used_decl_id, fragment_id);
       }
     }
   }

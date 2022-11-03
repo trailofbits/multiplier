@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Fragment.h"
+#include "multiplier/Types.h"
 
 #include <map>
 #include <multiplier/Weggli.h>
@@ -38,6 +39,9 @@ class WeggliQueryResultImpl final {
       capnp::Response<mx::rpc::Multiplier::WeggliQueryFragmentsResults>;
 
   ~WeggliQueryResultImpl(void) noexcept;
+
+  WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
+                        const std::vector<RawEntityId>& fragments);
 
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
                         Response response_);

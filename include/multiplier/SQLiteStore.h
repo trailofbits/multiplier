@@ -29,18 +29,19 @@ class Statement;
 
 class Error : public std::runtime_error {
  public:
-  Error(const std::string& msg) :runtime_error("[SQLite Error] " + msg) {};
+  Error(const std::string &msg) : runtime_error("[SQLite Error] " + msg) {}
+  Error(const std::string &msg, sqlite3 *db);
 };
 
 class QueryResult {
  public:
   ~QueryResult() = default;
 
-  std::vector<std::string> GetColumnNames();
+  std::vector<std::string> GetColumnNames(void);
 
-  uint32_t NumColumns();
+  uint32_t NumColumns(void);
 
-  bool Columns(std::vector<std::string>& row);
+  bool Columns(std::vector<std::string> &row);
 
   template <typename... Ts>
   void Columns(Ts &&...args) {
@@ -53,9 +54,10 @@ class QueryResult {
       using arg_t = std::decay_t<decltype(arg)>;
       if constexpr (std::is_integral_v<arg_t>) {
         arg = static_cast<arg_t>(getInt64(idx));
-      } else if (std::is_same_v<std::string, arg_t> ||
-          std::is_same_v<std::string_view, arg_t>) {
+      } else if (std::is_same_v<std::string, arg_t>) {
         arg = getText(idx);
+      } else if (std::is_same_v<std::string_view, arg_t>) {
+        arg = getBlob(idx);
       } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
         ;
       } else {
@@ -78,6 +80,7 @@ class QueryResult {
   int64_t getInt64(int32_t idx);
 
   std::string getText(int32_t idx);
+  std::string_view getBlob(int32_t idx);
 
   std::shared_ptr<Statement> stmt;
 };
@@ -89,8 +92,8 @@ class Statement : public std::enable_shared_from_this<Statement> {
   Statement(Connection &conn, const std::string &stmt);
 
   // non-copyable
-  Statement(const Statement&) = delete;
-  Statement& operator=(const Statement&) = delete;
+  Statement(const Statement &) = delete;
+  Statement &operator=(const Statement &) = delete;
 
   ~Statement();
 
@@ -104,6 +107,7 @@ class Statement : public std::enable_shared_from_this<Statement> {
       throw Error(msg);
     }
     size_t i = 0;
+    reset();
     bind_many(i, args...);
   }
 
@@ -114,6 +118,8 @@ class Statement : public std::enable_shared_from_this<Statement> {
   QueryResult GetResult(void);
 
   void Close() noexcept;
+
+  void Reset();
 
  private:
   friend class QueryResult;
@@ -133,17 +139,21 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   void bind(const size_t i, const std::nullptr_t &value);
 
-  void bind(const size_t i, const char* &value);
+  void bind(const size_t i, const char *&value);
 
   void bind(const size_t i, const std::string &value);
 
+  void bind(const size_t i, const std::string_view &value);
+
+  void reset();
+
   template<typename T>
-  void bind_many(size_t i, T& value) {
+  void bind_many(size_t i, T &value) {
     bind(i, value);
   }
 
   template<typename T, typename... Args>
-  void bind_many(size_t i, T& value, Args... args) {
+  void bind_many(size_t i, T &value, Args... args) {
     bind(i, value);
     i++;
     bind_many(i, args...);
@@ -161,19 +171,30 @@ class Statement : public std::enable_shared_from_this<Statement> {
   unsigned num_params;
 };
 
+class Transaction {
+ public:
+  Transaction(Connection &db);
+  void lock();
+  void unlock();
+
+ private:
+  Connection &db;
+};
+
 class Connection {
  public:
 
   // Uses sqlite3_open to open the database at the specified path
   Connection(const std::filesystem::path &filename,
+             bool readonly = false,
              const int busyTimeouts = 0);
 
   // non-copyable
   Connection(const Connection &) = delete;
-  Connection& operator=(const Connection &) = delete;
+  Connection &operator=(const Connection &) = delete;
 
   // Close the database connection and cleanup all cached statements
-  ~Connection() = default;
+  ~Connection(void) = default;
 
   // Execute statements without results
   void Execute(const std::string &query);
@@ -182,7 +203,7 @@ class Connection {
   std::shared_ptr<Statement> Prepare(const std::string &stmt);
 
   // Begin transactions to the database
-  void Begin(void);
+  void Begin(bool exclusive = false);
 
   // Commit transactions to the database
   void Commit(void);
@@ -209,7 +230,7 @@ class Connection {
   }
 
   // close database connection
-  void Close() noexcept;
+  void Close(void) noexcept;
 
   struct Deleter {
     void operator()(sqlite3 *db);

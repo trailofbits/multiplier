@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "Context.h"
-#include "Database.h"
 #include "Hash.h"
 #include "NameMangler.h"
 #include "PrintTokenGraph.h"
@@ -366,7 +365,7 @@ void IndexCompileJobAction::MaybePersistFile(
   auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
       worker_id, file_path, file_hash);
   if (is_new_file_id) {
-    PersistFile(*context, file_id, file_hash, file);
+    PersistFile(worker_id, *context, file_id, file_hash, file);
   }
 
   file_ids.emplace(file, file_id);
@@ -377,7 +376,6 @@ void IndexCompileJobAction::MaybePersistFile(
 void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   std::optional<mx::ProgressBarWork> parsing_progress_tracker(
       context->ast_progress.get());
-  IndexingCounterRes cj_counter(context->stat, kStatCompileJob);
 
   auto main_file_path =
       job.SourceFile().Path().lexically_normal().generic_string();
@@ -390,7 +388,6 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
     return;
   }
 
-  IndexingCounterRes ast_counter(context->stat, kStatAST);
   pasta::AST ast = maybe_ast.TakeValue();
   parsing_progress_tracker.reset();
 
@@ -542,7 +539,6 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
 
     auto [decls_for_group, begin_index, end_index] = std::move(*it);
 
-    IndexingCounterRes chunk_counter(context->stat, kStatCodeFragment);
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
     auto [code_id, is_new] = context->GetOrCreateFragmentId(
@@ -582,7 +578,7 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   NameMangler mangler(ast);
 
   for (PendingFragment &pending_fragment : pending_fragments) {
-    PersistFragment(*context, ast, mangler, entity_ids, file_ids, tok_range,
+    PersistFragment(worker_id, *context, ast, mangler, entity_ids, file_ids, tok_range,
                     std::move(pending_fragment));
   }
 }

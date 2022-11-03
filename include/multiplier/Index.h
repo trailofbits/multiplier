@@ -76,14 +76,10 @@ class EntityProvider {
 
   virtual ~EntityProvider(void) noexcept;
 
-  // Returns an entity provider that gets entities from a remote host.
-  static Ptr from_remote(std::string host, std::string port);
-
-  // Returns an entity provider that gets entities from a UNIX domain socket.
-  static Ptr from_socket(std::filesystem::path path);
-
   // Create an in-memory caching entity provider.
   static Ptr in_memory_cache(Ptr next, unsigned timeout_s=1u);
+
+  static Ptr from_database(std::filesystem::path path);
 
  private:
   friend class CachingEntityProvider;

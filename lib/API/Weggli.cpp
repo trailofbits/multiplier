@@ -9,10 +9,18 @@
 #include <cassert>
 
 #include "Fragment.h"
+#include "multiplier/Types.h"
 
 namespace mx {
 
 WeggliQueryResultImpl::~WeggliQueryResultImpl(void) noexcept {}
+
+WeggliQueryResultImpl::WeggliQueryResultImpl(
+    const WeggliQuery &query_, EntityProvider::Ptr ep_,
+    const std::vector<RawEntityId> &fragments)
+    : query(query_),
+      ep(std::move(ep_)),
+      fragments(fragments) {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(
     const WeggliQuery &query_, EntityProvider::Ptr ep_, Response response)

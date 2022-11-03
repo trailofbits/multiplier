@@ -6,17 +6,18 @@
 
 #include <filesystem>
 #include <memory>
+#include <multiplier/Executor.h>
+#include <pasta/Compile/Command.h>
 
-#include <capnp/ez-rpc.h>
 
-#include <multiplier/RPC.capnp.h>
+#include "Context.h"
 
 namespace llvm {
 namespace json {
 class Object;
 }  // namespace json
 }  // namespace llvm
-namespace importer {
+namespace indexer {
 
 class Importer {
  private:
@@ -28,12 +29,14 @@ class Importer {
 
  public:
   ~Importer(void);
-  explicit Importer(std::filesystem::path cwd_);
+  explicit Importer(std::filesystem::path cwd_,
+    pasta::FileManager &fm,
+    std::shared_ptr<IndexingContext> context);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o);
 
-  kj::Promise<void> Build(capnp::EzRpcClient &client, mx::rpc::Multiplier::Client &builder);
+  void Import(mx::Executor &executor);
 };
 
-}  // namespace importer
+}  // namespace indexer

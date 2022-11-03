@@ -18,8 +18,6 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <kj/array.h>
-#include <kj/async.h>
 #include <llvm/Support/Format.h>
 #include <llvm/Support/FormatVariadic.h>
 #include <llvm/Support/JSON.h>
@@ -39,11 +37,9 @@
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
 
-DECLARE_string(system_compiler);
-DECLARE_string(sysroot_dir);
-DECLARE_string(resource_dir);
+#include "IndexCompileJob.h"
 
-namespace importer {
+namespace indexer {
 namespace {
 
 static std::mutex gCompileJobListLock;
@@ -72,7 +68,7 @@ class BuildCommandAction final : public mx::Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
-  CompileJobList &jobs;
+  std::shared_ptr<IndexingContext> ctx;
 
   // If we are using something like CMake commands, then pull in the relevant
   // information by trying to execute the compiler directly.
@@ -80,16 +76,16 @@ class BuildCommandAction final : public mx::Action {
   InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
-                       CompileJobList &builder);
+                       mx::Executor &exe);
 
  public:
   virtual ~BuildCommandAction(void) = default;
 
-  inline BuildCommandAction(pasta::FileManager &fm_, Command &command_,
-                            CompileJobList &jobs_)
+  inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
+                            std::shared_ptr<IndexingContext> ctx)
       : fm(fm_),
         command(command_),
-        jobs(jobs_) {}
+        ctx(ctx) {}
 
   void Run(mx::Executor exe, mx::WorkerId) final;
 };
@@ -104,7 +100,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   }
   new_args.emplace_back("-Wno-missing-sysroot");
   new_args.emplace_back("-Wno-unknown-warning-option");
-  new_args.emplace_back("-E");
   new_args.emplace_back("-P");
   new_args.emplace_back("-v");
   new_args.emplace_back("-dD");
@@ -116,12 +111,19 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     return ret.TakeError();
   }
 
+  if (auto it = output_sysroot.find("error: "); it != std::string::npos) {
+    LOG(ERROR) << output_sysroot.substr(it + 7u);
+    return std::make_error_code(std::errc::bad_message);
+  }
+
   std::string output_no_sysroot;
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/xyz");
   auto ret2 = mx::Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
-  if (!ret2.Succeeded()) {
+
+  // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
+  if (!ret2.Succeeded() && output_no_sysroot.empty()) {
     return ret2.TakeError();
   }
 
@@ -130,7 +132,7 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc,
-                                         CompileJobList &jobs) {
+                                         mx::Executor &exe) {
   auto maybe_jobs = cc.CreateJobsForCommand(cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
@@ -138,9 +140,11 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
     return;
   }
 
+  // The build command action adds these jobs to the indexing executor, which
+  // is different than `exe`, because `exe` operates (and waits), for things
+  // to finish with the current working directory changed.
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
-    std::unique_lock<std::mutex> locker(gCompileJobListLock);
-    jobs.emplace_back(cc, job);
+    ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
 }
 
@@ -176,14 +180,14 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
     maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
     if (maybe_cc.Succeeded()) {
       RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue(),
-                      jobs);
+                      exe);
     } else {
       LOG(ERROR)
           << "Unable to create compiler: " << error;
     }
   } else {
     RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue(),
-                    jobs);
+                    exe);
   }
 }
 
@@ -203,15 +207,17 @@ struct Importer::PrivateData {
   std::unordered_map<std::string, std::vector<Command>> commands;
 
   std::filesystem::path cwd;
+  pasta::FileManager &fm;
+  std::shared_ptr<IndexingContext> ctx;
 
-  inline PrivateData(std::filesystem::path cwd_)
-      : cwd(std::move(cwd_)) {}
+  inline PrivateData(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<IndexingContext> ctx)
+      : cwd(std::move(cwd_)), fm(fm), ctx(ctx) {}
 };
 
 Importer::~Importer(void) {}
 
-Importer::Importer(std::filesystem::path cwd_)
-    : d(std::make_unique<Importer::PrivateData>(std::move(cwd_))) {}
+Importer::Importer(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<IndexingContext> ctx)
+    : d(std::make_unique<Importer::PrivateData>(std::move(cwd_), fm, ctx)) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 
@@ -264,11 +270,11 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   return true;
 }
 
-
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
   if (!cwd || !file) {
+    DLOG(WARNING) << "No 'file' and/or 'directory' in JSON object";
     return false;
   }
 
@@ -281,10 +287,11 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
   // E.g. from CMake, Blight.
   if (auto commands_str = o.getString("command")) {
-
     auto args_str = commands_str->str();
     auto &command = commands.emplace_back(args_str);
     if (command.vec.Size()) {
+      DLOG(INFO) << "Parsed command: " << command.vec.Join();
+
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
 
@@ -301,6 +308,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
       return true;
 
     } else {
+      DLOG(ERROR) << "Can't parse arguments from JSON object";
       commands.pop_back();
       return false;
     }
@@ -334,31 +342,22 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
     auto &command = commands.emplace_back(args_vec);
     if (command.vec.Size()) {
+      DLOG(INFO) << "Parsed command: " << command.vec.Join();
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
       command.lang = lang;
       return true;
 
     } else {
+      DLOG(ERROR) << "Can't parse arguments from JSON object";
       commands.pop_back();
       return false;
     }
 
   } else {
+    DLOG(ERROR) << "Can't locate compiler arguments in JSON object";
     return false;
   }
-}
-
-static mx::rpc::CompilerName FromPasta(pasta::CompilerName name) {
-  return static_cast<mx::rpc::CompilerName>(mx::FromPasta(name));
-}
-
-static mx::rpc::TargetLanguage FromPasta(pasta::TargetLanguage tl) {
-  return static_cast<mx::rpc::TargetLanguage>(mx::FromPasta(tl));
-}
-
-static mx::rpc::IncludePathLocation FromPasta(pasta::IncludePathLocation ipl) {
-  return static_cast<mx::rpc::IncludePathLocation>(mx::FromPasta(ipl));
 }
 
 template <typename Iter, typename C>
@@ -376,14 +375,9 @@ static void ForEachInterval(Iter begin, Iter end,
   }
 }
 
-kj::Promise<void> Importer::Build(capnp::EzRpcClient &client, mx::rpc::Multiplier::Client &builder) {
-  mx::Executor exe;
-  auto promises = kj::heapArrayBuilder<kj::Promise<void>>(d->commands.size());
-
+void Importer::Import(mx::Executor &exe) {
+  mx::Executor per_path_exe;
   for (auto &[cwd, commands] : d->commands) {
-
-    auto promises_array_size = (commands.size() + kCommandsBatchSize - 1u) / kCommandsBatchSize;
-    auto promises_commands = kj::heapArrayBuilder<kj::Promise<void>>(promises_array_size);
 
     // Change the current working directory to match that of the commands.
     // This is a process-wide operation.
@@ -396,103 +390,26 @@ kj::Promise<void> Importer::Build(capnp::EzRpcClient &client, mx::rpc::Multiplie
       continue;
     }
 
-    auto host_fs = pasta::FileSystem::CreateNative();
-    pasta::FileManager fm(host_fs);
+    for (const Command &cmd : commands) {
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
+    }
 
-    typedef decltype(commands.begin()) iter_t;
-    ForEachInterval(commands.begin(), commands.end(),
-                    kCommandsBatchSize,
-                    [&](iter_t from, iter_t to) {
-      CompileJobList jobs;
-      for (iter_t &it = from; it != to; it++) {
-        exe.EmplaceAction<BuildCommandAction>(fm, *it, jobs);
-      }
+    per_path_exe.Start();
+    per_path_exe.Wait();
 
-      exe.Start();
-      exe.Wait();
-      if (jobs.empty()) {
-        return;
-      }
-
-      auto request = builder.indexCompileCommandsRequest();
-      auto commands_builder = request.initCommands(
-          static_cast<unsigned>(jobs.size()));
-
-      // If we've got any messages, then send them out. The granularity is likely
-      // to be small because we don't expect many files to operate in the same
-      // working directory, though if they do, then at least we still have the
-      // benefit of the N-way split from the executor.
-      auto i = 0u;
-      for (const auto &[cc_, job_] : jobs) {
-        const pasta::Compiler &cc = cc_;
-        const pasta::CompileJob &job = job_;
-
-        mx::rpc::CompileCommand::Builder cb = commands_builder[i++];
-        cb.setSourcePath(
-            job.SourceFile().Path().lexically_normal().generic_string());
-        cb.setCompilerPath(
-            cc.ExecutablePath().lexically_normal().generic_string());
-        cb.setWorkingDirectory(
-            job.WorkingDirectory().lexically_normal().generic_string());
-        cb.setSystemRootDirectory(
-            job.SystemRootDirectory().lexically_normal().generic_string());
-        cb.setSystemRootIncludeDirectory(
-            job.SystemRootIncludeDirectory().lexically_normal().generic_string());
-        cb.setResourceDirectory(
-            job.ResourceDirectory().lexically_normal().generic_string());
-        cb.setInstallationDirectory(
-            cc.InstallationDirectory().lexically_normal().generic_string());
-
-        auto system_includes = cc.SystemIncludeDirectories();
-        auto user_includes = cc.UserIncludeDirectories();
-        auto frameworks = cc.FrameworkDirectories();
-
-        auto j = 0u;
-        auto paths = cb.initSystemIncludePaths(
-            static_cast<unsigned>(system_includes.size()));
-        for (const auto &ip : system_includes) {
-          mx::rpc::IncludePath::Builder ipb = paths[j++];
-          ipb.setDirectory(ip.Path().lexically_normal().generic_string());
-          ipb.setLocation(FromPasta(ip.Location()));
-        }
-
-        j = 0u;
-        paths = cb.initUserIncludePaths(
-            static_cast<unsigned>(user_includes.size()));
-        for (const auto &ip : user_includes) {
-          mx::rpc::IncludePath::Builder ipb = paths[j++];
-          ipb.setDirectory(ip.Path().lexically_normal().generic_string());
-          ipb.setLocation(FromPasta(ip.Location()));
-        }
-
-        j = 0u;
-        paths = cb.initFrameworkPaths(
-            static_cast<unsigned>(frameworks.size()));
-        for (const auto &ip : frameworks) {
-          mx::rpc::IncludePath::Builder ipb = paths[j++];
-          ipb.setDirectory(ip.Path().lexically_normal().generic_string());
-          ipb.setLocation(FromPasta(ip.Location()));
-        }
-
-        auto &args = job.Arguments();
-        auto args_list = cb.initArguments(static_cast<unsigned>(args.Size()));
-        j = 0u;
-        for (auto arg : args) {
-          args_list.set(j++, arg);
-        }
-
-        cb.setLanguage(FromPasta(cc.TargetLanguage()));
-        cb.setCompiler(FromPasta(cc.Name()));
-      }
-
-      promises_commands.add(request.send().ignoreResult());
-    });
-
-    // Add list of promises to the final list before waiting for the scope
-    promises.add(kj::joinPromises(promises_commands.finish()));
+//    typedef decltype(commands.begin()) iter_t;
+//    ForEachInterval(commands.begin(), commands.end(),
+//                    kCommandsBatchSize,
+//                    [&](iter_t from, iter_t to) {
+//
+//      for (iter_t &it = from; it != to; it++) {
+//        per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, *it, d->ctx);
+//      }
+//
+//      per_path_exe.Start();
+//      per_path_exe.Wait();
+//    });
   }
-
-  return kj::joinPromises(promises.finish());
 }
 
-}  // namespace importer
+}  // namespace indexer

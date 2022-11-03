@@ -8,5 +8,4 @@
 
 add_subdirectory("Examples")
 add_subdirectory("GenJSON")
-add_subdirectory("Import")
 add_subdirectory("Index")

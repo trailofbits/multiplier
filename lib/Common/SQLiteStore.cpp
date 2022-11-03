@@ -13,6 +13,9 @@
 
 namespace sqlite {
 
+Error::Error(const std::string &msg, sqlite3 *db)
+  : runtime_error("[SQLite Error] " + msg + ": " + std::string(sqlite3_errmsg(db))) {};
+
 QueryResult::QueryResult(Connection &conn, const std::string &query)
     : stmt(std::make_shared<Statement>(conn, query)){}
 
@@ -37,10 +40,11 @@ bool QueryResult::Columns(std::vector<std::string> &row) {
   auto prepared_stmt = stmt->prepareStatement();
 
   for (int i = 0; i < col_size; i++) {
-    auto col_val = sqlite3_column_text(prepared_stmt, i);
+    auto col_val = sqlite3_column_blob(prepared_stmt, i);
+    auto col_size = sqlite3_column_bytes(prepared_stmt, i);
 
     if (col_val) {
-      ret.push_back(std::string(reinterpret_cast<const char*>(col_val)));
+      ret.push_back(std::string(reinterpret_cast<const char *>(col_val), col_size));
     } else {
       ret.push_back("");
     }
@@ -62,9 +66,16 @@ int64_t QueryResult::getInt64(int32_t idx) {
 
 std::string QueryResult::getText(int32_t idx) {
   auto prepared_stmt = stmt->prepareStatement();
-  auto ptr = reinterpret_cast<const char*>(sqlite3_column_text(prepared_stmt, idx));
+  auto ptr = reinterpret_cast<const char *>(sqlite3_column_blob(prepared_stmt, idx));
   auto len = sqlite3_column_bytes(prepared_stmt, idx);
   return std::string(ptr, len);
+}
+
+std::string_view QueryResult::getBlob(int32_t idx) {
+  auto prepared_stmt = stmt->prepareStatement();
+  auto ptr = reinterpret_cast<const char *>(sqlite3_column_blob(prepared_stmt, idx));
+  auto len = sqlite3_column_bytes(prepared_stmt, idx);
+  return std::string_view(ptr, len);
 }
 
 Statement::Statement(Connection &conn, const std::string &stmt)
@@ -73,18 +84,18 @@ Statement::Statement(Connection &conn, const std::string &stmt)
   conn.stmts.emplace_back(this);
 
   auto getPrepareStatement = [this](void) -> std::shared_ptr<sqlite3_stmt> {
-    sqlite3_stmt* stmt;
+    sqlite3_stmt *stmt;
     char *tail;
     auto ret = sqlite3_prepare_v2(db.GetHandler(), query.c_str(),
                                   static_cast<int>(query.size()),
-                                  &stmt, const_cast<const char**>(&tail));
+                                  &stmt, const_cast<const char **>(&tail));
     if (SQLITE_OK != ret) {
       assert(0);
       throw Error("Failed to prepare statement");
     }
 
     return std::shared_ptr<sqlite3_stmt>(
-        stmt, [](sqlite3_stmt* stmt) { sqlite3_finalize(stmt); });
+        stmt, [](sqlite3_stmt *stmt) { sqlite3_finalize(stmt); });
   };
 
   prepared_stmt = getPrepareStatement();
@@ -98,11 +109,15 @@ sqlite3_stmt *Statement::prepareStatement(void){
   return prepared_stmt.get();
 }
 
-void Statement::Close() noexcept {
+void Statement::Close(void) noexcept {
   if (prepared_stmt) {
     sqlite3_finalize(prepared_stmt.get());
     prepared_stmt.reset();
   }
+}
+
+void Statement::Reset(void) {
+  sqlite3_reset(prepared_stmt.get());
 }
 
 void Statement::Execute(void) {
@@ -112,9 +127,9 @@ void Statement::Execute(void) {
       throw Error("Execute() does not expect results. Use executeStep.");
     } else if (ret == sqlite3_errcode(db.GetHandler())) {
       std::cerr << "Execute() failed with Errorcode " << ret << std::endl;
-      throw Error("Execute() failed with Errorcode");
+      throw Error("Execute() failed with Errorcode", db.GetHandler());
     } else {
-      throw Error("Execute() failed with Error");
+      throw Error("Execute() failed with Error", db.GetHandler());
     }
   }
   sqlite3_clear_bindings(prepared_stmt.get());
@@ -125,7 +140,7 @@ bool Statement::ExecuteStep(void) {
   auto ret = tryExecuteStep();
   if ((SQLITE_ROW != ret) && (SQLITE_DONE != ret)) {
     if (ret == sqlite3_errcode(db.GetHandler())) {
-      throw Error("ExecuteStep failed");
+      throw Error("ExecuteStep failed", db.GetHandler());
     } else {
       sqlite3_clear_bindings(prepared_stmt.get());
       sqlite3_reset(prepared_stmt.get());
@@ -138,9 +153,13 @@ QueryResult Statement::GetResult(void) {
   return QueryResult(shared_from_this());
 }
 
-
 int Statement::tryExecuteStep(void) {
   return sqlite3_step(prepared_stmt.get());
+}
+
+void Statement::reset(void) {
+  sqlite3_clear_bindings(prepared_stmt.get());
+  sqlite3_reset(prepared_stmt.get());
 }
 
 void Statement::bind(const size_t i, const int32_t &value) {
@@ -168,22 +187,33 @@ void Statement::bind(const size_t i, const std::nullptr_t &value) {
   sqlite3_bind_null(prepared_stmt.get(), i + 1);
 }
 
-void Statement::bind(const size_t i, const char* &value) {
+void Statement::bind(const size_t i, const char *&value) {
   sqlite3_bind_text(prepared_stmt.get(), i + 1,
                     value, strlen(value), SQLITE_TRANSIENT);
 }
 
 void Statement::bind(const size_t i, const std::string &value) {
-  sqlite3_bind_text(prepared_stmt.get(), i + 1,
-                    value.c_str(), value.size(), SQLITE_TRANSIENT);
+  sqlite3_bind_blob64(prepared_stmt.get(), i + 1,
+                    value.data(), value.size(), SQLITE_TRANSIENT);
+}
+
+void Statement::bind(const size_t i, const std::string_view &value) {
+  sqlite3_bind_blob64(prepared_stmt.get(), i + 1,
+                      value.data(), value.size(), SQLITE_TRANSIENT);
 }
 
 Connection::Connection(const std::filesystem::path &db_name,
+                       bool readonly,
                        const int busyTimeouts)
                       : dbFilename(db_name)
 {
-  sqlite3* db_handle;
-  const int ret = sqlite3_open(db_name.generic_string().c_str(), &db_handle);
+  sqlite3 *db_handle;
+  int ro_flag = readonly
+    ? SQLITE_OPEN_READONLY
+    : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+  const int ret = sqlite3_open_v2(
+    db_name.generic_string().c_str(), &db_handle,
+    ro_flag | SQLITE_OPEN_NOMUTEX, nullptr);
 
   sqlite3_exec(db_handle, "pragma synchronous = off",
                nullptr, nullptr, nullptr);
@@ -195,7 +225,7 @@ Connection::Connection(const std::filesystem::path &db_name,
   db.reset(db_handle);
 
   if (ret != SQLITE_OK) {
-    throw Error("Failed to open database");
+    throw Error("Failed to open database", db_handle);
   }
 
   if (busyTimeouts > 0) {
@@ -214,7 +244,7 @@ Connection::Connection(const std::filesystem::path &db_name,
 
 };
 
-void Connection::Close() noexcept {
+void Connection::Close(void) noexcept {
   while (stmts.empty()) {
     auto stmt = stmts.back();
     stmt->Close();
@@ -236,7 +266,7 @@ void Connection::CreateFunction(std::string func_name, unsigned n_args, unsigned
   auto ret = sqlite3_create_function_v2(GetHandler(), func_name.c_str(), n_args, rflags,
                                         nullptr, x_func, x_step, x_final, x_destroy);
   if (ret != SQLITE_OK) {
-    throw Error("Failed to create function");
+    throw Error("Failed to create function", GetHandler());
   }
 }
 
@@ -245,18 +275,18 @@ void Connection::DeleteFunction(std::string func_name, unsigned n_args, unsigned
   auto ret = sqlite3_create_function_v2(GetHandler(), func_name.c_str(), n_args, rflags,
                                         nullptr, nullptr, nullptr, nullptr, nullptr);
   if (ret != SQLITE_OK) {
-    throw Error("Failed to create function");
+    throw Error("Failed to create function", GetHandler());
   }
 }
 
 void Connection::SetBusyTimeout(const int32_t timeout) {
   const int ret = sqlite3_busy_timeout(GetHandler(), timeout);
   if (ret != SQLITE_OK) {
-    throw Error("Failed to set timeout");
+    throw Error("Failed to set timeout", GetHandler());
   }
 }
 
-void Connection::Execute(const std::string& query) {
+void Connection::Execute(const std::string &query) {
   char *error_msg;
   if (sqlite3_exec(GetHandler(), query.c_str(),
                    nullptr, nullptr, &error_msg)) {
@@ -269,11 +299,11 @@ std::shared_ptr<Statement> Connection::Prepare(const std::string &query) {
   return std::move(stmt);
 }
 
-QueryResult Connection::ExecuteAndGet(const std::string& stmt) {
+QueryResult Connection::ExecuteAndGet(const std::string &stmt) {
   return QueryResult(*this, stmt);
 }
 
-void Connection::Deleter::operator()(sqlite3* db) {
+void Connection::Deleter::operator()(sqlite3 *db) {
   const int ret = sqlite3_close(db);
   assert(SQLITE_OK == ret);
 }
@@ -282,8 +312,23 @@ void Connection::Commit(void) {
   Execute("commit transaction");
 }
 
-void Connection::Begin(void) {
-  Execute("begin transaction");
+void Connection::Begin(bool exclusive) {
+  if(exclusive) {
+    Execute("begin exclusive transaction");
+  } else {
+    Execute("begin transaction");
+  }
+}
+
+Transaction::Transaction(Connection &db)
+    : db(db) {}
+
+void Transaction::lock(void) {
+  db.Begin(true);
+}
+
+void Transaction::unlock(void) {
+  db.Commit();
 }
 
 } // namespace sqlite

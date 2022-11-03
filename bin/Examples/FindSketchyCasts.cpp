@@ -198,7 +198,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--fragment_id ID | --file_id ID | --entity_id ID]\n"
+    << " [--db DATABASE] [--fragment_id ID | --file_id ID | --entity_id ID]\n"
     << " [--show_locations] [--highlight_use]\n"
     << " [--show_implicit] [--show_explicit]\n"
     << " [--show_sign_changing] [--show_sign_down_cast]\n";

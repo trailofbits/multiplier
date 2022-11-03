@@ -5,8 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include <multiplier/SQLiteStore.h>
-
-#include <glog/logging.h>
+#include <multiplier/SymbolDatabase.h>
 
 #include <array>
 #include <cstdint>
@@ -21,9 +20,7 @@
 #include <blockingconcurrentqueue.h>
 #pragma GCC diagnostic pop
 
-#include "Database.h"
-
-namespace indexer {
+namespace mx {
 
 struct ExitSignal {};
 struct FlushSignal {};
@@ -36,11 +33,11 @@ using QueueItem = std::variant<SymbolToInsert, FlushSignal, ExitSignal>;
 // It also maintains the the list of active writers per table and uses it to write
 // to the table.
 //
-class DatabaseImpl {
+class SymbolDatabaseImpl {
  public:
   friend class Database;
 
-  sqlite::Connection db;
+  sqlite::Connection &db;
 
   std::thread bulk_insertion_thread;
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
@@ -51,42 +48,55 @@ class DatabaseImpl {
   std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
       insert_symbol_stmt;
 
-  DatabaseImpl(std::filesystem::path path);
+  SymbolDatabaseImpl(sqlite::Connection &db);
 
-  ~DatabaseImpl(void);
+  ~SymbolDatabaseImpl(void);
 };
 
-DatabaseImpl::~DatabaseImpl(void) {
+SymbolDatabaseImpl::~SymbolDatabaseImpl(void) {
   insertion_queue.enqueue(ExitSignal{});
   bulk_insertion_thread.join();
 }
 
-DatabaseImpl::DatabaseImpl(std::filesystem::path path)
-    : db(path) {
+SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection &db)
+    : db(db) {
 
   for (auto i = 0u; i < kNumCategories; ++i) {
     std::stringstream entities_symbols_table;
     entities_symbols_table
-        << "create table if not exists entities_symbols_"
-        << i << " (symbol TEXT)";
+        << "create table if not exists 'mx::entities_symbols_"
+        << i << "' (symbol TEXT)";
     db.Execute(entities_symbols_table.str());
 
     std::stringstream insert_query;
     insert_query
-        << "insert or ignore into entities_symbols_"
-        << i << " (rowid, symbol) values (?1, ?2)";
+        << "insert or ignore into 'mx::entities_symbols_"
+        << i << "' (rowid, symbol) values (?1, ?2)";
 
     insert_symbol_stmt[i] = db.Prepare(insert_query.str());
   }
 
-  auto bulk_inserter = [this] (void) {
+  auto bulk_inserter = [this, &db] (void) {
+    sqlite::Connection local_db{db.GetFilename()};
+    std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
+      local_insert_symbol_stmt;
+
+    for (auto i = 0u; i < kNumCategories; ++i) {
+      std::stringstream insert_query;
+      insert_query
+          << "insert or ignore into 'mx::entities_symbols_"
+          << i << "' (rowid, symbol) values (?1, ?2)";
+
+      local_insert_symbol_stmt[i] = local_db.Prepare(insert_query.str());
+    }
+
     for (bool should_exit = false; !should_exit; ) {
       QueueItem item;
 
       // Go get the first thing.
       insertion_queue.wait_dequeue(item);
 
-      db.Begin();
+      local_db.Begin();
 
       unsigned transaction_size = 0u;
       bool should_flush = false;
@@ -114,13 +124,13 @@ DatabaseImpl::DatabaseImpl(std::filesystem::path path)
             auto i = static_cast<unsigned>(std::get<1>(arg));
             ++num_symbols[i];
             ++transaction_size;
-            insert_symbol_stmt[i]->BindValues(
+            local_insert_symbol_stmt[i]->BindValues(
                 std::get<0>(arg), std::move(std::get<2>(arg)));
-            insert_symbol_stmt[i]->Execute();
+            local_insert_symbol_stmt[i]->Execute();
 
           } else {
-            LOG(FATAL)
-                << "Unknown data kind";
+            //LOG(FATAL)
+            //    << "Unknown data kind";
           }
         }, item);
 
@@ -142,7 +152,7 @@ DatabaseImpl::DatabaseImpl(std::filesystem::path path)
         }
       }
 
-      db.Commit();
+      local_db.Commit();
     }
   };
 
@@ -158,23 +168,23 @@ DatabaseImpl::DatabaseImpl(std::filesystem::path path)
   // db->Execute(entities_fts_table.str());
 }
 
-Database::Database(std::filesystem::path workspace_dir)
-    : d(std::make_shared<DatabaseImpl>(workspace_dir / "server.sqlite")) {}
+SymbolDatabase::SymbolDatabase(sqlite::Connection &db)
+    : d(std::make_shared<SymbolDatabaseImpl>(db)) {}
 
-Database::~Database(void) {}
+SymbolDatabase::~SymbolDatabase(void) {}
 
-void Database::Flush(void) {
+void SymbolDatabase::Flush(void) {
   d->insertion_queue.enqueue(FlushSignal{});
 }
 
-void Database::StoreSymbolName(mx::RawEntityId entity_id,
+void SymbolDatabase::StoreSymbolName(mx::RawEntityId entity_id,
                                mx::DeclCategory category,
                                std::string symbol) {
   d->insertion_queue.enqueue(
       SymbolToInsert(entity_id, category, std::move(symbol)));
 }
 
-std::vector<mx::RawEntityId> Database::QueryEntities(
+std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
     const std::string &name, mx::DeclCategory category) {
 
   auto table_id = static_cast<unsigned>(category);
@@ -202,7 +212,7 @@ std::vector<mx::RawEntityId> Database::QueryEntities(
   std::stringstream select_query;
   select_query
       << "select rowid, symbol "
-      << "from entities_symbols_" << table_id << " "
+      << "from 'mx::entities_symbols_" << table_id << "' "
       << "where symbol like '%' || ?1 || '%'";
 
   // select_query
@@ -211,7 +221,7 @@ std::vector<mx::RawEntityId> Database::QueryEntities(
   try {
     auto stmt = d->db.Prepare(select_query.str());
     if (!stmt) {
-      LOG(ERROR) << "Failed to prepare query statement";
+      //LOG(ERROR) << "Failed to prepare query statement";
       return entity_ids;
     }
 
@@ -224,7 +234,7 @@ std::vector<mx::RawEntityId> Database::QueryEntities(
     }
 
   } catch (sqlite::Error &e) {
-    LOG(ERROR) << "Failed to get symbol from database " << e.what();
+    //LOG(ERROR) << "Failed to get symbol from database " << e.what();
   }
 
   return entity_ids;

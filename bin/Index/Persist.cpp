@@ -11,7 +11,6 @@
 #include <capnp/message.h>
 #include <fstream>
 #include <glog/logging.h>
-#include <kj/string-tree.h>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/ProgressBar.h>
@@ -454,7 +453,7 @@ static void PersistTokenContexts(
 // for every such query. Similarly, we often want to map from matches in files
 // to matches in fragments, and so we create and persist a mapping of file
 // offsets to line numbers here to help us with those translations later.
-void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
+void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntityId file_id,
                  std::string file_hash, pasta::File file) {
   auto file_tokens = file.Tokens();
   auto maybe_file_data = file.Data();
@@ -523,7 +522,7 @@ void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
     ubb.setVal(line_num);
   }
 
-  context.PutSerializedFile(file_id, CompressedMessage("file", message));
+  context.PutSerializedFile(worker_id, file_id, CompressedMessage("file", message));
 }
 
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
@@ -547,7 +546,7 @@ void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(IndexingContext &context, pasta::AST &ast,
+void PersistFragment(mx::WorkerId worker_id, IndexingContext &context, pasta::AST &ast,
                      NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens,
@@ -633,17 +632,17 @@ void PersistFragment(IndexingContext &context, pasta::AST &ast,
       next_substitution_index);
   CHECK_EQ(next_substitution_index, num_substitutions);
 
-  context.PutFragmentLineCoverage(file_id, fragment_id, min_token.Line(),
+  context.PutFragmentLineCoverage(worker_id, file_id, fragment_id, min_token.Line(),
                                   max_token.Line());
 
-  frag.LinkDeclarations(context, em, mangler);
-  frag.LinkReferences(context, em);
-  frag.FindDeclarationUses(context, fb);
+  frag.LinkDeclarations(worker_id, context, em, mangler);
+  frag.LinkReferences(worker_id, context, em);
+  frag.FindDeclarationUses(worker_id, context, fb);
 
   context.PutSerializedFragment(
-      fragment_id, CompressedMessage("fragment", message));
+      worker_id, fragment_id, CompressedMessage("fragment", message));
 
-  frag.PersistDeclarationSymbols(context, em);
+  frag.PersistDeclarationSymbols(worker_id, context, em);
 }
 
 }  // namespace indexer

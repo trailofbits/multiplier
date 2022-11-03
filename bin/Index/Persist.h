@@ -16,10 +16,10 @@ namespace indexer {
 
 class IndexingContext;
 
-void PersistFile(IndexingContext &context, mx::RawEntityId file_id,
+void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntityId file_id,
                  std::string file_hash, pasta::File file);
 
-void PersistFragment(IndexingContext &context,
+void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
                      pasta::AST &ast,
                      NameMangler &mangler,
                      EntityIdMap &entity_ids,
