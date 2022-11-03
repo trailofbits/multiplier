@@ -285,6 +285,7 @@ bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
         << "JSON object is not an array of objects";
     return false;
   }
+  (void)file_name;
   return ret;
 }
 

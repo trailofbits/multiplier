@@ -44,7 +44,7 @@ namespace {
 
 static std::mutex gCompileJobListLock;
 
-static constexpr size_t kCommandsBatchSize = 256;
+// static constexpr size_t kCommandsBatchSize = 256;
 
 using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
 
@@ -146,6 +146,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
     ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
+  (void)exe;
 }
 
 // Build the compilers for the commands, then build the commands.
@@ -413,6 +414,7 @@ void Importer::Import(mx::Executor &exe) {
 //      per_path_exe.Wait();
 //    });
   }
+  (void)exe;
 }
 
 }  // namespace indexer
