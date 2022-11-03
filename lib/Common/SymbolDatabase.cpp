@@ -37,7 +37,7 @@ class SymbolDatabaseImpl {
  public:
   friend class Database;
 
-  sqlite::Connection& db;
+  sqlite::Connection &db;
 
   std::thread bulk_insertion_thread;
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
@@ -48,7 +48,7 @@ class SymbolDatabaseImpl {
   std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
       insert_symbol_stmt;
 
-  SymbolDatabaseImpl(sqlite::Connection& db);
+  SymbolDatabaseImpl(sqlite::Connection &db);
 
   ~SymbolDatabaseImpl(void);
 };
@@ -58,7 +58,7 @@ SymbolDatabaseImpl::~SymbolDatabaseImpl(void) {
   bulk_insertion_thread.join();
 }
 
-SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
+SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection &db)
     : db(db) {
 
   for (auto i = 0u; i < kNumCategories; ++i) {
@@ -168,7 +168,7 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection& db)
   // db->Execute(entities_fts_table.str());
 }
 
-SymbolDatabase::SymbolDatabase(sqlite::Connection& db)
+SymbolDatabase::SymbolDatabase(sqlite::Connection &db)
     : d(std::make_shared<SymbolDatabaseImpl>(db)) {}
 
 SymbolDatabase::~SymbolDatabase(void) {}
