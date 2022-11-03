@@ -40,7 +40,7 @@ DEFINE_string(db, "mx-index.db",
               "Path to the database file into which semi-permanent indexer data "
               "should be stored. Defaults mx-index.db in the current working directory.");
 
-DEFINE_string(bin_path, "", "Path to the binary or JSON (compile commands) file to import");
+DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to import");
 
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
 
@@ -66,7 +66,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  if (FLAGS_bin_path.empty()) {
+  if (FLAGS_target.empty()) {
     std::cerr
         << "Must specify a path to a file. Use - or /dev/stdin to read from stdin.";
     return EXIT_FAILURE;
@@ -89,19 +89,19 @@ extern "C" int main(int argc, char *argv[]) {
     ic->codegen.Disable();
   }
 
-  std::filesystem::path path(FLAGS_bin_path);
+  std::filesystem::path path(FLAGS_target);
 
-  if (FLAGS_bin_path == "/dev/stdin") {
-    FLAGS_bin_path = "-";
+  if (FLAGS_target == "/dev/stdin") {
+    FLAGS_target = "-";
   
-  } else if (FLAGS_bin_path == "-") {
+  } else if (FLAGS_target == "-") {
     path = "/dev/stdin";
   }
 
-  auto maybe_buff = llvm::MemoryBuffer::getFileOrSTDIN(FLAGS_bin_path, -1, false);
+  auto maybe_buff = llvm::MemoryBuffer::getFileOrSTDIN(FLAGS_target, -1, false);
   if (!maybe_buff) {
     std::cerr
-        << "Unable to open file " << FLAGS_bin_path << ":"
+        << "Unable to open file " << FLAGS_target << ":"
         << maybe_buff.getError().message();
     return EXIT_FAILURE;
   }
@@ -111,7 +111,7 @@ extern "C" int main(int argc, char *argv[]) {
   indexer::Parser parser(context, importer);
   if (!parser.Parse(*maybe_buff.get())) {
     std::cerr
-          << "An error occurred when trying to import " << FLAGS_bin_path;
+          << "An error occurred when trying to import " << FLAGS_target;
     return EXIT_FAILURE;
   }
 
