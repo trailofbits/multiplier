@@ -19,7 +19,7 @@ PackedFileImpl::PackedFileImpl(
       num_tokens(reader.getTokenKinds().size()) {}
 
 PackedFileImpl::PackedFileImpl(
-    RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader& reader_)
+    RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader &reader_)
     : FileImpl(id_, std::move(ep_)),
       package(reader_),
       reader(package.Reader<rpc::File>()),
