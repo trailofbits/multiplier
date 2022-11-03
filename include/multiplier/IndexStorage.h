@@ -59,7 +59,7 @@ enum MetadataName : char {
 };
 
 class IndexStorage final {
-  sqlite::Connection& db;
+  sqlite::Connection &db;
 
  public:
   // The next indexing version number. This is incremented prior to starting
@@ -167,7 +167,7 @@ class IndexStorage final {
 
   ~IndexStorage(void);
 
-  explicit IndexStorage(sqlite::Connection& db);
+  explicit IndexStorage(sqlite::Connection &db);
 
   // Return the set of redeclarations of an entity.
   std::vector<mx::RawEntityId> FindRedeclarations(mx::EntityId eid);
@@ -175,4 +175,5 @@ class IndexStorage final {
   std::optional<std::string>
   GetSerializedFile(mx::RawEntityId file_id);
 };
+
 } // namespace mx
