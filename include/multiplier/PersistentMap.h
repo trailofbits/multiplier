@@ -39,13 +39,13 @@ static constexpr const char* table_names[] = {
 template <uint8_t kId, typename... Keys>
 class PersistentSet {
  private:
-  sqlite::Connection& db;
+  sqlite::Connection &db;
   std::shared_ptr<sqlite::Statement> insert_stmt, test_stmt, scan_stmt;
   std::array<std::shared_ptr<sqlite::Statement>, sizeof...(Keys)> get_stmts;
   std::array<std::shared_ptr<sqlite::Statement>, sizeof...(Keys)> get_by_prefix_stmts;
 
   template <size_t I, typename K, typename C, size_t... Is>
-  void GetByFieldImpl(const K& key, C callback, std::index_sequence<Is...>) const {
+  void GetByFieldImpl(const K &key, C callback, std::index_sequence<Is...>) const {
     get_stmts[I]->BindValues(key);
     while(get_stmts[I]->ExecuteStep()) {
       auto res = get_stmts[I]->GetResult();
@@ -88,7 +88,7 @@ class PersistentSet {
   }
 
  public:
-  PersistentSet(sqlite::Connection& db) : db(db) {
+  PersistentSet(sqlite::Connection &db) : db(db) {
     std::stringstream table_desc;
     for(size_t i = 0; i < sizeof...(Keys); ++i) {
       table_desc << "key" << i;
@@ -171,12 +171,12 @@ class PersistentSet {
 
   template <size_t I, typename C,
     typename K = typename std::tuple_element<I, std::tuple<Keys...>>::type>
-  void GetByField(const K& key, C callback) const {
+  void GetByField(const K &key, C callback) const {
     GetByFieldImpl<I>(key, callback, std::make_index_sequence<sizeof...(Keys)>());
   }
 
   template <typename C, typename... Ks>
-  void GetByPrefix(const std::tuple<Ks...>& prefix, C callback) const {
+  void GetByPrefix(const std::tuple<Ks...> &prefix, C callback) const {
     GetByPrefixImpl(prefix, callback,
       std::make_index_sequence<sizeof...(Ks)>(),
       std::make_index_sequence<sizeof...(Keys)>());
@@ -192,11 +192,11 @@ class PersistentSet {
 template <uint8_t kId, typename K, typename V>
 class PersistentMap {
  private:
-  sqlite::Connection& db;
+  sqlite::Connection &db;
   std::shared_ptr<sqlite::Statement> set_stmt, get_stmt, get_or_set_stmt;
 
  public:
-  PersistentMap(sqlite::Connection& db) : db(db) {
+  PersistentMap(sqlite::Connection &db) : db(db) {
     std::stringstream ss;
     ss << "CREATE TABLE IF NOT EXISTS " << table_names[kId] << "(key, value, PRIMARY KEY(key))";
     db.Execute(ss.str());
