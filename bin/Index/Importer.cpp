@@ -39,10 +39,6 @@
 
 #include "IndexCompileJob.h"
 
-DECLARE_string(system_compiler);
-DECLARE_string(sysroot_dir);
-DECLARE_string(resource_dir);
-
 namespace indexer {
 namespace {
 
@@ -113,6 +109,11 @@ BuildCommandAction::InitCompilerFromCommand(void) {
       new_args, &(command.env), nullptr, nullptr, &output_sysroot);
   if (!ret.Succeeded()) {
     return ret.TakeError();
+  }
+
+  if (auto it = output_sysroot.find("error: "); it != std::string::npos) {
+    LOG(ERROR) << output_sysroot.substr(it + 7u);
+    return std::make_error_code(std::errc::bad_message);
   }
 
   std::string output_no_sysroot;
@@ -264,11 +265,11 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   return true;
 }
 
-
 bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
   if (!cwd || !file) {
+    DLOG(WARNING) << "No 'file' and/or 'directory' in JSON object";
     return false;
   }
 
@@ -281,10 +282,13 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
   // E.g. from CMake, Blight.
   if (auto commands_str = o.getString("command")) {
+    DLOG(INFO) << "JSON object looks like it's from CMake/Blight";
 
     auto args_str = commands_str->str();
     auto &command = commands.emplace_back(args_str);
     if (command.vec.Size()) {
+      DLOG(INFO) << "Parsed command: " << command.vec.Join();
+
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
 
@@ -301,6 +305,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
       return true;
 
     } else {
+      DLOG(ERROR) << "Can't parse arguments from JSON object";
       commands.pop_back();
       return false;
     }
@@ -308,6 +313,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   // E.g. from Bear (Build ear).
   } else if (auto arguments_list = o.getArray("arguments");
              arguments_list && !arguments_list->empty()) {
+    DLOG(INFO) << "JSON object looks like it's from Bear";
 
     auto lang = pasta::TargetLanguage::kC;
     std::stringstream ss;
@@ -334,17 +340,20 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
     auto &command = commands.emplace_back(args_vec);
     if (command.vec.Size()) {
+      DLOG(INFO) << "Parsed command: " << command.vec.Join();
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
       command.lang = lang;
       return true;
 
     } else {
+      DLOG(ERROR) << "Can't parse arguments from JSON object";
       commands.pop_back();
       return false;
     }
 
   } else {
+    DLOG(ERROR) << "Can't locate compiler arguments in JSON object";
     return false;
   }
 }
