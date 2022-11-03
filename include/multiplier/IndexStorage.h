@@ -69,17 +69,17 @@ class IndexStorage final {
   // during this time, but we don't want to commit to those results, just in
   // case there are more redeclarations that come in betwween the client request
   // and finishing indexing.
-  mx::atomic<kIndexingVersion, unsigned> version_number;
+  mx::PersistentAtomic<kIndexingVersion, unsigned> version_number;
 
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
-  mx::atomic<kNextFileId, mx::RawEntityId> next_file_id;
+  mx::PersistentAtomic<kNextFileId, mx::RawEntityId> next_file_id;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
   // are more common, and require fewer bits to encode token offsets inside of
   // the packed `mx::EntityId` for tokens.
-  mx::atomic<kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id;
+  mx::PersistentAtomic<kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id;
 
   // The next ID for a "big fragment." A big fragment has at least
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
@@ -89,7 +89,7 @@ class IndexStorage final {
   // but because we reserve the low ID space for big fragment IDs, we know that
   // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
   // bit for token offset bits.
-  mx::atomic<kNextBigCodeId, mx::RawEntityId> next_big_fragment_id;
+  mx::PersistentAtomic<kNextBigCodeId, mx::RawEntityId> next_big_fragment_id;
 
   // Maps file IDs to their absolute path, as well as to their token lists.
   mx::PersistentSet<kFileIdToPath, mx::RawEntityId, std::string>
