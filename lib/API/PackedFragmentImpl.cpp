@@ -31,7 +31,7 @@ PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
 
 PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
                                        EntityProvider::Ptr ep_,
-                                       const capnp::Data::Reader& reader_)
+                                       const capnp::Data::Reader &reader_)
     : FragmentImpl(id_, std::move(ep_)),
       package(reader_),
       reader(package.Reader<rpc::Fragment>()) {
