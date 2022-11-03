@@ -64,8 +64,11 @@ set(common_headers
 
 add_library("mx-common" STATIC
   "Compress.cpp"
+  "IndexStorage.cpp"
   "Re2.cpp"
   "Re2.h"
+  "SQLiteStore.cpp"
+  "SymbolDatabase.cpp"
   "Types.cpp"
   "Weggli.cpp"
 
@@ -82,7 +85,9 @@ add_dependencies("mx-common"
 target_link_libraries("mx-common"
   PUBLIC
     "CapnProto::capnp-rpc"
+    SQLite::SQLite3
   PRIVATE
+    $<BUILD_INTERFACE:concurrentqueue>
     "ZLIB::ZLIB"
 )
 

@@ -111,22 +111,22 @@ struct PendingFragment {
 
   // Store information persistently to enable linking of declarations across
   // fragments.
-  void LinkDeclarations(IndexingContext &context, EntityMapper &em,
+  void LinkDeclarations(mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em,
                         NameMangler &mangler);
 
   // Identify all unique entity IDs used by this fragment, and map them to the
   // fragment ID in the data store.
   void FindDeclarationUses(
-      IndexingContext &context, mx::rpc::Fragment::Builder &b);
+      mx::WorkerId worker_id, IndexingContext &context, mx::rpc::Fragment::Builder &b);
 
   // Identify all explicit references to entities.
   //
   // TODO(pag): Eventually make this identify the type of reference, or use
   //            the SourceIR to do so.
-  void LinkReferences(IndexingContext &context, EntityMapper &em);
+  void LinkReferences(mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em);
 
   // Store serialized declaration fragments symbol to the persistent store
-  void PersistDeclarationSymbols(IndexingContext &context, EntityMapper &em);
+  void PersistDeclarationSymbols(mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em);
 };
 
 }  // namespace indexer

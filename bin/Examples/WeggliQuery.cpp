@@ -16,8 +16,7 @@
 
 DECLARE_bool(help);
 DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?");
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
 
@@ -46,7 +45,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT]\n"
+    << " [--db DATABASE]\n"
     << " --query QUERY_STRING [--print_matches PRINT_MATCHES]";
 
   google::SetUsageMessage(ss.str());
@@ -72,8 +71,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
   for (mx::WeggliQueryMatch match : index.query_fragments(query)) {
     mx::Fragment frag = mx::Fragment::containing(match);

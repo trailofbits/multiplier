@@ -119,6 +119,8 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
 
   PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
                      Response response_);
+  PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
+                     const capnp::Data::Reader &reader_);
 
   inline PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
                             Response response_)

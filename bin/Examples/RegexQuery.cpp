@@ -15,8 +15,7 @@
 #include <sstream>
 
 DECLARE_bool(help);
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment in which to perform the search");
 
@@ -33,7 +32,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] [--fragment_id ID]\n"
+    << " [--db DATABASE] [--fragment_id ID]\n"
     << " --query QUERY_STRING";
 
   google::SetUsageMessage(ss.str());
@@ -52,8 +51,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
   mx::RegexQuery query(FLAGS_query);
 

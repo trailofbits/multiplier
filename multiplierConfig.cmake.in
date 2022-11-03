@@ -33,8 +33,8 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
     find_package(glog REQUIRED)
   endif()
 
-  if(NOT TARGET RocksDB::rocksdb)
-    find_package(RocksDB REQUIRED)
+  if(NOT TARGET SQLite3::SQLite)
+    find_package(SQLite3 3.35 REQUIRED)
   endif()
 
   if(MX_ENABLE_WEGGLI AND NOT TARGET weggli_native::static)

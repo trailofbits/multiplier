@@ -13,15 +13,14 @@
 #include <multiplier/AST.h>
 
 DECLARE_bool(help);
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 DEFINE_string(name, "", "Search for the symbol with name");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] --name SYMBOL_NAME";
+    << " [--db DATABASE] --name SYMBOL_NAME";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -39,8 +38,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
   for (auto category : mx::EnumerationRange<mx::DeclCategory>()) {
     auto symbols = index.query_entities(FLAGS_name, category);

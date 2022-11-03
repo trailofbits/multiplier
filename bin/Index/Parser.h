@@ -23,7 +23,8 @@ class LLVMContext;
 class MemoryBuffer;
 class Module;
 }  // namespace llvm
-namespace importer {
+
+namespace indexer {
 
 class Importer;
 
@@ -75,4 +76,4 @@ class Parser {
                                 llvm::json::Value &json);
 };
 
-}  // namespace importer
+}  // namespace indexer

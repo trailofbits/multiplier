@@ -42,7 +42,7 @@
 #include "Importer.h"
 #include "Log.h"
 
-namespace importer {
+namespace indexer {
 namespace {
 
 static std::vector<std::string> SplitCompileCommands(std::string_view cmd_str) {
@@ -312,4 +312,4 @@ bool Parser::Parse(const llvm::MemoryBuffer &buff) {
   }
 }
 
-}  // namespace importer
+}  // namespace indexer

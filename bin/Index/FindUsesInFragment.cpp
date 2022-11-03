@@ -125,7 +125,7 @@ namespace {
 // Identify all unique entity IDs used by this fragment, and map them to the
 // fragment ID in the data store.
 void PendingFragment::FindDeclarationUses(
-    IndexingContext &context, mx::rpc::Fragment::Builder &b) {
+    mx::WorkerId worker_id, IndexingContext &context, mx::rpc::Fragment::Builder &b) {
 
   std::unordered_set<mx::RawEntityId> entity_ids;
 
@@ -212,7 +212,7 @@ void PendingFragment::FindDeclarationUses(
   for (mx::RawEntityId eid : entity_ids) {
     mx::VariantId vid = mx::EntityId(eid).Unpack();
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
-      context.LinkUseInFragment(eid, fragment_id);
+      context.LinkUseInFragment(worker_id, eid, fragment_id);
     }
   }
 }

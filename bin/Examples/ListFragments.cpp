@@ -12,15 +12,14 @@
 #include <sstream>
 
 DECLARE_bool(help);
-DECLARE_string(host);
-DECLARE_string(port);
+DECLARE_string(db);
 DEFINE_uint64(file_id, 0, "ID of the file from which to print fragments.");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--host HOST] [--port PORT] --file_id FILE_ID\n";
+    << " [--db FILE] --file_id FILE_ID\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
@@ -31,8 +30,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_remote(
-      FLAGS_host, FLAGS_port));
+  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
   auto file = index.file(FLAGS_file_id);
   if (!file) {
     std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
