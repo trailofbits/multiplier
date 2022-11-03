@@ -19,7 +19,7 @@ extern "C" int main(int argc, char *argv[]) {
   ss
     << "Usage: " << argv[0]
     << " [--db DATABASE] --entity_id ID"
-		<< " [--show_locations SHOW_LOCATIONS] [--highlight_user HIGHLIGHT_USER]\n";
+    << " [--show_locations SHOW_LOCATIONS] [--highlight_user HIGHLIGHT_USER]\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);
