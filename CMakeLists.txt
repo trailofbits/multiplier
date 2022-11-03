@@ -54,12 +54,7 @@ find_package(glog CONFIG REQUIRED)
 find_package(Z3 4.8 CONFIG REQUIRED)
 find_llvm(llvm)
 find_package(Clang CONFIG REQUIRED)
-
-if(MX_DOWNLOAD_SQLITE)
-  DownloadSQLite3()
-else()
-  find_package(SQLite3 REQUIRED)
-endif()
+find_package(SQLite3 3.35 REQUIRED)
 
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
