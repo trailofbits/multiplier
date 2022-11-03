@@ -75,6 +75,6 @@ class PersistentAtomicStorage {
 };
 
 template<size_t key, typename T>
-using atomic = PersistentAtomicStorage<key, T>;
+using PersistentAtomic = PersistentAtomicStorage<key, T>;
 
 }  // namespace mx
