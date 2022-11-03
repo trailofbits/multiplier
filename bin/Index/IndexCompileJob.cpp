@@ -680,7 +680,7 @@ void IndexCompileJobAction::MaybePersistFile(
   auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
       worker_id, file_path, file_hash);
   if (is_new_file_id) {
-    PersistFile(*context, file_id, file_hash, file);
+    PersistFile(worker_id, *context, file_id, file_hash, file);
   }
 
   file_ids.emplace(file, file_id);
@@ -702,7 +702,6 @@ void IndexCompileJobAction::PersistParsedFiles(const pasta::AST &ast,
 void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   std::optional<mx::ProgressBarWork> parsing_progress_tracker(
       context->ast_progress.get());
-  IndexingCounterRes cj_counter(context->stat, kStatCompileJob);
 
   std::string main_file_path =
       job.SourceFile().Path().lexically_normal().generic_string();
@@ -715,7 +714,6 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
     return;
   }
 
-  IndexingCounterRes ast_counter(context->stat, kStatAST);
   pasta::AST ast = maybe_ast.TakeValue();
   parsing_progress_tracker.reset();
   PersistParsedFiles(ast, worker_id);
