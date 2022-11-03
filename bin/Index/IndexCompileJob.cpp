@@ -736,8 +736,8 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   NameMangler mangler(ast);
 
   for (PendingFragment &pending_fragment : pending_fragments) {
-    PersistFragment(worker_id, *context, ast, mangler, entity_ids, file_ids, tok_range,
-                    std::move(pending_fragment));
+    PersistFragment(worker_id, *context, ast, mangler, entity_ids,
+                    file_ids, tok_range, std::move(pending_fragment));
   }
 }
 

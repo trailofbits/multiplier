@@ -568,6 +568,19 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   const uint64_t begin_index = frag.begin_index;
   const uint64_t end_index = frag.end_index;
 
+  // Derive the macro substitution tree.
+  mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
+      tokens, begin_index, end_index);
+  if (!maybe_tt.Succeeded()) {
+    auto main_file_path = ast.MainFile().Path().generic_string();
+    LOG(ERROR)
+        << maybe_tt.TakeError() << " for top-level declaration "
+        << DeclToString(leader_decl)
+        << PrefixedLocation(leader_decl, " at or near ")
+        << " on main job file " << main_file_path;
+    return;
+  }
+
   auto maybe_file = FragmentFile(tokens, frag);
   if (!maybe_file) {
     auto main_file_path = ast.MainFile().Path().generic_string();
@@ -594,18 +607,6 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // Serialize all discovered entities.
   frag.Serialize(em, fb);
 
-  // Derive the macro substitution tree.
-  mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-      tokens, frag.begin_index, frag.end_index);
-  if (!maybe_tt.Succeeded()) {
-    auto main_file_path = ast.MainFile().Path().generic_string();
-    LOG(ERROR)
-        << maybe_tt.TakeError() << " for top-level declaration "
-        << DeclToString(leader_decl)
-        << PrefixedLocation(leader_decl, " at or near ")
-        << " on main job file " << main_file_path;
-    return;
-  }
 
   TokenTree token_tree = maybe_tt.TakeValue();
 
