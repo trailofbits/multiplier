@@ -144,7 +144,7 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
   const auto &args = job.Arguments();
   for (auto it = args.begin(); it != args.end(); ++it) {
-    if (*it != "-x") {
+    if (strcmp(*it, "-x")) {
       continue;
     }
     
@@ -156,7 +156,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
     
     // Next argument after opt_x flag will be lang value; Compare
     // it with the supported language i.e. C.
-    if (*it != "c") {
+    if (strcmp(*it, "c")) {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
                  << (*it) << ": " << args.Join();
       return false;
