@@ -4,6 +4,8 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <assert.h>
+
 #include <multiplier/SQLiteStore.h>
 #include <multiplier/SymbolDatabase.h>
 #include <multiplier/IndexStorage.h>
