@@ -70,12 +70,7 @@ ParseEnvVariablesFromFile(const std::string file_name) {
     for (std::string line; std::getline(ss, line, '\n');) {
       if (auto loc = line.find(sep); loc != std::string::npos) {
         std::string name = line.substr(0, loc);
-        // Fix PWD & CWD env variable and set it to current path
-        if (name == "PWD" || name == "CWD") {
-          envp[name] = std::filesystem::current_path();
-        } else {
-          envp[name] = line.substr(loc + 1, line.size());
-        }
+        envp[name] = line.substr(loc + 1, line.size());
       }
     }
   }

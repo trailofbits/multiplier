@@ -48,6 +48,15 @@ static std::mutex gCompileJobListLock;
 
 using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
 
+static inline void
+FixEnvVariables(EnvVariableMap &envp, std::string &path) {
+  for (const auto &[key, _]: envp) {
+    if (key == "PWD" || key == "CWD") {
+      envp[key] = path;
+    }
+  }
+}
+
 struct Command {
  public:
   std::string compiler_hash;
@@ -297,6 +306,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
       command.env = envp;
+      FixEnvVariables(command.env, cwd_str);
 
       // Guess at the language.
       if (commands_str->contains_insensitive("++") ||
@@ -349,6 +359,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
       command.env = envp;
+      FixEnvVariables(command.env, cwd_str);
       command.lang = lang;
       return true;
 
