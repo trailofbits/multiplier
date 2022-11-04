@@ -87,6 +87,8 @@ class BuildCommandAction final : public mx::Action {
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
                        mx::Executor &exe);
 
+  bool CanRunCompileJob(pasta::CompileJob &job);
+
  public:
   virtual ~BuildCommandAction(void) = default;
 
@@ -139,6 +141,31 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   return std::make_pair(output_sysroot, output_no_sysroot);
 }
 
+bool BuildCommandAction::CanRunCompileJob(pasta::CompileJob &job) {
+  static const std::string lang_opt = "-x";
+  static const char *lang_c = "c";
+  auto args = job.Arguments();
+  for (auto it = args.begin(); it != args.end(); ++it) {
+    if (lang_opt == *it) {
+      // Next argument after opt_x flag will be lang value; Compare
+      // it with the supported language i.e. C
+      auto lang_value = *(it + 1);
+      auto is_c = !strcmp(lang_value, lang_c);
+      if (!is_c) {
+        LOG(ERROR) << "Failed to Index compile job due to unsupported lang opt "
+                   << lang_value << " ! " << job.Arguments().Join();
+      }
+      return is_c;
+    }
+  }
+
+  // Compile job should have associated opt_x value. Fallback here and return false
+  // if the option does not exist.
+  LOG(ERROR) << "Failed to Index compile job due to missing lang opt! "
+             << job.Arguments().Join();
+  return false;
+}
+
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc,
                                          mx::Executor &exe) {
@@ -153,6 +180,9 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
   // is different than `exe`, because `exe` operates (and waits), for things
   // to finish with the current working directory changed.
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
+    if (!CanRunCompileJob(job)) {
+      continue;
+    }
     ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
   (void)exe;
