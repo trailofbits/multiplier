@@ -397,21 +397,6 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
   }
 }
 
-template <typename Iter, typename C>
-static void ForEachInterval(Iter begin, Iter end,
-                            size_t interval_size, C cb) {
-  auto to = begin;
-  while (to != end) {
-    auto from = to;
-    size_t counter = static_cast<size_t>(std::distance(from, end));
-    if (counter > interval_size) {
-      counter = interval_size;
-    }
-    std::advance(to, counter);
-    cb(from, to);
-  }
-}
-
 void Importer::Import(mx::Executor &exe) {
   mx::Executor per_path_exe;
   for (auto &[cwd, commands] : d->commands) {
