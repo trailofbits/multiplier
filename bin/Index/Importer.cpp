@@ -44,7 +44,7 @@ namespace {
 
 static std::mutex gCompileJobListLock;
 
-static constexpr size_t kCommandsBatchSize = 256;
+// static constexpr size_t kCommandsBatchSize = 256;
 
 using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
 
@@ -52,7 +52,7 @@ struct Command {
  public:
   std::string compiler_hash;
   std::string working_dir;
-  std::unordered_map<std::string, std::string> env;
+  EnvVariableMap env;
   pasta::ArgumentVector vec;
   pasta::CompilerName name{pasta::CompilerName::kUnknown};
   pasta::TargetLanguage lang{pasta::TargetLanguage::kC};
@@ -146,6 +146,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
     ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
+  (void)exe;
 }
 
 // Build the compilers for the commands, then build the commands.
@@ -270,7 +271,8 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   return true;
 }
 
-bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
+bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
+                                         const EnvVariableMap &envp) {
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
   if (!cwd || !file) {
@@ -294,6 +296,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
+      command.env = envp;
 
       // Guess at the language.
       if (commands_str->contains_insensitive("++") ||
@@ -345,6 +348,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
       DLOG(INFO) << "Parsed command: " << command.vec.Join();
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
+      command.env = envp;
       command.lang = lang;
       return true;
 
@@ -410,6 +414,7 @@ void Importer::Import(mx::Executor &exe) {
 //      per_path_exe.Wait();
 //    });
   }
+  (void)exe;
 }
 
 }  // namespace indexer
