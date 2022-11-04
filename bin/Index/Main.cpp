@@ -42,7 +42,7 @@ DEFINE_string(db, "mx-index.db",
 
 DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to import");
 
-DEFINE_string(env_path, "", "Path to the file listing environment variables to import");
+DEFINE_string(env, "", "Path to the file listing environment variables to import");
 
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
 
@@ -142,7 +142,7 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  auto envp = ParseEnvVariablesFromFile(FLAGS_env_path);
+  auto envp = ParseEnvVariablesFromFile(FLAGS_env);
 
   llvm::LLVMContext context;
   indexer::Importer importer(path.parent_path(), fm, ic);
