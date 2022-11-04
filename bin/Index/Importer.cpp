@@ -42,12 +42,6 @@
 namespace indexer {
 namespace {
 
-// static std::mutex gCompileJobListLock;
-
-// static constexpr size_t kCommandsBatchSize = 256;
-
-using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
-
 static inline void
 FixEnvVariables(EnvVariableMap &envp, std::string &path) {
   for (const auto &[key, _]: envp) {
@@ -236,14 +230,6 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
                     exe);
   }
 }
-
-//llvm::json::Value v(std::move(o));
-//std::string s;
-//llvm::raw_string_ostream os(s);
-//os << llvm::formatv("{0:2}", v);
-//os.flush();
-//std::cerr << s << std::endl;
-//return true;
 
 }  // namespace
 
@@ -448,18 +434,6 @@ void Importer::Import(mx::Executor &exe) {
     per_path_exe.Start();
     per_path_exe.Wait();
 
-//    typedef decltype(commands.begin()) iter_t;
-//    ForEachInterval(commands.begin(), commands.end(),
-//                    kCommandsBatchSize,
-//                    [&](iter_t from, iter_t to) {
-//
-//      for (iter_t &it = from; it != to; it++) {
-//        per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, *it, d->ctx);
-//      }
-//
-//      per_path_exe.Start();
-//      per_path_exe.Wait();
-//    });
   }
   (void)exe;
 }
