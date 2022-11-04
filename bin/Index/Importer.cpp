@@ -42,7 +42,7 @@
 namespace indexer {
 namespace {
 
-static std::mutex gCompileJobListLock;
+// static std::mutex gCompileJobListLock;
 
 // static constexpr size_t kCommandsBatchSize = 256;
 
