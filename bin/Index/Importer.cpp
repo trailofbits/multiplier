@@ -87,7 +87,7 @@ class BuildCommandAction final : public mx::Action {
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
                        mx::Executor &exe);
 
-  bool CanRunCompileJob(pasta::CompileJob &job);
+  static bool CanRunCompileJob(const pasta::CompileJob &job);
 
  public:
   virtual ~BuildCommandAction(void) = default;
@@ -141,28 +141,34 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   return std::make_pair(output_sysroot, output_no_sysroot);
 }
 
-bool BuildCommandAction::CanRunCompileJob(pasta::CompileJob &job) {
-  static const std::string lang_opt = "-x";
-  static const char *lang_c = "c";
-  auto args = job.Arguments();
+bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
+  const auto &args = job.Arguments();
   for (auto it = args.begin(); it != args.end(); ++it) {
-    if (lang_opt == *it) {
-      // Next argument after opt_x flag will be lang value; Compare
-      // it with the supported language i.e. C
-      auto lang_value = *(it + 1);
-      auto is_c = !strcmp(lang_value, lang_c);
-      if (!is_c) {
-        LOG(ERROR) << "Failed to Index compile job due to unsupported lang opt "
-                   << lang_value << " ! " << job.Arguments().Join();
-      }
-      return is_c;
+    if (*it != "-x") {
+      continue;
     }
+    
+    // Skip to the value after `-x`.
+    ++it;
+    if (it == args.end()) {
+      break;  // No language specified?
+    }
+    
+    // Next argument after opt_x flag will be lang value; Compare
+    // it with the supported language i.e. C.
+    if (*it != "c") {
+      LOG(ERROR) << "Skipping compile job due to unsupported language "
+                 << (*it) << ": " << args.Join();
+      return false;
+    }
+    
+    return true;
   }
 
   // Compile job should have associated opt_x value. Fallback here and return false
   // if the option does not exist.
-  LOG(ERROR) << "Failed to Index compile job due to missing lang opt! "
-             << job.Arguments().Join();
+  LOG(ERROR) << "Skipping compile job due to unknown language: "
+             << args.Join();
   return false;
 }
 
