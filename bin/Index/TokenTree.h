@@ -7,6 +7,7 @@
 #pragma once
 
 #include <multiplier/Result.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
 #include <string>
@@ -35,11 +36,14 @@ class TokenTreeNode {
 
  public:
   std::optional<pasta::FileToken> FileToken(void) const noexcept;
-  
+  std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
   
   std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
   MaybeSubstitution(void) const noexcept;
+
+  std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree>>
+  MaybeSubTree(void) const noexcept;
 };
 
 class TokenTreeNodeIteratorEnd {};

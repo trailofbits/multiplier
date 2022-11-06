@@ -43,16 +43,38 @@ enum TargetLanguage @0xeabe5088e5bc86fc {
   cxx @1 $Cxx.name("cxx");
 }
 
-enum TokenSubstitutionKind @0xa2f26f9d2081dec7 {
-  macroExpansion @0 $Cxx.name("macro_expansion");
-  functionLikeMacroExpansion @1 $Cxx.name("function_like_macro_expansion");
-  includeExpansion @2 $Cxx.name("include_expansion");
-}
+# # Must be kept in sync wiht `mx::TokenSubstitutionKind`.
+# enum TokenSubstitutionKind @0xa2f26f9d2081dec7 {
+#   
+#   otherDirective @0 $Cxx.name("other_directive");
+#   defineDirective @1 $Cxx.name("define_directive");
+#   undefDirective @2 $Cxx.name("undef_directive");
+#   pragmaDirective @3 $Cxx.name("pragma_directive");
+#   c99PragmaDirective @4 $Cxx.name("c99_pragma_directive");
+#   microsoftPragmaDirective @5 $Cxx.name("microsoft_pragma_directive");
+#   ifDirective @6 $Cxx.name("if_directive");
+#   ifdefDirective @7 $Cxx.name("ifdef_directive");
+#   ifndefDirective @8 $Cxx.name("ifndef_directive");
+#   elifDirective @9 $Cxx.name("elif_directive");
+#   elifdefDirective @10 $Cxx.name("elifdef_directive");
+#   elifndefDirective @11 $Cxx.name("elifndef_directive");
+#   elseDirective @12 $Cxx.name("else_directive");
+#   endifDirective @13 $Cxx.name("endif_directive");
+#   includeDirective @14 $Cxx.name("include_directive");
+#   macroDirective @15 $Cxx.name("macro_directive");
+#   macroParameterDirective @16 $Cxx.name("macro_parameter_directive");
+#   vaOptDirective @17 $Cxx.name("va_opt_directive");
+#   vaOptArgumentDirective @18 $Cxx.name("va_opt_argument_directive");
+#   macroArgumentDirective @19 $Cxx.name("macro_argument_directive");
+#   stringifyDirective @20 $Cxx.name("stringify_directive");
+#   concatenateDirective @21 $Cxx.name("concatenate_directive");
+#   substituteDirective @22 $Cxx.name("substitute_directive");
+# }
 
 struct TokenSubstitution @0xade5195a85fdc847 {
   beforeTokens @0 :List(UInt64);
   afterTokens @1 :List(UInt64);
-  kind @2 :TokenSubstitutionKind;
+#  kind @2 :TokenSubstitutionKind;
 }
 
 struct IncludePath @0x8b7f7dfed6973665 {

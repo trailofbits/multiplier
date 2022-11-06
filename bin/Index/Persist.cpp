@@ -42,6 +42,10 @@ static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
       CountSubstitutions(std::move(lhs), num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
       ++num_subs;
+    } else if (auto sub_tree = node.MaybeSubTree()) {
+      auto [kind, lhs] = std::move(sub_tree.value());
+      CountSubstitutions(std::move(lhs), num_subs);
+      ++num_subs;
     }
   }
 }
@@ -70,6 +74,10 @@ static void FindFileRange(TokenTree tt, const pasta::File &file,
       FindFileRange(std::move(lhs), file, min, max, num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
       ++num_subs;
+    } else if (auto sub_tree = node.MaybeSubTree()) {
+      auto [kind, lhs] = std::move(sub_tree.value());
+      FindFileRange(std::move(lhs), file, min, max, num_subs);
+      ++num_subs;
     }
   }
 }
@@ -89,12 +97,15 @@ static void PersistTokenTree(EntityMapper &em,
                              unsigned &next_sub_offset) {
   unsigned i =0;
   for (TokenTreeNode node : tree) {
+    // This is a parsed token.
     if (std::optional<pasta::Token> pt = node.Token()) {
       toks_builder.set(i++, em.EntityId(pt.value()));
 
+    // This is a file token.
     } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
       toks_builder.set(i++, em.EntityId(ft.value()));
 
+    // This is a substitution of two sub-trees.
     } else if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
       mx::TokenSubstitutionId sub_id;
@@ -116,6 +127,26 @@ static void PersistTokenTree(EntityMapper &em,
       PersistTokenTree(em, subs_builder,
                        next_sub.initAfterTokens(num_nodes_rhs), std::move(rhs),
                        fragment_id, next_sub_offset);
+
+    // This is a sub-tree.
+    } else if (auto st = node.MaybeSubTree()) {
+      auto [kind, lhs] = std::move(st.value());
+      mx::TokenSubstitutionId sub_id;
+      sub_id.fragment_id = fragment_id;
+      sub_id.kind = kind;
+      sub_id.offset = next_sub_offset;
+      mx::EntityId id(sub_id);
+      toks_builder.set(i++, id);
+
+      mx::rpc::TokenSubstitution::Builder next_sub =
+          subs_builder[next_sub_offset++];
+
+      unsigned num_nodes_lhs = lhs.NumNodes();
+      PersistTokenTree(em, subs_builder,
+                       next_sub.initBeforeTokens(num_nodes_lhs), std::move(lhs),
+                       fragment_id, next_sub_offset);
+
+      next_sub.initAfterTokens(0);
     }
   }
 }

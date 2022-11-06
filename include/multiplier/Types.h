@@ -25,12 +25,48 @@ enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
+// NOTE(pag): Must be kept in sync wiht `RPC.capnp`.
 enum class TokenSubstitutionKind : unsigned char {
-  MACRO_EXPANSION,
-  FUNCTION_LIKE_MACRO_EXPANSION,
-  INCLUDE_EXPANSION,
-  SUBSTITUTION,
+  OTHER_DIRECTIVE,
+  DEFINE_DIRECTIVE,
+  UNDEF_DIRECTIVE,
+  PRAGMA_DIRECTIVE,
+  C99_PRAGMA_DIRECTIVE,
+  MICROSOFT_PRAGMA_DIRECTIVE,
+
+  IF_DIRECTIVE,
+  IFDEF_DIRECTIVE,
+  IFNDEF_DIRECTIVE,
+  ELIF_DIRECTIVE,
+  ELIFDEF_DIRECTIVE,
+  ELIFNDEF_DIRECTIVE,
+  ELSE_DIRECTIVE,
+  ENDIF_DIRECTIVE,
+
+  INCLUDE,
+
+  MACRO,
+  MACRO_PARAMETER,
+
+  VA_OPT,
+
+  VA_OPT_ARGUMENT,
+  MACRO_ARGUMENT,
+
+  STRINGIFY,
+  CONCATENATE,
+  SUBSTITUTE,
 };
+
+inline static const char *EnumerationName(TokenSubstitutionKind) {
+  return "TokenSubstitutionKind";
+}
+
+const char *EnumeratorName(TokenSubstitutionKind);
+
+inline static constexpr unsigned NumEnumerators(TokenSubstitutionKind) {
+  return static_cast<unsigned>(TokenSubstitutionKind::SUBSTITUTE) + 1u;
+}
 
 using RawEntityId = uint64_t;
 

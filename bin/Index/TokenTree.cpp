@@ -20,6 +20,11 @@
 
 #include <iostream>
 
+//#define D(...) __VA_ARGS__
+#ifndef D
+# define D(...)
+#endif
+
 namespace indexer {
 
 struct TokenInfo {
@@ -121,6 +126,7 @@ class Substitution {
 
   } kind;
 
+  std::optional<pasta::MacroDirective> macro_dir;
   std::optional<pasta::MacroDefinition> macro_def;
   std::optional<pasta::MacroExpansion> macro_use;
 
@@ -143,7 +149,7 @@ class Substitution {
   TokenInfo *RightCornerOfUse(void) const;
   TokenInfo *LeftCornerOfExpansionOrUse(void) const;
   TokenInfo *RightCornerOfExpansionOrUse(void) const;
-//  bool EqualToBefore(const Substitution *that) const;
+
   void Print(std::ostream &os) const;
   void PrintDOT(std::ostream &os) const;
 };
@@ -168,7 +174,7 @@ class TokenTreeImpl {
   // Macro bodies.
   std::unordered_map<const void *, Substitution *> macro_body;
 
-  std::string indent;
+  D( std::string indent; )
 
   // Figure out if `node->after` looks like a macro argument pre-expansion of
   // `node`, and if so, return `node->after`, otherwise `nullptr`.
@@ -573,7 +579,7 @@ TokenInfo *Substitution::RightCornerOfExpansionOrUse(void) const {
 
 void Substitution::Print(std::ostream &os) const {
   if (before.empty()) {
-    assert(!after);
+//    assert(!after);
   }
 
   auto tok_data = [] (TokenInfo *info) -> std::string_view {
@@ -612,15 +618,11 @@ void Substitution::Print(std::ostream &os) const {
           std::cerr << tok_data(info);
           continue;
         case TokenInfo::kMacroUseToken:
-          std::cerr << "\033[4m" << tok_data(info) << "\033[0m";
-          continue;
         case TokenInfo::kMissingFileToken:
-          std::cerr << "\033[4m" << tok_data(info) << "\033[0m";
-          continue;
         case TokenInfo::kMacroStepToken:
         case TokenInfo::kMacroExpansionToken:
         case TokenInfo::kMarkerToken:
-          std::cerr << "\033[5m" << tok_data(info) << "\033[0m";
+          std::cerr << "\033[4m" << tok_data(info) << "\033[0m";
           continue;
         default:
           continue;
@@ -636,12 +638,20 @@ void Substitution::PrintDOT(std::ostream &os) const {
     after->PrintDOT(os);
   }
 
+  auto num_cols = before.size();
+  if (before_body && before_body->file_tok) {
+    ++num_cols;
+  }
+  if (after_body && after_body->file_tok) {
+    ++num_cols;
+  }
+
   os << "s" << reinterpret_cast<const void *>(this)
      << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
   if (InBefore(this)) {
     os << " color=\"brown\"";
   }
-  os << "><TR><TD colspan=\"" << before.size() << "\">";
+  os << "><TR><TD colspan=\"" << num_cols << "\">";
   switch (kind) {
     case kFileBody: os << "file body"; break;
     case kMacroArgument: os << "macro arg"; break;
@@ -664,13 +674,8 @@ void Substitution::PrintDOT(std::ostream &os) const {
   }
   os << "</TD></TR><TR>";
 
-  if (before_body && before_body->file_tok &&
-      after_body && after_body->file_tok) {
-    os << "<TD colspan=\"" << (before.size() / 2u) << "\">"
-       << before_body->file_tok->Index()
-       << "</TD><TD colspan=\"" << ((before.size() + 1u) / 2u) << "\">"
-       << after_body->file_tok->Index()
-       << "</TD></TR><TR>";
+  if (before_body && before_body->file_tok) {
+    os << "<TD>" << before_body->file_tok->Index() << "</TD>";
   }
 
   auto has_any = false;
@@ -723,8 +728,12 @@ void Substitution::PrintDOT(std::ostream &os) const {
     }
   }
 
-  if (!has_any) {
+  if (!has_any && !num_cols) {
     os << "<TD> </TD>";
+  }
+
+  if (after_body && after_body->file_tok) {
+    os << "<TD>" << after_body->file_tok->Index() << "</TD>";
   }
 
   os << "</TR></TABLE>>];\n";
@@ -898,7 +907,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
   if (prev_file != curr_file ||
       prev_file != pasta::File::Containing(min->file_tok.value()) ||
       prev_file != pasta::File::Containing(max->file_tok.value())) {
-    std::cerr << indent << "can't fill from two different files\n";
+    D( std::cerr << indent << "can't fill from two different files\n"; )
     return false;
   }
 
@@ -906,7 +915,8 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
   auto curr_i = curr_file_tok.Index();
 
   if (prev_i >= curr_i) {
-    std::cerr << indent << "can't fill: prev_i=" << prev_i << " >= curr_i=" << curr_i << "\n";
+    D( std::cerr << indent << "can't fill: prev_i=" << prev_i
+                 << " >= curr_i=" << curr_i << "\n"; )
     return false;
   }
 
@@ -917,12 +927,16 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
   // The range must not straddle the range of the stuff into which we're
   // injecting. It should either be in range, or out of range.
   if (prev_i < min_i && curr_i <= max_i) {
-    std::cerr << indent << "can't straddle: prev_i=" << prev_i << " < min_i=" << min_i << ", curr_i=" << curr_i << " <= max_i=" << max_i << "\n";
+    D( std::cerr << indent << "can't straddle: prev_i=" << prev_i
+                 << " < min_i=" << min_i << ", curr_i=" << curr_i
+                 << " <= max_i=" << max_i << "\n"; )
     return false;
   }
 
   if (min_i <= prev_i && max_i < curr_i) {
-    std::cerr << indent << "can't straddle: min_i=" << min_i << " <= prev_i=" << prev_i << ", max_i=" << max_i << " < curr_i=" << curr_i << "\n";
+    D( std::cerr << indent << "can't straddle: min_i=" << min_i
+                 << " <= prev_i=" << prev_i << ", max_i=" << max_i
+                 << " < curr_i=" << curr_i << "\n"; )
     return false;
   }
 
@@ -933,7 +947,9 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
   bool seen_ident = false;
   int paren_count = 0;
   bool in_va_opt = false;
-  std::cerr << indent << "FillBetweenFileTokensInSameFile(" << i << ", " << curr_i << "; min_i=" << min_i << ", max_i=" << max_i << ")\n";
+  D( std::cerr << indent << "FillBetweenFileTokensInSameFile(" << i << ", "
+               << curr_i << "; min_i=" << min_i << ", max_i=" << max_i
+               << ")\n"; )
 
   const auto orig_end_i = curr_i;
   bool changed = false;
@@ -948,7 +964,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
         if (!in_before) {
           goto exit_loop;
         }
-        std::cerr << indent << "seen pound (" << ft.Index() << ")\n";
+        D( std::cerr << indent << "seen pound (" << ft.Index() << ")\n"; )
         if (seen_pound) {
           goto exit_loop;
         }
@@ -965,7 +981,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           goto keep_going;
 
         } else if (prev_was_space && seen_ident) {
-          std::cerr << indent << "Prev was space and seen ident\n";
+          D( std::cerr << indent << "Prev was space and seen ident\n"; )
           goto exit_loop;
 
         // Treat these like identifiers.
@@ -987,7 +1003,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           goto keep_going;
 
         } else if (prev_was_space && seen_ident) {
-          std::cerr << indent << "Prev was space and seen ident\n";
+          D( std::cerr << indent << "Prev was space and seen ident\n"; )
           goto exit_loop;
 
         // Treat these like identifiers and spaces.
@@ -1004,7 +1020,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
         auto ft_data = ft.Data();
         if (ft_data == "__VA_OPT__" &&
             (seen_pound || !(prev_was_space && seen_ident))) {
-          std::cerr << indent << "Disabling pound on " << ft_data << "\n";
+          D( std::cerr << indent << "Disabling pound on " << ft_data << "\n"; )
           seen_pound = false;
           in_va_opt = true;
           seen_ident = false;
@@ -1013,10 +1029,11 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           curr_i = (i + 1u);  // Stop before next iteration.
 
         } else if (prev_was_space && seen_ident) {
-          std::cerr << indent << "Prev was space and seen ident\n";
+          D( std::cerr << indent << "Prev was space and seen ident\n"; )
           goto exit_loop;
         } else {
-          std::cerr << indent << "seen ident (" << ft.Index() << "): " << ft_data << '\n';
+          D( std::cerr << indent << "seen ident (" << ft.Index() << "): "
+                       << ft_data << '\n'; )
           seen_ident = true;
           prev_was_space = false;
         }
@@ -1025,7 +1042,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
       case pasta::TokenKind::kUnknown:
       case pasta::TokenKind::kEndOfFile:
       case pasta::TokenKind::kEndOfDirective:
-        std::cerr << indent << "seen space (" << ft.Index() << ")\n";
+        D( std::cerr << indent << "seen space (" << ft.Index() << ")\n"; )
         prev_was_space = true;
         goto keep_going;
       default:
@@ -1037,7 +1054,7 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           goto exit_loop;
 
         } else if (prev_was_space && seen_ident) {
-          std::cerr << indent << "Prev was space and seen ident\n";
+          D( std::cerr << indent << "Prev was space and seen ident\n"; )
           goto exit_loop;
 
         } else {
@@ -1058,9 +1075,9 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
     if (sub->kind == Substitution::kFileBody) {
       switch (ftk) {
         default:
-          std::cerr
+          D( std::cerr
               << indent << "NOT adding token (" << i << ") to file level: "
-              << ft.KindName() << ' ' << ft.Data() << '\n';
+              << ft.KindName() << ' ' << ft.Data() << '\n'; )
           goto exit_loop;
         case pasta::TokenKind::kUnknown:
         case pasta::TokenKind::kEndOfFile:
@@ -1074,9 +1091,9 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
 
     TokenInfo &info = tokens_alloc.emplace_back();
     info.file_tok = std::move(ft);
-    std::cerr
+    D( std::cerr
         << indent << "Adding token (" << i << "): "
-        << info.file_tok->KindName() << ' ' << info.file_tok->Data() << '\n';
+        << info.file_tok->KindName() << ' ' << info.file_tok->Data() << '\n'; )
     info.category = TokenInfo::kMissingFileToken;
     info.next = curr;
     prev->next = &info;
@@ -1096,7 +1113,8 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
   }
 
   if (i != orig_end_i && changed) {
-    std::cerr << indent << "Stopped early at i=" << i << " curr_i=" << orig_end_i << '\n';
+    D( std::cerr << indent << "Stopped early at i=" << i << " curr_i="
+                 << orig_end_i << '\n'; )
     stopped_early = true;
   }
 
@@ -1159,11 +1177,11 @@ Substitution *TokenTreeImpl::TryInventMissingSubstitutions(
 
   std::optional<unsigned> next_i = NextFromSameFile(sub, next_index);
   if (!next_i) {
-    std::cerr << indent << "No next token in same file\n";
+    D( std::cerr << indent << "No next token in same file\n"; )
     return nullptr;
   } else if (next_i.value() >= sub->before.size()) {
-    std::cerr << indent << "Out-of-bounds token in same file: next_i="
-        << next_i.value() << " before.size=" << sub->before.size() << '\n';
+    D( std::cerr << indent << "Out-of-bounds token in same file: next_i="
+        << next_i.value() << " before.size=" << sub->before.size() << '\n'; )
     return nullptr;
   }
 
@@ -1172,9 +1190,9 @@ Substitution *TokenTreeImpl::TryInventMissingSubstitutions(
     return nullptr;
   }
 
-  std::cerr
+  D( std::cerr
       << indent << "Next in same file (" << next->file_tok->Index() << "): "
-      << next->file_tok->Data() << '\n';
+      << next->file_tok->Data() << '\n'; )
 
   Substitution::NodeList missing_nodes;
   bool sub_stopped_early = false;
@@ -1188,11 +1206,11 @@ Substitution *TokenTreeImpl::TryInventMissingSubstitutions(
   // Nothing to substitute. Can happen with things like the `#` before an
   // `include`.
   if (missing_nodes.empty()) {
-    std::cerr << indent << "Ignoring empty substitution\n";
+    D( std::cerr << indent << "Ignoring empty substitution\n"; )
     return nullptr;
   }
 
-  std::cerr << indent << "Inventing missing substitution\n";
+  D( std::cerr << indent << "Inventing missing substitution\n"; )
   Substitution *new_sub = CreateSubstitution(Substitution::kSubstitutionBefore);
   Substitution *new_exp = CreateSubstitution(Substitution::kSubstitutionAfter);
 
@@ -1220,19 +1238,19 @@ bool TokenTreeImpl::AddMissingPrefixes(
 
   TokenInfo *curr = LeftCornerOfUse(curr_node);
   if (!curr) {
-    std::cerr << indent << "no left corner of use\n";
+    D( std::cerr << indent << "no left corner of use\n"; )
     return true;
   }
 
   if (curr->file_tok) {
-    std::cerr
+    D( std::cerr
         << indent << "left corner of substitution ("
         << curr->file_tok->Index() << "): "
-        << curr->file_tok->Data() << '\n';
+        << curr->file_tok->Data() << '\n'; )
   }
 
   if (TryFillBetweenFileTokens(sub, prev, curr, stopped_early, nodes)) {
-    std::cerr << indent << "filled between file tokens\n";
+    D( std::cerr << indent << "filled between file tokens\n"; )
     return true;
   }
 
@@ -1273,8 +1291,8 @@ Substitution *TokenTreeImpl::MergeArguments(
 
   Substitution *merged = CreateSubstitution(Substitution::kMacroArgument);
 
-  std::cerr << indent << "Merging argument and pre-expansion argument\n";
-  indent += "  ";
+  D( std::cerr << indent << "Merging argument and pre-expansion argument\n"; )
+  D( indent += "  "; )
 
   size_t i_index = 0u;
   size_t j_index = 0u;
@@ -1288,12 +1306,12 @@ Substitution *TokenTreeImpl::MergeArguments(
     const auto i_is_tok = std::holds_alternative<TokenInfo *>(node_i);
     i_lc = LeftCornerOfUse(node_i);
 
-    const auto j_is_tok = std::holds_alternative<TokenInfo *>(node_j);
+    D( const auto j_is_tok = std::holds_alternative<TokenInfo *>(node_j); )
     j_lc = LeftCornerOfUse(node_j);
 
-    std::cerr
+    D( std::cerr
         << indent << "i=" << i << " j=" << j << " i_is_tok=" << i_is_tok
-        << " j_is_tok=" << j_is_tok << "\n";
+        << " j_is_tok=" << j_is_tok << "\n"; )
 
     if (i_lc->file_tok) {
       i_index = i_lc->file_tok->Index();
@@ -1341,7 +1359,7 @@ Substitution *TokenTreeImpl::MergeArguments(
   pre_exp->before.clear();
   StripWhitespace(merged->before);
 
-  indent.resize(indent.size() - 2u);
+  D( indent.resize(indent.size() - 2u); )
   return merged;
 }
 
@@ -1355,7 +1373,7 @@ bool TokenTreeImpl::MergeArgPreExpansions(std::stringstream &err) {
     }
 
     // Try to merge a pre-argument expansion.
-    std::cerr << indent << "Merging pre-expansion " << pre_exp->macro_def->NameToken().Data() << '\n';
+    D( std::cerr << indent << "Merging pre-expansion " << pre_exp->macro_def->NameToken().Data() << '\n'; )
     if (MergeArgPreExpansion(sub, pre_exp, err)) {
       sub->macro_use = std::move(pre_exp->macro_use);
     } else {
@@ -1374,8 +1392,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
                                          Substitution *pre_exp,
                                          std::stringstream &err) {
 
-  std::cerr << indent << "Merge pre expansion\n";
-  indent += "  ";
+  D( std::cerr << indent << "Merge pre expansion\n"; )
+  D( indent += "  "; )
 
   Substitution::NodeList new_nodes;
   auto i = 0u;
@@ -1408,20 +1426,22 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
     j_lc = LeftCornerOfUse(node_j);
     j_arg = MacroArgument(node_j);
 
-    std::cerr
-        << indent << "i=" << i << " j=" << j << " i_is_tok=" << i_is_tok
-        << " j_is_tok=" << j_is_tok <<  " i_arg=" << (!!i_arg) << " j_arg="
-        << (!!j_arg);
+    D(
+      std::cerr
+          << indent << "i=" << i << " j=" << j << " i_is_tok=" << i_is_tok
+          << " j_is_tok=" << j_is_tok <<  " i_arg=" << (!!i_arg) << " j_arg="
+          << (!!j_arg);
 
-    if (i_rc && i_rc->file_tok) {
-      std::cerr << " i_rc=" << i_rc->file_tok->Data();
-    }
+      if (i_rc && i_rc->file_tok) {
+        std::cerr << " i_rc=" << i_rc->file_tok->Data();
+      }
 
-    if (j_lc && j_lc->file_tok) {
-      std::cerr << " j_lc=" << j_lc->file_tok->Data();
-    }
+      if (j_lc && j_lc->file_tok) {
+        std::cerr << " j_lc=" << j_lc->file_tok->Data();
+      }
 
-    std::cerr << '\n';
+      std::cerr << '\n';
+    )
 
     // Deal with things like injected whitespace.
     if (i_is_tok) {
@@ -1544,9 +1564,9 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
     }
   }
 
-  std::cerr
+  D( std::cerr
       << indent << "i=" << i << " j=" << j << " i_max=" << max_i
-      << " j_max=" << max_j << '\n';
+      << " j_max=" << max_j << '\n'; )
 
   if (!changed || i != max_i || j != max_j) {
     assert(false);
@@ -1564,7 +1584,7 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
   pre_exp->after = nullptr;
   pre_exp->before.clear();
 
-  indent.resize(indent.size() - 2u);
+  D( indent.resize(indent.size() - 2u); )
   return true;
 }
 
@@ -1635,13 +1655,13 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
 
   body->macro_def = def;
 
-  std::cerr << indent << "Macro body of " << def.NameToken().Data() << '\n';
-  indent += "  ";
+  D( std::cerr << indent << "Macro body of " << def.NameToken().Data() << '\n'; )
+  D( indent += "  "; )
 
   for (; it != end; ++it) {
     TokenInfo *tok = make_tok(*it);
     if (tok) {
-      std::cerr << indent << tok->macro_tok->Data() << '\n';
+      D( std::cerr << indent << tok->macro_tok->Data() << '\n'; )
       body->before.emplace_back(tok);
     }
   }
@@ -1649,7 +1669,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
   StripWhitespace(body->before);
   AddOrClearInsaneBounds(body);
 
-  indent.resize(indent.size()  - 2u);
+  D( indent.resize(indent.size()  - 2u); )
 
   return body;
 }
@@ -1688,7 +1708,7 @@ void TokenTreeImpl::TryAddAfterToken(Substitution *sub, TokenInfo *prev) {
 // Get rid of leading and trailing whitespace in all internal nodes.
 void TokenTreeImpl::StripWhitespace(Substitution::NodeList &nodes) {
 
-  auto remove_ws = [&nodes, this] (void) {
+  auto remove_ws = [&nodes D(, this)] (void) {
     while (!nodes.empty()) {
       if (!std::holds_alternative<TokenInfo *>(nodes.back())) {
         break;
@@ -1705,7 +1725,7 @@ void TokenTreeImpl::StripWhitespace(Substitution::NodeList &nodes) {
       if (tk == pasta::TokenKind::kUnknown ||
           tk == pasta::TokenKind::kEndOfDirective ||
           tk == pasta::TokenKind::kEndOfFile) {
-        std::cerr << indent << "Stripping whitespace token\n";
+        D( std::cerr << indent << "Stripping whitespace token\n"; )
         nodes.pop_back();
       } else {
         break;
@@ -1748,7 +1768,7 @@ void TokenTreeImpl::HandleVAOpt(
   }
 
   if (!va_opt) {
-    std::cerr << indent << "Didn't find __VA_OPT__\n";
+    D( std::cerr << indent << "Didn't find __VA_OPT__\n"; )
     return;
   }
 
@@ -1769,7 +1789,8 @@ void TokenTreeImpl::HandleVAOpt(
         ++paren_count;
       } else if (tok->file_tok->Kind() == pasta::TokenKind::kRParenthesis) {
         if (!--paren_count) {
-          std::cerr << indent << "Found __VA_OPT__ rparen (" << tok->file_tok->Index() << ")\n";
+          D( std::cerr << indent << "Found __VA_OPT__ rparen ("
+                       << tok->file_tok->Index() << ")\n"; )
           va_opt->before.emplace_back(std::move(node));
           ++i;
           break;
@@ -1790,7 +1811,8 @@ void TokenTreeImpl::HandleVAOpt(
 
       // Opening parenthesis of input tokens to `__VA_OPT__`.
       } else if (tok->file_tok->Kind() == pasta::TokenKind::kLParenthesis) {
-        std::cerr << indent << "Found __VA_OPT__ lparen (" << tok->file_tok->Index() << ")\n";
+        D( std::cerr << indent << "Found __VA_OPT__ lparen ("
+                     << tok->file_tok->Index() << ")\n"; )
         va_arg = CreateSubstitution(Substitution::kVAOptArgument);
         va_arg->parent = va_opt;
         va_opt->before.emplace_back(std::move(node));
@@ -1809,7 +1831,7 @@ void TokenTreeImpl::HandleVAOpt(
   }
 
   if (!va_arg) {
-    std::cerr << indent << "Didn't find argument of __VA_OPT__\n";
+    D( std::cerr << indent << "Didn't find argument of __VA_OPT__\n"; )
     return;
   }
 
@@ -1872,11 +1894,11 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
 
   TokenInfo *prev = nullptr;
   if (sub->before_body && sub->before_body->file_tok) {
-    std::cerr
+    D( std::cerr
         << indent << "before_body ("
         << sub->before_body->file_tok->Index() << "): "
         << sub->before_body->file_tok->KindName() << ' '
-        << sub->before_body->file_tok->Data() << '\n';
+        << sub->before_body->file_tok->Data() << '\n'; )
     prev = sub->before_body;
   }
 
@@ -1887,33 +1909,36 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
   // calculate `max_i` before adding `sub->after_body`.
   const auto max_i = sub->before.size();
   if (sub->after_body && sub->after_body->file_tok) {
-    std::cerr
+    D( std::cerr
         << indent << "after_body ("
         << sub->after_body->file_tok->Index() << "): "
         << sub->after_body->file_tok->KindName() << ' '
-        << sub->after_body->file_tok->Data() << '\n';
+        << sub->after_body->file_tok->Data() << '\n'; )
     sub->before.emplace_back(sub->after_body);
   }
 
   Substitution::NodeList new_nodes;
   pasta::TokenKind lck;
 
-  indent += "  ";
+  D( indent += "  "; )
 
   for (auto i = 0u; i < max_i;) {
     Substitution::Node node = sub->before[i++];
-    std::cerr << indent << "{\n";
-    indent += "  ";
+    D( std::cerr << indent << "{\n"; )
+    D( indent += "  "; )
 
     if (std::holds_alternative<TokenInfo *>(node)) {
-      TokenInfo *nested_tok = std::get<TokenInfo *>(node);
-      std::cerr << indent << "Token node";
-      if (nested_tok->file_tok) {
-        std::cerr << " (" << nested_tok->file_tok->Index() << "): " << nested_tok->file_tok->Data();
-      }
-      std::cerr << '\n';
+      D(
+        TokenInfo *nested_tok = std::get<TokenInfo *>(node);
+        std::cerr << indent << "Token node";
+        if (nested_tok->file_tok) {
+          std::cerr << " (" << nested_tok->file_tok->Index() << "): "
+                    << nested_tok->file_tok->Data();
+        }
+        std::cerr << '\n';
+      )
     } else if (std::holds_alternative<Substitution *>(node)) {
-      std::cerr << indent << "Substitution node\n";
+      D( std::cerr << indent << "Substitution node\n"; )
       Substitution *nested_sub = std::get<Substitution *>(node);
       if (!FillMissingFileTokens(nested_sub, err)) {
         return false;
@@ -1923,11 +1948,13 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
 
       bool stopped_early_nested1 = false;
       bool stopped_early_nested2 = false;
-      if (prev->file_tok) {
-        std::cerr
-            << indent << "Prev (" << prev->file_tok->Index() << "): "
-            << prev->file_tok->Data() << '\n';
-      }
+      D(
+        if (prev->file_tok) {
+          std::cerr
+              << indent << "Prev (" << prev->file_tok->Index() << "): "
+              << prev->file_tok->Data() << '\n';
+        }
+      )
 
       if (AddMissingPrefixes(sub, prev, node, stopped_early_nested1,
                              new_nodes, err)) {
@@ -1952,7 +1979,7 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
                    lck != pasta::TokenKind::kRawIdentifier) {
 
         revisit_curr_again:
-          std::cerr << indent << "!!! triggering revisit\n";
+          D( std::cerr << indent << "!!! triggering revisit\n"; )
           // We've probably stripped leading whitespace from our invented node,
           // so go and add it in if we can.
           AddOrClearInsaneBounds(invented_node);
@@ -1977,9 +2004,14 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
           // more stuff into the `invented_node->after.before`.
           if (std::optional<unsigned> next_i = NextFromSameFile(sub, i)) {
             for (; i < next_i.value() && i < max_i; ++i) {
-              if (auto tok = LeftCornerOfUse(sub->before[i]); tok && tok->file_tok) {
-                std::cerr << indent << "  Injecting (" << tok->file_tok->Index() << ") into invented sub\n";
-              }
+              D(
+                if (auto tok = LeftCornerOfUse(sub->before[i]);
+                    tok && tok->file_tok) {
+                  std::cerr
+                  << indent << "  Injecting ("
+                      << tok->file_tok->Index() << ") into invented sub\n";
+                }
+              )
               invented_node->after->before.emplace_back(sub->before[i]);
             }
           }
@@ -1987,15 +2019,16 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
           AddOrClearInsaneBounds(invented_node);
           AddOrClearInsaneBounds(invented_node->after);
 
-          std::cerr << indent << "invented substitution; going recursive {\n";
-          indent += "  ";
+          D( std::cerr << indent
+                       << "invented substitution; going recursive {\n"; )
+          D( indent += "  "; )
 
           if (!FillMissingFileTokens(invented_node, err)) {
             return false;
           }
 
-          indent.resize(indent.size() - 2u);
-          std::cerr << indent << "}\n";
+          D( indent.resize(indent.size() - 2u); )
+          D( std::cerr << indent << "}\n"; )
 
           // If we're in a vararg context, then check for `__VA_OPT__`, and turn
           // it into a substitution to nothing or to its contents.
@@ -2005,7 +2038,7 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
             HandleVAOpt(invented_node, in_vararg_context);
           }
 
-          std::cerr << indent << "prefixing invented substitution\n";
+          D( std::cerr << indent << "prefixing invented substitution\n"; )
 
           // We've probably stripped leading whitespace from our invented node,
           // so go and add it in if we can.
@@ -2022,15 +2055,15 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
         }
 
       } else {
-        std::cerr << indent << "  didn't add intermediate nodes\n";
+        D( std::cerr << indent << "  didn't add intermediate nodes\n"; )
         new_nodes.emplace_back(std::move(node));
       }
     } else {
       new_nodes.emplace_back(std::move(node));
     }
 
-    indent.resize(indent.size() - 2u);
-    std::cerr << indent << "}\n";
+    D( indent.resize(indent.size() - 2u); )
+    D( std::cerr << indent << "}\n"; )
 
     if (auto next_prev = RightCornerOfUse(new_nodes.back())) {
       prev = next_prev;
@@ -2066,7 +2099,7 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
     }
   }
 
-  indent.resize(indent.size() - 2u);
+  D( indent.resize(indent.size() - 2u); )
   return true;
 }
 
@@ -2220,6 +2253,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
       return nullptr;
     }
   }
+
+  dir_use->macro_dir = std::move(node);
 
   return sub;
 }
@@ -2600,8 +2635,7 @@ TokenSet *TokenTreeImpl::UnifyToken(TokenInfo *curr) {
     parsed_set->file_tok = curr->file_tok;
   }
 
-  std::optional<pasta::Token> derived_loc =
-      curr->parsed_tok->DerivedLocation();
+  std::optional<pasta::Token> derived_loc = curr->parsed_tok->DerivedLocation();
   if (!derived_loc) {
     return parsed_set;
   }
@@ -2729,10 +2763,12 @@ static void FindParameters(
 
 
           if (i < args.size()) {
-            std::cerr << "Found args for macro param name: " << param_name << '\n';
+            D( std::cerr
+                << "Found args for macro param name: "
+                << param_name << '\n'; )
             params.emplace(param_name, args[i]);
           } else {
-            std::cerr << "Found macro param name: " << param_name << '\n';
+            D( std::cerr << "Found macro param name: " << param_name << '\n'; )
             params.emplace(param_name, empty);
           }
           ++i;
@@ -2912,13 +2948,15 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
   std::unordered_map<std::string, Substitution::NodeList> params;
   impl->FinalizeParameters(sub, params);
 
-  std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-  std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-  sub->Print(std::cerr);
-  std::cerr << "\n\n\n";
-  sub->PrintDOT(std::cerr);
-  std::cerr << "\n\n\n";
-  return std::string();
+  D(
+    std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+    std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+    sub->Print(std::cerr);
+    std::cerr << "\n\n\n";
+    sub->PrintDOT(std::cerr);
+    std::cerr << "\n\n\n";
+    return std::string();
+  )
 
   std::shared_ptr<const Substitution> ret(std::move(impl), sub);
   return TokenTree(std::move(ret));
@@ -2933,6 +2971,15 @@ std::optional<pasta::FileToken> TokenTreeNode::FileToken(void) const noexcept {
   }
 }
 
+std::optional<pasta::MacroToken> TokenTreeNode::MacroToken(void) const noexcept {
+  if (const auto &ent = impl->before[offset];
+      std::holds_alternative<TokenInfo *>(ent)) {
+    return std::get<TokenInfo *>(ent)->macro_tok;
+  } else {
+    return std::nullopt;
+  }
+}
+
 std::optional<pasta::Token> TokenTreeNode::Token(void) const noexcept {
   if (const auto &ent = impl->before[offset];
       std::holds_alternative<TokenInfo *>(ent)) {
@@ -2942,13 +2989,94 @@ std::optional<pasta::Token> TokenTreeNode::Token(void) const noexcept {
   }
 }
 
+std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree>>
+TokenTreeNode::MaybeSubTree(void) const noexcept {
+  if (const auto &ent = impl->before[offset];
+      std::holds_alternative<class Substitution *>(ent)) {
+
+    auto lhs = std::get<class Substitution *>(ent);
+    auto subtree_kind = mx::TokenSubstitutionKind::OTHER_DIRECTIVE;
+    switch (lhs->kind) {
+      case Substitution::kDefinition: {
+        TokenTree before(std::shared_ptr<const class Substitution>(impl, lhs));
+        return std::make_tuple(mx::TokenSubstitutionKind::DEFINE_DIRECTIVE,
+                               std::move(before));
+      }
+      case Substitution::kDirective:
+        if (!lhs->macro_dir) {
+          subtree_kind = mx::TokenSubstitutionKind::OTHER_DIRECTIVE;
+          break;
+        }
+        switch (lhs->macro_dir->DirectiveKind()) {
+          case pasta::MacroDirectiveKind::kIf:
+            subtree_kind = mx::TokenSubstitutionKind::IF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kIfDefined:
+            subtree_kind = mx::TokenSubstitutionKind::IFDEF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kIfNotDefined:
+            subtree_kind = mx::TokenSubstitutionKind::IFNDEF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kElseIf:
+            subtree_kind = mx::TokenSubstitutionKind::ELIF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kElseIfDefined:
+            subtree_kind = mx::TokenSubstitutionKind::ELIFDEF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kElseIfNotDefined:
+            subtree_kind = mx::TokenSubstitutionKind::ELIFNDEF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kElse:
+            subtree_kind = mx::TokenSubstitutionKind::ELSE_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kEndIf:
+            subtree_kind = mx::TokenSubstitutionKind::ENDIF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kDefine:
+            subtree_kind = mx::TokenSubstitutionKind::DEFINE_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kUndefine:
+            subtree_kind = mx::TokenSubstitutionKind::UNDEF_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kHashPragma:
+            subtree_kind = mx::TokenSubstitutionKind::PRAGMA_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kC99Pragma:
+            subtree_kind = mx::TokenSubstitutionKind::C99_PRAGMA_DIRECTIVE;
+            break;
+          case pasta::MacroDirectiveKind::kMicrosoftPragma:
+            subtree_kind =
+                mx::TokenSubstitutionKind::MICROSOFT_PRAGMA_DIRECTIVE;
+            break;
+          default:
+            subtree_kind = mx::TokenSubstitutionKind::OTHER_DIRECTIVE;
+            break;
+        }
+        break;
+      case Substitution::kMacroArgument:
+        subtree_kind = mx::TokenSubstitutionKind::MACRO_ARGUMENT;
+        break;
+
+      case Substitution::kVAOptArgument:
+        subtree_kind = mx::TokenSubstitutionKind::VA_OPT_ARGUMENT;
+        break;
+
+      default:
+        return std::nullopt;
+    }
+
+    TokenTree before(std::shared_ptr<const class Substitution>(impl, lhs));
+    return std::make_tuple(subtree_kind, std::move(before));
+  }
+  return std::nullopt;
+}
+
 std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
 TokenTreeNode::MaybeSubstitution(void) const noexcept {
   if (const auto &ent = impl->before[offset];
       std::holds_alternative<class Substitution *>(ent)) {
     auto lhs = std::get<class Substitution *>(ent);
     auto rhs = lhs->after;
-    CHECK_NOTNULL(rhs);
 
     TokenTree before(std::shared_ptr<const class Substitution>(impl, lhs));
     TokenTree after(std::shared_ptr<const class Substitution>(impl, rhs));
@@ -2956,35 +3084,52 @@ TokenTreeNode::MaybeSubstitution(void) const noexcept {
     switch (lhs->kind) {
       case Substitution::kInclusion:
         return std::make_tuple(
-            mx::TokenSubstitutionKind::INCLUDE_EXPANSION,
+            mx::TokenSubstitutionKind::INCLUDE,
             std::move(before), std::move(after));
 
       case Substitution::kMacroUse:
-      case Substitution::kVAOptUse:
-        if (lhs->before.size() == 1u) {
-          return std::make_tuple(
-              mx::TokenSubstitutionKind::MACRO_EXPANSION,
-              std::move(before), std::move(after));
-        } else {
-          return std::make_tuple(
-              mx::TokenSubstitutionKind::FUNCTION_LIKE_MACRO_EXPANSION,
-              std::move(before), std::move(after));
-        }
-
-      case Substitution::kSubstitutionBefore:
-      case Substitution::kMacroParameterUse:
         return std::make_tuple(
-            mx::TokenSubstitutionKind::SUBSTITUTION,
+            mx::TokenSubstitutionKind::MACRO,
             std::move(before), std::move(after));
 
-      case Substitution::kDefinition:
+      case Substitution::kVAOptUse:
+        return std::make_tuple(
+            mx::TokenSubstitutionKind::VA_OPT,
+            std::move(before), std::move(after));
+
+      case Substitution::kSubstitutionBefore:
+        return std::make_tuple(
+            mx::TokenSubstitutionKind::SUBSTITUTE,
+            std::move(before), std::move(after));
+
+      case Substitution::kMacroParameterUse:
+        return std::make_tuple(
+            mx::TokenSubstitutionKind::MACRO_PARAMETER,
+            std::move(before), std::move(after));
+
+      case Substitution::kStringifyBefore:
+        return std::make_tuple(
+            mx::TokenSubstitutionKind::STRINGIFY,
+            std::move(before), std::move(after));
+
+      case Substitution::kConcatenateBefore:
+        return std::make_tuple(
+            mx::TokenSubstitutionKind::CONCATENATE,
+            std::move(before), std::move(after));
+
+      // Sub-tree things.
       case Substitution::kDirective:
+      case Substitution::kDefinition:
       case Substitution::kMacroArgument:
-      case Substitution::kMacroExpansion:
       case Substitution::kVAOptArgument:
+        return std::nullopt;
+
+      case Substitution::kMacroExpansion:
       case Substitution::kVAOptExpansion:
       case Substitution::kSubstitutionAfter:
       case Substitution::kMacroParameterSubstitution:
+      case Substitution::kStringifyAfter:
+      case Substitution::kConcatenateAfter:
       case Substitution::kFileBody:
         LOG(FATAL) << "Hrmm";
         break;
