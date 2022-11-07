@@ -34,6 +34,10 @@ static constexpr const char* table_names[] = {
   "'mx::MangledNameToEntityId'",
   "'mx::EntityIdUseToFragmentId'",
   "'mx::EntityIdReference'",
+  "'mx::syntex::Tokens'",
+  "'mx::syntex::GrammarRoot'",
+  "'mx::syntex::GrammarNodes'",
+  "'mx::syntex::GrammarChildren'",
 };
 
 template <uint8_t kId, typename... Keys>
@@ -106,7 +110,8 @@ class PersistentSet {
     db.Execute(ss.str());
 
     ss = {};
-    ss << "INSERT OR IGNORE INTO " << table_names[kId] << '(' << table_desc.str() << ") VALUES(";
+    ss << "INSERT OR IGNORE INTO " << table_names[kId]
+       << '(' << table_desc.str() << ") VALUES(";
     for(size_t i = 0; i < sizeof...(Keys); ++i) {
       ss << "?" << (i + 1);
       if(i != sizeof...(Keys) - 1) {
@@ -139,7 +144,8 @@ class PersistentSet {
 
     for(size_t i = 0; i < sizeof...(Keys); ++i) {
       ss = {};
-      ss << "SELECT " << table_desc.str() << " FROM " << table_names[kId] << " WHERE ";
+      ss << "SELECT " << table_desc.str()
+         << " FROM " << table_names[kId] << " WHERE ";
       for(size_t j = 0; j <= i; j++) {
         ss << "key" << j << " = ?" << (j + 1);
         if(j != i) {
@@ -188,31 +194,87 @@ class PersistentSet {
   }
 };
 
+template<typename... Ts>
+class Iterator {
+ private:
+  std::shared_ptr<sqlite::Statement> stmt;
+  std::tuple<Ts...> value;
+
+  template<size_t... Is>
+  void Read(std::index_sequence<Is...>) {
+    auto res = stmt->GetResult();
+    res.Columns(std::get<Is>(value)...);
+  }
+
+ public:
+  Iterator(std::shared_ptr<sqlite::Statement> stmt)
+    : stmt(std::move(stmt)) {
+    this->operator++();
+  }
+
+  bool operator==(const Iterator& b) const {
+    return stmt == b.stmt;
+  }
+
+  bool operator!=(const Iterator& b) const {
+    return stmt != b.stmt;
+  }
+
+  Iterator& operator++(void) {
+    if(!stmt->ExecuteStep()) {
+      stmt = nullptr;
+      return *this;
+    }
+
+    Read(std::make_index_sequence<sizeof...(Ts)>());
+    return *this;
+  }
+
+  const std::tuple<Ts...> &operator*(void) const {
+    return value;
+  }
+
+  const std::tuple<Ts...> *operator->(void) const {
+    return &value;
+  }
+};
+
 // Persistent mapping from keys to values.
 template <uint8_t kId, typename K, typename V>
 class PersistentMap {
  private:
   sqlite::Connection &db;
-  std::shared_ptr<sqlite::Statement> set_stmt, get_stmt, get_or_set_stmt;
+  std::shared_ptr<sqlite::Statement> set_stmt;
+  std::shared_ptr<sqlite::Statement> get_stmt;
+  std::shared_ptr<sqlite::Statement> get_or_set_stmt;
+  std::shared_ptr<sqlite::Statement> enum_stmt;
 
  public:
   PersistentMap(sqlite::Connection &db) : db(db) {
     std::stringstream ss;
-    ss << "CREATE TABLE IF NOT EXISTS " << table_names[kId] << "(key, value, PRIMARY KEY(key))";
+    ss << "CREATE TABLE IF NOT EXISTS " << table_names[kId]
+       << "(key, value, PRIMARY KEY(key))";
     db.Execute(ss.str());
 
     ss = {};
-    ss << "INSERT OR REPLACE INTO " << table_names[kId] << "(key, value) VALUES (?1, ?2)";
+    ss << "INSERT OR REPLACE INTO " << table_names[kId]
+       << "(key, value) VALUES (?1, ?2)";
     set_stmt = db.Prepare(ss.str());
 
     ss = {};
-    ss << "SELECT key, value FROM " << table_names[kId] << " WHERE key = ?1";
+    ss << "SELECT key, value FROM " << table_names[kId]
+       << " WHERE key = ?1";
     get_stmt = db.Prepare(ss.str());
 
     ss = {};
     ss << "INSERT INTO " << table_names[kId]
-       << "(key, value) VALUES(?1, ?2) ON CONFLICT DO UPDATE SET value=value RETURNING key, value";
+       << "(key, value) VALUES(?1, ?2) "
+       << "ON CONFLICT DO UPDATE SET value=value RETURNING key, value";
     get_or_set_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT key, value FROM " << table_names;
+    enum_stmt = db.Prepare(ss.str());
   }
 
   V GetOrSet(K key, V val) const {
@@ -243,6 +305,114 @@ class PersistentMap {
     }
 
     return std::nullopt;
+  }
+
+  Iterator<K, V> begin() {
+    return Iterator<K, V>(enum_stmt);
+  }
+
+  Iterator<K, V> end() {
+    return Iterator<K, V>(nullptr);
+  }
+};
+
+template <uint8_t kId, typename K1, typename K2, typename V>
+class PersistentMap2 {
+ private:
+  sqlite::Connection &db;
+  std::shared_ptr<sqlite::Statement> set_stmt;
+  std::shared_ptr<sqlite::Statement> get_stmt;
+  std::shared_ptr<sqlite::Statement> get_or_set_stmt;
+  std::shared_ptr<sqlite::Statement> enum_stmt;
+  std::shared_ptr<sqlite::Statement> enum_k1_stmt;
+  std::shared_ptr<sqlite::Statement> enum_k2_stmt;
+
+ public:
+  PersistentMap2(sqlite::Connection &db) : db(db) {
+    std::stringstream ss;
+    ss << "CREATE TABLE IF NOT EXISTS "
+       << table_names[kId] << "(key1, key2, value, PRIMARY KEY(key1, key2))";
+    db.Execute(ss.str());
+
+    ss = {};
+    ss << "INSERT OR REPLACE INTO "
+       << table_names[kId] << "(key1, key2, value) VALUES (?1, ?2, ?3)";
+    set_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT key1, key2, value FROM "
+       << table_names[kId] << " WHERE key1 = ?1 AND key2 = ?2";
+    get_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "INSERT INTO " << table_names[kId]
+       << "(key1, key2, value) VALUES(?1, ?2, ?3) "
+       << "ON CONFLICT DO UPDATE SET value=value RETURNING key1, key2, value";
+    get_or_set_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT key1, key2, value FROM " << table_names;
+    enum_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT key1, key2, value FROM " << table_names[kId]
+       << " WHERE key1 = ?1";
+    enum_k1_stmt = db.Prepare(ss.str());
+
+    ss = {};
+    ss << "SELECT key1, key2, value FROM " << table_names[kId]
+       << " WHERE key2 = ?1";
+    enum_k1_stmt = db.Prepare(ss.str());
+  }
+
+  V GetOrSet(K1 key1, K2 key2, V val) const {
+    get_or_set_stmt->BindValues(key1, key2, val);
+    get_or_set_stmt->ExecuteStep();
+    auto res = get_or_set_stmt->GetResult();
+    K1 stored_key1;
+    K2 stored_key2;
+    V stored_value;
+    res.Columns(stored_key1, stored_key2, stored_value);
+    get_or_set_stmt->ExecuteStep();
+    return stored_value;
+  }
+
+  void Set(K1 key1, K2 key2, V val) const {
+    set_stmt->BindValues(key1, key2, val);
+    set_stmt->Execute();
+  }
+
+  std::optional<V> TryGet(K1 key1, K2 key2) const {
+    get_stmt->BindValues(key1, key2);
+    if(get_stmt->ExecuteStep()) {
+      K1 stored_key1;
+      K2 stored_key2;
+      V stored_value;
+      auto res = get_stmt->GetResult();
+      res.Columns(stored_key1, stored_key2, stored_value);
+      get_stmt->ExecuteStep();
+      return stored_value;
+    }
+
+    return std::nullopt;
+  }
+
+  Iterator<K1, K2, V> begin() {
+    return Iterator<K1, K2, V>(enum_stmt);
+  }
+
+  Iterator<K1, K2, V> key1_equals(K1 key) {
+    enum_k1_stmt->BindValues(key);
+    return Iterator<K1, K2, V>(enum_k1_stmt);
+  }
+
+  Iterator<K1, K2, V> key2_equals(K2 key) {
+    enum_k2_stmt->BindValues(key);
+    return Iterator<K1, K2, V>(enum_k1_stmt);
+  }
+
+  Iterator<K1, K2, V> end() {
+    return Iterator<K1, K2, V>(nullptr);
   }
 };
 

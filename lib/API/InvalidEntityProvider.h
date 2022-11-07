@@ -57,6 +57,17 @@ class InvalidEntityProvider final : public EntityProvider {
   void FindSymbol(const Ptr &, std::string name,
                   mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
+
+  std::optional<mx::TokenKind>
+  TokenKindOf(std::string_view spelling) final;
+
+  void LoadGrammarRoot(syntex::GrammarLeaves &root) final;
+
+  std::vector<RawEntityId> GetFragmentsInAST(void) final;
+  ASTNode GetASTNode(std::uint64_t id) final;
+  std::vector<std::uint64_t> GetASTNodeChildren(std::uint64_t id) final;
+  std::vector<std::uint64_t> GetASTNodesInFragment(RawEntityId frag) final;
+  std::optional<std::uint64_t> GetASTNodeWithKind(RawEntityId frag, unsigned short kind) final;
 };
 
 }  // namespace mx

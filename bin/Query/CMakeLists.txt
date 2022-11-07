@@ -10,8 +10,9 @@ add_executable("syntex-query" "SyntexQuery.cpp")
 
 target_link_libraries("syntex-query"
   PRIVATE
+    gflags
+    glog::glog
     "mx-api"
-    "mx-syntex"
 )
 
 install(
@@ -29,6 +30,6 @@ add_executable("predicate-example" "PredicateExample.cpp")
 target_link_libraries("predicate-example"
   PRIVATE
     gflags
+    glog::glog
     "mx-api"
-    "mx-syntex"
 )

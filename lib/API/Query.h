@@ -6,17 +6,18 @@
 
 #pragma once
 
-#include "AST.h"
 #include "NodeKind.h"
 #include "Grammar.h"
 #include <multiplier/Syntex.h>
 #include <deque>
+#include <unordered_map>
+#include <unordered_set>
 
 template <class T>
 inline void hash_combine(size_t &h, const T& v)
 {
-    std::hash<T> hasher;
-    h ^= hasher(v) + 0x9e3779b9 + (h << 6) + (h >> 2);
+  std::hash<T> hasher;
+  h ^= hasher(v) + 0x9e3779b9 + (h << 6) + (h >> 2);
 }
 
 template<>
@@ -31,6 +32,30 @@ struct std::hash<std::pair<mx::syntex::NodeKind, size_t>> {
 
 namespace mx {
 namespace syntex {
+//
+// Result of parsing a query
+//
+
+class ParsedQuery {
+ private:
+  std::shared_ptr<ParsedQueryImpl> impl;
+  ParsedQuery(void) = delete;
+
+ public:
+  explicit ParsedQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query);
+
+  bool IsValid() const;
+
+  bool AddMetavarPredicate(const std::string_view &name,
+                           std::function<bool(const MetavarMatch&)> predicate);
+
+  void ForEachMatch(mx::RawEntityId frag_id,
+                    std::function<bool(Match)> pred) const;
+  void ForEachMatch(std::function<bool(Match)> pred) const;
+
+  std::vector<Match> Find(mx::RawEntityId frag_id) const;
+  std::vector<Match> Find(void) const;
+};
 
 struct Metavar {
   std::string_view m_name;
@@ -212,11 +237,12 @@ struct Item {
 //
 
 struct ParsedQueryImpl {
-  // GrammarImpl to be processed
-  const GrammarImpl &m_grammar;
+  std::shared_ptr<mx::EntityProvider> m_ep;
 
   // Input string
   std::string_view m_input;
+
+  GrammarLeaves grammar_root;
 
   // Main DP parse table
   using TableEntry = std::unordered_map<std::pair<NodeKind, size_t>,
@@ -239,12 +265,12 @@ struct ParsedQueryImpl {
 
   const TableEntry &ParsesAtIndex(size_t index);
 
-  explicit ParsedQueryImpl(const GrammarImpl &grammar, std::string_view input);
+  explicit ParsedQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input);
 
   void DebugParseTable(std::ostream &os);
 
   std::pair<bool, std::vector<MetavarMatch>> MatchMarker(
-    const TableEntry &entry, const ParseMarker &marker, const ASTNode *node);
+    const TableEntry &entry, const ParseMarker &marker, std::uint64_t node_id);
 };
 
 }  // namespace syntex

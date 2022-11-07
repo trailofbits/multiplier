@@ -78,6 +78,11 @@ std::string_view QueryResult::getBlob(int32_t idx) {
   return std::string_view(ptr, len);
 }
 
+bool QueryResult::isNull(int32_t idx) {
+  auto prepared_stmt = stmt->prepareStatement();
+  return sqlite3_column_type(prepared_stmt, idx) == SQLITE_NULL;
+}
+
 Statement::Statement(Connection &conn, const std::string &stmt)
     : db(conn),
       query(stmt) {
@@ -90,8 +95,7 @@ Statement::Statement(Connection &conn, const std::string &stmt)
                                   static_cast<int>(query.size()),
                                   &stmt, const_cast<const char **>(&tail));
     if (SQLITE_OK != ret) {
-      assert(0);
-      throw Error("Failed to prepare statement");
+      throw Error("Failed to prepare statement", db.GetHandler());
     }
 
     return std::shared_ptr<sqlite3_stmt>(

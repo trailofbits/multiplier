@@ -6,6 +6,7 @@
 
 #include "File.h"
 #include "Fragment.h"
+#include "Query.h"
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
@@ -327,6 +328,22 @@ NamedDeclList Index::query_entities(
   decls.erase(it, decls.end());
   
   return decls;
+}
+
+std::optional<std::vector<syntex::Match>> Index::query_syntex(std::string_view query) const {
+  syntex::ParsedQuery parsed_query(impl, query);
+  if(!parsed_query.IsValid()) {
+    return std::nullopt;
+  }
+  return parsed_query.Find();
+}
+
+std::optional<std::vector<syntex::Match>> Index::query_syntex(FragmentId frag, std::string_view query) const {
+  syntex::ParsedQuery parsed_query(impl, query);
+  if(!parsed_query.IsValid()) {
+    return std::nullopt;
+  }
+  return parsed_query.Find(frag.fragment_id);
 }
 
 }  // namespace mx

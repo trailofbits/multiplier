@@ -12,6 +12,122 @@
 #include <multiplier/Entities/DeclKind.h>
 
 namespace mx {
+PersistentAST::PersistentAST(sqlite::Connection &db) : db(db) {
+  db.Execute(
+    "CREATE TABLE IF NOT EXISTS "
+    "'mx::syntex::ASTNode'(prev, kind, entity, spelling)");
+  db.Execute(
+    "CREATE TABLE IF NOT EXISTS "
+    "'mx::syntex::ASTChildren'(parent, child, PRIMARY KEY(parent, child))");
+  db.Execute(
+    "CREATE TABLE IF NOT EXISTS "
+    "'mx::syntex::ASTIndex'(fragment, kind, node, PRIMARY KEY(fragment, kind))");
+  db.Execute(
+    "CREATE TABLE IF NOT EXISTS 'mx::syntex::ASTRoot'(fragment, node)");
+
+  get_root_stmt = db.Prepare(
+    "SELECT node FROM 'mx::syntex::ASTRoot' WHERE fragment = ?1");
+  create_node_stmt = db.Prepare(
+    "INSERT INTO 'mx::syntex::ASTNode'(prev, kind, entity, spelling) "
+    "VALUES (?1, ?2, ?3, ?4) RETURNING rowid");
+  add_root_stmt = db.Prepare(
+    "INSERT INTO 'mx::syntex::ASTRoot'(fragment, node) VALUES (?1, ?2)");
+  get_node_stmt = db.Prepare(
+    "SELECT prev, kind, entity, spelling "
+    "FROM 'mx::syntex::ASTNode' WHERE rowid = ?1");
+  get_index_stmt = db.Prepare(
+    "SELECT node FROM 'mx::syntex::ASTIndex' "
+    "WHERE fragment = ?1 AND kind = ?2");
+  set_index_stmt = db.Prepare(
+    "INSERT OR REPLACE INTO 'mx::syntex::ASTIndex'(fragment, kind, node) "
+    "VALUES(?1, ?2, ?3)"
+  );
+  get_fragments_stmt = db.Prepare(
+    "SELECT DISTINCT fragment FROM 'mx::syntex::ASTRoot'"
+  );
+  get_children_stmt = db.Prepare(
+    "SELECT child FROM 'mx::syntex::ASTChildren' WHERE parent = ?1"
+  );
+  add_child_stmt = db.Prepare(
+    "INSERT INTO 'mx::syntex::ASTChildren'(parent, child) VALUES (?1, ?2)"
+  );
+}
+
+std::vector<std::uint64_t> PersistentAST::Root(RawEntityId fragment) {
+  std::vector<std::uint64_t> results;
+  get_root_stmt->BindValues(fragment);
+  while(get_root_stmt->ExecuteStep()) {
+    get_root_stmt->GetResult().Columns(results.emplace_back());
+  }
+  return results;
+}
+
+std::uint64_t PersistentAST::AddNode(const ASTNode& node) {
+  create_node_stmt->BindValues(node.prev, node.kind,
+                               node.entity, node.spelling);
+  create_node_stmt->ExecuteStep();
+  std::uint64_t rowid;
+  create_node_stmt->GetResult().Columns(rowid);
+  return rowid;
+}
+
+void PersistentAST::AddNodeToRoot(RawEntityId fragment, std::uint64_t node_id) {
+  add_root_stmt->BindValues(fragment, node_id);
+  add_root_stmt->Execute();
+}
+
+ASTNode PersistentAST::GetNode(std::uint64_t node_id) {
+  ASTNode node;
+  get_node_stmt->BindValues(node_id);
+  get_node_stmt->ExecuteStep();
+  get_node_stmt->GetResult().Columns(node.prev, node.kind,
+                                     node.entity, node.spelling);
+  get_node_stmt->ExecuteStep();
+  return node;
+}
+
+std::optional<std::uint64_t> PersistentAST::GetNodeInIndex(
+  RawEntityId fragment,
+  unsigned short kind) {
+  get_index_stmt->BindValues(fragment, kind);
+  if(get_index_stmt->ExecuteStep()) {
+    std::uint64_t rowid;
+    get_index_stmt->GetResult().Columns(rowid);
+    return rowid;
+  }
+  return {};
+}
+
+void PersistentAST::SetNodeInIndex(
+  RawEntityId fragment,
+  unsigned short kind,
+  std::uint64_t node_id) {
+  set_index_stmt->BindValues(fragment, kind, node_id);
+  set_index_stmt->Execute();
+}
+
+std::vector<mx::RawEntityId> PersistentAST::GetFragments() {
+  std::vector<mx::RawEntityId> fragments;
+  while(get_fragments_stmt->ExecuteStep()) {
+    get_fragments_stmt->GetResult().Columns(fragments.emplace_back());
+  }
+  return fragments;
+}
+
+std::vector<std::uint64_t> PersistentAST::GetChildren(std::uint64_t parent) {
+  std::vector<std::uint64_t> children;
+  get_children_stmt->BindValues(parent);
+  while(get_children_stmt->ExecuteStep()) {
+    get_children_stmt->GetResult().Columns(children.emplace_back());
+  }
+  return children;
+}
+
+void PersistentAST::AddChild(std::uint64_t parent, std::uint64_t child) {
+  add_child_stmt->BindValues(parent, child);
+  add_child_stmt->Execute();
+}
+
 IndexStorage::IndexStorage(sqlite::Connection& db)
     : db(db)
     , version_number(db)
@@ -30,6 +146,11 @@ IndexStorage::IndexStorage(sqlite::Connection& db)
     , mangled_name_to_entity_id(db)
     , entity_id_use_to_fragment_id(db)
     , entity_id_reference(db)
+    , spelling_to_token_kind(db)
+    , grammar_root(db)
+    , grammar_nodes(db)
+    , grammar_children(db)
+    , ast(db)
     , database(db) {}
 
 IndexStorage::~IndexStorage() {}

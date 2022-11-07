@@ -72,8 +72,9 @@ static std::optional<unsigned> IntegralTypeWidth(const mx::ValueDecl &decl) {
   return IntegralTypeWidth(decl.type());
 }
 
-static void HighlightMatch(std::ostream &os, mx::syntex::Match m) {
-  auto ref = mx::DeclRefExpr::from(std::get<mx::Stmt>(m.MetavarMatch(0).Entity()));
+static void HighlightMatch(std::ostream &os, mx::Index index, mx::syntex::Match m) {
+  auto stmt = std::get<mx::Stmt>(index.entity(m.MetavarMatch(0).Entity()));
+  auto ref = mx::DeclRefExpr::from(stmt);
   if (!ref) {
     return;
   }
@@ -89,7 +90,7 @@ static void HighlightMatch(std::ostream &os, mx::syntex::Match m) {
   }
 
   auto lit = mx::IntegerLiteral::from(
-      std::get<mx::Stmt>(m.MetavarMatch(1).Entity()));
+      std::get<mx::Stmt>(index.entity(m.MetavarMatch(1).Entity())));
   if (!lit) {
     return;
   }
@@ -117,16 +118,25 @@ static void HighlightMatch(std::ostream &os, mx::syntex::Match m) {
     return;
   }
 
+  auto entity = index.entity(m.Entity());
+  auto fragment = index.fragment_containing(m.Entity());
   auto builtin_type = mx::BuiltinType::from(var->type());
-  os << "File ID: " << mx::File::containing(m.Fragment()).id() << '\n'
-     << "Fragment ID: " << m.Fragment().id().Pack() << '\n'
-     << "Token ID: " << m.FirstTokenId() << '\n'
+  mx::TokenRange tok_range;
+  if(std::holds_alternative<mx::Token>(entity)) {
+    tok_range = std::get<mx::Token>(entity);
+  } else if(std::holds_alternative<mx::Stmt>(entity)) {
+    tok_range = std::get<mx::Stmt>(entity).tokens();
+  } else if(std::holds_alternative<mx::Decl>(entity)) {
+    tok_range = std::get<mx::Decl>(entity).tokens();
+  }
+  os << "File ID: " << mx::File::containing(*fragment).id() << '\n'
+     << "Fragment ID: " << fragment->id().Pack() << '\n'
      << "Literal value: " << lit_val << '\n'
      << "Type size: " << type_size.value() << '\n'
      << "Type kind: " << mx::EnumeratorName(builtin_type->builtin_kind())
      << "\nExpression:";
 
-  for (mx::Token tok : m.TokenRange()) {
+  for (mx::Token tok : tok_range) {
     os << ' ' << tok.data();
   }
 
@@ -157,21 +167,18 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = mx::EntityProvider::in_memory_cache(
                       mx::EntityProvider::from_database(FLAGS_db));
-  mx::syntex::Grammar grammar(index, FLAGS_db);
 
   // Setup query
 
-  mx::syntex::ParsedQuery parsed_query(grammar, "$var:DECL_REF_EXPR << $num:INTEGER_LITERAL");
-  if (!parsed_query.IsValid()) {
+  auto res = index.query_syntex("$var:DECL_REF_EXPR << $num:INTEGER_LITERAL");
+  if (!res.has_value()) {
     return EXIT_FAILURE;
   }
 
   // Match fragments
-
-  parsed_query.ForEachMatch([] (mx::syntex::Match match) {
-    HighlightMatch(std::cout, std::move(match));
-    return true;
-  });
+  for(auto match : res.value()) {
+    HighlightMatch(std::cout, index, std::move(match));
+  }
 
   return EXIT_SUCCESS;
 }

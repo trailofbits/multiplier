@@ -4,12 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "AST.h"
 #include "Query.h"
 
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <multiplier/IndexStorage.h>
 
 namespace mx {
 namespace syntex {
@@ -530,8 +530,10 @@ FractionalConstant:
   }
 }
 
-ParsedQueryImpl::ParsedQueryImpl(const GrammarImpl &grammar, std::string_view input)
-  : m_grammar(grammar), m_input(input) {}
+ParsedQueryImpl::ParsedQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input)
+  : m_ep(std::move(ep)), m_input(input) {
+  ep->LoadGrammarRoot(grammar_root);
+}
 
 void ParsedQueryImpl::MatchGlob(TableEntry &result,
                                   const std::unordered_set<NodeKind> &follow,
@@ -595,7 +597,7 @@ void ParsedQueryImpl::MatchRule(TableEntry &result, Item &item, size_t next) {
 }
 
 void ParsedQueryImpl::MatchPrefix(TableEntry &result, NodeKind kind, size_t next) {
-  Item(&m_grammar.root).IterateShifts(kind, next, Glob::NO, [&] (Item &item) {
+  Item(&grammar_root).IterateShifts(kind, next, Glob::NO, [&] (Item &item) {
     MatchRule(result, item, next);
   });
 }
@@ -611,7 +613,7 @@ const ParsedQueryImpl::TableEntry &ParsedQueryImpl::ParsesAtIndex(size_t index) 
   auto &result = m_parses[index];
 
   auto TokenCallback = [&] (mx::TokenKind lex_kind, std::string_view spelling, size_t next) {
-    if (auto grm_kind = m_grammar.TokenKindOf(spelling)) {
+    if (auto grm_kind = m_ep->TokenKindOf(spelling)) {
       result[{*grm_kind, next}].emplace(spelling);
       MatchPrefix(result, *grm_kind, next);
     } else {
@@ -643,15 +645,17 @@ const ParsedQueryImpl::TableEntry &ParsedQueryImpl::ParsesAtIndex(size_t index) 
 }
 
 std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
-    const TableEntry &entry, const ParseMarker &marker, const ASTNode *node) {
+    const TableEntry &entry, const ParseMarker &marker, std::uint64_t node_id) {
 
   std::vector<MetavarMatch> metavar_matches;
+  auto node = m_ep->GetASTNode(node_id);
+  auto kind = NodeKind::Deserialize(node.kind);
+  auto children = m_ep->GetASTNodeChildren(node_id);
 
   switch (marker.m_kind) {
     case ParseMarker::METAVAR:
       if (marker.m_metavar) {
-        MetavarMatch mv_match(marker.m_metavar->m_name,
-          node->Entity(), node->TokenRange());
+        MetavarMatch mv_match(marker.m_metavar->m_name, node.entity);
         if (auto &predicate = marker.m_metavar->m_predicate) {
           if (!(*predicate)(mv_match)) {
             return {false, {}};
@@ -661,21 +665,22 @@ std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
       }
       return {true, metavar_matches};
     case ParseMarker::TERMINAL:
-      return {node->Kind().IsToken() && node->Spelling() == marker.m_spelling,
-              {}};
+      return {kind.IsToken() && node.spelling == marker.m_spelling, {}};
     case ParseMarker::NONTERMINAL:
-      if (node->Kind().IsToken() ||
-            node->ChildVector().size() != marker.m_children.size())  {
+      if (kind.IsToken() ||
+            children.size() != marker.m_children.size())  {
         return {false, {}};
       }
 
       auto child_entry = &entry;
       auto child_it = marker.m_children.begin();
 
-      for (const ASTNode *child_node : node->ChildVector()) {
+      for (std::uint64_t child_node_id : children) {
         auto &[kind, next, glob] = *child_it;
+        auto child_node = m_ep->GetASTNode(child_node_id);
+        auto child_node_kind = NodeKind::Deserialize(child_node.kind);
 
-        if (kind != NodeKind::Any() && kind != child_node->Kind()) {
+        if (kind != NodeKind::Any() && kind != child_node_kind) {
           return {false, {}};
         }
 
@@ -686,7 +691,7 @@ std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
           }
           for (auto &marker : markers->second) {
             auto [child_ok, child_metavar_matches] =
-              MatchMarker(*child_entry, marker, child_node);
+              MatchMarker(*child_entry, marker, child_node_id);
             if (child_ok) {
               metavar_matches.insert(
                 metavar_matches.end(),
@@ -753,8 +758,8 @@ void ParsedQueryImpl::DebugParseTable(std::ostream &os) {
   }
 }
 
-ParsedQuery::ParsedQuery(const Grammar &grammar, std::string_view query)
-  : impl(std::make_shared<ParsedQueryImpl>(*grammar.impl, query)) {}
+ParsedQuery::ParsedQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query)
+  : impl(std::make_shared<ParsedQueryImpl>(std::move(ep), query)) {}
 
 bool ParsedQuery::IsValid(void) const {
   for (auto &[key, markers] : impl->ParsesAtIndex(0)) {
@@ -790,35 +795,6 @@ bool ParsedQuery::AddMetavarPredicate(
   return true;
 }
 
-std::vector<Match> ParsedQuery::FindInFragment(
-    mx::RawEntityId fragment_id) const {
-  if (auto frag = impl->m_grammar.index.fragment(fragment_id)) {
-    return Find(frag.value());
-  } else {
-    return {};
-  }
-}
-
-void ParsedQuery::ForEachMatch(const mx::File &file,
-                               std::function<bool(Match)> pred) const {
-  bool done = false;
-  auto real_pred = [sub_pred = std::move(pred), &done] (Match m) -> bool {
-    if (sub_pred(std::move(m))) {
-      return true;
-    } else {
-      done = true;
-      return false;
-    }
-  };
-
-  for (mx::Fragment frag : mx::Fragment::in(file)) {
-    ForEachMatch(frag, real_pred);
-    if (done) {
-      break;
-    }
-  }
-}
-
 void ParsedQuery::ForEachMatch(std::function<bool(Match)> pred) const {
   bool done = false;
   auto real_pred = [sub_pred = std::move(pred), &done] (Match m) -> bool {
@@ -829,21 +805,15 @@ void ParsedQuery::ForEachMatch(std::function<bool(Match)> pred) const {
       return false;
     }
   };
-
-  for (mx::File file : mx::File::in(impl->m_grammar.index)) {
-    for (mx::Fragment frag : mx::Fragment::in(file)) {
-      ForEachMatch(frag, real_pred);
-      if (done) {
-        break;
-      }
-    }
+  for(auto frag_id : impl->m_ep->GetFragmentsInAST()) {
+    ForEachMatch(frag_id, real_pred);
     if (done) {
       break;
     }
   }
 }
 
-std::vector<Match> ParsedQuery::Find(const mx::Fragment &frag) const {
+std::vector<Match> ParsedQuery::Find(mx::RawEntityId frag) const {
   std::vector<Match> ret;
   ForEachMatch(frag, [&ret] (Match m) -> bool {
     ret.emplace_back(std::move(m));
@@ -852,33 +822,20 @@ std::vector<Match> ParsedQuery::Find(const mx::Fragment &frag) const {
   return ret;
 }
 
-std::vector<Match> ParsedQuery::Find(const mx::File &file) const {
-  std::vector<Match> ret;
-  ForEachMatch(file, [&ret] (Match m) -> bool {
-    ret.emplace_back(std::move(m));
-    return true;
-  });
-  return ret;
-}
-
 std::vector<Match> ParsedQuery::Find(void) const {
   std::vector<Match> ret;
-  for (mx::File file : mx::File::in(impl->m_grammar.index)) {
-    for (mx::Fragment frag : mx::Fragment::in(file)) {
-      ForEachMatch(frag, [&ret] (Match m) -> bool {
-        ret.emplace_back(std::move(m));
-        return true;
-      });
-    }
+  for (auto frag_id : impl->m_ep->GetFragmentsInAST()) {
+    ForEachMatch(frag_id, [&ret] (Match m) -> bool {
+      ret.emplace_back(std::move(m));
+      return true;
+    });
   }
   return ret;
 }
 
-void ParsedQuery::ForEachMatch(const mx::Fragment &frag,
+void ParsedQuery::ForEachMatch(mx::RawEntityId frag_id,
                                std::function<bool(Match)> pred) const {
-
-  // Create AST for fragment
-  auto frag_ast = AST::Build(frag);
+  auto frag = impl->m_ep->FragmentFor(impl->m_ep, frag_id);
 
   // Find matching AST node
   auto &entry = impl->ParsesAtIndex(0);
@@ -887,28 +844,27 @@ void ParsedQuery::ForEachMatch(const mx::Fragment &frag,
       continue;
     }
     if (key.first == NodeKind::Any()) {
-      for (auto &ast_node : frag_ast.AllNodes()) {
+      for (auto ast_node_id : impl->m_ep->GetASTNodesInFragment(frag_id)) {
+        auto ast_node = impl->m_ep->GetASTNode(ast_node_id);
         for (auto &marker : markers) {
           auto [ok, metavar_matches] = impl->MatchMarker(
-              entry, marker, &ast_node);
-          if (ok && !pred(Match(frag, ast_node.Entity(),
-                               ast_node.TokenRange(),
-                               metavar_matches))) {
+              entry, marker, ast_node_id);
+          if (ok && !pred(Match(ast_node.entity, metavar_matches))) {
             return;
           }
         }
       }
     } else {
-      for (auto *ast_node = frag_ast.WithKind(key.first);
-           ast_node; ast_node = ast_node->prev) {
+      auto ast_node_id = impl->m_ep->GetASTNodeWithKind(frag_id, key.first.Serialize());
+      while (ast_node_id.has_value()) {
+        auto ast_node = impl->m_ep->GetASTNode(*ast_node_id);
         for (auto &marker : markers) {
-          auto [ok, metavar_matches] = impl->MatchMarker(entry, marker, ast_node);
-          if (ok && !pred(Match(frag, ast_node->Entity(),
-                                ast_node->TokenRange(),
-                                metavar_matches))) {
+          auto [ok, metavar_matches] = impl->MatchMarker(entry, marker, *ast_node_id);
+          if (ok && !pred(Match(ast_node.entity, metavar_matches))) {
             return;
           }
         }
+        ast_node_id = ast_node.prev;
       }
     }
   }

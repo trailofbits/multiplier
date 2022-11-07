@@ -21,53 +21,43 @@ DEFINE_string(query, "", "Use argument value as query");
 DEFINE_uint64(threads, 0, "Use this number of threads");
 DEFINE_bool(suppress_output, false, "Don't print matches to stdout");
 
-static std::mutex gMatchPrintingMutex;
-
-static void PrintMatch(const mx::syntex::Match &match)
+static void PrintMatch(mx::Index index, const mx::syntex::Match &match)
 {
   if (FLAGS_suppress_output) {
     return;
   }
 
-  {
-    std::lock_guard<std::mutex> guard(gMatchPrintingMutex);
+  auto entity = index.entity(match.Entity());
+  auto fragment = *index.fragment_containing(match.Entity());
+  mx::TokenRange tok_range;
+  if(std::holds_alternative<mx::Token>(entity)) {
+    tok_range = std::get<mx::Token>(entity);
+  } else if(std::holds_alternative<mx::Stmt>(entity)) {
+    tok_range = std::get<mx::Stmt>(entity).tokens();
+  } else if(std::holds_alternative<mx::Decl>(entity)) {
+    tok_range = std::get<mx::Decl>(entity).tokens();
+  }
 
-    // Print matching fragment ID
-    std::cout << "Match in " << match.Fragment().id() << ":\n";
-
-    for (auto token : match.Fragment().parsed_tokens()) {
-      if (token.id() == match.FirstTokenId()) {
-        // Switch to ANSI red for the first matching token
-        std::cout << ANSI_RED;
-      }
-
-      std::cout << token.data() << " ";
-
-      if (token.id() == match.LastTokenId()) {
-        // Reset color after last matching token
-        std::cout << ANSI_RESET;
-      }
+  // Print matching fragment ID
+  std::cout << "Match in " << fragment.id() << ":\n";
+  for (auto token : fragment.parsed_tokens()) {
+    if (token.id() == tok_range.front().id()) {
+      // Switch to ANSI red for the first matching token
+      std::cout << ANSI_RED;
     }
 
-    std::cout << "\n";
+    std::cout << token.data() << " ";
 
-    for (auto &metavar : match.MetavarMatches()) {
-      std::cout << "Matching metavar " << metavar.Name() << "\n";
+    if (token.id() == tok_range.back().id()) {
+      // Reset color after last matching token
+      std::cout << ANSI_RESET;
     }
   }
-}
 
-static void ProcessFragmentRange(const mx::syntex::ParsedQuery &parsed_query,
-                                  const mx::RawEntityId *begin,
-                                  const mx::RawEntityId *end)
-{
-  for (; begin < end; ++begin) {
-    std::vector<mx::syntex::Match> matches =
-      parsed_query.FindInFragment(*begin);
+  std::cout << "\n";
 
-    for (const mx::syntex::Match &match : matches) {
-      PrintMatch(match);
-    }
+  for (auto &metavar : match.MetavarMatches()) {
+    std::cout << "Matching metavar " << metavar.Name() << "\n";
   }
 }
 
@@ -94,57 +84,18 @@ extern "C" int main(int argc, char *argv[]) {
   // Setup index and grammar
 
   mx::Index index = mx::EntityProvider::from_database(FLAGS_db);
-  mx::syntex::Grammar grammar(index, FLAGS_db);
 
   // Parse query
 
-  mx::syntex::ParsedQuery parsed_query(grammar, FLAGS_query);
+  auto res = index.query_syntex(FLAGS_query);
 
-  if (!parsed_query.IsValid()) {
+  if (!res.has_value()) {
     std::cerr << "Query `" << FLAGS_query << "` has no valid parses\n";
     return EXIT_FAILURE;
   }
 
-  // Choose number of threads
-
-  size_t threads = FLAGS_threads ?: std::thread::hardware_concurrency();
-  std::cout << "starting matcher with " << threads << " threads\n";
-
-  // Collect all fragments to process
-
-  std::vector<mx::RawEntityId> fragment_ids;
-
-  for (const mx::File &file : mx::File::in(index)) {
-    for (mx::RawEntityId fragment_id : file.fragment_ids()) {
-      fragment_ids.push_back(fragment_id);
-    }
-  }
-
-  // Find the ideal number of fragments per thread
-
-  size_t fragments_per_thread = fragment_ids.size() / threads;
-
-
-  // Create workers
-
-  std::vector<std::thread> thread_pool;
-
-  auto cur = &fragment_ids.front();
-  auto last = &fragment_ids.back();
-
-  while (cur < last) {
-    auto end = cur + fragments_per_thread;
-    if (end > last) {
-      end = last;
-    }
-    thread_pool.emplace_back(ProcessFragmentRange, parsed_query, cur, end);
-    cur = end;
-  }
-
-  // Wait for all workers to finish
-
-  for (auto &thread : thread_pool) {
-    thread.join();
+  for(auto match : *res) {
+    PrintMatch(index, match);
   }
 
   return EXIT_SUCCESS;

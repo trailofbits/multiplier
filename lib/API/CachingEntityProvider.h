@@ -14,6 +14,23 @@
 #include <mutex>
 #include <unordered_map>
 
+template <class T>
+inline void hash_combine(size_t &h, const T& v)
+{
+  std::hash<T> hasher;
+  h ^= hasher(v) + 0x9e3779b9 + (h << 6) + (h >> 2);
+}
+
+template<>
+struct std::hash<std::pair<std::uint64_t, std::uint64_t>> {
+  size_t operator()(const std::pair<std::uint64_t, std::uint64_t> &self) const {
+    size_t hash = 0;
+    hash_combine(hash, self.first);
+    hash_combine(hash, self.second);
+    return hash;
+  }
+};
+
 namespace mx {
 
 class CachingEntityProvider final : public EntityProvider {
@@ -49,6 +66,15 @@ class CachingEntityProvider final : public EntityProvider {
       uses;
   std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
       references;
+
+  std::unordered_map<std::string, TokenKind> spelling_to_token_kind;
+  syntex::GrammarLeaves grammar_root;
+
+  std::vector<std::uint64_t> fragments_in_ast;
+  std::unordered_map<std::uint64_t, ASTNode> node_contents;
+  std::unordered_multimap<std::uint64_t, std::uint64_t> node_children;
+  std::unordered_multimap<RawEntityId, std::uint64_t> fragment_nodes;
+  std::unordered_map<std::pair<RawEntityId, std::uint64_t>, std::uint64_t> node_index;
 
   void ClearCacheLocked(unsigned new_version_number);
 
@@ -98,6 +124,16 @@ class CachingEntityProvider final : public EntityProvider {
                   mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
 
+  std::optional<mx::TokenKind>
+  TokenKindOf(std::string_view spelling) final;
+
+  void LoadGrammarRoot(syntex::GrammarLeaves &root) final;
+
+  std::vector<RawEntityId> GetFragmentsInAST(void) final;
+  ASTNode GetASTNode(std::uint64_t id) final;
+  std::vector<std::uint64_t> GetASTNodeChildren(std::uint64_t id) final;
+  std::vector<std::uint64_t> GetASTNodesInFragment(RawEntityId frag) final;
+  std::optional<std::uint64_t> GetASTNodeWithKind(RawEntityId frag, unsigned short kind) final;
 };
 
 }  // namespace mx

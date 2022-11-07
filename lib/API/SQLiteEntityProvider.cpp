@@ -5,9 +5,11 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "SQLiteEntityProvider.h"
+#include "NodeKind.h"
 #include "API.h"
 #include "Compress.h"
 #include "Re2.h"
+#include "Grammar.h"
 #include <multiplier/Index.h>
 #include <multiplier/Re2.h>
 #include <multiplier/Types.h>
@@ -332,6 +334,66 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
         return std::get<mx::DeclarationId>(
             mx::EntityId(eid).Unpack()).is_definition;
       });
+}
+
+std::optional<mx::TokenKind>
+SQLiteEntityProvider::TokenKindOf(std::string_view spelling) {
+  auto &storage = d->GetStorage();
+  return storage.spelling_to_token_kind.TryGet(spelling);
+}
+
+void SQLiteEntityProvider::LoadGrammarRoot(syntex::GrammarLeaves &root) {
+  auto &storage = d->GetStorage();
+  std::vector<std::pair<std::uint64_t, syntex::GrammarNode*>> to_load;
+
+  for(auto [id, kind] : storage.grammar_root) {
+    auto is_production = storage.grammar_nodes.TryGet(id).value_or(0);
+    auto &node = root[syntex::NodeKind::Deserialize(kind)];
+    node.is_production = is_production;
+    to_load.emplace_back(id, &node);
+  }
+
+  while(!to_load.empty()) {
+    auto pair = to_load.back();
+    to_load.pop_back();
+    auto id = std::get<0>(pair);
+    auto &node = *std::get<1>(pair);
+
+    for(auto it = storage.grammar_children.key1_equals(id);
+        it != storage.grammar_children.end();
+        ++it) {
+      auto [parent_id, kind, child_id] = *it;
+      auto is_production = storage.grammar_nodes.TryGet(child_id).value_or(0);
+      auto &child_node = node.leaves[syntex::NodeKind::Deserialize(kind)];
+      child_node.is_production = is_production;
+      to_load.emplace_back(child_id, &child_node);
+    }
+  }
+}
+
+std::vector<RawEntityId> SQLiteEntityProvider::GetFragmentsInAST(void) {
+  auto &storage = d->GetStorage();
+  return storage.ast.GetFragments();
+}
+
+ASTNode SQLiteEntityProvider::GetASTNode(std::uint64_t id) {
+  auto &storage = d->GetStorage();
+  return storage.ast.GetNode(id);
+}
+
+std::vector<std::uint64_t> SQLiteEntityProvider::GetASTNodeChildren(std::uint64_t id) {
+  auto &storage = d->GetStorage();
+  return storage.ast.GetChildren(id);
+}
+
+std::vector<std::uint64_t> SQLiteEntityProvider::GetASTNodesInFragment(RawEntityId frag) {
+  auto &storage = d->GetStorage();
+  return storage.ast.Root(frag);
+}
+
+std::optional<std::uint64_t> SQLiteEntityProvider::GetASTNodeWithKind(RawEntityId frag, unsigned short kind) {
+  auto &storage = d->GetStorage();
+  return storage.ast.GetNodeInIndex(frag, kind);
 }
 
 EntityProvider::Ptr EntityProvider::from_database(std::filesystem::path path) {
