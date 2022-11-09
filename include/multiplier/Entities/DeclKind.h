@@ -93,6 +93,7 @@ enum class DeclKind : unsigned char {
   TYPE,
   TYPEDEF,
   TYPEDEF_NAME,
+  UNNAMED_GLOBAL_CONSTANT,
   UNRESOLVED_USING_IF_EXISTS,
   UNRESOLVED_USING_TYPENAME,
   UNRESOLVED_USING_VALUE,
@@ -113,7 +114,7 @@ inline static const char *EnumerationName(DeclKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclKind) {
-  return 94;
+  return 95;
 }
 
 const char *EnumeratorName(DeclKind);

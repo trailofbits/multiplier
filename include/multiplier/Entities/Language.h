@@ -24,6 +24,7 @@ enum class Language : unsigned char {
   CUDA,
   RENDER_SCRIPT,
   HIP,
+  HLSL,
 };
 
 inline static const char *EnumerationName(Language) {
@@ -31,7 +32,7 @@ inline static const char *EnumerationName(Language) {
 }
 
 inline static constexpr unsigned NumEnumerators(Language) {
-  return 12;
+  return 13;
 }
 
 const char *EnumeratorName(Language);

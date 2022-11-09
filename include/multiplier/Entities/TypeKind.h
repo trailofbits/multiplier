@@ -20,6 +20,7 @@ enum class TypeKind : unsigned char {
   VARIABLE_ARRAY,
   ATOMIC,
   ATTRIBUTED,
+  BTF_TAG_ATTRIBUTED,
   BIT_INT,
   BLOCK_POINTER,
   BUILTIN,
@@ -72,7 +73,7 @@ inline static const char *EnumerationName(TypeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeKind) {
-  return 53;
+  return 54;
 }
 
 const char *EnumeratorName(TypeKind);

@@ -15,6 +15,7 @@ enum class DeclModuleOwnershipKind : unsigned char {
   UNOWNED,
   VISIBLE,
   VISIBLE_WHEN_IMPORTED,
+  REACHABLE_WHEN_IMPORTED,
   MODULE_PRIVATE,
 };
 
@@ -23,7 +24,7 @@ inline static const char *EnumerationName(DeclModuleOwnershipKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclModuleOwnershipKind) {
-  return 4;
+  return 5;
 }
 
 const char *EnumeratorName(DeclModuleOwnershipKind);

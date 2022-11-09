@@ -129,6 +129,7 @@ class FunctionDecl : public DeclaratorDecl {
   Token ellipsis_token(void) const;
   TokenRange exception_spec_source_range(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
+  FunctionDecl instantiated_from_declaration(void) const;
   std::optional<FunctionDecl> instantiated_from_member_function(void) const;
   LanguageLinkage language_linkage(void) const;
   MultiVersionKind multi_version_kind(void) const;
@@ -167,6 +168,7 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_implicitly_instantiable(void) const;
   bool is_in_extern_c_context(void) const;
   bool is_in_extern_cxx_context(void) const;
+  bool is_ineligible_or_not_selected(void) const;
   bool is_inline_builtin_declaration(void) const;
   std::optional<bool> is_inline_definition_externally_visible(void) const;
   bool is_inline_specified(void) const;

@@ -31,6 +31,8 @@ enum class CallingConv : unsigned char {
   PRESERVE_MOST,
   PRESERVE_ALL,
   A_ARCH64_VECTOR_CALL,
+  A_ARCH64_SVEPCS,
+  AMDGPU_KERNEL_CALL,
 };
 
 inline static const char *EnumerationName(CallingConv) {
@@ -38,7 +40,7 @@ inline static const char *EnumerationName(CallingConv) {
 }
 
 inline static constexpr unsigned NumEnumerators(CallingConv) {
-  return 19;
+  return 21;
 }
 
 const char *EnumeratorName(CallingConv);

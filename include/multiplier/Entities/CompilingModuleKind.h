@@ -15,6 +15,7 @@ enum class CompilingModuleKind : unsigned char {
   NONE,
   MODULE_MAP,
   HEADER_MODULE,
+  HEADER_UNIT,
   MODULE_INTERFACE,
 };
 
@@ -23,7 +24,7 @@ inline static const char *EnumerationName(CompilingModuleKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(CompilingModuleKind) {
-  return 4;
+  return 5;
 }
 
 const char *EnumeratorName(CompilingModuleKind);

@@ -20,6 +20,7 @@ enum class Syntax : unsigned char {
   KEYWORD,
   PRAGMA,
   CONTEXT_SENSITIVE_KEYWORD,
+  HLSL_SEMANTIC,
 };
 
 inline static const char *EnumerationName(Syntax) {
@@ -27,7 +28,7 @@ inline static const char *EnumerationName(Syntax) {
 }
 
 inline static constexpr unsigned NumEnumerators(Syntax) {
-  return 8;
+  return 9;
 }
 
 const char *EnumeratorName(Syntax);

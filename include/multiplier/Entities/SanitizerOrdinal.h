@@ -18,7 +18,10 @@ enum class SanitizerOrdinal : unsigned char {
   KERNEL_ADDRESS,
   HW_ADDRESS,
   KERNEL_HW_ADDRESS,
-  MEMORY_TAG,
+  MEMTAG_STACK,
+  MEMTAG_HEAP,
+  MEMTAG_GLOBALS,
+  MEMORY_TAG_GROUP,
   MEMORY,
   KERNEL_MEMORY,
   FUZZER,
@@ -86,7 +89,7 @@ inline static const char *EnumerationName(SanitizerOrdinal) {
 }
 
 inline static constexpr unsigned NumEnumerators(SanitizerOrdinal) {
-  return 67;
+  return 70;
 }
 
 const char *EnumeratorName(SanitizerOrdinal);

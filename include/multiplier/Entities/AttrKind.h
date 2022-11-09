@@ -12,8 +12,10 @@
 
 namespace mx {
 enum class AttrKind : unsigned short {
+  A_ARCH64_SVE_PCS,
   A_ARCH64_VECTOR_PCS,
   AMDGPU_FLAT_WORK_GROUP_SIZE,
+  AMDGPU_KERNEL_CALL,
   AMDGPU_NUM_SGPR,
   AMDGPU_NUM_VGPR,
   AMDGPU_WAVES_PER_EU,
@@ -37,6 +39,7 @@ enum class AttrKind : unsigned short {
   ALWAYS_INLINE,
   ANALYZER_NO_RETURN,
   ANNOTATE,
+  ANNOTATE_TYPE,
   ANY_X86_INTERRUPT,
   ANY_X86_NO_CALLER_SAVED_REGISTERS,
   ANY_X86_NO_CF_CHECK,
@@ -124,10 +127,14 @@ enum class AttrKind : unsigned short {
   FLATTEN,
   FORMAT_ARG,
   FORMAT,
+  FUNCTION_RETURN_THUNKS,
   GNU_INLINE,
   GUARDED_BY,
   GUARDED_VAR,
   HIP_MANAGED,
+  HLSL_NUM_THREADS,
+  HLSLSV__GROUP_INDEX,
+  HLSL_SHADER,
   HOT,
   IB_ACTION,
   IB_OUTLET,
@@ -187,6 +194,7 @@ enum class AttrKind : unsigned short {
   NO_MICRO_MIPS,
   NO_MIPS16,
   NO_PROFILE_FUNCTION,
+  NO_RANDOMIZE_LAYOUT,
   NO_RETURN,
   NO_SANITIZE,
   NO_SPECULATIVE_LOAD_HARDENING,
@@ -276,6 +284,7 @@ enum class AttrKind : unsigned short {
   PTR64,
   PURE,
   RISCV_INTERRUPT,
+  RANDOMIZE_LAYOUT,
   REG_CALL,
   REINITIALIZES,
   RELEASE_CAPABILITY,
@@ -360,6 +369,7 @@ enum class AttrKind : unsigned short {
   X86_FORCE_ALIGN_ARG_POINTER,
   X_RAY_INSTRUMENT,
   X_RAY_LOG_ARGS,
+  ZERO_CALL_USED_REGS,
 };
 
 inline static const char *EnumerationName(AttrKind) {
@@ -367,7 +377,7 @@ inline static const char *EnumerationName(AttrKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(AttrKind) {
-  return 348;
+  return 358;
 }
 
 const char *EnumeratorName(AttrKind);

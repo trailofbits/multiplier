@@ -12,7 +12,7 @@
 
 namespace mx {
 enum class StringLiteralStringKind : unsigned char {
-  ASCII,
+  ORDINARY,
   WIDE,
   UTF8,
   UTF16,

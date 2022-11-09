@@ -95,6 +95,7 @@ class CoroutineSuspendExpr : public Expr {
   Expr common_expression(void) const;
   Token keyword_token(void) const;
   OpaqueValueExpr opaque_value(void) const;
+  Expr operand(void) const;
   Expr ready_expression(void) const;
   Expr resume_expression(void) const;
   Expr suspend_expression(void) const;

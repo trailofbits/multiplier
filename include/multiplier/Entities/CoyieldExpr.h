@@ -107,7 +107,6 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     }
   }
 
-  Expr operand(void) const;
 };
 
 static_assert(sizeof(CoyieldExpr) == sizeof(CoroutineSuspendExpr));

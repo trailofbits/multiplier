@@ -12,9 +12,12 @@
 
 namespace mx {
 enum class NoInlineAttrSpelling : unsigned char {
+  KEYWORD_NOINLINE,
   GNU_NOINLINE,
   CXX11_GNU_NOINLINE,
   C2X_GNU_NOINLINE,
+  CXX11_CLANG_NOINLINE,
+  C2X_CLANG_NOINLINE,
   DECLSPEC_NOINLINE,
   SPELLING_NOT_CALCULATED,
 };
@@ -24,7 +27,7 @@ inline static const char *EnumerationName(NoInlineAttrSpelling) {
 }
 
 inline static constexpr unsigned NumEnumerators(NoInlineAttrSpelling) {
-  return 5;
+  return 8;
 }
 
 const char *EnumeratorName(NoInlineAttrSpelling);

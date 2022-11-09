@@ -16,6 +16,7 @@ enum class SourceLocExprIdentKind : unsigned char {
   FILE,
   LINE,
   COLUMN,
+  SOURCE_TOKEN_STRUCT,
 };
 
 inline static const char *EnumerationName(SourceLocExprIdentKind) {
@@ -23,7 +24,7 @@ inline static const char *EnumerationName(SourceLocExprIdentKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(SourceLocExprIdentKind) {
-  return 4;
+  return 5;
 }
 
 const char *EnumeratorName(SourceLocExprIdentKind);

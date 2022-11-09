@@ -15,6 +15,7 @@ enum class TextDiagnosticFormat : unsigned char {
   CLANG,
   MSVC,
   VI,
+  SARIF,
 };
 
 inline static const char *EnumerationName(TextDiagnosticFormat) {
@@ -22,7 +23,7 @@ inline static const char *EnumerationName(TextDiagnosticFormat) {
 }
 
 inline static constexpr unsigned NumEnumerators(TextDiagnosticFormat) {
-  return 3;
+  return 4;
 }
 
 const char *EnumeratorName(TextDiagnosticFormat);

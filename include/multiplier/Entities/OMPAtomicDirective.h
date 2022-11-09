@@ -84,10 +84,14 @@ class OMPAtomicDirective : public OMPExecutableDirective {
     }
   }
 
+  Expr condition_expression(void) const;
+  Expr d(void) const;
   Expr expression(void) const;
+  Expr r(void) const;
   Expr update_expression(void) const;
   Expr v(void) const;
   Expr x(void) const;
+  bool is_fail_only(void) const;
   bool is_postfix_update(void) const;
   bool is_xlhs_in_rhs_part(void) const;
 };

@@ -17,6 +17,7 @@ enum class FunctionDeclTemplatedKind : unsigned char {
   MEMBER_SPECIALIZATION,
   FUNCTION_TEMPLATE_SPECIALIZATION,
   DEPENDENT_FUNCTION_TEMPLATE_SPECIALIZATION,
+  DEPENDENT_NON_TEMPLATE,
 };
 
 inline static const char *EnumerationName(FunctionDeclTemplatedKind) {
@@ -24,7 +25,7 @@ inline static const char *EnumerationName(FunctionDeclTemplatedKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(FunctionDeclTemplatedKind) {
-  return 5;
+  return 6;
 }
 
 const char *EnumeratorName(FunctionDeclTemplatedKind);

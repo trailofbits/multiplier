@@ -486,6 +486,8 @@ static std::string SnakeCaseToEnumCase(std::string_view name) {
     return "MIG_SERVER_ROUTINE_";
   } else if (name == "null") {
     return "NULL_";
+  } else if (name == "domain") {
+    return "DOMAIN_";
   }
 
   std::stringstream ss;

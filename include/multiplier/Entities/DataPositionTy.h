@@ -16,6 +16,9 @@ enum class DataPositionTy : unsigned char {
   POSV,
   POSE,
   POS_UPDATE_EXPRESSION,
+  POSD,
+  POS_CONDITION,
+  POSR,
 };
 
 inline static const char *EnumerationName(DataPositionTy) {
@@ -23,7 +26,7 @@ inline static const char *EnumerationName(DataPositionTy) {
 }
 
 inline static constexpr unsigned NumEnumerators(DataPositionTy) {
-  return 4;
+  return 7;
 }
 
 const char *EnumeratorName(DataPositionTy);

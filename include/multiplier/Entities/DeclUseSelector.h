@@ -72,6 +72,7 @@ enum class DeclUseSelector : unsigned short {
   IMPLICIT_PROPERTY_SETTER,
   INITIALIZED_FIELD_IN_UNION,
   INITIALIZING_DECLARATION,
+  INSTANTIATED_FROM_DECLARATION,
   INSTANTIATED_FROM_MEMBER_CLASS,
   INSTANTIATED_FROM_MEMBER_ENUM,
   INSTANTIATED_FROM_MEMBER_FUNCTION,
@@ -139,7 +140,7 @@ inline static const char *EnumerationName(DeclUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclUseSelector) {
-  return 120;
+  return 121;
 }
 
 const char *EnumeratorName(DeclUseSelector);

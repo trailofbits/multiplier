@@ -20,6 +20,7 @@ enum class TypeLocClass : unsigned char {
   VARIABLE_ARRAY,
   ATOMIC,
   ATTRIBUTED,
+  BTF_TAG_ATTRIBUTED,
   BIT_INT,
   BLOCK_POINTER,
   BUILTIN,
@@ -73,7 +74,7 @@ inline static const char *EnumerationName(TypeLocClass) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeLocClass) {
-  return 54;
+  return 55;
 }
 
 const char *EnumeratorName(TypeLocClass);

@@ -84,6 +84,7 @@ class AutoType : public DeducedType {
   std::optional<ConceptDecl> type_constraint_concept(void) const;
   bool is_constrained(void) const;
   bool is_decltype_auto(void) const;
+  bool is_gnu_auto_type(void) const;
 };
 
 static_assert(sizeof(AutoType) == sizeof(DeducedType));

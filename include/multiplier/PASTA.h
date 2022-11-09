@@ -12,8 +12,10 @@ namespace pasta {
 enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
 enum class AttrKind : unsigned;
+enum class AArch64SVEPcsAttrSpelling : unsigned;
 enum class AArch64VectorPcsAttrSpelling : unsigned;
 enum class AMDGPUFlatWorkGroupSizeAttrSpelling : unsigned;
+enum class AMDGPUKernelCallAttrSpelling : unsigned;
 enum class AMDGPUNumSGPRAttrSpelling : unsigned;
 enum class AMDGPUNumVGPRAttrSpelling : unsigned;
 enum class AMDGPUWavesPerEUAttrSpelling : unsigned;
@@ -32,6 +34,7 @@ enum class AllocSizeAttrSpelling : unsigned;
 enum class AlwaysDestroyAttrSpelling : unsigned;
 enum class AlwaysInlineAttrSpelling : unsigned;
 enum class AnnotateAttrSpelling : unsigned;
+enum class AnnotateTypeAttrSpelling : unsigned;
 enum class AnyX86InterruptAttrSpelling : unsigned;
 enum class AnyX86NoCallerSavedRegistersAttrSpelling : unsigned;
 enum class AnyX86NoCfCheckAttrSpelling : unsigned;
@@ -72,8 +75,10 @@ enum class CUDAGlobalAttrSpelling : unsigned;
 enum class CUDAHostAttrSpelling : unsigned;
 enum class CUDALaunchBoundsAttrSpelling : unsigned;
 enum class CUDASharedAttrSpelling : unsigned;
+enum class CXX11NoReturnAttrSpelling : unsigned;
 enum class CXXConstructExprConstructionKind : unsigned;
 enum class CXXNewExprInitializationStyle : unsigned;
+enum class CXXRecordDeclLambdaDependencyKind : unsigned;
 enum class CallExprADLCallKind : bool;
 enum class CallableWhenAttrConsumedState : unsigned;
 enum class CallableWhenAttrSpelling : unsigned;
@@ -128,9 +133,12 @@ enum class FlattenAttrSpelling : unsigned;
 enum class FormatArgAttrSpelling : unsigned;
 enum class FormatAttrSpelling : unsigned;
 enum class FunctionDeclTemplatedKind : unsigned;
+enum class FunctionReturnThunksAttrKind : unsigned;
+enum class FunctionReturnThunksAttrSpelling : unsigned;
 enum class GNUInlineAttrSpelling : unsigned;
 enum class GuardedVarAttrSpelling : unsigned;
 enum class HIPManagedAttrSpelling : unsigned;
+enum class HLSLShaderAttrShaderType : unsigned;
 enum class HotAttrSpelling : unsigned;
 enum class IBActionAttrSpelling : unsigned;
 enum class IBOutletAttrSpelling : unsigned;
@@ -186,6 +194,7 @@ enum class NoMergeAttrSpelling : unsigned;
 enum class NoMicroMipsAttrSpelling : unsigned;
 enum class NoMips16AttrSpelling : unsigned;
 enum class NoProfileFunctionAttrSpelling : unsigned;
+enum class NoRandomizeLayoutAttrSpelling : unsigned;
 enum class NoReturnAttrSpelling : unsigned;
 enum class NoSanitizeAttrSpelling : unsigned;
 enum class NoSpeculativeLoadHardeningAttrSpelling : unsigned;
@@ -272,6 +281,7 @@ enum class QualTypePrimitiveCopyKind : unsigned;
 enum class QualTypePrimitiveDefaultInitializeKind : unsigned;
 enum class RISCVInterruptAttrInterruptType : unsigned;
 enum class RISCVInterruptAttrSpelling : unsigned;
+enum class RandomizeLayoutAttrSpelling : unsigned;
 enum class RecordDeclArgPassingKind : unsigned;
 enum class RegCallAttrSpelling : unsigned;
 enum class ReinitializesAttrSpelling : unsigned;
@@ -358,6 +368,8 @@ enum class WebAssemblyImportNameAttrSpelling : unsigned;
 enum class X86ForceAlignArgPointerAttrSpelling : unsigned;
 enum class XRayInstrumentAttrSpelling : unsigned;
 enum class XRayLogArgsAttrSpelling : unsigned;
+enum class ZeroCallUsedRegsAttrSpelling : unsigned;
+enum class ZeroCallUsedRegsAttrZeroCallUsedRegsKind : unsigned;
 enum class ASTDumpOutputFormat : unsigned;
 enum class AccessSpecifier : unsigned;
 enum class AddrSpaceMapMangling : unsigned;
@@ -384,9 +396,11 @@ enum class CoreFoundationABI : int;
 enum class DataPositionTy : unsigned long;
 enum class DefaultArgKind : unsigned;
 enum class DefaultCallingConvention : unsigned;
+enum class DefaultVisiblityExportMapping : int;
 enum class DiagnosticLevelMask : unsigned;
 enum class ElaboratedTypeKeyword : unsigned;
 enum class EmbedBitcodeKind : unsigned;
+enum class EscapeChar : int;
 enum class ExceptionHandlingKind : int;
 enum class ExceptionSpecificationType : unsigned;
 enum class ExplicitSpecKind : unsigned;
@@ -397,14 +411,17 @@ enum class ExprValueKind : unsigned;
 enum class ExpressionTrait : unsigned;
 enum class ExtKind : unsigned;
 enum class ExtendArgsKind : int;
+enum class FPEvalMethodKind : int;
 enum class FPExceptionModeKind : unsigned;
 enum class FPModeKind : unsigned;
 enum class FiniteLoopsKind : unsigned;
 enum class FramePointerKind : int;
 enum class GC : unsigned;
 enum class GCMode : unsigned;
+enum class GPUDefaultStreamKind : int;
 enum class GVALinkage : unsigned;
 enum class GetBuiltinTypeError : unsigned;
+enum class HLSLLangStd : unsigned;
 enum class ID : unsigned;
 enum class IdentifierInfoFlag : unsigned;
 enum class IfStatementKind : unsigned;
@@ -488,6 +505,7 @@ enum class SFINAEResponse : unsigned;
 enum class SYCLMajorVersion : unsigned;
 enum class SanitizerOrdinal : unsigned long long;
 enum class SelectorLocationsKind : unsigned;
+enum class ShaderStage : int;
 enum class SignReturnAddressKeyKind : int;
 enum class SignReturnAddressScopeKind : int;
 enum class SignedOverflowBehaviorTy : unsigned;
@@ -532,6 +550,8 @@ enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
 enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
+enum class MacroNodeKind : unsigned char;
+enum class MacroDirectiveKind : unsigned char;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;
@@ -546,11 +566,17 @@ DeclKind FromPasta(pasta::DeclKind pasta_val);
 enum class AttrKind : unsigned short;
 AttrKind FromPasta(pasta::AttrKind pasta_val);
 
+enum class AArch64SVEPcsAttrSpelling : unsigned char;
+AArch64SVEPcsAttrSpelling FromPasta(pasta::AArch64SVEPcsAttrSpelling pasta_val);
+
 enum class AArch64VectorPcsAttrSpelling : unsigned char;
 AArch64VectorPcsAttrSpelling FromPasta(pasta::AArch64VectorPcsAttrSpelling pasta_val);
 
 enum class AMDGPUFlatWorkGroupSizeAttrSpelling : unsigned char;
 AMDGPUFlatWorkGroupSizeAttrSpelling FromPasta(pasta::AMDGPUFlatWorkGroupSizeAttrSpelling pasta_val);
+
+enum class AMDGPUKernelCallAttrSpelling : unsigned char;
+AMDGPUKernelCallAttrSpelling FromPasta(pasta::AMDGPUKernelCallAttrSpelling pasta_val);
 
 enum class AMDGPUNumSGPRAttrSpelling : unsigned char;
 AMDGPUNumSGPRAttrSpelling FromPasta(pasta::AMDGPUNumSGPRAttrSpelling pasta_val);
@@ -605,6 +631,9 @@ AlwaysInlineAttrSpelling FromPasta(pasta::AlwaysInlineAttrSpelling pasta_val);
 
 enum class AnnotateAttrSpelling : unsigned char;
 AnnotateAttrSpelling FromPasta(pasta::AnnotateAttrSpelling pasta_val);
+
+enum class AnnotateTypeAttrSpelling : unsigned char;
+AnnotateTypeAttrSpelling FromPasta(pasta::AnnotateTypeAttrSpelling pasta_val);
 
 enum class AnyX86InterruptAttrSpelling : unsigned char;
 AnyX86InterruptAttrSpelling FromPasta(pasta::AnyX86InterruptAttrSpelling pasta_val);
@@ -726,11 +755,17 @@ CUDALaunchBoundsAttrSpelling FromPasta(pasta::CUDALaunchBoundsAttrSpelling pasta
 enum class CUDASharedAttrSpelling : unsigned char;
 CUDASharedAttrSpelling FromPasta(pasta::CUDASharedAttrSpelling pasta_val);
 
+enum class CXX11NoReturnAttrSpelling : unsigned char;
+CXX11NoReturnAttrSpelling FromPasta(pasta::CXX11NoReturnAttrSpelling pasta_val);
+
 enum class CXXConstructExprConstructionKind : unsigned char;
 CXXConstructExprConstructionKind FromPasta(pasta::CXXConstructExprConstructionKind pasta_val);
 
 enum class CXXNewExprInitializationStyle : unsigned char;
 CXXNewExprInitializationStyle FromPasta(pasta::CXXNewExprInitializationStyle pasta_val);
+
+enum class CXXRecordDeclLambdaDependencyKind : unsigned char;
+CXXRecordDeclLambdaDependencyKind FromPasta(pasta::CXXRecordDeclLambdaDependencyKind pasta_val);
 
 enum class CallExprADLCallKind : unsigned char;
 CallExprADLCallKind FromPasta(pasta::CallExprADLCallKind pasta_val);
@@ -894,6 +929,12 @@ FormatAttrSpelling FromPasta(pasta::FormatAttrSpelling pasta_val);
 enum class FunctionDeclTemplatedKind : unsigned char;
 FunctionDeclTemplatedKind FromPasta(pasta::FunctionDeclTemplatedKind pasta_val);
 
+enum class FunctionReturnThunksAttrKind : unsigned char;
+FunctionReturnThunksAttrKind FromPasta(pasta::FunctionReturnThunksAttrKind pasta_val);
+
+enum class FunctionReturnThunksAttrSpelling : unsigned char;
+FunctionReturnThunksAttrSpelling FromPasta(pasta::FunctionReturnThunksAttrSpelling pasta_val);
+
 enum class GNUInlineAttrSpelling : unsigned char;
 GNUInlineAttrSpelling FromPasta(pasta::GNUInlineAttrSpelling pasta_val);
 
@@ -902,6 +943,9 @@ GuardedVarAttrSpelling FromPasta(pasta::GuardedVarAttrSpelling pasta_val);
 
 enum class HIPManagedAttrSpelling : unsigned char;
 HIPManagedAttrSpelling FromPasta(pasta::HIPManagedAttrSpelling pasta_val);
+
+enum class HLSLShaderAttrShaderType : unsigned char;
+HLSLShaderAttrShaderType FromPasta(pasta::HLSLShaderAttrShaderType pasta_val);
 
 enum class HotAttrSpelling : unsigned char;
 HotAttrSpelling FromPasta(pasta::HotAttrSpelling pasta_val);
@@ -1067,6 +1111,9 @@ NoMips16AttrSpelling FromPasta(pasta::NoMips16AttrSpelling pasta_val);
 
 enum class NoProfileFunctionAttrSpelling : unsigned char;
 NoProfileFunctionAttrSpelling FromPasta(pasta::NoProfileFunctionAttrSpelling pasta_val);
+
+enum class NoRandomizeLayoutAttrSpelling : unsigned char;
+NoRandomizeLayoutAttrSpelling FromPasta(pasta::NoRandomizeLayoutAttrSpelling pasta_val);
 
 enum class NoReturnAttrSpelling : unsigned char;
 NoReturnAttrSpelling FromPasta(pasta::NoReturnAttrSpelling pasta_val);
@@ -1326,6 +1373,9 @@ RISCVInterruptAttrInterruptType FromPasta(pasta::RISCVInterruptAttrInterruptType
 enum class RISCVInterruptAttrSpelling : unsigned char;
 RISCVInterruptAttrSpelling FromPasta(pasta::RISCVInterruptAttrSpelling pasta_val);
 
+enum class RandomizeLayoutAttrSpelling : unsigned char;
+RandomizeLayoutAttrSpelling FromPasta(pasta::RandomizeLayoutAttrSpelling pasta_val);
+
 enum class RecordDeclArgPassingKind : unsigned char;
 RecordDeclArgPassingKind FromPasta(pasta::RecordDeclArgPassingKind pasta_val);
 
@@ -1584,6 +1634,12 @@ XRayInstrumentAttrSpelling FromPasta(pasta::XRayInstrumentAttrSpelling pasta_val
 enum class XRayLogArgsAttrSpelling : unsigned char;
 XRayLogArgsAttrSpelling FromPasta(pasta::XRayLogArgsAttrSpelling pasta_val);
 
+enum class ZeroCallUsedRegsAttrSpelling : unsigned char;
+ZeroCallUsedRegsAttrSpelling FromPasta(pasta::ZeroCallUsedRegsAttrSpelling pasta_val);
+
+enum class ZeroCallUsedRegsAttrZeroCallUsedRegsKind : unsigned char;
+ZeroCallUsedRegsAttrZeroCallUsedRegsKind FromPasta(pasta::ZeroCallUsedRegsAttrZeroCallUsedRegsKind pasta_val);
+
 enum class ASTDumpOutputFormat : unsigned char;
 ASTDumpOutputFormat FromPasta(pasta::ASTDumpOutputFormat pasta_val);
 
@@ -1662,6 +1718,9 @@ DefaultArgKind FromPasta(pasta::DefaultArgKind pasta_val);
 enum class DefaultCallingConvention : unsigned char;
 DefaultCallingConvention FromPasta(pasta::DefaultCallingConvention pasta_val);
 
+enum class DefaultVisiblityExportMapping : unsigned char;
+DefaultVisiblityExportMapping FromPasta(pasta::DefaultVisiblityExportMapping pasta_val);
+
 enum class DiagnosticLevelMask : unsigned char;
 DiagnosticLevelMask FromPasta(pasta::DiagnosticLevelMask pasta_val);
 
@@ -1670,6 +1729,9 @@ ElaboratedTypeKeyword FromPasta(pasta::ElaboratedTypeKeyword pasta_val);
 
 enum class EmbedBitcodeKind : unsigned char;
 EmbedBitcodeKind FromPasta(pasta::EmbedBitcodeKind pasta_val);
+
+enum class EscapeChar : unsigned char;
+EscapeChar FromPasta(pasta::EscapeChar pasta_val);
 
 enum class ExceptionHandlingKind : unsigned char;
 ExceptionHandlingKind FromPasta(pasta::ExceptionHandlingKind pasta_val);
@@ -1701,6 +1763,9 @@ ExtKind FromPasta(pasta::ExtKind pasta_val);
 enum class ExtendArgsKind : unsigned char;
 ExtendArgsKind FromPasta(pasta::ExtendArgsKind pasta_val);
 
+enum class FPEvalMethodKind : unsigned char;
+FPEvalMethodKind FromPasta(pasta::FPEvalMethodKind pasta_val);
+
 enum class FPExceptionModeKind : unsigned char;
 FPExceptionModeKind FromPasta(pasta::FPExceptionModeKind pasta_val);
 
@@ -1719,11 +1784,17 @@ GC FromPasta(pasta::GC pasta_val);
 enum class GCMode : unsigned char;
 GCMode FromPasta(pasta::GCMode pasta_val);
 
+enum class GPUDefaultStreamKind : unsigned char;
+GPUDefaultStreamKind FromPasta(pasta::GPUDefaultStreamKind pasta_val);
+
 enum class GVALinkage : unsigned char;
 GVALinkage FromPasta(pasta::GVALinkage pasta_val);
 
 enum class GetBuiltinTypeError : unsigned char;
 GetBuiltinTypeError FromPasta(pasta::GetBuiltinTypeError pasta_val);
+
+enum class HLSLLangStd : unsigned char;
+HLSLLangStd FromPasta(pasta::HLSLLangStd pasta_val);
 
 enum class ID : unsigned char;
 ID FromPasta(pasta::ID pasta_val);
@@ -1968,6 +2039,9 @@ SanitizerOrdinal FromPasta(pasta::SanitizerOrdinal pasta_val);
 enum class SelectorLocationsKind : unsigned char;
 SelectorLocationsKind FromPasta(pasta::SelectorLocationsKind pasta_val);
 
+enum class ShaderStage : unsigned char;
+ShaderStage FromPasta(pasta::ShaderStage pasta_val);
+
 enum class SignReturnAddressKeyKind : unsigned char;
 SignReturnAddressKeyKind FromPasta(pasta::SignReturnAddressKeyKind pasta_val);
 
@@ -2099,6 +2173,12 @@ AttributeSyntax FromPasta(pasta::AttributeSyntax pasta_val);
 
 enum class DeclCategory : unsigned char;
 DeclCategory FromPasta(pasta::DeclCategory pasta_val);
+
+enum class MacroNodeKind : unsigned char;
+MacroNodeKind FromPasta(pasta::MacroNodeKind pasta_val);
+
+enum class MacroDirectiveKind : unsigned char;
+MacroDirectiveKind FromPasta(pasta::MacroDirectiveKind pasta_val);
 
 enum class PathKind : unsigned char;
 PathKind FromPasta(pasta::PathKind pasta_val);

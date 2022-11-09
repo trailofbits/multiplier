@@ -84,7 +84,12 @@ class HashVisitor final : public pasta::DeclVisitor {
 std::string FileHash(std::string_view data) {
   llvm::SHA256 hash;
   hash.update(data);
-  return hash.final().str();
+  std::string result;
+  result.reserve(32);
+  auto final_ = hash.final();
+  auto final_data = reinterpret_cast<const char *>(final_.data());
+  result.insert(result.end(), final_data, &(final_data[final_.size()]));
+  return result;
 }
 
 // Compute a hash of top-level declarations. This will produce a string of

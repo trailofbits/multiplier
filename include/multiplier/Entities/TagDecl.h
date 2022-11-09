@@ -115,6 +115,7 @@ class TagDecl : public TypeDecl {
   bool is_free_standing(void) const;
   bool is_interface(void) const;
   bool is_struct(void) const;
+  bool is_demoted_definition(void) const;
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
   std::vector<TemplateParameterList> template_parameter_lists(void) const;

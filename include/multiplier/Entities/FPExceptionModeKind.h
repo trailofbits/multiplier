@@ -15,6 +15,7 @@ enum class FPExceptionModeKind : unsigned char {
   IGNORE,
   MAY_TRAP,
   STRICT,
+  DEFAULT,
 };
 
 inline static const char *EnumerationName(FPExceptionModeKind) {
@@ -22,7 +23,7 @@ inline static const char *EnumerationName(FPExceptionModeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(FPExceptionModeKind) {
-  return 3;
+  return 4;
 }
 
 const char *EnumeratorName(FPExceptionModeKind);

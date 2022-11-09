@@ -12,6 +12,7 @@
 
 namespace mx {
 enum class AttrUseSelector : unsigned short {
+  ATTRIBUTE,
   DEFINING_ATTRIBUTE,
   EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE,
   UNUSED_RESULT_ATTRIBUTE,
@@ -22,7 +23,7 @@ inline static const char *EnumerationName(AttrUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(AttrUseSelector) {
-  return 3;
+  return 4;
 }
 
 const char *EnumeratorName(AttrUseSelector);

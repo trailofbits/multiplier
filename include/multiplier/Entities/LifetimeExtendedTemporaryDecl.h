@@ -75,7 +75,7 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     }
   }
 
-  std::vector<Stmt> children_expression(void) const;
+  std::vector<Stmt> children(void) const;
   ValueDecl extending_declaration(void) const;
   StorageDuration storage_duration(void) const;
   Expr temporary_expression(void) const;
