@@ -59,7 +59,6 @@ find_package(SQLite3 3.35 REQUIRED)
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
-find_package(absl CONFIG REQUIRED)
 
 if(PLATFORM_MACOS)
   set(CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
