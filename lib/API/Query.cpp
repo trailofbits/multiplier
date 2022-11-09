@@ -531,7 +531,7 @@ FractionalConstant:
 }
 
 ParsedQueryImpl::ParsedQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input)
-  : m_ep(std::move(ep)), m_input(input) {
+  : m_ep(ep), m_input(input) {
   ep->LoadGrammarRoot(grammar_root);
 }
 
@@ -759,7 +759,7 @@ void ParsedQueryImpl::DebugParseTable(std::ostream &os) {
 }
 
 ParsedQuery::ParsedQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query)
-  : impl(std::make_shared<ParsedQueryImpl>(std::move(ep), query)) {}
+  : impl(std::make_shared<ParsedQueryImpl>(ep, query)) {}
 
 bool ParsedQuery::IsValid(void) const {
   for (auto &[key, markers] : impl->ParsesAtIndex(0)) {

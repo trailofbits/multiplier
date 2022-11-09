@@ -6,7 +6,7 @@
 
 #include "InvalidEntityProvider.h"
 
-#include "NodeKind.h"
+#include <multiplier/NodeKind.h>
 #include "Grammar.h"
 #include <multiplier/IndexStorage.h>
 

@@ -30,9 +30,6 @@ enum : char {
   kEntityIdUseToFragmentId,
   kEntityIdReference,
   kSpellingToTokenKind,
-  kGrammarRoot,
-  kGrammarNodes,
-  kGrammarChildren,
 };
 
 enum MetadataName : char {
@@ -70,16 +67,8 @@ struct ASTNode {
 };
 
 class PersistentAST final {
-  sqlite::Connection &db;
-  std::shared_ptr<sqlite::Statement> get_root_stmt;
-  std::shared_ptr<sqlite::Statement> create_node_stmt;
-  std::shared_ptr<sqlite::Statement> add_root_stmt;
-  std::shared_ptr<sqlite::Statement> get_node_stmt;
-  std::shared_ptr<sqlite::Statement> get_index_stmt;
-  std::shared_ptr<sqlite::Statement> set_index_stmt;
-  std::shared_ptr<sqlite::Statement> get_fragments_stmt;
-  std::shared_ptr<sqlite::Statement> get_children_stmt;
-  std::shared_ptr<sqlite::Statement> add_child_stmt;
+  struct Impl;
+  std::unique_ptr<Impl> impl;
 
  public:
   PersistentAST(sqlite::Connection &db);
@@ -106,6 +95,28 @@ class PersistentAST final {
   std::vector<std::uint64_t> GetChildren(std::uint64_t parent);
 
   void AddChild(std::uint64_t parent, std::uint64_t child);
+};
+
+struct GrammarNode {
+  bool is_production;
+};
+
+class PersistentGrammar final {
+  struct Impl;
+  std::unique_ptr<Impl> impl;
+
+ public:
+  PersistentGrammar(sqlite::Connection &db);
+
+  std::vector<std::pair<unsigned short, std::uint64_t>> GetChildren(std::uint64_t parent);
+
+  std::uint64_t GetChild(std::uint64_t parent, unsigned short kind);
+
+  std::vector<std::pair<unsigned short, std::uint64_t>> GetChildLeaves(std::uint64_t parent, unsigned short kind);
+
+  void UpdateNode(std::uint64_t id, const GrammarNode &node);
+
+  GrammarNode GetNode(std::uint64_t id);
 };
 
 class IndexStorage final {
@@ -213,17 +224,9 @@ class IndexStorage final {
   mx::PersistentMap<kSpellingToTokenKind, std::string_view, mx::TokenKind>
       spelling_to_token_kind;
 
-  mx::PersistentMap<kGrammarRoot, unsigned short, std::uint64_t>
-      grammar_root;
-
-  mx::PersistentMap<kGrammarNodes, std::uint64_t, int>
-      grammar_nodes;
-
-  mx::PersistentMap2<kGrammarChildren,
-                     std::uint64_t, unsigned short, std::uint64_t>
-      grammar_children;
-
   PersistentAST ast;
+
+  PersistentGrammar grammar;
 
   // SQLite database. Used for things like symbol searches.
   SymbolDatabase database;

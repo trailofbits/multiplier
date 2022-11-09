@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "NodeKind.h"
+#include <multiplier/NodeKind.h>
 
 #include <unordered_map>
 

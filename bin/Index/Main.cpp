@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Parser.h"
 #include "Importer.h"
+#include "BuildAST.h"
 
 // Should we show a help message?
 DECLARE_bool(help);
@@ -157,6 +158,9 @@ extern "C" int main(int argc, char *argv[]) {
 
   executor.Start();
   executor.Wait();
+
+  auto index = mx::Index(mx::EntityProvider::from_database(FLAGS_db));
+  indexer::BuildAST(index, ic->server_context[0]);
 
   return EXIT_SUCCESS;
 }

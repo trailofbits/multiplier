@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "NodeKind.h"
+#include <multiplier/NodeKind.h>
 #include "Grammar.h"
 #include <multiplier/Syntex.h>
 #include <deque>

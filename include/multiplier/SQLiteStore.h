@@ -172,6 +172,11 @@ class Statement : public std::enable_shared_from_this<Statement> {
     }
   }
 
+  template<typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
+  void bind(const size_t i, const T &value) {
+    bind(i, static_cast<uint64_t>(value));
+  }
+
   void reset();
 
   template<typename T>

@@ -35,9 +35,6 @@ static constexpr const char* table_names[] = {
   "'mx::EntityIdUseToFragmentId'",
   "'mx::EntityIdReference'",
   "'mx::syntex::Tokens'",
-  "'mx::syntex::GrammarRoot'",
-  "'mx::syntex::GrammarNodes'",
-  "'mx::syntex::GrammarChildren'",
 };
 
 template <uint8_t kId, typename... Keys>
@@ -273,7 +270,7 @@ class PersistentMap {
     get_or_set_stmt = db.Prepare(ss.str());
 
     ss = {};
-    ss << "SELECT key, value FROM " << table_names;
+    ss << "SELECT key, value FROM " << table_names[kId];
     enum_stmt = db.Prepare(ss.str());
   }
 
