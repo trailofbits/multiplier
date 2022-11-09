@@ -655,7 +655,9 @@ std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
   switch (marker.m_kind) {
     case ParseMarker::METAVAR:
       if (marker.m_metavar) {
-        MetavarMatch mv_match(marker.m_metavar->m_name, node.entity);
+        MetavarMatch mv_match(
+          {marker.m_metavar->m_name.data(), marker.m_metavar->m_name.size()},
+          node.entity);
         if (auto &predicate = marker.m_metavar->m_predicate) {
           if (!(*predicate)(mv_match)) {
             return {false, {}};

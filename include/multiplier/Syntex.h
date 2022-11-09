@@ -33,15 +33,15 @@ class ParsedQueryImpl;
 
 class MetavarMatch {
 private:
-  std::string_view name;
+  std::string name;
   mx::EntityId entity;
 
 public:
-  MetavarMatch(std::string_view name_, mx::EntityId entity_)
+  MetavarMatch(const std::string& name_, mx::EntityId entity_)
     : name(std::move(name_)),
       entity(std::move(entity_)) {}
 
-  const std::string_view &Name(void) const {
+  const std::string &Name(void) const {
     return name;
   }
 
