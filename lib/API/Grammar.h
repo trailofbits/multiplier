@@ -7,7 +7,6 @@
 #pragma once
 
 #include <multiplier/NodeKind.h>
-
 #include <unordered_map>
 
 namespace mx {
@@ -17,8 +16,6 @@ struct GrammarNode;
 
 //
 // One set of grammar leaves
-// FIXME(frabert): Deserialization crashes if this is turned into
-//   an `absl::flat_hash_map`
 //
 using GrammarLeaves = std::unordered_map<NodeKind, GrammarNode>;
 
