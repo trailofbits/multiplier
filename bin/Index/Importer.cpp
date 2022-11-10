@@ -154,7 +154,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     return ret2.TakeError();
   }
 
-
 //  if (output_no_sysroot.find("udf.c") != std::string::npos) {
 //    auto fd = open("/tmp/udf_no_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
 //    write(fd, output_no_sysroot.data(), output_no_sysroot.size());
