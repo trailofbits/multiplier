@@ -267,12 +267,13 @@ bool Parser::ParseBinaryJSONCommand(llvm::json::Value &json) {
 
 // Parse a `compile_commands.json`-type file.
 bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
-                                      llvm::json::Value &json) {
+                                      llvm::json::Value &json,
+                                      const EnvVariableMap &envp) {
   auto ret = true;
-  if (llvm::json::Array *arr = json.getAsArray()) {
-    for (llvm::json::Value &val : *arr) {
-      if (llvm::json::Object *obj = val.getAsObject()) {
-        ret = importer.ImportCMakeCompileCommand(*obj) && ret;
+  if (auto arr = json.getAsArray()) {
+    for (auto &val : *arr) {
+      if (auto obj = val.getAsObject()) {
+        ret = importer.ImportCMakeCompileCommand(*obj, envp) && ret;
       } else {
         DLOG(ERROR)
             << "Entry in top-level array of JSON file is not an object";
@@ -284,19 +285,19 @@ bool Parser::ParseCompileCommandsJSON(std::string_view file_name,
         << "JSON object is not an array of objects";
     return false;
   }
+  (void)file_name;
   return ret;
 }
 
 // Parse a memory buffer as a binary/object of some form.
-bool Parser::Parse(const llvm::MemoryBuffer &buff) {
+bool Parser::Parse(const llvm::MemoryBuffer &buff, const EnvVariableMap &envp) {
   auto file_name = buff.getBufferIdentifier().str();
   DLOG(INFO) << "Parsing buffer " << file_name;
 
   auto maybe_json = llvm::json::parse(buff.getBuffer());
   if (maybe_json) {
     DLOG(INFO) << "Buffer is JSON; parsing commands";
-    return ParseCompileCommandsJSON(file_name, *maybe_json);
-
+    return ParseCompileCommandsJSON(file_name, *maybe_json, envp);
   } else {
     DLOG(INFO)
         << "Buffer " << file_name << " is not JSON: "

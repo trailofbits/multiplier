@@ -42,7 +42,42 @@ DEFINE_string(db, "mx-index.db",
 
 DEFINE_string(target, "", "Path to the binary or JSON (compile commands) file to import");
 
+DEFINE_string(env, "", "Path to the file listing environment variables to import");
+
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
+
+namespace {
+
+std::unique_ptr<llvm::MemoryBuffer>
+ReadFileBuffer(const std::string file_name) {
+  if (!file_name.empty()) {
+    auto maybe_envp = llvm::MemoryBuffer::getFileOrSTDIN(file_name, -1, false);
+    if (maybe_envp) {
+      return std::move(*maybe_envp);
+    }
+  }
+  return nullptr;
+}
+
+indexer::EnvVariableMap
+ParseEnvVariablesFromFile(const std::string file_name) {
+  const static std::string sep = "=";
+  std::unordered_map<std::string, std::string> envp;
+
+  // Check if the file buffer is valid
+  if (auto envp_buffer = ReadFileBuffer(file_name); envp_buffer) {
+    auto ss = std::stringstream{envp_buffer->getBuffer().str()};
+    for (std::string line; std::getline(ss, line, '\n');) {
+      if (auto loc = line.find(sep); loc != std::string::npos) {
+        std::string name = line.substr(0, loc);
+        envp[name] = line.substr(loc + 1, line.size());
+      }
+    }
+  }
+  return envp;
+}
+
+}
 
 extern "C" int main(int argc, char *argv[]) {
   pasta::InitPasta init_pasta;
@@ -107,10 +142,12 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  auto envp = ParseEnvVariablesFromFile(FLAGS_env);
+
   llvm::LLVMContext context;
   indexer::Importer importer(path.parent_path(), fm, ic);
   indexer::Parser parser(context, importer);
-  if (!parser.Parse(*maybe_buff.get())) {
+  if (!parser.Parse(*maybe_buff.get(), envp)) {
     std::cerr
           << "An error occurred when trying to import " << FLAGS_target;
     return EXIT_FAILURE;

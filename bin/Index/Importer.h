@@ -6,6 +6,8 @@
 
 #include <filesystem>
 #include <memory>
+#include <unordered_map>
+
 #include <multiplier/Executor.h>
 #include <pasta/Compile/Command.h>
 
@@ -18,6 +20,8 @@ class Object;
 }  // namespace json
 }  // namespace llvm
 namespace indexer {
+
+using EnvVariableMap = std::unordered_map<std::string, std::string>;
 
 class Importer {
  private:
@@ -34,7 +38,7 @@ class Importer {
     std::shared_ptr<IndexingContext> context);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
-  bool ImportCMakeCompileCommand(llvm::json::Object &o);
+  bool ImportCMakeCompileCommand(llvm::json::Object &o, const EnvVariableMap &envp);
 
   void Import(mx::Executor &executor);
 };

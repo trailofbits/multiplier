@@ -44,17 +44,20 @@
 namespace indexer {
 namespace {
 
-static std::mutex gCompileJobListLock;
-
-static constexpr size_t kCommandsBatchSize = 256;
-
-using CompileJobList = std::vector<std::pair<pasta::Compiler, pasta::CompileJob>>;
+static inline void
+FixEnvVariables(EnvVariableMap &envp, std::string &path) {
+  for (const auto &[key, _]: envp) {
+    if (key == "PWD" || key == "CWD") {
+      envp[key] = path;
+    }
+  }
+}
 
 struct Command {
  public:
   std::string compiler_hash;
   std::string working_dir;
-  std::unordered_map<std::string, std::string> env;
+  EnvVariableMap env;
   pasta::ArgumentVector vec;
   pasta::CompilerName name{pasta::CompilerName::kUnknown};
   pasta::TargetLanguage lang{pasta::TargetLanguage::kC};
@@ -79,6 +82,8 @@ class BuildCommandAction final : public mx::Action {
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
                        mx::Executor &exe);
+
+  static bool CanRunCompileJob(const pasta::CompileJob &job);
 
  public:
   virtual ~BuildCommandAction(void) = default;
@@ -167,6 +172,37 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   return std::make_pair(output_sysroot, output_no_sysroot);
 }
 
+bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
+  const auto &args = job.Arguments();
+  for (auto it = args.begin(); it != args.end(); ++it) {
+    if (strcmp(*it, "-x")) {
+      continue;
+    }
+    
+    // Skip to the value after `-x`.
+    ++it;
+    if (it == args.end()) {
+      break;  // No language specified?
+    }
+    
+    // Next argument after opt_x flag will be lang value; Compare
+    // it with the supported language i.e. C.
+    if (strcmp(*it, "c")) {
+      LOG(ERROR) << "Skipping compile job due to unsupported language "
+                 << (*it) << ": " << args.Join();
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Compile job should have associated opt_x value. Fallback here and return false
+  // if the option does not exist.
+  LOG(ERROR) << "Skipping compile job due to unknown language: "
+             << args.Join();
+  return false;
+}
+
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc,
                                          mx::Executor &exe) {
@@ -181,8 +217,12 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
   // is different than `exe`, because `exe` operates (and waits), for things
   // to finish with the current working directory changed.
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
+    if (!CanRunCompileJob(job)) {
+      continue;
+    }
     ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
+  (void)exe;
 }
 
 // Build the compilers for the commands, then build the commands.
@@ -228,14 +268,6 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
                     exe);
   }
 }
-
-//llvm::json::Value v(std::move(o));
-//std::string s;
-//llvm::raw_string_ostream os(s);
-//os << llvm::formatv("{0:2}", v);
-//os.flush();
-//std::cerr << s << std::endl;
-//return true;
 
 }  // namespace
 
@@ -308,7 +340,8 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
   return true;
 }
 
-bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
+bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
+                                         const EnvVariableMap &envp) {
   auto cwd = o.getString("directory");
   auto file = o.getString("file");
   if (!cwd || !file) {
@@ -332,6 +365,8 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
 
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
+      command.env = envp;
+      FixEnvVariables(command.env, cwd_str);
 
       // Guess at the language.
       if (commands_str->contains_insensitive("++") ||
@@ -383,6 +418,8 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
       DLOG(INFO) << "Parsed command: " << command.vec.Join();
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
+      command.env = envp;
+      FixEnvVariables(command.env, cwd_str);
       command.lang = lang;
       return true;
 
@@ -395,21 +432,6 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o) {
   } else {
     DLOG(ERROR) << "Can't locate compiler arguments in JSON object";
     return false;
-  }
-}
-
-template <typename Iter, typename C>
-static void ForEachInterval(Iter begin, Iter end,
-                            size_t interval_size, C cb) {
-  auto to = begin;
-  while (to != end) {
-    auto from = to;
-    size_t counter = static_cast<size_t>(std::distance(from, end));
-    if (counter > interval_size) {
-      counter = interval_size;
-    }
-    std::advance(to, counter);
-    cb(from, to);
   }
 }
 
@@ -435,19 +457,8 @@ void Importer::Import(mx::Executor &exe) {
     per_path_exe.Start();
     per_path_exe.Wait();
 
-//    typedef decltype(commands.begin()) iter_t;
-//    ForEachInterval(commands.begin(), commands.end(),
-//                    kCommandsBatchSize,
-//                    [&](iter_t from, iter_t to) {
-//
-//      for (iter_t &it = from; it != to; it++) {
-//        per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, *it, d->ctx);
-//      }
-//
-//      per_path_exe.Start();
-//      per_path_exe.Wait();
-//    });
   }
+  (void)exe;
 }
 
 }  // namespace indexer
