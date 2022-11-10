@@ -524,8 +524,9 @@ Substitution *TokenTreeImpl::PreExpansionOf(Substitution *node) {
 
   TokenInfo *macro_name = LeftCornerOfUse(node);
   TokenInfo *exp_macro_name = LeftCornerOfUse(sub_exp);
-  TokenSet *macro_name_root = Root(macro_name);
-  TokenSet *exp_macro_name_root = Root(exp_macro_name);
+
+  TokenSet *macro_name_root = UnifyToken(macro_name);
+  TokenSet *exp_macro_name_root = UnifyToken(exp_macro_name);
 
   if (!macro_name_root || macro_name_root != exp_macro_name_root) {
     return nullptr;
@@ -1608,6 +1609,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
   sub->after->after = nullptr;
   sub->after->before_body = nullptr;
   sub->after->after_body = nullptr;
+  sub->after->macro_def.reset();
+  sub->after->macro_use.reset();
   sub->after->before.clear();
 
   // Overwrite `sub->after` to point to the pre-expansion's `after`, so that
@@ -1622,6 +1625,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
   pre_exp->parent = nullptr;
   pre_exp->after = nullptr;
   pre_exp->before.clear();
+  pre_exp->macro_def.reset();
+  pre_exp->macro_use.reset();
 
   D( indent.resize(indent.size() - 2u); )
   return true;
