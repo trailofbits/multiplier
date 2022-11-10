@@ -813,7 +813,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kEndOfMacroExpansionMarker: {
-        DCHECK_NOTNULL(last_macro_use_token);
+        assert(last_macro_use_token != nullptr);
         TokenInfo &info = tokens_alloc.emplace_back();
         pasta::File file = pasta::File::Containing(
             last_macro_use_token->file_tok.value());
