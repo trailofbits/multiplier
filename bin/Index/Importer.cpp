@@ -39,6 +39,8 @@
 
 #include "IndexCompileJob.h"
 
+#include <fcntl.h>
+
 namespace indexer {
 namespace {
 
@@ -104,7 +106,8 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     new_args.emplace_back(arg);
   }
 
-  new_args.emplace_back("-Wno-everything");
+  new_args.emplace_back("-w");  // Disable all warnings (GCC).
+  new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
   new_args.emplace_back("-P");
   new_args.emplace_back("-v");
   new_args.emplace_back("-dD");
@@ -120,6 +123,11 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   if (!ret.Succeeded() && output_sysroot.empty()) {
     return ret.TakeError();
   }
+
+//  if (output_sysroot.find("udf.c") != std::string::npos) {
+//    auto fd = open("/tmp/udf_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
+//    write(fd, output_sysroot.data(), output_sysroot.size());
+//  }
 
   if (auto it = output_sysroot.find("End of search list.");
       it == std::string::npos) {
@@ -140,6 +148,12 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   if (!ret2.Succeeded() && output_no_sysroot.empty()) {
     return ret2.TakeError();
   }
+
+
+//  if (output_no_sysroot.find("udf.c") != std::string::npos) {
+//    auto fd = open("/tmp/udf_no_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
+//    write(fd, output_no_sysroot.data(), output_no_sysroot.size());
+//  }
 
   if (auto it = output_no_sysroot.find("End of search list.");
       it == std::string::npos) {
