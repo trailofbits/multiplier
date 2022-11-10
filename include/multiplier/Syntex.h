@@ -37,7 +37,7 @@ private:
   mx::EntityId entity;
 
 public:
-  MetavarMatch(const std::string& name_, mx::EntityId entity_)
+  MetavarMatch(const std::string &name_, mx::EntityId entity_)
     : name(std::move(name_)),
       entity(std::move(entity_)) {}
 
