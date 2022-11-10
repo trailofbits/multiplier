@@ -129,7 +129,7 @@ class FunctionDecl : public DeclaratorDecl {
   Token ellipsis_token(void) const;
   TokenRange exception_spec_source_range(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
-  FunctionDecl instantiated_from_declaration(void) const;
+  std::optional<FunctionDecl> instantiated_from_declaration(void) const;
   std::optional<FunctionDecl> instantiated_from_member_function(void) const;
   LanguageLinkage language_linkage(void) const;
   MultiVersionKind multi_version_kind(void) const;

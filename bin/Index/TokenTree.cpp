@@ -811,6 +811,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           info.category = TokenInfo::kMacroStepToken;
         }
         info.macro_tok = tok.MacroLocation();
+        assert(info.macro_tok.has_value());
         if (!info.file_tok && info.macro_tok) {
           info.file_tok = info.macro_tok->FileLocation();
         }
@@ -825,6 +826,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
           info.file_tok = std::move(file_tok);
         }
         info.macro_tok = tok.MacroLocation();
+        assert(info.macro_tok.has_value());
         if (!info.file_tok && info.macro_tok) {
           info.file_tok = info.macro_tok->FileLocation();
         }
