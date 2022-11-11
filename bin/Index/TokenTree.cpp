@@ -522,12 +522,8 @@ Substitution *TokenTreeImpl::PreExpansionOf(Substitution *node) {
     return nullptr;
   }
 
-  auto macro_name_root = UnifyToken(LeftCornerOfUse(node));
-  auto exp_macro_name_root = UnifyToken(LeftCornerOfUse(sub_exp));
-
-  if (macro_name_root && macro_name_root != exp_macro_name_root) {
-    exp_macro_name_root->root = macro_name_root;
-  }
+  (void) UnifyToken(LeftCornerOfUse(node));
+  (void) UnifyToken(LeftCornerOfUse(sub_exp));
 
   return sub_exp;
 }
