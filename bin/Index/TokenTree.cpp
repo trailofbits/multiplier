@@ -522,14 +522,11 @@ Substitution *TokenTreeImpl::PreExpansionOf(Substitution *node) {
     return nullptr;
   }
 
-  TokenInfo *macro_name = LeftCornerOfUse(node);
-  TokenInfo *exp_macro_name = LeftCornerOfUse(sub_exp);
+  auto macro_name_root = UnifyToken(LeftCornerOfUse(node));
+  auto exp_macro_name_root = UnifyToken(LeftCornerOfUse(sub_exp));
 
-  TokenSet *macro_name_root = UnifyToken(macro_name);
-  TokenSet *exp_macro_name_root = UnifyToken(exp_macro_name);
-
-  if (!macro_name_root || macro_name_root != exp_macro_name_root) {
-    return nullptr;
+  if (macro_name_root && macro_name_root != exp_macro_name_root) {
+    exp_macro_name_root->root = macro_name_root;
   }
 
   return sub_exp;
