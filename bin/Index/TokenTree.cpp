@@ -502,29 +502,23 @@ Substitution *TokenTreeImpl::PreExpansionOf(Substitution *node) {
     return nullptr;
   }
 
-  bool debug = node->macro_def->NameToken().Data() == "BATwalk";
-
   if (!node->after || node->after->kind != Substitution::kMacroExpansion ||
       node->after->before.size() != 1u || node->after->after ||
       !std::holds_alternative<Substitution *>(node->after->before[0])) {
-    assert(!debug);
     return nullptr;
   }
 
   auto sub_exp = std::get<Substitution *>(node->after->before[0]);
   if (sub_exp->kind != Substitution::kMacroUse) {
-    assert(!debug);
     return nullptr;
   }
 
   if (node->macro_def.has_value() != sub_exp->macro_def.has_value()) {
-    assert(!debug);
     return nullptr;
   }
 
   if (node->macro_def &&
       node->macro_def->RawNode() != sub_exp->macro_def->RawNode()) {
-    assert(!debug);
     return nullptr;
   }
 
