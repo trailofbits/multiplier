@@ -502,28 +502,37 @@ Substitution *TokenTreeImpl::PreExpansionOf(Substitution *node) {
     return nullptr;
   }
 
+  bool debug = node->macro_def->NameToken().Data() == "BATwalk";
+
   if (!node->after || node->after->kind != Substitution::kMacroExpansion ||
       node->after->before.size() != 1u || node->after->after ||
       !std::holds_alternative<Substitution *>(node->after->before[0])) {
+    assert(!debug);
     return nullptr;
   }
 
   auto sub_exp = std::get<Substitution *>(node->after->before[0]);
   if (sub_exp->kind != Substitution::kMacroUse) {
+    assert(!debug);
     return nullptr;
   }
 
   if (node->macro_def.has_value() != sub_exp->macro_def.has_value()) {
+    assert(!debug);
     return nullptr;
   }
 
   if (node->macro_def &&
       node->macro_def->RawNode() != sub_exp->macro_def->RawNode()) {
+    assert(!debug);
     return nullptr;
   }
 
-  (void) UnifyToken(LeftCornerOfUse(node));
-  (void) UnifyToken(LeftCornerOfUse(sub_exp));
+  TokenInfo *macro_name = LeftCornerOfUse(node);
+  TokenInfo *exp_macro_name = LeftCornerOfUse(sub_exp);
+
+  (void) Root(macro_name);
+  (void) Root(exp_macro_name);
 
   return sub_exp;
 }
@@ -699,9 +708,10 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
     }
     if (info->parsed_tok) {
       os << "<TR><TD>PK=" << info->parsed_tok->KindName() << "</TD></TR>";
+      os << "<TR><TD>PI=" << info->parsed_tok->Index() << "</TD></TR>";
     }
     if (info->file_tok) {
-      os << "<TR><TD>FT=" << info->file_tok->Index() << "</TD></TR>";
+      os << "<TR><TD>FI=" << info->file_tok->Index() << "</TD></TR>";
     }
 
     if (info->parsed_tok) {
@@ -776,6 +786,20 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   }
 }
 
+static void ResolveFileLocation(TokenInfo *info) {
+  for (auto pt = info->parsed_tok; pt && !info->file_tok;
+       pt = pt->DerivedLocation()) {
+    if (auto mt = pt->MacroLocation()) {
+      info->file_tok = mt->FileLocation();
+    } else {
+      info->file_tok = pt->FileLocation();
+    }
+  }
+  if (info->parsed_tok && info->parsed_tok->Index() == 2408) {
+    assert(info->file_tok.has_value());
+  }
+}
+
 // Build an initial token info list. This contains all of the tokens that were
 // parsed, plus the file tokens that were macro uses. This does not contain
 // file tokens that were elided due to things like conditional macros, e.g.
@@ -796,7 +820,7 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         return nullptr;
 
       case pasta::TokenRole::kBeginOfMacroExpansionMarker: {
-        DCHECK(tok.FileLocation().has_value());
+        assert(tok.FileLocation().has_value());
         TokenInfo &info = tokens_alloc.emplace_back();
         info.file_tok = tok.FileLocation();
         info.parsed_tok = std::move(tok);
@@ -816,48 +840,50 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMarkerToken;
         --macro_depth;
-        DCHECK_LE(0, macro_depth);
+        assert(0 <= macro_depth);
+        continue;
+      }
+
+      case pasta::TokenRole::kInitialMacroUseToken: {
+        assert(0 < macro_depth);
+        TokenInfo &info = tokens_alloc.emplace_back();
+        info.macro_tok = tok.MacroLocation();
+        info.category = TokenInfo::kMacroUseToken;
+        info.file_tok = tok.FileLocation();
+        last_macro_use_token = &info;
+        assert(info.macro_tok.has_value());
+        info.parsed_tok = std::move(tok);
+        ResolveFileLocation(&info);
         continue;
       }
 
       case pasta::TokenRole::kIntermediateMacroExpansionToken: {
-        DCHECK_LT(0, macro_depth);
+        assert(0 < macro_depth);
         TokenInfo &info = tokens_alloc.emplace_back();
-        if (auto file_tok = tok.FileLocation()) {
-          info.file_tok = std::move(file_tok);
-          info.category = TokenInfo::kMacroUseToken;
-          last_macro_use_token = &info;
-        } else {
-          info.category = TokenInfo::kMacroStepToken;
-        }
         info.macro_tok = tok.MacroLocation();
+        info.category = TokenInfo::kMacroStepToken;
+        info.file_tok = tok.FileLocation();
         assert(info.macro_tok.has_value());
-        if (!info.file_tok && info.macro_tok) {
-          info.file_tok = info.macro_tok->FileLocation();
-        }
         info.parsed_tok = std::move(tok);
+        ResolveFileLocation(&info);
         continue;
       }
 
       case pasta::TokenRole::kFinalMacroExpansionToken: {
-        DCHECK_LT(0, macro_depth);
+        assert(0 < macro_depth);
         TokenInfo &info = tokens_alloc.emplace_back();
-        if (auto file_tok = tok.FileLocation()) {
-          info.file_tok = std::move(file_tok);
-        }
+        info.file_tok = tok.FileLocation();
         info.macro_tok = tok.MacroLocation();
         assert(info.macro_tok.has_value());
-        if (!info.file_tok && info.macro_tok) {
-          info.file_tok = info.macro_tok->FileLocation();
-        }
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kMacroExpansionToken;
+        ResolveFileLocation(&info);
         continue;
       }
 
       case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker: {
-        DCHECK(tok.FileLocation().has_value());
+        assert(tok.FileLocation().has_value());
         TokenInfo &info = tokens_alloc.emplace_back();
         info.file_tok = tok.FileLocation();
         info.parsed_tok = std::move(tok);
@@ -866,11 +892,11 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
       }
 
       case pasta::TokenRole::kFileToken: {
-        DCHECK_EQ(0, macro_depth);
+        assert(!macro_depth);
         auto &info = tokens_alloc.emplace_back();
         info.file_tok = tok.FileLocation();
-        DCHECK(info.file_tok.has_value());
-        DCHECK_EQ(info.file_tok->Data(), tok.Data());
+        assert(info.file_tok.has_value());
+        assert(info.file_tok->Data() == tok.Data());
         info.parsed_tok = std::move(tok);
         info.category = TokenInfo::kFileToken;
         continue;
@@ -1554,6 +1580,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
       }
 
     } else if (i_arg) {
+      std::cerr << "\n\n\n";
+      substitutions_alloc.front().PrintDOT(std::cerr);
       assert(false);
       // TODO(pag): ???
 
@@ -2690,8 +2718,12 @@ TokenSet *TokenTreeImpl::UnifyToken(TokenInfo *curr) {
   if (!parsed_set->info) {
     parsed_set->info = curr;
   }
+
   if (!parsed_set->file_tok) {
     parsed_set->file_tok = curr->file_tok;
+
+  } else if (!curr->file_tok) {
+    curr->file_tok = parsed_set->file_tok;
   }
 
   std::optional<pasta::Token> derived_loc = curr->parsed_tok->DerivedLocation();
@@ -2711,9 +2743,15 @@ TokenSet *TokenTreeImpl::UnifyToken(TokenInfo *curr) {
   }
   if (!prev_set->file_tok) {
     prev_set->file_tok = curr->file_tok;
+
+  } else if (!curr->file_tok) {
+    curr->file_tok = prev_set->file_tok;
   }
+
   if (!prev_set->file_tok) {
     prev_set->file_tok = derived_loc->FileLocation();
+  } else if (!curr->file_tok) {
+    curr->file_tok = prev_set->file_tok;
   }
 
   assert(parsed_set == parsed_set->Root());

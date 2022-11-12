@@ -215,6 +215,7 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
           return false;
       }
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
       return false;
