@@ -329,6 +329,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         ++begin_tok_index;
         done = true;
         break;
+      case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
         --begin_tok_index;
@@ -361,6 +362,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         --end_tok_index;
         done = true;
         break;
+      case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
         ++end_tok_index;
