@@ -33,7 +33,7 @@ static std::mutex gPrintDOTLock;
 }  // namespace
 
 struct TokenInfo {
-  enum Category {
+  enum Category : unsigned char {
     // A token, produced as a result of macro expansion, but somewhere between
     // use and parse, i.e. this is not parsed.
     //
@@ -68,6 +68,7 @@ struct TokenInfo {
   std::optional<pasta::FileToken> file_tok;
   std::optional<pasta::MacroToken> macro_tok;
   Category category{kFileToken};
+  bool is_va_args_concat{false};  // `, ## __VA_ARGS__`.
 };
 
 struct TokenSet {
@@ -146,6 +147,8 @@ class Substitution {
   // A token that is logically a predecessor of `before`.
   TokenInfo *before_body{nullptr};
   TokenInfo *after_body{nullptr};
+
+  bool is_va_args_concat{false};
 
   explicit Substitution(Kind kind_)
       : kind(kind_) {}
@@ -1014,14 +1017,26 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
 
   const auto orig_end_i = curr_i;
   bool changed = false;
+  bool comma_pound_vaarg = false;
+  pasta::TokenKind ftk = prev_file_tok.Kind();
+  pasta::TokenKind prev_ftk = pasta::TokenKind::kUnknown;
   for (; i < curr_i; ++i) {
+
+    if (ftk != pasta::TokenKind::kUnknown) {
+      prev_ftk = ftk;
+    }
+
     pasta::FileToken ft = tokens[i];
-    pasta::TokenKind ftk = ft.Kind();
+    ftk = ft.Kind();
 
     // State machine to figure out if we need to stop early.
     switch (ftk) {
-      case pasta::TokenKind::kHash:
       case pasta::TokenKind::kHashHash:
+        if (prev_ftk == pasta::TokenKind::kComma) {
+          comma_pound_vaarg = true;
+        }
+        [[fallthrough]];
+      case pasta::TokenKind::kHash:
         if (!in_before) {
           goto exit_loop;
         }
@@ -1087,6 +1102,9 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           seen_ident = false;
 
         } else if (seen_pound) {
+          if (comma_pound_vaarg) {
+            assert(ft_data == "__VA_ARGS__");
+          }
           curr_i = (i + 1u);  // Stop before next iteration.
 
         } else if (prev_was_space && seen_ident) {
@@ -1161,6 +1179,11 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
     prev = &info;
     UnifyToken(&info);
     nodes.emplace_back(&info);
+
+    if (comma_pound_vaarg && info.file_tok->Data() == "__VA_ARGS__") {
+      D( std::cerr << indent << "  is __VA_ARGS__ concat\n"; )
+      info.is_va_args_concat = true;
+    }
 
     switch (info.file_tok->Kind()) {
       case pasta::TokenKind::kUnknown:
@@ -2051,11 +2074,14 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
 
         } else if (lck = invented_lc->file_tok->Kind();
                    lck != pasta::TokenKind::kHash &&
+                   lck != pasta::TokenKind::kHashHash &&
                    lck != pasta::TokenKind::kIdentifier &&
                    lck != pasta::TokenKind::kRawIdentifier) {
 
         revisit_curr_again:
-          D( std::cerr << indent << "!!! triggering revisit\n"; )
+          D( std::cerr << indent << "!!! triggering revisit on ("
+                       << invented_lc->file_tok->Index() << "): "
+                       << invented_lc->file_tok->Data() << '\n'; )
           // We've probably stripped leading whitespace from our invented node,
           // so go and add it in if we can.
           AddOrClearInsaneBounds(invented_node);
@@ -2871,7 +2897,6 @@ static void FindParameters(
           param_name.clear();
           param_name.insert(param_name.end(), ftd.begin(), ftd.end());
 
-
           if (i < args.size()) {
             D( std::cerr
                 << "Found args for macro param name: "
@@ -2900,12 +2925,26 @@ void TokenTreeImpl::FinalizeParameters(
   std::string param_name;
 
   std::unordered_map<std::string, Substitution::NodeList> next_params;
-  Substitution::NodeList param_toks;
+  Substitution::NodeList new_before;
 
   auto i = 0u;
-  for (Substitution::Node &node : sub->before) {
+  for (const Substitution::Node &node : sub->before) {
     if (std::holds_alternative<TokenInfo *>(node)) {
       TokenInfo *tok = std::get<TokenInfo *>(node);
+
+      // If this token was signalled to be a varargs concat, then it means
+      // its containing substitution is one, so mark it as such.
+      //
+      // NOTE(pag): It will have been mislabeled as a `kConcatenateBefore`.
+      if (tok->is_va_args_concat) {
+        assert(sub->kind == Substitution::kConcatenateBefore ||
+               sub->kind == Substitution::kSubstitutionBefore);
+        sub->kind = Substitution::kMacroParameterUse;
+        sub->after->kind = Substitution::kMacroParameterSubstitution;
+        sub->is_va_args_concat = true;
+        new_before.emplace_back(tok);
+        continue;
+      }
 
       // Try to re-label this substitution when specific operators are used.
       if (sub->kind == Substitution::kSubstitutionBefore && sub->after &&
@@ -2928,10 +2967,12 @@ void TokenTreeImpl::FinalizeParameters(
       }
 
       if (no_params) {
+        new_before.emplace_back(tok);
         continue;
       }
 
       if (!TokenIsParamName(tok, param_name, params)) {
+        new_before.emplace_back(tok);
         continue;
       }
 
@@ -2946,7 +2987,7 @@ void TokenTreeImpl::FinalizeParameters(
       arg->parent = param_sub;
       arg->before = params.find(param_name)->second;
 
-      node = param_sub;
+      new_before.emplace_back(param_sub);
 
     } else if (std::holds_alternative<Substitution *>(node)) {
       Substitution *nested_sub = std::get<Substitution *>(node);
@@ -2961,11 +3002,56 @@ void TokenTreeImpl::FinalizeParameters(
           std::holds_alternative<TokenInfo *>(nested_sub->before.front()) &&
           TokenIsParamName(std::get<TokenInfo *>(nested_sub->before.front()),
                            param_name, params)) {
+
         nested_sub->kind = Substitution::kMacroParameterUse;
         nested_sub->after->kind = Substitution::kMacroParameterSubstitution;
 
+        new_before.emplace_back(nested_sub);
+
       } else {
         FinalizeParameters(nested_sub, params);
+
+        // It's just a normal nested substitution.
+        if (!nested_sub->is_va_args_concat) {
+          new_before.emplace_back(nested_sub);
+          continue;
+        }
+
+        // It's a nested substitution with a `## __VA_ARGS__`, so we want to
+        // find the `, ` in `, ## __VA_ARGS__` and move it into the nested
+        // sub, and maybe into the `nested_sub->after`.
+
+        std::vector<Substitution::Node> comma_etc;
+        while (!new_before.empty()) {
+          if (!std::holds_alternative<TokenInfo *>(new_before.back())) {
+            Die(this);
+            goto skip;
+          }
+
+          auto ti = std::get<TokenInfo *>(new_before.back());
+          new_before.pop_back();
+          comma_etc.push_back(ti);
+          if (ti->file_tok &&
+              ti->file_tok->Kind() == pasta::TokenKind::kComma) {
+            break;
+          }
+        }
+
+        // Add the `, ` before the `## __VA_ARGS__`.
+        std::reverse(comma_etc.begin(), comma_etc.end());
+        nested_sub->before.insert(nested_sub->before.begin(),
+                                  comma_etc.begin(), comma_etc.end());
+
+        // Add the `, ` before the expansion to maintain the commas.
+        if (!nested_sub->after->before.empty()) {
+          nested_sub->after->before.insert(
+              nested_sub->after->before.begin(),
+              comma_etc.begin(), comma_etc.end());
+        }
+
+      skip:
+        new_before.emplace_back(nested_sub);
+        continue;
       }
 
     } else {
@@ -2974,6 +3060,8 @@ void TokenTreeImpl::FinalizeParameters(
 
     ++i;
   }
+
+  sub->before.swap(new_before);
 
   if (!sub->after) {
     return;
