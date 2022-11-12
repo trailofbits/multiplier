@@ -2222,16 +2222,12 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   arg_sub->parent = sub;
   sub->before.emplace_back(arg_sub);
 
-  auto orig_arg = arg_sub;
-
   for (const pasta::MacroNode &arg_node : node->Nodes()) {
     arg_sub = BuildMacroSubstitutions(
         prev, curr, arg_sub, arg_node, err);
     if (!arg_sub) {
       return nullptr;
     }
-
-    assert(arg_sub == orig_arg);
   }
 
   return sub;
