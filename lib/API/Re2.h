@@ -47,16 +47,9 @@ class RegexQueryResultImpl final {
   // List of fragments that might match.
   std::vector<RawEntityId> fragment_ids;
 
-  using Response =
-      capnp::Response<mx::rpc::Multiplier::RegexQueryFragmentsResults>;
-
   using Ptr = std::shared_ptr<RegexQueryResultImpl>;
 
   ~RegexQueryResultImpl(void) noexcept;
-
-  RegexQueryResultImpl(
-      const RegexQuery &re_, EntityProvider::Ptr ep_,
-      Response response_);
 
   RegexQueryResultImpl(
       const RegexQuery &re_, EntityProvider::Ptr ep_,

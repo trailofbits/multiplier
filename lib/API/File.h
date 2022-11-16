@@ -73,19 +73,14 @@ class FileImpl {
 // A file downloaded as a result of a making an RPC.
 class PackedFileImpl final : public FileImpl, public TokenReader {
  public:
-  using Response = capnp::Response<mx::rpc::Multiplier::DownloadFileResults>;
-
   PackedReaderState package;
   const rpc::File::Reader reader;
   const unsigned num_tokens;
 
   virtual ~PackedFileImpl(void) noexcept;
 
-  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_, Response response_);
-  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader &reader_);
-
-  inline PackedFileImpl(FileId id_, EntityProvider::Ptr ep_, Response response_)
-      : PackedFileImpl(id_.file_id, std::move(ep_), std::move(response_)) {}
+  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_,
+                 const capnp::Data::Reader &reader_);
 
   // Return the data of the file.
   std::string_view Data(void) const final;

@@ -35,16 +35,10 @@ class WeggliQueryResultImpl final {
   // List of fragments in this file.
   std::vector<RawEntityId> fragments;
 
-  using Response =
-      capnp::Response<mx::rpc::Multiplier::WeggliQueryFragmentsResults>;
-
   ~WeggliQueryResultImpl(void) noexcept;
 
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
-                        const std::vector<RawEntityId>& fragments);
-
-  WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
-                        Response response_);
+                        const std::vector<RawEntityId> &fragments);
 
   WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImpl::Ptr frag_);
 

@@ -21,19 +21,6 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_, Response response)
-    : query(query_),
-      ep(std::move(ep_)) {
-
-  auto fragment_ids_reader = response.getFragmentIds();
-  fragment_ids.reserve(fragment_ids_reader.size());
-
-  for (RawEntityId frag_id : fragment_ids_reader) {
-    fragment_ids.emplace_back(frag_id);
-  }
-}
-
-RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, EntityProvider::Ptr ep_,
     const std::vector<RawEntityId> &fragment_ids)
     : query(query_),

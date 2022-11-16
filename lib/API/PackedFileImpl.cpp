@@ -12,13 +12,6 @@ namespace mx {
 PackedFileImpl::~PackedFileImpl(void) noexcept {}
 
 PackedFileImpl::PackedFileImpl(
-    RawEntityId id_, EntityProvider::Ptr ep_, Response response)
-    : FileImpl(id_, std::move(ep_)),
-      package(response.getFile()),
-      reader(package.Reader<rpc::File>()),
-      num_tokens(reader.getTokenKinds().size()) {}
-
-PackedFileImpl::PackedFileImpl(
     RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader &reader_)
     : FileImpl(id_, std::move(ep_)),
       package(reader_),

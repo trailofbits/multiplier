@@ -22,15 +22,6 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(
       ep(std::move(ep_)),
       fragments(fragments) {}
 
-WeggliQueryResultImpl::WeggliQueryResultImpl(
-    const WeggliQuery &query_, EntityProvider::Ptr ep_, Response response)
-    : query(query_),
-      ep(std::move(ep_)) {
-  for (RawEntityId frag_id : response.getFragmentIds()) {
-    fragments.emplace_back(frag_id);
-  }
-}
-
 WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
                                              FragmentImpl::Ptr frag_)
     : query(query_),
