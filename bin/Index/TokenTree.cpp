@@ -1390,7 +1390,7 @@ Substitution *TokenTreeImpl::MergeArguments(
     const auto i_is_tok = std::holds_alternative<TokenInfo *>(node_i);
     i_lc = LeftCornerOfUse(node_i);
 
-    D( const auto j_is_tok = std::holds_alternative<TokenInfo *>(node_j); )
+    const auto j_is_tok = std::holds_alternative<TokenInfo *>(node_j);
     j_lc = LeftCornerOfUse(node_j);
 
     D( std::cerr
@@ -1413,9 +1413,29 @@ Substitution *TokenTreeImpl::MergeArguments(
       assert(i_lc->file_tok->Data() == j_lc->file_tok->Data());
       if (i_is_tok) {
         merged->before.emplace_back(node_j);
-      } else {
+        changed = true;
+        ++i;
+        ++j;
+
+      } else if (j_is_tok) {
         Die(this);
+
+        Substitution *before = CreateSubstitution(Substitution::kSubstitutionBefore);
+        Substitution *after = CreateSubstitution(Substitution::kSubstitutionAfter);
+        before->after = after;
+        merged->before.emplace_back(before);
+        before->before.emplace_back(node_i);
+        after->before.emplace_back(node_j);
+
+      } else {
+#ifndef NDEBUG
+        auto sub_i = std::get<Substitution *>(node_i);
+        auto sub_j = std::get<Substitution *>(node_j);
+        assert(sub_i->kind == sub_j->kind);
+#endif
+        merged->before.emplace_back(node_j);
       }
+
       changed = true;
       ++i;
       ++j;
@@ -1439,8 +1459,18 @@ Substitution *TokenTreeImpl::MergeArguments(
     merged->before.emplace_back(pre_exp->before[j]);
   }
 
+  orig->before_body = nullptr;
+  orig->after_body = nullptr;
+  orig->parent = nullptr;
+  orig->after = nullptr;
   orig->before.clear();
+
+  pre_exp->before_body = nullptr;
+  pre_exp->after_body = nullptr;
+  pre_exp->parent = nullptr;
+  pre_exp->after = nullptr;
   pre_exp->before.clear();
+
   StripWhitespace(merged->before);
 
   D( indent.resize(indent.size() - 2u); )
@@ -2227,9 +2257,11 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     return nullptr;
   }
 
+  // Can happen when trying to align an argument containing conditional
+  // directives in the use with pre-expansion form tht doesn't have the
+  // conditional directives.
   if (curr->macro_tok->RawNode() != node->RawNode()) {
-    err << "Could not align macro token with " << curr->parsed_tok->Data();
-    return nullptr;
+    return sub;
   }
 
   sub->before.emplace_back(curr);
@@ -2483,6 +2515,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   }
 
   if (!curr || curr->category != TokenInfo::kMarkerToken) {
+    Die(this);
     err << "Expected a marker token at the end of macro expansion";
     return nullptr;
   }
@@ -2730,6 +2763,10 @@ Substitution *TokenTreeImpl::BuildSubstitutions(std::stringstream &err) {
   }
 
   UnifyTokens(first);
+
+//  std::cerr << "\n\n";
+//  substitutions_alloc.front().PrintDOT(std::cerr);
+//  std::cerr << "\n\n";
 
   if (!MergeArgPreExpansions(err)) {
     return nullptr;
