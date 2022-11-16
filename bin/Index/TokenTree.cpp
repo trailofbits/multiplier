@@ -150,6 +150,8 @@ class Substitution {
 
   bool is_va_args_concat{false};
 
+  bool has_error{false};
+
   explicit Substitution(Kind kind_)
       : kind(kind_) {}
 
@@ -665,7 +667,9 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 
   os << "s" << reinterpret_cast<const void *>(this)
      << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
-  if (InBefore(this)) {
+  if (has_error) {
+    os << " color=\"red\"";
+  } else if (InBefore(this)) {
     os << " color=\"brown\"";
   }
   os << "><TR><TD colspan=\"" << num_cols << "\">";
@@ -1088,6 +1092,8 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           prev_was_space = true;
           goto keep_going;
         }
+      // E.g. `4_WITH_CHECK` from MonetDB.
+      case pasta::TokenKind::kNumericConstant:
       case pasta::TokenKind::kIdentifier:
       case pasta::TokenKind::kRawIdentifier: {
         if (!in_before) {
@@ -1129,6 +1135,8 @@ bool TokenTreeImpl::TryFillBetweenFileTokens(
           goto exit_loop;
 
         } else if (seen_pound) {
+          D( std::cerr << indent << "At space, Seen pound\n"; )
+          sub->has_error = true;
           Die(this);
           return false;  // Used to be `goto exit_loop`.
 
@@ -1418,6 +1426,8 @@ Substitution *TokenTreeImpl::MergeArguments(
         ++j;
 
       } else if (j_is_tok) {
+        orig->has_error = true;
+        pre_exp->has_error = true;
         Die(this);
 
         Substitution *before = CreateSubstitution(Substitution::kSubstitutionBefore);
@@ -1588,6 +1598,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
         TokenSet *i_rc_root = Root(i_rc);
         TokenSet *j_lc_root = Root(j_lc);
         if (!i_rc_root || i_rc_root != j_lc_root) {
+          sub->has_error = true;
+          pre_exp->has_error = true;
           Die(this);
           err << "Expected the right corner of the use's macro name to be the "
                  "left corner of the pre-expansion's macro name";
@@ -1602,6 +1614,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
         continue;
 
       } else {
+        sub->has_error = true;
+        pre_exp->has_error = true;
         Die(this);
         err << "Expected the first node in a use and its pre-expansion to both "
                "be tokens, or for the use to be a substitution, and the pre-"
@@ -1646,10 +1660,12 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
       }
 
     } else if (i_arg) {
+      i_arg->has_error = true;
       Die(this);
       return false;  // TODO(pag): ???
 
     } else if (j_arg) {
+      j_arg->has_error = true;
       Die(this);
       return false;  // TODO(pag): ???
 
@@ -1683,6 +1699,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
       << " j_max=" << max_j << '\n'; )
 
   if (!changed || i != max_i || j != max_j) {
+    sub->has_error = true;
+    pre_exp->has_error = true;
     Die(this);
     err << "Unable to complete merge";
     return false;
@@ -2099,6 +2117,8 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
 
         TokenInfo *invented_lc = LeftCornerOfUse(invented_node);
         if (!invented_lc || !invented_lc->file_tok) {
+          sub->has_error = true;
+          invented_node->has_error = true;
           Die(this);
           goto revisit_curr_again;
 
@@ -2515,6 +2535,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   }
 
   if (!curr || curr->category != TokenInfo::kMarkerToken) {
+    sub->has_error = true;
     Die(this);
     err << "Expected a marker token at the end of macro expansion";
     return nullptr;
@@ -2622,6 +2643,7 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
       case TokenInfo::kMacroUseToken:
       case TokenInfo::kMacroStepToken:
       case TokenInfo::kMacroExpansionToken:
+        sub->has_error = true;
         Die(this);
         err << "Macro tokens should not be seen here";
         return nullptr;
@@ -2742,6 +2764,7 @@ void TokenTreeImpl::FindSubstitutionBounds(void) {
         }
       }
       if (!BoundsAreSane(nested_sub)) {
+        nested_sub->has_error = true;
         Die(this);
         nested_sub->before_body = old_before;
         nested_sub->after_body = old_after;
@@ -3061,6 +3084,7 @@ void TokenTreeImpl::FinalizeParameters(
         std::vector<Substitution::Node> comma_etc;
         while (!new_before.empty()) {
           if (!std::holds_alternative<TokenInfo *>(new_before.back())) {
+            nested_sub->has_error = true;
             Die(this);
             goto skip;
           }
@@ -3092,6 +3116,7 @@ void TokenTreeImpl::FinalizeParameters(
       }
 
     } else {
+      sub->has_error = true;
       Die(this);
     }
 
