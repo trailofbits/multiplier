@@ -28,7 +28,6 @@
 #include "Context.h"
 #include "Hash.h"
 #include "NameMangler.h"
-#include "PrintTokenGraph.h"
 #include "PendingFragment.h"
 #include "Persist.h"
 #include "Util.h"

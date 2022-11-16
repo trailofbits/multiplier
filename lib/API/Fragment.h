@@ -109,8 +109,6 @@ class FragmentImpl {
 class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
  public:
   using Ptr = std::shared_ptr<const PackedFragmentImpl>;
-  using Response = capnp::Response<
-      mx::rpc::Multiplier::DownloadFragmentResults>;
 
   PackedReaderState package;
   const rpc::Fragment::Reader reader;
@@ -118,14 +116,7 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   virtual ~PackedFragmentImpl(void) noexcept;
 
   PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
-                     Response response_);
-  PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
                      const capnp::Data::Reader &reader_);
-
-  inline PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                            Response response_)
-      : PackedFragmentImpl(id_.fragment_id, std::move(ep_),
-                           std::move(response_)) {}
 
   // Return the ID of the file containing the first token.
   //
