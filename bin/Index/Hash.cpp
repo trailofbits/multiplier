@@ -84,7 +84,12 @@ class HashVisitor final : public pasta::DeclVisitor {
 std::string FileHash(std::string_view data) {
   llvm::SHA256 hash;
   hash.update(data);
-  return hash.final().str();
+  std::string result;
+  result.reserve(32);
+  auto final_ = hash.final();
+  auto final_data = reinterpret_cast<const char *>(final_.data());
+  result.insert(result.end(), final_data, &(final_data[final_.size()]));
+  return result;
 }
 
 // Compute a hash of top-level declarations. This will produce a string of
@@ -136,8 +141,14 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
     // Mix in generic token/structure/context information.
     switch (token.Role()) {
+      case pasta::TokenRole::kIntermediateMacroExpansionToken:
+      case pasta::TokenRole::kInitialMacroUseToken:
+        fs.AddInteger(static_cast<uint16_t>(token.Kind()));
+        fs.AddString(llvm::StringRef(token.Data()));
+        break;
+
       case pasta::TokenRole::kFileToken:
-      case pasta::TokenRole::kMacroExpansionToken:
+      case pasta::TokenRole::kFinalMacroExpansionToken:
         for (auto context = token.Context(); context;
              context = context->Parent()) {
           switch (context->Kind()) {

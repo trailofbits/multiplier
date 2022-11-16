@@ -17,6 +17,7 @@ enum class ImplicitParamDeclImplicitParamKind : unsigned char {
   CXX_THIS,
   CXXVTT,
   CAPTURED_CONTEXT,
+  THREAD_PRIVATE_VARIABLE,
   OTHER,
 };
 
@@ -25,7 +26,7 @@ inline static const char *EnumerationName(ImplicitParamDeclImplicitParamKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(ImplicitParamDeclImplicitParamKind) {
-  return 6;
+  return 7;
 }
 
 const char *EnumeratorName(ImplicitParamDeclImplicitParamKind);

@@ -224,6 +224,7 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<bool> is_interface_like(void) const;
   std::optional<bool> is_literal(void) const;
   std::optional<FunctionDecl> is_local_class(void) const;
+  bool is_never_dependent_lambda(void) const;
   std::optional<bool> is_pod(void) const;
   std::optional<bool> is_polymorphic(void) const;
   std::optional<bool> is_standard_layout(void) const;

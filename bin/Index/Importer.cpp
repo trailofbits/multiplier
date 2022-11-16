@@ -39,6 +39,8 @@
 
 #include "IndexCompileJob.h"
 
+#include <fcntl.h>
+
 namespace indexer {
 namespace {
 
@@ -100,36 +102,70 @@ class BuildCommandAction final : public mx::Action {
 mx::Result<std::pair<std::string, std::string>, std::error_code>
 BuildCommandAction::InitCompilerFromCommand(void) {
   std::vector<std::string> new_args;
-  for (auto arg : command.vec) {
+  for (const char *arg : command.vec) {
+    if (strstr(arg, "-Wno") == arg) {
+      // Keep the argument.
+    } else if (strstr(arg, "-W") == arg || strstr(arg, "-pendantic") == arg) {
+      continue;  // Skip the argument.
+    }
     new_args.emplace_back(arg);
   }
-  new_args.emplace_back("-Wno-missing-sysroot");
-  new_args.emplace_back("-Wno-unknown-warning-option");
+
+  new_args.emplace_back("-w");  // Disable all warnings (GCC).
+  new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
   new_args.emplace_back("-P");
   new_args.emplace_back("-v");
   new_args.emplace_back("-dD");
 
+  // Include a non-existent file. This guarantees a fatal error in all cases,
+  // which prevents any compilation jobs from proceeding.
+  new_args.emplace_back("-include");
+  new_args.emplace_back("/trail/of/bits");
+
   std::string output_sysroot;
   auto ret = mx::Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_sysroot);
-  if (!ret.Succeeded()) {
+  if (!ret.Succeeded() && output_sysroot.empty()) {
     return ret.TakeError();
   }
 
-  if (auto it = output_sysroot.find("error: "); it != std::string::npos) {
-    LOG(ERROR) << output_sysroot.substr(it + 7u);
-    return std::make_error_code(std::errc::bad_message);
+//  if (output_sysroot.find("udf.c") != std::string::npos) {
+//    auto fd = open("/tmp/udf_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
+//    write(fd, output_sysroot.data(), output_sysroot.size());
+//  }
+
+  if (auto it = output_sysroot.find("End of search list.");
+      it == std::string::npos) {
+    if (!ret.Succeeded()) {
+      return ret.TakeError();
+    } else {
+      return std::make_error_code(std::errc::invalid_argument);
+    }
   }
 
   std::string output_no_sysroot;
   new_args.emplace_back("-isysroot");
-  new_args.emplace_back(command.working_dir + "/xyz");
+  new_args.emplace_back(command.working_dir + "/trail_of_bits");
   auto ret2 = mx::Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
 
   // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
   if (!ret2.Succeeded() && output_no_sysroot.empty()) {
     return ret2.TakeError();
+  }
+
+//  if (output_no_sysroot.find("udf.c") != std::string::npos) {
+//    auto fd = open("/tmp/udf_no_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
+//    write(fd, output_no_sysroot.data(), output_no_sysroot.size());
+//  }
+
+  if (auto it = output_no_sysroot.find("End of search list.");
+      it == std::string::npos) {
+    if (!ret.Succeeded()) {
+      return ret.TakeError();
+    } else {
+      return std::make_error_code(std::errc::invalid_argument);
+    }
   }
 
   return std::make_pair(output_sysroot, output_no_sysroot);
@@ -204,7 +240,8 @@ void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
   if (!cc_info.Succeeded()) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
-        << cc_info.TakeError().message();
+        << cc_info.TakeError().message() << "; original command was: "
+        << command.vec.Join();
     return;
   }
 

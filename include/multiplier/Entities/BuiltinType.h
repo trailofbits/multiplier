@@ -68,6 +68,7 @@ class BuiltinType : public Type {
   BuiltinTypeKind builtin_kind(void) const;
   bool is_floating_point(void) const;
   bool is_integer(void) const;
+  bool is_sve_bool(void) const;
   bool is_signed_integer(void) const;
   bool is_sugared(void) const;
   bool is_unsigned_integer(void) const;

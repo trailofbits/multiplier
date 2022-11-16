@@ -17,10 +17,14 @@
 #include "Context.h"
 
 namespace pasta {
+class AST;
 class File;
 class TokenRange;
 }  // namespace pasta
 namespace indexer {
+
+struct FileIdMap;
+struct FileHashMap;
 
 class IndexCompileJobAction final : public mx::Action {
  private:
@@ -29,14 +33,16 @@ class IndexCompileJobAction final : public mx::Action {
   const pasta::CompileJob job;
 
   // Maps pasta files to their unique IDs.
-  std::unordered_map<pasta::File, mx::RawEntityId> file_ids;
+  FileIdMap file_ids;
 
   // Maps pasta files to their hashes, represented as SHA256 checksums.
-  std::unordered_map<pasta::File, std::string> file_hashes;
+  FileHashMap file_hashes;
 
   // Look through all files referenced by the AST get their unique IDs. If this
   // is the first time seeing a file, then tokenize the file.
   void MaybePersistFile(mx::WorkerId worker_id, pasta::File file);
+
+  void PersistParsedFiles(const pasta::AST &ast, mx::WorkerId worker_id);
 
  public:
   virtual ~IndexCompileJobAction(void);

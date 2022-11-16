@@ -118,6 +118,7 @@ enum class TypeUseSelector : unsigned short {
   WITH_RESTRICT,
   WITH_VOLATILE,
   WITHOUT_LOCAL_FAST_QUALIFIERS,
+  WRAPPED_TYPE,
   WRITTEN_TYPE,
 };
 
@@ -126,7 +127,7 @@ inline static const char *EnumerationName(TypeUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(TypeUseSelector) {
-  return 107;
+  return 108;
 }
 
 const char *EnumeratorName(TypeUseSelector);

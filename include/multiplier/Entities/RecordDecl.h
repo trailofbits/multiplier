@@ -129,6 +129,7 @@ class RecordDecl : public TagDecl {
   bool is_non_trivial_to_primitive_destroy(void) const;
   bool is_or_contains_union(void) const;
   bool is_parameter_destroyed_in_callee(void) const;
+  bool is_randomized(void) const;
   bool may_insert_extra_padding(void) const;
 };
 

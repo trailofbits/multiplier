@@ -26,8 +26,8 @@ enum class LangFeatures : unsigned char {
   DIGRAPHS,
   GNU_MODE,
   HEX_FLOAT,
-  IMPLICIT_INT,
   OPEN_CL,
+  HLSL,
 };
 
 inline static const char *EnumerationName(LangFeatures) {

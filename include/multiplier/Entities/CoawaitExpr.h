@@ -107,7 +107,6 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     }
   }
 
-  Expr operand(void) const;
   bool is_implicit(void) const;
 };
 

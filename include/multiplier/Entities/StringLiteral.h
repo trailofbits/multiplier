@@ -101,7 +101,7 @@ class StringLiteral : public Expr {
   std::string_view bytes(void) const;
   StringLiteralStringKind string_kind(void) const;
   std::optional<std::string_view> string(void) const;
-  bool is_ascii(void) const;
+  bool is_ordinary(void) const;
   bool is_pascal(void) const;
   bool is_utf16(void) const;
   bool is_utf32(void) const;

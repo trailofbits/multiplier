@@ -100,7 +100,6 @@ class SourceLocExpr : public Expr {
   SourceLocExprIdentKind identifier_kind(void) const;
   Token token(void) const;
   bool is_int_type(void) const;
-  bool is_string_type(void) const;
 };
 
 static_assert(sizeof(SourceLocExpr) == sizeof(Expr));

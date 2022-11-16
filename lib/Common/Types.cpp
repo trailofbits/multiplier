@@ -33,7 +33,8 @@ static constexpr uint64_t kNumStmtKinds = NumEnumerators(StmtKind{});
 static constexpr uint64_t kNumTypeKinds = NumEnumerators(TypeKind{});
 static constexpr uint64_t kNumAttrKinds = NumEnumerators(AttrKind{});
 static constexpr uint64_t kNumTokenKinds = NumEnumerators(TokenKind{});
-static constexpr uint64_t kNumTokenSubstitutionKinds = 3u;
+static constexpr uint64_t kNumTokenSubstitutionKinds =
+    NumEnumerators(TokenSubstitutionKind{});
 static constexpr uint64_t kNumPseudoKinds = 1;
 static constexpr unsigned kSubKindNumBits = 11;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumTypeKinds + kNumAttrKinds +
@@ -106,6 +107,57 @@ union PackedEntityId {
 static_assert(sizeof(PackedEntityId) == sizeof(uint64_t));
 
 }  // namespace
+
+const char *EnumeratorName(TokenSubstitutionKind kind) {
+  switch (kind) {
+    case TokenSubstitutionKind::OTHER_DIRECTIVE:
+      return "OTHER_DIRECTIVE";
+    case TokenSubstitutionKind::DEFINE_DIRECTIVE:
+      return "DEFINE_DIRECTIVE";
+    case TokenSubstitutionKind::UNDEF_DIRECTIVE:
+      return "UNDEF_DIRECTIVE";
+    case TokenSubstitutionKind::PRAGMA_DIRECTIVE:
+      return "PRAGMA_DIRECTIVE";
+    case TokenSubstitutionKind::C99_PRAGMA_DIRECTIVE:
+      return "C99_PRAGMA_DIRECTIVE";
+    case TokenSubstitutionKind::MICROSOFT_PRAGMA_DIRECTIVE:
+      return "MICROSOFT_PRAGMA_DIRECTIVE";
+    case TokenSubstitutionKind::IF_DIRECTIVE:
+      return "IF_DIRECTIVE";
+    case TokenSubstitutionKind::IFDEF_DIRECTIVE:
+      return "IFDEF_DIRECTIVE";
+    case TokenSubstitutionKind::IFNDEF_DIRECTIVE:
+      return "IFNDEF_DIRECTIVE";
+    case TokenSubstitutionKind::ELIF_DIRECTIVE:
+      return "ELIF_DIRECTIVE";
+    case TokenSubstitutionKind::ELIFDEF_DIRECTIVE:
+      return "ELIFDEF_DIRECTIVE";
+    case TokenSubstitutionKind::ELIFNDEF_DIRECTIVE:
+      return "ELIFNDEF_DIRECTIVE";
+    case TokenSubstitutionKind::ELSE_DIRECTIVE:
+      return "ELSE_DIRECTIVE";
+    case TokenSubstitutionKind::ENDIF_DIRECTIVE:
+      return "ENDIF_DIRECTIVE";
+    case TokenSubstitutionKind::INCLUDE:
+      return "INCLUDE";
+    case TokenSubstitutionKind::MACRO:
+      return "MACRO";
+    case TokenSubstitutionKind::MACRO_PARAMETER:
+      return "MACRO_PARAMETER";
+    case TokenSubstitutionKind::VA_OPT:
+      return "VA_OPT";
+    case TokenSubstitutionKind::VA_OPT_ARGUMENT:
+      return "VA_OPT_ARGUMENT";
+    case TokenSubstitutionKind::MACRO_ARGUMENT:
+      return "MACRO_ARGUMENT";
+    case TokenSubstitutionKind::STRINGIFY:
+      return "STRINGIFY";
+    case TokenSubstitutionKind::CONCATENATE:
+      return "CONCATENATE";
+    case TokenSubstitutionKind::SUBSTITUTE:
+      return "SUBSTITUTE";
+  }
+}
 
 EntityId::EntityId(DeclarationId id) {
   if (id.fragment_id) {

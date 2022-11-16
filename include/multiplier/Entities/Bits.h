@@ -21,6 +21,7 @@ enum class Bits : unsigned char {
   ERROR,
   VARIABLY_MODIFIED,
   SYNTACTIC,
+  SEMANTIC,
 };
 
 inline static const char *EnumerationName(Bits) {
@@ -28,7 +29,7 @@ inline static const char *EnumerationName(Bits) {
 }
 
 inline static constexpr unsigned NumEnumerators(Bits) {
-  return 9;
+  return 10;
 }
 
 const char *EnumeratorName(Bits);

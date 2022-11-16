@@ -91,12 +91,12 @@ class Expr : public ValueStmt {
   bool has_side_effects(void) const;
   Expr ignore_casts(void) const;
   Expr ignore_conversion_operator_single_step(void) const;
-  Expr ignore_imp_casts(void) const;
+  Expr ignore_implicit_casts(void) const;
   Expr ignore_implicit(void) const;
   Expr ignore_implicit_as_written(void) const;
   Expr ignore_parenthesis_base_casts(void) const;
   Expr ignore_parenthesis_casts(void) const;
-  Expr ignore_parenthesis_imp_casts(void) const;
+  Expr ignore_parenthesis_implicit_casts(void) const;
   Expr ignore_parenthesis_l_value_casts(void) const;
   Expr ignore_parenthesis_noop_casts(void) const;
   Expr ignore_parentheses(void) const;

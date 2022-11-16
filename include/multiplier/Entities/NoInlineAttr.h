@@ -20,18 +20,20 @@
 #include "../Use.h"
 
 #include "AttrKind.h"
-#include "InheritableAttr.h"
+#include "DeclOrStmtAttr.h"
 
 namespace mx {
 class Attr;
+class DeclOrStmtAttr;
 class InheritableAttr;
 class NoInlineAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using NoInlineAttrRange = DerivedEntityRange<AttrIterator, NoInlineAttr>;
 using NoInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInlineAttr>;
-class NoInlineAttr : public InheritableAttr {
+class NoInlineAttr : public DeclOrStmtAttr {
  private:
   friend class FragmentImpl;
+  friend class DeclOrStmtAttr;
   friend class InheritableAttr;
   friend class Attr;
  public:
@@ -55,6 +57,16 @@ class NoInlineAttr : public InheritableAttr {
   }
 
   static std::optional<NoInlineAttr> from(const TokenContext &c);
+  static std::optional<NoInlineAttr> from(const DeclOrStmtAttr &parent);
+
+  inline static std::optional<NoInlineAttr> from(const std::optional<DeclOrStmtAttr> &parent) {
+    if (parent) {
+      return NoInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<NoInlineAttr> from(const InheritableAttr &parent);
 
   inline static std::optional<NoInlineAttr> from(const std::optional<InheritableAttr> &parent) {
@@ -76,9 +88,10 @@ class NoInlineAttr : public InheritableAttr {
   }
 
   std::string_view spelling(void) const;
+  bool is_clang_no_inline(void) const;
 };
 
-static_assert(sizeof(NoInlineAttr) == sizeof(InheritableAttr));
+static_assert(sizeof(NoInlineAttr) == sizeof(DeclOrStmtAttr));
 
 #endif
 } // namespace mx

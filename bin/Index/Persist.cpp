@@ -42,6 +42,10 @@ static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
       CountSubstitutions(std::move(lhs), num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
       ++num_subs;
+    } else if (auto sub_tree = node.MaybeSubTree()) {
+      auto [kind, lhs] = std::move(sub_tree.value());
+      CountSubstitutions(std::move(lhs), num_subs);
+      ++num_subs;
     }
   }
 }
@@ -53,13 +57,12 @@ static void CountSubstitutions(TokenTree tt, unsigned &num_subs) {
 static void FindFileRange(TokenTree tt, const pasta::File &file,
                           pasta::FileToken *min, pasta::FileToken *max,
                           unsigned &num_subs) {
-  if (tt.File() != file) {
-    return;
-  }
 
   for (auto node : tt) {
     if (auto ft = node.FileToken()) {
-      DCHECK(pasta::File::Containing(*ft) == file);
+      if (pasta::File::Containing(*ft) != file) {
+        continue;
+      }
       if (ft->Index() < min->Index()) {
         *min = *ft;
       }
@@ -70,6 +73,10 @@ static void FindFileRange(TokenTree tt, const pasta::File &file,
       auto [kind, lhs, rhs] = std::move(sub.value());
       FindFileRange(std::move(lhs), file, min, max, num_subs);
       CountSubstitutions(std::move(rhs), num_subs);
+      ++num_subs;
+    } else if (auto sub_tree = node.MaybeSubTree()) {
+      auto [kind, lhs] = std::move(sub_tree.value());
+      FindFileRange(std::move(lhs), file, min, max, num_subs);
       ++num_subs;
     }
   }
@@ -90,12 +97,15 @@ static void PersistTokenTree(EntityMapper &em,
                              unsigned &next_sub_offset) {
   unsigned i =0;
   for (TokenTreeNode node : tree) {
+    // This is a parsed token.
     if (std::optional<pasta::Token> pt = node.Token()) {
       toks_builder.set(i++, em.EntityId(pt.value()));
 
+    // This is a file token.
     } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
       toks_builder.set(i++, em.EntityId(ft.value()));
 
+    // This is a substitution of two sub-trees.
     } else if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
       mx::TokenSubstitutionId sub_id;
@@ -117,6 +127,26 @@ static void PersistTokenTree(EntityMapper &em,
       PersistTokenTree(em, subs_builder,
                        next_sub.initAfterTokens(num_nodes_rhs), std::move(rhs),
                        fragment_id, next_sub_offset);
+
+    // This is a sub-tree.
+    } else if (auto st = node.MaybeSubTree()) {
+      auto [kind, lhs] = std::move(st.value());
+      mx::TokenSubstitutionId sub_id;
+      sub_id.fragment_id = fragment_id;
+      sub_id.kind = kind;
+      sub_id.offset = next_sub_offset;
+      mx::EntityId id(sub_id);
+      toks_builder.set(i++, id);
+
+      mx::rpc::TokenSubstitution::Builder next_sub =
+          subs_builder[next_sub_offset++];
+
+      unsigned num_nodes_lhs = lhs.NumNodes();
+      PersistTokenTree(em, subs_builder,
+                       next_sub.initBeforeTokens(num_nodes_lhs), std::move(lhs),
+                       fragment_id, next_sub_offset);
+
+      next_sub.initAfterTokens(0);
     }
   }
 }
@@ -516,13 +546,26 @@ void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntity
   i = 0u;
   auto ublb = fb.initEolOffsets(static_cast<unsigned>(
       eol_offset_to_line_num.size()));
-  for (auto [eol_offset, line_num] : eol_offset_to_line_num) {
+  for (auto eol_offset_line_num : eol_offset_to_line_num) {
     mx::rpc::UpperBound::Builder ubb = ublb[i++];
-    ubb.setOffset(eol_offset);
-    ubb.setVal(line_num);
+    ubb.setOffset(eol_offset_line_num.first);
+    ubb.setVal(eol_offset_line_num.second);
   }
 
   context.PutSerializedFile(worker_id, file_id, CompressedMessage("file", message));
+}
+
+// Return the file containing this fragment.
+static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
+                                               const PendingFragment &frag) {
+  for (auto i = frag.begin_index; i <= frag.end_index; ++i) {
+    auto file_tok = tokens[i].FileLocation();
+    if (file_tok) {
+      return pasta::File::Containing(file_tok.value());
+    }
+  }
+
+  return std::nullopt;
 }
 
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
@@ -546,11 +589,39 @@ void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntity
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(mx::WorkerId worker_id, IndexingContext &context, pasta::AST &ast,
-                     NameMangler &mangler,
+void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
+                     pasta::AST &ast, NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
-                     const pasta::TokenRange &tokens,
-                     PendingFragment frag) {
+                     const pasta::TokenRange &tokens, PendingFragment frag) {
+
+  const mx::RawEntityId fragment_id = frag.fragment_id;
+  const pasta::Decl &leader_decl = frag.decls[0];
+  const uint64_t begin_index = frag.begin_index;
+  const uint64_t end_index = frag.end_index;
+
+  // Derive the macro substitution tree.
+  mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
+      tokens, begin_index, end_index);
+  if (!maybe_tt.Succeeded()) {
+    auto main_file_path = ast.MainFile().Path().generic_string();
+    LOG(ERROR)
+        << maybe_tt.TakeError() << " for top-level declaration "
+        << DeclToString(leader_decl)
+        << PrefixedLocation(leader_decl, " at or near ")
+        << " on main job file " << main_file_path;
+    return;
+  }
+
+  auto maybe_file = FragmentFile(tokens, frag);
+  if (!maybe_file) {
+    auto main_file_path = ast.MainFile().Path().generic_string();
+    LOG(ERROR)
+        << "Unable to locate file containing "
+        << DeclToString(leader_decl)
+        << PrefixedLocation(leader_decl, " at or near ")
+        << " on main job file " << main_file_path;
+    return;
+  }
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
@@ -567,23 +638,6 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context, pasta::AS
   // Serialize all discovered entities.
   frag.Serialize(em, fb);
 
-  const mx::RawEntityId fragment_id = frag.fragment_id;
-  const pasta::Decl &leader_decl = frag.decls[0];
-  const uint64_t begin_index = frag.begin_index;
-  const uint64_t end_index = frag.end_index;
-
-  // Derive the macro substitution tree.
-  mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-      tokens, frag.begin_index, frag.end_index);
-  if (!maybe_tt.Succeeded()) {
-    auto main_file_path = ast.MainFile().Path().generic_string();
-    LOG(ERROR)
-        << maybe_tt.TakeError() << " for top-level declaration "
-        << DeclToString(leader_decl)
-        << PrefixedLocation(leader_decl, " at or near ")
-        << " on main job file " << main_file_path;
-    return;
-  }
 
   TokenTree token_tree = maybe_tt.TakeValue();
 
@@ -593,7 +647,7 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context, pasta::AS
   //
   // TODO(pag): Handle sub-ranges for x-macros? Probably should have something
   //            more robust that handles discontinuous ranges, just in case.
-  pasta::File file = token_tree.File();
+  pasta::File file = std::move(maybe_file.value());
   pasta::FileTokenRange file_tokens = file.Tokens();
   pasta::FileToken min_token = file_tokens[file_tokens.Size() - 1u];
   pasta::FileToken max_token = file_tokens[0];

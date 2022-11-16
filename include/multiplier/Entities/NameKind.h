@@ -19,6 +19,7 @@ enum class NameKind : unsigned char {
   DEPENDENT_TEMPLATE,
   SUBST_TEMPLATE_TEMPLATE_PARM,
   SUBST_TEMPLATE_TEMPLATE_PARM_PACK,
+  USING_TEMPLATE,
 };
 
 inline static const char *EnumerationName(NameKind) {
@@ -26,7 +27,7 @@ inline static const char *EnumerationName(NameKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(NameKind) {
-  return 7;
+  return 8;
 }
 
 const char *EnumeratorName(NameKind);

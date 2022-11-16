@@ -15,6 +15,8 @@ enum class AlwaysInlineAttrSpelling : unsigned char {
   GNU_ALWAYS_INLINE,
   CXX11_GNU_ALWAYS_INLINE,
   C2X_GNU_ALWAYS_INLINE,
+  CXX11_CLANG_ALWAYS_INLINE,
+  C2X_CLANG_ALWAYS_INLINE,
   KEYWORD_FORCEINLINE,
   SPELLING_NOT_CALCULATED,
 };
@@ -24,7 +26,7 @@ inline static const char *EnumerationName(AlwaysInlineAttrSpelling) {
 }
 
 inline static constexpr unsigned NumEnumerators(AlwaysInlineAttrSpelling) {
-  return 5;
+  return 7;
 }
 
 const char *EnumeratorName(AlwaysInlineAttrSpelling);

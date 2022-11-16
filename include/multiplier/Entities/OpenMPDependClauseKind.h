@@ -19,6 +19,9 @@ enum class OpenMPDependClauseKind : unsigned char {
   DEPOBJ,
   SOURCE,
   SINK,
+  INOUTSET,
+  OUTALLMEMORY,
+  INOUTALLMEMORY,
   UNKNOWN,
 };
 
@@ -27,7 +30,7 @@ inline static const char *EnumerationName(OpenMPDependClauseKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(OpenMPDependClauseKind) {
-  return 8;
+  return 11;
 }
 
 const char *EnumeratorName(OpenMPDependClauseKind);

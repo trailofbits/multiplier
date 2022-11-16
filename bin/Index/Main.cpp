@@ -84,7 +84,12 @@ extern "C" int main(int argc, char *argv[]) {
 
   std::stringstream ss;
   ss << "Usage: " << argv[0]
-     << " [--num_workers N] [--db DATABASE] [--target COMPILE_COMMANDS]\n";
+     << " [--num_workers N]\n"
+     << " [--env PATH_TO_COPIED_ENV_VARS]\n"
+     << " [--show_progress]\n"
+     << " [--generate_sourceir]\n"
+     << " --db DATABASE\n"
+     << " --target COMPILE_COMMANDS\n";
 
   google::SetUsageMessage(ss.str());
   google::ParseCommandLineFlags(&argc, &argv, false);

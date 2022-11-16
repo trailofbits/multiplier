@@ -20,6 +20,7 @@
 #include "../Use.h"
 
 #include "AttrKind.h"
+#include "CXX11NoReturnAttrSpelling.h"
 #include "InheritableAttr.h"
 
 namespace mx {
@@ -75,6 +76,7 @@ class CXX11NoReturnAttr : public InheritableAttr {
     }
   }
 
+  CXX11NoReturnAttrSpelling semantic_spelling(void) const;
   std::string_view spelling(void) const;
 };
 

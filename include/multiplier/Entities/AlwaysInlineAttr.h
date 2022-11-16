@@ -21,18 +21,20 @@
 
 #include "AlwaysInlineAttrSpelling.h"
 #include "AttrKind.h"
-#include "InheritableAttr.h"
+#include "DeclOrStmtAttr.h"
 
 namespace mx {
 class AlwaysInlineAttr;
 class Attr;
+class DeclOrStmtAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using AlwaysInlineAttrRange = DerivedEntityRange<AttrIterator, AlwaysInlineAttr>;
 using AlwaysInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlwaysInlineAttr>;
-class AlwaysInlineAttr : public InheritableAttr {
+class AlwaysInlineAttr : public DeclOrStmtAttr {
  private:
   friend class FragmentImpl;
+  friend class DeclOrStmtAttr;
   friend class InheritableAttr;
   friend class Attr;
  public:
@@ -56,6 +58,16 @@ class AlwaysInlineAttr : public InheritableAttr {
   }
 
   static std::optional<AlwaysInlineAttr> from(const TokenContext &c);
+  static std::optional<AlwaysInlineAttr> from(const DeclOrStmtAttr &parent);
+
+  inline static std::optional<AlwaysInlineAttr> from(const std::optional<DeclOrStmtAttr> &parent) {
+    if (parent) {
+      return AlwaysInlineAttr::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
+
   static std::optional<AlwaysInlineAttr> from(const InheritableAttr &parent);
 
   inline static std::optional<AlwaysInlineAttr> from(const std::optional<InheritableAttr> &parent) {
@@ -78,9 +90,10 @@ class AlwaysInlineAttr : public InheritableAttr {
 
   AlwaysInlineAttrSpelling semantic_spelling(void) const;
   std::string_view spelling(void) const;
+  bool is_clang_always_inline(void) const;
 };
 
-static_assert(sizeof(AlwaysInlineAttr) == sizeof(InheritableAttr));
+static_assert(sizeof(AlwaysInlineAttr) == sizeof(DeclOrStmtAttr));
 
 #endif
 } // namespace mx

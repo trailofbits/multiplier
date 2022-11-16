@@ -9,7 +9,6 @@
 cmake_minimum_required(VERSION 3.19)
 
 include("cmake/ccache.cmake")
-include("cmake/vcpkg_helper.cmake")
 
 project("multiplier" CXX C)
 

@@ -6,8 +6,6 @@
 
 #pragma once
 
-//#include <cassert>
-//#include <map>
 #include <multiplier/AST.capnp.h>
 #include <multiplier/AST.h>
 #include <multiplier/RPC.capnp.h>
@@ -20,19 +18,11 @@
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
 #include <cassert>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "Context.h"
 
 namespace indexer {
 
-using EntityIdMap = std::unordered_map<const void *, mx::EntityId>;
-using FileIdMap = std::unordered_map<pasta::File, mx::RawEntityId>;
-using TypeKey = std::pair<const void *, uint32_t>;
-using TypeIdMap = std::map<TypeKey, mx::EntityId>;
-using PseudoOffsetMap = std::unordered_map<const void *, uint32_t>;
 using Pseudo = std::variant<pasta::TemplateArgument,
                             pasta::CXXBaseSpecifier,
                             pasta::TemplateParameterList,
@@ -49,7 +39,8 @@ class NameMangler;
 // that expands into two separate top-level declarations. We don't want to
 // break this macro expansion into two, as in the original source file it
 // represents a single logical thing.
-struct PendingFragment {
+class PendingFragment {
+ public:
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::RawEntityId fragment_id;

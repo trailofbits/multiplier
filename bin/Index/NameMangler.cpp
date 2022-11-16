@@ -192,7 +192,9 @@ const std::string &NameManglerImpl::GetMangledNameRec(
       case clang::ImplicitParamDecl::CXXVTT:
         mangled_name_os << " implicit:vtt";
         break;
-
+      case clang::ImplicitParamDecl::ThreadPrivateVar:
+        mangled_name_os << " implicit:tpv";
+        break;
       case clang::ImplicitParamDecl::CapturedContext:
       case clang::ImplicitParamDecl::Other:
         mangled_name_os << " implicit:other";

@@ -22,6 +22,7 @@ VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
 
+#include <map>
 #include <pasta/AST/Decl.h>
 
 #include <vast/Util/Common.hpp>

@@ -192,6 +192,7 @@ class Type {
   bool is_elaborated_type_specifier(void) const;
   bool is_enumeral_type(void) const;
   bool is_event_t(void) const;
+  bool is_ext_vector_boolean_type(void) const;
   bool is_ext_vector_type(void) const;
   bool is_fixed_point_or_integer_type(void) const;
   bool is_fixed_point_type(void) const;
@@ -386,6 +387,7 @@ class Type {
   bool is_restrict_qualified(void) const;
   bool is_trivial_type(void) const;
   bool is_trivially_copyable_type(void) const;
+  bool is_trivially_relocatable_type(void) const;
   bool is_volatile_qualified(void) const;
   bool may_be_dynamic_class(void) const;
   bool may_be_not_dynamic_class(void) const;

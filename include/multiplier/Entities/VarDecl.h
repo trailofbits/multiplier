@@ -135,6 +135,7 @@ class VarDecl : public DeclaratorDecl {
   bool has_constant_initialization(void) const;
   bool has_dependent_alignment(void) const;
   bool has_external_storage(void) const;
+  std::optional<bool> has_flexible_array_initializer(void) const;
   bool has_global_storage(void) const;
   std::optional<bool> has_ice_initializer(void) const;
   bool has_initializer(void) const;
