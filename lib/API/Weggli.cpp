@@ -17,10 +17,10 @@ WeggliQueryResultImpl::~WeggliQueryResultImpl(void) noexcept {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(
     const WeggliQuery &query_, EntityProvider::Ptr ep_,
-    const std::vector<RawEntityId> &fragments)
+    std::vector<RawEntityId> fragment_ids)
     : query(query_),
       ep(std::move(ep_)),
-      fragments(fragments) {}
+      fragments(std::move(fragment_ids)) {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
                                              FragmentImpl::Ptr frag_)
@@ -199,7 +199,7 @@ void WeggliQueryResultIterator::Advance(void) {
     std::vector<TokenRange> matched_tokens;
     std::vector<std::string_view> matched_data;
 
-    for (auto sub_match : match.matches) {
+    for (WeggliMatchData::MatchRange sub_match : match.matches) {
       assert(sub_match.first <= sub_match.second);
       matched_data.emplace_back(frag_data.substr(
           sub_match.first,

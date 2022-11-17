@@ -38,7 +38,7 @@ class WeggliQueryResultImpl final {
   ~WeggliQueryResultImpl(void) noexcept;
 
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
-                        const std::vector<RawEntityId> &fragments);
+                        std::vector<RawEntityId> fragment_ids);
 
   WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImpl::Ptr frag_);
 

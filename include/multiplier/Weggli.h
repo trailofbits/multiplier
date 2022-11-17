@@ -23,8 +23,10 @@ struct WeggliMatchData final {
   unsigned begin_offset{~0u};
   unsigned end_offset{0u};
 
+  using MatchRange = std::pair<unsigned, unsigned>;
+
   std::vector<std::string> variables;
-  std::vector<std::pair<unsigned, unsigned>> matches;
+  std::vector<MatchRange> matches;
 };
 
 class WeggliQuery final {
