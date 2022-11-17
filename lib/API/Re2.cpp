@@ -22,9 +22,9 @@ RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, EntityProvider::Ptr ep_,
-    const std::vector<RawEntityId> &fragment_ids)
+    std::vector<RawEntityId> fragment_ids)
     : query(query_),
-      fragment_ids(fragment_ids),
+      fragment_ids(std::move(fragment_ids)),
       ep(std::move(ep_)) {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
