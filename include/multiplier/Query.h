@@ -37,6 +37,10 @@ class WeggliQueryMatch;
 class WeggliQueryResultIterator;
 class WeggliQueryResult;
 class WeggliQueryResultImpl;
+class SyntexQuery;
+class SyntexQueryImpl;
+class SyntexMatch;
+class SyntexMetavarMatch;
 
 // The range of tokens of a match.
 class WeggliQueryMatch : public TokenRange {
@@ -323,6 +327,27 @@ class RegexQueryResult {
   inline IteratorEnd end(void) const noexcept {
     return {};
   }
+};
+
+class SyntexQuery {
+ private:
+  std::shared_ptr<SyntexQueryImpl> impl;
+  SyntexQuery(void) = delete;
+
+ public:
+  explicit SyntexQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query);
+
+  bool IsValid() const;
+
+  bool AddMetavarPredicate(const std::string_view &name,
+                           std::function<bool(const SyntexMetavarMatch&)> predicate);
+
+  void ForEachMatch(mx::RawEntityId frag_id,
+                    std::function<bool(SyntexMatch)> pred) const;
+  void ForEachMatch(std::function<bool(SyntexMatch)> pred) const;
+
+  std::vector<SyntexMatch> Find(mx::RawEntityId frag_id) const;
+  std::vector<SyntexMatch> Find(void) const;
 };
 
 }  // namespace mx

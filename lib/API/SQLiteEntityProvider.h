@@ -68,7 +68,7 @@ class SQLiteEntityProvider final : public EntityProvider {
   std::optional<mx::TokenKind>
   TokenKindOf(std::string_view spelling) final;
 
-  void LoadGrammarRoot(syntex::GrammarLeaves &root) final;
+  void LoadGrammarRoot(SyntexGrammarLeaves &root) final;
 
   std::vector<RawEntityId> GetFragmentsInAST(void) final;
   ASTNode GetASTNode(std::uint64_t id) final;

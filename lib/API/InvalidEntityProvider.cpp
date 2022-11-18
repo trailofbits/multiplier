@@ -85,7 +85,7 @@ InvalidEntityProvider::TokenKindOf(std::string_view spelling) {
   return {};
 }
 
-void InvalidEntityProvider::LoadGrammarRoot(syntex::GrammarLeaves &) {}
+void InvalidEntityProvider::LoadGrammarRoot(SyntexGrammarLeaves &) {}
 
 std::vector<RawEntityId> InvalidEntityProvider::GetFragmentsInAST(void) {
   return {};

@@ -330,20 +330,8 @@ NamedDeclList Index::query_entities(
   return decls;
 }
 
-std::optional<std::vector<syntex::Match>> Index::query_syntex(std::string_view query) const {
-  syntex::ParsedQuery parsed_query(impl, query);
-  if(!parsed_query.IsValid()) {
-    return std::nullopt;
-  }
-  return parsed_query.Find();
-}
-
-std::optional<std::vector<syntex::Match>> Index::query_syntex(FragmentId frag, std::string_view query) const {
-  syntex::ParsedQuery parsed_query(impl, query);
-  if(!parsed_query.IsValid()) {
-    return std::nullopt;
-  }
-  return parsed_query.Find(frag.fragment_id);
+SyntexQuery Index::parse_syntex_query(std::string_view query) {
+  return SyntexQuery(impl, query);
 }
 
 }  // namespace mx

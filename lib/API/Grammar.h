@@ -10,25 +10,23 @@
 #include <unordered_map>
 
 namespace mx {
-namespace syntex {
 
-struct GrammarNode;
+struct SyntexGrammarNode;
 
 //
 // One set of grammar leaves
 //
-using GrammarLeaves = std::unordered_map<NodeKind, GrammarNode>;
+using SyntexGrammarLeaves = std::unordered_map<SyntexNodeKind, SyntexGrammarNode>;
 
 //
 // Node in the grammar tree
 //
 
-struct GrammarNode {
+struct SyntexGrammarNode {
   // Does this node correspond to the head of a production
   bool is_production;
   // Further leaves
-  GrammarLeaves leaves;
+  SyntexGrammarLeaves leaves;
 };
 
-}  // namespace syntex
 }  // namespace mx

@@ -45,15 +45,12 @@ class WeggliQueryResult;
 class WeggliQueryResultImpl;
 struct ASTNode;
 
-namespace syntex {
-class Match;
-class NodeKind;
-class GrammarNode;
-class ParsedQuery;
-class ParsedQueryImpl;
+class SyntexNodeKind;
+class SyntexGrammarNode;
+class SyntexQuery;
+class SyntexQueryImpl;
 
-using GrammarLeaves = std::unordered_map<NodeKind, GrammarNode>;
-}
+using SyntexGrammarLeaves = std::unordered_map<SyntexNodeKind, SyntexGrammarNode>;
 
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
@@ -113,8 +110,8 @@ class EntityProvider {
   friend class UseIteratorImpl;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
-  friend class syntex::ParsedQuery;
-  friend class syntex::ParsedQueryImpl;
+  friend class SyntexQuery;
+  friend class SyntexQueryImpl;
 
  protected:
 
@@ -189,7 +186,7 @@ class EntityProvider {
   virtual std::optional<mx::TokenKind>
   TokenKindOf(std::string_view spelling) = 0;
 
-  virtual void LoadGrammarRoot(syntex::GrammarLeaves &root) = 0;
+  virtual void LoadGrammarRoot(SyntexGrammarLeaves &root) = 0;
 
   virtual std::vector<RawEntityId> GetFragmentsInAST(void) = 0;
   virtual ASTNode GetASTNode(std::uint64_t id) = 0;
@@ -273,8 +270,7 @@ class Index {
   NamedDeclList query_entities(std::string name,
                                mx::DeclCategory category) const;
 
-  std::optional<std::vector<syntex::Match>> query_syntex(std::string_view query) const;
-  std::optional<std::vector<syntex::Match>> query_syntex(FragmentId frag, std::string_view query) const;
+  SyntexQuery parse_syntex_query(std::string_view query);
 };
 
 }  // namespace mx

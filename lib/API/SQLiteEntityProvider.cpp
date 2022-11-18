@@ -342,14 +342,14 @@ SQLiteEntityProvider::TokenKindOf(std::string_view spelling) {
   return storage.spelling_to_token_kind.TryGet(spelling);
 }
 
-void SQLiteEntityProvider::LoadGrammarRoot(syntex::GrammarLeaves &root) {
+void SQLiteEntityProvider::LoadGrammarRoot(SyntexGrammarLeaves &root) {
   auto &storage = d->GetStorage();
   auto &grammar = storage.grammar;
-  std::vector<std::pair<std::uint64_t, syntex::GrammarNode*>> to_load;
+  std::vector<std::pair<std::uint64_t, SyntexGrammarNode*>> to_load;
 
   for(auto [kind, id] : grammar.GetChildren(0)) {
     auto data = grammar.GetNode(id);
-    auto &node = root[syntex::NodeKind::Deserialize(kind)];
+    auto &node = root[SyntexNodeKind::Deserialize(kind)];
     node.is_production = data.is_production;
     to_load.emplace_back(id, &node);
   }
@@ -362,7 +362,7 @@ void SQLiteEntityProvider::LoadGrammarRoot(syntex::GrammarLeaves &root) {
 
     for(auto [kind, child_id] : grammar.GetChildren(id)) {
       auto data = grammar.GetNode(child_id);
-      auto &child_node = node.leaves[syntex::NodeKind::Deserialize(kind)];
+      auto &child_node = node.leaves[SyntexNodeKind::Deserialize(kind)];
       child_node.is_production = data.is_production;
       to_load.emplace_back(child_id, &child_node);
     }

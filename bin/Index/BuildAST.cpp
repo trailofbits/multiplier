@@ -39,7 +39,7 @@ static void SerializeAST(mx::Fragment fragment, ServerContext &ctx) {
 
     // Start with the token node
     mx::ASTNode node{};
-    node.kind = mx::syntex::NodeKind{tok.kind()}.Serialize();
+    node.kind = mx::SyntexNodeKind{tok.kind()}.Serialize();
     node.entity = tok.id();
     node.spelling = std::string(tok.data().data(), tok.data().size());
     node.prev = ast.GetNodeInIndex(fragment.id(), node.kind);
@@ -61,7 +61,7 @@ static void SerializeAST(mx::Fragment fragment, ServerContext &ctx) {
 
       if (auto decl = mx::Decl::from(*ctx)) {
         mx::ASTNode parent{};
-        parent.kind = mx::syntex::NodeKind{decl->kind()}.Serialize();
+        parent.kind = mx::SyntexNodeKind{decl->kind()}.Serialize();
         parent.entity = decl->id();
         parent.prev = ast.GetNodeInIndex(fragment.id(), parent.kind);
         auto parent_id = ast.AddNode(parent);
@@ -75,7 +75,7 @@ static void SerializeAST(mx::Fragment fragment, ServerContext &ctx) {
 
       if (auto stmt = mx::Stmt::from(*ctx)) {
         mx::ASTNode parent{};
-        parent.kind = mx::syntex::NodeKind{stmt->kind()}.Serialize();
+        parent.kind = mx::SyntexNodeKind{stmt->kind()}.Serialize();
         parent.entity = stmt->id();
         parent.prev = ast.GetNodeInIndex(fragment.id(), parent.kind);
         auto parent_id = ast.AddNode(parent);
@@ -107,7 +107,7 @@ static void ImportGrammar(mx::Fragment fragment, ServerContext& ctx) {
     nodes.pop_back();
 
     auto node = ast.GetNode(node_id);
-    auto node_kind = mx::syntex::NodeKind::Deserialize(node.kind);
+    auto node_kind = mx::SyntexNodeKind::Deserialize(node.kind);
 
     if (!node_kind.IsToken()) {
       // This is an internal or root node. E.g. given the following:

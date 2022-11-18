@@ -11,34 +11,33 @@
 #include <iostream>
 
 namespace mx {
-namespace syntex {
 
 //
-// NodeKind: Core class of Syntex, represents the following things:
+// SyntexNodeKind: Core class of Syntex, represents the following things:
 //  - An entry in a grammar rule
 //  - Kind of node in a multiplier AST
 //  - Kind of node in a query AST
 //
 
-class NodeKind {
+class SyntexNodeKind {
 private:
   unsigned short val;
 
-  NodeKind(unsigned short val_) : val(val_) {}
+  SyntexNodeKind(unsigned short val_) : val(val_) {}
 
 public:
-  static NodeKind Any() {
-    return NodeKind(UpperLimit());
+  static SyntexNodeKind Any() {
+    return SyntexNodeKind(UpperLimit());
   }
 
-  NodeKind(mx::DeclKind kind)
+  SyntexNodeKind(mx::DeclKind kind)
       : val(static_cast<unsigned short>(kind)) {}
 
-  NodeKind(mx::StmtKind kind)
+  SyntexNodeKind(mx::StmtKind kind)
       : val(static_cast<unsigned short>(kind)
             + mx::NumEnumerators(mx::DeclKind{})) {}
 
-  NodeKind(mx::TokenKind kind)
+  SyntexNodeKind(mx::TokenKind kind)
       : val(static_cast<unsigned short>(kind)
             + mx::NumEnumerators(mx::DeclKind{})
             + mx::NumEnumerators(mx::StmtKind{})) {}
@@ -72,11 +71,11 @@ public:
                                       - mx::NumEnumerators(mx::StmtKind{}));
   }
 
-  bool operator==(const NodeKind &other) const {
+  bool operator==(const SyntexNodeKind &other) const {
     return val == other.val;
   }
 
-  static NodeKind Deserialize(unsigned short val) {
+  static SyntexNodeKind Deserialize(unsigned short val) {
     return val;
   }
 
@@ -108,7 +107,7 @@ template<class... F> Visitor(F...) -> Visitor<F...>;
 // Pretty print a NodeKind to an output stream
 //
 
-inline std::ostream& operator<<(std::ostream &os, const NodeKind &kind) {
+inline std::ostream& operator<<(std::ostream &os, const SyntexNodeKind &kind) {
   kind.Visit(Visitor {
     [&] (mx::DeclKind kind)  { os << "DeclKind::" << EnumeratorName(kind);   },
     [&] (mx::StmtKind kind)  { os << "StmtKind::" << EnumeratorName(kind);   },
@@ -118,14 +117,13 @@ inline std::ostream& operator<<(std::ostream &os, const NodeKind &kind) {
   return os;
 }
 
-}  // namespace syntex
 }  // namespace mx
 
 namespace std {
 
 template<>
-struct hash<mx::syntex::NodeKind> {
-  size_t operator()(const mx::syntex::NodeKind &kind) const {
+struct hash<mx::SyntexNodeKind> {
+  size_t operator()(const mx::SyntexNodeKind &kind) const {
     return kind.Serialize();
   }
 };

@@ -5,6 +5,9 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Query.h"
+#include <multiplier/Query.h>
+#include <multiplier/Index.h>
+#include <multiplier/Syntex.h>
 
 #include <iostream>
 #include <iomanip>
@@ -12,7 +15,6 @@
 #include <multiplier/IndexStorage.h>
 
 namespace mx {
-namespace syntex {
 
 template<typename TokenCallback, typename MetavarCallback, typename VarargCallback>
 void Tokenize(TokenCallback token_callback, MetavarCallback metavar_callback,
@@ -185,7 +187,7 @@ void Tokenize(TokenCallback token_callback, MetavarCallback metavar_callback,
       }
   };
 
-  auto AddMetavar = [&] (std::string_view name, NodeKind filter) {
+  auto AddMetavar = [&] (std::string_view name, SyntexNodeKind filter) {
     size_t next = end;
     for (;;)
       switch (Look(next - end)) {
@@ -245,7 +247,7 @@ void Tokenize(TokenCallback token_callback, MetavarCallback metavar_callback,
       ;
 
     auto name = input.substr(begin + 1, end - begin - 1);
-    NodeKind filter = NodeKind::Any();
+    auto filter = SyntexNodeKind::Any();
 
     // Skip over filter if present
     if (Match(':')) {
@@ -261,21 +263,21 @@ void Tokenize(TokenCallback token_callback, MetavarCallback metavar_callback,
       for (int i = 0; i < NumEnumerators(mx::DeclKind::TYPE); ++i) {
         auto kind = static_cast<mx::DeclKind>(i);
         if (EnumeratorName(kind) == filter_str) {
-          filter = NodeKind(kind);
+          filter = SyntexNodeKind(kind);
           goto done_filters;
         }
       }
       for (int i = 0; i < NumEnumerators(mx::StmtKind::NULL_STMT); ++i) {
         auto kind = static_cast<mx::StmtKind>(i);
         if (EnumeratorName(kind) == filter_str) {
-          filter = NodeKind(kind);
+          filter = SyntexNodeKind(kind);
           goto done_filters;
         }
       }
       for (int i = 0; i < NumEnumerators(mx::TokenKind::UNKNOWN); ++i) {
         auto kind = static_cast<mx::TokenKind>(i);
         if (EnumeratorName(kind) == filter_str) {
-          filter = NodeKind(kind);
+          filter = SyntexNodeKind(kind);
           goto done_filters;
         }
       }
@@ -530,13 +532,13 @@ FractionalConstant:
   }
 }
 
-ParsedQueryImpl::ParsedQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input)
+SyntexQueryImpl::SyntexQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input)
   : m_ep(ep), m_input(input) {
   ep->LoadGrammarRoot(grammar_root);
 }
 
-void ParsedQueryImpl::MatchGlob(TableEntry &result,
-                                  const std::unordered_set<NodeKind> &follow,
+void SyntexQueryImpl::MatchGlob(TableEntry &result,
+                                  const std::unordered_set<SyntexNodeKind> &follow,
                                   Item &item,
                                   size_t next) {
 
@@ -559,9 +561,9 @@ void ParsedQueryImpl::MatchGlob(TableEntry &result,
 
     // Otherwise the rest of the grammar rule is a candiate for more globbing
     if (rest.leaves.size() > 0) {
-      const GrammarLeaves *old_leaves = item.m_leaves;
+      const SyntexGrammarLeaves *old_leaves = item.m_leaves;
       item.m_leaves = &rest.leaves;
-      item.m_children.emplace_back(NodeKind::Any(), next, Glob::YES);
+      item.m_children.emplace_back(SyntexNodeKind::Any(), next, Glob::YES);
       MatchGlob(result, follow, item, next);
       item.m_leaves = old_leaves;
       item.m_children.pop_back();
@@ -569,10 +571,10 @@ void ParsedQueryImpl::MatchGlob(TableEntry &result,
   }
 }
 
-void ParsedQueryImpl::MatchRule(TableEntry &result, Item &item, size_t next) {
+void SyntexQueryImpl::MatchRule(TableEntry &result, Item &item, size_t next) {
   // Iterate shifts
   for (auto &[key, _] : ParsesAtIndex(next)) {
-    NodeKind kind = key.first;
+    SyntexNodeKind kind = key.first;
     size_t next = key.second;
     item.IterateShifts(kind, next, Glob::NO, [&] (Item &item) {
       MatchRule(result, item, next);
@@ -582,7 +584,7 @@ void ParsedQueryImpl::MatchRule(TableEntry &result, Item &item, size_t next) {
   // Iterate glob shifts
   if (auto it = m_globs.find(next); it != m_globs.end()) {
     // Compute set of node kinds that can follow $...
-    std::unordered_set<NodeKind> follow;
+    std::unordered_set<SyntexNodeKind> follow;
     for (auto &[key, _] : ParsesAtIndex(it->second)) {
       follow.insert(key.first);
     }
@@ -590,19 +592,19 @@ void ParsedQueryImpl::MatchRule(TableEntry &result, Item &item, size_t next) {
   }
 
   // Iterate reductions
-  item.IterateReductions([&] (NodeKind kind, const auto &children) {
+  item.IterateReductions([&] (SyntexNodeKind kind, const auto &children) {
     result[{kind, next}].emplace(children);
     MatchPrefix(result, kind, next);
   });
 }
 
-void ParsedQueryImpl::MatchPrefix(TableEntry &result, NodeKind kind, size_t next) {
+void SyntexQueryImpl::MatchPrefix(TableEntry &result, SyntexNodeKind kind, size_t next) {
   Item(&grammar_root).IterateShifts(kind, next, Glob::NO, [&] (Item &item) {
     MatchRule(result, item, next);
   });
 }
 
-const ParsedQueryImpl::TableEntry &ParsedQueryImpl::ParsesAtIndex(size_t index) {
+const SyntexQueryImpl::TableEntry &SyntexQueryImpl::ParsesAtIndex(size_t index) {
   // Lookup memoized parses at this index
   auto it = m_parses.find(index);
   if (it != m_parses.end()) {
@@ -621,7 +623,7 @@ const ParsedQueryImpl::TableEntry &ParsedQueryImpl::ParsesAtIndex(size_t index) 
     }
   };
 
-  auto MetavarCallback = [&] (std::string_view name, NodeKind filter, size_t next) {
+  auto MetavarCallback = [&] (std::string_view name, SyntexNodeKind filter, size_t next) {
     if (name == "") {
       result[{filter, next}].emplace(nullptr);
     } else {
@@ -644,18 +646,18 @@ const ParsedQueryImpl::TableEntry &ParsedQueryImpl::ParsesAtIndex(size_t index) 
   return result;
 }
 
-std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
-    const TableEntry &entry, const ParseMarker &marker, std::uint64_t node_id) {
+std::pair<bool, std::vector<SyntexMetavarMatch>> SyntexQueryImpl::MatchMarker(
+    const TableEntry &entry, const SyntexParseMarker &marker, std::uint64_t node_id) {
 
-  std::vector<MetavarMatch> metavar_matches;
+  std::vector<SyntexMetavarMatch> metavar_matches;
   auto node = m_ep->GetASTNode(node_id);
-  auto kind = NodeKind::Deserialize(node.kind);
+  auto kind = SyntexNodeKind::Deserialize(node.kind);
   auto children = m_ep->GetASTNodeChildren(node_id);
 
   switch (marker.m_kind) {
-    case ParseMarker::METAVAR:
+    case SyntexParseMarker::METAVAR:
       if (marker.m_metavar) {
-        MetavarMatch mv_match(
+        SyntexMetavarMatch mv_match(
           {marker.m_metavar->m_name.data(), marker.m_metavar->m_name.size()},
           node.entity);
         if (auto &predicate = marker.m_metavar->m_predicate) {
@@ -666,9 +668,9 @@ std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
         metavar_matches.push_back(std::move(mv_match));
       }
       return {true, metavar_matches};
-    case ParseMarker::TERMINAL:
+    case SyntexParseMarker::TERMINAL:
       return {kind.IsToken() && node.spelling == marker.m_spelling, {}};
-    case ParseMarker::NONTERMINAL:
+    case SyntexParseMarker::NONTERMINAL:
       if (kind.IsToken() ||
             children.size() != marker.m_children.size())  {
         return {false, {}};
@@ -680,9 +682,9 @@ std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
       for (std::uint64_t child_node_id : children) {
         auto &[kind, next, glob] = *child_it;
         auto child_node = m_ep->GetASTNode(child_node_id);
-        auto child_node_kind = NodeKind::Deserialize(child_node.kind);
+        auto child_node_kind = SyntexNodeKind::Deserialize(child_node.kind);
 
-        if (kind != NodeKind::Any() && kind != child_node_kind) {
+        if (kind != SyntexNodeKind::Any() && kind != child_node_kind) {
           return {false, {}};
         }
 
@@ -712,7 +714,7 @@ std::pair<bool, std::vector<MetavarMatch>> ParsedQueryImpl::MatchMarker(
   }
 }
 
-void ParsedQueryImpl::DebugParseTable(std::ostream &os) {
+void SyntexQueryImpl::DebugParseTable(std::ostream &os) {
   // Make sure the DP table was actually filled in
   ParsesAtIndex(0);
 
@@ -737,13 +739,13 @@ void ParsedQueryImpl::DebugParseTable(std::ostream &os) {
 
         // Print body
         switch (marker.m_kind) {
-        case ParseMarker::METAVAR:
+        case SyntexParseMarker::METAVAR:
           std::cout << "$" << (marker.m_metavar ? marker.m_metavar->m_name : "");
           break;
-        case ParseMarker::TERMINAL:
+        case SyntexParseMarker::TERMINAL:
           std::cout << "`" << marker.m_spelling << "`";
           break;
-        case ParseMarker::NONTERMINAL:
+        case SyntexParseMarker::NONTERMINAL:
           for (auto &[kind, next, glob] : marker.m_children) {
             if (glob == Glob::YES) {
               std::cout << "(" << kind << ", " << next << ", ..." << ") ";
@@ -760,10 +762,10 @@ void ParsedQueryImpl::DebugParseTable(std::ostream &os) {
   }
 }
 
-ParsedQuery::ParsedQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query)
-  : impl(std::make_shared<ParsedQueryImpl>(ep, query)) {}
+SyntexQuery::SyntexQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query)
+  : impl(std::make_shared<SyntexQueryImpl>(ep, query)) {}
 
-bool ParsedQuery::IsValid(void) const {
+bool SyntexQuery::IsValid(void) const {
   for (auto &[key, markers] : impl->ParsesAtIndex(0)) {
     if (key.second == impl->m_input.size()) {
       return true;
@@ -772,9 +774,9 @@ bool ParsedQuery::IsValid(void) const {
   return false;
 }
 
-bool ParsedQuery::AddMetavarPredicate(
+bool SyntexQuery::AddMetavarPredicate(
     const std::string_view &name,
-    std::function<bool(const MetavarMatch&)> predicate) {
+    std::function<bool(const SyntexMetavarMatch&)> predicate) {
 
   // Find metavariable name
   auto it = impl->m_metavars.find(name);
@@ -786,7 +788,7 @@ bool ParsedQuery::AddMetavarPredicate(
   if (it->second.m_predicate) {
     it->second.m_predicate =
         [old_pred = std::move(it->second.m_predicate.value()),
-         new_pred = std::move(predicate)] (const MetavarMatch &mvm) -> bool {
+         new_pred = std::move(predicate)] (const SyntexMetavarMatch &mvm) -> bool {
       return old_pred(mvm) && new_pred(mvm);
     };
 
@@ -797,9 +799,9 @@ bool ParsedQuery::AddMetavarPredicate(
   return true;
 }
 
-void ParsedQuery::ForEachMatch(std::function<bool(Match)> pred) const {
+void SyntexQuery::ForEachMatch(std::function<bool(SyntexMatch)> pred) const {
   bool done = false;
-  auto real_pred = [sub_pred = std::move(pred), &done] (Match m) -> bool {
+  auto real_pred = [sub_pred = std::move(pred), &done] (SyntexMatch m) -> bool {
     if (sub_pred(std::move(m))) {
       return true;
     } else {
@@ -815,19 +817,19 @@ void ParsedQuery::ForEachMatch(std::function<bool(Match)> pred) const {
   }
 }
 
-std::vector<Match> ParsedQuery::Find(mx::RawEntityId frag) const {
-  std::vector<Match> ret;
-  ForEachMatch(frag, [&ret] (Match m) -> bool {
+std::vector<SyntexMatch> SyntexQuery::Find(mx::RawEntityId frag) const {
+  std::vector<SyntexMatch> ret;
+  ForEachMatch(frag, [&ret] (SyntexMatch m) -> bool {
     ret.emplace_back(std::move(m));
     return true;
   });
   return ret;
 }
 
-std::vector<Match> ParsedQuery::Find(void) const {
-  std::vector<Match> ret;
+std::vector<SyntexMatch> SyntexQuery::Find(void) const {
+  std::vector<SyntexMatch> ret;
   for (auto frag_id : impl->m_ep->GetFragmentsInAST()) {
-    ForEachMatch(frag_id, [&ret] (Match m) -> bool {
+    ForEachMatch(frag_id, [&ret] (SyntexMatch m) -> bool {
       ret.emplace_back(std::move(m));
       return true;
     });
@@ -835,8 +837,8 @@ std::vector<Match> ParsedQuery::Find(void) const {
   return ret;
 }
 
-void ParsedQuery::ForEachMatch(mx::RawEntityId frag_id,
-                               std::function<bool(Match)> pred) const {
+void SyntexQuery::ForEachMatch(mx::RawEntityId frag_id,
+                               std::function<bool(SyntexMatch)> pred) const {
   auto frag = impl->m_ep->FragmentFor(impl->m_ep, frag_id);
 
   // Find matching AST node
@@ -845,13 +847,13 @@ void ParsedQuery::ForEachMatch(mx::RawEntityId frag_id,
     if (key.second != impl->m_input.size()) {
       continue;
     }
-    if (key.first == NodeKind::Any()) {
+    if (key.first == SyntexNodeKind::Any()) {
       for (auto ast_node_id : impl->m_ep->GetASTNodesInFragment(frag_id)) {
         auto ast_node = impl->m_ep->GetASTNode(ast_node_id);
         for (auto &marker : markers) {
           auto [ok, metavar_matches] = impl->MatchMarker(
               entry, marker, ast_node_id);
-          if (ok && !pred(Match(ast_node.entity, metavar_matches))) {
+          if (ok && !pred(SyntexMatch(ast_node.entity, metavar_matches))) {
             return;
           }
         }
@@ -862,7 +864,7 @@ void ParsedQuery::ForEachMatch(mx::RawEntityId frag_id,
         auto ast_node = impl->m_ep->GetASTNode(*ast_node_id);
         for (auto &marker : markers) {
           auto [ok, metavar_matches] = impl->MatchMarker(entry, marker, *ast_node_id);
-          if (ok && !pred(Match(ast_node.entity, metavar_matches))) {
+          if (ok && !pred(SyntexMatch(ast_node.entity, metavar_matches))) {
             return;
           }
         }
@@ -872,5 +874,4 @@ void ParsedQuery::ForEachMatch(mx::RawEntityId frag_id,
   }
 }
 
-}  // namespace syntex
 }  // namespace mx

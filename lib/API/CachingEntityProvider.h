@@ -68,7 +68,7 @@ class CachingEntityProvider final : public EntityProvider {
       references;
 
   std::unordered_map<std::string, TokenKind> spelling_to_token_kind;
-  syntex::GrammarLeaves grammar_root;
+  SyntexGrammarLeaves grammar_root;
 
   std::vector<std::uint64_t> fragments_in_ast;
   std::unordered_map<std::uint64_t, ASTNode> node_contents;
@@ -127,7 +127,7 @@ class CachingEntityProvider final : public EntityProvider {
   std::optional<mx::TokenKind>
   TokenKindOf(std::string_view spelling) final;
 
-  void LoadGrammarRoot(syntex::GrammarLeaves &root) final;
+  void LoadGrammarRoot(SyntexGrammarLeaves &root) final;
 
   std::vector<RawEntityId> GetFragmentsInAST(void) final;
   ASTNode GetASTNode(std::uint64_t id) final;

@@ -20,24 +20,21 @@
 #include "Token.h"
 
 namespace mx {
-namespace syntex {
 
-class Grammar;
-class GrammarImpl;
-class ParsedQuery;
-class ParsedQueryImpl;
+class SyntexQuery;
+class SyntexQueryImpl;
 
 //
 // Chunk of a fragment (potentially) matching a metavariable
 //
 
-class MetavarMatch {
+class SyntexMetavarMatch {
 private:
   std::string name;
   mx::EntityId entity;
 
 public:
-  MetavarMatch(const std::string &name_, mx::EntityId entity_)
+  SyntexMetavarMatch(const std::string &name_, mx::EntityId entity_)
     : name(std::move(name_)),
       entity(std::move(entity_)) {}
 
@@ -54,16 +51,16 @@ public:
 // Chunk of a ParsedQuery that matched against a part of a fragment
 //
 
-class Match {
+class SyntexMatch {
 private:
-  friend class ParsedQuery;
+  friend class SyntexQuery;
 
   mx::EntityId entity;
 
-  std::vector<MetavarMatch> metavars;
+  std::vector<SyntexMetavarMatch> metavars;
 
 public:
-  Match(mx::EntityId entity_, std::vector<MetavarMatch> matevars_)
+  SyntexMatch(mx::EntityId entity_, std::vector<SyntexMetavarMatch> matevars_)
     : entity(std::move(entity_)),
       metavars(std::move(matevars_)) {}
 
@@ -71,14 +68,13 @@ public:
     return entity;
   }
 
-  const std::vector<MetavarMatch> &MetavarMatches(void) const {
+  const std::vector<SyntexMetavarMatch> &MetavarMatches(void) const {
     return metavars;
   }
 
-  const MetavarMatch &MetavarMatch(size_t i) const {
+  const SyntexMetavarMatch &MetavarMatch(size_t i) const {
     return metavars[i];
   }
 };
 
-}  // namespace syntex
 }  // namespace mx

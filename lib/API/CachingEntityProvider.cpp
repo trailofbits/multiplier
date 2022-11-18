@@ -285,7 +285,7 @@ CachingEntityProvider::TokenKindOf(std::string_view spelling) {
   return it->second;
 }
 
-void CachingEntityProvider::LoadGrammarRoot(syntex::GrammarLeaves& root) {
+void CachingEntityProvider::LoadGrammarRoot(SyntexGrammarLeaves& root) {
   if(grammar_root.empty()) {
     next->LoadGrammarRoot(grammar_root);
   }

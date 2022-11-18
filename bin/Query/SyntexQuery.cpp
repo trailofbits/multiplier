@@ -21,7 +21,7 @@ DEFINE_string(query, "", "Use argument value as query");
 DEFINE_uint64(threads, 0, "Use this number of threads");
 DEFINE_bool(suppress_output, false, "Don't print matches to stdout");
 
-static void PrintMatch(mx::Index index, const mx::syntex::Match &match)
+static void PrintMatch(mx::Index index, const mx::SyntexMatch &match)
 {
   if (FLAGS_suppress_output) {
     return;
@@ -87,16 +87,17 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Parse query
 
-  auto res = index.query_syntex(FLAGS_query);
+  auto res = index.parse_syntex_query(FLAGS_query);
 
-  if (!res.has_value()) {
+  if (!res.IsValid()) {
     std::cerr << "Query `" << FLAGS_query << "` has no valid parses\n";
     return EXIT_FAILURE;
   }
 
-  for(auto match : *res) {
-    PrintMatch(index, match);
-  }
+  res.ForEachMatch([&](auto match) {
+    PrintMatch(index, std::move(match));
+    return true;
+  });
 
   return EXIT_SUCCESS;
 }

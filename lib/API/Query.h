@@ -8,6 +8,7 @@
 
 #include <multiplier/NodeKind.h>
 #include "Grammar.h"
+#include <multiplier/Query.h>
 #include <multiplier/Syntex.h>
 #include <deque>
 #include <unordered_map>
@@ -21,8 +22,8 @@ inline void hash_combine(size_t &h, const T& v)
 }
 
 template<>
-struct std::hash<std::pair<mx::syntex::NodeKind, size_t>> {
-  size_t operator()(const std::pair<mx::syntex::NodeKind, size_t> &self) const {
+struct std::hash<std::pair<mx::SyntexNodeKind, size_t>> {
+  size_t operator()(const std::pair<mx::SyntexNodeKind, size_t> &self) const {
     size_t hash = 0;
     hash_combine(hash, self.first);
     hash_combine(hash, self.second);
@@ -31,38 +32,13 @@ struct std::hash<std::pair<mx::syntex::NodeKind, size_t>> {
 };
 
 namespace mx {
-namespace syntex {
-//
-// Result of parsing a query
-//
-
-class ParsedQuery {
- private:
-  std::shared_ptr<ParsedQueryImpl> impl;
-  ParsedQuery(void) = delete;
-
- public:
-  explicit ParsedQuery(std::shared_ptr<mx::EntityProvider> ep, std::string_view query);
-
-  bool IsValid() const;
-
-  bool AddMetavarPredicate(const std::string_view &name,
-                           std::function<bool(const MetavarMatch&)> predicate);
-
-  void ForEachMatch(mx::RawEntityId frag_id,
-                    std::function<bool(Match)> pred) const;
-  void ForEachMatch(std::function<bool(Match)> pred) const;
-
-  std::vector<Match> Find(mx::RawEntityId frag_id) const;
-  std::vector<Match> Find(void) const;
-};
 
 struct Metavar {
   std::string_view m_name;
-  std::optional<std::function<bool(const MetavarMatch&)>> m_predicate;
+  std::optional<std::function<bool(const SyntexMetavarMatch&)>> m_predicate;
 
   explicit Metavar(std::string_view name,
-                    std::optional<std::function<bool(MetavarMatch)>> predicate)
+                    std::optional<std::function<bool(SyntexMetavarMatch)>> predicate)
     : m_name(name), m_predicate(std::move(predicate)) {}
 };
 
@@ -71,7 +47,7 @@ enum class Glob {
   YES
 };
 
-struct ParseMarker {
+struct SyntexParseMarker {
 
   // Node category
   enum {
@@ -84,19 +60,19 @@ struct ParseMarker {
   union {
     Metavar *m_metavar;
     std::string_view m_spelling;
-    std::vector<std::tuple<NodeKind, size_t, Glob>> m_children;
+    std::vector<std::tuple<SyntexNodeKind, size_t, Glob>> m_children;
   };
 
-  explicit ParseMarker(Metavar *metavar)
+  explicit SyntexParseMarker(Metavar *metavar)
     : m_kind(METAVAR), m_metavar(metavar) {}
 
-  explicit ParseMarker(std::string_view spelling)
+  explicit SyntexParseMarker(std::string_view spelling)
     : m_kind(TERMINAL), m_spelling(spelling) {}
 
-  explicit ParseMarker(const std::vector<std::tuple<NodeKind, size_t, Glob>> &children)
+  explicit SyntexParseMarker(const std::vector<std::tuple<SyntexNodeKind, size_t, Glob>> &children)
     : m_kind(NONTERMINAL), m_children(children) {}
 
-  ParseMarker(ParseMarker &&other)
+  SyntexParseMarker(SyntexParseMarker &&other)
     : m_kind(other.m_kind)
   {
     switch (m_kind) {
@@ -107,12 +83,12 @@ struct ParseMarker {
       new (&m_spelling) std::string_view(other.m_spelling);
       break;
     case NONTERMINAL:
-      new (&m_children) std::vector<std::tuple<NodeKind, size_t, Glob>>(std::move(other.m_children));
+      new (&m_children) std::vector<std::tuple<SyntexNodeKind, size_t, Glob>>(std::move(other.m_children));
       break;
     }
   }
 
-  ~ParseMarker() {
+  ~SyntexParseMarker() {
     switch (m_kind) {
     case METAVAR:
       break;
@@ -120,12 +96,12 @@ struct ParseMarker {
       m_spelling.std::string_view::~string_view();
       break;
     case NONTERMINAL:
-      m_children.std::vector<std::tuple<NodeKind, size_t, Glob>>::~vector();
+      m_children.std::vector<std::tuple<SyntexNodeKind, size_t, Glob>>::~vector();
       break;
     }
   }
 
-  bool operator==(const ParseMarker &other) const {
+  bool operator==(const SyntexParseMarker &other) const {
     if (m_kind != other.m_kind) {
       return false;
     }
@@ -144,21 +120,20 @@ struct ParseMarker {
   }
 };
 
-}  // namespace syntex
 }  // namespace mx
 
 template<>
-struct std::hash<mx::syntex::ParseMarker> {
-  size_t operator()(const mx::syntex::ParseMarker &self) const {
+struct std::hash<mx::SyntexParseMarker> {
+  size_t operator()(const mx::SyntexParseMarker &self) const {
     size_t hash = 0;
     hash_combine(hash, self.m_kind);
     switch (self.m_kind) {
-      case mx::syntex::ParseMarker::METAVAR:
+      case mx::SyntexParseMarker::METAVAR:
         break;
-      case mx::syntex::ParseMarker::TERMINAL:
+      case mx::SyntexParseMarker::TERMINAL:
         hash_combine(hash, self.m_spelling);
         break;
-      case mx::syntex::ParseMarker::NONTERMINAL:
+      case mx::SyntexParseMarker::NONTERMINAL:
         for (auto &[kind, next, glob] : self.m_children) {
           hash_combine(hash, kind);
           hash_combine(hash, next);
@@ -171,24 +146,23 @@ struct std::hash<mx::syntex::ParseMarker> {
 };
 
 namespace mx {
-namespace syntex {
 
 //
 // Parser state (e.g. a pointer into the grammar trie)
 //
 
 struct Item {
-  const GrammarLeaves *m_leaves;
-  std::vector<std::tuple<NodeKind, size_t, Glob>> m_children;
+  const SyntexGrammarLeaves *m_leaves;
+  std::vector<std::tuple<SyntexNodeKind, size_t, Glob>> m_children;
 
-  explicit Item(const GrammarLeaves *leaves)
+  explicit Item(const SyntexGrammarLeaves *leaves)
     : m_leaves(leaves)
   {}
 
   template<typename F>
-  void IterateShifts(NodeKind kind, size_t next, Glob glob, F cb) {
-    if (kind == NodeKind::Any()) {
-      const GrammarLeaves *old_leaves = m_leaves;
+  void IterateShifts(SyntexNodeKind kind, size_t next, Glob glob, F cb) {
+    if (kind == SyntexNodeKind::Any()) {
+      const SyntexGrammarLeaves *old_leaves = m_leaves;
       m_children.emplace_back(kind, next, glob);
 
       for (auto &[kind, rest] : *m_leaves) {
@@ -209,7 +183,7 @@ struct Item {
       }
 
       // Morph ourselves into the shifted state
-      const GrammarLeaves *old_leaves = m_leaves;
+      const SyntexGrammarLeaves *old_leaves = m_leaves;
       m_leaves = &it->second.leaves;
       m_children.emplace_back(kind, next, glob);
 
@@ -236,17 +210,17 @@ struct Item {
 // Wrapper around parsing functions
 //
 
-struct ParsedQueryImpl {
+struct SyntexQueryImpl {
   std::shared_ptr<mx::EntityProvider> m_ep;
 
   // Input string
   std::string_view m_input;
 
-  GrammarLeaves grammar_root;
+  SyntexGrammarLeaves grammar_root;
 
   // Main DP parse table
-  using TableEntry = std::unordered_map<std::pair<NodeKind, size_t>,
-                                        std::unordered_set<ParseMarker>>;
+  using TableEntry = std::unordered_map<std::pair<SyntexNodeKind, size_t>,
+                                        std::unordered_set<SyntexParseMarker>>;
 
   std::unordered_map<size_t, TableEntry> m_parses;
 
@@ -256,22 +230,21 @@ struct ParsedQueryImpl {
   // Globs
   std::unordered_map<size_t, size_t> m_globs;
 
-  void MatchGlob(TableEntry &result, const std::unordered_set<NodeKind> &follow,
+  void MatchGlob(TableEntry &result, const std::unordered_set<SyntexNodeKind> &follow,
                   Item &item, size_t next);
 
   void MatchRule(TableEntry &result, Item &item, size_t next);
 
-  void MatchPrefix(TableEntry &result, NodeKind kind, size_t next);
+  void MatchPrefix(TableEntry &result, SyntexNodeKind kind, size_t next);
 
   const TableEntry &ParsesAtIndex(size_t index);
 
-  explicit ParsedQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input);
+  explicit SyntexQueryImpl(std::shared_ptr<mx::EntityProvider> ep, std::string_view input);
 
   void DebugParseTable(std::ostream &os);
 
-  std::pair<bool, std::vector<MetavarMatch>> MatchMarker(
-    const TableEntry &entry, const ParseMarker &marker, std::uint64_t node_id);
+  std::pair<bool, std::vector<SyntexMetavarMatch>> MatchMarker(
+    const TableEntry &entry, const SyntexParseMarker &marker, std::uint64_t node_id);
 };
 
-}  // namespace syntex
 }  // namespace mx

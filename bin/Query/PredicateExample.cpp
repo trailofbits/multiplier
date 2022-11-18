@@ -72,7 +72,7 @@ static std::optional<unsigned> IntegralTypeWidth(const mx::ValueDecl &decl) {
   return IntegralTypeWidth(decl.type());
 }
 
-static void HighlightMatch(std::ostream &os, mx::Index index, mx::syntex::Match m) {
+static void HighlightMatch(std::ostream &os, mx::Index index, mx::SyntexMatch m) {
   auto stmt = std::get<mx::Stmt>(index.entity(m.MetavarMatch(0).Entity()));
   auto ref = mx::DeclRefExpr::from(stmt);
   if (!ref) {
@@ -170,15 +170,16 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Setup query
 
-  auto res = index.query_syntex("$var:DECL_REF_EXPR << $num:INTEGER_LITERAL");
-  if (!res.has_value()) {
+  auto res = index.parse_syntex_query("$var:DECL_REF_EXPR << $num:INTEGER_LITERAL");
+  if (!res.IsValid()) {
     return EXIT_FAILURE;
   }
 
   // Match fragments
-  for(auto match : res.value()) {
+  res.ForEachMatch([&](auto match) {
     HighlightMatch(std::cout, index, std::move(match));
-  }
+    return true;
+  });
 
   return EXIT_SUCCESS;
 }
