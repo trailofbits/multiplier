@@ -148,15 +148,15 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
-      id.offset = next_parsed_token_index;
-      break;
+//      id.offset = next_parsed_token_index;
+      return false;
 
     // Alias whatever the previous ID to be generated is.
     case pasta::TokenRole::kEndOfFileMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
-      CHECK_LT(0u, next_parsed_token_index);
-      id.offset = next_parsed_token_index - 1u;
-      break;
+//      CHECK_LT(0u, next_parsed_token_index);
+//      id.offset = next_parsed_token_index - 1u;
+      return false;
 
     default:
       return false;
@@ -183,7 +183,10 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
   EntityLabeller labeller(entity_ids, *this);
 
   for (auto i = begin_index; i <= end_index; ++i) {
-    (void) labeller.Label(tok_range[i]);
+    pasta::Token tok = tok_range[i];
+    if (IsParsedToken(tok)) {
+      (void) labeller.Label(tok);
+    }
   }
 
   // Go top-down through the top-level declarations of this pending fragment

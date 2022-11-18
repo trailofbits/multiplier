@@ -55,21 +55,6 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
   }
 }
 
-// Tell us if this was a token that was actually parsed, and thus should have
-// a fragment token ID.
-//
-// NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
-static bool IsParsedToken(const pasta::Token &tok) {
-  switch (tok.Role()) {
-    case pasta::TokenRole::kFileToken:
-    case pasta::TokenRole::kFinalMacroExpansionToken:
-      return true;
-
-    default:
-      return false;
-  }
-}
-
 // Count the number of substitutions in a token tree. We need to pre-initialize
 // the total size of lists in Cap'n Proto, and so we need to know how many
 // substitutions we'll want to store when serializing a fragment, as the
@@ -84,15 +69,7 @@ static void CountSubstitutions(EntityMapper &em, TokenTree tt,
     if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
 
-      // The kind applies to `lhs` (before).
-      mx::MacroSubstitutionId id;
-      id.fragment_id = em.fragment.fragment_id;
-      id.kind = kind;
-      id.offset = num_subs++;
-
-      mx::RawEntityId eid = mx::EntityId(id).Pack();
-      em.entity_ids.emplace(lhs.RawNode(), eid);
-      em.entity_ids.emplace(rhs.RawNode(), eid);
+      ++num_subs;
 
       CountSubstitutions(em, std::move(lhs), todo, num_subs, num_toks);
       todo.emplace_back(std::move(rhs));
@@ -100,13 +77,7 @@ static void CountSubstitutions(EntityMapper &em, TokenTree tt,
     } else if (auto sub_tree = node.MaybeSubTree()) {
       auto [kind, lhs] = std::move(sub_tree.value());
 
-      mx::MacroSubstitutionId id;
-      id.fragment_id = em.fragment.fragment_id;
-      id.kind = kind;
-      id.offset = num_subs++;
-
-      mx::RawEntityId eid = mx::EntityId(id).Pack();
-      em.entity_ids.emplace(lhs.RawNode(), eid);
+      ++num_subs;
 
       CountSubstitutions(em, std::move(lhs), todo, num_subs, num_toks);
 
@@ -145,10 +116,6 @@ static void CountSubstitutions(EntityMapper &em, TokenTree tt,
 
       if (pt) {
         em.entity_ids.emplace(pt->RawToken(), eid);
-      }
-
-      if (mt) {
-        em.entity_ids.emplace(mt->RawNode(), eid);
       }
     }
   }
@@ -239,16 +206,15 @@ static void PersistTokens(EntityMapper &em, const pasta::TokenRange &tokens,
   // that the file is in UTF-8, so we re-build the contents on a per-token
   // basis, because that's the only way to guarantee token offsets in the
   // presence of UTF-8 issues.
-  auto j = 0u;
-  for (auto i = begin_index; i <= end_index; ++i, ++j) {
+  for (auto i = begin_index; i <= end_index; ++i) {
     pasta::Token tok = tokens[i];
     if (!pred(tok)) {
       continue;
     }
 
     dtb.set(next_tok_offset, DerivedTokenId(em, tok));
-    tkb.set(next_tok_offset, static_cast<unsigned short>(TokenKindFromPasta(tok)));
-    tob.set(next_tok_offset, static_cast<unsigned>(utf8_fragment_data.size()));
+    tkb.set(next_tok_offset, static_cast<uint16_t>(TokenKindFromPasta(tok)));
+    tob.set(next_tok_offset, static_cast<uint32_t>(utf8_fragment_data.size()));
     aib.set(next_tok_offset, em.EntityId(tok));
 
     AccumulateTokenData(utf8_fragment_data, tok);
@@ -394,9 +360,6 @@ static void PersistTokenTree(EntityMapper &em,
       mx::RawEntityId eid = mx::EntityId(sub_id).Pack();
       work.nib.set(i++, eid);
 
-      DCHECK_EQ(eid, em.EntityId(lhs.RawNode()));
-      DCHECK_EQ(eid, em.EntityId(rhs.RawNode()));
-
       SubstitutionBuilder next_sub = subs_builder[next_sub_offset++];
       next_sub.setKind(static_cast<uint8_t>(kind));
 
@@ -422,8 +385,6 @@ static void PersistTokenTree(EntityMapper &em,
       sub_id.offset = next_sub_offset;
       mx::RawEntityId eid = mx::EntityId(sub_id).Pack();
       work.nib.set(i++, eid);
-
-      DCHECK_EQ(eid, em.EntityId(lhs.RawNode()));
 
       mx::rpc::MacroSubstitution::Builder next_sub =
           subs_builder[next_sub_offset++];
@@ -479,7 +440,6 @@ static void PersistTokenTree(EntityMapper &em,
       dtb.set(next_tok_offset, eid);
       tob.set(next_tok_offset, static_cast<uint32_t>(utf8_macro_data.size()));
       tkb.set(next_tok_offset, static_cast<uint16_t>(kind));
-      next_tok_offset++;
 
       // Recreate it; it should match what we did in `CountSubstitutions`.
       mx::MacroTokenId id;
@@ -489,12 +449,7 @@ static void PersistTokenTree(EntityMapper &em,
       eid = mx::EntityId(id).Pack();
       work.nib.set(i++, eid);
 
-      if (pt) {
-        DCHECK_EQ(eid, em.EntityId(*pt));
-      }
-      if (mt) {
-        DCHECK_EQ(eid, em.EntityId(mt->RawNode()));
-      }
+      ++next_tok_offset;
     }
   }
 

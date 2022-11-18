@@ -30,6 +30,21 @@
 
 namespace indexer {
 
+// Tell us if this was a token that was actually parsed, and thus should have
+// a fragment token ID.
+//
+// NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
+bool IsParsedToken(const pasta::Token &tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
