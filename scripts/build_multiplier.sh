@@ -254,7 +254,7 @@ MULTIPLIER_BRANCH="main"
 # Configure and build multiplier on MacOS
 function BuildMultiplierOSX
 {
-  if !(ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
+  if !(ConfigureAndBuild "${MULTIPLIER_NAME}" \
     -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install"); then
@@ -266,7 +266,7 @@ function BuildMultiplierOSX
 # Configure and build multiplier on Linux
 function BuildMultiplierLinux
 {
-  ConfigureAndBuild "${MULTIPLIER_NAME}" -DMX_DOWNLOAD_SQLITE=ON \
+  ConfigureAndBuild "${MULTIPLIER_NAME}" \
     -DMX_ENABLE_WEGGLI=ON  -DMX_ENABLE_VAST=OFF \
     -DVCPKG_ROOT=${VCPKG_ROOT} -DVCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET} \
     -Dpasta_ROOT="${WORKSPACE_DIR}/install"
