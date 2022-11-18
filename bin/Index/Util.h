@@ -16,6 +16,7 @@ namespace pasta {
 class AST;
 class Decl;
 class FileToken;
+class MacroToken;
 class Stmt;
 class Token;
 class Type;
@@ -38,6 +39,9 @@ std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix=" ");
 
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data);
+
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity);
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);

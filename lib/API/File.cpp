@@ -174,7 +174,7 @@ File File::containing(const Fragment &fragment) {
 }
 
 // Return the file containing a specific fragment.
-File File::containing(const TokenSubstitution &entity) {
+File File::containing(const MacroSubstitution &entity) {
   const auto &ep = entity.impl->ep;
   return File(ep->FileFor(ep, entity.impl->FileContaingFirstToken()));
 }
@@ -256,9 +256,7 @@ std::vector<RawEntityId> File::fragment_ids(void) const {
 
 // Return the file tokens for the file.
 TokenList File::tokens(void) const noexcept {
-  auto tokens = impl->TokenReader(impl);
-  auto num_tokens = tokens->NumTokens();
-  return TokenList(std::move(tokens), num_tokens);
+  return TokenList(impl->TokenReader(impl), impl->num_tokens);
 }
 
 // Return the contents of the file as a UTF-8 string.

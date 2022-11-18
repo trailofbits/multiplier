@@ -28,9 +28,9 @@ class TokenList;
 class TokenListIterator;
 class TokenRange;
 class TokenReader;
-class TokenSubstitutionList;
-class TokenSubstitutionListImpl;
-class TokenSubstitutionListIterator;
+class MacroSubstitutionList;
+class MacroSubstitutionListImpl;
+class MacroSubstitutionListIterator;
 
 enum class TokenKind : unsigned short;
 using TokenUse = Use<TokenUseSelector>;
@@ -46,7 +46,7 @@ class Token {
   friend class TokenList;
   friend class TokenListIterator;
   friend class TokenRange;
-  friend class TokenSubstitutionListIterator;
+  friend class MacroSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
   unsigned offset;
@@ -63,21 +63,29 @@ class Token {
 
   // Return the list of parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
+  __attribute__((deprecated("Switch to Fragment::parsed_tokens")))
   static TokenList in(const Fragment &);
 
   // Return the list of tokens in this file.
+  __attribute__((deprecated("Switch to File::tokens")))
   static TokenList in(const File &);
 
   // Kind of this token.
   TokenKind kind(void) const;
 
   // Return the data of this token.
-  std::string_view data(void) const;
+  std::string_view data(void) const &;
 
   // Return the ID of this token.
   EntityId id(void) const;
 
-  // Return the version of this token from a file, if any.
+  // Return the token from which this token was derived. This can be a macro
+  // token or a file token.
+  std::optional<Token> derived_token(void) const;
+
+  // Return the version of this token from a file, if any. If this is a parsed
+  // or macro token, then this will walk the derivation chain back to a file
+  // token.
   std::optional<Token> file_token(void) const;
 
   // Return the version of this token from a file, if any. If there isn't a
@@ -180,7 +188,7 @@ class TokenRange {
   friend class RegexQueryResultIterator;
   friend class WeggliQueryResultIterator;
   friend class TokenList;
-  friend class TokenSubstitutionListIterator;
+  friend class MacroSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
   unsigned index;
@@ -223,7 +231,7 @@ class TokenRange {
 
   // Return the underlying token data associated with the tokens covered by this
   // token range.
-  std::string_view data(void) const;
+  std::string_view data(void) const &;
 
   // Return an iterator pointing at the first token in this list.
   inline TokenListIterator begin(void) && noexcept {
@@ -265,7 +273,7 @@ class TokenList : public TokenRange {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Token;
-  friend class TokenSubstitutionListIterator;
+  friend class MacroSubstitutionListIterator;
 
   inline TokenList(std::shared_ptr<const TokenReader> impl_,
                    unsigned num_tokens_)
@@ -290,7 +298,7 @@ class TokenList : public TokenRange {
 // A token substitution gives access to the before and after tokens of a
 // substitution. There can be one-or-more `before` tokens (e.g. function-like
 // macro expansions, file inclusions) and zero-or-more `after` tokens.
-class TokenSubstitution {
+class MacroSubstitution {
  protected:
   std::shared_ptr<const FragmentImpl> impl;
 
@@ -298,45 +306,45 @@ class TokenSubstitution {
   friend class Fragment;
   friend class File;
   friend class Index;
-  friend class TokenSubstitutionListIterator;
+  friend class MacroSubstitutionListIterator;
 
   unsigned offset;
-  TokenSubstitutionKind kind_;
+  MacroSubstitutionKind kind_;
 
-  inline TokenSubstitution(
+  inline MacroSubstitution(
       std::shared_ptr<const FragmentImpl> impl_,
-      unsigned offset_, TokenSubstitutionKind kind__)
+      unsigned offset_, MacroSubstitutionKind kind__)
       : impl(std::move(impl_)),
         offset(offset_),
         kind_(kind__) {}
 
  public:
-  inline TokenSubstitutionKind kind(void) const noexcept {
+  inline MacroSubstitutionKind kind(void) const noexcept {
     return kind_;
   }
 
-  TokenSubstitutionList before(void) const;
-  TokenSubstitutionList after(void) const;
+  MacroSubstitutionList before(void) const;
+  std::optional<MacroSubstitutionList> after(void) const;
 };
 
-class TokenSubstitutionListIterator;
+class MacroSubstitutionListIterator;
 
-using TokenSubstitutionEnty = std::variant<Token, TokenSubstitution>;
+using MacroSubstitutionEnty = std::variant<Token, MacroSubstitution>;
 
 // Iterate over a list of token or token substitution nodes.
-class TokenSubstitutionListIterator {
+class MacroSubstitutionListIterator {
  private:
-  friend class TokenSubstitutionList;
+  friend class MacroSubstitutionList;
 
-  std::shared_ptr<const TokenSubstitutionListImpl> impl;
+  std::shared_ptr<const MacroSubstitutionListImpl> impl;
   unsigned index;
   unsigned num_nodes;
 
-  bool operator==(const TokenSubstitutionListIterator &) = delete;
-  bool operator!=(const TokenSubstitutionListIterator &) = delete;
+  bool operator==(const MacroSubstitutionListIterator &) = delete;
+  bool operator!=(const MacroSubstitutionListIterator &) = delete;
 
-  inline TokenSubstitutionListIterator(
-      std::shared_ptr<const TokenSubstitutionListImpl> impl_,
+  inline MacroSubstitutionListIterator(
+      std::shared_ptr<const MacroSubstitutionListImpl> impl_,
       unsigned index_, unsigned num_nodes_)
       : impl(std::move(impl_)),
         index(index_),
@@ -345,17 +353,17 @@ class TokenSubstitutionListIterator {
  public:
   using EndIteratorType = IteratorEnd;
 
-  std::variant<Token, TokenSubstitution> operator*(void) const;
+  std::variant<Token, MacroSubstitution> operator*(void) const;
 
   // Pre-increment.
-  inline TokenSubstitutionListIterator &operator++(void) noexcept {
+  inline MacroSubstitutionListIterator &operator++(void) noexcept {
     ++index;
     return *this;
   }
 
   // Post-increment.
-  inline TokenSubstitutionListIterator operator++(int) noexcept {
-    return TokenSubstitutionListIterator(impl, index++, num_nodes);
+  inline MacroSubstitutionListIterator operator++(int) noexcept {
+    return MacroSubstitutionListIterator(impl, index++, num_nodes);
   }
 
   inline bool operator==(EndIteratorType) const noexcept {
@@ -368,32 +376,32 @@ class TokenSubstitutionListIterator {
 };
 
 // List of token or substitution nodes.
-class TokenSubstitutionList {
+class MacroSubstitutionList {
  private:
   friend class Fragment;
-  friend class TokenSubstitution;
+  friend class MacroSubstitution;
 
-  std::shared_ptr<const TokenSubstitutionListImpl> impl;
+  std::shared_ptr<const MacroSubstitutionListImpl> impl;
   unsigned num_nodes{0u};
 
-  inline TokenSubstitutionList(
-      std::shared_ptr<const TokenSubstitutionListImpl> impl_,
+  inline MacroSubstitutionList(
+      std::shared_ptr<const MacroSubstitutionListImpl> impl_,
       unsigned num_nodes_)
       : impl(std::move(impl_)),
         num_nodes(num_nodes_) {}
 
  public:
-  TokenSubstitutionList(void) = default;
+  MacroSubstitutionList(void) = default;
 
-  inline TokenSubstitutionListIterator begin(void) && noexcept {
-    return TokenSubstitutionListIterator(std::move(impl), 0, num_nodes);
+  inline MacroSubstitutionListIterator begin(void) && noexcept {
+    return MacroSubstitutionListIterator(std::move(impl), 0, num_nodes);
   }
 
-  inline TokenSubstitutionListIterator begin(void) const & noexcept {
-    return TokenSubstitutionListIterator(impl, 0, num_nodes);
+  inline MacroSubstitutionListIterator begin(void) const & noexcept {
+    return MacroSubstitutionListIterator(impl, 0, num_nodes);
   }
 
-  inline TokenSubstitutionListIterator::EndIteratorType
+  inline MacroSubstitutionListIterator::EndIteratorType
   end(void) const noexcept {
     return {};
   }

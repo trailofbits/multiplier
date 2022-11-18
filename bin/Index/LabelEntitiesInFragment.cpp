@@ -8,11 +8,16 @@
 
 #include <multiplier/PASTA.h>
 
+#include "Context.h"
 #include "PendingFragment.h"
 #include "Util.h"
 #include "Visitor.h"
 
 namespace indexer {
+
+struct EntityIdMap;
+class PendingFragment;
+
 namespace {
 
 // Labels entities (decls, stmts, types, tokens). The idea here is that in
@@ -35,6 +40,12 @@ class EntityLabeller final : public EntityVisitor {
   EntityIdMap &entity_ids;
   PendingFragment &fragment;
 
+  // Tracks the index of the next parsed token. Logic surrounding this
+  // processing is replicated when serializing `TokenTree`s. The key is that
+  // we want to serialize the final parsed tokens, and not any marker tokens
+  // or intermediate macro expansion tokens.
+  unsigned next_parsed_token_index{0u};
+
   inline explicit EntityLabeller(EntityIdMap &entity_ids_,
                                  PendingFragment &fragment_)
       : entity_ids(entity_ids_),
@@ -45,6 +56,15 @@ class EntityLabeller final : public EntityVisitor {
   bool Enter(const pasta::Decl &entity) final;
   bool Enter(const pasta::Stmt &entity) final;
   bool Enter(const pasta::Type &entity) final;
+
+  // Create initial fragment token IDs for all of the tokens in the range of
+  // this fragment. This needs to be careful about assigning IDs to tokens that
+  // aren't actually parsed, i.e. tokens whose roles are things like
+  // intermediate macro expansions.
+  //
+  // NOTE(pag): This labeling process is tightly coupled with how tokens are
+  //            serialized into fragments, and how token trees are serialized
+  //            into fragments.
   bool Label(const pasta::Token &entity);
 };
 
@@ -102,14 +122,47 @@ bool EntityLabeller::Enter(const pasta::Type &entity) {
   }
 }
 
-
+// Create initial fragment token IDs for all of the tokens in the range of
+// this fragment. This needs to be careful about assigning IDs to tokens that
+// aren't actually parsed, i.e. tokens whose roles are things like
+// intermediate macro expansions.
+//
+// NOTE(pag): This labeling process is tightly coupled with how tokens are
+//            serialized into fragments, and how token trees are serialized
+//            into fragments.
 bool EntityLabeller::Label(const pasta::Token &entity) {
   auto index = entity.Index();
   CHECK_LE(fragment.begin_index, index);
   CHECK_LE(index, fragment.end_index);
-  mx::FragmentTokenId id;
+
+  mx::ParsedTokenId id;
+  switch (entity.Role()) {
+    // This is a token that actually reached the parser.
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      id.offset = next_parsed_token_index++;
+      break;
+
+    // Alias whatever the next ID to be generated is.
+    case pasta::TokenRole::kBeginOfFileMarker:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kInitialMacroUseToken:
+    case pasta::TokenRole::kIntermediateMacroExpansionToken:
+      id.offset = next_parsed_token_index;
+      break;
+
+    // Alias whatever the previous ID to be generated is.
+    case pasta::TokenRole::kEndOfFileMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      CHECK_LT(0u, next_parsed_token_index);
+      id.offset = next_parsed_token_index - 1u;
+      break;
+
+    default:
+      return false;
+  }
+
   id.fragment_id = fragment.fragment_id;
-  id.offset = static_cast<uint32_t>(index - fragment.begin_index);
   id.kind = TokenKindFromPasta(entity);
 
   if (entity_ids.emplace(entity.RawToken(), id).second) {
@@ -137,6 +190,13 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
   // and build up an initial list of `decls_to_serialize` and
   // `stmts_to_serialize`. This list will be expanded to fixpoint by
   // `PendingFragment::Build`.
+  //
+  // This process is manual, as opposed to `PendingFragment::Build` being a
+  // more automated process, because the "hands on touch" of the manual effort
+  // lets us be a bit more decisive about what should actually belong to a given
+  // fragment, and stop when we go too far, whereas the automated approach might
+  // just scoop everything reachable into a fragment, even if it doesn't really
+  // belong there.
   for (const pasta::Decl &decl : decls) {
     (void) labeller.Accept(decl);
   }

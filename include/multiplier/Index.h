@@ -30,6 +30,7 @@ class FileListImpl;
 class Fragment;
 class FragmentImpl;
 class Index;
+class InvalidEntityProvider;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
@@ -37,7 +38,7 @@ class RegexQueryResultIterator;
 class RegexQueryMatch;
 class RegexQueryResultImpl;
 class RegexQueryResult;
-class InvalidEntityProvider;
+class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
 class WeggliQueryResultIterator;
@@ -99,6 +100,7 @@ class EntityProvider {
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
+  friend class TokenReader;
   friend class UseIteratorImpl;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
@@ -175,7 +177,7 @@ class EntityProvider {
 };
 
 using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
-                                   Token, TokenSubstitution,
+                                   Token, MacroSubstitution,
                                    Designator, Fragment, File>;
 
 // Access to the indexed code.

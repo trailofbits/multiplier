@@ -6,6 +6,8 @@
 
 #include "Util.h"
 
+#include <glog/logging.h>
+
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Attr.h>
 #include <clang/AST/Decl.h>
@@ -223,18 +225,30 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   switch (entity.Role()) {
-    case pasta::TokenRole::kBeginOfFileMarker:
-      return mx::TokenKind::BEGIN_OF_FILE_MARKER;
-    case pasta::TokenRole::kEndOfFileMarker:
-      return mx::TokenKind::END_OF_FILE_MARKER;
-    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-      return mx::TokenKind::BEGIN_OF_MACRO_EXPANSION_MARKER;
-    case pasta::TokenRole::kEndOfMacroExpansionMarker:
-      return mx::TokenKind::END_OF_MACRO_EXPANSION_MARKER;
     default:
       break;
+
+    case pasta::TokenRole::kBeginOfFileMarker:
+    case pasta::TokenRole::kEndOfFileMarker:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      LOG(ERROR)
+          << "Should not be serializing marker tokens";
+      return mx::TokenKind::UNKNOWN;
   }
   auto kind = mx::FromPasta(entity.Kind());
+  if (kind == mx::TokenKind::UNKNOWN) {
+    if (IsWhitespaceOrEmpty(entity.Data())) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return kind;
+}
+
+
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
+  auto kind = mx::FromPasta(entity.TokenKind());
   if (kind == mx::TokenKind::UNKNOWN) {
     if (IsWhitespaceOrEmpty(entity.Data())) {
       return mx::TokenKind::WHITESPACE;

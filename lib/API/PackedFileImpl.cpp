@@ -15,8 +15,10 @@ PackedFileImpl::PackedFileImpl(
     RawEntityId id_, EntityProvider::Ptr ep_, const capnp::Data::Reader &reader_)
     : FileImpl(id_, std::move(ep_)),
       package(reader_),
-      reader(package.Reader<rpc::File>()),
-      num_tokens(reader.getTokenKinds().size()) {}
+      reader(package.Reader<rpc::File>()) {
+
+  this->num_tokens = reader.getTokenKinds().size();
+}
 
 // Return the data of the file.
 std::string_view PackedFileImpl::Data(void) const {
@@ -56,6 +58,11 @@ std::string_view PackedFileImpl::NthTokenData(unsigned token_index) const {
   }
 }
 
+// Return the id of the token from which the Nth token is derived.
+EntityId PackedFileImpl::NthDerivedTokenId(unsigned) const {
+  return kInvalidEntityId;
+}
+
 // Return the id of the Nth token.
 EntityId PackedFileImpl::NthTokenId(unsigned token_index) const {
   if (token_index < num_tokens) {
@@ -73,16 +80,10 @@ EntityId PackedFileImpl::NthFileTokenId(unsigned token_index) const {
   return NthTokenId(token_index);
 }
 
-// Return the token reader for another file.
-TokenReader::Ptr PackedFileImpl::ReaderForFile(const TokenReader::Ptr &self,
-                                               RawEntityId fid) const {
-  if (fid == file_id) {
-    return self;
-  } else if (FileImpl::Ptr ptr = ep->FileFor(ep, fid)) {
-    return ptr->TokenReader(ptr);
-  } else {
-    return {};
-  }
+// Return the token reader for another file/fragment.
+TokenReader::Ptr PackedFileImpl::ReaderForToken(const TokenReader::Ptr &self,
+                                                RawEntityId eid) const {
+  return TokenReader::ReaderForToken(self, ep, eid);
 }
 
 // Returns `true` if `this` is logically equivalent to `that`.

@@ -14,7 +14,7 @@
 #include <tuple>
 
 namespace mx {
-enum class TokenSubstitutionKind : unsigned char;
+enum class MacroSubstitutionKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
@@ -39,10 +39,10 @@ class TokenTreeNode {
   std::optional<pasta::MacroToken> MacroToken(void) const noexcept;
   std::optional<pasta::Token> Token(void) const noexcept;
   
-  std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree, TokenTree>>
+  std::optional<std::tuple<mx::MacroSubstitutionKind, TokenTree, TokenTree>>
   MaybeSubstitution(void) const noexcept;
 
-  std::optional<std::tuple<mx::TokenSubstitutionKind, TokenTree>>
+  std::optional<std::tuple<mx::MacroSubstitutionKind, TokenTree>>
   MaybeSubTree(void) const noexcept;
 };
 
@@ -95,7 +95,8 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static mx::Result<TokenTree, std::string>
-  Create(pasta::TokenRange range, uint64_t begin_index, uint64_t end_index);
+  Create(pasta::TokenRange range, uint64_t begin_index, uint64_t end_index,
+         bool fallback=false);
 
   TokenTreeNodeIterator begin(void) const noexcept;
   inline TokenTreeNodeIteratorEnd end(void) const noexcept {
@@ -104,6 +105,10 @@ class TokenTree {
 
   // Return the number of nodes in this tree.
   unsigned NumNodes(void) const noexcept;
+
+  inline const void *RawNode(void) const {
+    return impl.get();
+  }
 };
 
 }  // namespace indexer

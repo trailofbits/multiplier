@@ -21,10 +21,10 @@ void HighlightToken(std::ostream &os, mx::Token token);
 
 void PrintToken(std::ostream &os, mx::Token token);
 
-bool ContainsHighlightedTokens(mx::TokenSubstitutionList nodes,
+bool ContainsHighlightedTokens(mx::MacroSubstitutionList nodes,
                                const mx::TokenRange &entity_tokens);
 
-void PrintUnparsedTokens(std::ostream &os, mx::TokenSubstitutionList nodes,
+void PrintUnparsedTokens(std::ostream &os, mx::MacroSubstitutionList nodes,
                          const mx::TokenRange &entity_tokens=mx::TokenRange(),
                          bool force_highlight=false);
 

@@ -43,16 +43,15 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
-bool ContainsHighlightedTokens(mx::TokenSubstitutionList nodes,
+bool ContainsHighlightedTokens(mx::MacroSubstitutionList nodes,
                                const mx::TokenRange &entity_tokens) {
   for (auto node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
       if (entity_tokens.index_of(std::get<mx::Token>(node))) {
         return true;
       }
-    } else {
-      if (ContainsHighlightedTokens(
-              std::get<mx::TokenSubstitution>(node).after(), entity_tokens)) {
+    } else if (auto after = std::get<mx::MacroSubstitution>(node).after()) {
+      if (ContainsHighlightedTokens(*after, entity_tokens)) {
         return true;
       }
     }
@@ -60,7 +59,10 @@ bool ContainsHighlightedTokens(mx::TokenSubstitutionList nodes,
   return false;
 }
 
-void PrintUnparsedTokens(std::ostream &os, mx::TokenSubstitutionList nodes,
+// TODO(pag): This whole thing is broken, because you can't ask top-down if a
+//            parsed token is inside of a substitution; you can only ask if a
+//            token derived from a parsed token is in the right range.
+void PrintUnparsedTokens(std::ostream &os, mx::MacroSubstitutionList nodes,
                          const mx::TokenRange &entity_tokens,
                          bool force_highlight) {
   for (auto node : nodes) {
@@ -72,11 +74,15 @@ void PrintUnparsedTokens(std::ostream &os, mx::TokenSubstitutionList nodes,
         PrintToken(os, std::move(token));
       }
     } else {
-      auto sub = std::get<mx::TokenSubstitution>(node);
-      PrintUnparsedTokens(
-          os, sub.before(), entity_tokens,
-          (force_highlight ||
-           ContainsHighlightedTokens(sub.after(), entity_tokens)));
+      auto sub = std::get<mx::MacroSubstitution>(node);
+      auto sub_force_highlight = force_highlight;
+      if (!sub_force_highlight) {
+        if (auto after = sub.after()) {
+          sub_force_highlight = ContainsHighlightedTokens(
+              *after, entity_tokens);
+        }
+      }
+      PrintUnparsedTokens(os, sub.before(), entity_tokens, sub_force_highlight);
     }
   }
 }
@@ -92,7 +98,11 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
   auto line_number = location->first;
   std::stringstream ss;
   std::string sep = indent;
-  PrintUnparsedTokens(ss, fragment.substitutions(), entity_tokens);
+  if (auto pp_code = fragment.preprocessed_code()) {
+    PrintUnparsedTokens(ss, pp_code->before(), entity_tokens);
+  } else {
+    // TODO(pag): Do this.
+  }
   auto render_line_number = print_line_numbers;
 
   if (print_line_numbers) {

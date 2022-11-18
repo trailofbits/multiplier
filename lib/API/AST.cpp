@@ -7128,10 +7128,6 @@ const char *EnumeratorName(TokenKind e) {
     case TokenKind::OBJC_AT_DYNAMIC: return "OBJC_AT_DYNAMIC";
     case TokenKind::OBJC_AT_IMPORT: return "OBJC_AT_IMPORT";
     case TokenKind::OBJC_AT_AVAILABLE: return "OBJC_AT_AVAILABLE";
-    case TokenKind::BEGIN_OF_FILE_MARKER: return "BEGIN_OF_FILE_MARKER";
-    case TokenKind::END_OF_FILE_MARKER: return "END_OF_FILE_MARKER";
-    case TokenKind::BEGIN_OF_MACRO_EXPANSION_MARKER: return "BEGIN_OF_MACRO_EXPANSION_MARKER";
-    case TokenKind::END_OF_MACRO_EXPANSION_MARKER: return "END_OF_MACRO_EXPANSION_MARKER";
     default: return "<invalid>";
   }
 }
