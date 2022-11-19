@@ -223,6 +223,9 @@ static void PersistTokens(EntityMapper &em, const pasta::TokenRange &tokens,
     //
     // NOTE(pag): This means that `PackedFragmentImpl::NthTokenData` needs
     //            to account for this additional space.
+    //
+    // NOTE(pag): This means parsed tokens, even if empty, will have unique
+    //            data pointers.
     utf8_fragment_data.push_back(' ');
 
     ++next_tok_offset;
@@ -425,6 +428,9 @@ static void PersistTokenTree(EntityMapper &em,
         eid = em.EntityId(*ft);
       }
 
+      dtb.set(next_tok_offset, eid);
+      tob.set(next_tok_offset, static_cast<uint32_t>(utf8_macro_data.size()));
+
       mx::TokenKind kind = mx::TokenKind::UNKNOWN;
       if (pt) {
         AccumulateTokenData(utf8_macro_data, *pt);
@@ -437,8 +443,6 @@ static void PersistTokenTree(EntityMapper &em,
         kind = TokenKindFromPasta(*mt);
       }
 
-      dtb.set(next_tok_offset, eid);
-      tob.set(next_tok_offset, static_cast<uint32_t>(utf8_macro_data.size()));
       tkb.set(next_tok_offset, static_cast<uint16_t>(kind));
 
       // Recreate it; it should match what we did in `CountSubstitutions`.

@@ -81,9 +81,12 @@ std::string_view PackedFragmentImpl::NthTokenData(unsigned token_index) const {
   auto bo = tor[token_index];
   auto eo = tor[token_index + 1u];
 
+  // Parsed tokens are serialized to be followed by spaces.
+  auto diff = token_index < num_parsed_tokens ? 1u : 0u;
+
   // NOTE(pag): Extra space is added after tokens in the indexer.
   return std::string_view(&(reader.getTokenData().cStr()[bo]),
-                          eo - bo - 1u);
+                          (eo - bo) - diff);
 }
 
 // Return the id of the token from which the Nth token is derived.

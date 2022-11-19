@@ -25,14 +25,11 @@
 # define D(...)
 #endif
 
-#ifdef assert
-# undef assert
-#endif
-
-#define TT_STR(x) #x
+#define TT_STR_(x) #x
+#define TT_STR(x) TT_STR_(x)
 #define TT_ASSERT(cond) \
-  D(assert(cond)); \
   if (!(cond)) { \
+    assert(false);
     throw "Failed assertion " #cond " at " __FILE__ ":" TT_STR(__LINE__) ; \
   }
 

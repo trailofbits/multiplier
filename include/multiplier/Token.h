@@ -260,6 +260,17 @@ class TokenRange {
   std::optional<unsigned> index_of(const Token &that) const noexcept;
 
   // Convert this token range into a file token range.
+  //
+  // NOTE(pag): This will not always work because it will use the derived token
+  //            chain to locate the begin/end, and those may not represent the
+  //            actual bounds of the entity. Consider the following macro:
+  //
+  //                #define DECLARE(end, name, type) type name end
+  //                DECLARE(;, foo, int)
+  //
+  //            Here, the file token from which the end of the parsed token
+  //            range is derived is the `;`, which precedes the file token
+  //            derived from the first parsed token, `int`.
   TokenRange file_tokens(void) const noexcept;
 
   // Strip leading and trailing whitespace.
