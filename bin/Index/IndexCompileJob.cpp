@@ -614,10 +614,10 @@ static std::vector<PendingFragment> CreatePendingFragments(
   pending_fragments.reserve(decl_group_ranges.size());
 
   for (std::vector<DeclGroupRange>::reverse_iterator
-		       it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
+       it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-	DeclGroupRange &group = *it;
+    DeclGroupRange &group = *it;
     std::vector<pasta::Decl> decls_for_group = std::move(std::get<0u>(group));
     uint64_t begin_index = std::get<1u>(group);
     uint64_t end_index = std::get<2u>(group);

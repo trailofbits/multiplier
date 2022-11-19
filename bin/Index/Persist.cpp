@@ -313,8 +313,9 @@ static void BackupPersistMacroTokens(
 
   // Make sure that we add a final ending offset for token data.
   tob.set(next_token_index, static_cast<unsigned>(utf8_fragment_data.size()));
+  utf8_fragment_data.push_back('\0');
 
-  fb.setTokenData(std::move(utf8_fragment_data));
+  fb.setTokenData(utf8_fragment_data);
 }
 
 struct PersistTokenTreeWork {
@@ -543,8 +544,9 @@ static void PersistTokenTree(EntityMapper &em, mx::rpc::Fragment::Builder &fb,
   // Make sure that we add a final ending offset for token data.
   CHECK_EQ(next_token_index, num_macro_tokens);
   tob.set(next_token_index, static_cast<unsigned>(utf8_fragment_data.size()));
+  utf8_fragment_data.push_back('\0');
 
-  fb.setTokenData(std::move(utf8_fragment_data));
+  fb.setTokenData(utf8_fragment_data);
 }
 
 // Find the entity id of `canon_decl` that resides in the current fragment

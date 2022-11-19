@@ -6,6 +6,7 @@
 
 #include "TokenTree.h"
 
+#include <cassert>
 #include <deque>
 #include <glog/logging.h>
 #include <multiplier/Types.h>
@@ -20,7 +21,7 @@
 
 #include <iostream>
 
-#define D(...) __VA_ARGS__
+//#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
