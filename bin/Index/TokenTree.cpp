@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-//#define D(...) __VA_ARGS__
+#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
@@ -29,7 +29,7 @@
 #define TT_STR(x) TT_STR_(x)
 #define TT_ASSERT(cond) \
   if (!(cond)) { \
-    assert(false);
+    assert(false); \
     throw "Failed assertion " #cond " at " __FILE__ ":" TT_STR(__LINE__) ; \
   }
 
