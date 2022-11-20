@@ -166,13 +166,14 @@ std::optional<Token> Token::derived_token(void) const {
 // or macro token, then this will walk the derivation chain back to a file
 // token.
 std::optional<Token> Token::file_token(void) const {
-  VariantId vid = EntityId(impl->NthFileTokenId(offset)).Unpack();
+  EntityId eid(impl->NthFileTokenId(offset));
+  VariantId vid = eid.Unpack();
   if (!std::holds_alternative<FileTokenId>(vid)) {
     return std::nullopt;
   }
 
   FileTokenId fid = std::get<FileTokenId>(vid);
-  auto fr = impl->ReaderForToken(impl, fid.file_id);
+  auto fr = impl->ReaderForToken(impl, eid);
   if (!fr) {
     return std::nullopt;
   }
@@ -385,7 +386,8 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);
       if (fid.file_id == file_id) {
-        ret.num_tokens = fid.offset + 1u;
+        ret.num_tokens = std::max(ret.index, fid.offset) + 1u;
+        ret.index = std::min(ret.index, fid.offset);
         return ret;
       }
     }
@@ -401,8 +403,12 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);
       if (fid.file_id == file_id) {
-        ret.num_tokens = fid.offset + offset_shift;
-        return ret;
+        if (fid.offset >= ret.index) {
+          ret.num_tokens = fid.offset + offset_shift;
+          return ret;
+        } else {
+          break;  // TODO(pag): Come up with a better thing.
+        }
       }
     }
     offset_shift = 1u;

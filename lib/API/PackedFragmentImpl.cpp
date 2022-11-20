@@ -112,11 +112,8 @@ EntityId PackedFragmentImpl::NthTokenId(unsigned token_index) const {
 }
 
 EntityId PackedFragmentImpl::NthFileTokenId(unsigned token_index) const {
-  auto prev_token_index = num_tokens;
   auto dt = reader.getDerivedTokenIds();
-  while (token_index < prev_token_index) {
-    prev_token_index = token_index;
-
+  for (;;) {
     mx::EntityId eid(dt[token_index]);
     mx::VariantId vid = eid.Unpack();
     if (std::holds_alternative<mx::FileTokenId>(vid)) {
