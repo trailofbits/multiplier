@@ -37,7 +37,7 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   FilePathList ListFiles(const Ptr &) final;
 
-  std::vector<RawEntityId> ListFragmentsInFile(const Ptr &, RawEntityId id);
+  std::vector<EntityId> ListFragmentsInFile(const Ptr &, RawEntityId id);
 
   std::shared_ptr<const FileImpl> FileFor(const Ptr &, RawEntityId id) final;
 

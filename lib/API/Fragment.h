@@ -19,10 +19,10 @@ class FragmentListImpl {
   const EntityProvider::Ptr ep;
 
   // List of fragment IDs.
-  std::vector<RawEntityId> fragment_ids;
+  std::vector<EntityId> fragment_ids;
 
   inline FragmentListImpl(EntityProvider::Ptr ep_,
-                          std::vector<RawEntityId> fragment_ids_)
+                          std::vector<EntityId> fragment_ids_)
       : ep(std::move(ep_)),
         fragment_ids(std::move(fragment_ids_)) {}
 };

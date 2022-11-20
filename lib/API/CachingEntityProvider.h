@@ -40,7 +40,7 @@ class CachingEntityProvider final : public EntityProvider {
   std::unordered_map<RawEntityId, FileImpl::WeakPtr> files;
 
   // Cached list of fragments inside of files.
-  std::unordered_map<RawEntityId, std::vector<RawEntityId>> file_fragments;
+  std::unordered_map<RawEntityId, std::vector<EntityId>> file_fragments;
 
   // Cached redeclarations/references/uses.
   std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
@@ -68,11 +68,9 @@ class CachingEntityProvider final : public EntityProvider {
 
   FilePathList ListFiles(const Ptr &) final;
 
-  std::vector<RawEntityId> ListFragmentsInFile(
-      const Ptr &, RawEntityId id) final;
+  std::vector<EntityId> ListFragmentsInFile(const Ptr &, RawEntityId id) final;
 
-  std::shared_ptr<const FileImpl> FileFor(
-      const Ptr &, RawEntityId id) final;
+  std::shared_ptr<const FileImpl> FileFor(const Ptr &, RawEntityId id) final;
 
   // Download a fragment by its unique ID.
   std::shared_ptr<const FragmentImpl>

@@ -60,7 +60,7 @@ FilePathList CachingEntityProvider::ListFiles(const Ptr &self) {
 }
 
 // Get the current list of fragment IDs associated with a file.
-std::vector<RawEntityId> CachingEntityProvider::ListFragmentsInFile(
+std::vector<EntityId> CachingEntityProvider::ListFragmentsInFile(
     const Ptr &self, RawEntityId id) {
   std::lock_guard<std::recursive_mutex> locker(lock);
   if (auto it = file_fragments.find(id); it != file_fragments.end()) {
