@@ -783,8 +783,9 @@ static void PersistTokenContexts(
       continue;
     }
 
+    tco_list.set(num_tokens, mx::kInvalidEntityId);
+
     std::optional<mx::rpc::TokenContext::Builder> tcb;
-    bool has_context = false;
     for (auto context = tok.Context(); context; context = context->Parent()) {
 
       pasta::TokenContext c = *context;
@@ -795,11 +796,10 @@ static void PersistTokenContexts(
 
       const PendingTokenContext &info = pc_it->second;
 
+      CHECK_LT(info.offset, num_contexts);
       if (!tcb) {
-        has_context = true;
         tco_list.set(num_tokens, (info.offset << 1u) | 1u);
       } else {
-        assert(has_context);
         tcb->setParentIndex((info.offset << 1u) | 1u);
       }
 
@@ -808,15 +808,14 @@ static void PersistTokenContexts(
       tcb.reset();
       tcb.emplace(tcb_list[info.offset]);
       tcb->setEntityId(info.entity_id);
+      tcb->setParentIndex(0u);
 
       if (info.is_alias) {
+        CHECK_LT(info.alias_offset, num_contexts);
         tcb->setAliasIndex((info.alias_offset << 1u) | 1u);
+      } else {
+        tcb->setAliasIndex(0u);
       }
-    }
-
-    // Didn't get any contexts for this token.
-    if (!has_context) {
-      tco_list.set(num_tokens, 0u);
     }
 
     ++num_tokens;
