@@ -33,7 +33,7 @@ target_compile_features("${exe_name}"
 # needs to know the actual include directories of Multiplier and its
 # dependencies. We pass those in at the first two arguments.
 set(install_include_dir "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
-set(dependencies_include_dir "${VCPKG_ROOT_INSTALL_DIR}/${VCPKG_TARGET_TRIPLET}/${CMAKE_INSTALL_INCLUDEDIR}")
+list(GET LLVM_INCLUDE_DIRS 0 dependencies_include_dir)
 
 set(generated_files
   "${MX_BOOTSTRAP_LIB_COMMON_AST_CAPNP}"

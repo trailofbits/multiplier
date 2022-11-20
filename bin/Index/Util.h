@@ -16,6 +16,7 @@ namespace pasta {
 class AST;
 class Decl;
 class FileToken;
+class MacroToken;
 class Stmt;
 class Token;
 class Type;
@@ -24,6 +25,12 @@ namespace mx {
 enum class TokenKind : unsigned short;
 }  // namespace mx
 namespace indexer {
+
+// Tell us if this was a token that was actually parsed, and thus should have
+// a fragment token ID.
+//
+// NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
+bool IsParsedToken(const pasta::Token &tok);
 
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl);
@@ -38,6 +45,9 @@ std::string PrefixedLocation(const pasta::Decl &decl, const char *prefix=" ");
 
 // Returns `true` if `data` contains only whitespace or is empty.
 bool IsWhitespaceOrEmpty(std::string_view data);
+
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity);
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity);

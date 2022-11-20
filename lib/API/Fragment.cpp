@@ -75,7 +75,7 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
   }
 }
 
-Fragment Fragment::containing(const TokenSubstitution &entity) {
+Fragment Fragment::containing(const MacroSubstitution &entity) {
   return Fragment(entity.impl);
 }
 
@@ -116,17 +116,29 @@ TokenRange Fragment::file_tokens(void) const {
       first_fid.offset, last_fid.offset + 1u);
 }
 
-// The range of parsed tokens in this fragment. This is equivalent to
-// `Token::in(fragment)`.
+// The range of parsed tokens in this fragment.
 TokenList Fragment::parsed_tokens(void) const {
-  return TokenList(impl->TokenReader(impl), impl->num_tokens);
+  return TokenList(impl->TokenReader(impl), impl->num_parsed_tokens);
 }
 
-// Return the list of token substitutions.
-TokenSubstitutionList Fragment::substitutions(void) const {
-  auto ret = std::make_shared<const TokenSubstitutionListImpl>(impl);
-  auto num_nodes = ret->nodes.size();
-  return TokenSubstitutionList(std::move(ret), num_nodes);
+// Return the pre-processed code from this fragment.
+std::optional<MacroSubstitution> Fragment::preprocessed_code(void) const & {
+  if (impl->Fragment().getHadSubstitutionError()) {
+    return std::nullopt;
+  } else {
+    return MacroSubstitution(
+        impl, 0u, MacroSubstitutionKind::PREPROCESSED_CODE);
+  }
+}
+
+// Return the pre-processed code from this fragment.
+std::optional<MacroSubstitution> Fragment::preprocessed_code(void) const && {
+  if (impl->Fragment().getHadSubstitutionError()) {
+    return std::nullopt;
+  } else {
+    return MacroSubstitution(
+        std::move(impl), 0u, MacroSubstitutionKind::PREPROCESSED_CODE);
+  }
 }
 
 // Return the list of top-level declarations in this fragment.

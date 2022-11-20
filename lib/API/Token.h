@@ -25,6 +25,9 @@ class TokenReader {
   // Return the data of the Nth token.
   virtual std::string_view NthTokenData(unsigned token_index) const = 0;
 
+  // Return the id of the token from which the Nth token is derived.
+  virtual EntityId NthDerivedTokenId(unsigned token_index) const = 0;
+
   // Return the id of the Nth token.
   virtual EntityId NthTokenId(unsigned token_index) const = 0;
 
@@ -34,28 +37,31 @@ class TokenReader {
   // is the file token associated with the file token, if any.
   virtual EntityId NthFileTokenId(unsigned token_index) const = 0;
 
-  // Return the token reader for another file. Returns a null reader on
+  // Return the token reader for another token. Returns a null reader on
   // failure.
-  virtual Ptr ReaderForFile(const Ptr &self, RawEntityId id) const = 0;
+  virtual Ptr ReaderForToken(const Ptr &self, RawEntityId id) const = 0;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   virtual bool Equals(const TokenReader *that) const = 0;
+
+  static Ptr ReaderForToken(const Ptr &self, const EntityProvider::Ptr &ep,
+                            EntityId eid);
 };
 
 struct BeforeTag {};
 struct AfterTag {};
 
-class TokenSubstitutionListImpl {
+class MacroSubstitutionListImpl {
  public:
   const std::shared_ptr<const FragmentImpl> fragment;
   const NodeReader nodes;
 
-  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_);
+  MacroSubstitutionListImpl(void) = delete;
 
-  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+  MacroSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
                             unsigned offset, BeforeTag);
 
-  TokenSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
+  MacroSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
                             unsigned offset, AfterTag);
 };
 
@@ -73,12 +79,15 @@ class InvalidTokenReader final : public TokenReader {
   // Return the data of the Nth token.
   std::string_view NthTokenData(unsigned) const final;
 
+  // Return the id of the token from which the Nth token is derived.
+  EntityId NthDerivedTokenId(unsigned) const;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;
   EntityId NthFileTokenId(unsigned token_index) const final;
 
   // Return the token reader for another file.
-  Ptr ReaderForFile(const Ptr &self, RawEntityId id) const final;
+  Ptr ReaderForToken(const Ptr &self, RawEntityId id) const final;
   
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const TokenReader *) const final;

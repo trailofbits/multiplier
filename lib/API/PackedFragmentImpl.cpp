@@ -26,7 +26,16 @@ PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
   num_types = reader.getTypes().size();
   num_attrs = reader.getAttributes().size();
   num_pseudos = reader.getOthers().size();
+  num_parsed_tokens = reader.getTokenContextOffsets().size();
   num_tokens = reader.getTokenKinds().size();
+  num_substitutions = reader.getSubstitutions().size();
+
+  assert(num_parsed_tokens <= num_tokens);
+  assert(num_tokens == reader.getDerivedTokenIds().size());
+  assert((num_tokens + 1u) == reader.getTokenOffsets().size());
+  assert(1u <= num_substitutions);
+  assert(num_parsed_tokens ==
+         reader.getSubstitutions()[0].getAfterIds().size());
 }
 
 // Return the ID of the file containing the first token.
@@ -49,7 +58,7 @@ TokenReader::Ptr PackedFragmentImpl::TokenReader(
   return TokenReader::Ptr(self, static_cast<const class TokenReader *>(this));
 }
 
-// Return the number of tokens in the file.
+// Return the number of tokens in the fragment.
 unsigned PackedFragmentImpl::NumTokens(void) const {
   return num_tokens;
 }
@@ -65,23 +74,34 @@ TokenKind PackedFragmentImpl::NthTokenKind(unsigned token_index) const {
 
 // Return the data of the Nth token.
 std::string_view PackedFragmentImpl::NthTokenData(unsigned token_index) const {
-  if (token_index < num_tokens) {
-    auto tor = reader.getTokenOffsets();
-    auto bo = tor[token_index];
-    auto eo = tor[token_index + 1u];
-
-    // NOTE(pag): Extra space is added after tokens in the indexer.
-    return std::string_view(&(reader.getParsedTokenData().cStr()[bo]),
-                            eo - bo - 1u);
-  } else {
+  if (token_index >= num_tokens) {
     return {};
+  }
+  auto tor = reader.getTokenOffsets();
+  auto bo = tor[token_index];
+  auto eo = tor[token_index + 1u];
+
+  // Parsed tokens are serialized to be followed by spaces.
+  auto diff = token_index < num_parsed_tokens ? 1u : 0u;
+
+  // NOTE(pag): Extra space is added after tokens in the indexer.
+  return std::string_view(&(reader.getTokenData().cStr()[bo]),
+                          (eo - bo) - diff);
+}
+
+// Return the id of the token from which the Nth token is derived.
+EntityId PackedFragmentImpl::NthDerivedTokenId(unsigned token_index) const {
+  if (token_index < num_tokens) {
+    return reader.getDerivedTokenIds()[token_index];
+  } else {
+    return kInvalidEntityId;
   }
 }
 
 // Return the id of the Nth token.
 EntityId PackedFragmentImpl::NthTokenId(unsigned token_index) const {
   if (token_index < num_tokens) {
-    FragmentTokenId id;
+    ParsedTokenId id;
     id.fragment_id = this->fragment_id;
     id.offset = token_index;
     id.kind = static_cast<TokenKind>(reader.getTokenKinds()[token_index]);
@@ -92,22 +112,55 @@ EntityId PackedFragmentImpl::NthTokenId(unsigned token_index) const {
 }
 
 EntityId PackedFragmentImpl::NthFileTokenId(unsigned token_index) const {
-  if (token_index < num_tokens) {
-    return reader.getFileTokenIds()[token_index];
-  } else {
-    return kInvalidEntityId;
+  auto prev_token_index = num_tokens;
+  auto dt = reader.getDerivedTokenIds();
+  while (token_index < prev_token_index) {
+    prev_token_index = token_index;
+
+    mx::EntityId eid(dt[token_index]);
+    mx::VariantId vid = eid.Unpack();
+    if (std::holds_alternative<mx::FileTokenId>(vid)) {
+      return eid;
+    } else if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
+      mx::ParsedTokenId fid = std::get<mx::ParsedTokenId>(vid);
+      if (fid.fragment_id == fragment_id) {
+        token_index = fid.offset;  // Follow to the next one.
+
+      } else if (FragmentImpl::Ptr frag = ep->FragmentFor(ep, fid.fragment_id)) {
+        assert(false);
+        return frag->TokenReader(frag)->NthFileTokenId(fid.offset);
+      } else {
+        assert(false);
+        return kInvalidEntityId;
+      }
+
+    } else if (std::holds_alternative<mx::MacroTokenId>(vid)) {
+      mx::MacroTokenId fid = std::get<mx::MacroTokenId>(vid);
+      if (fid.fragment_id == fragment_id) {
+        token_index = fid.offset;  // Follow to the next one.
+
+      } else if (FragmentImpl::Ptr frag = ep->FragmentFor(ep, fid.fragment_id)) {
+        assert(false);
+        return frag->TokenReader(frag)->NthFileTokenId(fid.offset);
+      } else {
+        assert(false);
+        return kInvalidEntityId;
+      }
+
+    } else {
+      assert(std::holds_alternative<mx::InvalidId>(vid));
+      return kInvalidEntityId;
+    }
   }
+
+  assert(false);
+  return kInvalidEntityId;
 }
 
 // Return the token reader for another file.
-TokenReader::Ptr PackedFragmentImpl::ReaderForFile(
-    const TokenReader::Ptr &self, RawEntityId file_id) const {
-  FileImpl::Ptr ptr = ep->FileFor(ep, file_id);
-  if (ptr) {
-    return ptr->TokenReader(ptr);
-  } else {
-    return {};
-  }
+TokenReader::Ptr PackedFragmentImpl::ReaderForToken(
+    const TokenReader::Ptr &self, RawEntityId eid) const {
+  return TokenReader::ReaderForToken(self, ep, eid);
 }
 
 // Returns `true` if `this` is logically equivalent to `that`.
@@ -161,9 +214,9 @@ std::string_view PackedFragmentImpl::SourceIR(void) const {
 }
 
 std::string_view PackedFragmentImpl::Data(void) const {
-  if (reader.hasParsedTokenData()) {
-    return std::string_view(reader.getParsedTokenData().cStr(),
-                            reader.getParsedTokenData().size());
+  if (reader.hasTokenData()) {
+    return std::string_view(reader.getTokenData().cStr(),
+                            reader.getTokenData().size());
   } else {
     return {};
   }

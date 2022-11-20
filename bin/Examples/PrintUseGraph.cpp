@@ -36,8 +36,8 @@ KindAndColor(mx::RawEntityId id) {
     auto eid = std::get<mx::TypeId>(vid);
     return {mx::EnumeratorName(eid.kind), "cadetblue1"};
 
-  } else if (std::holds_alternative<mx::FragmentTokenId>(vid)) {
-    auto eid = std::get<mx::FragmentTokenId>(vid);
+  } else if (std::holds_alternative<mx::ParsedTokenId>(vid)) {
+    auto eid = std::get<mx::ParsedTokenId>(vid);
     return {mx::EnumeratorName(eid.kind), "deepskyblue3"};
 
   } else if (std::holds_alternative<mx::FileTokenId>(vid)) {

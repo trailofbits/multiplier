@@ -104,17 +104,17 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
     ptr = impl->FragmentFor(
         impl, std::get<mx::AttributeId>(opt_id).fragment_id);
 
-  } else if (std::holds_alternative<mx::FragmentTokenId>(opt_id)) {
+  } else if (std::holds_alternative<mx::ParsedTokenId>(opt_id)) {
     ptr = impl->FragmentFor(
-        impl, std::get<mx::FragmentTokenId>(opt_id).fragment_id);
+        impl, std::get<mx::ParsedTokenId>(opt_id).fragment_id);
 
   } else if (std::holds_alternative<mx::DesignatorId>(opt_id)) {
     ptr = impl->FragmentFor(
         impl, std::get<mx::DesignatorId>(opt_id).fragment_id);
 
-  } else if (std::holds_alternative<mx::TokenSubstitutionId>(opt_id)) {
+  } else if (std::holds_alternative<mx::MacroSubstitutionId>(opt_id)) {
     ptr = impl->FragmentFor(
-        impl, std::get<mx::TokenSubstitutionId>(opt_id).fragment_id);
+        impl, std::get<mx::MacroSubstitutionId>(opt_id).fragment_id);
   }
 
   if (ptr) {
@@ -133,14 +133,13 @@ VariantEntity Index::entity(EntityId eid) const {
   if (std::holds_alternative<DeclarationId>(vid)) {
     DeclarationId id = std::get<DeclarationId>(vid);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
-      if (id.offset < frag_ptr->num_decls) {
-        Decl decl(std::move(frag_ptr), id.offset);
-        if (decl.id() == eid) {
-          return decl;
-        } else {
-          assert(false);
-        }
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_decls) {
+      Decl decl(std::move(frag_ptr), id.offset);
+      if (decl.id() == eid) {
+        return decl;
+      } else {
+        assert(false);
       }
     }
 
@@ -148,14 +147,13 @@ VariantEntity Index::entity(EntityId eid) const {
   } else if (std::holds_alternative<StatementId>(vid)) {
     StatementId id = std::get<StatementId>(vid);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
-      if (id.offset < frag_ptr->num_stmts) {
-        Stmt stmt(std::move(frag_ptr), id.offset);
-        if (stmt.id() == eid) {
-          return stmt;
-        } else {
-          assert(false);
-        }
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_stmts) {
+      Stmt stmt(std::move(frag_ptr), id.offset);
+      if (stmt.id() == eid) {
+        return stmt;
+      } else {
+        assert(false);
       }
     }
 
@@ -163,14 +161,13 @@ VariantEntity Index::entity(EntityId eid) const {
   } else if (std::holds_alternative<TypeId>(vid)) {
     TypeId id = std::get<TypeId>(vid);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
-      if (id.offset < frag_ptr->num_types) {
-        Type type(std::move(frag_ptr), id.offset);
-        if (type.id() == eid) {
-          return type;
-        } else {
-          assert(false);
-        }
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_types) {
+      Type type(std::move(frag_ptr), id.offset);
+      if (type.id() == eid) {
+        return type;
+      } else {
+        assert(false);
       }
     }
 
@@ -178,55 +175,66 @@ VariantEntity Index::entity(EntityId eid) const {
   } else if (std::holds_alternative<AttributeId>(vid)) {
     AttributeId id = std::get<AttributeId>(vid);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
-      if (id.offset < frag_ptr->num_attrs) {
-        Attr attr(std::move(frag_ptr), id.offset);
-        if (attr.id() == eid) {
-          return attr;
-        } else {
-          assert(false);
-        }
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_attrs) {
+      Attr attr(std::move(frag_ptr), id.offset);
+      if (attr.id() == eid) {
+        return attr;
+      } else {
+        assert(false);
       }
     }
 
-  // It's a reference to a fragment token.
-  } else if (std::holds_alternative<FragmentTokenId>(vid)) {
-    FragmentTokenId id = std::get<FragmentTokenId>(vid);
+  // It's a reference to a parsed token resident in a fragment.
+  } else if (std::holds_alternative<ParsedTokenId>(vid)) {
+    ParsedTokenId id = std::get<ParsedTokenId>(vid);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
-      auto tok_reader = frag_ptr->TokenReader(frag_ptr);
-      if (id.offset < tok_reader->NumTokens()) {
-        Token tok(std::move(tok_reader), id.offset);
-        if (tok.id() == eid) {
-          return tok;
-        } else {
-          assert(false);
-        }
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_parsed_tokens) {
+      Token tok(frag_ptr->TokenReader(frag_ptr), id.offset);
+      if (tok.id() == eid) {
+        return tok;
+      } else {
+        assert(false);
       }
     }
+
+  // It's a reference to a macro token resident in a fragment.
+  } else if (std::holds_alternative<MacroTokenId>(vid)) {
+    MacroTokenId id = std::get<MacroTokenId>(vid);
+    assert(id == EntityId(id));
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && frag_ptr->num_parsed_tokens <= id.offset &&
+        id.offset < frag_ptr->num_tokens) {
+      Token tok(frag_ptr->TokenReader(frag_ptr), id.offset);
+      if (tok.id() == eid) {
+        return tok;
+      } else {
+        assert(false);
+      }
+    }
+
 
   // It's a reference to a token substitution.
-  } else if (std::holds_alternative<TokenSubstitutionId>(vid)) {
-    TokenSubstitutionId id = std::get<TokenSubstitutionId>(vid);
+  } else if (std::holds_alternative<MacroSubstitutionId>(vid)) {
+    MacroSubstitutionId id = std::get<MacroSubstitutionId>(vid);
     assert(id == EntityId(id));
 
-    // TODO(pag): Bounds check.
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id)) {
-      return TokenSubstitution(frag_ptr, id.offset, id.kind);
+    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
+        frag_ptr && id.offset < frag_ptr->num_substitutions) {
+      return MacroSubstitution(frag_ptr, id.offset, id.kind);
     }
 
   // It's a reference to a file token.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
     FileTokenId id = std::get<FileTokenId>(vid);
-    if (FileImpl::Ptr file_ptr = impl->FileFor(impl, id.file_id)) {
-      auto tok_reader = file_ptr->TokenReader(file_ptr);
-      if (id.offset < tok_reader->NumTokens()) {
-        Token tok(std::move(tok_reader), id.offset);
-        if (tok.id() == eid) {
-          return tok;
-        } else {
-          assert(false);
-        }
+    if (FileImpl::Ptr file_ptr = impl->FileFor(impl, id.file_id);
+        file_ptr && id.offset < file_ptr->num_tokens) {
+      Token tok(file_ptr->TokenReader(file_ptr), id.offset);
+      if (tok.id() == eid) {
+        return tok;
+      } else {
+        assert(false);
       }
     }
   

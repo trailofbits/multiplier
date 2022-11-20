@@ -20,13 +20,13 @@ DECLARE_string(db);
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
 
-static void PrintUnparsedTokens(mx::TokenSubstitutionList nodes) {
+static void PrintUnparsedTokens(mx::MacroSubstitutionList nodes) {
   for (auto node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
       auto tok = std::get<mx::Token>(node);
       std::cout << tok.data();
     } else {
-      auto sub = std::get<mx::TokenSubstitution>(node);
+      auto sub = std::get<mx::MacroSubstitution>(node);
       PrintUnparsedTokens(sub.before());
     }
   }
@@ -99,7 +99,9 @@ extern "C" int main(int argc, char *argv[]) {
       }
       std::cout << "\n\n";
     }
-    PrintUnparsedTokens(frag.substitutions());
+    std::cerr << "TODO\n";
+    return EXIT_FAILURE;
+//    PrintUnparsedTokens(frag.substitutions());
     std::cout << "\n\n";
   }
   return EXIT_SUCCESS;

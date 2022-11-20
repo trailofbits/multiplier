@@ -297,6 +297,13 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 
   const auto max_tok_index = range.Size();
 
+  // TODO(pag): The following code doesn't handle something like:
+  //
+  //            enum Foo
+  //            #include "Foo_body.h"
+  //
+  //            Where `Foo`'s `;` is in `Foo_body.h`.
+
   // We should always at least hit the end of file marker token first.
   CHECK_LT(end_tok_index, max_tok_index);
 
@@ -314,24 +321,24 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         break;
       case pasta::TokenRole::kFileToken:
         if (CanElideTokenFromTLD(tok)) {
-          ++begin_tok_index;
+          ++begin_tok_index;  // Don't include it.
         } else {
           done = true;
         }
         break;
       case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-      case pasta::TokenRole::kBeginOfFileMarker:
         done = true;
         break;
+      case pasta::TokenRole::kBeginOfFileMarker:
       case pasta::TokenRole::kEndOfFileMarker:
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
-        ++begin_tok_index;
+        ++begin_tok_index;  // Don't include it.
         done = true;
         break;
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-        --begin_tok_index;
+        --begin_tok_index;  // Include it.
         break;
     }
   }
@@ -347,24 +354,24 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
         break;
       case pasta::TokenRole::kFileToken:
         if (CanElideTokenFromTLD(tok)) {
-          --end_tok_index;
+          --end_tok_index;  // Don't include it.
         } else {
           done = true;
         }
         break;
       case pasta::TokenRole::kEndOfMacroExpansionMarker:
-      case pasta::TokenRole::kEndOfFileMarker:
         done = true;
         break;
-      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
       case pasta::TokenRole::kBeginOfFileMarker:
-        --end_tok_index;
+      case pasta::TokenRole::kEndOfFileMarker:
+      case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+        --end_tok_index;  // Don't include it.
         done = true;
         break;
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-        ++end_tok_index;
+        ++end_tok_index;  // Include it.
         break;
     }
   }
@@ -596,22 +603,21 @@ static std::vector<DeclGroupRange> PartitionTLDs(
 // the redundant declarations that are likely to appear early in ASTs, i.e.
 // in `#include`d headers.
 static std::vector<PendingFragment> CreatePendingFragments(
-    mx::ProgressBar *identification_progress_bar, mx::WorkerId worker_id,
-    IndexingContext &context, EntityIdMap &entity_ids, FileHashMap &file_hashes,
-    const pasta::TokenRange &tok_range,
+    mx::WorkerId worker_id, IndexingContext &context, EntityIdMap &entity_ids,
+    FileHashMap &file_hashes, const pasta::TokenRange &tok_range,
     std::vector<DeclGroupRange> decl_group_ranges) {
 
   mx::ProgressBarWork identification_progress_tracker(
-      identification_progress_bar);
+      context.identification_progress.get());
 
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
   for (std::vector<DeclGroupRange>::reverse_iterator
-		  it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
+       it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-	DeclGroupRange &group = *it;
+    DeclGroupRange &group = *it;
     std::vector<pasta::Decl> decls_for_group = std::move(std::get<0u>(group));
     uint64_t begin_index = std::get<1u>(group);
     uint64_t end_index = std::get<2u>(group);
@@ -728,8 +734,8 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
   EntityIdMap entity_ids;
 
   std::vector<PendingFragment> pending_fragments = CreatePendingFragments(
-      context->identification_progress.get(), worker_id, *context,
-      entity_ids, file_hashes, tok_range, std::move(decl_group_ranges));
+      worker_id, *context, entity_ids, file_hashes, tok_range,
+      std::move(decl_group_ranges));
 
   // Serialize the new code chunks.
   mx::ProgressBarWork fragment_progress_tracker(

@@ -27,7 +27,7 @@ bool MayHaveRemoteRedeclarations(const mx::Decl &decl);
 bool MayHaveRemoteUses(const mx::Decl &decl);
 
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
-using TokenSubstitutionsReader = capnp::List<rpc::TokenSubstitution,
+using MacroSubstitutionsReader = capnp::List<rpc::MacroSubstitution,
                                              capnp::Kind::STRUCT>::Reader;
 using FragmentReader = rpc::Fragment::Reader;
 using DeclReader = ast::Decl::Reader;

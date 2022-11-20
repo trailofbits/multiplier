@@ -43,40 +43,6 @@ enum TargetLanguage @0xeabe5088e5bc86fc {
   cxx @1 $Cxx.name("cxx");
 }
 
-# # Must be kept in sync wiht `mx::TokenSubstitutionKind`.
-# enum TokenSubstitutionKind @0xa2f26f9d2081dec7 {
-#   
-#   otherDirective @0 $Cxx.name("other_directive");
-#   defineDirective @1 $Cxx.name("define_directive");
-#   undefDirective @2 $Cxx.name("undef_directive");
-#   pragmaDirective @3 $Cxx.name("pragma_directive");
-#   c99PragmaDirective @4 $Cxx.name("c99_pragma_directive");
-#   microsoftPragmaDirective @5 $Cxx.name("microsoft_pragma_directive");
-#   ifDirective @6 $Cxx.name("if_directive");
-#   ifdefDirective @7 $Cxx.name("ifdef_directive");
-#   ifndefDirective @8 $Cxx.name("ifndef_directive");
-#   elifDirective @9 $Cxx.name("elif_directive");
-#   elifdefDirective @10 $Cxx.name("elifdef_directive");
-#   elifndefDirective @11 $Cxx.name("elifndef_directive");
-#   elseDirective @12 $Cxx.name("else_directive");
-#   endifDirective @13 $Cxx.name("endif_directive");
-#   includeDirective @14 $Cxx.name("include_directive");
-#   macroDirective @15 $Cxx.name("macro_directive");
-#   macroParameterDirective @16 $Cxx.name("macro_parameter_directive");
-#   vaOptDirective @17 $Cxx.name("va_opt_directive");
-#   vaOptArgumentDirective @18 $Cxx.name("va_opt_argument_directive");
-#   macroArgumentDirective @19 $Cxx.name("macro_argument_directive");
-#   stringifyDirective @20 $Cxx.name("stringify_directive");
-#   concatenateDirective @21 $Cxx.name("concatenate_directive");
-#   substituteDirective @22 $Cxx.name("substitute_directive");
-# }
-
-struct TokenSubstitution @0xade5195a85fdc847 {
-  beforeTokens @0 :List(UInt64);
-  afterTokens @1 :List(UInt64);
-#  kind @2 :TokenSubstitutionKind;
-}
-
 struct IncludePath @0x8b7f7dfed6973665 {
   directory @0 :Text;
   location @1 :IncludePathLocation;
@@ -96,6 +62,26 @@ struct CompileCommand @0xab30180088262c95 {
   arguments @10 :List(Text);
   language @11 :TargetLanguage;
   compiler @12 :CompilerName;
+}
+
+struct MacroSubstitution @0xade5195a85fdc847 {
+  
+  # A mix of macro token IDs, file token IDs, and macro substitution IDs.
+  beforeIds @0 :List(UInt64);
+  
+  # The IDs of the replacement tokens for this substitution. This might be an
+  # invalid ID if there is no after.
+  afterIds @1 :List(UInt64);
+  
+  # `mx::MacroSubstitutionKind`.
+  kind @2 :UInt8;
+  
+  # The offsets of the begin / after-end token IDs of the macro tokens in
+  # a fragment. This can be used to form token ranges with the appropriate data.
+  firstBeforeTokenOffset @3 :UInt32;
+  afterFirstBeforeTokenOffset @4 :UInt32;
+  firstAfterTokenOffset @5 :UInt32;
+  afterLastAfterTokenOffset @6 :UInt32;
 }
 
 # Used to tell us the upper bound of something, e.g. the byte offsets of the
@@ -166,33 +152,50 @@ struct Fragment @0xe5f27760091f9a3a {
   # List of top-level declarations in this code chunk.
   topLevelDeclarations @8 :List(UInt64);
   
-  # List of token substitutions in this fragment.
-  tokenSubstitutions @9 :List(TokenSubstitution);
+  # List of token contexts. 
+  tokenContexts @9 :List(TokenContext);
+  
+  # List of offsets of token contexts for each of the tokens.
+  tokenContextOffsets @10 :List(UInt32);
   
   # The actual parsed tokens, as a text buffer. Each token is separated by a
   # single space. There are no newlines, except those that might be inside of
   # character/string literals.
-  parsedTokenData @10 :Text;
+  #
+  # The data of the macro tokens. For the following substition tree:
+  #
+  #                   A * C D
+  #                    / \
+  #                   B   E
+  #
+  # We lay out the data as follows:
+  #
+  #                   A B C D E
+  #
+  # The tokens associated with the data are laid out in the same order.
+  tokenData @11 :Text;
   
-  # List of parsed token kinds in this fragment.
-  tokenKinds @11 :List(UInt16);
-  
-  # List of offsets of the beginning of tokens. There is one extra element in
-  # here than there are tokens, which represents the size of the data.
+  # Offsets of the beginning of tokens into `tokenData`. There is one extra
+  # element in here than there are tokens, which represents the size of the data.
   tokenOffsets @12 :List(UInt32);
   
-  # List of token IDs for file tokens corresponding with the parsed tokens.
-  fileTokenIds @13 :List(UInt64);
+  # List of macro token kinds in this fragment.
+  tokenKinds @13 :List(UInt16);
   
-  # List of token contexts. 
-  tokenContexts @14 :List(TokenContext);
+  # Every macro token is associated with an ID. The id is one of:
+  #
+  #   - FileTokenId:         This macro token is derived from a file token.
+  #   - MacroTokenId:        This macro token is a copy of another macro token.
+  #   - MacroSubstitutionId: This macro token is derived in some way from its
+  #                          parent substitution. E.g. stringize, concat, etc.
+  derivedTokenIds @14 :List(UInt64);
   
-  # List of offsets of token contexts for each of the tokens.
-  tokenContextOffsets @15 :List(UInt32);
-  
-  # List of tokens/substitution IDs in the top level.
-  unparsedTokens @16 :List(UInt64);
+  # List of token substitutions in this fragment.
+  substitutions @15 :List(MacroSubstitution);
 
   # Source IR in text format
-  mlir @17 :Text;
+  mlir @16 :Text;
+  
+  # Was there an error when building out the token tree?
+  hadSubstitutionError @17 :Bool;
 }
