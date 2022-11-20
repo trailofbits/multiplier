@@ -242,11 +242,11 @@ FileList File::in(const Index &index) {
 }
 
 // Return the ID of this file.
-RawEntityId File::id(void) const noexcept {
+EntityId File::id(void) const noexcept {
   return EntityId(FileId{impl->file_id});
 }
 
-std::vector<RawEntityId> File::fragment_ids(void) const {
+std::vector<EntityId> File::fragment_ids(void) const {
   auto fragment_ids = impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
   for (auto &fragment_id : fragment_ids) {
     fragment_id = EntityId(FragmentId(fragment_id));

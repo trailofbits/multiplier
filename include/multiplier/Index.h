@@ -131,7 +131,7 @@ class EntityProvider {
   virtual FilePathList ListFiles(const Ptr &) = 0;
 
   // Download a list of fragment IDs contained in a specific file.
-  virtual std::vector<RawEntityId>
+  virtual std::vector<EntityId>
   ListFragmentsInFile(const Ptr &, RawEntityId id) = 0;
 
   // Download a file by its unique ID.

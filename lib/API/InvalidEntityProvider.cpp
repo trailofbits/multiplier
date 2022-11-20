@@ -26,7 +26,7 @@ FilePathList InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
-std::vector<RawEntityId> InvalidEntityProvider::ListFragmentsInFile(
+std::vector<EntityId> InvalidEntityProvider::ListFragmentsInFile(
     const Ptr &, RawEntityId) {
   return {};
 }

@@ -75,10 +75,10 @@ FilePathList SQLiteEntityProvider::ListFiles(const Ptr &) {
   return res;
 }
 
-std::vector<RawEntityId> SQLiteEntityProvider::ListFragmentsInFile(
+std::vector<EntityId> SQLiteEntityProvider::ListFragmentsInFile(
     const Ptr &, RawEntityId file_id) {
 
-  std::vector<mx::RawEntityId> fragment_ids;
+  std::vector<EntityId> fragment_ids;
   fragment_ids.reserve(128u);
 
   // Collect the fragments associated with this file.
@@ -86,7 +86,7 @@ std::vector<RawEntityId> SQLiteEntityProvider::ListFragmentsInFile(
       file_id,
       [file_id, &fragment_ids] (mx::RawEntityId found_file_id,
                                 mx::RawEntityId fragment_id) {
-        fragment_ids.push_back(fragment_id);
+        fragment_ids.emplace_back(fragment_id);
         return file_id == found_file_id;
       });
   return fragment_ids;
