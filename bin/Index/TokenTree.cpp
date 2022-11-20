@@ -2035,7 +2035,9 @@ bool TokenTreeImpl::FillMissingFileTokens(Substitution *sub,
     }
   }
 
-  TT_ASSERT(i <= max_i);  // Probably an infinite loop.
+  if (i > max_i) {
+    Die(this);  // Probably an infinite loop.
+  }
 
   return ret;
 }
