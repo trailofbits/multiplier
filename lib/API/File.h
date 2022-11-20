@@ -53,6 +53,9 @@ class FileImpl {
   // or look up entities related to other fragments.
   const EntityProvider::Ptr ep;
 
+  // Number of tokens in this file.
+  unsigned num_tokens{0u};
+
   virtual ~FileImpl(void) noexcept;
 
   inline FileImpl(RawEntityId id_, EntityProvider::Ptr ep_)
@@ -75,7 +78,6 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
  public:
   PackedReaderState package;
   const rpc::File::Reader reader;
-  const unsigned num_tokens;
 
   virtual ~PackedFileImpl(void) noexcept;
 
@@ -98,13 +100,16 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
   // Return the data of the Nth token.
   std::string_view NthTokenData(unsigned index) const final;
 
+  // Return the id of the token from which the Nth token is derived.
+  EntityId NthDerivedTokenId(unsigned token_index) const final;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;
   EntityId NthFileTokenId(unsigned token_index) const final;
 
-  // Return the token reader for another file.
-  TokenReader::Ptr ReaderForFile(const TokenReader::Ptr &self,
-                                 RawEntityId id) const final;
+  // Return the token reader for another file/fragment.
+  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
+                                  RawEntityId id) const final;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const final;

@@ -161,7 +161,7 @@ class File {
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
   friend class Token;
-  friend class TokenSubstitutionListIterator;
+  friend class MacroSubstitutionListIterator;
 
   Ptr impl;
 
@@ -180,7 +180,7 @@ class File {
   static File containing(const Fragment &fragment);
 
   // Return the file containing a specific token substitution.
-  static File containing(const TokenSubstitution &entity);
+  static File containing(const MacroSubstitution &entity);
 
   // Return the file containing a specific designator.
   static File containing(const Designator &entity);

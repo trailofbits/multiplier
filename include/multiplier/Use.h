@@ -24,7 +24,7 @@ class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
 class Token;
-class TokenSubstitution;
+class MacroSubstitution;
 class Type;
 
 using UseSelectorSet = std::bitset<256>;

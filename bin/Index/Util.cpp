@@ -6,6 +6,8 @@
 
 #include "Util.h"
 
+#include <glog/logging.h>
+
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Attr.h>
 #include <clang/AST/Decl.h>
@@ -27,6 +29,21 @@
 #include <sstream>
 
 namespace indexer {
+
+// Tell us if this was a token that was actually parsed, and thus should have
+// a fragment token ID.
+//
+// NOTE(pag): This logic is similarly reflected in `EntityLabeller::Label`.
+bool IsParsedToken(const pasta::Token &tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+      return true;
+
+    default:
+      return false;
+  }
+}
 
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl) {
@@ -223,18 +240,30 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   switch (entity.Role()) {
-    case pasta::TokenRole::kBeginOfFileMarker:
-      return mx::TokenKind::BEGIN_OF_FILE_MARKER;
-    case pasta::TokenRole::kEndOfFileMarker:
-      return mx::TokenKind::END_OF_FILE_MARKER;
-    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
-      return mx::TokenKind::BEGIN_OF_MACRO_EXPANSION_MARKER;
-    case pasta::TokenRole::kEndOfMacroExpansionMarker:
-      return mx::TokenKind::END_OF_MACRO_EXPANSION_MARKER;
     default:
       break;
+
+    case pasta::TokenRole::kBeginOfFileMarker:
+    case pasta::TokenRole::kEndOfFileMarker:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      LOG(ERROR)
+          << "Should not be serializing marker tokens";
+      return mx::TokenKind::UNKNOWN;
   }
   auto kind = mx::FromPasta(entity.Kind());
+  if (kind == mx::TokenKind::UNKNOWN) {
+    if (IsWhitespaceOrEmpty(entity.Data())) {
+      return mx::TokenKind::WHITESPACE;
+    }
+  }
+  return kind;
+}
+
+
+// Return the token kind.
+mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
+  auto kind = mx::FromPasta(entity.TokenKind());
   if (kind == mx::TokenKind::UNKNOWN) {
     if (IsWhitespaceOrEmpty(entity.Data())) {
       return mx::TokenKind::WHITESPACE;

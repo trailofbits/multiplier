@@ -616,7 +616,6 @@ class CodeGenerator {
   // We extend `TokenKind` with these.
   std::optional<pasta::EnumDecl> pp_keyword_kinds;
   std::optional<pasta::EnumDecl> objc_at_keywords;
-  std::optional<pasta::EnumDecl> token_role;
 
   std::unordered_map<std::string, std::pair<const char *, const char *>>
       enum_type;
@@ -779,7 +778,6 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
   if (enum_name == "TokenKind") {
     assert(pp_keyword_kinds.has_value());
     assert(objc_at_keywords.has_value());
-    assert(token_role.has_value());
     auto j = 0u;
     for (pasta::EnumConstantDecl val : pp_keyword_kinds->Enumerators()) {
       if (!j++) {
@@ -812,30 +810,6 @@ void CodeGenerator::RunOnEnum(pasta::EnumDecl enum_decl) {
       auto val_name = val.Name();
       assert(val_name[0] == 'k');
       val_name = "ObjcAt" + val_name.substr(1);
-
-      auto snake_name = CapitalCaseToSnakeCase(val_name);
-      auto enum_case = SnakeCaseToEnumCase(snake_name);
-
-      os << "  " << enum_case << ",\n";
-
-      name_cases_ss
-          << "    case " << enum_name << "::" << enum_case << ": return \""
-          << enum_case << "\";\n";
-
-      serialize_inc_os << "  MX_ENUM_CLASS_ENTRY(" << enum_name << ", " << enum_case << ", " << types.first << ")\n";
-      ++i;
-    }
-
-    // Token roles.
-    j = 0u;
-    for (pasta::EnumConstantDecl val : token_role->Enumerators()) {
-      auto val_name = val.Name();
-      if (!val_name.ends_with("Marker")) {
-        continue;
-      }
-
-      assert(val_name[0] == 'k');
-      val_name = val_name.substr(1);
 
       auto snake_name = CapitalCaseToSnakeCase(val_name);
       auto enum_case = SnakeCaseToEnumCase(snake_name);
@@ -3184,8 +3158,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       pp_keyword_kinds = tag;
     } else if (enum_name == "ObjCKeywordKind") {
       objc_at_keywords = tag;
-    } else if (enum_name == "TokenRole") {
-      token_role = tag;
     }
   }
 
@@ -3591,14 +3563,17 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  const auto command = maybe_command.TakeValue();
+  const pasta::CompileCommand command = maybe_command.TakeValue();
+
+  std::cerr << command.Arguments().Join() << "\n\n";
+
   auto maybe_jobs = maybe_compiler->CreateJobsForCommand(command);
   if (!maybe_jobs.Succeeded()) {
     std::cerr << maybe_jobs.TakeError() << std::endl;
     return EXIT_FAILURE;
   }
 
-  for (const auto &job : maybe_jobs.TakeValue()) {
+  for (const pasta::CompileJob &job : maybe_jobs.TakeValue()) {
     auto maybe_ast = job.Run();
     if (!maybe_ast.Succeeded()) {
       std::cerr << maybe_ast.TakeError() << std::endl;

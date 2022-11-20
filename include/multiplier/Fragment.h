@@ -37,7 +37,7 @@ class RegexQueryResultImpl;
 class RegexQueryResultIterator;
 class Stmt;
 class Token;
-class TokenSubstitutionListIterator;
+class MacroSubstitutionListIterator;
 class Type;
 class WeggliQuery;
 class WeggliQueryMatch;
@@ -151,7 +151,7 @@ class Fragment {
   friend class RegexQueryResultIterator;
   friend class Stmt;
   friend class Token;
-  friend class TokenSubstitutionListIterator;
+  friend class MacroSubstitutionListIterator;
   friend class Type;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
@@ -176,7 +176,7 @@ class Fragment {
   static Fragment containing(const Attr &);
   static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
-  static Fragment containing(const TokenSubstitution &);
+  static Fragment containing(const MacroSubstitution &);
   static Fragment containing(const UseBase &);
   static Fragment containing(const Reference &);
 
@@ -186,13 +186,12 @@ class Fragment {
   // The range of file tokens in this fragment.
   TokenRange file_tokens(void) const;
 
-  // The range of parsed tokens in this fragment. This is equivalent to
-  // `Token::in(fragment)`.
+  // The range of parsed tokens in this fragment.
   TokenList parsed_tokens(void) const;
 
-  // Return the list of token substitutions. The original file tokens can be
-  // recovered by choosing `.before()` on all substitution objects.
-  TokenSubstitutionList substitutions(void) const;
+  // Return the pre-processed code from this fragment.
+  std::optional<MacroSubstitution> preprocessed_code(void) const &;
+  std::optional<MacroSubstitution> preprocessed_code(void) const &&;
 
   // Return the list of top-level declarations in this fragment.
   std::vector<Decl> top_level_declarations(void) const;

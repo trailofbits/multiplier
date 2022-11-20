@@ -26,7 +26,9 @@ enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
 
 // NOTE(pag): Must be kept in sync wiht `RPC.capnp`.
-enum class TokenSubstitutionKind : unsigned char {
+enum class MacroSubstitutionKind : unsigned char {
+  PREPROCESSED_CODE,
+
   OTHER_DIRECTIVE,
   DEFINE_DIRECTIVE,
   UNDEF_DIRECTIVE,
@@ -43,7 +45,7 @@ enum class TokenSubstitutionKind : unsigned char {
   ELSE_DIRECTIVE,
   ENDIF_DIRECTIVE,
 
-  INCLUDE,
+  INCLUDE_DIRECTIVE,
 
   MACRO,
   MACRO_PARAMETER,
@@ -58,14 +60,14 @@ enum class TokenSubstitutionKind : unsigned char {
   SUBSTITUTE,
 };
 
-inline static const char *EnumerationName(TokenSubstitutionKind) {
-  return "TokenSubstitutionKind";
+inline static const char *EnumerationName(MacroSubstitutionKind) {
+  return "MacroSubstitutionKind";
 }
 
-const char *EnumeratorName(TokenSubstitutionKind);
+const char *EnumeratorName(MacroSubstitutionKind);
 
-inline static constexpr unsigned NumEnumerators(TokenSubstitutionKind) {
-  return static_cast<unsigned>(TokenSubstitutionKind::SUBSTITUTE) + 1u;
+inline static constexpr unsigned NumEnumerators(MacroSubstitutionKind) {
+  return static_cast<unsigned>(MacroSubstitutionKind::SUBSTITUTE) + 1u;
 }
 
 using RawEntityId = uint64_t;
@@ -89,8 +91,9 @@ struct DeclarationId;
 struct StatementId;
 struct TypeId;
 struct FileTokenId;
-struct FragmentTokenId;
-struct TokenSubstitutionId;
+struct MacroTokenId;
+struct ParsedTokenId;
+struct MacroSubstitutionId;
 struct DesignatorId;
 
 // Identifies a serialized fragment.
@@ -106,8 +109,9 @@ struct FragmentId {
   inline /* implicit */ FragmentId(const StatementId &);
   inline /* implicit */ FragmentId(const TypeId &);
   inline /* implicit */ FragmentId(const AttributeId &);
-  inline /* implicit */ FragmentId(const FragmentTokenId &);
-  inline /* implicit */ FragmentId(const TokenSubstitutionId &);
+  inline /* implicit */ FragmentId(const ParsedTokenId &);
+  inline /* implicit */ FragmentId(const MacroTokenId &);
+  inline /* implicit */ FragmentId(const MacroSubstitutionId &);
   inline /* implicit */ FragmentId(const DesignatorId &);
 };
 
@@ -178,8 +182,8 @@ struct AttributeId {
   auto operator<=>(const AttributeId &) const noexcept = default;
 };
 
-// Identifies a token inside of a `Fragment`.
-struct FragmentTokenId {
+// Identifies a parsed token inside of a `Fragment`.
+struct ParsedTokenId {
   RawEntityId fragment_id;
   TokenKind kind;
 
@@ -187,31 +191,7 @@ struct FragmentTokenId {
   // `rpc::Fragment::tokenKinds` (and other token related lists).
   uint32_t offset;
 
-  auto operator<=>(const FragmentTokenId &) const noexcept = default;
-};
-
-// The offset of a substitution inside of a fragment.
-struct TokenSubstitutionId {
- public:
-  RawEntityId fragment_id;
-
-  TokenSubstitutionKind kind;
-
-  // Offset of where this token substitution is stored inside of a
-  // serialized `rpc::Fragment::tokenSubstitutions`.
-  uint32_t offset;
-
-  auto operator<=>(const TokenSubstitutionId &) const noexcept = default;
-};
-
-struct DesignatorId {
- public:
-  RawEntityId fragment_id;
-
-  // Offset of the designator inside of the fragment.
-  uint32_t offset;
-
-  auto operator<=>(const DesignatorId &) const noexcept = default;
+  auto operator<=>(const ParsedTokenId &) const noexcept = default;
 };
 
 // Identifies a token inside of a `File`.
@@ -226,6 +206,43 @@ struct FileTokenId {
   auto operator<=>(const FileTokenId &) const noexcept = default;
 };
 
+// Identifies a token inside of a `Fragment` that corresponds to a macro
+// use or macro expansion.
+struct MacroTokenId {
+  RawEntityId fragment_id;
+  TokenKind kind;
+
+  // Offset of this where this token is stored inside of a serialized
+  // `rpc::File::tokens` list.
+  uint32_t offset;
+
+  auto operator<=>(const MacroTokenId &) const noexcept = default;
+};
+
+// The offset of a substitution inside of a fragment.
+struct MacroSubstitutionId {
+ public:
+  RawEntityId fragment_id;
+
+  MacroSubstitutionKind kind;
+
+  // Offset of where this token substitution is stored inside of a
+  // serialized `rpc::Fragment::tokenSubstitutions`.
+  uint32_t offset;
+
+  auto operator<=>(const MacroSubstitutionId &) const noexcept = default;
+};
+
+struct DesignatorId {
+ public:
+  RawEntityId fragment_id;
+
+  // Offset of the designator inside of the fragment.
+  uint32_t offset;
+
+  auto operator<=>(const DesignatorId &) const noexcept = default;
+};
+
 inline FragmentId::FragmentId(const DeclarationId &id_)
     : fragment_id(id_.fragment_id) {}
 
@@ -235,10 +252,13 @@ inline FragmentId::FragmentId(const StatementId &id_)
 inline FragmentId::FragmentId(const TypeId &id_)
     : fragment_id(id_.fragment_id) {}
 
-inline FragmentId::FragmentId(const FragmentTokenId &id_)
+inline FragmentId::FragmentId(const ParsedTokenId &id_)
     : fragment_id(id_.fragment_id) {}
 
-inline FragmentId::FragmentId(const TokenSubstitutionId &id_)
+inline FragmentId::FragmentId(const MacroTokenId &id_)
+    : fragment_id(id_.fragment_id) {}
+
+inline FragmentId::FragmentId(const MacroSubstitutionId &id_)
     : fragment_id(id_.fragment_id) {}
 
 inline FragmentId::FragmentId(const DesignatorId &id_)
@@ -254,8 +274,8 @@ struct InvalidId {};
 // `EntityId`.
 using VariantId = std::variant<InvalidId, FileId, FragmentId,
                                DeclarationId, StatementId, TypeId, AttributeId,
-                               FragmentTokenId, FileTokenId,
-                               TokenSubstitutionId, DesignatorId>;
+                               ParsedTokenId, MacroTokenId, FileTokenId,
+                               MacroSubstitutionId, DesignatorId>;
 
 // An opaque, compressed entity id.
 class EntityId {
@@ -275,8 +295,9 @@ class EntityId {
   /* implicit */ EntityId(StatementId id);
   /* implicit */ EntityId(TypeId id);
   /* implicit */ EntityId(AttributeId id);
-  /* implicit */ EntityId(FragmentTokenId id);
-  /* implicit */ EntityId(TokenSubstitutionId id);
+  /* implicit */ EntityId(ParsedTokenId id);
+  /* implicit */ EntityId(MacroTokenId id);
+  /* implicit */ EntityId(MacroSubstitutionId id);
   /* implicit */ EntityId(DesignatorId id);
   /* implicit */ EntityId(FileTokenId id);
 
@@ -298,13 +319,13 @@ class EntityId {
     return *this;
   }
 
-  inline EntityId &operator=(FragmentTokenId id) {
+  inline EntityId &operator=(ParsedTokenId id) {
     EntityId self(id);
     opaque = self.opaque;
     return *this;
   }
 
-  inline EntityId &operator=(TokenSubstitutionId id) {
+  inline EntityId &operator=(MacroSubstitutionId id) {
     EntityId self(id);
     opaque = self.opaque;
     return *this;

@@ -94,7 +94,7 @@ target_link_libraries("mx-common"
 if(MX_ENABLE_RE2)
   target_link_libraries("mx-common"
     PRIVATE
-    	"re2::re2"
+      "re2::re2"
   )
 else()
   target_compile_definitions("mx-common"

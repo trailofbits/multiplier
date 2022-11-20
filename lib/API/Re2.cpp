@@ -305,7 +305,8 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_, Response response)
+    const RegexQuery &query_, EntityProvider::Ptr ep_,
+    std::vector<RawEntityId>)
     : query(query_),
       ep(std::move(ep_)) {}
 

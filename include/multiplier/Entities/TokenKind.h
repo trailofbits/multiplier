@@ -459,10 +459,6 @@ enum class TokenKind : unsigned short {
   OBJC_AT_DYNAMIC,
   OBJC_AT_IMPORT,
   OBJC_AT_AVAILABLE,
-  BEGIN_OF_FILE_MARKER,
-  END_OF_FILE_MARKER,
-  BEGIN_OF_MACRO_EXPANSION_MARKER,
-  END_OF_MACRO_EXPANSION_MARKER,
 };
 
 inline static const char *EnumerationName(TokenKind) {
@@ -470,7 +466,7 @@ inline static const char *EnumerationName(TokenKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenKind) {
-  return 451;
+  return 447;
 }
 
 const char *EnumeratorName(TokenKind);

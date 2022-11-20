@@ -21,14 +21,13 @@ std::optional<Token> FragmentImpl::TokenFor(
   VariantId vid = eid.Unpack();
 
   // It's a fragment token.
-  if (std::holds_alternative<FragmentTokenId>(vid)) {
-    const FragmentTokenId tid = std::get<FragmentTokenId>(vid);
+  if (std::holds_alternative<ParsedTokenId>(vid)) {
+    const ParsedTokenId tid = std::get<ParsedTokenId>(vid);
 
     // It's a token inside of the current fragment.
     if (tid.fragment_id == fragment_id) {
-      auto reader = this->TokenReader(self);
-      if (tid.offset < reader->NumTokens()) {
-        Token tok(std::move(reader), tid.offset);
+      if (tid.offset < num_parsed_tokens) {
+        Token tok(this->TokenReader(self), tid.offset);
         if (tok.id() == eid) {
           return tok;
         } else {
@@ -37,27 +36,36 @@ std::optional<Token> FragmentImpl::TokenFor(
       }
 
     // It's a token inside of another fragment, go get the other fragment.
-    } else {
-      auto other_frag = ep->FragmentFor(ep, tid.fragment_id);
-      auto reader = other_frag->TokenReader(other_frag);
-      if (tid.offset < reader->NumTokens()) {
-        Token tok(std::move(reader), tid.offset);
+    } else if (auto other_frag = ep->FragmentFor(ep, tid.fragment_id)) {
+      return other_frag->TokenFor(other_frag, eid, can_fail);
+    }
+
+  // It's a macro token.
+  } else if (std::holds_alternative<MacroTokenId>(vid)) {
+    const MacroTokenId tid = std::get<MacroTokenId>(vid);
+
+    // It's a token inside of the current fragment.
+    if (tid.fragment_id == fragment_id) {
+      if (num_parsed_tokens <= tid.offset && tid.offset < num_tokens) {
+        Token tok(this->TokenReader(self), tid.offset);
         if (tok.id() == eid) {
           return tok;
         } else {
           assert(false);
         }
       }
+
+    // It's a token inside of another fragment, go get the other fragment.
+    } else if (auto other_frag = ep->FragmentFor(ep, tid.fragment_id)) {
+      return other_frag->TokenFor(other_frag, eid, can_fail);
     }
 
   // It's a file token; go get the file.
   } else if (std::holds_alternative<FileTokenId>(vid)) {
     const FileTokenId tid = std::get<FileTokenId>(vid);
-    FileImpl::Ptr file = ep->FileFor(ep, tid.file_id);
-
-    auto reader = file->TokenReader(file);
-    if (tid.offset < reader->NumTokens()) {
-      Token tok(std::move(reader), tid.offset);
+    if (FileImpl::Ptr file = ep->FileFor(ep, tid.file_id);
+        file && tid.offset < file->num_tokens) {
+      Token tok(file->TokenReader(file), tid.offset);
       if (tok.id() == eid) {
         return tok;
       } else {
@@ -80,34 +88,58 @@ TokenRange FragmentImpl::TokenRangeFor(
   VariantId bvid = begin_id.Unpack();
   VariantId evid = end_id.Unpack();
 
-  // It's a fragment token.
-  if (std::holds_alternative<FragmentTokenId>(bvid)) {
-    if (!std::holds_alternative<FragmentTokenId>(evid)) {
+  // It's a parsed fragment token.
+  if (std::holds_alternative<ParsedTokenId>(bvid)) {
+    if (!std::holds_alternative<ParsedTokenId>(evid)) {
       return TokenRange();
     }
 
-    auto bfid = std::get<FragmentTokenId>(bvid);
-    auto efid = std::get<FragmentTokenId>(evid);
+    auto bfid = std::get<ParsedTokenId>(bvid);
+    auto efid = std::get<ParsedTokenId>(evid);
     if (bfid.fragment_id != efid.fragment_id || bfid.offset > efid.offset) {
       return TokenRange();
     }
 
     // It's a token inside of the current fragment.
     if (bfid.fragment_id == fragment_id) {
-      if (efid.offset < num_tokens) {
+      if (efid.offset < num_parsed_tokens) {
         return TokenRange(this->TokenReader(self),
                           bfid.offset, efid.offset + 1u);
       }
 
     // It's a token inside of another fragment, go get the other fragment.
+    } else if (auto other_frag = ep->FragmentFor(ep, bfid.fragment_id)) {
+      return other_frag->TokenRangeFor(self, begin_id, end_id);
+
     } else {
-      auto other_frag = ep->FragmentFor(ep, bfid.fragment_id);
-      auto other_reader = other_frag->TokenReader(other_frag);
-      if (auto other_num_tokens = other_reader->NumTokens();
-          efid.offset < other_num_tokens) {
-        return TokenRange(std::move(other_reader), bfid.offset,
-                          efid.offset + 1u);
+      return TokenRange();
+    }
+
+  // It's a macro token.
+  } else if (std::holds_alternative<MacroTokenId>(bvid)) {
+    if (!std::holds_alternative<MacroTokenId>(evid)) {
+      return TokenRange();
+    }
+
+    auto bfid = std::get<MacroTokenId>(bvid);
+    auto efid = std::get<MacroTokenId>(evid);
+    if (bfid.fragment_id != efid.fragment_id || bfid.offset > efid.offset) {
+      return TokenRange();
+    }
+
+    // It's a token inside of the current fragment.
+    if (bfid.fragment_id == fragment_id) {
+      if (bfid.offset >= num_parsed_tokens && efid.offset < num_tokens) {
+        return TokenRange(this->TokenReader(self),
+                          bfid.offset, efid.offset + 1u);
       }
+
+    // It's a token inside of another fragment, go get the other fragment.
+    } else if (auto other_frag = ep->FragmentFor(ep, bfid.fragment_id)) {
+      return other_frag->TokenRangeFor(self, begin_id, end_id);
+
+    } else {
+      return TokenRange();
     }
 
   // It's a file token; go get the file.
@@ -122,11 +154,9 @@ TokenRange FragmentImpl::TokenRangeFor(
       return TokenRange();
     }
 
-    auto file = ep->FileFor(ep, bfid.file_id);
-    auto file_reader = file->TokenReader(file);
-    if (auto file_num_tokens = file_reader->NumTokens();
-        efid.offset < file_num_tokens) {
-      return TokenRange(std::move(file_reader), bfid.offset, efid.offset + 1u);
+    if (auto file = ep->FileFor(ep, bfid.file_id);
+        file && efid.offset < file->num_tokens) {
+      return TokenRange(file->TokenReader(file), bfid.offset, efid.offset + 1u);
     }
   }
 

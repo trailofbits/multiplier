@@ -68,7 +68,7 @@ extern "C" int main(int argc, char *argv[]) {
   std::unordered_map<unsigned, mx::TokenContext> contexts;
 
   auto i = 0u;
-  for (mx::Token tok : mx::Token::in(*fragment)) {
+  for (mx::Token tok : fragment->parsed_tokens()) {
     for (auto context = mx::TokenContext::of(tok); context;
          context = context->parent()) {
       contexts.emplace(context->id(), context.value());
@@ -127,7 +127,7 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   i = 0u;
-  for (mx::Token tok : mx::Token::in(*fragment)) {
+  for (mx::Token tok : fragment->parsed_tokens()) {
     if (auto context = mx::TokenContext::of(tok)) {
       os
           << "tokens:t" << (i++) << " -> c" << context->id() << ";\n";
@@ -136,7 +136,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   os << "}\n";
 
-  for (mx::Token token : mx::Token::in(*fragment)) {
+  for (mx::Token token : fragment->parsed_tokens()) {
 
   }
 
