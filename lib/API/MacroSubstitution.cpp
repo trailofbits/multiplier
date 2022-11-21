@@ -20,6 +20,10 @@ MacroSubstitutionListIterator::operator*(void) const {
     auto tok = std::get<ParsedTokenId>(id);
     return Token(impl->fragment->TokenReader(impl->fragment), tok.offset);
 
+  } else if (std::holds_alternative<MacroTokenId>(id)) {
+    auto tok = std::get<MacroTokenId>(id);
+    return Token(impl->fragment->TokenReader(impl->fragment), tok.offset);
+
   } else if (std::holds_alternative<FileTokenId>(id)) {
     auto tok = std::get<FileTokenId>(id);
     auto file = File::containing(impl->fragment);
