@@ -679,53 +679,12 @@ static void PersistTokenContexts(
   // be placed, the offset at which each context will reside within an entity-
   // specific list, etc.
   for (const auto &entry : contexts) {
-    mx::VariantId vid = mx::EntityId(entry.first).Unpack();
     const DeclContextSet &entity_contexts = entry.second;
 
     // First, make a "template" of the context info, based on the entity kind
     // and fragment info.
     PendingTokenContext tpl;
     tpl.entity_id = entry.first;
-
-    // Declarations.
-    if (std::holds_alternative<mx::DeclarationId>(vid)) {
-      mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
-      if (id.fragment_id != frag_id) {
-        continue;  // E.g. translation unit.
-      }
-
-    // Statements.
-    } else if (std::holds_alternative<mx::StatementId>(vid)) {
-      mx::StatementId id = std::get<mx::StatementId>(vid);
-      if (id.fragment_id != frag_id) {
-        continue;  // Not sure how but oh well.
-      }
-
-    // Types.
-    } else if (std::holds_alternative<mx::TypeId>(vid)) {
-      mx::TypeId id = std::get<mx::TypeId>(vid);
-      if (id.fragment_id != frag_id) {
-        continue;  // Not sure how but oh well.
-      }
-
-    // Attributes.
-    } else if (std::holds_alternative<mx::AttributeId>(vid)) {
-      mx::AttributeId id = std::get<mx::AttributeId>(vid);
-      if (id.fragment_id != frag_id) {
-        continue;  // Not sure how but oh well.
-      }
-
-    // Designators.
-    } else if (std::holds_alternative<mx::DesignatorId>(vid)) {
-      mx::DesignatorId id = std::get<mx::DesignatorId>(vid);
-      if (id.fragment_id != frag_id) {
-        continue;  // Not sure how but oh well.
-      }
-
-    } else {
-      LOG(FATAL)
-          << "Unsupported entity kind";
-    }
 
     // Then, specialize this template for each context we encounter.
     for (const pasta::TokenContext &context : entity_contexts) {
@@ -783,7 +742,7 @@ static void PersistTokenContexts(
       continue;
     }
 
-    tco_list.set(num_tokens, mx::kInvalidEntityId);
+    tco_list.set(num_tokens, 0u);
 
     std::optional<mx::rpc::TokenContext::Builder> tcb;
     for (auto context = tok.Context(); context; context = context->Parent()) {

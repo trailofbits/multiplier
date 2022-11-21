@@ -27,9 +27,15 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
     return std::nullopt;
   }
 
+  // Only parsed tokens have token contexts.
+  if (tok.offset >= frag->num_parsed_tokens) {
+    return std::nullopt;
+  }
+
   FragmentReader frag_reader = frag->Fragment();
   unsigned tagged_offset = frag_reader.getTokenContextOffsets()[tok.offset];
   if (!(tagged_offset & 1u)) {
+    assert(!tagged_offset);
     return std::nullopt;
   }
 
