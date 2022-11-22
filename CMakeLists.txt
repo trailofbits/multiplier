@@ -50,8 +50,8 @@ find_package(CapnProto CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
-find_package(Z3 4.8 CONFIG REQUIRED)
-find_llvm(llvm)
+find_package(Z3 CONFIG REQUIRED)
+find_package(LLVM CONFIG REQUIRED)
 find_package(Clang CONFIG REQUIRED)
 find_package(SQLite3 3.35 REQUIRED)
 
@@ -90,12 +90,6 @@ if(MX_ENABLE_INSTALL)
   install(EXPORT "${PROJECT_NAME}Targets"
     DESTINATION "${cmake_install_dir}"
     NAMESPACE "${PROJECT_NAME}::"
-  )
-  install(
-    TARGETS
-      "llvm"
-    EXPORT
-      "${PROJECT_NAME}Targets"
   )
 endif(MX_ENABLE_INSTALL)
 
