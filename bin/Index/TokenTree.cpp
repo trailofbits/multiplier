@@ -144,6 +144,7 @@ class Substitution {
   std::optional<pasta::MacroDirective> macro_dir;
   std::optional<pasta::MacroDefinition> macro_def;
   std::optional<pasta::MacroExpansion> macro_use;
+  std::optional<pasta::MacroArgument> macro_arg;
 
   using Node = std::variant<TokenInfo *, Substitution *>;
   using NodeList = std::vector<Node>;
@@ -215,6 +216,8 @@ class TokenTreeImpl {
   Substitution *GetMacroBody(pasta::MacroDefinition def,
                              std::stringstream &err);
 
+  TokenInfo *TryGetBeforeToken(TokenInfo *curr);
+  TokenInfo *TryGetAfterToken(TokenInfo *curr);
   void TryAddBeforeToken(Substitution *sub, TokenInfo *curr);
   void TryAddAfterToken(Substitution *sub, TokenInfo *prev);
 
@@ -224,6 +227,9 @@ class TokenTreeImpl {
   bool FillMissingFileTokens(Substitution *sub, std::stringstream &err);
   bool FillMissingFileTokensRec(Substitution *sub, bool &changed,
                                 std::stringstream &err);
+
+  bool FindSubstitutionBoundsRec(Substitution *sub, TokenInfo *lower_bound,
+                                 TokenInfo *upper_bound);
   void FindSubstitutionBounds(void);
   Substitution *MergeArguments(Substitution *orig, Substitution *pre_arg,
                                std::stringstream &err);
@@ -291,7 +297,7 @@ class TokenTreeImpl {
       const std::unordered_map<std::string,
                                Substitution::NodeList> &params);
 
-  static bool BoundsAreSane(Substitution *sub);
+  static bool BoundsAreSane(const Substitution *sub);
   void AddOrClearInsaneBounds(Substitution *sub);
 
   // Try to unify tokens in the token list back to the same file token.
@@ -307,13 +313,26 @@ static void Die(const TokenTreeImpl *impl) {
   TT_ASSERT(false);
 }
 
-bool TokenTreeImpl::BoundsAreSane(Substitution *sub) {
+bool TokenTreeImpl::BoundsAreSane(const Substitution *sub) {
+  if (!sub->before_body != !sub->after_body) {
+    return false;
+  }
+
   if (!sub->before_body || !sub->after_body) {
     return true;
   }
 
+  if (!sub->before_body->file_tok != !sub->after_body->file_tok) {
+    return false;
+  }
+
   if (!sub->before_body->file_tok || !sub->after_body->file_tok) {
     return true;
+  }
+
+  if (pasta::File::Containing(sub->before_body->file_tok.value()) !=
+      pasta::File::Containing(sub->after_body->file_tok.value())) {
+    return false;
   }
 
   return sub->after_body->file_tok->Index() >
@@ -677,8 +696,9 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   os << "s" << reinterpret_cast<const void *>(this)
      << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
   if (has_error) {
-    os << " color=\"red\"";
-  } else if (InBefore(this)) {
+    os << " bgcolor=\"red\"";
+  }
+  if (InBefore(this)) {
     os << " color=\"brown\"";
   }
   os << "><TR><TD colspan=\"" << num_cols << "\">";
@@ -1379,101 +1399,11 @@ static Substitution *MacroArgument(Substitution::Node node) {
 // not in `pre_exp`.
 Substitution *TokenTreeImpl::MergeArguments(
     Substitution *orig, Substitution *pre_exp, std::stringstream &err) {
-  auto i = 0u;
-  auto j = 0u;
-  const auto max_i = orig->before.size();
-  const auto max_j = pre_exp->before.size();
-  auto changed = true;
-  TokenInfo *i_lc = nullptr;
-  TokenInfo *j_lc = nullptr;
+  TT_ASSERT(orig->macro_arg->Index() == pre_exp->macro_arg->Index());
 
-  Substitution *merged = CreateSubstitution(Substitution::kMacroArgument);
-
-  D( std::cerr << indent << "Merging argument and pre-expansion argument\n"; )
-  D( indent += "  "; )
-
-  size_t i_index = 0u;
-  size_t j_index = 0u;
-
-  while (i < max_i && j < max_j && changed) {
-
-    changed = false;
-    Substitution::Node node_i = orig->before[i];
-    Substitution::Node node_j = pre_exp->before[j];
-
-    const auto i_is_tok = std::holds_alternative<TokenInfo *>(node_i);
-    i_lc = LeftCornerOfUse(node_i);
-
-    const auto j_is_tok = std::holds_alternative<TokenInfo *>(node_j);
-    j_lc = LeftCornerOfUse(node_j);
-
-    D( std::cerr
-        << indent << "i=" << i << " j=" << j << " i_is_tok=" << i_is_tok
-        << " j_is_tok=" << j_is_tok << "\n"; )
-
-    if (i_lc->file_tok) {
-      i_index = i_lc->file_tok->Index();
-    } else {
-      i_index = ~0u;
-    }
-
-    if (j_lc->file_tok) {
-      j_index = j_lc->file_tok->Index();
-    } else {
-      j_index = ~0u;
-    }
-
-    if (i_index == j_index) {
-      TT_ASSERT(i_lc->file_tok->Data() == j_lc->file_tok->Data());
-      if (i_is_tok) {
-        merged->before.emplace_back(node_j);
-        changed = true;
-        ++i;
-        ++j;
-
-      } else if (j_is_tok) {
-        orig->has_error = true;
-        pre_exp->has_error = true;
-        Die(this);
-
-        Substitution *before = CreateSubstitution(Substitution::kSubstitutionBefore);
-        Substitution *after = CreateSubstitution(Substitution::kSubstitutionAfter);
-        before->after = after;
-        merged->before.emplace_back(before);
-        before->before.emplace_back(node_i);
-        after->before.emplace_back(node_j);
-
-      } else {
-#ifndef NDEBUG
-        auto sub_i = std::get<Substitution *>(node_i);
-        auto sub_j = std::get<Substitution *>(node_j);
-        TT_ASSERT(sub_i->kind == sub_j->kind);
-#endif
-        merged->before.emplace_back(node_j);
-      }
-
-      changed = true;
-      ++i;
-      ++j;
-
-    } else if (i_index < j_index) {
-      merged->before.emplace_back(node_i);
-      changed = true;
-      ++i;
-
-    } else if (j_index < i_index) {
-      merged->before.emplace_back(node_j);
-      changed = true;
-      ++j;
-
-    } else {
-      TT_ASSERT(false);  // Unreachable.
-    }
-  }
-
-  for (; j < max_j; ++j) {
-    merged->before.emplace_back(pre_exp->before[j]);
-  }
+  pre_exp->parent = orig->parent;
+  pre_exp->before_body = orig->before_body;
+  pre_exp->after_body = orig->after_body;
 
   orig->before_body = nullptr;
   orig->after_body = nullptr;
@@ -1481,16 +1411,8 @@ Substitution *TokenTreeImpl::MergeArguments(
   orig->after = nullptr;
   orig->before.clear();
 
-  pre_exp->before_body = nullptr;
-  pre_exp->after_body = nullptr;
-  pre_exp->parent = nullptr;
-  pre_exp->after = nullptr;
-  pre_exp->before.clear();
-
-  StripWhitespace(merged->before);
-
-  D( indent.resize(indent.size() - 2u); )
-  return merged;
+  D( std::cerr << indent << "Merging argument and pre-expansion argument\n"; )
+  return pre_exp;
 }
 
 bool TokenTreeImpl::MergeArgPreExpansions(std::stringstream &err) {
@@ -1827,35 +1749,77 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
   return body;
 }
 
-void TokenTreeImpl::TryAddBeforeToken(Substitution *sub, TokenInfo *curr) {
-  UnifyToken(curr);
-
-  if (sub->before_body || !curr || !curr->file_tok) {
-    return;
+TokenInfo *TokenTreeImpl::TryGetBeforeToken(TokenInfo *curr) {
+  if (!curr || !curr->file_tok) {
+    return nullptr;
   }
 
-  if (auto index = curr->file_tok->Index()) {
-    pasta::File file = pasta::File::Containing(curr->file_tok.value());
-    sub->before_body = &(tokens_alloc.emplace_back());
-    sub->before_body->file_tok = file.Tokens().At(index - 1u);
-    sub->before_body->next = curr;
-    sub->before_body->category = TokenInfo::kMissingFileToken;
-    UnifyToken(sub->before_body);
+  UnifyToken(curr);
+
+  auto index = curr->file_tok->Index();
+  if (!index) {
+    return nullptr;
+  }
+  pasta::File file = pasta::File::Containing(curr->file_tok.value());
+  auto prev_file_tok = file.Tokens().At(index - 1u);
+  if (!prev_file_tok) {
+    return nullptr;
+  }
+
+  TokenInfo *before_tok = &(tokens_alloc.emplace_back());
+  before_tok->file_tok = prev_file_tok;
+  before_tok->next = curr;
+  before_tok->category = TokenInfo::kMissingFileToken;
+  UnifyToken(before_tok);
+  return before_tok;
+}
+
+
+TokenInfo *TokenTreeImpl::TryGetAfterToken(TokenInfo *curr) {
+  if (!curr || !curr->file_tok) {
+    return nullptr;
+  }
+
+  UnifyToken(curr);
+
+  auto index = curr->file_tok->Index();
+  if (!index) {
+    return nullptr;
+  }
+
+  pasta::File file = pasta::File::Containing(curr->file_tok.value());
+  auto next_file_tok = file.Tokens().At(index + 1u);
+  if (!next_file_tok) {
+    return nullptr;
+  }
+
+  if (curr->next && curr->next->file_tok &&
+      curr->next->file_tok->RawFileToken() == next_file_tok->RawFileToken()) {
+    return curr->next;
+  }
+
+  TokenInfo *ater_tok = &(tokens_alloc.emplace_back());
+  ater_tok->file_tok = next_file_tok;
+  ater_tok->next = curr;
+  ater_tok->category = TokenInfo::kMissingFileToken;
+  UnifyToken(ater_tok);
+  return ater_tok;
+}
+
+void TokenTreeImpl::TryAddBeforeToken(Substitution *sub, TokenInfo *curr) {
+  if (sub->before_body) {
+    return;
+  } else {
+    sub->before_body = TryGetBeforeToken(curr);
   }
 }
 
 void TokenTreeImpl::TryAddAfterToken(Substitution *sub, TokenInfo *prev) {
-  if (sub->after_body || !prev || !prev->file_tok) {
+  if (sub->after_body) {
     return;
+  } else {
+    sub->after_body = TryGetAfterToken(prev);
   }
-
-  pasta::File file = pasta::File::Containing(prev->file_tok.value());
-  sub->after_body = &(tokens_alloc.emplace_back());
-  sub->after_body->file_tok = file.Tokens().At(prev->file_tok->Index() + 1u);
-  sub->after_body->category = TokenInfo::kMissingFileToken;
-  UnifyToken(sub->after_body);
-
-  prev->next = sub->after_body;
 }
 
 // Get rid of leading and trailing whitespace in all internal nodes.
@@ -2022,11 +1986,18 @@ bool TokenTreeImpl::FillMissingFileTokens(Substitution *sub,
   auto ret = false;
   std::stringstream sub_err;
   auto i = 0u;
-  auto max_i = (sub->before.size() + 1u) * 2u;
+  auto max_i = sub->before.size() + 1u;
+
   for (bool changed = true; changed && i <= max_i; ++i) {
     changed = false;
+    if (i >= 5) {
+      sub->has_error = true;
+      Die(this);
+
+    }
     if (FillMissingFileTokensRec(sub, changed, sub_err)) {
       ret = true;
+      max_i = sub->before.size() + 1u;
     } else if (!ret) {
       err << sub_err.str();
       break;
@@ -2115,6 +2086,9 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
                              new_nodes, err)) {
         new_nodes.emplace_back(std::move(node));
         if (stopped_early_nested1) {
+          if (!stopped_early) {
+            D( std::cerr << indent << "!!! stopped_early_nested1\n"; )
+          }
           stopped_early = true;
         }
 
@@ -2211,6 +2185,9 @@ bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
         }
 
         if (stopped_early_nested2) {
+          if (!stopped_early) {
+            D( std::cerr << indent << "!!! stopped_early_nested2\n"; )
+          }
           stopped_early = true;
         }
 
@@ -2306,6 +2283,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
   Substitution *arg_sub = CreateSubstitution(Substitution::kMacroArgument);
   arg_sub->parent = sub;
+  arg_sub->macro_arg = node;
   sub->before.emplace_back(arg_sub);
 
   for (const pasta::MacroNode &arg_node : node->Nodes()) {
@@ -2702,6 +2680,151 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
   return sub;
 }
 
+bool TokenTreeImpl::FindSubstitutionBoundsRec(
+    Substitution *sub, TokenInfo *lower_bound,
+    TokenInfo *upper_bound) {
+  TT_ASSERT(BoundsAreSane(sub));
+
+  if (sub->after) {
+    FindSubstitutionBoundsRec(sub->after, nullptr, nullptr);
+  }
+
+  // Wiped out node.
+  if (!sub->parent && !sub->before_body && !sub->after_body &&
+      sub->before.empty()) {
+    return false;
+  }
+
+  if (!lower_bound || !lower_bound->file_tok) {
+    lower_bound = sub->before_body;
+  }
+
+  if (!upper_bound || !upper_bound->file_tok) {
+    upper_bound = sub->after_body;
+  }
+
+  if (!lower_bound || !upper_bound) {
+    sub->before_body = nullptr;
+    sub->after_body = nullptr;
+    return false;
+  }
+
+  sub->before_body = lower_bound;
+  sub->after_body = upper_bound;
+
+  auto bi = lower_bound->file_tok->Index();
+  auto ai = upper_bound->file_tok->Index();
+  auto outer_file = pasta::File::Containing(sub->before_body->file_tok.value());
+
+  auto restrict_sub = [&] (Substitution *nested_sub) -> bool {
+    if (!nested_sub->before_body || !nested_sub->after_body) {
+      nested_sub->before_body = nullptr;
+      nested_sub->after_body = nullptr;
+      FindSubstitutionBoundsRec(nested_sub, nullptr, nullptr);
+      return false;
+    }
+
+    TT_ASSERT(nested_sub->parent == sub);
+    TT_ASSERT(BoundsAreSane(nested_sub));
+
+    auto inner_file = pasta::File::Containing(
+        nested_sub->before_body->file_tok.value());
+    if (inner_file != outer_file) {
+      FindSubstitutionBoundsRec(nested_sub, nullptr, nullptr);
+      return false;
+    }
+
+    auto old_before = nested_sub->before_body;
+    auto old_after = nested_sub->after_body;
+
+    auto sbi = old_before->file_tok->Index();
+    auto sai = old_after->file_tok->Index();
+
+    if ((sbi <= bi && ai <= sai) ||
+        (sbi <= bi && bi <= sai) ||
+        (sbi <= ai && ai <= sai)) {
+      if (bi <= sbi && ai <= sai) {
+        nested_sub->after_body = upper_bound;
+      }
+
+      if (sbi < bi && sai <= ai) {
+        nested_sub->before_body = lower_bound;
+      }
+    }
+    if (BoundsAreSane(nested_sub)) {
+      FindSubstitutionBoundsRec(nested_sub, nested_sub->before_body,
+                                nested_sub->after_body);
+      return true;
+    }
+
+    nested_sub->has_error = true;
+    Die(this);
+    nested_sub->before_body = old_before;
+    nested_sub->after_body = old_after;
+    FindSubstitutionBoundsRec(nested_sub, nullptr, nullptr);
+    return false;
+  };
+
+  // Restrict child substitutions. This goes in the forward direction.
+  for (Substitution::Node &node : sub->before) {
+    if (std::holds_alternative<TokenInfo *>(node)) {
+      if (auto ti = std::get<TokenInfo *>(node)) {
+        auto tii = ti->file_tok->Index();
+        if (bi < tii && tii < ai) {
+          lower_bound = ti;
+          bi = tii;
+        }
+      }
+      continue;
+    } else if (std::holds_alternative<Substitution *>(node)) {
+      Substitution *nested_sub = std::get<Substitution *>(node);
+      if (restrict_sub(nested_sub)) {
+        lower_bound = nested_sub->RightCornerOfUse();
+        if (!lower_bound) {
+          lower_bound = TryGetBeforeToken(nested_sub->after_body);
+        }
+        if (lower_bound && lower_bound->file_tok) {
+          bi = lower_bound->file_tok->Index();
+        }
+      }
+    }
+  }
+
+  // This goes in the backward direction.
+  lower_bound = sub->before_body;
+  upper_bound = sub->after_body;
+  bi = lower_bound->file_tok->Index();
+  ai = upper_bound->file_tok->Index();
+
+  for (auto it = sub->before.rbegin(), end = sub->before.rend();
+       it != end; ++it) {
+    Substitution::Node &node = *it;
+    if (std::holds_alternative<TokenInfo *>(node)) {
+      if (auto ti = std::get<TokenInfo *>(node)) {
+        auto tii = ti->file_tok->Index();
+        if (bi < tii && tii < ai) {
+          upper_bound = ti;
+          ai = tii;
+        }
+      }
+      continue;
+    } else if (std::holds_alternative<Substitution *>(node)) {
+      Substitution *nested_sub = std::get<Substitution *>(node);
+      if (restrict_sub(nested_sub)) {
+        upper_bound = nested_sub->LeftCornerOfUse();
+        if (!upper_bound) {
+          upper_bound = TryGetAfterToken(nested_sub->before_body);
+        }
+        if (upper_bound && upper_bound->file_tok) {
+          ai = upper_bound->file_tok->Index();
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 void TokenTreeImpl::FindSubstitutionBounds(void) {
   for (Substitution &sub : substitutions_alloc) {
     TT_ASSERT(!sub.after || sub.after->parent == &sub);
@@ -2709,76 +2832,7 @@ void TokenTreeImpl::FindSubstitutionBounds(void) {
     AddOrClearInsaneBounds(&sub);
   }
 
-  for (Substitution &sub : substitutions_alloc) {
-    TT_ASSERT(BoundsAreSane(&sub));
-
-    // Wiped out node.
-    if (!sub.parent && !sub.before_body && !sub.after_body &&
-        sub.before.empty()) {
-      continue;
-    }
-
-    if (sub.kind != Substitution::kMacroExpansion) {
-      continue;
-
-    } else if (!sub.before_body || !sub.after_body) {
-      sub.before_body = nullptr;
-      sub.after_body = nullptr;
-      continue;
-    }
-
-    auto bi = sub.before_body->file_tok->Index();
-    auto ai = sub.after_body->file_tok->Index();
-
-    auto outer_file = pasta::File::Containing(sub.before_body->file_tok.value());
-
-    // Restrict child substitutions.
-    for (Substitution::Node &node : sub.before) {
-      if (!std::holds_alternative<Substitution *>(node)) {
-        continue;
-      }
-
-      Substitution *nested_sub = std::get<Substitution *>(node);
-      if (!nested_sub->before_body || !nested_sub->after_body) {
-        nested_sub->before_body = nullptr;
-        nested_sub->after_body = nullptr;
-        continue;
-      }
-
-      TT_ASSERT(nested_sub->parent == &sub);
-      TT_ASSERT(BoundsAreSane(nested_sub));
-
-      auto inner_file = pasta::File::Containing(
-          nested_sub->before_body->file_tok.value());
-      if (inner_file != outer_file) {
-        continue;
-      }
-
-      auto old_before = nested_sub->before_body;
-      auto old_after = nested_sub->after_body;
-
-      auto sbi = old_before->file_tok->Index();
-      auto sai = old_after->file_tok->Index();
-
-      if ((sbi <= bi && ai <= sai) ||
-          (sbi <= bi && bi <= sai) ||
-          (sbi <= ai && ai <= sai)) {
-        if (bi <= sbi && ai <= sai) {
-          nested_sub->after_body = sub.after_body;
-        }
-
-        if (sbi < bi && sai <= ai) {
-          nested_sub->before_body = sub.before_body;
-        }
-      }
-      if (!BoundsAreSane(nested_sub)) {
-        nested_sub->has_error = true;
-        Die(this);
-        nested_sub->before_body = old_before;
-        nested_sub->after_body = old_after;
-      }
-    }
-  }
+  FindSubstitutionBoundsRec(&(substitutions_alloc.front()), nullptr, nullptr);
 }
 
 // Build the initial tree of substitutions.
@@ -3198,15 +3252,15 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     impl->UnifyTokens();
 
     if (!fallback) {
-//      std::cerr << "\n\n";
-//      impl->substitutions_alloc.front().PrintDOT(std::cerr);
-//      std::cerr << "\n\n";
-
       if (!impl->MergeArgPreExpansions(err)) {
         return err.str();
       }
 
       impl->FindSubstitutionBounds();
+
+//      std::cerr << "\n\n";
+//      impl->substitutions_alloc.front().PrintDOT(std::cerr);
+//      std::cerr << "\n\n";
 
       // Fill in things like whitespace gaps between file tokens. This doesn't
       // do any tracking of substitutions.
@@ -3216,16 +3270,16 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
       std::unordered_map<std::string, Substitution::NodeList> params;
       impl->FinalizeParameters(sub, params);
-
-      D(
-        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-        sub->Print(std::cerr);
-        std::cerr << "\n\n\n";
-        sub->PrintDOT(std::cerr);
-        std::cerr << "\n\n\n";
-        return std::string();
-      )
+//
+//      D(
+//        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//        sub->Print(std::cerr);
+//        std::cerr << "\n\n\n";
+//        sub->PrintDOT(std::cerr);
+//        std::cerr << "\n\n\n";
+//        return std::string();
+//      )
     }
 
     std::shared_ptr<const Substitution> ret(std::move(impl), sub);

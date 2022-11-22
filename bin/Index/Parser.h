@@ -27,8 +27,7 @@ class Module;
 
 namespace indexer {
 
-using EnvVariableMap = std::unordered_map<std::string, std::string>;
-
+class EnvVariableMap;
 class Importer;
 
 class Parser {

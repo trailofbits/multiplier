@@ -957,6 +957,7 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // condition, but we can't let it stop us from actually serializing the
   // fragment or its data.
   bool is_fallback_token_tree = false;
+
   mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
       tokens, begin_index, end_index, is_fallback_token_tree);
   if (!maybe_tt.Succeeded()) {
