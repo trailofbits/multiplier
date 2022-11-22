@@ -3045,10 +3045,11 @@ void TokenTreeImpl::FinalizeParameters(
       // If this token was signalled to be a varargs concat, then it means
       // its containing substitution is one, so mark it as such.
       //
-      // NOTE(pag): It will have been mislabeled as a `kConcatenateBefore`.
+      // NOTE(pag): It may have been mislabeled as a `kConcatenateBefore`.
       if (tok->is_va_args_concat) {
         TT_ASSERT(sub->kind == Substitution::kConcatenateBefore ||
-               sub->kind == Substitution::kSubstitutionBefore);
+                  sub->kind == Substitution::kSubstitutionBefore ||
+                  sub->kind == Substitution::kMacroParameterUse);
         sub->kind = Substitution::kMacroParameterUse;
         sub->after->kind = Substitution::kMacroParameterSubstitution;
         sub->is_va_args_concat = true;
