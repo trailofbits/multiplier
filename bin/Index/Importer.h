@@ -11,7 +11,6 @@
 #include <multiplier/Executor.h>
 #include <pasta/Compile/Command.h>
 
-
 #include "Context.h"
 
 namespace llvm {
@@ -21,7 +20,7 @@ class Object;
 }  // namespace llvm
 namespace indexer {
 
-using EnvVariableMap = std::unordered_map<std::string, std::string>;
+class EnvVariableMap : public std::unordered_map<std::string, std::string> {};
 
 class Importer {
  private:

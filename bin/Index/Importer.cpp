@@ -313,7 +313,7 @@ bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
     }
   }
 
-  std::unordered_map<std::string, std::string> envp;
+  EnvVariableMap envp;
   for (const auto &it : *env) {
     const llvm::json::ObjectKey &key = it.first;
     const llvm::json::Value &val = it.second;
@@ -434,9 +434,17 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
   }
 }
 
+namespace {
+static std::mutex gImportLock;
+}  // namespace
+
 void Importer::Import(mx::Executor &exe) {
   mx::Executor per_path_exe;
   for (auto &[cwd, commands] : d->commands) {
+
+    // Make sure that even concurrent calls to `Import` never concurrently
+    // change the current working directory.
+    std::unique_lock<std::mutex> locker(gImportLock);
 
     // Change the current working directory to match that of the commands.
     // This is a process-wide operation.

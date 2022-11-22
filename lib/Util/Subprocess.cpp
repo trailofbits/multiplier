@@ -25,11 +25,9 @@ Result<int, std::error_code> Subprocess::Execute(
   reproc::process process;
   reproc::arguments args(cmd);
   reproc::options options;
+  options.env.behavior = reproc::env::empty;
   if (env) {
-    options.env.behavior = reproc::env::empty;
     options.env.extra = reproc::env(*env);
-  } else {
-    options.env.behavior = reproc::env::extend;
   }
 
   if (input) {
