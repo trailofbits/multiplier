@@ -217,6 +217,7 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
     case pasta::TokenRole::kInitialMacroUseToken:
     case pasta::TokenRole::kIntermediateMacroExpansionToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
+    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
       return false;
   }
   return false;
@@ -338,6 +339,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
+      case pasta::TokenRole::kEndOfInternalMacroEventMarker:
         --begin_tok_index;  // Include it.
         break;
     }
@@ -371,6 +373,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
       case pasta::TokenRole::kInitialMacroUseToken:
       case pasta::TokenRole::kIntermediateMacroExpansionToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
+      case pasta::TokenRole::kEndOfInternalMacroEventMarker:
         ++end_tok_index;  // Include it.
         break;
     }

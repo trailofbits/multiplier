@@ -158,7 +158,8 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
 //      id.offset = next_parsed_token_index - 1u;
       return false;
 
-    default:
+    case pasta::TokenRole::kInvalid:
+    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
       return false;
   }
 

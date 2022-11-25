@@ -129,7 +129,10 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
   std::scoped_lock<sqlite::Transaction> lock{tx};
 
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
-  if (num_tokens >= mx::kNumTokensInBigFragment) {
+  //
+  // NOTE(pag): We have a fudge factor here of `3x` to account for macro
+  //            expansions.
+  if ((num_tokens * 3u) >= mx::kNumTokensInBigFragment) {
     auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
     mx::RawEntityId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {

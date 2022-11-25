@@ -247,6 +247,7 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
     case pasta::TokenRole::kEndOfFileMarker:
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
+    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
       LOG(ERROR)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
