@@ -50,9 +50,7 @@ DEFINE_string(env, "", "Path to the file listing environment variables to import
 
 DEFINE_bool(generate_sourceir, false, "Generate SourceIR from the top-level declarations");
 
-#ifndef NDEBUG
 DEFINE_bool(attach, false, "Print out the process ID for attaching gdb/lldb.");
-#endif
 
 namespace {
 
@@ -197,7 +195,6 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
 
   importer.Import(executor);
 
-#ifndef NDEBUG
   // Sometimes bugs don't reproduce in debuggers, e.g. due to the environment
   // variables or something else being different. This gives us the possibility
   // to late-attach a debugger before anything interesting happens.
@@ -207,7 +204,6 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     char x;
     read(0, &x, 1);
   }
-#endif
 
   executor.Start();
   executor.Wait();

@@ -11,6 +11,7 @@
 #include <glog/logging.h>
 #include <multiplier/Types.h>
 #include <optional>
+#include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Token.h>
@@ -21,7 +22,7 @@
 
 #include <iostream>
 
-#define D(...) __VA_ARGS__
+//#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
@@ -323,7 +324,21 @@ class TokenTreeImpl {
 
 static void Die(const TokenTreeImpl *impl) {
   std::unique_lock<std::mutex> locker(gPrintDOTLock);
-  impl->substitutions_alloc.front().PrintDOT(std::cerr);
+  std::cerr.flush();
+  auto &sub = impl->substitutions_alloc.front();
+  std::cerr << "--------------------------------------------------------\n";
+  std::cerr << "--------------------------------------------------------\n";
+  for (auto &tok : impl->tokens_alloc) {
+    if (tok.parsed_tok) {
+      pasta::AST ast = pasta::AST::From(tok.parsed_tok.value());
+      std::cerr << ast.MainFile().Path().generic_string() << "\n\n";
+      break;
+    }
+  }
+  sub.Print(std::cerr);
+  std::cerr << "\n\n";
+  sub.PrintDOT(std::cerr);
+  std::cerr << "\n\n";
   std::cerr.flush();
   TT_ASSERT(false);
 }
@@ -4122,16 +4137,16 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
       impl->FindSubstitutionBounds();
 
-      std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-      std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-      sub->Print(std::cerr);
-      std::cerr << "\n\n\n";
-      sub->PrintDOT(std::cerr);
-      std::cerr << "\n\n";
+//      std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//      std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//      sub->Print(std::cerr);
+//      std::cerr << "\n\n\n";
+//      sub->PrintDOT(std::cerr);
+//      std::cerr << "\n\n";
 
 
-      std::shared_ptr<const Substitution> ret(std::move(impl), sub);
-      return TokenTree(std::move(ret));
+//      std::shared_ptr<const Substitution> ret(std::move(impl), sub);
+//      return TokenTree(std::move(ret));
 
 
       if (!impl->MergeArgPreExpansions(err)) {
@@ -4139,22 +4154,22 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
       }
 
 
-      // Fill in things like whitespace gaps between file tokens. This doesn't
-      // do any tracking of substitutions.
-      if (!impl->FillMissingFileTokens(sub, err)) {
-        return err.str();
-      }
+//      // Fill in things like whitespace gaps between file tokens. This doesn't
+//      // do any tracking of substitutions.
+//      if (!impl->FillMissingFileTokens(sub, err)) {
+//        return err.str();
+//      }
 
-      std::unordered_map<std::string, Substitution::NodeList> params;
-      impl->FinalizeParameters(sub, params);
+//      std::unordered_map<std::string, Substitution::NodeList> params;
+//      impl->FinalizeParameters(sub, params);
 
 
-        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
-        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
-        sub->Print(std::cerr);
-        std::cerr << "\n\n\n";
-        sub->PrintDOT(std::cerr);
-        std::cerr << "\n\n\n";
+//        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
+//        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
+//        sub->Print(std::cerr);
+//        std::cerr << "\n\n\n";
+//        sub->PrintDOT(std::cerr);
+//        std::cerr << "\n\n\n";
 //        return std::string();
 
     }
