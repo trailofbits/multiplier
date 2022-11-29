@@ -34,13 +34,28 @@ ServerContext::ServerContext(std::filesystem::path db_path)
   // the server to `1` so that clients are always out-of-date.
   storage.version_number.store_if_empty(1u);
 
-  storage.next_file_id.store_if_empty(mx::kMinEntityIdIncrement);
-  storage.next_small_fragment_id.store_if_empty(mx::kMaxBigFragmentId);
-  storage.next_big_fragment_id.store_if_empty(mx::kMinEntityIdIncrement);
+  mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId> next_file_id(db);
+  mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id(db);
+  mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId> next_big_fragment_id(db);
+
+  next_file_id.store_if_empty(mx::kMinEntityIdIncrement);
+  next_small_fragment_id.store_if_empty(mx::kMaxBigFragmentId);
+  next_big_fragment_id.store_if_empty(mx::kMinEntityIdIncrement);
+
+  this->next_file_id.store(next_file_id.load());
+  this->next_small_fragment_id.store(next_small_fragment_id.load());
+  this->next_big_fragment_id.store(next_big_fragment_id.load());
 }
 
 ServerContext::~ServerContext(void) {
   Flush();
+
+  mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId> next_file_id(db);
+  mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id(db);
+  mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId> next_big_fragment_id(db);
+  next_file_id.store(this->next_file_id.load());
+  next_small_fragment_id.store(this->next_small_fragment_id.load());
+  next_big_fragment_id.store(this->next_big_fragment_id.load());
 }
 
 void ServerContext::Flush(void) {
@@ -91,13 +106,10 @@ void IndexingContext::InitializeProgressBars(void) {
 std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFileId(
     mx::WorkerId worker_id, std::filesystem::path file_path,
     const std::string &contents_hash) {
-  sqlite::Transaction tx{server_context[worker_id].db};
-  std::scoped_lock<sqlite::Transaction> lock{tx};
-
   auto &maybe_id = this->local_next_file_id[worker_id].id;
   mx::RawEntityId created_id = mx::kInvalidEntityId;
   if (!maybe_id.has_value()) {
-    created_id = server_context[worker_id]->next_file_id.fetch_add(
+    created_id = server_context[worker_id].next_file_id.fetch_add(
         mx::kMinEntityIdIncrement);
   } else {
     created_id = std::move(maybe_id.value());
@@ -125,9 +137,6 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFileId(
 std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
     mx::WorkerId worker_id, const std::string &code_hash,
     uint64_t num_tokens) {
-  sqlite::Transaction tx{server_context[worker_id].db};
-  std::scoped_lock<sqlite::Transaction> lock{tx};
-
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   //
   // NOTE(pag): We have a fudge factor here of `3x` to account for macro
@@ -136,7 +145,7 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
     auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
     mx::RawEntityId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {
-      created_id = server_context[worker_id]->next_big_fragment_id.fetch_add(
+      created_id = server_context[worker_id].next_big_fragment_id.fetch_add(
           mx::kMinEntityIdIncrement);;
     } else {
       created_id = std::move(maybe_id.value());
@@ -160,7 +169,7 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
     auto &maybe_id = this->local_next_small_fragment_id[worker_id].id;
     mx::RawEntityId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {
-      created_id = server_context[worker_id]->next_small_fragment_id.fetch_add(
+      created_id = server_context[worker_id].next_small_fragment_id.fetch_add(
           mx::kMinEntityIdIncrement);;
     } else {
       created_id = std::move(maybe_id.value());
