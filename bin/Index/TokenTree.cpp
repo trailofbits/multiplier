@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-#define D(...) __VA_ARGS__
+//#define D(...) __VA_ARGS__
 #ifndef D
 # define D(...)
 #endif
@@ -320,6 +320,7 @@ class TokenTreeImpl {
 //                               Substitution::NodeList> &params);
 
   static bool BoundsAreSane(const Substitution *sub);
+  static bool BoundsAreSane(const TokenInfo *lb, const TokenInfo *ub);
   void AddOrClearInsaneBounds(Substitution *sub);
 
   // Try to unify tokens in the token list back to the same file token.
@@ -349,42 +350,40 @@ static void Die(const TokenTreeImpl *impl) {
   TT_ASSERT(false);
 }
 
-bool TokenTreeImpl::BoundsAreSane(const Substitution *sub) {
-  if (!sub->before_body != !sub->after_body) {
+bool TokenTreeImpl::BoundsAreSane(const TokenInfo *lb, const TokenInfo *ub) {
+  if (!lb != !ub) {
     return false;
   }
 
-  if (!sub->before_body || !sub->after_body) {
+  if (!lb || !ub) {
     return true;
   }
 
-  if (!sub->before_body->file_tok != !sub->after_body->file_tok) {
+  if (!lb->file_tok != !ub->file_tok) {
     return false;
   }
 
-  if (!sub->before_body->file_tok || !sub->after_body->file_tok) {
+  if (!lb->file_tok || !ub->file_tok) {
     return true;
   }
 
-  if (pasta::File::Containing(sub->before_body->file_tok.value()) !=
-      pasta::File::Containing(sub->after_body->file_tok.value())) {
+  if (pasta::File::Containing(lb->file_tok.value()) !=
+      pasta::File::Containing(ub->file_tok.value())) {
     return false;
   }
 
-  auto bi = sub->before_body->file_tok->Index();
-  auto ai = sub->after_body->file_tok->Index();
+  auto bi = lb->file_tok->Index();
+  auto ai = ub->file_tok->Index();
   if (bi < ai) {
     return true;
-
-//    if (sub->IsEmpty()) {
-//      return 1u == (ai - bi);
-//    } else {
-//      return true;
-//    }
 
   } else {
     return false;
   }
+}
+
+bool TokenTreeImpl::BoundsAreSane(const Substitution *sub) {
+  return BoundsAreSane(sub->before_body, sub->after_body);
 }
 
 void TokenTreeImpl::AddOrClearInsaneBounds(Substitution *sub) {
@@ -677,9 +676,9 @@ Substitution *TokenTreeImpl::PreExpansionOf(Substitution *node) {
     return nullptr;
   }
 
-  TokenInfo *macro_name = LeftCornerOfUse(node);
-  TokenInfo *exp_macro_name = LeftCornerOfUse(sub_exp);
-
+//  TokenInfo *macro_name = LeftCornerOfUse(node);
+//  TokenInfo *exp_macro_name = LeftCornerOfUse(sub_exp);
+//
 //  (void) Root(macro_name);
 //  (void) Root(exp_macro_name);
 
@@ -3511,28 +3510,30 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
   if (!sub->before_body && lower_bound) {
     sub->before_body = lower_bound;
     changed_bounds = true;
-
-  } else if (lower_bound && sub->before_body) {
-    auto lb_i = lower_bound->file_tok->Index();
-    auto bb_i = sub->before_body->file_tok->Index();
-    if (lb_i > bb_i && sub->kind != Substitution::kMacroArgument) {
-      sub->has_error = true;
-      Die(this);
-    }
   }
+
+//  } else if (lower_bound && sub->before_body) {
+//    auto lb_i = lower_bound->file_tok->Index();
+//    auto bb_i = sub->before_body->file_tok->Index();
+//    if (lb_i > bb_i && sub->kind != Substitution::kMacroArgument) {
+//      sub->has_error = true;
+//      Die(this);
+//    }
+//  }
 
   if (!sub->after_body && upper_bound) {
     sub->after_body = upper_bound;
     changed_bounds = true;
-
-  } else if (upper_bound && sub->after_body) {
-    auto ub_i = upper_bound->file_tok->Index();
-    auto ab_i = sub->after_body->file_tok->Index();
-    if (ub_i < ab_i && sub->kind != Substitution::kMacroArgument) {
-      sub->has_error = true;
-      Die(this);
-    }
   }
+
+//  } else if (upper_bound && sub->after_body) {
+//    auto ub_i = upper_bound->file_tok->Index();
+//    auto ab_i = sub->after_body->file_tok->Index();
+//    if (ub_i < ab_i && sub->kind != Substitution::kMacroArgument) {
+//      sub->has_error = true;
+//      Die(this);
+//    }
+//  }
 
   // An empty node should have the same lower/upper bounds.
   if (sub->IsEmpty()) {
@@ -3550,10 +3551,8 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
     auto orig_bb = sub->before_body;
     auto orig_ab = sub->after_body;
 
-    if (sub->kind == Substitution::kMacroArgument) {
-      sub->before_body = sub->LeftCornerOfUse();
-      sub->after_body = sub->RightCornerOfUse();
-    }
+    sub->before_body = TryGetBeforeToken(sub->LeftCornerOfUse());
+    sub->after_body = TryGetAfterToken(sub->RightCornerOfUse());
 
     if (!BoundsAreSane(sub)) {
       sub->has_error = true;
@@ -3580,6 +3579,10 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
   std::vector<bool> checked_provenance;
   lb_ub.resize(max_i);
   checked_provenance.resize(max_i);
+
+  auto accept = +[] (TokenInfo *lb, TokenInfo *mid, TokenInfo *ub) {
+    return BoundsAreSane(lb, mid) && BoundsAreSane(mid, ub);
+  };
 
   for (auto changed = true; changed; ) {
     changed = false;
@@ -3616,12 +3619,23 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
         }
 
         Substitution *sub_node = std::get<Substitution *>(node);
-        lower_bound = nullptr;
-        if (sub_node->after_body) {
-          lower_bound = TryGetBeforeToken(sub_node->after_body);
+        if (TokenInfo *next_lb = TryGetBeforeToken(sub_node->after_body);
+            next_lb && accept(lower_bound, next_lb, upper_bound)) {
+          lower_bound = next_lb;
+          continue;
+        }
+
+        if (TokenInfo *rc = sub_node->RightCornerOfUse();
+            rc && accept(lower_bound, rc, upper_bound)) {
+          lower_bound = rc;
+        } else {
+          lower_bound = nullptr;
         }
       }
     }
+
+    lower_bound = sub->before_body;
+    upper_bound = sub->after_body;
 
     // Backward pass, collect upper bounds.
     for (auto j = 1u; j <= max_i; ++j) {
@@ -3641,9 +3655,17 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
         }
 
         Substitution *sub_node = std::get<Substitution *>(node);
-        upper_bound = nullptr;
-        if (sub_node->before_body) {
-          upper_bound = TryGetAfterToken(sub_node->before_body);
+        if (TokenInfo *next_ub = TryGetAfterToken(sub_node->before_body);
+            next_ub && accept(lower_bound, next_ub, upper_bound)) {
+          upper_bound = next_ub;
+          continue;
+        }
+
+        if (TokenInfo *lc = sub_node->LeftCornerOfUse();
+            lc && accept(lower_bound, lc, upper_bound)) {
+          upper_bound = lc;
+        } else {
+          upper_bound = nullptr;
         }
       }
     }
