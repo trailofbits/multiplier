@@ -3584,7 +3584,8 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
     return BoundsAreSane(lb, mid) && BoundsAreSane(mid, ub);
   };
 
-  for (auto changed = true; changed; ) {
+  auto changed = true;
+  for (auto c = 0u; changed && c <= max_i; ++c) {
     changed = false;
 
     lower_bound = sub->before_body;
@@ -3717,7 +3718,6 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
 
       if (FindSubstitutionBoundsRec(sub_node, lb_ub[i].first,
                                     lb_ub[i].second)) {
-        changed_bounds = true;
         changed = true;
       }
     }
