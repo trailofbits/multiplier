@@ -9,7 +9,7 @@ int C99VarArgsTokenPaste(void) {
 #define LEVEL 0
 #define FMT "hi"
 #define FILENAME __FILE_NAME__
-#define sc_log(a, b, args...) \
+#define sc_log(a, b, ...) \
     log_func(a, FILENAME, __LINE__, __FUNCTION__, b, ##__VA_ARGS__)
 
   return sc_log(LEVEL, FMT);
