@@ -62,6 +62,15 @@ class IndexStorage final {
   sqlite::Connection &db;
 
  public:
+  mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId>
+      next_file_id;
+
+  mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId>
+      next_small_fragment_id;
+
+  mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId>
+      next_big_fragment_id;
+
   // The next indexing version number. This is incremented prior to starting
   // an indexing run, and just after. The double-increment is there just in
   // case some clients come along and issue some queries prior to indexing being

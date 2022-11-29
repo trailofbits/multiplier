@@ -26,36 +26,26 @@
 
 namespace indexer {
 
-ServerContext::ServerContext(std::filesystem::path db_path)
-    : db(db_path),
+ServerContext::ServerContext(std::filesystem::path db_path,
+                             size_t worker_id_)
+    : worker_id(worker_id_),
+      db(db_path),
       storage(db) {
 
-  // Clients all default-initialize their version numbers to `0`, so we default
-  // the server to `1` so that clients are always out-of-date.
-  storage.version_number.store_if_empty(1u);
+  // The first initialized server context can initialize the key metadata.
+  if (!worker_id) {
 
-  mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId> next_file_id(db);
-  mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id(db);
-  mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId> next_big_fragment_id(db);
-
-  next_file_id.store_if_empty(mx::kMinEntityIdIncrement);
-  next_small_fragment_id.store_if_empty(mx::kMaxBigFragmentId);
-  next_big_fragment_id.store_if_empty(mx::kMinEntityIdIncrement);
-
-  this->next_file_id.store(next_file_id.load());
-  this->next_small_fragment_id.store(next_small_fragment_id.load());
-  this->next_big_fragment_id.store(next_big_fragment_id.load());
+    // Clients all default-initialize their version numbers to `0`, so we default
+    // the server to `1` so that clients are always out-of-date.
+    storage.version_number.store_if_empty(1u);
+    storage.next_file_id.store_if_empty(mx::kMinEntityIdIncrement);
+    storage.next_small_fragment_id.store_if_empty(mx::kMaxBigFragmentId);
+    storage.next_big_fragment_id.store_if_empty(mx::kMinEntityIdIncrement);
+  }
 }
 
 ServerContext::~ServerContext(void) {
   Flush();
-
-  mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId> next_file_id(db);
-  mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id(db);
-  mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId> next_big_fragment_id(db);
-  next_file_id.store(this->next_file_id.load());
-  next_small_fragment_id.store(this->next_small_fragment_id.load());
-  next_big_fragment_id.store(this->next_big_fragment_id.load());
 }
 
 void ServerContext::Flush(void) {
@@ -65,18 +55,27 @@ void ServerContext::Flush(void) {
 IndexingContext::IndexingContext(std::filesystem::path db_path,
                                  const mx::Executor &exe_)
     : num_workers(exe_.NumWorkers()),
-      executor(exe_),
-      local_next_file_id(num_workers),
-      local_next_small_fragment_id(num_workers),
-      local_next_big_fragment_id(num_workers) {
+      executor(exe_) {
   for(size_t i = 0; i < num_workers; ++i) {
-    server_context.emplace_back(db_path);
+    server_context.emplace_back(db_path, i);
   }
   server_context[0]->version_number.fetch_add(1);
+
+  // Load the in the most recent versions of the IDs.
+  auto &storage = server_context[0].storage;
+  next_file_id.store(storage.next_file_id.load());
+  next_small_fragment_id.store(storage.next_small_fragment_id.load());
+  next_big_fragment_id.store(storage.next_big_fragment_id.load());
 }
 
 IndexingContext::~IndexingContext(void) {
   server_context[0]->version_number.fetch_add(1);
+
+  // Store the most up-to-date versions of the IDs to the db.
+  auto &storage = server_context[0].storage;
+  storage.next_file_id.store(next_file_id.load());
+  storage.next_small_fragment_id.store(next_small_fragment_id.load());
+  storage.next_big_fragment_id.store(next_big_fragment_id.load());
 }
 
 void IndexingContext::InitializeProgressBars(void) {
@@ -106,14 +105,13 @@ void IndexingContext::InitializeProgressBars(void) {
 std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFileId(
     mx::WorkerId worker_id, std::filesystem::path file_path,
     const std::string &contents_hash) {
-  auto &maybe_id = this->local_next_file_id[worker_id].id;
+  auto &maybe_id = server_context[worker_id].local_next_file_id;
   mx::RawEntityId created_id = mx::kInvalidEntityId;
   if (!maybe_id.has_value()) {
-    created_id = server_context[worker_id].next_file_id.fetch_add(
-        mx::kMinEntityIdIncrement);
+    created_id = next_file_id.fetch_add(mx::kMinEntityIdIncrement);
   } else {
     created_id = std::move(maybe_id.value());
-    maybe_id = {};
+    maybe_id.reset();
   }
 
   mx::RawEntityId file_id = server_context[worker_id]->file_hash_to_file_id.GetOrSet(
@@ -137,23 +135,24 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFileId(
 std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
     mx::WorkerId worker_id, const std::string &code_hash,
     uint64_t num_tokens) {
+
   // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.
   //
   // NOTE(pag): We have a fudge factor here of `3x` to account for macro
   //            expansions.
   if ((num_tokens * 3u) >= mx::kNumTokensInBigFragment) {
-    auto &maybe_id = this->local_next_big_fragment_id[worker_id].id;
+    auto &maybe_id = server_context[worker_id].local_next_big_fragment_id;
     mx::RawEntityId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {
-      created_id = server_context[worker_id].next_big_fragment_id.fetch_add(
-          mx::kMinEntityIdIncrement);;
+      created_id = next_big_fragment_id.fetch_add(mx::kMinEntityIdIncrement);
     } else {
       created_id = std::move(maybe_id.value());
-      maybe_id = {};
+      maybe_id.reset();
     }
 
-    mx::RawEntityId code_id = server_context[worker_id]->code_hash_to_fragment_id.GetOrSet(
-        code_hash, created_id);
+    mx::RawEntityId code_id =
+        server_context[worker_id]->code_hash_to_fragment_id.GetOrSet(
+            code_hash, created_id);
 
     CHECK_LT(code_id, mx::kMaxBigFragmentId);
     if (code_id == created_id) {
@@ -164,20 +163,21 @@ std::pair<mx::RawEntityId, bool> IndexingContext::GetOrCreateFragmentId(
       return {code_id, false};
     }
 
-  // "Small codes" have IDs in the range `[mx::mx::kMaxNumBigPendingFragments, ...)`.
+  // "Small codes" have IDs in the range
+  // `[mx::mx::kMaxNumBigPendingFragments, ...)`.
   } else {
-    auto &maybe_id = this->local_next_small_fragment_id[worker_id].id;
+    auto &maybe_id = server_context[worker_id].local_next_small_fragment_id;
     mx::RawEntityId created_id = mx::kInvalidEntityId;
     if (!maybe_id.has_value()) {
-      created_id = server_context[worker_id].next_small_fragment_id.fetch_add(
-          mx::kMinEntityIdIncrement);;
+      created_id = next_small_fragment_id.fetch_add(mx::kMinEntityIdIncrement);
     } else {
       created_id = std::move(maybe_id.value());
-      maybe_id = {};
+      maybe_id.reset();
     }
 
-    mx::RawEntityId code_id = server_context[worker_id]->code_hash_to_fragment_id.GetOrSet(
-        code_hash, created_id);
+    mx::RawEntityId code_id =
+        server_context[worker_id]->code_hash_to_fragment_id.GetOrSet(
+            code_hash, created_id);
 
     CHECK_GE(code_id, mx::kMaxBigFragmentId);
     if (code_id == created_id) {
@@ -256,14 +256,5 @@ void IndexingContext::PutFragmentLineCoverage(
     server_context[worker_id]->file_fragment_lines.Insert(file_id, i, fragment_id);
   }
 }
-
-SearchingContext::SearchingContext(std::filesystem::path db_path, mx::Executor ex)
-    : local_next_file_id(mx::kMinEntityIdIncrement) {
-  for(size_t i = 0; i < ex.NumWorkers(); ++i) {
-    server_context.emplace_back(db_path);
-  }
-}
-
-SearchingContext::~SearchingContext(void) {}
 
 }  // namespace indexer

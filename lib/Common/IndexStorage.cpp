@@ -14,6 +14,9 @@
 namespace mx {
 IndexStorage::IndexStorage(sqlite::Connection& db)
     : db(db)
+    , next_file_id(db)
+    , next_small_fragment_id(db)
+    , next_big_fragment_id(db)
     , version_number(db)
     , file_id_to_path(db)
     , file_id_to_serialized_file(db)

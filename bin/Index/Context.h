@@ -48,36 +48,17 @@ using TypeKey = std::pair<const void *, uint32_t>;
 struct TypeIdMap final : public std::map<TypeKey, mx::EntityId> {};
 struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
 
-template <typename T>
-struct alignas(64) NextId {
-  std::optional<T> id;
-};
-
 // State that lives at least as long as the server itself.
-class ServerContext {
+class alignas(64) ServerContext {
  public:
+  const size_t worker_id;
   sqlite::Connection db;
   mx::IndexStorage storage;
 
-  // The next file ID that can be assigned. This represents an upper bound on
-  // the total number of file IDs.
-  std::atomic<mx::RawEntityId> next_file_id;
-
-  // The next ID for a "small fragment." A small fragment has fewer than
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
-  // are more common, and require fewer bits to encode token offsets inside of
-  // the packed `mx::EntityId` for tokens.
-  std::atomic<mx::RawEntityId> next_small_fragment_id;
-
-  // The next ID for a "big fragment." A big fragment has at least
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
-  // are less common, so we reserve space for fewer of them (typically there is
-  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
-  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
-  // but because we reserve the low ID space for big fragment IDs, we know that
-  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
-  // bit for token offset bits.
-  std::atomic<mx::RawEntityId> next_big_fragment_id;
+  // Worker-local next counters for IDs.
+  std::optional<mx::RawEntityId> local_next_file_id;
+  std::optional<mx::RawEntityId> local_next_small_fragment_id;
+  std::optional<mx::RawEntityId> local_next_big_fragment_id;
 
   void Flush(void);
 
@@ -87,7 +68,8 @@ class ServerContext {
 
   ~ServerContext(void);
 
-  explicit ServerContext(std::filesystem::path db_path);
+  explicit ServerContext(std::filesystem::path db_path,
+                         size_t worker_id);
 };
 
 // State that needs to live only as long as there are active indexing jobs
@@ -119,10 +101,26 @@ class IndexingContext {
 
   mx::Executor executor;
 
-  // Worker-local next counters for IDs.
-  std::vector<NextId<mx::RawEntityId>> local_next_file_id;
-  std::vector<NextId<mx::RawEntityId>> local_next_small_fragment_id;
-  std::vector<NextId<mx::RawEntityId>> local_next_big_fragment_id;
+  // The next file ID that can be assigned. This represents an upper bound on
+  // the total number of file IDs.
+  std::atomic<mx::RawEntityId> next_file_id;
+
+  // The next ID for a "small fragment." A small fragment has fewer than
+  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
+  // are more common, and require fewer bits to encode token offsets inside of
+  // the packed `mx::EntityId` for tokens.
+  std::atomic<mx::RawEntityId> next_small_fragment_id;
+
+  // The next ID for a "big fragment." A big fragment has at least
+  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
+  // are less common, so we reserve space for fewer of them (typically there is
+  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
+  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
+  // but because we reserve the low ID space for big fragment IDs, we know that
+  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
+  // bit for token offset bits.
+  std::atomic<mx::RawEntityId> next_big_fragment_id;
+
 
   CodeGenerator codegen;
 
@@ -169,22 +167,6 @@ class IndexingContext {
   void PutFragmentLineCoverage(mx::WorkerId worker_id_, mx::RawEntityId file_id,
                                mx::RawEntityId fragment_id,
                                unsigned start_line, unsigned end_line);
-};
-
-class SearchingContext {
- public:
-  std::deque<ServerContext> server_context;
-
-  explicit SearchingContext(std::filesystem::path db_path, mx::Executor ex);
-  virtual ~SearchingContext(void);
-
-  // Next file ID for any `SearchingAction` to look at.
-  std::atomic<mx::RawEntityId> local_next_file_id;
-
-  // Set of `file_id:line_number` pairs where matches were approximately
-  // found.
-  std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
-  std::mutex line_results_lock;
 };
 
 }  // namespace indexer
