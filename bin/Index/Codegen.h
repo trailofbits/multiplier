@@ -7,16 +7,17 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Action.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/Decl.h>
 #include <string>
 #include <vector>
 
+#include "Action.h"
+
 namespace indexer {
 
 class EntityMapper;
-class IndexingContext;
+class GlobalIndexingState;
 
 class CodeGeneratorImpl;
 class CodeGenerator {

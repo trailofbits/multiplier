@@ -140,7 +140,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   conn.Execute("PRAGMA application_id = 0xce9ccea7");
 
   mx::Executor executor{{FLAGS_num_workers}};
-  auto ic = std::make_shared<indexer::IndexingContext>(FLAGS_db, executor);
+  auto ic = std::make_shared<indexer::GlobalIndexingState>(FLAGS_db, executor);
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 

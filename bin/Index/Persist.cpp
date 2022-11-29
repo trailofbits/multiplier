@@ -13,7 +13,6 @@
 #include <glog/logging.h>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
-#include <multiplier/ProgressBar.h>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
@@ -24,6 +23,7 @@
 #include "Compress.h"
 #include "Context.h"
 #include "EntityMapper.h"
+#include "ProgressBar.h"
 #include "TokenTree.h"
 #include "Util.h"
 
@@ -791,7 +791,7 @@ static void PersistTokenContexts(
 // for every such query. Similarly, we often want to map from matches in files
 // to matches in fragments, and so we create and persist a mapping of file
 // offsets to line numbers here to help us with those translations later.
-void PersistFile(mx::WorkerId worker_id, IndexingContext &context,
+void PersistFile(mx::WorkerId worker_id, GlobalIndexingState &context,
                  mx::RawEntityId file_id, std::string file_hash,
                  pasta::File file) {
 
@@ -891,7 +891,7 @@ static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
+void PersistFragment(mx::WorkerId worker_id, GlobalIndexingState &context,
                      pasta::AST &ast, NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens, PendingFragment frag) {
@@ -958,11 +958,12 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // fragment or its data.
   bool is_fallback_token_tree = false;
 
-  mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-      tokens, begin_index, end_index, is_fallback_token_tree);
-  if (!maybe_tt.Succeeded()) {
+  std::stringstream tok_tree_err;
+  std::optional<TokenTree> maybe_tt = TokenTree::Create(
+      tokens, begin_index, end_index, tok_tree_err, is_fallback_token_tree);
+  if (!maybe_tt) {
     LOG(ERROR)
-      << maybe_tt.TakeError() << " for top-level declaration "
+      << tok_tree_err.str() << " for top-level declaration "
       << DeclToString(leader_decl)
       << PrefixedLocation(leader_decl, " at or near ")
       << " on main job file "
@@ -972,7 +973,8 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
 
     // Try to create a simpler, fallback token tree.
     maybe_tt = TokenTree::Create(
-        tokens, begin_index, end_index, is_fallback_token_tree  /* fallback */);
+        tokens, begin_index, end_index, tok_tree_err,
+        is_fallback_token_tree  /* fallback */);
 
   } else {
     fb.setHadSubstitutionError(false);
@@ -982,13 +984,13 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // effort saving of macro tokens. Don't bother organizing them into
   // substitutions because that will just replicate logic from the token
   // tree.
-  if (!maybe_tt.Succeeded()) {
+  if (!maybe_tt) {
     BackupPersistMacroTokens(em, tokens, begin_index, end_index, fb);
 
   // We have a token tree, or possibly a fallback token tree. The fallback
   // token trees aren't as nice because they lack whitespace.
   } else {
-    PersistTokenTree(em, fb, maybe_tt.TakeValue(), tokens, begin_index,
+    PersistTokenTree(em, fb, std::move(maybe_tt.value()), tokens, begin_index,
                      end_index);
   }
 

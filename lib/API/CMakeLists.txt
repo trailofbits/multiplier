@@ -11,7 +11,22 @@ string(TOLOWER "${PROJECT_NAME}" lower_project_name)
 set(source_include_dir "${PROJECT_SOURCE_DIR}/include/${lower_project_name}")
 set(binary_include_dir "${PROJECT_BINARY_DIR}/include/${lower_project_name}")
 
-file(GLOB entity_headers CONFIGURE_DEPENDS "${source_include_dir}/entities/*.h")
+file(GLOB entity_headers CONFIGURE_DEPENDS "${source_include_dir}/Entities/*.h")
+
+add_library("mx-entities" INTERFACE)
+set_target_properties("mx-entities"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    PUBLIC_HEADER
+      "${entity_headers}"
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+)
 
 set(api_headers
   "${source_include_dir}/AST.h"
@@ -19,19 +34,17 @@ set(api_headers
   "${source_include_dir}/Fragment.h"
   "${source_include_dir}/Index.h"
   "${source_include_dir}/Iterator.h"
-  "${source_include_dir}/Compress.h"
   "${source_include_dir}/Query.h"
   "${source_include_dir}/Reference.h"
-  "${source_include_dir}/Result.h"
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Use.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
-  ${entity_headers}
 )
 
 add_library("mx-api"
   STATIC
     ${api_headers}
+    ${entity_headers}
 
     "${MX_BOOTSTRAP_LIB_API_AST_CPP}"  # Auto-generated
     
@@ -72,6 +85,7 @@ add_library("mx-api"
 target_link_libraries("mx-api"
   PUBLIC
     "mx-common"
+    "mx-entities"
 )
 
 set_target_properties("mx-api"
@@ -100,8 +114,18 @@ target_include_directories("mx-api"
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
+      "mx-entities"
+    EXPORT
+      "${PROJECT_NAME}Targets"
+    PUBLIC_HEADER
+      DESTINATION
+        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}/Entities"
+  )
+  install(
+    TARGETS
       "mx-api"
-    EXPORT "${PROJECT_NAME}Targets"
+    EXPORT
+      "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
         "${CMAKE_INSTALL_BINDIR}"

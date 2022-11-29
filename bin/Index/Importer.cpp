@@ -22,12 +22,8 @@
 #include <llvm/Support/FormatVariadic.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
-#include <multiplier/Action.h>
 #include <multiplier/AST.h>
-#include <multiplier/Executor.h>
-#include <multiplier/PASTA.h>
 #include <multiplier/Result.h>
-#include <multiplier/Subprocess.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
@@ -37,7 +33,10 @@
 #include <pasta/Util/FileSystem.h>
 #include <pasta/Util/Result.h>
 
+#include "Action.h"
 #include "IndexCompileJob.h"
+#include "PASTA.h"
+#include "Subprocess.h"
 
 #include <fcntl.h>
 
@@ -73,7 +72,7 @@ class BuildCommandAction final : public mx::Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
-  std::shared_ptr<IndexingContext> ctx;
+  std::shared_ptr<GlobalIndexingState> ctx;
 
   // If we are using something like CMake commands, then pull in the relevant
   // information by trying to execute the compiler directly.
@@ -89,7 +88,7 @@ class BuildCommandAction final : public mx::Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            std::shared_ptr<IndexingContext> ctx)
+                            std::shared_ptr<GlobalIndexingState> ctx)
       : fm(fm_),
         command(command_),
         ctx(ctx) {}
@@ -277,15 +276,15 @@ struct Importer::PrivateData {
 
   std::filesystem::path cwd;
   pasta::FileManager &fm;
-  std::shared_ptr<IndexingContext> ctx;
+  std::shared_ptr<GlobalIndexingState> ctx;
 
-  inline PrivateData(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<IndexingContext> ctx)
+  inline PrivateData(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<GlobalIndexingState> ctx)
       : cwd(std::move(cwd_)), fm(fm), ctx(ctx) {}
 };
 
 Importer::~Importer(void) {}
 
-Importer::Importer(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<IndexingContext> ctx)
+Importer::Importer(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<GlobalIndexingState> ctx)
     : d(std::make_unique<Importer::PrivateData>(std::move(cwd_), fm, ctx)) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {

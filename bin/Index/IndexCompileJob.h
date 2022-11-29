@@ -7,14 +7,14 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Action.h>
-#include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Job.h>
 #include <pasta/Util/FileManager.h>
 #include <unordered_map>
 
+#include "Action.h"
 #include "Context.h"
+#include "ProgressBar.h"
 
 namespace pasta {
 class AST;
@@ -28,7 +28,7 @@ struct FileHashMap;
 
 class IndexCompileJobAction final : public mx::Action {
  private:
-  const std::shared_ptr<IndexingContext> context;
+  const std::shared_ptr<GlobalIndexingState> context;
   const pasta::FileManager file_manager;
   const pasta::CompileJob job;
 
@@ -47,7 +47,7 @@ class IndexCompileJobAction final : public mx::Action {
  public:
   virtual ~IndexCompileJobAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<IndexingContext> context_,
+  IndexCompileJobAction(std::shared_ptr<GlobalIndexingState> context_,
                         pasta::FileManager file_manager_,
                         pasta::CompileJob job_);
 

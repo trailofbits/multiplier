@@ -8,7 +8,6 @@
 
 #include "Serialize.h"
 
-#include <multiplier/PASTA.h>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
@@ -21,6 +20,7 @@
 
 #include <glog/logging.h>
 #include "EntityMapper.h"
+#include "PASTA.h"
 #include "Util.h"
 
 namespace indexer {

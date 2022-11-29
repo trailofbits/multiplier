@@ -223,14 +223,14 @@ class TokenTreeImpl {
   TokenInfo *BuildInitialTokenList(pasta::TokenRange range,
                                    uint64_t begin_index,
                                    uint64_t end_index,
-                                   std::stringstream &err);
+                                   std::ostream &err);
 
   bool TryFillBetweenFileTokens(
       Substitution *sub, TokenInfo *prev, TokenInfo *curr, bool &stopped_early,
       Substitution::NodeList &nodes);
 
   Substitution *GetMacroBody(pasta::MacroDefinition def,
-                             std::stringstream &err);
+                             std::ostream &err);
 
   TokenInfo *TryGetBeforeToken(TokenInfo *curr);
   TokenInfo *TryGetAfterToken(TokenInfo *curr);
@@ -240,9 +240,9 @@ class TokenTreeImpl {
   // Fill in the missing tokens from the token tree.
   void StripWhitespace(Substitution::NodeList &nodes);
   void HandleVAOpt(Substitution *sub, bool has_macro_token_in_arg=false);
-//  bool FillMissingFileTokens(Substitution *sub, std::stringstream &err);
+//  bool FillMissingFileTokens(Substitution *sub, std::ostream &err);
 //  bool FillMissingFileTokensRec(Substitution *sub, bool &changed,
-//                                std::stringstream &err);
+//                                std::ostream &err);
 
 
 //  void ProvenanceBasedParameterSubstitution(
@@ -254,10 +254,10 @@ class TokenTreeImpl {
                                  TokenInfo *upper_bound);
 //  void FindSubstitutionBounds(void);
   Substitution *MergeArguments(Substitution *orig, Substitution *pre_arg,
-                               std::stringstream &err);
-  bool MergeArgPreExpansions(std::stringstream &err);
+                               std::ostream &err);
+  bool MergeArgPreExpansions(std::ostream &err);
   bool MergeArgPreExpansion(Substitution *sub, Substitution *pre_exp,
-                            std::stringstream &err);
+                            std::ostream &err);
   Substitution *TryInventMissingSubstitutions(
       Substitution *sub, TokenInfo *prev, Substitution::Node curr_node,
       unsigned next_index, bool &stopped_early);
@@ -265,52 +265,52 @@ class TokenTreeImpl {
   bool AddMissingPrefixes(
       Substitution *sub, TokenInfo *prev, Substitution::Node curr,
       bool &stopped_early, Substitution::NodeList &nodes,
-      std::stringstream &err);
+      std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroToken> node, std::stringstream &err);
+      std::optional<pasta::MacroToken> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroArgument> node, std::stringstream &err);
+      std::optional<pasta::MacroArgument> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroSubstitution> node, std::stringstream &err);
+      std::optional<pasta::MacroSubstitution> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroExpansion> node, std::stringstream &err);
+      std::optional<pasta::MacroExpansion> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroDirective> node, std::stringstream &err);
+      std::optional<pasta::MacroDirective> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroFileInclusion> node, std::stringstream &err);
+      std::optional<pasta::MacroFileInclusion> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroDefinition> node, std::stringstream &err);
+      std::optional<pasta::MacroDefinition> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      pasta::MacroNode node, std::stringstream &err);
+      pasta::MacroNode node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::stringstream &err);
+      std::ostream &err);
 
   Substitution *BuildFileSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::stringstream &err);
+      std::ostream &err);
 
   Substitution *BuildSubstitutions(TokenInfo *&prev, TokenInfo *&curr,
-                                   std::stringstream &err);
+                                   std::ostream &err);
 
-  Substitution *BuildSubstitutions(std::stringstream &err);
+  Substitution *BuildSubstitutions(std::ostream &err);
 
   Substitution *CreateSubstitution(Substitution::Kind kind);
 
@@ -984,7 +984,7 @@ static void ResolveFileLocation(TokenInfo *info) {
 TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
                                                 uint64_t begin_index,
                                                 uint64_t end_index,
-                                                std::stringstream &err) {
+                                                std::ostream &err) {
   int macro_depth = 0;
   TokenInfo *last_macro_use_token = nullptr;
 
@@ -1557,7 +1557,7 @@ Substitution *TokenTreeImpl::TryInventMissingSubstitutions(
 bool TokenTreeImpl::AddMissingPrefixes(
     Substitution *sub, TokenInfo *prev, Substitution::Node curr_node,
     bool &stopped_early, Substitution::NodeList &nodes,
-    std::stringstream &err) {
+    std::ostream &err) {
 
   TokenInfo *curr = LeftCornerOfUse(curr_node);
   if (!curr) {
@@ -1662,7 +1662,7 @@ static Substitution *MacroDirective(Substitution::Node node) {
 // Then things like `another_macro` and the `#if` will be present in `orig` but
 // not in `pre_exp`.
 Substitution *TokenTreeImpl::MergeArguments(
-    Substitution *sub, Substitution *pre_exp, std::stringstream &err) {
+    Substitution *sub, Substitution *pre_exp, std::ostream &err) {
 
   assert(sub->after != pre_exp);
   assert(!sub->after);
@@ -1734,7 +1734,7 @@ Substitution *TokenTreeImpl::MergeArguments(
   return sub;
 }
 
-bool TokenTreeImpl::MergeArgPreExpansions(std::stringstream &err) {
+bool TokenTreeImpl::MergeArgPreExpansions(std::ostream &err) {
   auto max_i = substitutions_alloc.size();
   for (auto i = 0u; i < max_i; ++i) {
     Substitution *sub = &(substitutions_alloc[i]);
@@ -1761,7 +1761,7 @@ bool TokenTreeImpl::MergeArgPreExpansions(std::stringstream &err) {
 // presented in a confusing way.
 bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
                                          Substitution *pre_exp,
-                                         std::stringstream &err) {
+                                         std::ostream &err) {
 
   D( std::cerr << indent << "Merge pre expansion\n"; )
   D( indent += "  "; )
@@ -2154,7 +2154,7 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
 // Get or create a substitution representing the body of the macro. Really, this
 // is to get the beginning/ending tokens.
 Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
-                                          std::stringstream &err) {
+                                          std::ostream &err) {
 
   TokenInfo *prev = nullptr;
   Substitution *&body = macro_body[def.RawNode()];
@@ -2499,7 +2499,7 @@ void TokenTreeImpl::HandleVAOpt(
 //
 //// Fill in the missing tokens from the token tree.
 //bool TokenTreeImpl::FillMissingFileTokens(Substitution *sub,
-//                                          std::stringstream &err) {
+//                                          std::ostream &err) {
 //  auto ret = false;
 //  std::stringstream sub_err;
 //  auto i = 0u;
@@ -2528,7 +2528,7 @@ void TokenTreeImpl::HandleVAOpt(
 //// Fill in the missing tokens from the token tree.
 //bool TokenTreeImpl::FillMissingFileTokensRec(Substitution *sub,
 //                                             bool &stopped_early,
-//                                             std::stringstream &err) {
+//                                             std::ostream &err) {
 //
 //  TokenInfo *prev = nullptr;
 //  if (sub->before_body && sub->before_body->file_tok) {
@@ -2825,7 +2825,7 @@ static void LabelUseNodesIn(Substitution::NodeList &nodes,
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroToken> node, std::stringstream &err) {
+    std::optional<pasta::MacroToken> node, std::ostream &err) {
 
   // We may have filled in missing file tokens between macro use tokens, which
   // have file location information.
@@ -2878,7 +2878,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroArgument> node, std::stringstream &err) {
+    std::optional<pasta::MacroArgument> node, std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(Substitution::kMacroArgument);
   arg_sub->parent = sub;
@@ -2901,7 +2901,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroSubstitution> node, std::stringstream &err) {
+    std::optional<pasta::MacroSubstitution> node, std::ostream &err) {
 
   Substitution *exp_use = CreateSubstitution(Substitution::kSubstitutionBefore);
   Substitution *exp_sub = CreateSubstitution(Substitution::kSubstitutionAfter);
@@ -2934,7 +2934,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroExpansion> node, std::stringstream &err) {
+    std::optional<pasta::MacroExpansion> node, std::ostream &err) {
 
   Substitution *exp_use = CreateSubstitution(Substitution::kMacroUse);
   Substitution *exp_sub = CreateSubstitution(Substitution::kMacroExpansion);
@@ -2998,7 +2998,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroDirective> node, std::stringstream &err) {
+    std::optional<pasta::MacroDirective> node, std::ostream &err) {
   Substitution *dir_use = CreateSubstitution(Substitution::kDirective);
   sub->before.emplace_back(dir_use);
   dir_use->parent = sub;
@@ -3025,7 +3025,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroFileInclusion> node, std::stringstream &err) {
+    std::optional<pasta::MacroFileInclusion> node, std::ostream &err) {
   Substitution *dir_use = CreateSubstitution(Substitution::kInclusion);
   sub->before.emplace_back(dir_use);
   dir_use->parent = sub;
@@ -3050,7 +3050,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroDefinition> node, std::stringstream &err) {
+    std::optional<pasta::MacroDefinition> node, std::ostream &err) {
   Substitution *def = CreateSubstitution(Substitution::kDefinition);
   sub->before.emplace_back(def);
   def->parent = sub;
@@ -3075,7 +3075,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    pasta::MacroNode node, std::stringstream &err) {
+    pasta::MacroNode node, std::ostream &err) {
   switch (node.Kind()) {
     case pasta::MacroNodeKind::kInvalid:
       DCHECK(false);
@@ -3112,7 +3112,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 // uses bottom-up, working our way up to the root node.
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::stringstream &err) {
+    std::ostream &err) {
 
   TokenInfo *before_body = curr;
 
@@ -3188,7 +3188,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildFileSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::stringstream &err) {
+    std::ostream &err) {
 
   TokenInfo * const before_body = curr;
 
@@ -3249,7 +3249,7 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
 }
 
 Substitution *TokenTreeImpl::BuildSubstitutions(
-    TokenInfo *&prev, TokenInfo *&curr, std::stringstream &err) {
+    TokenInfo *&prev, TokenInfo *&curr, std::ostream &err) {
 
   Substitution *sub = CreateSubstitution(Substitution::kFileBody);
   while (curr) {
@@ -3925,7 +3925,7 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
 //}
 
 // Build the initial tree of substitutions.
-Substitution *TokenTreeImpl::BuildSubstitutions(std::stringstream &err) {
+Substitution *TokenTreeImpl::BuildSubstitutions(std::ostream &err) {
   std::vector<Substitution *> subs;
 
   TokenInfo *prev = nullptr;
@@ -4314,22 +4314,21 @@ TokenTree::~TokenTree(void) {}
 
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
-mx::Result<TokenTree, std::string>
+std::optional<TokenTree>
 TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
-                  uint64_t end_index, bool fallback) {
-  std::stringstream err;
+                  uint64_t end_index, std::ostream &err, bool fallback) {
 
   if (begin_index > end_index) {
     err << "Cannot create token tree; begin index (" << begin_index
         << ") is greater than end index (" << end_index << ")";
-    return err.str();
+    return std::nullopt;
   }
 
   if (auto range_size = range.Size(); end_index >= range_size) {
     err << "Cannot create token tree; end index (" << end_index
         << ") is greater than or equal to the range size ("
         << range_size << ")";
-    return err.str();
+    return std::nullopt;
   }
 
   auto impl = std::make_shared<TokenTreeImpl>();
@@ -4339,12 +4338,12 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     // Build and classify the initial list of tokens.
     if (!impl->BuildInitialTokenList(std::move(range), begin_index,
                                      end_index, err)) {
-      return err.str();
+      return std::nullopt;
     }
 
     Substitution *sub = impl->BuildSubstitutions(err);
     if (!sub) {
-      return err.str();
+      return std::nullopt;
     }
 
 //    impl->UnifyTokens();
@@ -4367,7 +4366,7 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 
 
       if (!impl->MergeArgPreExpansions(err)) {
-        return err.str();
+        return std::nullopt;
       }
 
 
@@ -4395,7 +4394,8 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
     return TokenTree(std::move(ret));
 
   } catch (const char *msg) {
-    return std::string(msg);
+    err << msg;
+    return std::nullopt;
   }
 }
 

@@ -606,7 +606,7 @@ static std::vector<DeclGroupRange> PartitionTLDs(
 // the redundant declarations that are likely to appear early in ASTs, i.e.
 // in `#include`d headers.
 static std::vector<PendingFragment> CreatePendingFragments(
-    mx::WorkerId worker_id, IndexingContext &context, EntityIdMap &entity_ids,
+    mx::WorkerId worker_id, GlobalIndexingState &context, EntityIdMap &entity_ids,
     FileHashMap &file_hashes, const pasta::TokenRange &tok_range,
     std::vector<DeclGroupRange> decl_group_ranges) {
 
@@ -616,6 +616,9 @@ static std::vector<PendingFragment> CreatePendingFragments(
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
+  // Visit decl range groups in reverse order, so that we're more likely to
+  // see the definitely unique fragments first, as they'll appear in the main
+  // source file of this translation unit.
   for (std::vector<DeclGroupRange>::reverse_iterator
        it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
@@ -664,7 +667,7 @@ static std::vector<PendingFragment> CreatePendingFragments(
 IndexCompileJobAction::~IndexCompileJobAction(void) {}
 
 IndexCompileJobAction::IndexCompileJobAction(
-    std::shared_ptr<IndexingContext> context_,
+    std::shared_ptr<GlobalIndexingState> context_,
     pasta::FileManager file_manager_,
     pasta::CompileJob job_)
     : context(std::move(context_)),

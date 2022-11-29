@@ -14,7 +14,6 @@
 #include <map>
 #include <memory>
 #include <multiplier/PersistentMap.h>
-#include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <multiplier/IndexStorage.h>
 #include <mutex>
@@ -28,7 +27,8 @@
 #include <deque>
 
 #include "Codegen.h"
-#include "multiplier/SQLiteStore.h"
+#include "Executor.h"
+#include "ProgressBar.h"
 
 namespace mx {
 class Executor;
@@ -38,7 +38,7 @@ enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
-class IndexingContext;
+class GlobalIndexingState;
 class CodeGenerator;
 
 struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
@@ -49,34 +49,45 @@ struct TypeIdMap final : public std::map<TypeKey, mx::EntityId> {};
 struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
 
 // State that lives at least as long as the server itself.
-class alignas(64) ServerContext {
+class alignas(64) WorkerIndexingState {
  public:
-  const size_t worker_id;
   sqlite::Connection db;
+
+  // Access to the database, shared with the API.
   mx::IndexStorage storage;
 
-  // Worker-local next counters for IDs.
+  // Worker-local next counters for IDs. There is a global version of these
+  // that is an atomic counter. There is a deliberate race condition when
+  // assigning IDs to things like fragments. There may be two or more worker
+  // threads vying to assign the same fragment different IDs, and only one can
+  // win. So, what ends up happening is that when we fail, we save off the ID
+  // that didn't get assigned, and try to use it for the next thing. In general,
+  // we want a dense ID space, as there are only so many bits allocated to
+  // differerent things inside of a packed `RawEntityId`.
   std::optional<mx::RawEntityId> local_next_file_id;
   std::optional<mx::RawEntityId> local_next_small_fragment_id;
   std::optional<mx::RawEntityId> local_next_big_fragment_id;
 
   void Flush(void);
 
-  inline mx::IndexStorage* operator->() {
-    return &storage;
+  ~WorkerIndexingState(void);
+
+  explicit WorkerIndexingState(std::filesystem::path db_path);
+
+  inline mx::IndexStorage &ClientSharedStorage(void) {
+    return storage;
   }
-
-  ~ServerContext(void);
-
-  explicit ServerContext(std::filesystem::path db_path,
-                         size_t worker_id);
 };
 
 // State that needs to live only as long as there are active indexing jobs
 // underway.
-class IndexingContext {
+class GlobalIndexingState {
  public:
-  std::deque<ServerContext> server_context;
+  std::deque<WorkerIndexingState> server_context;
+
+  inline WorkerIndexingState &PerWorkerState(mx::WorkerId wid) {
+    return server_context[wid];
+  }
 
   // Tracks progress in parsing compile commands and turning them into compile
   // jobs.
@@ -103,12 +114,18 @@ class IndexingContext {
 
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
+  //
+  // NOTE(pag): This is an in-memory "fast" version that is meant to hold
+  //            the next state for `IndexStorage::next_file_id`.
   std::atomic<mx::RawEntityId> next_file_id;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
   // are more common, and require fewer bits to encode token offsets inside of
   // the packed `mx::EntityId` for tokens.
+  //
+  // NOTE(pag): This is an in-memory "fast" version that is meant to hold
+  //            the next state for `IndexStorage::next_small_fragment_id`.
   std::atomic<mx::RawEntityId> next_small_fragment_id;
 
   // The next ID for a "big fragment." A big fragment has at least
@@ -119,15 +136,18 @@ class IndexingContext {
   // but because we reserve the low ID space for big fragment IDs, we know that
   // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
   // bit for token offset bits.
+  //
+  // NOTE(pag): This is an in-memory "fast" version that is meant to hold
+  //            the next state for `IndexStorage::next_big_fragment_id`.
   std::atomic<mx::RawEntityId> next_big_fragment_id;
 
-
+  // MLIR code generator.
   CodeGenerator codegen;
 
-  explicit IndexingContext(std::filesystem::path db_path,
-                           const mx::Executor &exe_);
+  explicit GlobalIndexingState(std::filesystem::path db_path,
+                               const mx::Executor &exe_);
 
-  ~IndexingContext(void);
+  ~GlobalIndexingState(void);
 
   void InitializeProgressBars(void);
 
@@ -144,22 +164,28 @@ class IndexingContext {
       uint64_t num_tokens);
 
   // Save the serialized contents of a file as a token list.
-  void PutSerializedFile(mx::WorkerId worker_id_, mx::RawEntityId file_id, std::string);
+  void PutSerializedFile(mx::WorkerId worker_id_, mx::RawEntityId file_id,
+                         std::string);
 
   // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(mx::WorkerId worker_id_, mx::RawEntityId id, std::string);
+  void PutSerializedFragment(mx::WorkerId worker_id_, mx::RawEntityId id,
+                             std::string);
 
   // Link fragment declarations.
-  void LinkDeclarations(mx::WorkerId worker_id_, mx::RawEntityId a, mx::RawEntityId b);
+  void LinkDeclarations(mx::WorkerId worker_id_, mx::RawEntityId a,
+                        mx::RawEntityId b);
 
   // Link the mangled name of something to its entity ID.
-  void LinkMangledName(mx::WorkerId worker_id_, const std::string &name, mx::RawEntityId eid);
+  void LinkMangledName(mx::WorkerId worker_id_, const std::string &name,
+                       mx::RawEntityId eid);
 
   // Link an entity to the fragment that uses the entity.
-  void LinkUseInFragment(mx::WorkerId worker_id_, mx::RawEntityId use, mx::RawEntityId user);
+  void LinkUseInFragment(mx::WorkerId worker_id_, mx::RawEntityId use,
+                         mx::RawEntityId user);
 
   // Link a direct reference to an entity from another entity.
-  void LinkReferenceInFragment(mx::WorkerId worker_id_, mx::RawEntityId use, mx::RawEntityId user);
+  void LinkReferenceInFragment(mx::WorkerId worker_id_, mx::RawEntityId use,
+                               mx::RawEntityId user);
 
   // Save an entries of the form `(file_id, line_number, fragment_id)` over
   // the inclusive range `[start_line, end_line]` so that we can figure out

@@ -6,16 +6,12 @@
 
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <system_error>
 #include <unordered_map>
 #include <vector>
-#include "Result.h"
+#include <multiplier/Result.h>
 
-namespace pasta {
-class ArgumentVector;
-}  // namespace pasta
 namespace mx {
 
 class Subprocess {

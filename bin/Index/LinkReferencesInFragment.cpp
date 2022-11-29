@@ -7,10 +7,10 @@
 
 #include <type_traits>
 
-#include <multiplier/PASTA.h>
 #include <pasta/AST/Stmt.h>
 
 #include "EntityMapper.h"
+#include "PASTA.h"
 #include "PendingFragment.h"
 #include "Util.h"
 
@@ -85,7 +85,7 @@ static bool MayHaveRemoteRedeclarations(const pasta::Decl &decl) {
 }  // namespace
 
 void PendingFragment::LinkReferences(
-    mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em) {
+    mx::WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
     if (stmt.Kind() == pasta::StmtKind::kImplicitCastExpr) {
       continue;

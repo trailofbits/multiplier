@@ -14,12 +14,12 @@
 
 namespace indexer {
 
-class IndexingContext;
+class GlobalIndexingState;
 
-void PersistFile(mx::WorkerId worker_id, IndexingContext &context, mx::RawEntityId file_id,
+void PersistFile(mx::WorkerId worker_id, GlobalIndexingState &context, mx::RawEntityId file_id,
                  std::string file_hash, pasta::File file);
 
-void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
+void PersistFragment(mx::WorkerId worker_id, GlobalIndexingState &context,
                      pasta::AST &ast,
                      NameMangler &mangler,
                      EntityIdMap &entity_ids,

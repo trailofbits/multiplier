@@ -594,8 +594,8 @@ class CodeGenerator {
   std::ofstream serialize_h_os;  // `bin/Index/Serialize.h`
   std::ofstream serialize_cpp_os;  // `bin/Index/Serialize.cpp`
   std::ofstream serialize_inc_os;  // `include/multiplier/Visitor.inc.h`
-  std::ofstream lib_pasta_cpp_os;  // `lib/Util/PASTA.cpp`
-  std::ofstream lib_pasta_h_os;  // `include/Multiplier/PASTA.h`
+  std::ofstream lib_pasta_cpp_os;  // `bin/Index/PASTA.cpp`
+  std::ofstream lib_pasta_h_os;  // `bin/Index/PASTA.h`
   std::stringstream late_serialize_inc_os;
 
   // Keep track of where the decl/stmt/type kind is stored.
@@ -2893,7 +2893,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#include <multiplier/PASTA.h>\n\n"
+      << "#include \"PASTA.h\"\n\n"
       << "#include <multiplier/AST.h>\n\n"
       << "namespace mx {\n";
 
@@ -3085,7 +3085,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include \"Serialize.h\"\n\n"
-      << "#include <multiplier/PASTA.h>\n"
       << "#include <multiplier/RPC.capnp.h>\n"
       << "#include <pasta/AST/Attr.h>\n"
       << "#include <pasta/AST/Decl.h>\n"
@@ -3097,7 +3096,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <pasta/Util/ArgumentVector.h>\n\n"
       << "#include <glog/logging.h>\n"
       << "#include \"EntityMapper.h\"\n"
-      << "#include \"Util.h\"\n\n"
+      << "#include \"PASTA.h\"\n"
+      << "#include \"Util.h\"\n"
       << "namespace indexer {\n\n";
 
   include_h_os

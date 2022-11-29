@@ -8,10 +8,10 @@
 #include <memory>
 #include <unordered_map>
 
-#include <multiplier/Executor.h>
 #include <pasta/Compile/Command.h>
 
 #include "Context.h"
+#include "Executor.h"
 
 namespace llvm {
 namespace json {
@@ -34,7 +34,7 @@ class Importer {
   ~Importer(void);
   explicit Importer(std::filesystem::path cwd_,
     pasta::FileManager &fm,
-    std::shared_ptr<IndexingContext> context);
+    std::shared_ptr<GlobalIndexingState> context);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o, const EnvVariableMap &envp);

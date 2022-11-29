@@ -6,9 +6,8 @@
 
 #include <glog/logging.h>
 
-#include <multiplier/PASTA.h>
-
 #include "Context.h"
+#include "PASTA.h"
 #include "PendingFragment.h"
 #include "Util.h"
 #include "Visitor.h"

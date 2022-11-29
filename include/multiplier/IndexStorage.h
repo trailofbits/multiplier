@@ -62,12 +62,26 @@ class IndexStorage final {
   sqlite::Connection &db;
 
  public:
+  // The next file ID that can be assigned. This represents an upper bound on
+  // the total number of file IDs.
   mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId>
       next_file_id;
 
+  // The next ID for a "small fragment." A small fragment has fewer than
+  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
+  // are more common, and require fewer bits to encode token offsets inside of
+  // the packed `mx::EntityId` for tokens.
   mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId>
       next_small_fragment_id;
 
+  // The next ID for a "big fragment." A big fragment has at least
+  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
+  // are less common, so we reserve space for fewer of them (typically there is
+  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
+  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
+  // but because we reserve the low ID space for big fragment IDs, we know that
+  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
+  // bit for token offset bits.
   mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId>
       next_big_fragment_id;
 
