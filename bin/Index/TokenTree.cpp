@@ -3998,123 +3998,123 @@ Substitution *TokenTreeImpl::BuildSubstitutions(std::ostream &err) {
 //  return prev_set;
 //}
 
-static bool TokenIsParamName(
-    TokenInfo *tok, std::string &param_name,
-    const std::unordered_map<std::string,
-                             Substitution::NodeList> &params) {
-  if (!tok->file_tok || tok->macro_tok || tok->parsed_tok) {
-    return false;
-  }
+//static bool TokenIsParamName(
+//    TokenInfo *tok, std::string &param_name,
+//    const std::unordered_map<std::string,
+//                             Substitution::NodeList> &params) {
+//  if (!tok->file_tok || tok->macro_tok || tok->parsed_tok) {
+//    return false;
+//  }
+//
+//  switch (tok->file_tok->Kind()) {
+//    case pasta::TokenKind::kIdentifier:
+//    case pasta::TokenKind::kRawIdentifier:
+//      break;
+//    default:
+//      return false;
+//  }
+//
+//  auto ftd = tok->file_tok->Data();
+//  param_name.clear();
+//  param_name.insert(param_name.end(), ftd.begin(), ftd.end());
+//  return params.count(param_name);
+//}
 
-  switch (tok->file_tok->Kind()) {
-    case pasta::TokenKind::kIdentifier:
-    case pasta::TokenKind::kRawIdentifier:
-      break;
-    default:
-      return false;
-  }
+//static void CollectExpansionTokensInto(
+//    const Substitution *in, Substitution::NodeList &out) {
+//  while (in->after) {
+//    in = in->after;
+//  }
+//  for (Substitution::Node node : in->before) {
+//    if (std::holds_alternative<Substitution *>(node)) {
+//      CollectExpansionTokensInto(std::get<Substitution *>(node), out);
+//    } else {
+//      out.emplace_back(std::move(node));
+//    }
+//  }
+//}
 
-  auto ftd = tok->file_tok->Data();
-  param_name.clear();
-  param_name.insert(param_name.end(), ftd.begin(), ftd.end());
-  return params.count(param_name);
-}
+//static void CollectArgumentsInto(
+//    const Substitution::NodeList &in, unsigned i,
+//    std::vector<Substitution::NodeList> &out) {
+//
+//  for (auto max_i = in.size(); i < max_i; ++i) {
+//    Substitution::Node node = in[i];
+//    if (!std::holds_alternative<Substitution *>(node)) {
+//      continue;
+//    }
+//    Substitution *sub = std::get<Substitution *>(node);
+//    if (sub->kind == Substitution::kMacroArgument) {
+//      CollectExpansionTokensInto(sub, out.emplace_back());
+//
+//
+//    } else if (sub->kind == Substitution::kMacroUse && sub->after) {
+//      CollectArgumentsInto(sub->after->before, 0u, out);
+//
+//    } else {
+//      CollectArgumentsInto(sub->before, 0u, out);
+//    }
+//  }
+//}
 
-static void CollectExpansionTokensInto(
-    const Substitution *in, Substitution::NodeList &out) {
-  while (in->after) {
-    in = in->after;
-  }
-  for (Substitution::Node node : in->before) {
-    if (std::holds_alternative<Substitution *>(node)) {
-      CollectExpansionTokensInto(std::get<Substitution *>(node), out);
-    } else {
-      out.emplace_back(std::move(node));
-    }
-  }
-}
-
-static void CollectArgumentsInto(
-    const Substitution::NodeList &in, unsigned i,
-    std::vector<Substitution::NodeList> &out) {
-
-  for (auto max_i = in.size(); i < max_i; ++i) {
-    Substitution::Node node = in[i];
-    if (!std::holds_alternative<Substitution *>(node)) {
-      continue;
-    }
-    Substitution *sub = std::get<Substitution *>(node);
-    if (sub->kind == Substitution::kMacroArgument) {
-      CollectExpansionTokensInto(sub, out.emplace_back());
-
-
-    } else if (sub->kind == Substitution::kMacroUse && sub->after) {
-      CollectArgumentsInto(sub->after->before, 0u, out);
-
-    } else {
-      CollectArgumentsInto(sub->before, 0u, out);
-    }
-  }
-}
-
-static void FindParameters(
-    Substitution *sub,
-    std::string &param_name,
-    std::unordered_map<std::string, Substitution::NodeList> &params) {
-
-  TT_ASSERT(sub->kind == Substitution::kMacroUse);
-
-  Substitution::NodeList empty;
-  std::vector<Substitution::NodeList> args;
-  CollectArgumentsInto(sub->before, 1u /* Skip macro name */, args);
-
-  auto i = 0u;
-
-  bool seen_paren = false;
-  for (pasta::MacroNode node : sub->macro_def->Nodes()) {
-    auto tok = pasta::MacroToken::From(node);
-    if (!tok) {
-      continue;
-    }
-
-    switch (tok->TokenKind()) {
-      case pasta::TokenKind::kLParenthesis:
-        if (seen_paren) {
-          goto done;
-        } else {
-          seen_paren = true;
-          continue;
-        }
-      case pasta::TokenKind::kRParenthesis:
-        goto done;
-      case pasta::TokenKind::kIdentifier:
-      case pasta::TokenKind::kRawIdentifier:
-        if (!seen_paren) {
-          continue;
-        } else {
-          std::string_view ftd = tok->Data();
-          param_name.clear();
-          param_name.insert(param_name.end(), ftd.begin(), ftd.end());
-
-          if (i < args.size()) {
-            D( std::cerr
-                << "Found args for macro param name: "
-                << param_name << '\n'; )
-            params.emplace(param_name, args[i]);
-          } else {
-            D( std::cerr << "Found macro param name: " << param_name << '\n'; )
-            params.emplace(param_name, empty);
-          }
-          ++i;
-        }
-        break;
-      default:
-        continue;
-    }
-  }
-done:
-  params.emplace("__VA_ARGS__", empty);
-}
+//static void FindParameters(
+//    Substitution *sub,
+//    std::string &param_name,
+//    std::unordered_map<std::string, Substitution::NodeList> &params) {
+//
+//  TT_ASSERT(sub->kind == Substitution::kMacroUse);
+//
+//  Substitution::NodeList empty;
+//  std::vector<Substitution::NodeList> args;
+//  CollectArgumentsInto(sub->before, 1u /* Skip macro name */, args);
+//
+//  auto i = 0u;
+//
+//  bool seen_paren = false;
+//  for (pasta::MacroNode node : sub->macro_def->Nodes()) {
+//    auto tok = pasta::MacroToken::From(node);
+//    if (!tok) {
+//      continue;
+//    }
+//
+//    switch (tok->TokenKind()) {
+//      case pasta::TokenKind::kLParenthesis:
+//        if (seen_paren) {
+//          goto done;
+//        } else {
+//          seen_paren = true;
+//          continue;
+//        }
+//      case pasta::TokenKind::kRParenthesis:
+//        goto done;
+//      case pasta::TokenKind::kIdentifier:
+//      case pasta::TokenKind::kRawIdentifier:
+//        if (!seen_paren) {
+//          continue;
+//        } else {
+//          std::string_view ftd = tok->Data();
+//          param_name.clear();
+//          param_name.insert(param_name.end(), ftd.begin(), ftd.end());
+//
+//          if (i < args.size()) {
+//            D( std::cerr
+//                << "Found args for macro param name: "
+//                << param_name << '\n'; )
+//            params.emplace(param_name, args[i]);
+//          } else {
+//            D( std::cerr << "Found macro param name: " << param_name << '\n'; )
+//            params.emplace(param_name, empty);
+//          }
+//          ++i;
+//        }
+//        break;
+//      default:
+//        continue;
+//    }
+//  }
+//done:
+//  params.emplace("__VA_ARGS__", empty);
+//}
 
 //void TokenTreeImpl::FinalizeParameters(
 //    Substitution *sub,
