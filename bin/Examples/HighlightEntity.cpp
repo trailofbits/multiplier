@@ -10,6 +10,7 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
+#include <multiplier/Macro.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
 DEFINE_bool(unparsed, false, "Show original source code?");

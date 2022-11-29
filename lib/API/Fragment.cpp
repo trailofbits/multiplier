@@ -5,13 +5,14 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Fragment.h"
+
+#include <cassert>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
 
-#include <cassert>
-
 #include "File.h"
+#include "Macro.h"
 #include "Re2.h"
 #include "Weggli.h"
 

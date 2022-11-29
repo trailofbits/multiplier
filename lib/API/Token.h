@@ -48,23 +48,6 @@ class TokenReader {
                             EntityId eid);
 };
 
-struct BeforeTag {};
-struct AfterTag {};
-
-class MacroSubstitutionListImpl {
- public:
-  const std::shared_ptr<const FragmentImpl> fragment;
-  const NodeReader nodes;
-
-  MacroSubstitutionListImpl(void) = delete;
-
-  MacroSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
-                            unsigned offset, BeforeTag);
-
-  MacroSubstitutionListImpl(std::shared_ptr<const FragmentImpl> fragment_,
-                            unsigned offset, AfterTag);
-};
-
 // Used for invalid tokens.
 class InvalidTokenReader final : public TokenReader {
  public:
