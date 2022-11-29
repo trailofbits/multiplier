@@ -9,7 +9,7 @@
 #include <csignal>
 #include <functional>
 
-namespace mx {
+namespace indexer {
 
 using SignalAction = void(int);
 using LibcSignalAction = void(int, siginfo_t *, void *);
@@ -45,4 +45,4 @@ class Signal {
   Signal(void) = delete;
 };
 
-}  // namespace mx
+}  // namespace indexer

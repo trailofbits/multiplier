@@ -19,7 +19,7 @@
 #include <blockingconcurrentqueue.h>
 #include <llvm/Support/raw_ostream.h>
 
-namespace mx {
+namespace indexer {
 namespace {
 
 class Semaphore : public moodycamel::LightweightSemaphore {
@@ -261,4 +261,4 @@ void ProgressBar::SetNumWorkers(unsigned num_workers) const {
   d->num_workers = num_workers;
 };
 
-}  // namespace mx
+}  // namespace indexer

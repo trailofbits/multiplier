@@ -9,7 +9,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace mx {
+namespace indexer {
 
 // Options for configuring the executor.
 struct ExecutorOptions {
@@ -59,4 +59,4 @@ class Executor {
   std::shared_ptr<ExecutorImpl> d;
 };
 
-}  // namespace mx
+}  // namespace indexer

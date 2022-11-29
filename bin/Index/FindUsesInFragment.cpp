@@ -124,7 +124,7 @@ namespace {
 // Identify all unique entity IDs used by this fragment, and map them to the
 // fragment ID in the data store.
 void PendingFragment::FindDeclarationUses(
-    mx::WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b) {
+    WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b) {
 
   std::unordered_set<mx::RawEntityId> entity_ids;
 

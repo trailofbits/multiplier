@@ -10,7 +10,7 @@
 #include <chrono>
 #include <memory>
 
-namespace mx {
+namespace indexer {
 
 class ProgressBar {
  public:
@@ -76,4 +76,4 @@ class ProgressBarWork : public ProgressBarStep {
   }
 };
 
-}  // namespace mx
+}  // namespace indexer

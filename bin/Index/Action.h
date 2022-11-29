@@ -11,7 +11,7 @@
 
 #include "Executor.h"
 
-namespace mx {
+namespace indexer {
 
 enum WorkerId : unsigned;
 
@@ -77,4 +77,4 @@ class DeferredAction : public std::enable_shared_from_this<DeferredAction> {
   }
 };
 
-}  // namespace mx
+}  // namespace indexer

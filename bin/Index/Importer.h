@@ -39,7 +39,7 @@ class Importer {
   bool ImportBlightCompileCommand(llvm::json::Object &o);
   bool ImportCMakeCompileCommand(llvm::json::Object &o, const EnvVariableMap &envp);
 
-  void Import(mx::Executor &executor);
+  void Import(Executor &executor);
 };
 
 }  // namespace indexer

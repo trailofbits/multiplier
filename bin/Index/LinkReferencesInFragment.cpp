@@ -85,7 +85,7 @@ static bool MayHaveRemoteRedeclarations(const pasta::Decl &decl) {
 }  // namespace
 
 void PendingFragment::LinkReferences(
-    mx::WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
+    WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
   for (const pasta::Stmt &stmt : stmts_to_serialize) {
     if (stmt.Kind() == pasta::StmtKind::kImplicitCastExpr) {
       continue;

@@ -6,8 +6,8 @@
 
 #include "Action.h"
 
-namespace mx {
+namespace indexer {
 
 Action::~Action(void) {}
 
-}  // namespace mx
+}  // namespace indexer

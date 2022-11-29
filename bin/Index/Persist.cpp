@@ -791,7 +791,7 @@ static void PersistTokenContexts(
 // for every such query. Similarly, we often want to map from matches in files
 // to matches in fragments, and so we create and persist a mapping of file
 // offsets to line numbers here to help us with those translations later.
-void PersistFile(mx::WorkerId worker_id, GlobalIndexingState &context,
+void PersistFile(WorkerId worker_id, GlobalIndexingState &context,
                  mx::RawEntityId file_id, std::string file_hash,
                  pasta::File file) {
 
@@ -891,7 +891,7 @@ static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(mx::WorkerId worker_id, GlobalIndexingState &context,
+void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
                      pasta::AST &ast, NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens, PendingFragment frag) {

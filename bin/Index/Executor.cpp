@@ -11,7 +11,7 @@
 #include "Action.h"
 #include "WorkerPool.h"
 
-namespace mx {
+namespace indexer {
 namespace {
 
 // Figure out how many worker threads to use based off of the `ExecutorOptions`.
@@ -72,7 +72,7 @@ void Executor::AddAction(std::unique_ptr<Action> action) const {
 
 // Return the number of workers in this executor.
 unsigned Executor::NumWorkers(void) const noexcept {
-  return ::mx::NumWorkers(d->options);
+  return ::indexer::NumWorkers(d->options);
 }
 
 // Run the executor.
@@ -86,4 +86,4 @@ void Executor::Wait(void) {
   d->Join();
 }
 
-}  // namespace mx
+}  // namespace indexer

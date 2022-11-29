@@ -13,7 +13,7 @@
 #include <thread>
 #include <unistd.h>
 
-namespace mx {
+namespace indexer {
 namespace {
 
 enum : int {
@@ -191,4 +191,4 @@ void Signal::AddHandler(int sig_num, LibcSignalAction *handler) {
   sigaction(sig_num, &act, nullptr);
 }
 
-}  // namespace mx
+}  // namespace indexer

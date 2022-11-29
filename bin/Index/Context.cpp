@@ -37,7 +37,7 @@ void WorkerIndexingState::Flush(void) {
 }
 
 GlobalIndexingState::GlobalIndexingState(std::filesystem::path db_path,
-                                 const mx::Executor &exe_)
+                                 const Executor &exe_)
     : num_workers(exe_.NumWorkers()),
       executor(exe_) {
   for(size_t i = 0; i < num_workers; ++i) {
@@ -75,17 +75,17 @@ GlobalIndexingState::~GlobalIndexingState(void) {
 
 void GlobalIndexingState::InitializeProgressBars(void) {
   std::chrono::seconds report_freq = std::chrono::seconds(1);
-  command_progress.reset(new mx::ProgressBar("1) Command interpretation",
+  command_progress.reset(new ProgressBar("1) Command interpretation",
                                              report_freq));
-  ast_progress.reset(new mx::ProgressBar("2) Parsing / AST building",
+  ast_progress.reset(new ProgressBar("2) Parsing / AST building",
                                          report_freq));
-  file_progress.reset(new mx::ProgressBar("3) File serialization",
+  file_progress.reset(new ProgressBar("3) File serialization",
                                           report_freq));
-  partitioning_progress.reset(new mx::ProgressBar("4) Fragment partitioning",
+  partitioning_progress.reset(new ProgressBar("4) Fragment partitioning",
                                                   report_freq));
-  identification_progress.reset(new mx::ProgressBar("5) Fragment identification",
+  identification_progress.reset(new ProgressBar("5) Fragment identification",
                                                     report_freq));
-  serialization_progress.reset(new mx::ProgressBar("6) Fragment serialization",
+  serialization_progress.reset(new ProgressBar("6) Fragment serialization",
                                                    report_freq));
 
   command_progress->SetNumWorkers(num_workers);
@@ -99,7 +99,7 @@ void GlobalIndexingState::InitializeProgressBars(void) {
 // Get or create a file ID for the file at `file_path` with contents
 // `contents_hash`.
 std::pair<mx::RawEntityId, bool> GlobalIndexingState::GetOrCreateFileId(
-    mx::WorkerId worker_id, std::filesystem::path file_path,
+    WorkerId worker_id, std::filesystem::path file_path,
     const std::string &contents_hash) {
 
   WorkerIndexingState &worker = PerWorkerState(worker_id);
@@ -133,7 +133,7 @@ std::pair<mx::RawEntityId, bool> GlobalIndexingState::GetOrCreateFileId(
 // Get or create a code ID for the top-level declarations that hash to
 // `code_hash`.
 std::pair<mx::RawEntityId, bool> GlobalIndexingState::GetOrCreateFragmentId(
-    mx::WorkerId worker_id, const std::string &code_hash,
+    WorkerId worker_id, const std::string &code_hash,
     uint64_t num_tokens) {
 
   WorkerIndexingState &worker = PerWorkerState(worker_id);
@@ -193,14 +193,14 @@ std::pair<mx::RawEntityId, bool> GlobalIndexingState::GetOrCreateFragmentId(
 
 // Save the tokenized contents of a file.
 void GlobalIndexingState::PutSerializedFile(
-    mx::WorkerId worker_id, mx::RawEntityId id, std::string data) {
+    WorkerId worker_id, mx::RawEntityId id, std::string data) {
   WorkerIndexingState &worker = PerWorkerState(worker_id);
   mx::IndexStorage &storage = worker.ClientSharedStorage();
   storage.file_id_to_serialized_file.Set(id, std::move(data));
 }
 
 // Save the serialized top-level entities and the parsed tokens.
-void GlobalIndexingState::PutSerializedFragment(mx::WorkerId worker_id,
+void GlobalIndexingState::PutSerializedFragment(WorkerId worker_id,
                                             mx::RawEntityId id,
                                             std::string data) {
   WorkerIndexingState &worker = PerWorkerState(worker_id);
@@ -209,7 +209,7 @@ void GlobalIndexingState::PutSerializedFragment(mx::WorkerId worker_id,
 }
 
 // Link fragment declarations.
-void GlobalIndexingState::LinkDeclarations(mx::WorkerId worker_id,
+void GlobalIndexingState::LinkDeclarations(WorkerId worker_id,
                                            mx::RawEntityId a,
                                            mx::RawEntityId b) {
   if (a != b && a != mx::kInvalidEntityId && b != mx::kInvalidEntityId) {
@@ -221,7 +221,7 @@ void GlobalIndexingState::LinkDeclarations(mx::WorkerId worker_id,
 }
 
 // Link the mangled name of something to its entity ID.
-void GlobalIndexingState::LinkMangledName(mx::WorkerId worker_id,
+void GlobalIndexingState::LinkMangledName(WorkerId worker_id,
                                           const std::string &name,
                                           mx::RawEntityId eid) {
   if (!name.empty() && eid != mx::kInvalidEntityId) {
@@ -233,7 +233,7 @@ void GlobalIndexingState::LinkMangledName(mx::WorkerId worker_id,
 }
 
 // Link an entity to the fragment that uses the entity.
-void GlobalIndexingState::LinkUseInFragment(mx::WorkerId worker_id,
+void GlobalIndexingState::LinkUseInFragment(WorkerId worker_id,
                                             mx::RawEntityId use,
                                             mx::RawEntityId user) {
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
@@ -244,7 +244,7 @@ void GlobalIndexingState::LinkUseInFragment(mx::WorkerId worker_id,
 }
 
 // Link a direct reference to an entity from another entity.
-void GlobalIndexingState::LinkReferenceInFragment(mx::WorkerId worker_id,
+void GlobalIndexingState::LinkReferenceInFragment(WorkerId worker_id,
                                                   mx::RawEntityId use,
                                                   mx::RawEntityId user) {
   if (use != mx::kInvalidEntityId && user != mx::kInvalidEntityId) {
@@ -260,7 +260,7 @@ void GlobalIndexingState::LinkReferenceInFragment(mx::WorkerId worker_id,
 // expression matches or Weggli syntax matches on files into matches inside of
 // fragments.
 void GlobalIndexingState::PutFragmentLineCoverage(
-    mx::WorkerId worker_id,
+    WorkerId worker_id,
     mx::RawEntityId file_id, mx::RawEntityId fragment_id,
     unsigned start_line, unsigned end_line) {
 

@@ -102,22 +102,22 @@ class PendingFragment {
 
   // Store information persistently to enable linking of declarations across
   // fragments.
-  void LinkDeclarations(mx::WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em,
+  void LinkDeclarations(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em,
                         NameMangler &mangler);
 
   // Identify all unique entity IDs used by this fragment, and map them to the
   // fragment ID in the data store.
   void FindDeclarationUses(
-      mx::WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b);
+      WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b);
 
   // Identify all explicit references to entities.
   //
   // TODO(pag): Eventually make this identify the type of reference, or use
   //            the SourceIR to do so.
-  void LinkReferences(mx::WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
+  void LinkReferences(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
 
   // Store serialized declaration fragments symbol to the persistent store
-  void PersistDeclarationSymbols(mx::WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
+  void PersistDeclarationSymbols(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
 };
 
 }  // namespace indexer

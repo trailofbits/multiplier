@@ -546,10 +546,10 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
 //
 // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
 static std::vector<DeclGroupRange> PartitionTLDs(
-    mx::ProgressBar *partition_progress_bar, std::string_view main_file_path,
+    ProgressBar *partition_progress_bar, std::string_view main_file_path,
     const pasta::AST &ast) {
 
-  mx::ProgressBarWork partitioning_progress_tracker(partition_progress_bar);
+  ProgressBarWork partitioning_progress_tracker(partition_progress_bar);
 
   std::vector<DeclRange> decl_ranges = SortTLDs(
       ast.Tokens(), main_file_path, FindTLDs(ast.TranslationUnit()));
@@ -606,11 +606,11 @@ static std::vector<DeclGroupRange> PartitionTLDs(
 // the redundant declarations that are likely to appear early in ASTs, i.e.
 // in `#include`d headers.
 static std::vector<PendingFragment> CreatePendingFragments(
-    mx::WorkerId worker_id, GlobalIndexingState &context, EntityIdMap &entity_ids,
+    WorkerId worker_id, GlobalIndexingState &context, EntityIdMap &entity_ids,
     FileHashMap &file_hashes, const pasta::TokenRange &tok_range,
     std::vector<DeclGroupRange> decl_group_ranges) {
 
-  mx::ProgressBarWork identification_progress_tracker(
+  ProgressBarWork identification_progress_tracker(
       context.identification_progress.get());
 
   std::vector<PendingFragment> pending_fragments;
@@ -677,7 +677,7 @@ IndexCompileJobAction::IndexCompileJobAction(
 // Look through all files referenced by the AST get their unique IDs. If this
 // is the first time seeing a file, then tokenize the file.
 void IndexCompileJobAction::MaybePersistFile(
-    mx::WorkerId worker_id, pasta::File file) {
+    WorkerId worker_id, pasta::File file) {
   if (!file.WasParsed()) {
     return;
   }
@@ -702,8 +702,8 @@ void IndexCompileJobAction::MaybePersistFile(
 }
 
 void IndexCompileJobAction::PersistParsedFiles(const pasta::AST &ast,
-                                               mx::WorkerId worker_id) {
-  mx::ProgressBarWork progress_tracker(context->file_progress.get());
+                                               WorkerId worker_id) {
+  ProgressBarWork progress_tracker(context->file_progress.get());
   auto parsed_files = ast.ParsedFiles();
   for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
        it != end; ++it) {
@@ -713,8 +713,8 @@ void IndexCompileJobAction::PersistParsedFiles(const pasta::AST &ast,
 }
 
 // Build and index the AST.
-void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
-  std::optional<mx::ProgressBarWork> parsing_progress_tracker(
+void IndexCompileJobAction::Run(Executor, WorkerId worker_id) {
+  std::optional<ProgressBarWork> parsing_progress_tracker(
       context->ast_progress.get());
 
   std::string main_file_path =
@@ -744,7 +744,7 @@ void IndexCompileJobAction::Run(mx::Executor, mx::WorkerId worker_id) {
       std::move(decl_group_ranges));
 
   // Serialize the new code chunks.
-  mx::ProgressBarWork fragment_progress_tracker(
+  ProgressBarWork fragment_progress_tracker(
       context->serialization_progress.get());
 
   NameMangler mangler(ast);

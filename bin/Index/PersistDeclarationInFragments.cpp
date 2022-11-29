@@ -126,7 +126,7 @@ std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
 }  // namespace
 
 void PendingFragment::PersistDeclarationSymbols(
-    mx::WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
+    WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
 
   WorkerIndexingState &worker = context.PerWorkerState(worker_id);
   mx::IndexStorage &storage = worker.ClientSharedStorage();

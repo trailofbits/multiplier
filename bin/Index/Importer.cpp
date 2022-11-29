@@ -68,7 +68,7 @@ struct Command {
       : vec(args) {}
 };
 
-class BuildCommandAction final : public mx::Action {
+class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
@@ -80,7 +80,7 @@ class BuildCommandAction final : public mx::Action {
   InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
-                       mx::Executor &exe);
+                       Executor &exe);
 
   static bool CanRunCompileJob(const pasta::CompileJob &job);
 
@@ -93,7 +93,7 @@ class BuildCommandAction final : public mx::Action {
         command(command_),
         ctx(ctx) {}
 
-  void Run(mx::Executor exe, mx::WorkerId) final;
+  void Run(Executor exe, WorkerId) final;
 };
 
 // If we are using something like CMake commands, then pull in the relevant
@@ -122,7 +122,7 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   new_args.emplace_back("/trail/of/bits");
 
   std::string output_sysroot;
-  auto ret = mx::Subprocess::Execute(
+  auto ret = Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_sysroot);
   if (!ret.Succeeded() && output_sysroot.empty()) {
     return ret.TakeError();
@@ -145,7 +145,7 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   std::string output_no_sysroot;
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/trail_of_bits");
-  auto ret2 = mx::Subprocess::Execute(
+  auto ret2 = Subprocess::Execute(
       new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
 
   // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
@@ -203,7 +203,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
                                          pasta::Compiler cc,
-                                         mx::Executor &exe) {
+                                         Executor &exe) {
   auto maybe_jobs = cc.CreateJobsForCommand(cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
@@ -224,7 +224,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 }
 
 // Build the compilers for the commands, then build the commands.
-void BuildCommandAction::Run(mx::Executor exe, mx::WorkerId) {
+void BuildCommandAction::Run(Executor exe, WorkerId) {
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
@@ -437,8 +437,8 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(mx::Executor &exe) {
-  mx::Executor per_path_exe;
+void Importer::Import(Executor &exe) {
+  Executor per_path_exe;
   for (auto &[cwd, commands] : d->commands) {
 
     // Make sure that even concurrent calls to `Import` never concurrently

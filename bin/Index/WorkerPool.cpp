@@ -19,7 +19,7 @@
 
 #include "Signal.h"
 
-namespace mx {
+namespace indexer {
 namespace {
 
 static thread_local bool gInWorkerThread = false;
@@ -402,4 +402,4 @@ void WorkerThreadPoolBase::OnSignalToStopInternal(void) {
   d->EnqueueDummyWorkItems();
 }
 
-}  // namespace mx
+}  // namespace indexer
