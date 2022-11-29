@@ -3577,8 +3577,10 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
   const auto max_i = sub->before.size();
   std::vector<std::pair<TokenInfo *, TokenInfo *>> lb_ub;
   std::vector<bool> checked_provenance;
+  std::vector<bool> same_recursive;
   lb_ub.resize(max_i);
   checked_provenance.resize(max_i);
+  same_recursive.resize(max_i);
 
   auto accept = +[] (TokenInfo *lb, TokenInfo *mid, TokenInfo *ub) {
     return BoundsAreSane(lb, mid) && BoundsAreSane(mid, ub);
@@ -3616,6 +3618,7 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
       } else if (std::holds_alternative<Substitution *>(node)) {
         if (lower_bound && lower_bound != lb_ub[i].first) {
           lb_ub[i].first = lower_bound;
+          same_recursive[i] = false;
           changed = true;
         }
 
@@ -3652,6 +3655,7 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
       } else if (std::holds_alternative<Substitution *>(node)) {
         if (upper_bound && upper_bound != lb_ub[i].second) {
           lb_ub[i].second = upper_bound;
+          same_recursive[i] = false;
           changed = true;
         }
 
@@ -3714,12 +3718,13 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
       }
 
     keep_going:
-      checked_provenance[i] = true;
-
-      if (FindSubstitutionBoundsRec(sub_node, lb_ub[i].first,
+      if (!same_recursive[i] &&
+          FindSubstitutionBoundsRec(sub_node, lb_ub[i].first,
                                     lb_ub[i].second)) {
         changed = true;
       }
+      checked_provenance[i] = true;
+      same_recursive[i] = true;
     }
   }
 
