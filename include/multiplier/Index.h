@@ -44,6 +44,14 @@ class WeggliQueryMatch;
 class WeggliQueryResultIterator;
 class WeggliQueryResult;
 class WeggliQueryResultImpl;
+struct ASTNode;
+
+class SyntexNodeKind;
+class SyntexGrammarNode;
+class SyntexQuery;
+class SyntexQueryImpl;
+
+using SyntexGrammarLeaves = std::unordered_map<SyntexNodeKind, SyntexGrammarNode>;
 
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
@@ -104,6 +112,8 @@ class EntityProvider {
   friend class UseIteratorImpl;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
+  friend class SyntexQuery;
+  friend class SyntexQueryImpl;
 
  protected:
 
@@ -174,6 +184,17 @@ class EntityProvider {
   virtual void FindSymbol(const Ptr &, std::string name,
                           mx::DeclCategory category,
                           std::vector<RawEntityId> &ids_out) = 0;
+
+  virtual std::optional<mx::TokenKind>
+  TokenKindOf(std::string_view spelling) = 0;
+
+  virtual void LoadGrammarRoot(SyntexGrammarLeaves &root) = 0;
+
+  virtual std::vector<RawEntityId> GetFragmentsInAST(void) = 0;
+  virtual ASTNode GetASTNode(std::uint64_t id) = 0;
+  virtual std::vector<std::uint64_t> GetASTNodeChildren(std::uint64_t id) = 0;
+  virtual std::vector<std::uint64_t> GetASTNodesInFragment(RawEntityId frag) = 0;
+  virtual std::optional<std::uint64_t> GetASTNodeWithKind(RawEntityId frag, unsigned short kind) = 0;
 };
 
 using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
@@ -250,6 +271,8 @@ class Index {
   // Search for entities by their name and category.
   NamedDeclList query_entities(std::string name,
                                mx::DeclCategory category) const;
+
+  SyntexQuery parse_syntex_query(std::string_view query);
 };
 
 }  // namespace mx

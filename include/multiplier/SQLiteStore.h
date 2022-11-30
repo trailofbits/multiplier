@@ -34,6 +34,39 @@ class Error : public std::runtime_error {
 };
 
 class QueryResult {
+ private:
+  void column_dispatcher(int& idx, std::string& arg) {
+    arg = getText(idx);
+    idx++;
+  }
+
+  void column_dispatcher(int& idx, std::string_view& arg) {
+    arg = getBlob(idx);
+    idx++;
+  }
+
+  void column_dispatcher(int& idx, std::nullopt_t& arg) {
+    idx++;
+  }
+
+  template<typename T, typename = std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T>>>
+  void column_dispatcher(int& idx, T& arg) {
+    arg = static_cast<T>(getInt64(idx));
+    idx++;
+  }
+
+  template<typename T>
+  void column_dispatcher(int& idx, std::optional<T>& arg) {
+    if(isNull(idx)) {
+      arg = {};
+      idx++;
+      return;
+    }
+    T value;
+    column_dispatcher(idx, value);
+    arg = value;
+  }
+
  public:
   ~QueryResult() = default;
 
@@ -50,23 +83,7 @@ class QueryResult {
     }
 
     int idx = 0;
-    auto column_dispatcher = [this, &idx] (auto &&arg) {
-      using arg_t = std::decay_t<decltype(arg)>;
-      if constexpr (std::is_integral_v<arg_t>) {
-        arg = static_cast<arg_t>(getInt64(idx));
-      } else if (std::is_same_v<std::string, arg_t>) {
-        arg = getText(idx);
-      } else if (std::is_same_v<std::string_view, arg_t>) {
-        arg = getBlob(idx);
-      } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
-        ;
-      } else {
-        throw Error("Can't read column data; Type not supported!");
-      }
-      idx++;
-    };
-
-    (column_dispatcher(std::forward<Ts>(args)), ...);
+    (column_dispatcher(idx, std::forward<Ts>(args)), ...);
   }
 
  private:
@@ -81,6 +98,7 @@ class QueryResult {
 
   std::string getText(int32_t idx);
   std::string_view getBlob(int32_t idx);
+  bool isNull(int32_t idx);
 
   std::shared_ptr<Statement> stmt;
 };
@@ -144,6 +162,20 @@ class Statement : public std::enable_shared_from_this<Statement> {
   void bind(const size_t i, const std::string &value);
 
   void bind(const size_t i, const std::string_view &value);
+
+  template<typename T>
+  void bind(const size_t i, const std::optional<T> &value) {
+    if(value.has_value()) {
+      bind(i, value.value());
+    } else {
+      bind(i, nullptr);
+    }
+  }
+
+  template<typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
+  void bind(const size_t i, const T &value) {
+    bind(i, static_cast<uint64_t>(value));
+  }
 
   void reset();
 

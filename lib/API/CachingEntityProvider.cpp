@@ -4,7 +4,11 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <multiplier/NodeKind.h>
+#include "Grammar.h"
 #include "CachingEntityProvider.h"
+
+#include <multiplier/IndexStorage.h>
 
 #include <cassert>
 #include <chrono>
@@ -40,6 +44,13 @@ void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
   references.clear();
   has_file_list = false;
   version_number = new_version_number;
+  spelling_to_token_kind.clear();
+  grammar_root.clear();
+  fragments_in_ast.clear();
+  node_contents.clear();
+  node_children.clear();
+  fragment_nodes.clear();
+  node_index.clear();
   next->VersionNumberChanged(new_version_number);
 }
 
@@ -258,6 +269,81 @@ EntityProvider::Ptr EntityProvider::in_memory_cache(
       timeout_s_);
   reclaimer_thread.detach();
   return ret;
+}
+
+std::optional<mx::TokenKind>
+CachingEntityProvider::TokenKindOf(std::string_view spelling) {
+  std::string str{spelling.data(), spelling.size()};
+  auto it = spelling_to_token_kind.find(str);
+  if(it == spelling_to_token_kind.end()) {
+    auto kind = next->TokenKindOf(spelling);
+    if(kind) {
+      spelling_to_token_kind[str] = *kind;
+    }
+    return kind;
+  }
+  return it->second;
+}
+
+void CachingEntityProvider::LoadGrammarRoot(SyntexGrammarLeaves& root) {
+  if(grammar_root.empty()) {
+    next->LoadGrammarRoot(grammar_root);
+  }
+  root = grammar_root;
+}
+
+std::vector<RawEntityId> CachingEntityProvider::GetFragmentsInAST(void) {
+  if(fragments_in_ast.empty()) {
+    fragments_in_ast = next->GetFragmentsInAST();
+  }
+  return fragments_in_ast;
+}
+
+ASTNode CachingEntityProvider::GetASTNode(std::uint64_t id) {
+  auto it = node_contents.find(id);
+  if(it == node_contents.end()) {
+    node_contents[id] = next->GetASTNode(id);
+  }
+  return node_contents[id];
+}
+
+std::vector<std::uint64_t> CachingEntityProvider::GetASTNodeChildren(std::uint64_t id) {
+  if(node_children.find(id) == node_children.end()) {
+    for(auto child : next->GetASTNodeChildren(id)) {
+      node_children.insert({id, child});
+    }
+  }
+  std::vector<std::uint64_t> res;
+  for(auto [it, end] = node_children.equal_range(id); it != end; ++it) {
+    res.push_back(it->second);
+  }
+  return res;
+}
+
+std::vector<std::uint64_t> CachingEntityProvider::GetASTNodesInFragment(RawEntityId frag) {
+  if(fragment_nodes.find(frag) == fragment_nodes.end()) {
+    for(auto child : next->GetASTNodesInFragment(frag)) {
+      fragment_nodes.insert({frag, child});
+    }
+  }
+  std::vector<std::uint64_t> res;
+  for(auto [it, end] = fragment_nodes.equal_range(frag); it != end; ++it) {
+    res.push_back(it->second);
+  }
+  return res;
+}
+
+std::optional<std::uint64_t> CachingEntityProvider::GetASTNodeWithKind(RawEntityId frag, unsigned short kind) {
+  auto it = node_index.find({frag, kind});
+  if(it == node_index.end()) {
+    auto value = next->GetASTNodeWithKind(frag, kind);
+    if(value.has_value()) {
+      node_index[{frag, kind}] = value.value();
+      return value;
+    }
+    return {};
+  }
+  return it->second;
 }
 
 }  // namespace mx

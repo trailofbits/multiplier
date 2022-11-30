@@ -28,7 +28,8 @@ enum : char {
   kEntityIdToMangledName,
   kMangledNameToEntityId,
   kEntityIdUseToFragmentId,
-  kEntityIdReference
+  kEntityIdReference,
+  kSpellingToTokenKind,
 };
 
 enum MetadataName : char {
@@ -56,6 +57,66 @@ enum MetadataName : char {
   // want to be able to know when we should possibly re-compute the definition
   // and re-declarations list for a given entity.
   kIndexingVersion,
+};
+
+struct ASTNode {
+  std::optional<std::uint64_t> prev;
+  unsigned short kind;
+  RawEntityId entity;
+  std::optional<std::string> spelling;
+};
+
+class PersistentAST final {
+  struct Impl;
+  std::unique_ptr<Impl> impl;
+
+ public:
+  PersistentAST(sqlite::Connection &db);
+
+  std::vector<std::uint64_t> Root(RawEntityId fragment);
+
+  std::uint64_t AddNode(const ASTNode& node);
+
+  void AddNodeToRoot(RawEntityId fragment, std::uint64_t node_id);
+  
+  ASTNode GetNode(std::uint64_t node_id);
+
+  std::optional<std::uint64_t> GetNodeInIndex(
+    RawEntityId fragment,
+    unsigned short kind);
+
+  void SetNodeInIndex(
+    RawEntityId fragment,
+    unsigned short kind,
+    std::uint64_t node_id);
+
+  std::vector<mx::RawEntityId> GetFragments();
+
+  std::vector<std::uint64_t> GetChildren(std::uint64_t parent);
+
+  void AddChild(std::uint64_t parent, std::uint64_t child);
+};
+
+struct GrammarNode {
+  bool is_production;
+};
+
+class PersistentGrammar final {
+  struct Impl;
+  std::unique_ptr<Impl> impl;
+
+ public:
+  PersistentGrammar(sqlite::Connection &db);
+
+  std::vector<std::pair<unsigned short, std::uint64_t>> GetChildren(std::uint64_t parent);
+
+  std::uint64_t GetChild(std::uint64_t parent, unsigned short kind);
+
+  std::vector<std::pair<unsigned short, std::uint64_t>> GetChildLeaves(std::uint64_t parent, unsigned short kind);
+
+  void UpdateNode(std::uint64_t id, const GrammarNode &node);
+
+  GrammarNode GetNode(std::uint64_t id);
 };
 
 class IndexStorage final {
@@ -159,6 +220,13 @@ class IndexStorage final {
   // `MemberExpr`, etc.
   mx::PersistentSet<kEntityIdReference, mx::RawEntityId, mx::RawEntityId>
       entity_id_reference;
+
+  mx::PersistentMap<kSpellingToTokenKind, std::string_view, mx::TokenKind>
+      spelling_to_token_kind;
+
+  PersistentAST ast;
+
+  PersistentGrammar grammar;
 
   // SQLite database. Used for things like symbol searches.
   SymbolDatabase database;

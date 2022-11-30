@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "Parser.h"
 #include "Importer.h"
+#include "BuildAST.h"
 
 #include <fcntl.h>
 
@@ -211,6 +212,9 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
 
   executor.Start();
   executor.Wait();
+
+  auto index = mx::Index(mx::EntityProvider::from_database(FLAGS_db));
+  indexer::BuildAST(index, ic->server_context[0]);
 
   return EXIT_SUCCESS;
 }

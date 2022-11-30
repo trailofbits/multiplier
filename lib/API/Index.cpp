@@ -6,6 +6,7 @@
 
 #include "File.h"
 #include "Fragment.h"
+#include "Query.h"
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
@@ -335,6 +336,10 @@ NamedDeclList Index::query_entities(
   decls.erase(it, decls.end());
   
   return decls;
+}
+
+SyntexQuery Index::parse_syntex_query(std::string_view query) {
+  return SyntexQuery(impl, query);
 }
 
 }  // namespace mx

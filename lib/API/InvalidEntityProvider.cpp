@@ -6,6 +6,10 @@
 
 #include "InvalidEntityProvider.h"
 
+#include <multiplier/NodeKind.h>
+#include "Grammar.h"
+#include <multiplier/IndexStorage.h>
+
 namespace mx {
 
 InvalidEntityProvider::~InvalidEntityProvider(void) noexcept {}
@@ -74,6 +78,33 @@ void InvalidEntityProvider::FindSymbol(
     const Ptr &, std::string name,
     mx::DeclCategory category, std::vector<RawEntityId> &ids_out) {
   ids_out.clear();
+}
+
+std::optional<mx::TokenKind>
+InvalidEntityProvider::TokenKindOf(std::string_view spelling) {
+  return {};
+}
+
+void InvalidEntityProvider::LoadGrammarRoot(SyntexGrammarLeaves &) {}
+
+std::vector<RawEntityId> InvalidEntityProvider::GetFragmentsInAST(void) {
+  return {};
+}
+
+ASTNode InvalidEntityProvider::GetASTNode(std::uint64_t id) {
+  return {};
+}
+
+std::vector<std::uint64_t> InvalidEntityProvider::GetASTNodeChildren(std::uint64_t id) {
+  return {};
+}
+
+std::vector<std::uint64_t> InvalidEntityProvider::GetASTNodesInFragment(RawEntityId frag) {
+  return {};
+}
+
+std::optional<std::uint64_t> InvalidEntityProvider::GetASTNodeWithKind(RawEntityId frag, unsigned short kind) {
+  return {};
 }
 
 Index::Index(void)
