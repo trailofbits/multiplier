@@ -45,7 +45,7 @@ class SymbolDatabaseImpl {
   static constexpr unsigned kNumCategories =
       mx::NumEnumerators(mx::DeclCategory{});
 
-  std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
+  std::vector<sqlite::Query<>>
       insert_symbol_stmt;
 
   SymbolDatabaseImpl(sqlite::Connection &db);
@@ -73,13 +73,12 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection &db)
         << "insert or ignore into 'mx::entities_symbols_"
         << i << "' (rowid, symbol) values (?1, ?2)";
 
-    insert_symbol_stmt[i] = db.Prepare(insert_query.str());
+    insert_symbol_stmt.emplace_back(db.Prepare(insert_query.str()));
   }
 
   auto bulk_inserter = [this, &db] (void) {
     sqlite::Connection local_db{db.GetFilename()};
-    std::array<std::shared_ptr<sqlite::Statement>, kNumCategories>
-      local_insert_symbol_stmt;
+    std::vector<sqlite::Query<>> local_insert_symbol_stmt;
 
     for (auto i = 0u; i < kNumCategories; ++i) {
       std::stringstream insert_query;
@@ -87,7 +86,7 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection &db)
           << "insert or ignore into 'mx::entities_symbols_"
           << i << "' (rowid, symbol) values (?1, ?2)";
 
-      local_insert_symbol_stmt[i] = local_db.Prepare(insert_query.str());
+      local_insert_symbol_stmt.emplace_back(local_db.Prepare(insert_query.str()));
     }
 
     for (bool should_exit = false; !should_exit; ) {
@@ -124,9 +123,9 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection &db)
             auto i = static_cast<unsigned>(std::get<1>(arg));
             ++num_symbols[i];
             ++transaction_size;
-            local_insert_symbol_stmt[i]->BindValues(
+            local_insert_symbol_stmt[i].Bind(
                 std::get<0>(arg), std::move(std::get<2>(arg)));
-            local_insert_symbol_stmt[i]->Execute();
+            local_insert_symbol_stmt[i].Execute();
 
           } else {
             //LOG(FATAL)
@@ -211,7 +210,7 @@ std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
 
   std::stringstream select_query;
   select_query
-      << "select rowid, symbol "
+      << "select rowid "
       << "from 'mx::entities_symbols_" << table_id << "' "
       << "where symbol like '%' || ?1 || '%'";
 
@@ -219,19 +218,10 @@ std::vector<mx::RawEntityId> SymbolDatabase::QueryEntities(
   //     << "select rowid from entities_fts_" << table_id
   //     << " where entities_fts" << table_id << " match ?1 || '*'";
   try {
-    auto stmt = d->db.Prepare(select_query.str());
-    if (!stmt) {
-      //LOG(ERROR) << "Failed to prepare query statement";
-      return entity_ids;
-    }
+    auto query = d->db.Prepare<mx::RawEntityId>(select_query.str());
 
-    stmt->BindValues(name);
-    while (stmt->ExecuteStep()) {
-      auto result = stmt->GetResult();
-      mx::RawEntityId entity_id = mx::kInvalidEntityId;
-      result.Columns(entity_id);
-      entity_ids.push_back(entity_id);
-    }
+    query.Bind(name);
+    entity_ids.insert(entity_ids.end(), query.begin(), query.end());
 
   } catch (sqlite::Error &e) {
     //LOG(ERROR) << "Failed to get symbol from database " << e.what();
