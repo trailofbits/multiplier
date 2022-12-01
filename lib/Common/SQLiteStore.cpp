@@ -6,6 +6,8 @@
 
 #include <cassert>
 #include <iostream>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/Support/SHA256.h>
 #include <sqlite3.h>
 #include <thread>
 
@@ -93,6 +95,14 @@ void Marshal<std::string_view>::bind(sqlite3_stmt *prepared_stmt, int i,
                       SQLITE_TRANSIENT);
 }
 
+static void sha256Func(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+  llvm::SHA256 hash;
+  auto blob = static_cast<const uint8_t *>(sqlite3_value_blob(argv[0]));
+  auto size = static_cast<size_t>(sqlite3_value_bytes(argv[0]));
+  auto data = llvm::SHA256::hash({blob, size});
+  sqlite3_result_blob(ctx, data.data(), data.size(), SQLITE_TRANSIENT);
+}
+
 Connection::Connection(const std::filesystem::path &db_name, bool readonly,
                        const int busyTimeouts)
     : dbFilename(db_name) {
@@ -129,6 +139,9 @@ Connection::Connection(const std::filesystem::path &db_name, bool readonly,
         return 1;
       },
       nullptr);
+
+  CreateFunction("sha256", 1, SQLITE_DETERMINISTIC, sha256Func, nullptr,
+                 nullptr, nullptr);
 };
 
 void Deleter::operator()(sqlite3 *db) { sqlite3_close_v2(db); }
