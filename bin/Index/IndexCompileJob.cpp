@@ -722,11 +722,22 @@ static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
     const pasta::MacroNode &node) {
   switch (node.Kind()) {
     case pasta::MacroNodeKind::kDirective:  // `#if`, `#pragma`, etc.
-    case pasta::MacroNodeKind::kInclude:
       if (auto dir = pasta::MacroDirective::From(node)) {
         return dir->HashToken().FileLocation();
       }
       return std::nullopt;
+
+    // `#define`, `#include`, etc.
+    //
+    // NOTE(pag): We don't want to merge adjacent `#include`s, because that
+    //            might accidentally trigger treating included files as part
+    //            of a "top-level" `#include`s expansion, and really we want
+    //            to only see expansions of `#include`s in the case that the
+    //            `#include` is nested inside of a decl, e.g.:
+    //
+    //                enum ... {
+    //                #include ...
+    //                };
     default:
       return std::nullopt;
   }
