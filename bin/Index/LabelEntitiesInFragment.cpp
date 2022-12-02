@@ -182,7 +182,7 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
                             const pasta::TokenRange &tok_range) {
   EntityLabeller labeller(entity_ids, *this);
 
-  for (auto i = begin_index; i <= end_index; ++i) {
+  for (uint64_t i = begin_index; i <= end_index; ++i) {
     pasta::Token tok = tok_range[i];
     if (IsParsedToken(tok)) {
       (void) labeller.Label(tok);
@@ -200,8 +200,9 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
   // fragment, and stop when we go too far, whereas the automated approach might
   // just scoop everything reachable into a fragment, even if it doesn't really
   // belong there.
-  for (auto i = 0u; i < num_top_level_declarations; ++i) {
-    pasta::Decl decl = decls_to_serialize[i];
+  //
+  // NOTE(pag): Steal
+  for (const pasta::Decl &decl : top_level_decls) {
     (void) labeller.Accept(decl);
   }
 }

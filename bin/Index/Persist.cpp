@@ -914,8 +914,8 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
   auto maybe_file = FragmentFile(tokens, frag);
   if (!maybe_file) {
     auto main_file_path = ast.MainFile().Path().generic_string();
-    if (!frag.decls_to_serialize.empty()) {
-      const pasta::Decl &leader_decl = frag.decls_to_serialize.front();
+    if (!frag.top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = frag.top_level_decls.front();
       LOG(ERROR)
           << "Unable to locate file containing "
           << DeclToString(leader_decl)
@@ -967,7 +967,7 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
 
   auto tlds = fb.initTopLevelDeclarations(frag.num_top_level_declarations);
   for (auto i = 0u; i < frag.num_top_level_declarations; ++i) {
-    tlds.set(i, em.EntityId(frag.decls_to_serialize[i]));
+    tlds.set(i, em.EntityId(frag.top_level_decls[i]));
   }
 
   // Derive the macro substitution tree. Failing to build the tree is an error

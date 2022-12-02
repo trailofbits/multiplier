@@ -597,7 +597,12 @@ static std::vector<pasta::MacroNode> FindTLMs(const pasta::AST &ast) {
       }
 
     // Include all `#include`s, `#pragma`s, `#if`s, etc.
-    } else if (pasta::MacroDirective::From(mn)) {
+    } else if (auto dir = pasta::MacroDirective::From(mn)) {
+
+      if (!dir->HashToken().FileLocation()) {
+        continue;
+      }
+
       tlms.push_back(std::move(mn));
     }
   }
@@ -880,12 +885,12 @@ static std::vector<PendingFragment> CreatePendingFragments(
 
     for (const Entity &entity : entities) {
       if (std::holds_alternative<pasta::Decl>(entity)) {
-        pending_fragment.decls_to_serialize.push_back(
+        pending_fragment.top_level_decls.push_back(
             std::get<pasta::Decl>(entity));
         pending_fragment.num_top_level_declarations++;
 
       } else if (std::holds_alternative<pasta::MacroNode>(entity)) {
-        pending_fragment.macros_to_serialize.push_back(
+        pending_fragment.top_level_macros.push_back(
             std::get<pasta::MacroNode>(entity));
         pending_fragment.num_top_level_macros++;
 

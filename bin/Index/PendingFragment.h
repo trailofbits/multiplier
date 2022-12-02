@@ -62,10 +62,11 @@ class PendingFragment {
   // Offsets of the serialized version of pseudo entities in this fragment.
   PseudoOffsetMap pseudo_offsets;
 
-  // The first `num_top_level_declarations` entries in `decls_to_serialize`
-  // are the "top level declarations." These are discovered by `TLDFinder`.
   unsigned num_top_level_declarations{0u};
   unsigned num_top_level_macros{0u};
+
+  std::vector<pasta::Decl> top_level_decls;
+  std::vector<pasta::MacroNode> top_level_macros;
 
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.

@@ -105,6 +105,11 @@ std::string FileHash(std::string_view data) {
 // structure itself. Finally, the ODR hashes are there to help us to distinguish
 // template instantiations, where the tokens and their contexts match, but the
 // declarations in the AST do not.
+//
+// NOTE(pag): We want the hash to be very unique to this fragment. We never want
+//            two different fragments to have the same hash, because their
+//            ASTs might be different, and if their ASTs are different, then
+//            our entity ID numbering scheme will fail horribly.
 std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
                      const std::vector<Entity> &entities,
                      const pasta::TokenRange &toks,
@@ -116,8 +121,6 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
   std::stringstream ss;
   bool seen_floc = false;
-
-  std::vector<uint16_t> context_kinds;
 
   for (uint64_t i = begin_index; i < end_index; i++) {
     pasta::Token token = toks[i];
@@ -152,59 +155,32 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
       case pasta::TokenRole::kFileToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
-        context_kinds.clear();
         for (auto context = token.Context(); context;
              context = context->Parent()) {
           switch (context->Kind()) {
             case pasta::TokenContextKind::kDecl:
-              context_kinds.push_back(static_cast<uint16_t>(
+              fs.AddInteger(static_cast<uint16_t>(
                   pasta::Decl::From(*context)->Kind()));
               break;
             case pasta::TokenContextKind::kStmt:
-              context_kinds.push_back(static_cast<uint16_t>(
+              fs.AddInteger(static_cast<uint16_t>(
                   pasta::Stmt::From(*context)->Kind()));
               break;
             case pasta::TokenContextKind::kType:
-              switch (auto type_kind = pasta::Type::From(*context)->Kind()) {
-
-                // This is a bit subtle, and relates to issue #191. It's meant
-                // to handle things like this:
-                //
-                //    typedef void *CURL;  // In public header.
-                //    typedef struct Curl_easy *CURL;  // In private header.
-                //
-                //    void function(CURL curl);  // In both.
-                //
-                // The idea here is that the token contexts will look like this:
-                //
-                //    Type(void) -> Pointer -> Typedef(CURL) -> ...
-                //    Type(struct Curl_Easy) -> Pointer -> Typedef(CURL) -> ...
-                //
-                // And so we want to cut off the prefix and represent them
-                // both uniformly as:
-                //
-                //    Pointer -> Typedef(CURL) -> ...
-                //
-                // XREF: https://github.com/trailofbits/multiplier/issues/191
-                case pasta::TypeKind::kPointer:
-                  context_kinds.clear();
-                  [[clang::fallthrough]];
-                default:
-                  context_kinds.push_back(static_cast<uint16_t>(type_kind));
-                  break;
-              }
-
+              fs.AddInteger(static_cast<uint16_t>(
+                  pasta::Type::From(*context)->Kind()));
+              break;
+            case pasta::TokenContextKind::kAttr:
+              fs.AddInteger(static_cast<uint16_t>(
+                  pasta::Attr::From(*context)->Kind()));
               break;
             default:
-              context_kinds.push_back(static_cast<uint16_t>(context->Kind()));
+              fs.AddInteger(static_cast<uint16_t>(context->Kind()));
               break;
           }
         }
 
-        context_kinds.push_back(static_cast<uint16_t>(token.Kind()));
-        for (uint16_t kind : context_kinds) {
-          fs.AddInteger(kind);
-        }
+        fs.AddInteger(static_cast<uint16_t>(token.Kind()));
         fs.AddString(llvm::StringRef(token.Data()));
         break;
 

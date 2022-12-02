@@ -135,18 +135,17 @@ void PendingFragment::LabelParents(EntityMapper &em) {
   }
 
   // Visit the top-level decls first.
-  size_t i = 0u;
-  size_t max_i = decls_to_serialize.size();
-  for (; i < max_i; ++i) {
-    vis.Accept(decls_to_serialize[i]);
+
+  for (const pasta::Decl &decl : top_level_decls) {
+    vis.Accept(decl);
   }
 
   // Expand the set of decls.
-  max_i = decls_to_serialize.size();
-  for (; i < max_i; ++i) {
+  for (size_t i = 0u, max_i = decls_to_serialize.size(); i < max_i; ++i) {
     pasta::Decl decl = decls_to_serialize[i];
     if (vis.not_yet_seen.count(decl.RawDecl())) {
-      vis.Accept(decl);   
+      vis.Accept(decl);
+      DCHECK_EQ(max_i, decls_to_serialize.size());
       max_i = decls_to_serialize.size();
     }
   }
