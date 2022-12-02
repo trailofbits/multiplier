@@ -200,7 +200,8 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
   // fragment, and stop when we go too far, whereas the automated approach might
   // just scoop everything reachable into a fragment, even if it doesn't really
   // belong there.
-  for (const pasta::Decl &decl : decls) {
+  for (auto i = 0u; i < num_top_level_declarations; ++i) {
+    pasta::Decl decl = decls_to_serialize[i];
     (void) labeller.Accept(decl);
   }
 }

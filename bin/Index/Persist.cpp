@@ -65,6 +65,7 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
 static void CountSubstitutions(EntityMapper &em, TokenTree tt,
                                std::vector<TokenTree> &todo,
                                unsigned &num_subs, unsigned &num_toks) {
+
   for (auto node : tt) {
     if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
@@ -182,7 +183,7 @@ static void FindFileRange(const pasta::TokenRange &tokens, uint64_t min_index,
       continue;
     }
 
-    if (pasta::File::Containing(*ft) != file) {
+    if (ft->RawFile() != file.RawFile()) {
       continue;
     }
     if (ft->Index() < min->Index()) {
@@ -359,7 +360,17 @@ static void PersistTokenTree(EntityMapper &em,
       auto [kind, lhs, rhs] = std::move(sub.value());
       mx::MacroSubstitutionId sub_id;
       sub_id.fragment_id = em.fragment.fragment_id;
-      sub_id.kind = kind;
+
+      // If we can't isolate / locate this macro expansion to a specific
+      // definition site, then reinterpret this macro as a substitution.
+      if (kind == mx::MacroSubstitutionKind::MACRO &&
+          (!lhs.MacroDefinition() ||
+           !lhs.MacroDefinition()->NameToken().FileLocation())) {
+        sub_id.kind = mx::MacroSubstitutionKind::SUBSTITUTE;
+      } else {
+        sub_id.kind = kind;
+      }
+
       sub_id.offset = next_sub_offset;
       mx::RawEntityId eid = mx::EntityId(sub_id).Pack();
       work.nib.set(i++, eid);
@@ -897,18 +908,24 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
                      const pasta::TokenRange &tokens, PendingFragment frag) {
 
   const mx::RawEntityId fragment_id = frag.fragment_id;
-  const pasta::Decl &leader_decl = frag.decls[0];
   const uint64_t begin_index = frag.begin_index;
   const uint64_t end_index = frag.end_index;
 
   auto maybe_file = FragmentFile(tokens, frag);
   if (!maybe_file) {
     auto main_file_path = ast.MainFile().Path().generic_string();
-    LOG(ERROR)
-        << "Unable to locate file containing "
-        << DeclToString(leader_decl)
-        << PrefixedLocation(leader_decl, " at or near ")
-        << " on main job file " << main_file_path;
+    if (!frag.decls_to_serialize.empty()) {
+      const pasta::Decl &leader_decl = frag.decls_to_serialize.front();
+      LOG(ERROR)
+          << "Unable to locate file containing "
+          << DeclToString(leader_decl)
+          << PrefixedLocation(leader_decl, " at or near ")
+          << " on main job file " << main_file_path;
+    } else {
+      LOG(ERROR)
+          << "Unable to locate file containing macros on main job file "
+          << main_file_path;
+    }
     return;
   }
 
@@ -945,12 +962,12 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
   // Generate source IR before saving the fragments to the persistent
   // storage.
   fb.setMlir(context.codegen.GenerateSourceIRFromTLDs(
-      fragment_id, em, frag.decls));
+      fragment_id, em, frag.decls_to_serialize,
+      frag.num_top_level_declarations));
 
-  auto num_tlds = static_cast<unsigned>(frag.decls.size());
-  auto tlds = fb.initTopLevelDeclarations(num_tlds);
-  for (auto i = 0u; i < num_tlds; ++i) {
-    tlds.set(i, em.EntityId(frag.decls[i]));
+  auto tlds = fb.initTopLevelDeclarations(frag.num_top_level_declarations);
+  for (auto i = 0u; i < frag.num_top_level_declarations; ++i) {
+    tlds.set(i, em.EntityId(frag.decls_to_serialize[i]));
   }
 
   // Derive the macro substitution tree. Failing to build the tree is an error
@@ -962,12 +979,19 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
   std::optional<TokenTree> maybe_tt = TokenTree::Create(
       tokens, begin_index, end_index, tok_tree_err, is_fallback_token_tree);
   if (!maybe_tt) {
-    LOG(ERROR)
-      << tok_tree_err.str() << " for top-level declaration "
-      << DeclToString(leader_decl)
-      << PrefixedLocation(leader_decl, " at or near ")
-      << " on main job file "
-      << ast.MainFile().Path().generic_string();
+    if (!frag.decls_to_serialize.empty()) {
+      const pasta::Decl &leader_decl = frag.decls_to_serialize.front();
+      LOG(ERROR)
+          << tok_tree_err.str() << " for top-level declaration "
+          << DeclToString(leader_decl)
+          << PrefixedLocation(leader_decl, " at or near ")
+          << " on main job file "
+          << ast.MainFile().Path().generic_string();
+    } else {
+      LOG(ERROR)
+          << tok_tree_err.str() << " for macros on main job file "
+          << ast.MainFile().Path().generic_string();
+    }
 
     fb.setHadSubstitutionError(true);
 

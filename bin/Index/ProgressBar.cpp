@@ -175,26 +175,6 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
   }
   const auto steps_done = static_cast<double>(curr);
   const auto steps_total = static_cast<double>(max);
-
-  double estimated_remaining_time_seconds = 0;
-  if (steps_done > 0) {
-    // Our estimate of the remaining time is an extrapolation based on the
-    // 95th-percentile upper bound on the expected elapsed time of a job, using
-    // the elapsed times of the jobs that have already finished as our sample.
-    const auto average_elapsed_time_ms =
-        static_cast<double>(sum_of_elapsed_time_ms.load()) / steps_done;
-    const auto elapsed_time_ms_variance =
-        (static_cast<double>(sum_of_elapsed_time_ms_squared.load()) /
-         steps_done) - pow(average_elapsed_time_ms, 2);
-    const auto z_score = 1.96;
-    const auto average_elapsed_time_ms_upper_bound =
-        average_elapsed_time_ms +
-        z_score * sqrt(elapsed_time_ms_variance) / sqrt(steps_done);
-    estimated_remaining_time_seconds =
-        average_elapsed_time_ms_upper_bound * (steps_total - steps_done) /
-        (1000 * num_workers);
-  }
-
   const auto percentage = std::min<double>(1.0, steps_done / steps_total);
   const auto lpad = static_cast<int>(
       std::min(kNumProgressBars, (percentage * kNumProgressBars)));
@@ -207,13 +187,11 @@ void ProgressBar::Impl::Report(uint32_t curr, uint32_t max, std::string &line,
 
   // Write into `next_line`, which is "local" to the owning thread.
   auto len = snprintf(next_line.data(), next_line.size() - 2u,
-          "%s%*s (%*" PRIu32 " / %" PRIu32 ")%*s %3d%% [%.*s%*s]  "
-          "%.2f minutes remaining\n",
+          "%s%*s (%*" PRIu32 " / %" PRIu32 ")%*s %3d%% [%.*s%*s]\n",
           label, static_cast<int>(label_rpad), "",
           num_digits, curr, max, static_cast<int>(div_rpad), "",
           static_cast<int>(percentage * 100.0),
-          lpad, kProgressBars, rpad, "",
-          estimated_remaining_time_seconds / 60);
+          lpad, kProgressBars, rpad, "");
   if (0 < len) {
     next_line[static_cast<unsigned>(len)] = '\0';
   }

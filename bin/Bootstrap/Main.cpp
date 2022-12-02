@@ -196,8 +196,10 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "IsFromASTFile"},
   {"Decl", "HasBody"},
   {"Decl", "AsFunction"},
+  {"Decl", "FunctionType"},
   {"Decl", "TranslationUnitDeclaration"},
   {"Decl", "NextDeclarationInContext"},
+  {"Decl", "HasDefiningAttribute"},  // Already have `Decl::DefiningAttribute`.
 
   {"Decl", "MostRecentDeclaration"},
   {"NamedDecl", "MostRecentDeclaration"},

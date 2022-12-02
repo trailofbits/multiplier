@@ -10,6 +10,7 @@
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
@@ -105,7 +106,7 @@ std::string FileHash(std::string_view data) {
 // template instantiations, where the tokens and their contexts match, but the
 // declarations in the AST do not.
 std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
-                     const std::vector<pasta::Decl> &tlds,
+                     const std::vector<Entity> &entities,
                      const pasta::TokenRange &toks,
                      uint64_t begin_index, uint64_t end_index) {
   llvm::FoldingSetNodeID fs;
@@ -114,10 +115,12 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
   }
 
   std::stringstream ss;
-  auto seen_floc = false;
+  bool seen_floc = false;
 
-  for (auto i = begin_index; i < end_index; i++) {
-    auto token = toks[i];
+  std::vector<uint16_t> context_kinds;
+
+  for (uint64_t i = begin_index; i < end_index; i++) {
+    pasta::Token token = toks[i];
 
     // Try to find the first token in the range with a file location, as a kind
     // of anchor point.
@@ -149,28 +152,59 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
       case pasta::TokenRole::kFileToken:
       case pasta::TokenRole::kFinalMacroExpansionToken:
+        context_kinds.clear();
         for (auto context = token.Context(); context;
              context = context->Parent()) {
           switch (context->Kind()) {
             case pasta::TokenContextKind::kDecl:
-              fs.AddInteger(static_cast<uint16_t>(
+              context_kinds.push_back(static_cast<uint16_t>(
                   pasta::Decl::From(*context)->Kind()));
               break;
             case pasta::TokenContextKind::kStmt:
-              fs.AddInteger(static_cast<uint16_t>(
+              context_kinds.push_back(static_cast<uint16_t>(
                   pasta::Stmt::From(*context)->Kind()));
               break;
             case pasta::TokenContextKind::kType:
-              fs.AddInteger(static_cast<uint16_t>(
-                  pasta::Type::From(*context)->Kind()));
+              switch (auto type_kind = pasta::Type::From(*context)->Kind()) {
+
+                // This is a bit subtle, and relates to issue #191. It's meant
+                // to handle things like this:
+                //
+                //    typedef void *CURL;  // In public header.
+                //    typedef struct Curl_easy *CURL;  // In private header.
+                //
+                //    void function(CURL curl);  // In both.
+                //
+                // The idea here is that the token contexts will look like this:
+                //
+                //    Type(void) -> Pointer -> Typedef(CURL) -> ...
+                //    Type(struct Curl_Easy) -> Pointer -> Typedef(CURL) -> ...
+                //
+                // And so we want to cut off the prefix and represent them
+                // both uniformly as:
+                //
+                //    Pointer -> Typedef(CURL) -> ...
+                //
+                // XREF: https://github.com/trailofbits/multiplier/issues/191
+                case pasta::TypeKind::kPointer:
+                  context_kinds.clear();
+                  [[clang::fallthrough]];
+                default:
+                  context_kinds.push_back(static_cast<uint16_t>(type_kind));
+                  break;
+              }
+
               break;
             default:
-              fs.AddInteger(static_cast<uint16_t>(context->Kind()));
+              context_kinds.push_back(static_cast<uint16_t>(context->Kind()));
               break;
           }
         }
 
-        fs.AddInteger(static_cast<uint16_t>(token.Kind()));
+        context_kinds.push_back(static_cast<uint16_t>(token.Kind()));
+        for (uint16_t kind : context_kinds) {
+          fs.AddInteger(kind);
+        }
         fs.AddString(llvm::StringRef(token.Data()));
         break;
 
@@ -182,9 +216,11 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
   ss << std::hex;
 
   // Mix in ODR hashes.
-  for (auto &decl : tlds) {
-    HashVisitor visitor(ss);
-    visitor.Accept(decl);
+  HashVisitor visitor(ss);
+  for (const Entity &entity : entities) {
+    if (std::holds_alternative<pasta::Decl>(entity)) {
+      visitor.Accept(std::get<pasta::Decl>(entity));
+    }
   }
 
   // Mix in summarized generic info.

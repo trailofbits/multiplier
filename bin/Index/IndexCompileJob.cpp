@@ -18,6 +18,7 @@
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
@@ -45,11 +46,16 @@ namespace {
 // A declaration, the index of the first token to be saved associated with
 // the decl, and the (inclusive) index of the last token associated with
 // this token.
-using DeclRange = std::tuple<pasta::Decl, uint64_t, uint64_t>;
+using EntityRange = std::tuple<Entity, uint64_t, uint64_t>;
+static constexpr unsigned kEntityIndex = 0u;
+static constexpr unsigned kBeginIndex = 1u;
+static constexpr unsigned kEndIndex = 2u;
 
-// A group of declarations with overlapping `DeclRange`s, along with the
+// A group of declarations with overlapping `EntityRange`s, along with the
 // minimum and maximum (inclusive) indices of the tokens.
-using DeclGroupRange = std::tuple<std::vector<pasta::Decl>, uint64_t, uint64_t>;
+using EntityGroup = std::vector<Entity>;
+using EntityGroupRange = std::tuple<EntityGroup, uint64_t, uint64_t>;
+static constexpr unsigned kGroupIndex = 0u;
 
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
@@ -158,10 +164,23 @@ class TLDFinder final : public pasta::DeclVisitor {
 };
 
 // Find all top-level declarations.
-static std::vector<pasta::Decl> FindTLDs(pasta::TranslationUnitDecl tu) {
+static std::vector<pasta::Decl> FindTLDs(const pasta::AST &ast) {
   std::vector<pasta::Decl> tlds;
   TLDFinder tld_finder(tlds);
-  tld_finder.VisitTranslationUnitDecl(tu);
+  tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
+
+  auto eq = +[] (const pasta::Decl &a, const pasta::Decl &b) {
+    return a.RawDecl() == b.RawDecl();
+  };
+
+  auto less = +[] (const pasta::Decl &a, const pasta::Decl &b) {
+    return a.RawDecl() < b.RawDecl();
+  };
+
+  std::sort(tlds.begin(), tlds.end(), less);
+  auto it = std::unique(tlds.begin(), tlds.end(), eq);
+  tlds.erase(it, tlds.end());
+
   return tlds;
 }
 
@@ -224,7 +243,7 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
 }
 
 // Do some minor stuff to find begin/ending tokens.
-static std::pair<uint64_t, uint64_t> BaselineDeclRange(
+static std::pair<uint64_t, uint64_t> BaselineEntityRange(
     const pasta::Decl &decl, pasta::Token tok, std::string_view main_file_path) {
   DCHECK(tok);  // Make sure we're dealing with a valid token.
 
@@ -286,15 +305,11 @@ static std::pair<uint64_t, uint64_t> BaselineDeclRange(
 //  return false;
 //}
 
-// Find the range of tokens of this decl. The range is returned as an inclusive
-// [begin_index, end_index]` pair, and is expanded to cover leading/trailing
-// macro expansions, and contracted to try to elide leading/trailing whitespace.
-static std::pair<uint64_t, uint64_t> FindDeclRange(
-    const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok,
-    std::string_view main_file_path) {
-
-  auto [begin_tok_index, end_tok_index] = BaselineDeclRange(decl, tok,
-                                                            main_file_path);
+// Expand an inclusive `[begin, end]` range to be as wide as necessary to
+// include the full scope of macro expansion.
+static std::pair<uint64_t, uint64_t> ExpandRange(
+    const pasta::TokenRange &range, uint64_t begin_tok_index,
+    uint64_t end_tok_index) {
 
   const auto max_tok_index = range.Size();
 
@@ -312,8 +327,8 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
   // expansion ranges, then the expand until we find the beginning of the
   // range.
   bool done = false;
-  while (!done && 0u < begin_tok_index && begin_tok_index < end_tok_index) {
-    tok = range[begin_tok_index];
+  while (!done && 0u < begin_tok_index && begin_tok_index <= end_tok_index) {
+    pasta::Token tok = range[begin_tok_index];
     switch (tok.Role()) {
       default:
       case pasta::TokenRole::kInvalid:
@@ -347,7 +362,7 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 
   done = false;
   while (!done && 0u < end_tok_index && end_tok_index < max_tok_index) {
-    tok = range[end_tok_index];
+    pasta::Token tok = range[end_tok_index];
     switch (tok.Role()) {
       default:
       case pasta::TokenRole::kInvalid:
@@ -388,7 +403,53 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
     }
   }
 
+#ifndef NDEBUG
+  // Try to detect these types of issues early, as they'd otherwise manifest
+  // downstream in `TokenTree::Create`'s internal function
+  // `TokenTreeImpl::BuildInitialTokenList`. If these assertions trigger, then
+  // it might suggest a bug in PASTA, where PASTA isn't properly wrapping the
+  // ranges of macro tokens in a begin and an end expansion marker.
+  // Alternatively, it could suggest some kind of initial bad bounds
+  // computation.
+  switch (range[begin_tok_index].Role()) {
+    case pasta::TokenRole::kInitialMacroUseToken:
+    case pasta::TokenRole::kIntermediateMacroExpansionToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      assert(false);
+      break;
+    default:
+      break;
+  }
+
+  switch (range[end_tok_index].Role()) {
+    case pasta::TokenRole::kInitialMacroUseToken:
+    case pasta::TokenRole::kIntermediateMacroExpansionToken:
+    case pasta::TokenRole::kFinalMacroExpansionToken:
+    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+      assert(false);
+      break;
+    default:
+      break;
+  }
+#endif
+
   return {begin_tok_index, end_tok_index};
+}
+
+// Find the range of tokens of this decl. The range is returned as an inclusive
+// [begin_index, end_index]` pair, and is expanded to cover leading/trailing
+// macro expansions, and contracted to try to elide leading/trailing whitespace.
+static std::pair<uint64_t, uint64_t> FindDeclRange(
+    const pasta::TokenRange &range, pasta::Decl decl, pasta::Token tok,
+    std::string_view main_file_path) {
+
+  auto [begin_tok_index, end_tok_index] = BaselineEntityRange(
+      decl, tok, main_file_path);
+
+  return ExpandRange(range, begin_tok_index, end_tok_index);
 }
 
 // Returns `true` if `decl` is probably a compiler-built-in declaration. It's
@@ -447,58 +508,176 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
   }
 }
 
+static void AddDeclRangeToEntityList(
+    const pasta::TokenRange &tok_range, std::string_view main_file_path,
+    std::vector<EntityRange> &entity_ranges, pasta::Decl decl) {
+
+  if (decl.Kind() == pasta::DeclKind::kEmpty) {
+    return;
+  }
+
+  pasta::Token tok = decl.Token();
+
+  // These are probably part of the preamble of compiler-provided builtin
+  // declarations.
+  if (!tok) {
+    LOG_IF(WARNING, !IsProbablyABuiltinDecl(decl))
+        << "Could not find location of " << decl.KindName()
+        << " declaration: " << DeclToString(decl)
+        << PrefixedLocation(decl, " at or near ")
+        << " on main job file " << main_file_path;
+    return;
+  }
+
+  // This suggests an error in PASTA, usually related to token alignment
+  // against printed tokens. That process tries to "align" pretty-printed
+  // decl tokens, which are full of contextual information, with parsed
+  // tokens, which have no contextual information. We do this so that we
+  // can get the contextual information from parsed tokens, which is often
+  // more useful.
+  LOG_IF(FATAL, ShouldFindDeclInTokenContexts(decl) &&
+                !TokenIsInContextOfDecl(tok, decl) &&
+                !IsProbablyABuiltinDecl(decl))
+      << "Could not find location of " << decl.KindName()
+      << " declaration: " << DeclToString(decl)
+      << PrefixedLocation(decl, " at or near ")
+      << " on main job file " << main_file_path;
+
+  auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok,
+                                                  main_file_path);
+
+  // There should always be at least two tokens in any top-level decl.
+  LOG_IF(ERROR, begin_index == end_index)
+      << "Only found one token " << tok.Data() << " for: "
+      << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
+      << " on main job file " << main_file_path;
+
+  entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
+}
+
+static pasta::MacroNode RootNodeFrom(pasta::MacroNode node) {
+  if (auto parent = node.Parent()) {
+    return RootNodeFrom(parent.value());
+  } else {
+    return node;
+  }
+}
+
+// Go find the macro definitions, and for each definition, find the uses, then
+// find the "root" of that use.
+static std::vector<pasta::MacroNode> FindTLMs(const pasta::AST &ast) {
+
+  std::vector<pasta::MacroNode> tlms;
+
+  for (pasta::MacroNode mn : ast.Macros()) {
+
+    // Include all uses macros, and only those `#define`s for which the
+    // macro is used at least once.
+    if (auto md = pasta::MacroDefinition::From(mn)) {
+
+      // Builtin or command-line specified macros have no location.
+      //
+      // NOTE(pag): The persistence for macros re-interprets macros with no
+      //            definition site as substitutions instead of macro
+      //            expansions.
+      //
+      // TODO(pag): Find a way to give these file locations.
+      if (!md->NameToken().FileLocation()) {
+        continue;
+      }
+
+      bool is_used = false;
+      for (pasta::MacroNode use : md->Uses()) {
+        tlms.push_back(RootNodeFrom(std::move(use)));
+        is_used = true;
+      }
+
+      if (is_used) {
+        tlms.push_back(std::move(mn));
+      }
+
+    // Include all `#include`s, `#pragma`s, `#if`s, etc.
+    } else if (pasta::MacroDirective::From(mn)) {
+      tlms.push_back(std::move(mn));
+    }
+  }
+
+  auto eq = +[] (const pasta::MacroNode &a, const pasta::MacroNode &b) {
+    return a.RawNode() == b.RawNode();
+  };
+
+  auto less = +[] (const pasta::MacroNode &a, const pasta::MacroNode &b) {
+    return a.RawNode() < b.RawNode();
+  };
+
+  std::sort(tlms.begin(), tlms.end(), less);
+  auto it = std::unique(tlms.begin(), tlms.end(), eq);
+  tlms.erase(it, tlms.end());
+
+  return tlms;
+}
+
+// Add a macro to our entity range list. The first token in a macro is usually
+// the first usage token, and the last one is the last expansion token.
+static void AddMacroRangeToEntityList(
+    const pasta::TokenRange &tok_range, std::string_view main_file_path,
+    std::vector<EntityRange> &entity_ranges, pasta::MacroNode node) {
+
+  pasta::MacroToken bt = node.BeginToken();
+  pasta::MacroToken et = node.EndToken();
+
+  LOG_IF(FATAL, !bt.RawNode())
+      << "Unable to find beginning of macro node in translation unit of main "
+         "source file "
+      << main_file_path;
+
+  LOG_IF(FATAL, !et.RawNode())
+      << "Unable to find ending of macro node in translation unit of main "
+         "source file "
+      << main_file_path;
+
+  std::optional<pasta::Token> pbt = bt.ParsedLocation();
+  if (!pbt) {
+    LOG(ERROR)
+        << "Unable to find beginning of macro node in translation unit of main "
+           "source file "
+        << main_file_path;
+    return;
+  }
+
+  std::optional<pasta::Token> pet = et.ParsedLocation();
+  if (!pet) {
+    LOG(ERROR)
+        << "Unable to find ending of macro node in translation unit of main "
+           "source file "
+        << main_file_path;
+    return;
+  }
+
+  auto [begin_index, end_index] = ExpandRange(
+      tok_range, pbt->Index(), pet->Index());
+
+  entity_ranges.emplace_back(std::move(node), begin_index, end_index);
+}
+
 // Sort the top-level declarations so that syntactically overlapping
 // declarations are in the correct order, and are side-by-side in the output
 // vector.
-static std::vector<DeclRange> SortTLDs(pasta::TokenRange tok_range,
-                                       std::string_view main_file_path,
-                                       std::vector<pasta::Decl> tlds) {
-  std::vector<DeclRange> decl_ranges;
-  decl_ranges.reserve(8192u);
+static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
+                                             std::string_view main_file_path) {
 
-  for (pasta::Decl decl : tlds) {
-    if (decl.Kind() == pasta::DeclKind::kEmpty) {
-      continue;
-    }
+  pasta::TokenRange tok_range = ast.Tokens();
+  std::vector<EntityRange> entity_ranges;
+  entity_ranges.reserve(8192u);
 
-    pasta::Token tok = decl.Token();
+  for (pasta::Decl decl : FindTLDs(ast)) {
+    AddDeclRangeToEntityList(tok_range, main_file_path, entity_ranges,
+                             std::move(decl));
+  }
 
-    // These are probably part of the preamble of compiler-provided builtin
-    // declarations.
-    if (!tok) {
-      LOG_IF(WARNING, !IsProbablyABuiltinDecl(decl))
-          << "Could not find location of " << decl.KindName()
-          << " declaration: " << DeclToString(decl)
-          << PrefixedLocation(decl, " at or near ")
-          << " on main job file " << main_file_path;
-
-    } else {
-
-      // This suggests an error in PASTA, usually related to token alignment
-      // against printed tokens. That process tries to "align" pretty-printed
-      // decl tokens, which are full of contextual information, with parsed
-      // tokens, which have no contextual information. We do this so that we
-      // can get the contextual information from parsed tokens, which is often
-      // more useful.
-      LOG_IF(FATAL, ShouldFindDeclInTokenContexts(decl) &&
-                    !TokenIsInContextOfDecl(tok, decl) &&
-                    !IsProbablyABuiltinDecl(decl))
-          << "Could not find location of " << decl.KindName()
-          << " declaration: " << DeclToString(decl)
-          << PrefixedLocation(decl, " at or near ")
-          << " on main job file " << main_file_path;
-
-      auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok,
-                                                    main_file_path);
-
-      // There should always be at least two tokens in any top-level decl.
-      LOG_IF(ERROR, begin_index == end_index)
-          << "Only found one token " << tok.Data() << " for: "
-          << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
-          << " on main job file " << main_file_path;
-
-      decl_ranges.emplace_back(decl, begin_index, end_index);
-    }
+  for (pasta::MacroNode node : FindTLMs(ast)) {
+    AddMacroRangeToEntityList(tok_range, main_file_path, entity_ranges,
+                              std::move(node));
   }
 
   // It's possible that we have two-or-more things that appear to be top-level
@@ -510,20 +689,20 @@ static std::vector<DeclRange> SortTLDs(pasta::TokenRange tok_range,
   // as its own top-level declaration, despite it being logically nested inside
   // of another top-level declaration.
 
-  std::stable_sort(decl_ranges.begin(), decl_ranges.end(),
-                   [] (const DeclRange &a, const DeclRange &b) {
-                     auto a_begin = std::get<1>(a);
-                     auto b_begin = std::get<1>(b);
+  std::stable_sort(entity_ranges.begin(), entity_ranges.end(),
+                   [] (const EntityRange &a, const EntityRange &b) {
+                     auto a_begin = std::get<kBeginIndex>(a);
+                     auto b_begin = std::get<kBeginIndex>(b);
                      if (a_begin < b_begin) {
                        return true;
                      } else if (a_begin > b_begin) {
                        return false;
                      } else {
-                       return std::get<2>(a) < std::get<2>(b);
+                       return std::get<kEndIndex>(a) < std::get<kEndIndex>(b);
                      }
                    });
 
-  return decl_ranges;
+  return entity_ranges;
 }
 
 // TODO(pag,kumarak): Add support for detecting that some of the containing
@@ -532,6 +711,71 @@ static std::vector<DeclRange> SortTLDs(pasta::TokenRange tok_range,
 //                    Need to use `Stmt::ContainsErrors`.
 static bool StatementsHaveErrors(const pasta::Decl &) {
   return false;
+}
+
+static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
+    const pasta::MacroNode &node) {
+  switch (node.Kind()) {
+    case pasta::MacroNodeKind::kDirective:  // `#if`, `#pragma`, etc.
+    case pasta::MacroNodeKind::kInclude:
+      if (auto dir = pasta::MacroDirective::From(node)) {
+        return dir->HashToken().FileLocation();
+      }
+      return std::nullopt;
+    default:
+      return std::nullopt;
+  }
+}
+
+// Returns `true` if at least one of the input entities is a macro node that
+// isn't a macro definition or expansion, and if the entities are on adjacent
+// lines.
+//
+// Ideally, we want to be able to merge adjacent macro directives, and then
+// also the macro directives that are adjacent to top-level declarations.
+//
+// TODO(pag): Consider degenerate cases, e.g.:
+//
+//                #if 1
+//                decl0
+//                decl1
+//                #endif
+static bool CanMergeNonOverlappingEntitiesIntoFragment(
+    const Entity &first, const Entity &second) {
+  auto seen_macro = false;
+  std::optional<pasta::FileToken> first_loc;
+  std::optional<pasta::FileToken> second_loc;
+  if (std::holds_alternative<pasta::MacroNode>(first)) {
+    first_loc = BeginOfMergableMacroNode(std::get<pasta::MacroNode>(first));
+    seen_macro = true;
+  } else if (std::holds_alternative<pasta::Decl>(first)) {
+    first_loc = std::get<pasta::Decl>(first).EndToken().FileLocation();
+  } else {
+    return false;
+  }
+
+  if (!first_loc) {
+    return false;
+  } else if (std::holds_alternative<pasta::MacroNode>(second)) {
+    second_loc = BeginOfMergableMacroNode(std::get<pasta::MacroNode>(second));
+  } else if (!seen_macro) {
+    return false;
+  } else if (std::holds_alternative<pasta::Decl>(second)) {
+    second_loc = std::get<pasta::Decl>(second).BeginToken().FileLocation();
+  } else {
+    return false;
+  }
+
+  if (!second_loc) {
+    return false;
+  }
+
+  // Different files.
+  if (first_loc->RawFile() != second_loc->RawFile()) {
+    return false;
+  }
+
+  return (first_loc->Line() + 1u) >= second_loc->Line();
 }
 
 // Try to accumulate the nearby top-level declarations whose token ranges
@@ -545,60 +789,54 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
 // as well as for template specializations.
 //
 // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
-static std::vector<DeclGroupRange> PartitionTLDs(
+static std::vector<EntityGroupRange> PartitionEntities(
     ProgressBar *partition_progress_bar, std::string_view main_file_path,
     const pasta::AST &ast) {
 
   ProgressBarWork partitioning_progress_tracker(partition_progress_bar);
 
-  std::vector<DeclRange> decl_ranges = SortTLDs(
-      ast.Tokens(), main_file_path, FindTLDs(ast.TranslationUnit()));
+  std::vector<EntityRange> entity_ranges = SortEntities(ast, main_file_path);
+  std::vector<EntityGroupRange> entity_group_ranges;
+  entity_group_ranges.reserve(entity_ranges.size());
 
-  std::vector<DeclGroupRange> decl_group_ranges;
-  decl_group_ranges.reserve(decl_ranges.size());
-
-  for (size_t i = 0u, max_i = decl_ranges.size(); i < max_i; ) {
-    DeclRange range = std::move(decl_ranges[i++]);
-    pasta::Decl decl = std::move(std::get<0u>(range));
-    uint64_t begin_index = std::get<1u>(range);
-    uint64_t end_index = std::get<2u>(range);
-    size_t num_errors = StatementsHaveErrors(decl);
-
-    std::vector<pasta::Decl> decls_for_group;
-    decls_for_group.push_back(decl);
+  for (size_t i = 0u, max_i = entity_ranges.size(); i < max_i; ) {
+    EntityGroup entities_for_group;
+    const EntityRange &entity_range = entity_ranges[i];
+    uint64_t begin_index = std::get<kBeginIndex>(entity_range);
+    uint64_t end_index = std::get<kEndIndex>(entity_range);
 
     for (; i < max_i; ++i) {
-      if (std::get<1>(decl_ranges[i]) <= end_index) {
-        auto next_decl = std::get<0>(decl_ranges[i]);
-        auto next_end = std::get<2>(decl_ranges[i]);
 
-        if (next_decl == decl) {
-          DLOG(FATAL)
-              << "Declaration of " << decl.KindName()
-              << PrefixedName(decl) << PrefixedLocation(decl, " at or near ")
-              << " is repeated in top-level decl list for job on file "
-              << " on main job file " << main_file_path;
-        } else {
-          num_errors += StatementsHaveErrors(next_decl);
-          decls_for_group.push_back(std::move(next_decl));
-        }
-
-        // Make sure we definitely enclose over the next decl.
-        end_index = std::max(end_index, next_end);
+      const EntityRange &next_entity_range = entity_ranges[i];
+      const Entity &next_entity = std::get<kEntityIndex>(next_entity_range);
+      uint64_t next_begin = std::get<kBeginIndex>(next_entity_range);
+      uint64_t next_end = std::get<kEndIndex>(next_entity_range);
 
       // Doesn't close over.
-      } else {
-        break;
+      if (next_begin > end_index) {
+        if (entities_for_group.empty() ||
+            !CanMergeNonOverlappingEntitiesIntoFragment(
+                entities_for_group.back(), next_entity)) {
+          break;
+        }
       }
+
+      if (std::holds_alternative<pasta::Decl>(next_entity)) {
+        CHECK_EQ(StatementsHaveErrors(std::get<pasta::Decl>(next_entity)), 0u);
+      }
+
+      // Make sure we definitely enclose over the next decl.
+      begin_index = std::min(begin_index, next_begin);
+      end_index = std::max(end_index, next_end);
+      entities_for_group.push_back(next_entity);
     }
 
-    CHECK_EQ(num_errors, 0u);
-
-    decl_group_ranges.emplace_back(
-        std::move(decls_for_group), begin_index, end_index);
+    CHECK(!entities_for_group.empty());
+    entity_group_ranges.emplace_back(
+        std::move(entities_for_group), begin_index, end_index);
   }
 
-  return decl_group_ranges;
+  return entity_group_ranges;
 }
 
 // Create fragments in reverse order that we see them in the AST. The hope
@@ -608,7 +846,7 @@ static std::vector<DeclGroupRange> PartitionTLDs(
 static std::vector<PendingFragment> CreatePendingFragments(
     WorkerId worker_id, GlobalIndexingState &context, EntityIdMap &entity_ids,
     FileHashMap &file_hashes, const pasta::TokenRange &tok_range,
-    std::vector<DeclGroupRange> decl_group_ranges) {
+    std::vector<EntityGroupRange> decl_group_ranges) {
 
   ProgressBarWork identification_progress_tracker(
       context.identification_progress.get());
@@ -619,28 +857,46 @@ static std::vector<PendingFragment> CreatePendingFragments(
   // Visit decl range groups in reverse order, so that we're more likely to
   // see the definitely unique fragments first, as they'll appear in the main
   // source file of this translation unit.
-  for (std::vector<DeclGroupRange>::reverse_iterator
+  for (std::vector<EntityGroupRange>::reverse_iterator
        it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-    DeclGroupRange &group = *it;
-    std::vector<pasta::Decl> decls_for_group = std::move(std::get<0u>(group));
-    uint64_t begin_index = std::get<1u>(group);
-    uint64_t end_index = std::get<2u>(group);
+    const EntityGroupRange &group_range = *it;
+    const EntityGroup &entities = std::get<kGroupIndex>(group_range);
+    uint64_t begin_index = std::get<kBeginIndex>(group_range);
+    uint64_t end_index = std::get<kEndIndex>(group_range);
 
     // Don't create token `decls_for_chunk` if the decl is already seen. This
     // means it's already been indexed.
     auto [code_id, is_new] = context.GetOrCreateFragmentId(
         worker_id,
-        CodeHash(file_hashes, decls_for_group, tok_range,
-                 begin_index, end_index),
+        CodeHash(file_hashes, entities, tok_range, begin_index, end_index),
         end_index - begin_index + 1u);
 
     PendingFragment pending_fragment;
     pending_fragment.fragment_id = code_id;
-    pending_fragment.decls = std::move(decls_for_group);
     pending_fragment.begin_index = begin_index;
     pending_fragment.end_index = end_index;
+
+    for (const Entity &entity : entities) {
+      if (std::holds_alternative<pasta::Decl>(entity)) {
+        pending_fragment.decls_to_serialize.push_back(
+            std::get<pasta::Decl>(entity));
+        pending_fragment.num_top_level_declarations++;
+
+      } else if (std::holds_alternative<pasta::MacroNode>(entity)) {
+        pending_fragment.macros_to_serialize.push_back(
+            std::get<pasta::MacroNode>(entity));
+        pending_fragment.num_top_level_macros++;
+
+      } else {
+        LOG(FATAL)
+            << "TODO: Unsupported top-level entity kind";
+      }
+    }
+
+    CHECK_NE((pending_fragment.num_top_level_declarations +
+              pending_fragment.num_top_level_macros), 0u);
 
     // We always need to label the entities inside of a fragment, regardless of
     // if fragment `is_new`. This is because each fragment might have arbitrary
@@ -732,7 +988,7 @@ void IndexCompileJobAction::Run(Executor, WorkerId worker_id) {
   parsing_progress_tracker.reset();
   PersistParsedFiles(ast, worker_id);
 
-  std::vector<DeclGroupRange> decl_group_ranges = PartitionTLDs(
+  std::vector<EntityGroupRange> decl_group_ranges = PartitionEntities(
       context->partitioning_progress.get(), main_file_path, ast);
 
   pasta::TokenRange tok_range = ast.Tokens();

@@ -65,7 +65,8 @@ CodeGenerator::~CodeGenerator(void) {}
 std::string CodeGenerator::GenerateSourceIRFromTLDs(
     mx::RawEntityId fragment_id,
     const EntityMapper &em,
-    const std::vector<pasta::Decl> &decls) {
+    const std::vector<pasta::Decl> &decls,
+    unsigned num_decls) {
 
   std::string ret;
 
@@ -99,7 +100,8 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
 
   try {
     vast::hl::CodeGenVisitor visitor(tctx);
-    for (const pasta::Decl &decl : decls) {
+    for (auto i = 0u; i < num_decls; ++i) {
+      const pasta::Decl &decl = decls[i];
       vast::ValueOrStmt hl_decl =
           visitor.Visit(const_cast<clang::Decl *>(decl.RawDecl()));
       if (std::holds_alternative<vast::Value>(hl_decl)) {

@@ -13,6 +13,7 @@
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
@@ -45,9 +46,6 @@ class PendingFragment {
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::RawEntityId fragment_id;
 
-  // Top-level declarations. These are the roots of serialization.
-  std::vector<pasta::Decl> decls;
-
   // Offsets of the serialized version of types in this fragment.
   //
   // NOTE(pag): Types are redundantly represented in/across fragments; no
@@ -64,8 +62,14 @@ class PendingFragment {
   // Offsets of the serialized version of pseudo entities in this fragment.
   PseudoOffsetMap pseudo_offsets;
 
-  // Declarations, statements, types, and pseudo-entities to serialize, in their
-  // order of appearance and serialization.
+  // The first `num_top_level_declarations` entries in `decls_to_serialize`
+  // are the "top level declarations." These are discovered by `TLDFinder`.
+  unsigned num_top_level_declarations{0u};
+  unsigned num_top_level_macros{0u};
+
+  // Macros, declarations, statements, types, and pseudo-entities to serialize,
+  // in their order of appearance and serialization.
+  std::vector<pasta::MacroNode> macros_to_serialize;
   std::vector<pasta::Decl> decls_to_serialize;
   std::vector<pasta::Stmt> stmts_to_serialize;
   std::vector<pasta::Type> types_to_serialize;

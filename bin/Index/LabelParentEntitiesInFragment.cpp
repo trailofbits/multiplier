@@ -134,16 +134,24 @@ void PendingFragment::LabelParents(EntityMapper &em) {
     vis.not_yet_seen.emplace(type.RawType());
   }
 
-  for (const pasta::Decl &decl : decls) {
-    vis.Accept(decl);
+  // Visit the top-level decls first.
+  size_t i = 0u;
+  size_t max_i = decls_to_serialize.size();
+  for (; i < max_i; ++i) {
+    vis.Accept(decls_to_serialize[i]);
   }
 
-  for (const pasta::Decl &decl : decls_to_serialize) {
+  // Expand the set of decls.
+  max_i = decls_to_serialize.size();
+  for (; i < max_i; ++i) {
+    pasta::Decl decl = decls_to_serialize[i];
     if (vis.not_yet_seen.count(decl.RawDecl())) {
       vis.Accept(decl);   
+      max_i = decls_to_serialize.size();
     }
   }
 
+#ifndef NDEBUG
   // NOTE(pag): If this assertion is hit, then it suggests that the manually-
   //            written traversals in `Visitor.cpp` are missing something that
   //            the automatically generated visitors created from
@@ -152,6 +160,11 @@ void PendingFragment::LabelParents(EntityMapper &em) {
   //            detect them here if possible. Missing things can also be an
   //            indication that we're not fully linking something to its parent
   //            decls/statements.
+  for (const pasta::Decl &decl : decls_to_serialize) {
+    assert(!vis.not_yet_seen.count(decl.RawDecl()));
+  }
+#endif
+
 // #ifndef NDEBUG
   // TODO(kumarak): Does the manually written Visitor.cpp should have traverse function
   //                for all stmt types. If not then we can probably remove assert here.
