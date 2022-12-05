@@ -60,16 +60,18 @@ static constexpr unsigned kGroupIndex = 0u;
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
  private:
-  std::vector<pasta::Decl> &tlds;
+  std::vector<std::pair<pasta::Decl, unsigned>> &tlds;
 
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
   std::unordered_set<pasta::Decl> seen_specs;
 
+  unsigned order{0u};
+
  public:
   virtual ~TLDFinder(void) = default;
 
-  explicit TLDFinder(std::vector<pasta::Decl> &tlds_)
+  explicit TLDFinder(std::vector<std::pair<pasta::Decl, unsigned>> &tlds_)
       : tlds(tlds_) {}
 
   void VisitDeclContext(const pasta::DeclContext &dc) {;
@@ -158,28 +160,50 @@ class TLDFinder final : public pasta::DeclVisitor {
 
   void VisitDecl(const pasta::Decl &decl) final {
     if (!decl.IsImplicit()) {
-      tlds.emplace_back(decl);
+      tlds.emplace_back(decl, order++);
     }
   }
 };
 
 // Find all top-level declarations.
-static std::vector<pasta::Decl> FindTLDs(const pasta::AST &ast) {
-  std::vector<pasta::Decl> tlds;
+static std::vector<std::pair<pasta::Decl, unsigned>>
+FindTLDs(const pasta::AST &ast) {
+  using OrderedNode = std::pair<pasta::Decl, unsigned>;
+  std::vector<OrderedNode> tlds;
   TLDFinder tld_finder(tlds);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
-  auto eq = +[] (const pasta::Decl &a, const pasta::Decl &b) {
-    return a.RawDecl() == b.RawDecl();
+  auto eq = +[] (const OrderedNode &a, const OrderedNode &b) {
+    return a.first.RawDecl() == b.first.RawDecl();
   };
 
-  auto less = +[] (const pasta::Decl &a, const pasta::Decl &b) {
-    return a.RawDecl() < b.RawDecl();
+  auto less = +[] (const OrderedNode &a, const OrderedNode &b) {
+    auto a_id = a.first.RawDecl();
+    auto b_id = b.first.RawDecl();
+    if (a_id < b_id) {
+      return true;
+    } else if (a_id > b_id) {
+      return false;
+    } else {
+      return a.second < b.second;
+    }
+  };
+
+  auto orig_less = +[] (const OrderedNode &a, const OrderedNode &b) {
+    return a.second < b.second;
   };
 
   std::sort(tlds.begin(), tlds.end(), less);
   auto it = std::unique(tlds.begin(), tlds.end(), eq);
   tlds.erase(it, tlds.end());
+
+  // NOTE(pag): It is extremely important to retain the original ordering. You
+  //            can't rely on `sort` (a quicksort) to behave like a stable sort,
+  //            nor can you rely on ASTs of different translation units putting
+  //            side-by-side declarations one-after-another in memory, thus
+  //            getting the same sort order. This is why we keep the extra info
+  //            in the `pair` of the original sort order.
+  std::sort(tlds.begin(), tlds.end(), orig_less);
 
   return tlds;
 }
@@ -565,10 +589,13 @@ static pasta::MacroNode RootNodeFrom(pasta::MacroNode node) {
 
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
-static std::vector<pasta::MacroNode> FindTLMs(const pasta::AST &ast) {
+static std::vector<std::pair<pasta::MacroNode, unsigned>>
+FindTLMs(const pasta::AST &ast) {
+  using OrderedNode = std::pair<pasta::MacroNode, unsigned>;
+  std::vector<OrderedNode> tlms;
+  std::vector<pasta::MacroDefinition> defs;
 
-  std::vector<pasta::MacroNode> tlms;
-
+  auto order = 0u;
   for (pasta::MacroNode mn : ast.Macros()) {
 
     // Include all uses macros, and only those `#define`s for which the
@@ -586,14 +613,10 @@ static std::vector<pasta::MacroNode> FindTLMs(const pasta::AST &ast) {
         continue;
       }
 
-      bool is_used = false;
       for (pasta::MacroNode use : md->Uses()) {
-        tlms.push_back(RootNodeFrom(std::move(use)));
-        is_used = true;
-      }
-
-      if (is_used) {
-        tlms.push_back(std::move(mn));
+        tlms.emplace_back(std::move(mn), order++);
+        defs.push_back(std::move(md.value()));
+        break;
       }
 
     // Include all `#include`s, `#pragma`s, `#if`s, etc.
@@ -603,21 +626,47 @@ static std::vector<pasta::MacroNode> FindTLMs(const pasta::AST &ast) {
         continue;
       }
 
-      tlms.push_back(std::move(mn));
+      tlms.emplace_back(std::move(mn), order++);
     }
   }
 
-  auto eq = +[] (const pasta::MacroNode &a, const pasta::MacroNode &b) {
-    return a.RawNode() == b.RawNode();
+  for (pasta::MacroDefinition def : defs) {
+    for (pasta::MacroNode use : def.Uses()) {
+      tlms.emplace_back(RootNodeFrom(std::move(use)), order++);
+    }
+  }
+
+  auto eq = +[] (const OrderedNode &a, const OrderedNode &b) {
+    return a.first.RawNode() == b.first.RawNode();
   };
 
-  auto less = +[] (const pasta::MacroNode &a, const pasta::MacroNode &b) {
-    return a.RawNode() < b.RawNode();
+  auto less = +[] (const OrderedNode &a, const OrderedNode &b) {
+    auto a_id = a.first.RawNode();
+    auto b_id = b.first.RawNode();
+    if (a_id < b_id) {
+      return true;
+    } else if (a_id > b_id) {
+      return false;
+    } else {
+      return a.second < b.second;
+    }
+  };
+
+  auto orig_less = +[] (const OrderedNode &a, const OrderedNode &b) {
+    return a.second < b.second;
   };
 
   std::sort(tlms.begin(), tlms.end(), less);
   auto it = std::unique(tlms.begin(), tlms.end(), eq);
   tlms.erase(it, tlms.end());
+
+  // NOTE(pag): It is extremely important to retain the original ordering. You
+  //            can't rely on `sort` (a quicksort) to behave like a stable sort,
+  //            nor can you rely on ASTs of different translation units putting
+  //            side-by-side declarations one-after-another in memory, thus
+  //            getting the same sort order. This is why we keep the extra info
+  //            in the `pair` of the original sort order.
+  std::sort(tlms.begin(), tlms.end(), orig_less);
 
   return tlms;
 }
@@ -675,14 +724,14 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   std::vector<EntityRange> entity_ranges;
   entity_ranges.reserve(8192u);
 
-  for (pasta::Decl decl : FindTLDs(ast)) {
+  for (auto &&ordered_entry : FindTLDs(ast)) {
     AddDeclRangeToEntityList(tok_range, main_file_path, entity_ranges,
-                             std::move(decl));
+                             std::move(ordered_entry.first));
   }
 
-  for (pasta::MacroNode node : FindTLMs(ast)) {
+  for (auto &&ordered_entry : FindTLMs(ast)) {
     AddMacroRangeToEntityList(tok_range, main_file_path, entity_ranges,
-                              std::move(node));
+                              std::move(ordered_entry.first));
   }
 
   // It's possible that we have two-or-more things that appear to be top-level
@@ -926,6 +975,7 @@ static std::vector<PendingFragment> CreatePendingFragments(
     // auto-generated, as our auto-generation has no concept of which AST
     // methods descend vs. cross the tree (into other fragments).
     pending_fragment.Label(entity_ids, tok_range);
+
     if (is_new) {
       pending_fragments.emplace_back(std::move(pending_fragment));
     }

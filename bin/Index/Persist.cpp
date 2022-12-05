@@ -962,7 +962,7 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
   // Generate source IR before saving the fragments to the persistent
   // storage.
   fb.setMlir(context.codegen.GenerateSourceIRFromTLDs(
-      fragment_id, em, frag.decls_to_serialize,
+      fragment_id, em, frag.top_level_decls,
       frag.num_top_level_declarations));
 
   auto tlds = fb.initTopLevelDeclarations(frag.num_top_level_declarations);
@@ -979,8 +979,8 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
   std::optional<TokenTree> maybe_tt = TokenTree::Create(
       tokens, begin_index, end_index, tok_tree_err, is_fallback_token_tree);
   if (!maybe_tt) {
-    if (!frag.decls_to_serialize.empty()) {
-      const pasta::Decl &leader_decl = frag.decls_to_serialize.front();
+    if (!frag.top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = frag.top_level_decls.front();
       LOG(ERROR)
           << tok_tree_err.str() << " for top-level declaration "
           << DeclToString(leader_decl)

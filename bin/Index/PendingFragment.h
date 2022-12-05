@@ -46,6 +46,10 @@ class PendingFragment {
   // Unique ID of the fragment containing the top-level declarations `decls`.
   mx::RawEntityId fragment_id;
 
+  // Top-level declarations. These are the roots of serialization.
+  std::vector<pasta::Decl> top_level_decls;
+  std::vector<pasta::MacroNode> top_level_macros;
+
   // Offsets of the serialized version of types in this fragment.
   //
   // NOTE(pag): Types are redundantly represented in/across fragments; no
@@ -64,9 +68,6 @@ class PendingFragment {
 
   unsigned num_top_level_declarations{0u};
   unsigned num_top_level_macros{0u};
-
-  std::vector<pasta::Decl> top_level_decls;
-  std::vector<pasta::MacroNode> top_level_macros;
 
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.
