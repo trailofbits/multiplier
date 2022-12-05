@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/Signal.h>
+#include "Signal.h"
 
 #include <atomic>
 #include <cstdint>
@@ -13,7 +13,7 @@
 #include <thread>
 #include <unistd.h>
 
-namespace mx {
+namespace indexer {
 namespace {
 
 enum : int {
@@ -191,4 +191,4 @@ void Signal::AddHandler(int sig_num, LibcSignalAction *handler) {
   sigaction(sig_num, &act, nullptr);
 }
 
-}  // namespace mx
+}  // namespace indexer

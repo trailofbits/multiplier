@@ -7,16 +7,17 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Action.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/Decl.h>
 #include <string>
 #include <vector>
 
+#include "Action.h"
+
 namespace indexer {
 
 class EntityMapper;
-class IndexingContext;
+class GlobalIndexingState;
 
 class CodeGeneratorImpl;
 class CodeGenerator {
@@ -39,9 +40,8 @@ class CodeGenerator {
   // the top-level declaration is not `FunctionDecl`, it will visit
   // AST node and generate source ir for function decl found.
   std::string GenerateSourceIRFromTLDs(
-      mx::RawEntityId frag_id,
-      const EntityMapper &em,
-      const std::vector<pasta::Decl> &tlds);
+      mx::RawEntityId frag_id, const EntityMapper &em,
+      const std::vector<pasta::Decl> &tlds, unsigned num_decls);
 };
 
 }  // namespace indexer

@@ -11,8 +11,8 @@
 namespace indexer {
 namespace {
 
-static void TrackRedeclarations(mx::WorkerId worker_id,
-                                IndexingContext &context, EntityMapper &em,
+static void TrackRedeclarations(WorkerId worker_id,
+                                GlobalIndexingState &context, EntityMapper &em,
                                 const std::string &mangled_name,
                                 std::vector<pasta::Decl> redecls) {
   for (const pasta::Decl &redecl_a : redecls) {
@@ -32,8 +32,8 @@ static void TrackRedeclarations(mx::WorkerId worker_id,
 
 // Store information persistently to enable linking of declarations across
 // fragments.
-void PendingFragment::LinkDeclarations(mx::WorkerId worker_id,
-                                       IndexingContext &context,
+void PendingFragment::LinkDeclarations(WorkerId worker_id,
+                                       GlobalIndexingState &context,
                                        EntityMapper &em,
                                        NameMangler &mangler) {
   std::string dummy_mangled_name;

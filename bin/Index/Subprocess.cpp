@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/Subprocess.h>
+#include "Subprocess.h"
 
 #include <gflags/gflags.h>
 
@@ -12,12 +12,12 @@
 #include <reproc++/reproc.hpp>
 #include <sstream>
 
-namespace mx {
+namespace indexer {
 
 // Execute the command specified in `args` with the ability to feed the
 // command input and capture output. Passing `nullptr` to any of `input`,
 // `output`, or `error` is acceptable.
-Result<int, std::error_code> Subprocess::Execute(
+mx::Result<int, std::error_code> Subprocess::Execute(
     const std::vector<std::string> &cmd,
     const std::unordered_map<std::string, std::string> *env,
     std::string *input, std::string *output, std::string *error) {
@@ -96,4 +96,4 @@ Result<int, std::error_code> Subprocess::Execute(
   return status;
 }
 
-}  // namespace mx
+}  // namespace indexer

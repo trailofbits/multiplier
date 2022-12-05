@@ -9,6 +9,8 @@
 set(exe_name "mx-index")
 
 add_executable("${exe_name}"
+  "Action.cpp"
+  "Action.h"
   "BuildPendingFragment.cpp"
   "Compress.cpp"
   "Compress.h"
@@ -18,6 +20,8 @@ add_executable("${exe_name}"
   "Context.h"
   "EntityMapper.cpp"
   "EntityMapper.h"
+  "Executor.cpp"
+  "Executor.h"
   "FindUsesInFragment.cpp"
   "Hash.cpp"
   "Hash.h"
@@ -38,14 +42,24 @@ add_executable("${exe_name}"
   "Persist.cpp"
   "Persist.h"
   "PersistDeclarationInFragments.cpp"
+  "ProgressBar.cpp"
+  "ProgressBar.h"
   "Pseudo.h"
   "SerializePendingFragment.cpp"
+  "Signal.cpp"
+  "Signal.h"
+  "Subprocess.cpp"
+  "Subprocess.h"
   "TokenTree.cpp"
   "TokenTree.h"
   "Util.cpp"
   "Util.h"
   "Visitor.cpp"
   "Visitor.h"
+  "WorkerPool.cpp"
+  "WorkerPool.h"
+  "${MX_BOOTSTRAP_INDEX_PASTA_CPP}"
+  "${MX_BOOTSTRAP_INDEX_PASTA_H}"
   "${MX_BOOTSTRAP_INDEX_SERIALIZE_H}"
   "${MX_BOOTSTRAP_INDEX_SERIALIZE_CPP}"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
@@ -54,8 +68,11 @@ add_executable("${exe_name}"
 target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
-    "mx-util"
-    "concurrentqueue"
+    mx-common
+    "glog::glog"
+    gflags::gflags
+    concurrentqueue
+    reproc++
     ${MX_BEGIN_FORCE_LOAD_LIB} pasta::pasta ${MX_END_FORCE_LOAD_LIB}
     ${MX_END_FORCE_LOAD_GROUP}
 )

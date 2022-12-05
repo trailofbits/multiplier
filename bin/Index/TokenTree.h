@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include <multiplier/Result.h>
+#include <iosfwd>
+#include <optional>
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Token.h>
 #include <pasta/Util/File.h>
@@ -94,14 +95,19 @@ class TokenTree {
 
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
-  static mx::Result<TokenTree, std::string>
+  static std::optional<TokenTree>
   Create(pasta::TokenRange range, uint64_t begin_index, uint64_t end_index,
-         bool fallback=false);
+         std::ostream &err, bool fallback=false);
 
   TokenTreeNodeIterator begin(void) const noexcept;
   inline TokenTreeNodeIteratorEnd end(void) const noexcept {
     return {};
   }
+
+  std::optional<pasta::MacroDirective> MacroDirective(void) const noexcept;
+  std::optional<pasta::MacroDefinition> MacroDefinition(void) const noexcept;
+  std::optional<pasta::MacroExpansion> MacroExpansion(void) const noexcept;
+  std::optional<pasta::MacroArgument> MacroArgument(void) const noexcept;
 
   // Return the number of nodes in this tree.
   unsigned NumNodes(void) const noexcept;

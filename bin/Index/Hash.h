@@ -10,14 +10,18 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace pasta {
 class Decl;
 class File;
+class MacroNode;
 class TokenRange;
 }  // namespace pasta
 namespace indexer {
+
+using Entity = std::variant<pasta::Decl, pasta::MacroNode>;
 
 // Compute a SHA256 hash of some data from a file.
 std::string FileHash(std::string_view data);
@@ -35,7 +39,7 @@ std::string FileHash(std::string_view data);
 // template instantiations, where the tokens and their contexts match, but the
 // declarations in the AST do not.
 std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
-                     const std::vector<pasta::Decl> &decl_range,
+                     const std::vector<Entity> &entity_range,
                      const pasta::TokenRange &toks,
                      uint64_t begin_index, uint64_t end_index);
 

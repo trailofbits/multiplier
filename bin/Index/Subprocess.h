@@ -6,17 +6,13 @@
 
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <system_error>
 #include <unordered_map>
 #include <vector>
-#include "Result.h"
+#include <multiplier/Result.h>
 
-namespace pasta {
-class ArgumentVector;
-}  // namespace pasta
-namespace mx {
+namespace indexer {
 
 class Subprocess {
  public:
@@ -24,7 +20,7 @@ class Subprocess {
   // Execute the command specified in `args` with the ability to feed the
   // command input and capture output. Passing `nullptr` to any of `input`,
   // `output`, or `error` is acceptable.
-  static Result<int, std::error_code> Execute(
+  static mx::Result<int, std::error_code> Execute(
       const std::vector<std::string> &args,
       const std::unordered_map<std::string, std::string> *env=nullptr,
       std::string *input=nullptr,
@@ -32,4 +28,4 @@ class Subprocess {
       std::string *error=nullptr);
 };
 
-}  // namespace mx
+}  // namespace indexer

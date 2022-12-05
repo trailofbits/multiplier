@@ -10,6 +10,7 @@
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
@@ -104,8 +105,13 @@ std::string FileHash(std::string_view data) {
 // structure itself. Finally, the ODR hashes are there to help us to distinguish
 // template instantiations, where the tokens and their contexts match, but the
 // declarations in the AST do not.
+//
+// NOTE(pag): We want the hash to be very unique to this fragment. We never want
+//            two different fragments to have the same hash, because their
+//            ASTs might be different, and if their ASTs are different, then
+//            our entity ID numbering scheme will fail horribly.
 std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
-                     const std::vector<pasta::Decl> &tlds,
+                     const std::vector<Entity> &entities,
                      const pasta::TokenRange &toks,
                      uint64_t begin_index, uint64_t end_index) {
   llvm::FoldingSetNodeID fs;
@@ -114,10 +120,10 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
   }
 
   std::stringstream ss;
-  auto seen_floc = false;
+  bool seen_floc = false;
 
-  for (auto i = begin_index; i < end_index; i++) {
-    auto token = toks[i];
+  for (uint64_t i = begin_index; i < end_index; i++) {
+    pasta::Token token = toks[i];
 
     // Try to find the first token in the range with a file location, as a kind
     // of anchor point.
@@ -164,6 +170,10 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
               fs.AddInteger(static_cast<uint16_t>(
                   pasta::Type::From(*context)->Kind()));
               break;
+            case pasta::TokenContextKind::kAttr:
+              fs.AddInteger(static_cast<uint16_t>(
+                  pasta::Attr::From(*context)->Kind()));
+              break;
             default:
               fs.AddInteger(static_cast<uint16_t>(context->Kind()));
               break;
@@ -182,9 +192,11 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
   ss << std::hex;
 
   // Mix in ODR hashes.
-  for (auto &decl : tlds) {
-    HashVisitor visitor(ss);
-    visitor.Accept(decl);
+  HashVisitor visitor(ss);
+  for (const Entity &entity : entities) {
+    if (std::holds_alternative<pasta::Decl>(entity)) {
+      visitor.Accept(std::get<pasta::Decl>(entity));
+    }
   }
 
   // Mix in summarized generic info.

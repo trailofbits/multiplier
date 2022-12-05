@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/WorkerPool.h>
+#include "WorkerPool.h"
 
 #include <atomic>
 #include <cassert>
@@ -17,9 +17,9 @@
 
 #include <blockingconcurrentqueue.h>
 
-#include <multiplier/Signal.h>
+#include "Signal.h"
 
-namespace mx {
+namespace indexer {
 namespace {
 
 static thread_local bool gInWorkerThread = false;
@@ -402,4 +402,4 @@ void WorkerThreadPoolBase::OnSignalToStopInternal(void) {
   d->EnqueueDummyWorkItems();
 }
 
-}  // namespace mx
+}  // namespace indexer

@@ -4,40 +4,42 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <assert.h>
+
+#include <multiplier/IndexStorage.h>
+
+#include <cassert>
 
 #include <multiplier/SQLiteStore.h>
 #include <multiplier/SymbolDatabase.h>
-#include <multiplier/IndexStorage.h>
 #include <multiplier/Entities/DeclKind.h>
 
 namespace mx {
-IndexStorage::IndexStorage(sqlite::Connection& db)
-    : db(db)
-    , version_number(db)
-    , next_file_id(db)
-    , next_small_fragment_id(db)
-    , next_big_fragment_id(db)
-    , file_id_to_path(db)
-    , file_id_to_serialized_file(db)
-    , file_fragment_ids(db)
-    , file_fragment_lines(db)
-    , file_hash_to_file_id(db)
-    , code_hash_to_fragment_id(db)
-    , fragment_id_to_serialized_fragment(db)
-    , entity_redecls(db)
-    , entity_id_to_mangled_name(db)
-    , mangled_name_to_entity_id(db)
-    , entity_id_use_to_fragment_id(db)
-    , entity_id_reference(db)
-    , database(db) {}
 
-IndexStorage::~IndexStorage() {}
+IndexStorage::IndexStorage(sqlite::Connection &db)
+    : db(db),
+      next_file_id(db),
+      next_small_fragment_id(db),
+      next_big_fragment_id(db),
+      version_number(db),
+      file_id_to_path(db),
+      file_id_to_serialized_file(db),
+      file_fragment_ids(db),
+      file_fragment_lines(db),
+      file_hash_to_file_id(db),
+      code_hash_to_fragment_id(db),
+      fragment_id_to_serialized_fragment(db),
+      entity_redecls(db),
+      entity_id_to_mangled_name(db),
+      mangled_name_to_entity_id(db),
+      entity_id_use_to_fragment_id(db),
+      entity_id_reference(db),
+      database(db) {}
 
-void IndexStorage::Flush() {
-    database.Flush();
+IndexStorage::~IndexStorage(void) {}
+
+void IndexStorage::Flush(void) {
+  database.Flush();
 }
-
 
 // Return the set of redeclarations of an entity.
 std::vector<mx::RawEntityId> IndexStorage::FindRedeclarations(

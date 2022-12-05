@@ -7,11 +7,11 @@
 
 #include <type_traits>
 
-#include <multiplier/PASTA.h>
 #include <pasta/AST/Stmt.h>
 
 #include "Context.h"
 #include "EntityMapper.h"
+#include "PASTA.h"
 #include "PendingFragment.h"
 #include "Util.h"
 
@@ -126,12 +126,16 @@ std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
 }  // namespace
 
 void PendingFragment::PersistDeclarationSymbols(
-    mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em) {
+    WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
+
+  WorkerIndexingState &worker = context.PerWorkerState(worker_id);
+  mx::IndexStorage &storage = worker.ClientSharedStorage();
+
   for (const pasta::Decl &decl : decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {
       
-      context.server_context[worker_id]->database.StoreSymbolName(
+      storage.database.StoreSymbolName(
           em.EntityId(decl), mx::FromPasta(decl.Category()),
           ContextualSymbolName(nd.value()));
     }

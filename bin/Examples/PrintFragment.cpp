@@ -42,9 +42,26 @@ extern "C" int main(int argc, char *argv[]) {
   // are post-macro expansion tokens, and generally don't include whitespace
   // or comments. There can be empty tokens, however.
   } else {
+
+    std::cout << "Parsed data from tokens:\n";
+
     for (mx::Token token : fragment->parsed_tokens()) {
-      std::cout << ' ' << token.data();
+      std::cout << token.id() << '\t' << mx::EnumeratorName(token.kind()) << '\t' << token.data() << '\n';
+//      std::cout << token.data() << ' ';
     }
+
+    std::cout << "\n\nParsed data from token range:\n";
+    std::cout << fragment->parsed_tokens().data();
+
+    std::cout << "\n\nFile data from tokens:\n";
+    for (mx::Token token : fragment->file_tokens()) {
+      std::cout << token.data();
+    }
+
+    std::cout << "\n\nFile data from file token range:\n";
+    std::cout << fragment->file_tokens().data();
+
+    std::cout << '\n';
   }
 
   return EXIT_SUCCESS;

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <array>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -14,7 +15,6 @@
 #include <sstream>
 #include <utility>
 
-#include "Serialize.h"
 #include "SQLiteStore.h"
 
 namespace mx {
@@ -40,7 +40,9 @@ template <uint8_t kId, typename... Keys>
 class PersistentSet {
  private:
   sqlite::Connection &db;
-  std::shared_ptr<sqlite::Statement> insert_stmt, test_stmt, scan_stmt;
+  std::shared_ptr<sqlite::Statement> insert_stmt;
+  std::shared_ptr<sqlite::Statement> test_stmt;
+  std::shared_ptr<sqlite::Statement> scan_stmt;
   std::array<std::shared_ptr<sqlite::Statement>, sizeof...(Keys)> get_stmts;
   std::array<std::shared_ptr<sqlite::Statement>, sizeof...(Keys)> get_by_prefix_stmts;
 
@@ -193,7 +195,9 @@ template <uint8_t kId, typename K, typename V>
 class PersistentMap {
  private:
   sqlite::Connection &db;
-  std::shared_ptr<sqlite::Statement> set_stmt, get_stmt, get_or_set_stmt;
+  std::shared_ptr<sqlite::Statement> set_stmt;
+  std::shared_ptr<sqlite::Statement> get_stmt;
+  std::shared_ptr<sqlite::Statement> get_or_set_stmt;
 
  public:
   PersistentMap(sqlite::Connection &db) : db(db) {

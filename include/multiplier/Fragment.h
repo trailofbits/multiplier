@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "File.h"
+#include "Macro.h"
 
 namespace mx {
 

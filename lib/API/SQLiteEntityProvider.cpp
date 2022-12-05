@@ -33,9 +33,20 @@ class SQLiteEntityProvider::Impl {
   std::filesystem::path db_path;
   std::mutex mtx;
   std::unordered_map<std::thread::id, Context> contexts;
+  mx::RawEntityId next_file_id;
+  mx::RawEntityId next_small_fragment_id;
+  mx::RawEntityId next_big_fragment_id;
 
   Impl(std::filesystem::path path)
-      : db_path(path) {}
+      : db_path(path) {
+        sqlite::Connection db(path, true);
+        mx::PersistentAtomic<mx::kNextFileId, mx::RawEntityId> next_file_id(db);
+        mx::PersistentAtomic<mx::kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id(db);
+        mx::PersistentAtomic<mx::kNextBigCodeId, mx::RawEntityId> next_big_fragment_id(db);
+        this->next_file_id = next_file_id.load();
+        this->next_small_fragment_id = next_small_fragment_id.load();
+        this->next_big_fragment_id = next_big_fragment_id.load();
+      }
 
   IndexStorage &GetStorage(void) {
     std::scoped_lock<std::mutex> lock(mtx);
@@ -142,7 +153,7 @@ std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(
   std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
   auto &storage = d->GetStorage();
   for(RawEntityId file_id = kMinEntityIdIncrement;
-        file_id < storage.next_file_id;
+        file_id < d->next_file_id;
         ++file_id) {
 
     // Get the contents of the file. We may fail, which is OK, and generally
@@ -216,7 +227,7 @@ std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(
   std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
   auto &storage = d->GetStorage();
   for(RawEntityId file_id = kMinEntityIdIncrement;
-        file_id < storage.next_file_id;
+        file_id < d->next_file_id;
         ++file_id) {
     // Get the contents of the file. We may fail, which is OK, and generally
     // implies a bad file id. There can be small gaps in the file ID space, which

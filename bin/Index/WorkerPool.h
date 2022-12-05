@@ -10,7 +10,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace mx {
+namespace indexer {
 class BlockingConcurrentQueue;
 class Semaphore;
 class QueuePointer;
@@ -135,4 +135,4 @@ class WorkerThreadPool : public WorkerThreadPoolBase {
   }
 };
 
-}  // namespace mx
+}  // namespace indexer

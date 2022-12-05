@@ -62,24 +62,17 @@ class IndexStorage final {
   sqlite::Connection &db;
 
  public:
-  // The next indexing version number. This is incremented prior to starting
-  // an indexing run, and just after. The double-increment is there just in
-  // case some clients come along and issue some queries prior to indexing being
-  // finished. We want best-effort resolution of definitions/redeclarations
-  // during this time, but we don't want to commit to those results, just in
-  // case there are more redeclarations that come in betwween the client request
-  // and finishing indexing.
-  mx::PersistentAtomic<kIndexingVersion, unsigned> version_number;
-
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
-  mx::PersistentAtomic<kNextFileId, mx::RawEntityId> next_file_id;
+  mx::PersistentAtomicStorage<mx::kNextFileId, mx::RawEntityId>
+      next_file_id;
 
   // The next ID for a "small fragment." A small fragment has fewer than
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
   // are more common, and require fewer bits to encode token offsets inside of
   // the packed `mx::EntityId` for tokens.
-  mx::PersistentAtomic<kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id;
+  mx::PersistentAtomicStorage<mx::kNextSmallCodeId, mx::RawEntityId>
+      next_small_fragment_id;
 
   // The next ID for a "big fragment." A big fragment has at least
   // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
@@ -89,7 +82,17 @@ class IndexStorage final {
   // but because we reserve the low ID space for big fragment IDs, we know that
   // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
   // bit for token offset bits.
-  mx::PersistentAtomic<kNextBigCodeId, mx::RawEntityId> next_big_fragment_id;
+  mx::PersistentAtomicStorage<mx::kNextBigCodeId, mx::RawEntityId>
+      next_big_fragment_id;
+
+  // The next indexing version number. This is incremented prior to starting
+  // an indexing run, and just after. The double-increment is there just in
+  // case some clients come along and issue some queries prior to indexing being
+  // finished. We want best-effort resolution of definitions/redeclarations
+  // during this time, but we don't want to commit to those results, just in
+  // case there are more redeclarations that come in betwween the client request
+  // and finishing indexing.
+  mx::PersistentAtomic<kIndexingVersion, unsigned> version_number;
 
   // Maps file IDs to their absolute path, as well as to their token lists.
   mx::PersistentSet<kFileIdToPath, mx::RawEntityId, std::string>

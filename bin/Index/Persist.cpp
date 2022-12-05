@@ -13,7 +13,6 @@
 #include <glog/logging.h>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
-#include <multiplier/ProgressBar.h>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
@@ -24,6 +23,7 @@
 #include "Compress.h"
 #include "Context.h"
 #include "EntityMapper.h"
+#include "ProgressBar.h"
 #include "TokenTree.h"
 #include "Util.h"
 
@@ -65,6 +65,7 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
 static void CountSubstitutions(EntityMapper &em, TokenTree tt,
                                std::vector<TokenTree> &todo,
                                unsigned &num_subs, unsigned &num_toks) {
+
   for (auto node : tt) {
     if (auto sub = node.MaybeSubstitution()) {
       auto [kind, lhs, rhs] = std::move(sub.value());
@@ -182,7 +183,7 @@ static void FindFileRange(const pasta::TokenRange &tokens, uint64_t min_index,
       continue;
     }
 
-    if (pasta::File::Containing(*ft) != file) {
+    if (ft->RawFile() != file.RawFile()) {
       continue;
     }
     if (ft->Index() < min->Index()) {
@@ -359,7 +360,17 @@ static void PersistTokenTree(EntityMapper &em,
       auto [kind, lhs, rhs] = std::move(sub.value());
       mx::MacroSubstitutionId sub_id;
       sub_id.fragment_id = em.fragment.fragment_id;
-      sub_id.kind = kind;
+
+      // If we can't isolate / locate this macro expansion to a specific
+      // definition site, then reinterpret this macro as a substitution.
+      if (kind == mx::MacroSubstitutionKind::MACRO &&
+          (!lhs.MacroDefinition() ||
+           !lhs.MacroDefinition()->NameToken().FileLocation())) {
+        sub_id.kind = mx::MacroSubstitutionKind::SUBSTITUTE;
+      } else {
+        sub_id.kind = kind;
+      }
+
       sub_id.offset = next_sub_offset;
       mx::RawEntityId eid = mx::EntityId(sub_id).Pack();
       work.nib.set(i++, eid);
@@ -791,7 +802,7 @@ static void PersistTokenContexts(
 // for every such query. Similarly, we often want to map from matches in files
 // to matches in fragments, and so we create and persist a mapping of file
 // offsets to line numbers here to help us with those translations later.
-void PersistFile(mx::WorkerId worker_id, IndexingContext &context,
+void PersistFile(WorkerId worker_id, GlobalIndexingState &context,
                  mx::RawEntityId file_id, std::string file_hash,
                  pasta::File file) {
 
@@ -891,24 +902,30 @@ static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
 // tokens associated with the covered declarations/statements. This is partially
 // because our serialized decls/stmts/etc. reference these tokens, and partially
 // so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
+void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
                      pasta::AST &ast, NameMangler &mangler,
                      EntityIdMap &entity_ids, FileIdMap &file_ids,
                      const pasta::TokenRange &tokens, PendingFragment frag) {
 
   const mx::RawEntityId fragment_id = frag.fragment_id;
-  const pasta::Decl &leader_decl = frag.decls[0];
   const uint64_t begin_index = frag.begin_index;
   const uint64_t end_index = frag.end_index;
 
   auto maybe_file = FragmentFile(tokens, frag);
   if (!maybe_file) {
     auto main_file_path = ast.MainFile().Path().generic_string();
-    LOG(ERROR)
-        << "Unable to locate file containing "
-        << DeclToString(leader_decl)
-        << PrefixedLocation(leader_decl, " at or near ")
-        << " on main job file " << main_file_path;
+    if (!frag.top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = frag.top_level_decls.front();
+      LOG(ERROR)
+          << "Unable to locate file containing "
+          << DeclToString(leader_decl)
+          << PrefixedLocation(leader_decl, " at or near ")
+          << " on main job file " << main_file_path;
+    } else {
+      LOG(ERROR)
+          << "Unable to locate file containing macros on main job file "
+          << main_file_path;
+    }
     return;
   }
 
@@ -945,12 +962,12 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // Generate source IR before saving the fragments to the persistent
   // storage.
   fb.setMlir(context.codegen.GenerateSourceIRFromTLDs(
-      fragment_id, em, frag.decls));
+      fragment_id, em, frag.top_level_decls,
+      frag.num_top_level_declarations));
 
-  auto num_tlds = static_cast<unsigned>(frag.decls.size());
-  auto tlds = fb.initTopLevelDeclarations(num_tlds);
-  for (auto i = 0u; i < num_tlds; ++i) {
-    tlds.set(i, em.EntityId(frag.decls[i]));
+  auto tlds = fb.initTopLevelDeclarations(frag.num_top_level_declarations);
+  for (auto i = 0u; i < frag.num_top_level_declarations; ++i) {
+    tlds.set(i, em.EntityId(frag.top_level_decls[i]));
   }
 
   // Derive the macro substitution tree. Failing to build the tree is an error
@@ -958,21 +975,30 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // fragment or its data.
   bool is_fallback_token_tree = false;
 
-  mx::Result<TokenTree, std::string> maybe_tt = TokenTree::Create(
-      tokens, begin_index, end_index, is_fallback_token_tree);
-  if (!maybe_tt.Succeeded()) {
-    LOG(ERROR)
-      << maybe_tt.TakeError() << " for top-level declaration "
-      << DeclToString(leader_decl)
-      << PrefixedLocation(leader_decl, " at or near ")
-      << " on main job file "
-      << ast.MainFile().Path().generic_string();
+  std::stringstream tok_tree_err;
+  std::optional<TokenTree> maybe_tt = TokenTree::Create(
+      tokens, begin_index, end_index, tok_tree_err, is_fallback_token_tree);
+  if (!maybe_tt) {
+    if (!frag.top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = frag.top_level_decls.front();
+      LOG(ERROR)
+          << tok_tree_err.str() << " for top-level declaration "
+          << DeclToString(leader_decl)
+          << PrefixedLocation(leader_decl, " at or near ")
+          << " on main job file "
+          << ast.MainFile().Path().generic_string();
+    } else {
+      LOG(ERROR)
+          << tok_tree_err.str() << " for macros on main job file "
+          << ast.MainFile().Path().generic_string();
+    }
 
     fb.setHadSubstitutionError(true);
 
     // Try to create a simpler, fallback token tree.
     maybe_tt = TokenTree::Create(
-        tokens, begin_index, end_index, is_fallback_token_tree  /* fallback */);
+        tokens, begin_index, end_index, tok_tree_err,
+        is_fallback_token_tree  /* fallback */);
 
   } else {
     fb.setHadSubstitutionError(false);
@@ -982,13 +1008,13 @@ void PersistFragment(mx::WorkerId worker_id, IndexingContext &context,
   // effort saving of macro tokens. Don't bother organizing them into
   // substitutions because that will just replicate logic from the token
   // tree.
-  if (!maybe_tt.Succeeded()) {
+  if (!maybe_tt) {
     BackupPersistMacroTokens(em, tokens, begin_index, end_index, fb);
 
   // We have a token tree, or possibly a fallback token tree. The fallback
   // token trees aren't as nice because they lack whitespace.
   } else {
-    PersistTokenTree(em, fb, maybe_tt.TakeValue(), tokens, begin_index,
+    PersistTokenTree(em, fb, std::move(maybe_tt.value()), tokens, begin_index,
                      end_index);
   }
 

@@ -7,12 +7,13 @@
 #include "File.h"
 
 #include <cctype>
+#include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Type.h>
 
+#include "Macro.h"
 #include "Fragment.h"
 #include "Re2.h"
 #include "Weggli.h"
-#include <multiplier/Entities/Designator.h>
-#include <multiplier/Entities/Type.h>
 
 namespace mx {
 

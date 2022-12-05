@@ -4,13 +4,14 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/SQLiteStore.h>
 #include <multiplier/SymbolDatabase.h>
 
 #include <array>
+#include <cassert>
 #include <cstdint>
 #include <deque>
 #include <multiplier/AST.h>
+#include <multiplier/SQLiteStore.h>
 #include <sstream>
 #include <thread>
 #include <variant>
@@ -129,6 +130,7 @@ SymbolDatabaseImpl::SymbolDatabaseImpl(sqlite::Connection &db)
             local_insert_symbol_stmt[i]->Execute();
 
           } else {
+            assert(false);
             //LOG(FATAL)
             //    << "Unknown data kind";
           }

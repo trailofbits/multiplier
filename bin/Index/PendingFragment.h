@@ -13,6 +13,7 @@
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
@@ -29,7 +30,7 @@ using Pseudo = std::variant<pasta::TemplateArgument,
                             pasta::Designator>;
 
 class EntityMapper;
-class IndexingContext;
+class GlobalIndexingState;
 class NameMangler;
 
 // Summary information about a group of top-level declarations that are
@@ -46,7 +47,8 @@ class PendingFragment {
   mx::RawEntityId fragment_id;
 
   // Top-level declarations. These are the roots of serialization.
-  std::vector<pasta::Decl> decls;
+  std::vector<pasta::Decl> top_level_decls;
+  std::vector<pasta::MacroNode> top_level_macros;
 
   // Offsets of the serialized version of types in this fragment.
   //
@@ -64,8 +66,12 @@ class PendingFragment {
   // Offsets of the serialized version of pseudo entities in this fragment.
   PseudoOffsetMap pseudo_offsets;
 
-  // Declarations, statements, types, and pseudo-entities to serialize, in their
-  // order of appearance and serialization.
+  unsigned num_top_level_declarations{0u};
+  unsigned num_top_level_macros{0u};
+
+  // Macros, declarations, statements, types, and pseudo-entities to serialize,
+  // in their order of appearance and serialization.
+  std::vector<pasta::MacroNode> macros_to_serialize;
   std::vector<pasta::Decl> decls_to_serialize;
   std::vector<pasta::Stmt> stmts_to_serialize;
   std::vector<pasta::Type> types_to_serialize;
@@ -102,22 +108,22 @@ class PendingFragment {
 
   // Store information persistently to enable linking of declarations across
   // fragments.
-  void LinkDeclarations(mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em,
+  void LinkDeclarations(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em,
                         NameMangler &mangler);
 
   // Identify all unique entity IDs used by this fragment, and map them to the
   // fragment ID in the data store.
   void FindDeclarationUses(
-      mx::WorkerId worker_id, IndexingContext &context, mx::rpc::Fragment::Builder &b);
+      WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b);
 
   // Identify all explicit references to entities.
   //
   // TODO(pag): Eventually make this identify the type of reference, or use
   //            the SourceIR to do so.
-  void LinkReferences(mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em);
+  void LinkReferences(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
 
   // Store serialized declaration fragments symbol to the persistent store
-  void PersistDeclarationSymbols(mx::WorkerId worker_id, IndexingContext &context, EntityMapper &em);
+  void PersistDeclarationSymbols(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
 };
 
 }  // namespace indexer

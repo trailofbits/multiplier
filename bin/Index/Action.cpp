@@ -4,10 +4,10 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/Action.h>
+#include "Action.h"
 
-namespace mx {
+namespace indexer {
 
 Action::~Action(void) {}
 
-}  // namespace mx
+}  // namespace indexer

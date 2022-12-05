@@ -17,7 +17,6 @@
 #include <clang/AST/PrettyPrinter.h>
 
 #include <multiplier/AST.h>
-#include <multiplier/PASTA.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
@@ -27,6 +26,8 @@
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
 #include <sstream>
+
+#include "PASTA.h"
 
 namespace indexer {
 
@@ -247,6 +248,7 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
     case pasta::TokenRole::kEndOfFileMarker:
     case pasta::TokenRole::kBeginOfMacroExpansionMarker:
     case pasta::TokenRole::kEndOfMacroExpansionMarker:
+    case pasta::TokenRole::kEndOfInternalMacroEventMarker:
       LOG(ERROR)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;

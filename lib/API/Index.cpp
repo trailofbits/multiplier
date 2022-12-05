@@ -4,13 +4,16 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "File.h"
-#include "Fragment.h"
+#include <multiplier/Index.h>
+
+#include <cassert>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
 
-#include <cassert>
+#include "File.h"
+#include "Fragment.h"
+#include "Macro.h"
 
 namespace mx {
 

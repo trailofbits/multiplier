@@ -7,14 +7,14 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Action.h>
-#include <multiplier/ProgressBar.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Job.h>
 #include <pasta/Util/FileManager.h>
 #include <unordered_map>
 
+#include "Action.h"
 #include "Context.h"
+#include "ProgressBar.h"
 
 namespace pasta {
 class AST;
@@ -26,9 +26,9 @@ namespace indexer {
 struct FileIdMap;
 struct FileHashMap;
 
-class IndexCompileJobAction final : public mx::Action {
+class IndexCompileJobAction final : public Action {
  private:
-  const std::shared_ptr<IndexingContext> context;
+  const std::shared_ptr<GlobalIndexingState> context;
   const pasta::FileManager file_manager;
   const pasta::CompileJob job;
 
@@ -40,19 +40,19 @@ class IndexCompileJobAction final : public mx::Action {
 
   // Look through all files referenced by the AST get their unique IDs. If this
   // is the first time seeing a file, then tokenize the file.
-  void MaybePersistFile(mx::WorkerId worker_id, pasta::File file);
+  void MaybePersistFile(WorkerId worker_id, pasta::File file);
 
-  void PersistParsedFiles(const pasta::AST &ast, mx::WorkerId worker_id);
+  void PersistParsedFiles(const pasta::AST &ast, WorkerId worker_id);
 
  public:
   virtual ~IndexCompileJobAction(void);
 
-  IndexCompileJobAction(std::shared_ptr<IndexingContext> context_,
+  IndexCompileJobAction(std::shared_ptr<GlobalIndexingState> context_,
                         pasta::FileManager file_manager_,
                         pasta::CompileJob job_);
 
   // Build and index the AST.
-  void Run(mx::Executor exe, mx::WorkerId worker_id) final;
+  void Run(Executor exe, WorkerId worker_id) final;
 };
 
 }  // namespace indexer

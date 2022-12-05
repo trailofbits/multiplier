@@ -9,6 +9,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/Index.h>
+#include <multiplier/AST.h>
 #include <sstream>
 
 DECLARE_bool(help);
@@ -37,6 +38,16 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  std::cout << "File data from tokens:\n";
+  for (mx::Token token : file->tokens()) {
+    std::cout << token.id() << '\t' << mx::EnumeratorName(token.kind()) << '\t' << token.data() << '\n';
+  }
+
+  std::cout << "\n\nFile data from token range:\n";
+  std::cout << file->tokens().data();
+
+
+  std::cout << "\n\nFile data from underlying buffer:\n";
   std::cout << file->data();
 
   return EXIT_SUCCESS;

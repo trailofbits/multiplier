@@ -11,6 +11,7 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
+#include <multiplier/Macro.h>
 
 DECLARE_bool(help);
 DEFINE_string(db, "", "Database file");
