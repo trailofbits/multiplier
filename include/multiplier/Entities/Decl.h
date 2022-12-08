@@ -27,13 +27,11 @@
 #include "DeclKind.h"
 #include "DeclModuleOwnershipKind.h"
 #include "DeclUseSelector.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class Attr;
 class Decl;
 class ExternalSourceSymbolAttr;
-class FunctionType;
 class ReferenceRange;
 class Stmt;
 class TemplateParameterList;
@@ -128,11 +126,9 @@ class Decl {
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;
-  std::optional<FunctionType> function_type(void) const;
   DeclModuleOwnershipKind module_ownership_kind(void) const;
   std::optional<Decl> non_closure_context(void) const;
   bool has_attributes(void) const;
-  bool has_defining_attribute(void) const;
   bool has_owning_module(void) const;
   bool has_tag_identifier_namespace(void) const;
   bool is_defined_outside_function_or_method(void) const;

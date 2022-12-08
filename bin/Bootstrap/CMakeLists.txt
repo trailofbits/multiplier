@@ -57,6 +57,7 @@ add_custom_command(
     "${exe_name}"
     "${install_include_dir}"
     "${dependencies_include_dir}"
+    "${LLVM_INCLUDE_DIR}"
     ${generated_files}
   COMMENT
     "Bootstrapping Multiplier"

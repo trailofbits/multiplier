@@ -16,6 +16,7 @@
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
+#include <pasta/AST/Macro.h>
 #include <pasta/AST/Printer.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/AST/Type.h>
@@ -37,6 +38,7 @@
 #define DECL_NAME(name) #name "Decl",
 #define TYPE_NAME(name) #name "Type",
 #define ATTR_NAME(name) #name "Attr",
+#define MACRO_NAME(name) #name,
 #define STR_NAME(name) #name,
 
 // These are types with no corresponding enumeration for the respective `kind`
@@ -46,6 +48,7 @@ static const std::unordered_set<std::string> gAbstractTypes{
   PASTA_FOR_EACH_STMT_IMPL(IGNORE, IGNORE, IGNORE, IGNORE, IGNORE, STR_NAME)
   PASTA_FOR_EACH_TYPE_IMPL(IGNORE, STR_NAME)
   PASTA_FOR_EACH_ATTR_IMPL(IGNORE, STR_NAME)
+//  "MacroNode",
 };
 
 static const std::unordered_set<std::string> gUnserializableTypes{
@@ -151,6 +154,11 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   "Token",
   "TokenRange",
   "FileToken",
+//  "MacroToken",
+//  "MacroSubstitution",
+//  "MacroDirective",
+//  "MacroDefintion",
+//  "MacroFileInclusion",
   NON_REF_TYPES
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
@@ -3500,18 +3508,18 @@ int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {
 }
 
 CodeGenerator::CodeGenerator(char *argv[])
-    : base_dir(argv[5]),
-      schema_os(argv[3], std::ios::trunc | std::ios::out),
-      lib_cpp_os(argv[4], std::ios::trunc | std::ios::out),
-      include_h_os(std::string(argv[5]) + "/AST.h", std::ios::trunc | std::ios::out),
-      serialize_h_os(argv[6], std::ios::trunc | std::ios::out),
-      serialize_cpp_os(argv[7], std::ios::trunc | std::ios::out),
-      serialize_inc_os(argv[8], std::ios::trunc | std::ios::out),
-      lib_pasta_cpp_os(argv[9], std::ios::trunc | std::ios::out),
-      lib_pasta_h_os(argv[10], std::ios::trunc | std::ios::out) {}
+    : base_dir(argv[6]),
+      schema_os(argv[4], std::ios::trunc | std::ios::out),
+      lib_cpp_os(argv[5], std::ios::trunc | std::ios::out),
+      include_h_os(base_dir + "/AST.h", std::ios::trunc | std::ios::out),
+      serialize_h_os(argv[7], std::ios::trunc | std::ios::out),
+      serialize_cpp_os(argv[8], std::ios::trunc | std::ios::out),
+      serialize_inc_os(argv[9], std::ios::trunc | std::ios::out),
+      lib_pasta_cpp_os(argv[10], std::ios::trunc | std::ios::out),
+      lib_pasta_h_os(argv[11], std::ios::trunc | std::ios::out) {}
 
 int main(int argc, char *argv[]) {
-  if (11 != argc) {
+  if (12 != argc) {
     std::cerr
         << "Usage: " << argv[0]
         << " PASTA_INCLUDE_PATH LLVM_INCLUDE_PATH LIB_AST_CAPNP LIB_AST_CPP"
@@ -3555,7 +3563,8 @@ int main(int argc, char *argv[]) {
   std::vector<const char *> cc_args{
       exe_path.c_str(),
       "-x", "c++", "-std=c++20", "-c", __FILE__, "-o", "/dev/null",
-      "-isystem", argv[1], "-isystem", argv[2]};
+      "-isystem", argv[1], "-isystem", argv[2], "-isystem", argv[3],
+      "-DMX_IN_BOOTSTRAP"};
 
   const pasta::ArgumentVector args(cc_args);
   auto maybe_command = pasta::CompileCommand::CreateFromArguments(
