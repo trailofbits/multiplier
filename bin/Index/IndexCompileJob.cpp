@@ -593,14 +593,14 @@ static std::vector<std::pair<pasta::MacroNode, unsigned>>
 FindTLMs(const pasta::AST &ast) {
   using OrderedNode = std::pair<pasta::MacroNode, unsigned>;
   std::vector<OrderedNode> tlms;
-  std::vector<pasta::MacroDefinition> defs;
+  std::vector<pasta::DefineMacroDirective> defs;
 
   auto order = 0u;
   for (pasta::MacroNode mn : ast.Macros()) {
 
     // Include all uses macros, and only those `#define`s for which the
     // macro is used at least once.
-    if (auto md = pasta::MacroDefinition::From(mn)) {
+    if (auto md = pasta::DefineMacroDirective::From(mn)) {
 
       // Builtin or command-line specified macros have no location.
       //
@@ -609,7 +609,7 @@ FindTLMs(const pasta::AST &ast) {
       //            expansions.
       //
       // TODO(pag): Find a way to give these file locations.
-      if (!md->NameToken().FileLocation()) {
+      if (!md->Name().FileLocation()) {
         continue;
       }
 
@@ -621,8 +621,7 @@ FindTLMs(const pasta::AST &ast) {
 
     // Include all `#include`s, `#pragma`s, `#if`s, etc.
     } else if (auto dir = pasta::MacroDirective::From(mn)) {
-
-      if (!dir->HashToken().FileLocation()) {
+      if (!dir->Hash().FileLocation()) {
         continue;
       }
 
@@ -630,7 +629,7 @@ FindTLMs(const pasta::AST &ast) {
     }
   }
 
-  for (pasta::MacroDefinition def : defs) {
+  for (pasta::DefineMacroDirective def : defs) {
     for (pasta::MacroNode use : def.Uses()) {
       tlms.emplace_back(RootNodeFrom(std::move(use)), order++);
     }
@@ -677,33 +676,37 @@ static void AddMacroRangeToEntityList(
     const pasta::TokenRange &tok_range, std::string_view main_file_path,
     std::vector<EntityRange> &entity_ranges, pasta::MacroNode node) {
 
-  pasta::MacroToken bt = node.BeginToken();
-  pasta::MacroToken et = node.EndToken();
+  std::optional<pasta::MacroToken> bt = node.BeginToken();
+  std::optional<pasta::MacroToken> et = node.EndToken();
 
-  LOG_IF(FATAL, !bt.RawNode())
-      << "Unable to find beginning of macro node in translation unit of main "
-         "source file "
+  LOG_IF(FATAL, !bt && !et)
+      << "Unable to find either the beginning or ending of macro node in "
+         "translation unit of main source file "
       << main_file_path;
 
-  LOG_IF(FATAL, !et.RawNode())
-      << "Unable to find ending of macro node in translation unit of main "
-         "source file "
-      << main_file_path;
+  std::optional<pasta::Token> pbt;
+  std::optional<pasta::Token> pet;
 
-  std::optional<pasta::Token> pbt = bt.ParsedLocation();
-  if (!pbt) {
-    LOG(ERROR)
-        << "Unable to find beginning of macro node in translation unit of main "
-           "source file "
-        << main_file_path;
-    return;
+  if (bt) {
+    pbt = bt->ParsedLocation();
   }
 
-  std::optional<pasta::Token> pet = et.ParsedLocation();
+  if (et) {
+    pet = et->ParsedLocation();
+  }
+
+  if (!pbt) {
+    pbt = pet;
+  }
+
   if (!pet) {
+    pet = pbt;
+  }
+
+  if (!pbt || !pet) {
     LOG(ERROR)
-        << "Unable to find ending of macro node in translation unit of main "
-           "source file "
+        << "Unable to find beginning/ending of macro node in translation unit "
+           "of main source file "
         << main_file_path;
     return;
   }
@@ -770,9 +773,19 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
 static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
     const pasta::MacroNode &node) {
   switch (node.Kind()) {
-    case pasta::MacroNodeKind::kDirective:  // `#if`, `#pragma`, etc.
+    case pasta::MacroNodeKind::kOtherDirective:
+    case pasta::MacroNodeKind::kIfDirective:
+    case pasta::MacroNodeKind::kIfDefinedDirective:
+    case pasta::MacroNodeKind::kIfNotDefinedDirective:
+    case pasta::MacroNodeKind::kElseIfDirective:
+    case pasta::MacroNodeKind::kElseIfDefinedDirective:
+    case pasta::MacroNodeKind::kElseIfNotDefinedDirective:
+    case pasta::MacroNodeKind::kElseDirective:
+    case pasta::MacroNodeKind::kEndIfDirective:
+    case pasta::MacroNodeKind::kUndefineDirective:
+    case pasta::MacroNodeKind::kPragmaDirective:
       if (auto dir = pasta::MacroDirective::From(node)) {
-        return dir->HashToken().FileLocation();
+        return dir->Hash().FileLocation();
       }
       return std::nullopt;
 
@@ -787,6 +800,11 @@ static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
     //                enum ... {
     //                #include ...
     //                };
+    case pasta::MacroNodeKind::kDefineDirective:
+    case pasta::MacroNodeKind::kIncludeDirective:
+    case pasta::MacroNodeKind::kIncludeNextDirective:
+    case pasta::MacroNodeKind::kIncludeMacrosDirective:
+    case pasta::MacroNodeKind::kImportDirective:
     default:
       return std::nullopt;
   }

@@ -105,9 +105,9 @@ class TokenTree {
   }
 
   std::optional<pasta::MacroDirective> MacroDirective(void) const noexcept;
-  std::optional<pasta::MacroDefinition> MacroDefinition(void) const noexcept;
+  std::optional<pasta::DefineMacroDirective> MacroDefinition(void) const noexcept;
   std::optional<pasta::MacroExpansion> MacroExpansion(void) const noexcept;
-  std::optional<pasta::MacroArgument> MacroArgument(void) const noexcept;
+  std::optional<pasta::MacroExpansionArgument> MacroArgument(void) const noexcept;
 
   // Return the number of nodes in this tree.
   unsigned NumNodes(void) const noexcept;

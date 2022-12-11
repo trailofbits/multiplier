@@ -119,6 +119,7 @@ class Substitution {
     kFileBody,
 
     // An identity-like substitution that wraps around a macro argument.
+    kMacroParameter,
     kMacroArgument,
 
     // Normal macro substitution kind. `before` points to a sequence of file
@@ -151,10 +152,12 @@ class Substitution {
 
   } kind;
 
+  // TODO(pag): Make this a `std::variant`.
   std::optional<pasta::MacroDirective> macro_dir;
-  std::optional<pasta::MacroDefinition> macro_def;
+  std::optional<pasta::DefineMacroDirective> macro_def;
   std::optional<pasta::MacroExpansion> macro_use;
-  std::optional<pasta::MacroArgument> macro_arg;
+  std::optional<pasta::MacroExpansionArgument> macro_arg;
+  std::optional<pasta::MacroDefinitionParameter> macro_param;
 
   using Node = std::variant<TokenInfo *, Substitution *>;
   using NodeList = std::vector<Node>;
@@ -229,7 +232,7 @@ class TokenTreeImpl {
 //      Substitution *sub, TokenInfo *prev, TokenInfo *curr, bool &stopped_early,
 //      Substitution::NodeList &nodes);
 
-  Substitution *GetMacroBody(pasta::MacroDefinition def,
+  Substitution *GetMacroBody(pasta::DefineMacroDirective def,
                              std::ostream &err);
 
   TokenInfo *TryGetBeforeToken(TokenInfo *curr);
@@ -274,7 +277,11 @@ class TokenTreeImpl {
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroArgument> node, std::ostream &err);
+      std::optional<pasta::MacroExpansionArgument> node, std::ostream &err);
+
+  Substitution *BuildMacroSubstitutions(
+      TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
+      std::optional<pasta::MacroDefinitionParameter> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
@@ -290,11 +297,11 @@ class TokenTreeImpl {
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroFileInclusion> node, std::ostream &err);
+      std::optional<pasta::IncludeMacroDirective> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-      std::optional<pasta::MacroDefinition> node, std::ostream &err);
+      std::optional<pasta::DefineMacroDirective> node, std::ostream &err);
 
   Substitution *BuildMacroSubstitutions(
       TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
@@ -469,6 +476,7 @@ static bool InFileBody(const Substitution *sub) {
       return true;
     case Substitution::kInclusion:
     case Substitution::kDefinition:
+    case Substitution::kMacroParameter:
       return true;
     case Substitution::kDirective:  // Watch out for `_Pragma` -> `#pragma`.
     case Substitution::kMacroUse:
@@ -483,6 +491,7 @@ static bool InFileBody(const Substitution *sub) {
 
 static bool InBeforeRestrictedRec(const Substitution *sub) {
   switch (sub->kind) {
+    case Substitution::kMacroParameter:
     case Substitution::kMacroArgument:
     case Substitution::kVAOptUse:
     case Substitution::kVAOptArgument:
@@ -508,6 +517,7 @@ static bool InBefore(const Substitution *sub) {
   switch (sub->kind) {
     case Substitution::kFileBody:
     case Substitution::kMacroUse:
+    case Substitution::kMacroParameter:
     case Substitution::kMacroArgument:
     case Substitution::kMacroExpansion:
     case Substitution::kSubstitutionBefore:
@@ -832,6 +842,7 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   os << "><TR><TD colspan=\"" << num_cols << "\">";
   switch (kind) {
     case kFileBody: os << "file body"; break;
+    case kMacroParameter: os << "macro param"; break;
     case kMacroArgument: os << "macro arg"; break;
     case kMacroUse: os << "macro use"; break;
     case kMacroExpansion: os << "macro exp"; break;
@@ -852,7 +863,7 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   }
 
   if (macro_def) {
-    os << " def=" << macro_def->NameToken().Data() << '='
+    os << " def=" << macro_def->Name().Data() << '='
        << reinterpret_cast<uintptr_t>(macro_def->RawNode());
   }
 
@@ -2154,7 +2165,7 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
 
 // Get or create a substitution representing the body of the macro. Really, this
 // is to get the beginning/ending tokens.
-Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
+Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
                                           std::ostream &err) {
 
   TokenInfo *prev = nullptr;
@@ -2163,15 +2174,17 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
     return body;
   }
 
-  auto name = def.NameToken();
-  auto range = def.Nodes();
-  auto it = range.begin();
-  auto end = range.end();
-  auto make_tok = [&] (const pasta::MacroNode &node) -> TokenInfo * {
-    std::optional<pasta::MacroToken> tok = pasta::MacroToken::From(*it);
+  auto name = def.Name();
+  body = CreateSubstitution(Substitution::kFileBody);
+  body->macro_def = def;
+
+  for (auto &node : def.Body()) {
+    std::optional<pasta::MacroToken> tok = pasta::MacroToken::From(node);
     if (!tok) {
-      return nullptr;
+      continue;
     }
+
+    D(std::cerr << indent << "body token: " << tok->Data() << '\n'; )
 
     TokenInfo &info = tokens_alloc.emplace_back();
     info.file_tok = tok->FileLocation();
@@ -2180,73 +2193,19 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::MacroDefinition def,
     info.is_part_of_sub = info.file_tok.has_value();
     info.category = TokenInfo::kMissingFileToken;
 
-//    UnifyToken(&info);
-    if (prev) {
-      prev->next = &info;
-    }
-    prev = &info;
-
     switch (tok->TokenKind()) {
       case pasta::TokenKind::kEndOfFile:
       case pasta::TokenKind::kEndOfDirective:
-        return nullptr;
+        continue;
       default:
         if (info.is_part_of_sub) {
-          return &info;
-        }
-        return nullptr;
-    }
-  };
-
-  body = CreateSubstitution(Substitution::kFileBody);
-
-  D( std::cerr << indent << "Macro body of " << def.NameToken().Data() << '\n'; )
-  D( indent += "  "; )
-
-  // Advance to past the name.
-  for (; it != end; ++it) {
-    D(
-        auto mt = pasta::MacroToken::From(*it);
-        std::cerr << indent << "Looking for name: " << mt->Data() << '\n';
-    )
-    if (it->RawNode() == name.RawNode()) {
-      ++it;
-      break;
-    }
-  }
-
-  // Go find the closing paren of the argument list.
-  if (def.IsFunctionLike()) {
-    auto paren_count = 0;
-    for (; it != end; ++it) {
-      D(
-          auto mt = pasta::MacroToken::From(*it);
-          std::cerr << indent << "Looking for params: " << mt->Data() << '\n';
-      )
-      if (TokenInfo *tok = make_tok(*it)) {
-        auto kind = tok->macro_tok->TokenKind();
-        if (kind == pasta::TokenKind::kLParenthesis) {
-          ++paren_count;
-        } else if (kind == pasta::TokenKind::kRParenthesis) {
-          if (!--paren_count) {
-            ++it;
-            break;
+          if (prev) {
+            prev->next = &info;
           }
+          prev = &info;
+          body->before.emplace_back(&info);
         }
-      }
-    }
-  }
-
-  body->macro_def = def;
-
-  for (; it != end; ++it) {
-    D(
-        auto mt = pasta::MacroToken::From(*it);
-        std::cerr << indent << "Looking for body: " << mt->Data() << '\n';
-    )
-    TokenInfo *tok = make_tok(*it);
-    if (tok) {
-      body->before.emplace_back(tok);
+        break;
     }
   }
 
@@ -2879,11 +2838,34 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroArgument> node, std::ostream &err) {
+    std::optional<pasta::MacroExpansionArgument> node, std::ostream &err) {
 
   Substitution *arg_sub = CreateSubstitution(Substitution::kMacroArgument);
   arg_sub->parent = sub;
   arg_sub->macro_arg = node;
+  sub->before.emplace_back(arg_sub);
+
+  for (const pasta::MacroNode &arg_node : node->Nodes()) {
+    arg_sub = BuildMacroSubstitutions(
+        prev, curr, arg_sub, arg_node, err);
+    if (!arg_sub) {
+      return nullptr;
+    }
+  }
+
+  LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
+                  ContainingMacroDef(arg_sub));
+
+  return sub;
+}
+
+Substitution *TokenTreeImpl::BuildMacroSubstitutions(
+    TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
+    std::optional<pasta::MacroDefinitionParameter> node, std::ostream &err) {
+
+  Substitution *arg_sub = CreateSubstitution(Substitution::kMacroParameter);
+  arg_sub->parent = sub;
+  arg_sub->macro_param = node;
   sub->before.emplace_back(arg_sub);
 
   for (const pasta::MacroNode &arg_node : node->Nodes()) {
@@ -2984,7 +2966,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   Substitution *macro_body = GetMacroBody(exp_sub->macro_def.value(), err);
   if (!macro_body) {
     err << "Unable to find macro body for macro with name '"
-        << exp_sub->macro_def->NameToken().Data() << "'";
+        << exp_sub->macro_def->Name().Data() << "'";
     return nullptr;
   }
 
@@ -3026,7 +3008,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroFileInclusion> node, std::ostream &err) {
+    std::optional<pasta::IncludeMacroDirective> node, std::ostream &err) {
   Substitution *dir_use = CreateSubstitution(Substitution::kInclusion);
   sub->before.emplace_back(dir_use);
   dir_use->parent = sub;
@@ -3051,7 +3033,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
 Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     TokenInfo *&prev, TokenInfo *&curr, Substitution *sub,
-    std::optional<pasta::MacroDefinition> node, std::ostream &err) {
+    std::optional<pasta::DefineMacroDirective> node, std::ostream &err) {
   Substitution *def = CreateSubstitution(Substitution::kDefinition);
   sub->before.emplace_back(def);
   def->parent = sub;
@@ -3087,22 +3069,38 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
           prev, curr, sub, pasta::MacroToken::From(node), err);
     case pasta::MacroNodeKind::kArgument:
       return BuildMacroSubstitutions(
-          prev, curr, sub, pasta::MacroArgument::From(node), err);
+          prev, curr, sub, pasta::MacroExpansionArgument::From(node), err);
+    case pasta::MacroNodeKind::kParameter:
+      return BuildMacroSubstitutions(
+          prev, curr, sub, pasta::MacroDefinitionParameter::From(node), err);
     case pasta::MacroNodeKind::kExpansion:
       return BuildMacroSubstitutions(
           prev, curr, sub, pasta::MacroExpansion::From(node), err);
     case pasta::MacroNodeKind::kSubstitution:
       return BuildMacroSubstitutions(
           prev, curr, sub, pasta::MacroSubstitution::From(node), err);
-    case pasta::MacroNodeKind::kDirective:
+    case pasta::MacroNodeKind::kOtherDirective:
+    case pasta::MacroNodeKind::kIfDirective:
+    case pasta::MacroNodeKind::kIfDefinedDirective:
+    case pasta::MacroNodeKind::kIfNotDefinedDirective:
+    case pasta::MacroNodeKind::kElseIfDirective:
+    case pasta::MacroNodeKind::kElseIfDefinedDirective:
+    case pasta::MacroNodeKind::kElseIfNotDefinedDirective:
+    case pasta::MacroNodeKind::kElseDirective:
+    case pasta::MacroNodeKind::kEndIfDirective:
+    case pasta::MacroNodeKind::kUndefineDirective:
+    case pasta::MacroNodeKind::kPragmaDirective:
       return BuildMacroSubstitutions(
           prev, curr, sub, pasta::MacroDirective::From(node), err);
-    case pasta::MacroNodeKind::kInclude:
+    case pasta::MacroNodeKind::kIncludeDirective:
+    case pasta::MacroNodeKind::kIncludeNextDirective:
+    case pasta::MacroNodeKind::kIncludeMacrosDirective:
+    case pasta::MacroNodeKind::kImportDirective:
       return BuildMacroSubstitutions(
-          prev, curr, sub, pasta::MacroFileInclusion::From(node), err);
-    case pasta::MacroNodeKind::kDefine:
+          prev, curr, sub, pasta::IncludeMacroDirective::From(node), err);
+    case pasta::MacroNodeKind::kDefineDirective:
       return BuildMacroSubstitutions(
-          prev, curr, sub, pasta::MacroDefinition::From(node), err);
+          prev, curr, sub, pasta::DefineMacroDirective::From(node), err);
     default:
       err << "Unexpected/unsupported substitution kind";
       return nullptr;
@@ -4454,46 +4452,39 @@ TokenTreeNode::MaybeSubTree(void) const noexcept {
           subtree_kind = mx::MacroSubstitutionKind::OTHER_DIRECTIVE;
           break;
         }
-        switch (lhs->macro_dir->DirectiveKind()) {
-          case pasta::MacroDirectiveKind::kIf:
+        switch (lhs->macro_dir->Kind()) {
+          case pasta::MacroNodeKind::kIfDirective:
             subtree_kind = mx::MacroSubstitutionKind::IF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kIfDefined:
+          case pasta::MacroNodeKind::kIfDefinedDirective:
             subtree_kind = mx::MacroSubstitutionKind::IFDEF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kIfNotDefined:
+          case pasta::MacroNodeKind::kIfNotDefinedDirective:
             subtree_kind = mx::MacroSubstitutionKind::IFNDEF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kElseIf:
+          case pasta::MacroNodeKind::kElseIfDirective:
             subtree_kind = mx::MacroSubstitutionKind::ELIF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kElseIfDefined:
+          case pasta::MacroNodeKind::kElseIfDefinedDirective:
             subtree_kind = mx::MacroSubstitutionKind::ELIFDEF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kElseIfNotDefined:
+          case pasta::MacroNodeKind::kElseIfNotDefinedDirective:
             subtree_kind = mx::MacroSubstitutionKind::ELIFNDEF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kElse:
+          case pasta::MacroNodeKind::kElseDirective:
             subtree_kind = mx::MacroSubstitutionKind::ELSE_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kEndIf:
+          case pasta::MacroNodeKind::kEndIfDirective:
             subtree_kind = mx::MacroSubstitutionKind::ENDIF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kDefine:
+          case pasta::MacroNodeKind::kDefineDirective:
             subtree_kind = mx::MacroSubstitutionKind::DEFINE_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kUndefine:
+          case pasta::MacroNodeKind::kUndefineDirective:
             subtree_kind = mx::MacroSubstitutionKind::UNDEF_DIRECTIVE;
             break;
-          case pasta::MacroDirectiveKind::kHashPragma:
+          case pasta::MacroNodeKind::kPragmaDirective:
             subtree_kind = mx::MacroSubstitutionKind::PRAGMA_DIRECTIVE;
-            break;
-          case pasta::MacroDirectiveKind::kC99Pragma:
-            subtree_kind = mx::MacroSubstitutionKind::C99_PRAGMA_DIRECTIVE;
-            break;
-          case pasta::MacroDirectiveKind::kMicrosoftPragma:
-            subtree_kind =
-                mx::MacroSubstitutionKind::MICROSOFT_PRAGMA_DIRECTIVE;
             break;
           default:
             subtree_kind = mx::MacroSubstitutionKind::OTHER_DIRECTIVE;
@@ -4503,7 +4494,9 @@ TokenTreeNode::MaybeSubTree(void) const noexcept {
       case Substitution::kMacroArgument:
         subtree_kind = mx::MacroSubstitutionKind::MACRO_ARGUMENT;
         break;
-
+      case Substitution::kMacroParameter:
+        subtree_kind = mx::MacroSubstitutionKind::MACRO_PARAMETER;
+        break;
       case Substitution::kVAOptArgument:
         subtree_kind = mx::MacroSubstitutionKind::VA_OPT_ARGUMENT;
         break;
@@ -4576,6 +4569,7 @@ TokenTreeNode::MaybeSubstitution(void) const noexcept {
       // Sub-tree things.
       case Substitution::kDirective:
       case Substitution::kDefinition:
+      case Substitution::kMacroParameter:
       case Substitution::kMacroArgument:
       case Substitution::kVAOptArgument:
         return std::nullopt;
@@ -4612,7 +4606,7 @@ TokenTree::MacroDirective(void) const noexcept {
   return impl->macro_dir;
 }
 
-std::optional<pasta::MacroDefinition>
+std::optional<pasta::DefineMacroDirective>
 TokenTree::MacroDefinition(void) const noexcept {
   return impl->macro_def;
 }
@@ -4622,7 +4616,7 @@ TokenTree::MacroExpansion(void) const noexcept {
   return impl->macro_use;
 }
 
-std::optional<pasta::MacroArgument>
+std::optional<pasta::MacroExpansionArgument>
 TokenTree::MacroArgument(void) const noexcept {
   return impl->macro_arg;
 }

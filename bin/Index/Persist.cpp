@@ -365,7 +365,7 @@ static void PersistTokenTree(EntityMapper &em,
       // definition site, then reinterpret this macro as a substitution.
       if (kind == mx::MacroSubstitutionKind::MACRO &&
           (!lhs.MacroDefinition() ||
-           !lhs.MacroDefinition()->NameToken().FileLocation())) {
+           !lhs.MacroDefinition()->Name().FileLocation())) {
         sub_id.kind = mx::MacroSubstitutionKind::SUBSTITUTE;
       } else {
         sub_id.kind = kind;

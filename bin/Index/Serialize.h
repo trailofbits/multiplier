@@ -1333,7 +1333,6 @@ enum class Visibility : unsigned;
 enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
 enum class MacroNodeKind : unsigned char;
-enum class MacroDirectiveKind : unsigned char;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;

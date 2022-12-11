@@ -551,7 +551,6 @@ enum class Visibility : unsigned;
 enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
 enum class MacroNodeKind : unsigned char;
-enum class MacroDirectiveKind : unsigned char;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;
@@ -2176,9 +2175,6 @@ DeclCategory FromPasta(pasta::DeclCategory pasta_val);
 
 enum class MacroNodeKind : unsigned char;
 MacroNodeKind FromPasta(pasta::MacroNodeKind pasta_val);
-
-enum class MacroDirectiveKind : unsigned char;
-MacroDirectiveKind FromPasta(pasta::MacroDirectiveKind pasta_val);
 
 enum class PathKind : unsigned char;
 PathKind FromPasta(pasta::PathKind pasta_val);

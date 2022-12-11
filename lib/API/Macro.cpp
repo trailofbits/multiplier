@@ -65,8 +65,6 @@ std::optional<MacroSubstitutionList> MacroSubstitution::after(void) const {
     case MacroSubstitutionKind::DEFINE_DIRECTIVE:
     case MacroSubstitutionKind::UNDEF_DIRECTIVE:
     case MacroSubstitutionKind::PRAGMA_DIRECTIVE:
-    case MacroSubstitutionKind::C99_PRAGMA_DIRECTIVE:
-    case MacroSubstitutionKind::MICROSOFT_PRAGMA_DIRECTIVE:
     case MacroSubstitutionKind::IF_DIRECTIVE:
     case MacroSubstitutionKind::IFDEF_DIRECTIVE:
     case MacroSubstitutionKind::IFNDEF_DIRECTIVE:

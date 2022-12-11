@@ -135,10 +135,6 @@ const char *EnumeratorName(MacroSubstitutionKind kind) {
       return "UNDEF_DIRECTIVE";
     case MacroSubstitutionKind::PRAGMA_DIRECTIVE:
       return "PRAGMA_DIRECTIVE";
-    case MacroSubstitutionKind::C99_PRAGMA_DIRECTIVE:
-      return "C99_PRAGMA_DIRECTIVE";
-    case MacroSubstitutionKind::MICROSOFT_PRAGMA_DIRECTIVE:
-      return "MICROSOFT_PRAGMA_DIRECTIVE";
     case MacroSubstitutionKind::IF_DIRECTIVE:
       return "IF_DIRECTIVE";
     case MacroSubstitutionKind::IFDEF_DIRECTIVE:
