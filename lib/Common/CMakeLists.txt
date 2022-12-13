@@ -90,6 +90,10 @@ target_link_libraries("mx-common"
   PUBLIC
     "CapnProto::capnp-rpc"
     SQLite::SQLite3
+    gap::gap
+    gap::gap-core
+    std::coroutines
+    gap::gap-settings
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     "ZLIB::ZLIB"

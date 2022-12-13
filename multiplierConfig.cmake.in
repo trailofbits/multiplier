@@ -37,6 +37,10 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
     find_package(SQLite3 3.35 REQUIRED)
   endif()
 
+  if(NOT TARGET gap::gap)
+    find_package(gap CONFIG REQUIRED)
+  endif()
+
   if(MX_ENABLE_WEGGLI AND NOT TARGET weggli_native::static)
     find_package(weggli_native CONFIG REQUIRED)
   endif()
