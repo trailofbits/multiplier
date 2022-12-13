@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -39,8 +40,6 @@ class Stmt {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
-  friend class ReferenceIteratorImpl;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;

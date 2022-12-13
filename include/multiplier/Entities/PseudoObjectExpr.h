@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"

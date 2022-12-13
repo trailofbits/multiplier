@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -32,7 +33,7 @@ namespace mx {
 class Attr;
 class Decl;
 class ExternalSourceSymbolAttr;
-class ReferenceRange;
+class Reference;
 class Stmt;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -49,8 +50,6 @@ class Decl {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
-  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class StmtIterator;
   friend class TokenContext;
@@ -92,7 +91,7 @@ class Decl {
   std::vector<Decl> redeclarations(void) const;
   EntityId id(void) const;
   UseRange<DeclUseSelector> uses(void) const;
-  ReferenceRange references(void) const;
+  gap::generator<Reference> references(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);

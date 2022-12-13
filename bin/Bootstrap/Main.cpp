@@ -1567,6 +1567,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     << "#include <memory>\n"
     << "#include <optional>\n"
     << "#include <vector>\n\n"
+    << "#include <gap/core/generator.hpp>\n"
     << "#include \"../Iterator.h\"\n"
     << "#include \"../Types.h\"\n"
     << "#include \"../Token.h\"\n"
@@ -1872,8 +1873,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "Fragment")
         << FriendOf(class_os, class_name, "FragmentImpl")
         << FriendOf(class_os, class_name, "Index")
-        << FriendOf(class_os, class_name, "ReferenceIterator")
-        << FriendOf(class_os, class_name, "ReferenceIteratorImpl")
         << FriendOf(class_os, class_name, "Stmt")
         << FriendOf(class_os, class_name, "StmtIterator")
         << FriendOf(class_os, class_name, "TokenContext")
@@ -1895,7 +1894,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "        offset_(offset__) {}\n\n";
 
     if (class_name == "Decl") {
-      forward_decls.insert("ReferenceRange");
+      forward_decls.insert("Reference");
       needed_decls.insert("DeclUseSelector");
       forward_decls.insert("Stmt");
       class_os
@@ -1915,7 +1914,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::vector<Decl> redeclarations(void) const;\n"
           << "  EntityId id(void) const;\n"
           << "  UseRange<DeclUseSelector> uses(void) const;\n"
-          << "  ReferenceRange references(void) const;\n\n"
+          << "  gap::generator<Reference> references(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
