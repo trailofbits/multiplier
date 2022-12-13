@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "File.h"
-#include "Macro.h"
 
 namespace mx {
 
@@ -35,7 +34,6 @@ class RegexQueryResultImpl;
 class RegexQueryResultIterator;
 class Stmt;
 class Token;
-class MacroSubstitutionListIterator;
 class Type;
 class WeggliQuery;
 class WeggliQueryMatch;
@@ -62,7 +60,7 @@ class Fragment {
   friend class RegexQueryResultIterator;
   friend class Stmt;
   friend class Token;
-  friend class MacroSubstitutionListIterator;
+  friend class MacroSubstitution;
   friend class Type;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;

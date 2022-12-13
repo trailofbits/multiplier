@@ -28,9 +28,6 @@ class TokenList;
 class TokenListIterator;
 class TokenRange;
 class TokenReader;
-class MacroSubstitutionList;
-class MacroSubstitutionListImpl;
-class MacroSubstitutionListIterator;
 
 enum class TokenKind : unsigned short;
 using TokenUse = Use<TokenUseSelector>;
@@ -46,7 +43,7 @@ class Token {
   friend class TokenList;
   friend class TokenListIterator;
   friend class TokenRange;
-  friend class MacroSubstitutionListIterator;
+  friend class MacroSubstitution;
 
   std::shared_ptr<const TokenReader> impl;
   unsigned offset;
@@ -188,7 +185,7 @@ class TokenRange {
   friend class RegexQueryResultIterator;
   friend class WeggliQueryResultIterator;
   friend class TokenList;
-  friend class MacroSubstitutionListIterator;
+  friend class MacroSubstitution;
 
   std::shared_ptr<const TokenReader> impl;
   unsigned index;
@@ -284,7 +281,7 @@ class TokenList : public TokenRange {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Token;
-  friend class MacroSubstitutionListIterator;
+  friend class MacroSubstitution;
 
   inline TokenList(std::shared_ptr<const TokenReader> impl_,
                    unsigned num_tokens_)

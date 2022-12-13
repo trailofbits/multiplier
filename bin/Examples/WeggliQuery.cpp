@@ -10,6 +10,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <multiplier/Index.h>
+#include <multiplier/Macro.h>
 #include <multiplier/Weggli.h>
 #include <fstream>
 #include <sstream>
@@ -20,7 +21,7 @@ DECLARE_string(db);
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
 
-static void PrintUnparsedTokens(mx::MacroSubstitutionList nodes) {
+static void PrintUnparsedTokens(gap::generator<mx::MacroSubstitutionEntry> nodes) {
   for (auto node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
       auto tok = std::get<mx::Token>(node);

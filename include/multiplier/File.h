@@ -76,7 +76,7 @@ class File {
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
   friend class Token;
-  friend class MacroSubstitutionListIterator;
+  friend class MacroSubstitution;
 
   Ptr impl;
 

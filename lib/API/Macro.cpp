@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "Macro.h"
+#include <multiplier/Macro.h>
 
 #include <cassert>
 
@@ -14,52 +14,37 @@
 
 namespace mx {
 
-std::variant<Token, MacroSubstitution>
-MacroSubstitutionListIterator::operator*(void) const {
-  VariantId id = EntityId(impl->nodes[index]).Unpack();
+gap::generator<MacroSubstitutionEntry> MacroSubstitution::before(void) const {
+  auto nodes = impl->Fragment().getSubstitutions()[offset].getBeforeIds();
+  for(auto node : nodes) {
+    VariantId id = EntityId(node).Unpack();
 
-  if (std::holds_alternative<ParsedTokenId>(id)) {
-    auto tok = std::get<ParsedTokenId>(id);
-    return Token(impl->fragment->TokenReader(impl->fragment), tok.offset);
+    if (std::holds_alternative<ParsedTokenId>(id)) {
+      auto tok = std::get<ParsedTokenId>(id);
+      co_yield Token(impl->TokenReader(impl), tok.offset);
 
-  } else if (std::holds_alternative<MacroTokenId>(id)) {
-    auto tok = std::get<MacroTokenId>(id);
-    return Token(impl->fragment->TokenReader(impl->fragment), tok.offset);
+    } else if (std::holds_alternative<MacroTokenId>(id)) {
+      auto tok = std::get<MacroTokenId>(id);
+      co_yield Token(impl->TokenReader(impl), tok.offset);
 
-  } else if (std::holds_alternative<FileTokenId>(id)) {
-    auto tok = std::get<FileTokenId>(id);
-    auto file = File::containing(impl->fragment);
-    return Token(file.impl->TokenReader(file.impl), tok.offset);
+    } else if (std::holds_alternative<FileTokenId>(id)) {
+      auto tok = std::get<FileTokenId>(id);
+      auto file = File::containing(impl);
+      co_yield Token(file.impl->TokenReader(file.impl), tok.offset);
 
-  } else if (std::holds_alternative<MacroSubstitutionId>(id)) {
-    auto sub = std::get<MacroSubstitutionId>(id);
-    assert(sub.fragment_id == impl->fragment->fragment_id);
-    return MacroSubstitution(impl->fragment, sub.offset, sub.kind);
+    } else if (std::holds_alternative<MacroSubstitutionId>(id)) {
+      auto sub = std::get<MacroSubstitutionId>(id);
+      assert(sub.fragment_id == impl->fragment_id);
+      co_yield MacroSubstitution(impl, sub.offset, sub.kind);
 
-  } else {
-    assert(false);
-    __builtin_unreachable();
+    } else {
+      assert(false);
+      __builtin_unreachable();
+    }
   }
 }
 
-MacroSubstitutionListImpl::MacroSubstitutionListImpl(
-    std::shared_ptr<const FragmentImpl> fragment_, unsigned offset, BeforeTag)
-    : fragment(std::move(fragment_)),
-      nodes(fragment->Fragment().getSubstitutions()[offset].getBeforeIds()) {}
-
-MacroSubstitutionListImpl::MacroSubstitutionListImpl(
-    std::shared_ptr<const FragmentImpl> fragment_, unsigned offset, AfterTag)
-    : fragment(std::move(fragment_)),
-      nodes(fragment->Fragment().getSubstitutions()[offset].getAfterIds()) {}
-
-MacroSubstitutionList MacroSubstitution::before(void) const {
-  auto ret = std::make_shared<const MacroSubstitutionListImpl>(
-      impl, offset, BeforeTag{});
-  auto num_nodes = ret->nodes.size();
-  return MacroSubstitutionList(std::move(ret), num_nodes);
-}
-
-std::optional<MacroSubstitutionList> MacroSubstitution::after(void) const {
+bool MacroSubstitution::has_after(void) const {
   switch (kind_) {
     case MacroSubstitutionKind::OTHER_DIRECTIVE:
     case MacroSubstitutionKind::DEFINE_DIRECTIVE:
@@ -75,19 +60,52 @@ std::optional<MacroSubstitutionList> MacroSubstitution::after(void) const {
     case MacroSubstitutionKind::ENDIF_DIRECTIVE:
     case MacroSubstitutionKind::VA_OPT_ARGUMENT:
     case MacroSubstitutionKind::MACRO_ARGUMENT:
-      return std::nullopt;
+      return false;
     default:
       break;
   }
 
-  auto ret = std::make_shared<const MacroSubstitutionListImpl>(
-      impl, offset, AfterTag{});
-  auto num_nodes = ret->nodes.size();
-  if (!num_nodes) {
-    return std::nullopt;
+  auto nodes = impl->Fragment().getSubstitutions()[offset].getAfterIds();
+  if (!nodes.size()) {
+    return false;
   }
 
-  return MacroSubstitutionList(std::move(ret), num_nodes);
+  return true;
+}
+
+gap::generator<MacroSubstitutionEntry> MacroSubstitution::after(void) const {
+  if(!has_after()) {
+    co_return;
+  }
+
+  auto nodes = impl->Fragment().getSubstitutions()[offset].getAfterIds();
+
+  for(auto node : nodes) {
+    VariantId id = EntityId(node).Unpack();
+
+    if (std::holds_alternative<ParsedTokenId>(id)) {
+      auto tok = std::get<ParsedTokenId>(id);
+      co_yield Token(impl->TokenReader(impl), tok.offset);
+
+    } else if (std::holds_alternative<MacroTokenId>(id)) {
+      auto tok = std::get<MacroTokenId>(id);
+      co_yield Token(impl->TokenReader(impl), tok.offset);
+
+    } else if (std::holds_alternative<FileTokenId>(id)) {
+      auto tok = std::get<FileTokenId>(id);
+      auto file = File::containing(impl);
+      co_yield Token(file.impl->TokenReader(file.impl), tok.offset);
+
+    } else if (std::holds_alternative<MacroSubstitutionId>(id)) {
+      auto sub = std::get<MacroSubstitutionId>(id);
+      assert(sub.fragment_id == impl->fragment_id);
+      co_yield MacroSubstitution(impl, sub.offset, sub.kind);
+
+    } else {
+      assert(false);
+      __builtin_unreachable();
+    }
+  }
 }
 
 }  // namespace mx

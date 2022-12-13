@@ -44,15 +44,15 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
-bool ContainsHighlightedTokens(mx::MacroSubstitutionList nodes,
+bool ContainsHighlightedTokens(gap::generator<mx::MacroSubstitutionEntry> nodes,
                                const mx::TokenRange &entity_tokens) {
   for (auto node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
       if (entity_tokens.index_of(std::get<mx::Token>(node))) {
         return true;
       }
-    } else if (auto after = std::get<mx::MacroSubstitution>(node).after()) {
-      if (ContainsHighlightedTokens(*after, entity_tokens)) {
+    } else if (std::get<mx::MacroSubstitution>(node).has_after()) {
+      if (ContainsHighlightedTokens(std::get<mx::MacroSubstitution>(node).after(), entity_tokens)) {
         return true;
       }
     }
@@ -63,7 +63,7 @@ bool ContainsHighlightedTokens(mx::MacroSubstitutionList nodes,
 // TODO(pag): This whole thing is broken, because you can't ask top-down if a
 //            parsed token is inside of a substitution; you can only ask if a
 //            token derived from a parsed token is in the right range.
-void PrintUnparsedTokens(std::ostream &os, mx::MacroSubstitutionList nodes,
+void PrintUnparsedTokens(std::ostream &os, gap::generator<mx::MacroSubstitutionEntry> nodes,
                          const mx::TokenRange &entity_tokens,
                          bool force_highlight) {
   for (auto node : nodes) {
@@ -78,9 +78,9 @@ void PrintUnparsedTokens(std::ostream &os, mx::MacroSubstitutionList nodes,
       auto sub = std::get<mx::MacroSubstitution>(node);
       auto sub_force_highlight = force_highlight;
       if (!sub_force_highlight) {
-        if (auto after = sub.after()) {
+        if (sub.has_after()) {
           sub_force_highlight = ContainsHighlightedTokens(
-              *after, entity_tokens);
+              sub.after(), entity_tokens);
         }
       }
       PrintUnparsedTokens(os, sub.before(), entity_tokens, sub_force_highlight);
