@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string_view>
+#include <gap/core/generator.hpp>
 
 #include "Reference.h"
 #include "Token.h"
@@ -17,7 +18,6 @@ namespace mx {
 class EntityProvider;
 class File;
 class FileImpl;
-class FileListImpl;
 class FileLocationCache;
 class FileLocationCacheImpl;
 class FileFragmentListIterator;
@@ -62,87 +62,6 @@ class FileLocationCache {
   void clear(void);
 };
 
-class FileListIterator {
- private:
-  friend class FileList;
-
-  std::shared_ptr<FileListImpl> impl;
-  std::shared_ptr<const FileImpl> file;
-  unsigned index;
-  unsigned num_files;
-
-  void Advance(void);
-
-  bool operator==(const FileListIterator &) = delete;
-  bool operator!=(const FileListIterator &) = delete;
-
-  FileListIterator(std::shared_ptr<FileListImpl> impl_, unsigned index_,
-                   unsigned num_files_)
-      : impl(std::move(impl_)),
-        index(index_),
-        num_files(num_files_) {
-    Advance();
-  }
-
-  FileListIterator(std::shared_ptr<FileListImpl> impl_, 
-                   std::shared_ptr<const FileImpl> file_,
-                   unsigned index_, unsigned num_files_)
-      : impl(std::move(impl_)),
-        file(std::move(file_)),
-        index(index_),
-        num_files(num_files_) {
-    Advance();
-  }
-
- public:
-  using EndIteratorType = IteratorEnd;
-
-  inline File operator*(void) && noexcept;
-  inline File operator*(void) const & noexcept;
-
-  // Pre-increment.
-  inline FileListIterator &operator++(void) noexcept {
-    ++index;
-    Advance();
-    return *this;
-  }
-
-  // Post-increment.
-  inline FileListIterator operator++(int) noexcept {
-    FileListIterator ret(impl, file, index, num_files);
-    ++index;
-    Advance();
-    return ret;
-  }
-
-  inline bool operator==(EndIteratorType) const noexcept {
-    return index >= num_files;
-  }
-
-  inline bool operator!=(EndIteratorType) const noexcept {
-    return index < num_files;
-  }
-};
-
-// A range of all files.
-class FileList {
- private:
-  friend class File;
-
-  std::shared_ptr<FileListImpl> impl;
-
-  inline FileList(std::shared_ptr<FileListImpl> impl_)
-      : impl(std::move(impl_)) {}
-
- public:
-  FileListIterator begin(void) &&;
-  FileListIterator begin(void) const &;
-
-  inline FileListIterator::EndIteratorType end(void) const {
-    return {};
-  }
-};
-
 // Represents a file. A given file may have many associated paths. We
 // de-duplicate via a hash of the contents.
 class File {
@@ -152,7 +71,6 @@ class File {
   friend class EntityProvider;
   friend class Fragment;
   friend class FragmentList;
-  friend class FileListIterator;
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
   friend class FragmentImpl;
@@ -201,7 +119,7 @@ class File {
   static std::optional<File> containing(const Token &token);
 
   // Return all files in a given index.
-  static FileList in(const Index &index);
+  static gap::generator<File> in(const Index &index);
 
   // Return the entity ID of this file.
   EntityId id(void) const noexcept;
@@ -223,14 +141,6 @@ class File {
     return id() != that.id();
   }
 };
-
-inline File FileListIterator::operator*(void) && noexcept {
-  return File(std::move(file));
-}
-
-inline File FileListIterator::operator*(void) const & noexcept {
-  return File(file);
-}
 
 class FileManager {
  private:

@@ -29,16 +29,6 @@ class FileLocationCacheImpl {
   const FileLocationVector &Add(File file);
 };
 
-class FileListImpl {
- public:
-  const EntityProvider::Ptr ep;
-
-  // NOTE(pag): These are `EntityId`-packed file ids.
-  std::vector<RawEntityId> file_ids;
-
-  explicit FileListImpl(EntityProvider::Ptr ep_);
-};
-
 // Interface for accessing the tokens of a file.
 class FileImpl {
  public:

@@ -238,8 +238,27 @@ File File::containing(const WeggliQueryMatch &match) {
 }
 
 // Return all files in a given index.
-FileList File::in(const Index &index) {
-  return FileList(std::make_shared<FileListImpl>(index.impl));
+gap::generator<File> File::in(const Index &index) {
+  std::vector<RawEntityId> file_ids;
+  auto file_paths = index.impl->ListFiles(index.impl);
+  file_ids.reserve(file_paths.size());
+  for (const auto &[path, file_id] : file_paths) {
+    file_ids.emplace_back(file_id);
+  }
+
+  std::sort(file_ids.begin(), file_ids.end());
+  auto it = std::unique(file_ids.begin(), file_ids.end());
+  file_ids.erase(it, file_ids.end());
+
+  for (size_t i = 0; i < file_ids.size(); ++i) {
+    VariantId vid = EntityId(file_ids[i]).Unpack();
+    if (std::holds_alternative<FileId>(vid)) {
+      auto file = index.impl->FileFor(index.impl, std::get<FileId>(vid).file_id);
+      if (file) {
+        co_yield file;
+      }
+    }
+  }
 }
 
 // Return the ID of this file.
