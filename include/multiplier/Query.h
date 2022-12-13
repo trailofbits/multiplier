@@ -20,7 +20,6 @@ class File;
 class FragmentList;
 class FileFragmentListIterator;
 class FileImpl;
-class FileListImpl;
 class Fragment;
 class FragmentImpl;
 class Index;

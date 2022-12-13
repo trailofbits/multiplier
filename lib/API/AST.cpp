@@ -7508,24 +7508,34 @@ const char *EnumeratorName(MacroNodeKind e) {
     case MacroNodeKind::TOKEN: return "TOKEN";
     case MacroNodeKind::EXPANSION: return "EXPANSION";
     case MacroNodeKind::SUBSTITUTION: return "SUBSTITUTION";
-    case MacroNodeKind::OTHER_DIRECTIVE: return "OTHER_DIRECTIVE";
-    case MacroNodeKind::IF_DIRECTIVE: return "IF_DIRECTIVE";
-    case MacroNodeKind::IF_DEFINED_DIRECTIVE: return "IF_DEFINED_DIRECTIVE";
-    case MacroNodeKind::IF_NOT_DEFINED_DIRECTIVE: return "IF_NOT_DEFINED_DIRECTIVE";
-    case MacroNodeKind::ELSE_IF_DIRECTIVE: return "ELSE_IF_DIRECTIVE";
-    case MacroNodeKind::ELSE_IF_DEFINED_DIRECTIVE: return "ELSE_IF_DEFINED_DIRECTIVE";
-    case MacroNodeKind::ELSE_IF_NOT_DEFINED_DIRECTIVE: return "ELSE_IF_NOT_DEFINED_DIRECTIVE";
-    case MacroNodeKind::ELSE_DIRECTIVE: return "ELSE_DIRECTIVE";
-    case MacroNodeKind::END_IF_DIRECTIVE: return "END_IF_DIRECTIVE";
-    case MacroNodeKind::DEFINE_DIRECTIVE: return "DEFINE_DIRECTIVE";
-    case MacroNodeKind::UNDEFINE_DIRECTIVE: return "UNDEFINE_DIRECTIVE";
-    case MacroNodeKind::PRAGMA_DIRECTIVE: return "PRAGMA_DIRECTIVE";
-    case MacroNodeKind::INCLUDE_DIRECTIVE: return "INCLUDE_DIRECTIVE";
-    case MacroNodeKind::INCLUDE_NEXT_DIRECTIVE: return "INCLUDE_NEXT_DIRECTIVE";
-    case MacroNodeKind::INCLUDE_MACROS_DIRECTIVE: return "INCLUDE_MACROS_DIRECTIVE";
-    case MacroNodeKind::IMPORT_DIRECTIVE: return "IMPORT_DIRECTIVE";
+    case MacroNodeKind::DIRECTIVE: return "DIRECTIVE";
+    case MacroNodeKind::DEFINE: return "DEFINE";
+    case MacroNodeKind::INCLUDE: return "INCLUDE";
     case MacroNodeKind::ARGUMENT: return "ARGUMENT";
-    case MacroNodeKind::PARAMETER: return "PARAMETER";
+    default: return "<invalid>";
+  }
+}
+
+const char *EnumeratorName(MacroDirectiveKind e) {
+  switch (e) {
+    case MacroDirectiveKind::OTHER: return "OTHER";
+    case MacroDirectiveKind::IF: return "IF";
+    case MacroDirectiveKind::IF_DEFINED: return "IF_DEFINED";
+    case MacroDirectiveKind::IF_NOT_DEFINED: return "IF_NOT_DEFINED";
+    case MacroDirectiveKind::ELSE_IF: return "ELSE_IF";
+    case MacroDirectiveKind::ELSE_IF_DEFINED: return "ELSE_IF_DEFINED";
+    case MacroDirectiveKind::ELSE_IF_NOT_DEFINED: return "ELSE_IF_NOT_DEFINED";
+    case MacroDirectiveKind::ELSE: return "ELSE";
+    case MacroDirectiveKind::END_IF: return "END_IF";
+    case MacroDirectiveKind::DEFINE: return "DEFINE";
+    case MacroDirectiveKind::UNDEFINE: return "UNDEFINE";
+    case MacroDirectiveKind::HASH_PRAGMA: return "HASH_PRAGMA";
+    case MacroDirectiveKind::C99_PRAGMA: return "C99_PRAGMA";
+    case MacroDirectiveKind::MICROSOFT_PRAGMA: return "MICROSOFT_PRAGMA";
+    case MacroDirectiveKind::INCLUDE: return "INCLUDE";
+    case MacroDirectiveKind::INCLUDE_NEXT: return "INCLUDE_NEXT";
+    case MacroDirectiveKind::INCLUDE_MACROS: return "INCLUDE_MACROS";
+    case MacroDirectiveKind::IMPORT: return "IMPORT";
     default: return "<invalid>";
   }
 }

@@ -26,7 +26,6 @@ class File;
 class FragmentList;
 class FileFragmentListIterator;
 class FileImpl;
-class FileListImpl;
 class Fragment;
 class FragmentImpl;
 class Index;
@@ -87,9 +86,7 @@ class EntityProvider {
   friend class Decl;
   friend class File;
   friend class FileImpl;
-  friend class FileListIterator;
   friend class FileFragmentListIterator;
-  friend class FileListImpl;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;

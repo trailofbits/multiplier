@@ -547,6 +547,7 @@
 #include "Entities/AttributeSyntax.h"
 #include "Entities/DeclCategory.h"
 #include "Entities/MacroNodeKind.h"
+#include "Entities/MacroDirectiveKind.h"
 #include "Entities/PathKind.h"
 #include "Entities/FileType.h"
 #include "Entities/CompilerName.h"

@@ -16,24 +16,10 @@ enum class MacroNodeKind : unsigned char {
   TOKEN,
   EXPANSION,
   SUBSTITUTION,
-  OTHER_DIRECTIVE,
-  IF_DIRECTIVE,
-  IF_DEFINED_DIRECTIVE,
-  IF_NOT_DEFINED_DIRECTIVE,
-  ELSE_IF_DIRECTIVE,
-  ELSE_IF_DEFINED_DIRECTIVE,
-  ELSE_IF_NOT_DEFINED_DIRECTIVE,
-  ELSE_DIRECTIVE,
-  END_IF_DIRECTIVE,
-  DEFINE_DIRECTIVE,
-  UNDEFINE_DIRECTIVE,
-  PRAGMA_DIRECTIVE,
-  INCLUDE_DIRECTIVE,
-  INCLUDE_NEXT_DIRECTIVE,
-  INCLUDE_MACROS_DIRECTIVE,
-  IMPORT_DIRECTIVE,
+  DIRECTIVE,
+  DEFINE,
+  INCLUDE,
   ARGUMENT,
-  PARAMETER,
 };
 
 inline static const char *EnumerationName(MacroNodeKind) {
@@ -41,7 +27,7 @@ inline static const char *EnumerationName(MacroNodeKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(MacroNodeKind) {
-  return 22;
+  return 8;
 }
 
 const char *EnumeratorName(MacroNodeKind);
