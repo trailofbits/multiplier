@@ -89,8 +89,7 @@ class EntityProvider {
   friend class Index;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
-  friend class ReferenceIterator;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;

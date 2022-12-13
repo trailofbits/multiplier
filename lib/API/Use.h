@@ -46,10 +46,4 @@ class UseIteratorImpl : public BaseUseIteratorImpl {
   bool FindNext(UseIteratorBase &self);
 };
 
-class ReferenceIteratorImpl : public BaseUseIteratorImpl {
- public:
-
-  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
-};
-
 }  // namespace mx

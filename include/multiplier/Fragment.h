@@ -24,8 +24,6 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class InvalidEntityProvider;
-class ReferenceIterator;
-class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
@@ -53,8 +51,7 @@ class Fragment {
   friend class File;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class RemoteEntityProvider;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;

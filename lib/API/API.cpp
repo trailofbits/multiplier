@@ -222,8 +222,101 @@ UseRange<DeclUseSelector> Decl::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
-ReferenceRange Decl::references(void) const {
-  return std::make_shared<ReferenceIteratorImpl>(fragment->ep, *this);
+gap::generator<Reference> Decl::references(void) const {
+  std::vector<RawEntityId> search_ids;
+  std::vector<RawEntityId> fragment_ids;
+  auto &ep = fragment->ep;
+
+  if (MayHaveRemoteUses(*this)) {
+    ep->FillReferences(ep, id(), search_ids, fragment_ids);
+  }
+
+  if (search_ids.empty()) {
+    for (const mx::Decl &redecl :
+             redeclarations_visible_in_translation_unit()) {
+      search_ids.push_back(redecl.id());
+      fragment_ids.push_back(redecl.fragment->fragment_id);
+    }
+  }
+
+  if (fragment_ids.empty()) {
+    for (auto eid : search_ids) {
+      auto vid = EntityId(eid).Unpack();
+      if (std::holds_alternative<DeclarationId>(vid)) {
+        fragment_ids.push_back(std::get<DeclarationId>(vid).fragment_id);
+      }
+    }
+  }
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
+
+  Reference user;
+  unsigned fragment_offset = 0;
+
+  for (;;) {
+    // Initialize to the first statement of the fragment.
+    if (!user.fragment) {
+      if (fragment_offset >= fragment_ids.size()) {
+        co_return;
+      }
+
+      auto frag_id = fragment_ids[fragment_offset++];
+      user.fragment = ep->FragmentFor(ep, frag_id);
+      if (!user.fragment) {
+        continue;
+      }
+
+      user.offset = 0u;
+
+    // Skip to the next statement.
+    } else {
+      ++user.offset;
+    }
+
+    // We've exhausted the statements in this fragment; skip to the next
+    // fragment.
+    if (user.offset >= user.fragment->num_stmts) {
+      user.fragment.reset();
+      user.offset = 0u;
+      continue;
+    }
+
+    Stmt stmt(std::move(user.fragment), user.offset);
+    switch (stmt.kind()) {
+      case StmtKind::DECL_REF_EXPR:
+      case StmtKind::MEMBER_EXPR:
+      case StmtKind::CXX_CONSTRUCT_EXPR:
+      case StmtKind::CXX_NEW_EXPR:
+      case StmtKind::GOTO_STMT:
+      case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+      case StmtKind::BUILTIN_BIT_CAST_EXPR:
+      case StmtKind::C_STYLE_CAST_EXPR:
+      case StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+      case StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+      case StmtKind::CXX_CONST_CAST_EXPR:
+      case StmtKind::CXX_DYNAMIC_CAST_EXPR:
+      case StmtKind::CXX_REINTERPRET_CAST_EXPR:
+      case StmtKind::CXX_STATIC_CAST_EXPR:
+      case StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+      //case StmtKind::IMPLICIT_CAST_EXPR:
+        if (auto ref_decl = stmt.referenced_declaration()) {
+          RawEntityId referenced_id = ref_decl->id();
+          for (auto search_id : search_ids) {
+            if (referenced_id == search_id) {
+              user.fragment = std::move(stmt.fragment);  // Take it back.
+              co_yield user;  // Hit!
+            }
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    user.fragment = std::move(stmt.fragment);  // Take it back.
+  }
 }
 
 DeclIterator Decl::in_internal(const Fragment &fragment) {
