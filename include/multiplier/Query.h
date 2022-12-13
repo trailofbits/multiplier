@@ -17,8 +17,6 @@ namespace mx {
 
 class EntityProvider;
 class File;
-class FragmentList;
-class FileFragmentListIterator;
 class FileImpl;
 class Fragment;
 class FragmentImpl;

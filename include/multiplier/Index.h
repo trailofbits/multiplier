@@ -23,8 +23,6 @@ namespace mx {
 class CachingEntityProvider;
 class EntityProvider;
 class File;
-class FragmentList;
-class FileFragmentListIterator;
 class FileImpl;
 class Fragment;
 class FragmentImpl;
@@ -86,7 +84,6 @@ class EntityProvider {
   friend class Decl;
   friend class File;
   friend class FileImpl;
-  friend class FileFragmentListIterator;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;

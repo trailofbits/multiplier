@@ -20,10 +20,8 @@ class File;
 class FileImpl;
 class FileLocationCache;
 class FileLocationCacheImpl;
-class FileFragmentListIterator;
 class Fragment;
 class FragmentImpl;
-class FragmentList;
 class Index;
 class RegexQueryMatch;
 class WeggliQueryMatch;
@@ -70,7 +68,6 @@ class File {
 
   friend class EntityProvider;
   friend class Fragment;
-  friend class FragmentList;
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
   friend class FragmentImpl;

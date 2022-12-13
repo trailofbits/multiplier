@@ -21,11 +21,8 @@ class Attr;
 class Decl;
 class EntityProvider;
 class File;
-class FileFragmentListIterator;
 class Fragment;
 class FragmentImpl;
-class FragmentList;
-class FragmentListImpl;
 class Index;
 class InvalidEntityProvider;
 class ReferenceIterator;
@@ -47,91 +44,6 @@ class WeggliQueryResultImpl;
 class WeggliQueryResultIterator;
 class WeggliQueryResultIterator;
 
-// Iterate over the fragments from a file.
-class FileFragmentListIterator {
- private:
-  friend class FragmentList;
-
-  std::shared_ptr<const FragmentListImpl> impl;
-  std::shared_ptr<const FragmentImpl> frag;
-  unsigned index{0u};
-  unsigned num_fragments{0u};
-
-  bool operator==(const FileFragmentListIterator &) = delete;
-  bool operator!=(const FileFragmentListIterator &) = delete;
-
-  inline FileFragmentListIterator(std::shared_ptr<const FragmentListImpl> impl_,
-                                  unsigned index_, unsigned num_fragments_)
-      : impl(std::move(impl_)),
-        index(index_),
-        num_fragments(num_fragments_) {
-    Advance();
-  }
-
-  void Advance(void);
-
- public:
-  using EndIteratorType = IteratorEnd;
-
-  inline Fragment operator*(void) && noexcept;
-  inline Fragment operator*(void) const & noexcept;
-
-  // Pre-increment.
-  inline FileFragmentListIterator &operator++(void) {
-    ++index;
-    Advance();
-    return *this;
-  }
-
-  // Post-increment.
-  inline FileFragmentListIterator operator++(int) {
-    return FileFragmentListIterator(impl, index++, num_fragments);
-  }
-
-  inline bool operator==(EndIteratorType) const noexcept {
-    return index >= num_fragments;
-  }
-
-  inline bool operator!=(EndIteratorType) const noexcept {
-    return index < num_fragments;
-  }
-};
-
-// List of fragments asociated with a file.
-class FragmentList {
- private:
-  friend class File;
-  friend class Fragment;
-
-  std::shared_ptr<const FragmentListImpl> impl;
-  unsigned num_fragments{0};
-
-  inline FragmentList(std::shared_ptr<const FragmentListImpl> impl_,
-                      unsigned num_fragments_)
-      : impl(std::move(impl_)),
-        num_fragments(num_fragments_) {}
-
- public:
-  // Return the number of fragments in this token list.
-  inline size_t size(void) const noexcept {
-    return num_fragments;
-  }
-
-  // Return an iterator pointing at the first token in this list.
-  inline FileFragmentListIterator begin(void) && noexcept {
-    return FileFragmentListIterator(std::move(impl), 0, num_fragments);
-  }
-
-  // Return an iterator pointing at the first token in this list.
-  inline FileFragmentListIterator begin(void) const & noexcept {
-    return FileFragmentListIterator(impl, 0, num_fragments);
-  }
-
-  inline FileFragmentListIterator::EndIteratorType end(void) const noexcept {
-    return {};
-  }
-};
-
 // A fragment of code containing one or more top-level declarations, the
 // associated declaration and statement entities, macro expansion/substitution
 // trees, and tokens.
@@ -141,9 +53,7 @@ class Fragment {
   friend class Decl;
   friend class EntityProvider;
   friend class File;
-  friend class FileFragmentListIterator;
   friend class FragmentImpl;
-  friend class FragmentList;
   friend class Index;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
@@ -164,7 +74,7 @@ class Fragment {
 
  public:
   // Return the list of fragments in a file.
-  static FragmentList in(const File &);
+  static gap::generator<Fragment> in(const File &);
 
   // Return the fragment containing a query match.
   static Fragment containing(const WeggliQueryMatch &);
@@ -214,13 +124,5 @@ class Fragment {
   // Run a regular expression search over this fragment.
   RegexQueryResult query(const RegexQuery &query) const;
 };
-
-inline Fragment FileFragmentListIterator::operator*(void) && noexcept {
-  return Fragment(std::move(frag));
-}
-
-inline Fragment FileFragmentListIterator::operator*(void) const & noexcept {
-  return Fragment(frag);
-}
 
 }  // namespace mx

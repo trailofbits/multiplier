@@ -18,23 +18,17 @@
 
 namespace mx {
 
-// Advance to the next valid fragment.
-void FileFragmentListIterator::Advance(void) {
-  for (; index < num_fragments; ++index) {
-    frag = impl->ep->FragmentFor(impl->ep, impl->fragment_ids[index]);
+// Return the list of fragments in a file.
+gap::generator<Fragment> Fragment::in(const File &file) {
+  auto &ep = file.impl->ep;
+  auto fragment_ids = ep->ListFragmentsInFile(ep, file.impl->file_id);
+  auto num_fragments = fragment_ids.size();
+  for(size_t i = 0; i < num_fragments; ++i) {
+    auto frag = ep->FragmentFor(ep, fragment_ids[i]);
     if (frag) {
-      return;
+      co_yield frag;
     }
   }
-}
-
-// Return the list of fragments in a file.
-FragmentList Fragment::in(const File &file) {
-  auto &ep = file.impl->ep;
-  auto list = std::make_shared<FragmentListImpl>(
-      ep, ep->ListFragmentsInFile(ep, file.impl->file_id));
-  auto num_fragments = list->fragment_ids.size();
-  return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
 }
 
 // Return the fragment containing a query match.
