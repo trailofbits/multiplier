@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class M68kInterruptAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using M68kInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, M68kInterruptAttr>;
 class M68kInterruptAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class M68kInterruptAttr : public InheritableAttr {
     }
   }
 
-  inline static M68kInterruptAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<M68kInterruptAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

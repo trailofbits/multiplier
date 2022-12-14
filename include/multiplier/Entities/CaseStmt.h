@@ -30,7 +30,6 @@ class Expr;
 class Stmt;
 class SwitchCase;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CaseStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CaseStmt>;
 using CaseStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CaseStmt>;
 
 class CaseStmt : public SwitchCase {
@@ -47,8 +46,12 @@ class CaseStmt : public SwitchCase {
     }
   }
 
-  inline static CaseStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CaseStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

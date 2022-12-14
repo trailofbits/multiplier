@@ -32,7 +32,6 @@ class TypeAliasTemplateDecl;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeAliasDecl>;
 using TypeAliasDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TypeAliasDecl>;
 
 class TypeAliasDecl : public TypedefNameDecl {
@@ -51,8 +50,12 @@ class TypeAliasDecl : public TypedefNameDecl {
     }
   }
 
-  inline static TypeAliasDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<TypeAliasDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

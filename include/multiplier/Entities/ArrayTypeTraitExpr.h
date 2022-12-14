@@ -31,7 +31,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArrayTypeTraitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArrayTypeTraitExpr>;
 using ArrayTypeTraitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ArrayTypeTraitExpr>;
 
 class ArrayTypeTraitExpr : public Expr {
@@ -49,8 +48,12 @@ class ArrayTypeTraitExpr : public Expr {
     }
   }
 
-  inline static ArrayTypeTraitExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ArrayTypeTraitExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

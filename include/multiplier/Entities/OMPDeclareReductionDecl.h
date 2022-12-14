@@ -31,7 +31,6 @@ class NamedDecl;
 class OMPDeclareReductionDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPDeclareReductionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareReductionDecl>;
 using OMPDeclareReductionDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPDeclareReductionDecl>;
 
 class OMPDeclareReductionDecl : public ValueDecl {
@@ -49,8 +48,12 @@ class OMPDeclareReductionDecl : public ValueDecl {
     }
   }
 
-  inline static OMPDeclareReductionDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OMPDeclareReductionDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

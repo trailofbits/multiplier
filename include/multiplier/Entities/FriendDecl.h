@@ -32,7 +32,6 @@ class NamedDecl;
 class TemplateParameterList;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FriendDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FriendDecl>;
 using FriendDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, FriendDecl>;
 
 class FriendDecl : public Decl {
@@ -48,8 +47,12 @@ class FriendDecl : public Decl {
     }
   }
 
-  inline static FriendDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<FriendDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

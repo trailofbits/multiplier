@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ObjCExplicitProtocolImplAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCExplicitProtocolImplAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCExplicitProtocolImplAttr>;
 class ObjCExplicitProtocolImplAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
     }
   }
 
-  inline static ObjCExplicitProtocolImplAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCExplicitProtocolImplAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

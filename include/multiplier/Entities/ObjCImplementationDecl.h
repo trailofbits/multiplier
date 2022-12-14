@@ -32,7 +32,6 @@ class ObjCImplementationDecl;
 class ObjCInterfaceDecl;
 class ObjCIvarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCImplementationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCImplementationDecl>;
 using ObjCImplementationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCImplementationDecl>;
 
 class ObjCImplementationDecl : public ObjCImplDecl {
@@ -51,8 +50,12 @@ class ObjCImplementationDecl : public ObjCImplDecl {
     }
   }
 
-  inline static ObjCImplementationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCImplementationDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

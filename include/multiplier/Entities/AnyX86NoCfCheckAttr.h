@@ -28,7 +28,6 @@ class AnyX86NoCfCheckAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AnyX86NoCfCheckAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnyX86NoCfCheckAttr>;
 class AnyX86NoCfCheckAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
     }
   }
 
-  inline static AnyX86NoCfCheckAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

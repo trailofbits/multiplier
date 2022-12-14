@@ -28,7 +28,6 @@ class Attr;
 class BTFDeclTagAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BTFDeclTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BTFDeclTagAttr>;
 class BTFDeclTagAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class BTFDeclTagAttr : public InheritableAttr {
     }
   }
 
-  inline static BTFDeclTagAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<BTFDeclTagAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

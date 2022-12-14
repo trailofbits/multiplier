@@ -28,7 +28,6 @@ class Expr;
 class ObjCForCollectionStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCForCollectionStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCForCollectionStmt>;
 using ObjCForCollectionStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCForCollectionStmt>;
 
 class ObjCForCollectionStmt : public Stmt {
@@ -44,8 +43,12 @@ class ObjCForCollectionStmt : public Stmt {
     }
   }
 
-  inline static ObjCForCollectionStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCForCollectionStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

@@ -28,7 +28,6 @@ class ObjCTypeParamDecl;
 class ObjCTypeParamType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCTypeParamTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCTypeParamType>;
 class ObjCTypeParamType : public Type {
  private:
   friend class FragmentImpl;
@@ -42,8 +41,12 @@ class ObjCTypeParamType : public Type {
     }
   }
 
-  inline static ObjCTypeParamTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCTypeParamType> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

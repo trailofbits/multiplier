@@ -28,7 +28,6 @@ namespace mx {
 class Stmt;
 class SwitchCase;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwitchCaseContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwitchCase>;
 using SwitchCaseContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SwitchCase>;
 
 class SwitchCase : public Stmt {
@@ -44,8 +43,12 @@ class SwitchCase : public Stmt {
     }
   }
 
-  inline static SwitchCaseContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<SwitchCase> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

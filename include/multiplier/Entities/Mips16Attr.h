@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class Mips16Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using Mips16AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Mips16Attr>;
 class Mips16Attr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class Mips16Attr : public InheritableAttr {
     }
   }
 
-  inline static Mips16AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<Mips16Attr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

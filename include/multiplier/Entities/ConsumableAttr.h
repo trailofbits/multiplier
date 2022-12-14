@@ -29,7 +29,6 @@ class Attr;
 class ConsumableAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConsumableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConsumableAttr>;
 class ConsumableAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -44,8 +43,12 @@ class ConsumableAttr : public InheritableAttr {
     }
   }
 
-  inline static ConsumableAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ConsumableAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

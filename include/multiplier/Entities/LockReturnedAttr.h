@@ -29,7 +29,6 @@ class Expr;
 class InheritableAttr;
 class LockReturnedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LockReturnedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LockReturnedAttr>;
 class LockReturnedAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -44,8 +43,12 @@ class LockReturnedAttr : public InheritableAttr {
     }
   }
 
-  inline static LockReturnedAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<LockReturnedAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

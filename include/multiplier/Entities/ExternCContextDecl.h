@@ -27,7 +27,6 @@ namespace mx {
 class Decl;
 class ExternCContextDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExternCContextDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExternCContextDecl>;
 using ExternCContextDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ExternCContextDecl>;
 
 class ExternCContextDecl : public Decl {
@@ -43,8 +42,12 @@ class ExternCContextDecl : public Decl {
     }
   }
 
-  inline static ExternCContextDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ExternCContextDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

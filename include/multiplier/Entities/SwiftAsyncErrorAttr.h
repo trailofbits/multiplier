@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class SwiftAsyncErrorAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftAsyncErrorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncErrorAttr>;
 class SwiftAsyncErrorAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -44,8 +43,12 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
     }
   }
 
-  inline static SwiftAsyncErrorAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<SwiftAsyncErrorAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

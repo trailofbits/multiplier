@@ -30,7 +30,6 @@ class Type;
 class VAArgExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VAArgExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, VAArgExpr>;
 using VAArgExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, VAArgExpr>;
 
 class VAArgExpr : public Expr {
@@ -48,8 +47,12 @@ class VAArgExpr : public Expr {
     }
   }
 
-  inline static VAArgExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<VAArgExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

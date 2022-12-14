@@ -29,7 +29,6 @@ class RecoveryExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RecoveryExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, RecoveryExpr>;
 using RecoveryExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, RecoveryExpr>;
 
 class RecoveryExpr : public Expr {
@@ -47,8 +46,12 @@ class RecoveryExpr : public Expr {
     }
   }
 
-  inline static RecoveryExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<RecoveryExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

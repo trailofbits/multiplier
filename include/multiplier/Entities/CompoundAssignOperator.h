@@ -31,7 +31,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundAssignOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundAssignOperator>;
 using CompoundAssignOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundAssignOperator>;
 
 class CompoundAssignOperator : public BinaryOperator {
@@ -50,8 +49,12 @@ class CompoundAssignOperator : public BinaryOperator {
     }
   }
 
-  inline static CompoundAssignOperatorContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CompoundAssignOperator> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

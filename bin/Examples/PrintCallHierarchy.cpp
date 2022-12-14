@@ -136,11 +136,11 @@ extern "C" int main(int argc, char *argv[]) {
 
   } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
     mx::Token token = std::get<mx::Token>(maybe_entity);
-    if (auto stmt = mx::Stmt::containing(token)) {
-      PrintCallHierarchy(stmt.value(), 0u);
-
-    } else if (auto decl = mx::Decl::containing(token)) {
-      PrintCallHierarchy(decl.value(), 0u);
+    for (auto stmt : mx::Stmt::containing(token)) {
+      PrintCallHierarchy(stmt, 0u);
+    }
+    for (auto decl : mx::Decl::containing(token)) {
+      PrintCallHierarchy(decl, 0u);
     }
 
   } else {

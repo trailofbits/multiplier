@@ -27,7 +27,6 @@ namespace mx {
 class Attr;
 class OMPCaptureKindAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCaptureKindAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCaptureKindAttr>;
 class OMPCaptureKindAttr : public Attr {
  private:
   friend class FragmentImpl;
@@ -41,8 +40,12 @@ class OMPCaptureKindAttr : public Attr {
     }
   }
 
-  inline static OMPCaptureKindAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OMPCaptureKindAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

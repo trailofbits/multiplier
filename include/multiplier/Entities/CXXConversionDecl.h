@@ -33,7 +33,6 @@ class NamedDecl;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXConversionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXConversionDecl>;
 using CXXConversionDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXConversionDecl>;
 
 class CXXConversionDecl : public CXXMethodDecl {
@@ -54,8 +53,12 @@ class CXXConversionDecl : public CXXMethodDecl {
     }
   }
 
-  inline static CXXConversionDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CXXConversionDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

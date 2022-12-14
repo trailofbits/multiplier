@@ -29,7 +29,6 @@ class NamedDecl;
 class TypeDecl;
 class UnresolvedUsingTypenameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedUsingTypenameDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingTypenameDecl>;
 using UnresolvedUsingTypenameDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnresolvedUsingTypenameDecl>;
 
 class UnresolvedUsingTypenameDecl : public TypeDecl {
@@ -47,8 +46,12 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     }
   }
 
-  inline static UnresolvedUsingTypenameDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<UnresolvedUsingTypenameDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

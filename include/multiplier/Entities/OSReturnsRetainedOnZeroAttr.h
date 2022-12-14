@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OSReturnsRetainedOnZeroAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OSReturnsRetainedOnZeroAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSReturnsRetainedOnZeroAttr>;
 class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class OSReturnsRetainedOnZeroAttr : public InheritableAttr {
     }
   }
 
-  inline static OSReturnsRetainedOnZeroAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OSReturnsRetainedOnZeroAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

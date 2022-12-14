@@ -30,7 +30,6 @@ class Stmt;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedLookupExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedLookupExpr>;
 using UnresolvedLookupExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnresolvedLookupExpr>;
 
 class UnresolvedLookupExpr : public OverloadExpr {
@@ -49,8 +48,12 @@ class UnresolvedLookupExpr : public OverloadExpr {
     }
   }
 
-  inline static UnresolvedLookupExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<UnresolvedLookupExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

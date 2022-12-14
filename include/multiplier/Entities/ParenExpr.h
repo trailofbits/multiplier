@@ -29,7 +29,6 @@ class ParenExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ParenExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParenExpr>;
 using ParenExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ParenExpr>;
 
 class ParenExpr : public Expr {
@@ -47,8 +46,12 @@ class ParenExpr : public Expr {
     }
   }
 
-  inline static ParenExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ParenExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

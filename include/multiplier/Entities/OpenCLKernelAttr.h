@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OpenCLKernelAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLKernelAttr>;
 class OpenCLKernelAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class OpenCLKernelAttr : public InheritableAttr {
     }
   }
 
-  inline static OpenCLKernelAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OpenCLKernelAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

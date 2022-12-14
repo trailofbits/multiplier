@@ -30,7 +30,6 @@ class ObjCSubscriptRefExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCSubscriptRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCSubscriptRefExpr>;
 using ObjCSubscriptRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCSubscriptRefExpr>;
 
 class ObjCSubscriptRefExpr : public Expr {
@@ -48,8 +47,12 @@ class ObjCSubscriptRefExpr : public Expr {
     }
   }
 
-  inline static ObjCSubscriptRefExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCSubscriptRefExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

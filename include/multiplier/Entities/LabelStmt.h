@@ -29,7 +29,6 @@ class LabelStmt;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LabelStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, LabelStmt>;
 using LabelStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, LabelStmt>;
 
 class LabelStmt : public ValueStmt {
@@ -46,8 +45,12 @@ class LabelStmt : public ValueStmt {
     }
   }
 
-  inline static LabelStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<LabelStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

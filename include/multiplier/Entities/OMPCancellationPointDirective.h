@@ -28,7 +28,6 @@ class OMPCancellationPointDirective;
 class OMPExecutableDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCancellationPointDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCancellationPointDirective>;
 using OMPCancellationPointDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPCancellationPointDirective>;
 
 class OMPCancellationPointDirective : public OMPExecutableDirective {
@@ -45,8 +44,12 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
     }
   }
 
-  inline static OMPCancellationPointDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OMPCancellationPointDirective> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

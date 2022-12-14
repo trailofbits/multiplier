@@ -29,7 +29,6 @@ class Decl;
 class DeclStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeclStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeclStmt>;
 using DeclStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DeclStmt>;
 
 class DeclStmt : public Stmt {
@@ -45,8 +44,12 @@ class DeclStmt : public Stmt {
     }
   }
 
-  inline static DeclStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<DeclStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

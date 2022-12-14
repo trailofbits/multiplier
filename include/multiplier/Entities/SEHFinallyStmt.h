@@ -28,7 +28,6 @@ class CompoundStmt;
 class SEHFinallyStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHFinallyStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHFinallyStmt>;
 using SEHFinallyStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHFinallyStmt>;
 
 class SEHFinallyStmt : public Stmt {
@@ -44,8 +43,12 @@ class SEHFinallyStmt : public Stmt {
     }
   }
 
-  inline static SEHFinallyStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<SEHFinallyStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

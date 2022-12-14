@@ -36,7 +36,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CallExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CallExpr>;
 using CallExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CallExpr>;
 
 class CallExpr : public Expr {
@@ -54,8 +53,12 @@ class CallExpr : public Expr {
     }
   }
 
-  inline static CallExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CallExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

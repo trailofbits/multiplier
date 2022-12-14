@@ -30,7 +30,6 @@ class Stmt;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentCoawaitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentCoawaitExpr>;
 using DependentCoawaitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DependentCoawaitExpr>;
 
 class DependentCoawaitExpr : public Expr {
@@ -48,8 +47,12 @@ class DependentCoawaitExpr : public Expr {
     }
   }
 
-  inline static DependentCoawaitExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<DependentCoawaitExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

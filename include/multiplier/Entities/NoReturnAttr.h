@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoReturnAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoReturnAttr>;
 class NoReturnAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class NoReturnAttr : public InheritableAttr {
     }
   }
 
-  inline static NoReturnAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<NoReturnAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

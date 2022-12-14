@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class WebAssemblyImportModuleAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WebAssemblyImportModuleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WebAssemblyImportModuleAttr>;
 class WebAssemblyImportModuleAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
     }
   }
 
-  inline static WebAssemblyImportModuleAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<WebAssemblyImportModuleAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

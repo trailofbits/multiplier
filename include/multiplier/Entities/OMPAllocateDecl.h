@@ -29,7 +29,6 @@ class Expr;
 class OMPAllocateDecl;
 class OMPDeclarativeDirectiveDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPAllocateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPAllocateDecl>;
 using OMPAllocateDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPAllocateDecl>;
 
 class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
@@ -46,8 +45,12 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     }
   }
 
-  inline static OMPAllocateDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OMPAllocateDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

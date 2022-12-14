@@ -30,7 +30,6 @@ class FullExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExprWithCleanupsContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExprWithCleanups>;
 using ExprWithCleanupsContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ExprWithCleanups>;
 
 class ExprWithCleanups : public FullExpr {
@@ -49,8 +48,12 @@ class ExprWithCleanups : public FullExpr {
     }
   }
 
-  inline static ExprWithCleanupsContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ExprWithCleanups> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

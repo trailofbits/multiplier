@@ -32,7 +32,6 @@ class ObjCMethodDecl;
 class ObjCPropertyDecl;
 class ObjCPropertyImplDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCPropertyImplDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPropertyImplDecl>;
 using ObjCPropertyImplDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCPropertyImplDecl>;
 
 class ObjCPropertyImplDecl : public Decl {
@@ -48,8 +47,12 @@ class ObjCPropertyImplDecl : public Decl {
     }
   }
 
-  inline static ObjCPropertyImplDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCPropertyImplDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

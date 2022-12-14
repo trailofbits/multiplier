@@ -27,7 +27,6 @@ namespace mx {
 class Attr;
 class CalledOnceAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CalledOnceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CalledOnceAttr>;
 class CalledOnceAttr : public Attr {
  private:
   friend class FragmentImpl;
@@ -41,8 +40,12 @@ class CalledOnceAttr : public Attr {
     }
   }
 
-  inline static CalledOnceAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CalledOnceAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

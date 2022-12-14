@@ -29,7 +29,6 @@ class DiagnoseAsBuiltinAttr;
 class FunctionDecl;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DiagnoseAsBuiltinAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DiagnoseAsBuiltinAttr>;
 class DiagnoseAsBuiltinAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -44,8 +43,12 @@ class DiagnoseAsBuiltinAttr : public InheritableAttr {
     }
   }
 
-  inline static DiagnoseAsBuiltinAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<DiagnoseAsBuiltinAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

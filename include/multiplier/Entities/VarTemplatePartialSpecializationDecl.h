@@ -32,7 +32,6 @@ class VarDecl;
 class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VarTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarTemplatePartialSpecializationDecl>;
 using VarTemplatePartialSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, VarTemplatePartialSpecializationDecl>;
 
 class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
@@ -53,8 +52,12 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     }
   }
 
-  inline static VarTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

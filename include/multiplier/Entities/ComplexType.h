@@ -27,7 +27,6 @@ namespace mx {
 class ComplexType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ComplexTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ComplexType>;
 class ComplexType : public Type {
  private:
   friend class FragmentImpl;
@@ -41,8 +40,12 @@ class ComplexType : public Type {
     }
   }
 
-  inline static ComplexTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ComplexType> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

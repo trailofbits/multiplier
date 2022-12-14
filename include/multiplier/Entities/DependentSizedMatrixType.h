@@ -29,7 +29,6 @@ class Expr;
 class MatrixType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentSizedMatrixTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentSizedMatrixType>;
 class DependentSizedMatrixType : public MatrixType {
  private:
   friend class FragmentImpl;
@@ -44,8 +43,12 @@ class DependentSizedMatrixType : public MatrixType {
     }
   }
 
-  inline static DependentSizedMatrixTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<DependentSizedMatrixType> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

@@ -28,7 +28,6 @@ class OMPExecutableDirective;
 class OMPMasterDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPMasterDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMasterDirective>;
 using OMPMasterDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPMasterDirective>;
 
 class OMPMasterDirective : public OMPExecutableDirective {
@@ -45,8 +44,12 @@ class OMPMasterDirective : public OMPExecutableDirective {
     }
   }
 
-  inline static OMPMasterDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OMPMasterDirective> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

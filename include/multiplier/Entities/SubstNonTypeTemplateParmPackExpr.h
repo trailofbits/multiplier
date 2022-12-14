@@ -30,7 +30,6 @@ class Stmt;
 class SubstNonTypeTemplateParmPackExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SubstNonTypeTemplateParmPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SubstNonTypeTemplateParmPackExpr>;
 using SubstNonTypeTemplateParmPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SubstNonTypeTemplateParmPackExpr>;
 
 class SubstNonTypeTemplateParmPackExpr : public Expr {
@@ -48,8 +47,12 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
     }
   }
 
-  inline static SubstNonTypeTemplateParmPackExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<SubstNonTypeTemplateParmPackExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

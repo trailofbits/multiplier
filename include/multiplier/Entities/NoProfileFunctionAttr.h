@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoProfileFunctionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoProfileFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoProfileFunctionAttr>;
 class NoProfileFunctionAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class NoProfileFunctionAttr : public InheritableAttr {
     }
   }
 
-  inline static NoProfileFunctionAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<NoProfileFunctionAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

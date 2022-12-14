@@ -28,7 +28,6 @@ class Attr;
 class TypeAttr;
 class UPtrAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UPtrAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UPtrAttr>;
 class UPtrAttr : public TypeAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class UPtrAttr : public TypeAttr {
     }
   }
 
-  inline static UPtrAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<UPtrAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

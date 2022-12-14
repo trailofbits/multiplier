@@ -29,7 +29,6 @@ class ObjCSelectorExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCSelectorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCSelectorExpr>;
 using ObjCSelectorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCSelectorExpr>;
 
 class ObjCSelectorExpr : public Expr {
@@ -47,8 +46,12 @@ class ObjCSelectorExpr : public Expr {
     }
   }
 
-  inline static ObjCSelectorExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCSelectorExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

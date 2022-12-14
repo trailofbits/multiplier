@@ -28,7 +28,6 @@ namespace mx {
 class Attr;
 class OpenCLAccessAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLAccessAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLAccessAttr>;
 class OpenCLAccessAttr : public Attr {
  private:
   friend class FragmentImpl;
@@ -42,8 +41,12 @@ class OpenCLAccessAttr : public Attr {
     }
   }
 
-  inline static OpenCLAccessAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OpenCLAccessAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

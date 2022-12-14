@@ -30,7 +30,6 @@ class MSPropertyRefExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertyRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertyRefExpr>;
 using MSPropertyRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSPropertyRefExpr>;
 
 class MSPropertyRefExpr : public Expr {
@@ -48,8 +47,12 @@ class MSPropertyRefExpr : public Expr {
     }
   }
 
-  inline static MSPropertyRefExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<MSPropertyRefExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

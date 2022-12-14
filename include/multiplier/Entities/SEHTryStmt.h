@@ -30,7 +30,6 @@ class SEHFinallyStmt;
 class SEHTryStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHTryStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHTryStmt>;
 using SEHTryStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHTryStmt>;
 
 class SEHTryStmt : public Stmt {
@@ -46,8 +45,12 @@ class SEHTryStmt : public Stmt {
     }
   }
 
-  inline static SEHTryStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<SEHTryStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

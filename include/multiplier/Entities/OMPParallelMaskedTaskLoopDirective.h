@@ -30,7 +30,6 @@ class OMPLoopDirective;
 class OMPParallelMaskedTaskLoopDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPParallelMaskedTaskLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelMaskedTaskLoopDirective>;
 using OMPParallelMaskedTaskLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPParallelMaskedTaskLoopDirective>;
 
 class OMPParallelMaskedTaskLoopDirective : public OMPLoopDirective {
@@ -49,8 +48,12 @@ class OMPParallelMaskedTaskLoopDirective : public OMPLoopDirective {
     }
   }
 
-  inline static OMPParallelMaskedTaskLoopDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<OMPParallelMaskedTaskLoopDirective> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

@@ -33,7 +33,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXDependentScopeMemberExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDependentScopeMemberExpr>;
 using CXXDependentScopeMemberExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXDependentScopeMemberExpr>;
 
 class CXXDependentScopeMemberExpr : public Expr {
@@ -51,8 +50,12 @@ class CXXDependentScopeMemberExpr : public Expr {
     }
   }
 
-  inline static CXXDependentScopeMemberExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CXXDependentScopeMemberExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

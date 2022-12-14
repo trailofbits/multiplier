@@ -28,7 +28,6 @@ class Attr;
 class Ptr32Attr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using Ptr32AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Ptr32Attr>;
 class Ptr32Attr : public TypeAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class Ptr32Attr : public TypeAttr {
     }
   }
 
-  inline static Ptr32AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<Ptr32Attr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

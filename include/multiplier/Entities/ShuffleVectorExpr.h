@@ -29,7 +29,6 @@ class ShuffleVectorExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ShuffleVectorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ShuffleVectorExpr>;
 using ShuffleVectorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ShuffleVectorExpr>;
 
 class ShuffleVectorExpr : public Expr {
@@ -47,8 +46,12 @@ class ShuffleVectorExpr : public Expr {
     }
   }
 
-  inline static ShuffleVectorExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ShuffleVectorExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

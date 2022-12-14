@@ -28,7 +28,6 @@ class CompoundStmt;
 class MSDependentExistsStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSDependentExistsStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSDependentExistsStmt>;
 using MSDependentExistsStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSDependentExistsStmt>;
 
 class MSDependentExistsStmt : public Stmt {
@@ -44,8 +43,12 @@ class MSDependentExistsStmt : public Stmt {
     }
   }
 
-  inline static MSDependentExistsStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<MSDependentExistsStmt> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

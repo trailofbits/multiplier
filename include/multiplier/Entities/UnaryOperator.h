@@ -30,7 +30,6 @@ class Stmt;
 class UnaryOperator;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnaryOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnaryOperator>;
 using UnaryOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnaryOperator>;
 
 class UnaryOperator : public Expr {
@@ -48,8 +47,12 @@ class UnaryOperator : public Expr {
     }
   }
 
-  inline static UnaryOperatorContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<UnaryOperator> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

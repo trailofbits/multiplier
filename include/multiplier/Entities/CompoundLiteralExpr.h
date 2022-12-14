@@ -29,7 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundLiteralExpr>;
 using CompoundLiteralExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundLiteralExpr>;
 
 class CompoundLiteralExpr : public Expr {
@@ -47,8 +46,12 @@ class CompoundLiteralExpr : public Expr {
     }
   }
 
-  inline static CompoundLiteralExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<CompoundLiteralExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

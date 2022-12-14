@@ -29,7 +29,6 @@ class ObjCIndirectCopyRestoreExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIndirectCopyRestoreExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIndirectCopyRestoreExpr>;
 using ObjCIndirectCopyRestoreExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCIndirectCopyRestoreExpr>;
 
 class ObjCIndirectCopyRestoreExpr : public Expr {
@@ -47,8 +46,12 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     }
   }
 
-  inline static ObjCIndirectCopyRestoreExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

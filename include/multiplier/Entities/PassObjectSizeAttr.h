@@ -30,7 +30,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class PassObjectSizeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PassObjectSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PassObjectSizeAttr>;
 class PassObjectSizeAttr : public InheritableParamAttr {
  private:
   friend class FragmentImpl;
@@ -46,8 +45,12 @@ class PassObjectSizeAttr : public InheritableParamAttr {
     }
   }
 
-  inline static PassObjectSizeAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<PassObjectSizeAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

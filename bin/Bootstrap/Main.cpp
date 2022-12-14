@@ -1602,9 +1602,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     needed_decls.insert("DeclKind");
     class_os
         << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n"
-        << "using " << class_name
         << "ContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, "
         << class_name << ">;\n\n";
 
@@ -1634,9 +1631,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     needed_decls.insert("StmtKind");
     class_os
         << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n"
-        << "using " << class_name
         << "ContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, "
         << class_name << ">;\n\n";
 
@@ -1661,10 +1655,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   
   } else if (is_type) {
     needed_decls.insert("TypeKind");
-    class_os
-        << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -1691,10 +1681,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   // Attributes. Treated like entities because they have a class hierarchy.
   } else if (is_attr) {
     needed_decls.insert("AttrKind");
-    class_os
-        << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -2032,9 +2018,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "      }\n"
         << "    }\n"
         << "  }\n\n"
-        << "  inline static " << class_name
-        << "ContainingTokenRange containing(const Token &tok) {\n"
-        << "    return TokenContextIterator(TokenContext::of(tok));\n"
+        << "  inline static gap::generator<" << class_name
+        << "> containing(const Token &tok) {\n"
+        << "    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {\n"
+        << "      if(auto d = from(*ctx)) {\n"
+        << "        co_yield *d;\n"
+        << "      }\n"
+        << "    }\n"
         << "  }\n\n"
         << "  inline bool contains(const Token &tok) {\n"
         << "    for(auto &parent : " << class_name << "::containing(tok)) {\n"

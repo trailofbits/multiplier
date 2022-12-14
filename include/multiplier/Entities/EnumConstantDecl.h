@@ -31,7 +31,6 @@ class Expr;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EnumConstantDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumConstantDecl>;
 using EnumConstantDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, EnumConstantDecl>;
 
 class EnumConstantDecl : public ValueDecl {
@@ -49,8 +48,12 @@ class EnumConstantDecl : public ValueDecl {
     }
   }
 
-  inline static EnumConstantDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<EnumConstantDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

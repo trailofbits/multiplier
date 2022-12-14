@@ -29,7 +29,6 @@ class NamedDecl;
 class UnnamedGlobalConstantDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnnamedGlobalConstantDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnnamedGlobalConstantDecl>;
 using UnnamedGlobalConstantDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnnamedGlobalConstantDecl>;
 
 class UnnamedGlobalConstantDecl : public ValueDecl {
@@ -47,8 +46,12 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
     }
   }
 
-  inline static UnnamedGlobalConstantDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<UnnamedGlobalConstantDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

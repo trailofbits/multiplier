@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NakedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NakedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NakedAttr>;
 class NakedAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class NakedAttr : public InheritableAttr {
     }
   }
 
-  inline static NakedAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<NakedAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

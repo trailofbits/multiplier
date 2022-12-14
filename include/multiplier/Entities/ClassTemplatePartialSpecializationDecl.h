@@ -33,7 +33,6 @@ class RecordDecl;
 class TagDecl;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ClassTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassTemplatePartialSpecializationDecl>;
 using ClassTemplatePartialSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ClassTemplatePartialSpecializationDecl>;
 
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
@@ -55,8 +54,12 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     }
   }
 
-  inline static ClassTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

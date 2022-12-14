@@ -31,7 +31,6 @@ class Stmt;
 class UserDefinedLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UserDefinedLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, UserDefinedLiteral>;
 using UserDefinedLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UserDefinedLiteral>;
 
 class UserDefinedLiteral : public CallExpr {
@@ -50,8 +49,12 @@ class UserDefinedLiteral : public CallExpr {
     }
   }
 
-  inline static UserDefinedLiteralContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<UserDefinedLiteral> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

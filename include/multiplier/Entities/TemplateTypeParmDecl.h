@@ -31,7 +31,6 @@ class TemplateTypeParmDecl;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TemplateTypeParmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateTypeParmDecl>;
 using TemplateTypeParmDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TemplateTypeParmDecl>;
 
 class TemplateTypeParmDecl : public TypeDecl {
@@ -49,8 +48,12 @@ class TemplateTypeParmDecl : public TypeDecl {
     }
   }
 
-  inline static TemplateTypeParmDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<TemplateTypeParmDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

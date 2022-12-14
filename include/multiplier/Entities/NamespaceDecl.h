@@ -28,7 +28,6 @@ class Decl;
 class NamedDecl;
 class NamespaceDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NamespaceDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NamespaceDecl>;
 using NamespaceDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, NamespaceDecl>;
 
 class NamespaceDecl : public NamedDecl {
@@ -45,8 +44,12 @@ class NamespaceDecl : public NamedDecl {
     }
   }
 
-  inline static NamespaceDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<NamespaceDecl> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

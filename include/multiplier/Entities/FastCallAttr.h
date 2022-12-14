@@ -28,7 +28,6 @@ class Attr;
 class FastCallAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FastCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FastCallAttr>;
 class FastCallAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
@@ -43,8 +42,12 @@ class FastCallAttr : public InheritableAttr {
     }
   }
 
-  inline static FastCallAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+  inline static gap::generator<FastCallAttr> containing(const Token &tok) {
+    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+      if(auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
