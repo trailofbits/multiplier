@@ -32,10 +32,6 @@ class Token;
 class Type;
 class WeggliQuery;
 class WeggliQueryMatch;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
-class WeggliQueryResultIterator;
-class WeggliQueryResultIterator;
 
 // A fragment of code containing one or more top-level declarations, the
 // associated declaration and statement entities, macro expansion/substitution
@@ -56,7 +52,6 @@ class Fragment {
   friend class MacroSubstitution;
   friend class Type;
   friend class WeggliQueryResultImpl;
-  friend class WeggliQueryResultIterator;
 
   std::shared_ptr<const FragmentImpl> impl;
 
@@ -110,7 +105,7 @@ class Fragment {
   }
 
   // Run a Weggli search over this fragment.
-  WeggliQueryResult query(const WeggliQuery &query) const;
+  gap::generator<WeggliQueryMatch> query(const WeggliQuery &query) const;
 
   // Run a regular expression search over this fragment.
   gap::generator<RegexQueryMatch> query(const RegexQuery &query) const;

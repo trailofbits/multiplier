@@ -28,16 +28,12 @@ class RegexQueryMatch;
 class InvalidEntityProvider;
 class WeggliQuery;
 class WeggliQueryMatch;
-class WeggliQueryResultIterator;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
 
 // The range of tokens of a match.
 class WeggliQueryMatch : public TokenRange {
  private:
   friend class File;
   friend class Fragment;
-  friend class WeggliQueryResult;
   friend class WeggliQueryResultImpl;
 
   // Fragment with the match
@@ -87,90 +83,6 @@ class WeggliQueryMatch : public TokenRange {
   // Return the number of capture groups.
   inline size_t num_captures(void) const {
     return 1u + matched_tokens.size();
-  }
-};
-
-class WeggliQueryResultIterator {
- private:
-  friend class WeggliQueryResult;
-
-  std::shared_ptr<WeggliQueryResultImpl> impl;
-
-  unsigned index;
-  unsigned num_fragments;
-  std::optional<WeggliQueryMatch> result;
-
-  // Try to advance to the next result. There can be multiple results per
-  // fragment.
-  void Advance(void);
-
-  inline WeggliQueryResultIterator(
-      std::shared_ptr<WeggliQueryResultImpl> impl_,
-      unsigned index_, unsigned num_fragments_)
-      : impl(std::move(impl_)),
-        index(index_),
-        num_fragments(num_fragments_) {
-    Advance();
-  }
-
- public:
-  inline WeggliQueryMatch operator*(void) && noexcept {
-    return std::move(result.value());
-  }
-
-  inline const WeggliQueryMatch &operator*(void) const & noexcept {
-    return result.value();
-  }
-
-  inline const WeggliQueryMatch *operator->(void) const & noexcept {
-    return std::addressof(result.value());
-  }
-
-  inline bool operator==(IteratorEnd) const noexcept {
-    return index >= num_fragments;
-  }
-
-  inline bool operator!=(IteratorEnd) const noexcept {
-    return index < num_fragments;
-  }
-
-  // Pre-increment.
-  inline WeggliQueryResultIterator &operator++(void) noexcept {
-    Advance();
-    return *this;
-  }
-};
-
-// NOTE(pag): The iterators from this are *NOT* restartable.
-class WeggliQueryResult {
- private:
-
-  using Ptr = std::shared_ptr<const WeggliQueryResult>;
-
-  friend class EntityProvider;
-  friend class RemoteEntityProvider;
-  friend class InvalidEntityProvider;
-  friend class WeggliQueryResultIterator;
-
-  std::shared_ptr<WeggliQueryResultImpl> impl;
-  unsigned num_fragments{0u};
-
- public:
-  WeggliQueryResult(void) = default;
-  WeggliQueryResult(std::shared_ptr<WeggliQueryResultImpl> impl_);
-
-  // Return an iterator pointing at the first token in this list.
-  inline WeggliQueryResultIterator begin(void) && noexcept {
-    return WeggliQueryResultIterator(std::move(impl), 0, num_fragments);
-  }
-
-  // Return an iterator pointing at the first token in this list.
-  inline WeggliQueryResultIterator begin(void) const & noexcept {
-    return WeggliQueryResultIterator(impl, 0, num_fragments);
-  }
-
-  inline IteratorEnd end(void) const noexcept {
-    return {};
   }
 };
 

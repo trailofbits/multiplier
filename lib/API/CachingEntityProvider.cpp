@@ -115,7 +115,7 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
   return ptr;
 }
 
-WeggliQueryResultImpl::Ptr CachingEntityProvider::Query(
+gap::generator<WeggliQueryMatch> CachingEntityProvider::Query(
     const Ptr &self, const WeggliQuery &query) {
   return next->Query(self, query);
 }

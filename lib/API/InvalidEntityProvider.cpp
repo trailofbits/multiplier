@@ -39,9 +39,9 @@ FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, RawEntityId) {
   return {};
 }
 
-WeggliQueryResultImpl::Ptr InvalidEntityProvider::Query(
+gap::generator<WeggliQueryMatch> InvalidEntityProvider::Query(
     const Ptr &, const WeggliQuery &) {
-  return {};
+  co_return;
 }
 
 gap::generator<RegexQueryMatch> InvalidEntityProvider::Query(

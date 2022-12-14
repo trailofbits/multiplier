@@ -168,9 +168,9 @@ std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
 }
 
 // Run a Weggli search over this fragment.
-WeggliQueryResult Fragment::query(const WeggliQuery &query) const {
-  return WeggliQueryResult(
-      std::make_shared<WeggliQueryResultImpl>(query, impl));
+gap::generator<WeggliQueryMatch> Fragment::query(const WeggliQuery &query) const {
+  WeggliQueryResultImpl res(query, impl);
+  return res.enumerate();
 }
 
 // Run a regular expression search over this fragment.

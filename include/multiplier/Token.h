@@ -182,7 +182,7 @@ class TokenRange {
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
-  friend class WeggliQueryResultIterator;
+  friend class WeggliQueryResultImpl;
   friend class TokenList;
   friend class MacroSubstitution;
 

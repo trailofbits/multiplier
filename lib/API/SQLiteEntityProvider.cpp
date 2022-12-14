@@ -146,7 +146,7 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
   return FragmentImpl::Ptr(std::move(ret), ret_ptr);
 }
 
-std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(
+gap::generator<WeggliQueryMatch> SQLiteEntityProvider::Query(
     const Ptr &self, const WeggliQuery &query_tree) {
 
   std::map<unsigned, unsigned> eol_offset_to_line_num;
@@ -216,8 +216,8 @@ std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(
   auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it, fragment_ids.end());
 
-  return std::make_shared<WeggliQueryResultImpl>(
-      query_tree, self, std::move(fragment_ids));
+  WeggliQueryResultImpl res(query_tree, self, std::move(fragment_ids));
+  return res.enumerate();
 }
 
 gap::generator<RegexQueryMatch> SQLiteEntityProvider::Query(

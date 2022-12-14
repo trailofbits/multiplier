@@ -38,7 +38,7 @@ class InvalidEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, RawEntityId id) final;
 
-  std::shared_ptr<WeggliQueryResultImpl>
+  gap::generator<WeggliQueryMatch>
   Query(const Ptr &, const WeggliQuery &) final;
 
   gap::generator<RegexQueryMatch> Query(

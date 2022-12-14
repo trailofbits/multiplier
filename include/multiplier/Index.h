@@ -35,9 +35,6 @@ class RegexQueryMatch;
 class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
-class WeggliQueryResultIterator;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
 
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
@@ -75,7 +72,6 @@ class EntityProvider {
   friend class TokenReader;
   friend class UseIteratorImpl;
   friend class WeggliQueryResultImpl;
-  friend class WeggliQueryResultIterator;
 
  protected:
 
@@ -120,7 +116,7 @@ class EntityProvider {
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, RawEntityId id) = 0;
 
-  virtual std::shared_ptr<WeggliQueryResultImpl>
+  virtual gap::generator<WeggliQueryMatch>
   Query(const Ptr &, const WeggliQuery &query) = 0;
 
   virtual gap::generator<RegexQueryMatch>
@@ -212,7 +208,7 @@ class Index {
   // Run a Weggli search over the fragments in the index.
   //
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  WeggliQueryResult query_fragments(const WeggliQuery &query) const;
+  gap::generator<WeggliQueryMatch> query_fragments(const WeggliQuery &query) const;
 
   // Run a regular expression search over the fragments in the index.
   //

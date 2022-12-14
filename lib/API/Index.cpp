@@ -264,11 +264,13 @@ VariantEntity Index::entity(EntityId eid) const {
   return NotAnEntity{};
 }
 
-WeggliQueryResult Index::query_fragments(const WeggliQuery &query) const {
-  return WeggliQueryResult(impl->Query(impl, query));
+gap::generator<WeggliQueryMatch>
+Index::query_fragments(const WeggliQuery &query) const {
+  return impl->Query(impl, query);
 }
 
-gap::generator<RegexQueryMatch> Index::query_fragments(const RegexQuery &query) const {
+gap::generator<RegexQueryMatch>
+Index::query_fragments(const RegexQuery &query) const {
   return impl->Query(impl, query);
 }
 
