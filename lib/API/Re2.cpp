@@ -110,28 +110,6 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
       match, frag, query);
 }
 
-void RegexQueryResultIterator::Advance(void) {
-  result.reset();
-
-  while (index < num_matches) {
-
-    // We don't yet have any matches for `index`, so go compute them.
-    if (!impl->frag) {
-      if (!impl->InitForFragment(impl->fragment_ids[index])) {
-        ++index;
-        continue;
-      }
-    }
-
-    impl->GetNextMatchInFragment().swap(result);
-    if (result) {
-      return;
-    }
-
-    ++index;
-  }
-}
-
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
 RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
@@ -289,9 +267,27 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return ret;
 }
 
-RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
-    : impl(std::move(impl_)),
-      num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::enumerate(void) {
+  unsigned index = 0;
+  unsigned num_matches = fragment_ids.size();
+
+  while (index < num_matches) {
+    // We don't yet have any matches for `index`, so go compute them.
+    if (!frag) {
+      if (!InitForFragment(fragment_ids[index])) {
+        ++index;
+        continue;
+      }
+    }
+
+    GetNextMatchInFragment();
+    if (auto result = GetNextMatchInFragment()) {
+      co_yield *result;
+    }
+
+    ++index;
+  }
+}
 
 RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
   return RegexQuery(match.query);
@@ -328,7 +324,9 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
     return std::nullopt;
 }
 
-void RegexQueryResultIterator::Advance(void) {}
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::enumerate(void) {
+  co_return;
+}
 
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
@@ -385,10 +383,6 @@ size_t RegexQueryMatch::num_captures(void) const {
 std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return {};
 }
-
-RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
-    : impl(std::move(impl_)),
-      num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
 
 RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
   return RegexQuery(match.query);

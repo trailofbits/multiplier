@@ -31,10 +31,7 @@ class InvalidEntityProvider;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
-class RegexQueryResultIterator;
 class RegexQueryMatch;
-class RegexQueryResultImpl;
-class RegexQueryResult;
 class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
@@ -74,7 +71,6 @@ class EntityProvider {
   friend class PackedFragmentImpl;
   friend class Reference;
   friend class RegexQueryResultImpl;
-  friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
   friend class TokenReader;
   friend class UseIteratorImpl;
@@ -127,7 +123,7 @@ class EntityProvider {
   virtual std::shared_ptr<WeggliQueryResultImpl>
   Query(const Ptr &, const WeggliQuery &query) = 0;
 
-  virtual std::shared_ptr<RegexQueryResultImpl>
+  virtual gap::generator<RegexQueryMatch>
   Query(const Ptr &, const RegexQuery &query) = 0;
 
   // Return the redeclarations of a given declaration.
@@ -221,7 +217,7 @@ class Index {
   // Run a regular expression search over the fragments in the index.
   //
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  RegexQueryResult query_fragments(const RegexQuery &query) const;
+  gap::generator<RegexQueryMatch> query_fragments(const RegexQuery &query) const;
 
   // Search for entities by their name and category.
   NamedDeclList query_entities(std::string name,

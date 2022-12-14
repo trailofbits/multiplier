@@ -73,8 +73,6 @@ class File {
   friend class FragmentImpl;
   friend class Index;
   friend class RemoteEntityProvider;
-  friend class RegexQueryResultIterator;
-  friend class RegexQueryResultImpl;
   friend class Token;
   friend class MacroSubstitution;
 

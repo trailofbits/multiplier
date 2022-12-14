@@ -44,9 +44,9 @@ WeggliQueryResultImpl::Ptr InvalidEntityProvider::Query(
   return {};
 }
 
-RegexQueryResultImpl::Ptr InvalidEntityProvider::Query(
+gap::generator<RegexQueryMatch> InvalidEntityProvider::Query(
     const Ptr &, const RegexQuery &) {
-  return {};
+  co_return;
 }
 
 std::vector<RawEntityId> InvalidEntityProvider::Redeclarations(

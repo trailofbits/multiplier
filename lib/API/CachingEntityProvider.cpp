@@ -120,7 +120,7 @@ WeggliQueryResultImpl::Ptr CachingEntityProvider::Query(
   return next->Query(self, query);
 }
 
-RegexQueryResultImpl::Ptr CachingEntityProvider::Query(
+gap::generator<RegexQueryMatch> CachingEntityProvider::Query(
     const Ptr &self, const RegexQuery &query) {
   return next->Query(self, query);
 }

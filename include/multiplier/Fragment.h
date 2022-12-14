@@ -27,9 +27,6 @@ class InvalidEntityProvider;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
-class RegexQueryResult;
-class RegexQueryResultImpl;
-class RegexQueryResultIterator;
 class Stmt;
 class Token;
 class Type;
@@ -54,7 +51,6 @@ class Fragment {
   friend class Reference;
   friend class RemoteEntityProvider;
   friend class RegexQueryResultImpl;
-  friend class RegexQueryResultIterator;
   friend class Stmt;
   friend class Token;
   friend class MacroSubstitution;
@@ -117,7 +113,7 @@ class Fragment {
   WeggliQueryResult query(const WeggliQuery &query) const;
 
   // Run a regular expression search over this fragment.
-  RegexQueryResult query(const RegexQuery &query) const;
+  gap::generator<RegexQueryMatch> query(const RegexQuery &query) const;
 };
 
 }  // namespace mx

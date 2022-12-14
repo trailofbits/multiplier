@@ -220,7 +220,7 @@ std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(
       query_tree, self, std::move(fragment_ids));
 }
 
-std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(
+gap::generator<RegexQueryMatch> SQLiteEntityProvider::Query(
     const Ptr &self, const RegexQuery &regex) {
 
   std::map<unsigned, unsigned> offset_to_line_num;
@@ -288,8 +288,8 @@ std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(
   auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it, fragment_ids.end());
 
-  return std::make_shared<RegexQueryResultImpl>(
-      regex, self, std::move(fragment_ids));
+  RegexQueryResultImpl res(regex, self, std::move(fragment_ids));
+  return res.enumerate();
 }
 
 std::vector<RawEntityId> SQLiteEntityProvider::Redeclarations(

@@ -55,7 +55,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::RegexQuery query(FLAGS_query);
 
-  mx::RegexQueryResult results;
+  auto results = []() -> gap::generator<mx::RegexQueryMatch> { co_return; }();
 
   // Query a specific fragment.
   if (FLAGS_fragment_id) {

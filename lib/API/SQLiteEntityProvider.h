@@ -48,7 +48,7 @@ class SQLiteEntityProvider final : public EntityProvider {
   std::shared_ptr<WeggliQueryResultImpl>
   Query(const Ptr &, const WeggliQuery &) final;
 
-  std::shared_ptr<RegexQueryResultImpl> Query(
+  gap::generator<RegexQueryMatch> Query(
       const Ptr &, const RegexQuery &) final;
 
   std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;

@@ -174,8 +174,9 @@ WeggliQueryResult Fragment::query(const WeggliQuery &query) const {
 }
 
 // Run a regular expression search over this fragment.
-RegexQueryResult Fragment::query(const RegexQuery &query) const {
-  return RegexQueryResult(std::make_shared<RegexQueryResultImpl>(query, impl));
+gap::generator<RegexQueryMatch> Fragment::query(const RegexQuery &query) const {
+  RegexQueryResultImpl res(query, impl);
+  return res.enumerate();
 }
 
 }  // namespace mx
