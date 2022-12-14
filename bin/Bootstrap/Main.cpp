@@ -1832,18 +1832,14 @@ MethodListPtr CodeGenerator::RunOnClass(
         << " {\n"
         << " protected:\n"
         << FriendOf(class_os, class_name, "Attr")
-        << FriendOf(class_os, class_name, "AttrIterator")
         << FriendOf(class_os, class_name, "Decl")
-        << FriendOf(class_os, class_name, "DeclIterator")
         << FriendOf(class_os, class_name, "File")
         << FriendOf(class_os, class_name, "Fragment")
         << FriendOf(class_os, class_name, "FragmentImpl")
         << FriendOf(class_os, class_name, "Index")
         << FriendOf(class_os, class_name, "Stmt")
-        << FriendOf(class_os, class_name, "StmtIterator")
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
-        << FriendOf(class_os, class_name, "TypeIterator")
         << FriendOf(class_os, class_name, "UseBase")
         << FriendOf(class_os, class_name, "UseIteratorImpl")
         << "  template <typename> friend class UseIterator;\n\n"

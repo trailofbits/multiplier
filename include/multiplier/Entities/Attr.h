@@ -28,18 +28,14 @@ class Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Attr {
  protected:
-  friend class AttrIterator;
   friend class Decl;
-  friend class DeclIterator;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Stmt;
-  friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
-  friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
   template <typename> friend class UseIterator;
