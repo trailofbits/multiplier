@@ -30,8 +30,6 @@ namespace mx {
 class Decl;
 class NamedDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NamedDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, NamedDecl>;
-
 class NamedDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class NamedDecl : public Decl {
     return DeclKind::NAMED;
   }
 
-  static NamedDeclContainingDeclRange containing(const Decl &decl);
-  static NamedDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<NamedDecl> containing(const Decl &decl);
+  static gap::generator<NamedDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

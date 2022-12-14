@@ -30,8 +30,6 @@ class Stmt;
 class TemplateArgument;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConceptSpecializationExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ConceptSpecializationExpr>;
-
 class ConceptSpecializationExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ConceptSpecializationExpr : public Expr {
     return StmtKind::CONCEPT_SPECIALIZATION_EXPR;
   }
 
-  static ConceptSpecializationExprContainingStmtRange containing(const Decl &decl);
-  static ConceptSpecializationExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ConceptSpecializationExpr> containing(const Decl &decl);
+  static gap::generator<ConceptSpecializationExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

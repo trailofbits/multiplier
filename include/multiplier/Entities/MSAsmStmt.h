@@ -29,8 +29,6 @@ class Expr;
 class MSAsmStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSAsmStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSAsmStmt>;
-
 class MSAsmStmt : public AsmStmt {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class MSAsmStmt : public AsmStmt {
     return StmtKind::MS_ASM_STMT;
   }
 
-  static MSAsmStmtContainingStmtRange containing(const Decl &decl);
-  static MSAsmStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MSAsmStmt> containing(const Decl &decl);
+  static gap::generator<MSAsmStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

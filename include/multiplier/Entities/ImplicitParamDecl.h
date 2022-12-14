@@ -32,8 +32,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImplicitParamDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ImplicitParamDecl>;
-
 class ImplicitParamDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -70,8 +68,8 @@ class ImplicitParamDecl : public VarDecl {
     return DeclKind::IMPLICIT_PARAM;
   }
 
-  static ImplicitParamDeclContainingDeclRange containing(const Decl &decl);
-  static ImplicitParamDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ImplicitParamDecl> containing(const Decl &decl);
+  static gap::generator<ImplicitParamDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

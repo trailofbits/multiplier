@@ -30,8 +30,6 @@ class OMPLoopDirective;
 class OMPTargetParallelForSimdDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTargetParallelForSimdDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTargetParallelForSimdDirective>;
-
 class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class OMPTargetParallelForSimdDirective : public OMPLoopDirective {
     return StmtKind::OMP_TARGET_PARALLEL_FOR_SIMD_DIRECTIVE;
   }
 
-  static OMPTargetParallelForSimdDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTargetParallelForSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTargetParallelForSimdDirective> containing(const Decl &decl);
+  static gap::generator<OMPTargetParallelForSimdDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -30,8 +30,6 @@ class OpaqueValueExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArrayInitLoopExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ArrayInitLoopExpr>;
-
 class ArrayInitLoopExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ArrayInitLoopExpr : public Expr {
     return StmtKind::ARRAY_INIT_LOOP_EXPR;
   }
 
-  static ArrayInitLoopExprContainingStmtRange containing(const Decl &decl);
-  static ArrayInitLoopExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ArrayInitLoopExpr> containing(const Decl &decl);
+  static gap::generator<ArrayInitLoopExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

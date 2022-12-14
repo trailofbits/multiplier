@@ -29,8 +29,6 @@ class ExtVectorElementExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExtVectorElementExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ExtVectorElementExpr>;
-
 class ExtVectorElementExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ExtVectorElementExpr : public Expr {
     return StmtKind::EXT_VECTOR_ELEMENT_EXPR;
   }
 
-  static ExtVectorElementExprContainingStmtRange containing(const Decl &decl);
-  static ExtVectorElementExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ExtVectorElementExpr> containing(const Decl &decl);
+  static gap::generator<ExtVectorElementExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

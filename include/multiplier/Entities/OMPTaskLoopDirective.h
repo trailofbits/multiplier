@@ -30,8 +30,6 @@ class OMPLoopDirective;
 class OMPTaskLoopDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTaskLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTaskLoopDirective>;
-
 class OMPTaskLoopDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class OMPTaskLoopDirective : public OMPLoopDirective {
     return StmtKind::OMP_TASK_LOOP_DIRECTIVE;
   }
 
-  static OMPTaskLoopDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTaskLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTaskLoopDirective> containing(const Decl &decl);
+  static gap::generator<OMPTaskLoopDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -29,8 +29,6 @@ class MSGuidDecl;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSGuidDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, MSGuidDecl>;
-
 class MSGuidDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class MSGuidDecl : public ValueDecl {
     return DeclKind::MS_GUID;
   }
 
-  static MSGuidDeclContainingDeclRange containing(const Decl &decl);
-  static MSGuidDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<MSGuidDecl> containing(const Decl &decl);
+  static gap::generator<MSGuidDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

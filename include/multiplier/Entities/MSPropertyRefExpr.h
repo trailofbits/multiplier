@@ -30,8 +30,6 @@ class MSPropertyRefExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertyRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSPropertyRefExpr>;
-
 class MSPropertyRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class MSPropertyRefExpr : public Expr {
     return StmtKind::MS_PROPERTY_REF_EXPR;
   }
 
-  static MSPropertyRefExprContainingStmtRange containing(const Decl &decl);
-  static MSPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MSPropertyRefExpr> containing(const Decl &decl);
+  static gap::generator<MSPropertyRefExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

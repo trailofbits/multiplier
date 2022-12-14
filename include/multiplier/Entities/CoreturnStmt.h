@@ -28,8 +28,6 @@ class CoreturnStmt;
 class Expr;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoreturnStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoreturnStmt>;
-
 class CoreturnStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class CoreturnStmt : public Stmt {
     return StmtKind::CORETURN_STMT;
   }
 
-  static CoreturnStmtContainingStmtRange containing(const Decl &decl);
-  static CoreturnStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CoreturnStmt> containing(const Decl &decl);
+  static gap::generator<CoreturnStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

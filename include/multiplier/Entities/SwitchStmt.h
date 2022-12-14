@@ -33,8 +33,6 @@ class SwitchCase;
 class SwitchStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwitchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SwitchStmt>;
-
 class SwitchStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class SwitchStmt : public Stmt {
     return StmtKind::SWITCH_STMT;
   }
 
-  static SwitchStmtContainingStmtRange containing(const Decl &decl);
-  static SwitchStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SwitchStmt> containing(const Decl &decl);
+  static gap::generator<SwitchStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

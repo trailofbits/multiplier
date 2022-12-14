@@ -28,8 +28,6 @@ class CompoundStmt;
 class MSDependentExistsStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSDependentExistsStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSDependentExistsStmt>;
-
 class MSDependentExistsStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class MSDependentExistsStmt : public Stmt {
     return StmtKind::MS_DEPENDENT_EXISTS_STMT;
   }
 
-  static MSDependentExistsStmtContainingStmtRange containing(const Decl &decl);
-  static MSDependentExistsStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MSDependentExistsStmt> containing(const Decl &decl);
+  static gap::generator<MSDependentExistsStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

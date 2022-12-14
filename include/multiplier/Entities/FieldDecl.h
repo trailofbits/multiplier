@@ -35,8 +35,6 @@ class NamedDecl;
 class ValueDecl;
 class VariableArrayType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FieldDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, FieldDecl>;
-
 class FieldDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -72,8 +70,8 @@ class FieldDecl : public DeclaratorDecl {
     return DeclKind::FIELD;
   }
 
-  static FieldDeclContainingDeclRange containing(const Decl &decl);
-  static FieldDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<FieldDecl> containing(const Decl &decl);
+  static gap::generator<FieldDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

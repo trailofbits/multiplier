@@ -27,8 +27,6 @@ namespace mx {
 class Decl;
 class ExternCContextDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExternCContextDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ExternCContextDecl>;
-
 class ExternCContextDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class ExternCContextDecl : public Decl {
     return DeclKind::EXTERN_C_CONTEXT;
   }
 
-  static ExternCContextDeclContainingDeclRange containing(const Decl &decl);
-  static ExternCContextDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ExternCContextDecl> containing(const Decl &decl);
+  static gap::generator<ExternCContextDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

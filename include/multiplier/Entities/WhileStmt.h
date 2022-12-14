@@ -32,8 +32,6 @@ class Stmt;
 class VarDecl;
 class WhileStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WhileStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, WhileStmt>;
-
 class WhileStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class WhileStmt : public Stmt {
     return StmtKind::WHILE_STMT;
   }
 
-  static WhileStmtContainingStmtRange containing(const Decl &decl);
-  static WhileStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<WhileStmt> containing(const Decl &decl);
+  static gap::generator<WhileStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

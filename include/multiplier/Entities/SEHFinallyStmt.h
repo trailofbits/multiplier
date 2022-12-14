@@ -28,8 +28,6 @@ class CompoundStmt;
 class SEHFinallyStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHFinallyStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHFinallyStmt>;
-
 class SEHFinallyStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class SEHFinallyStmt : public Stmt {
     return StmtKind::SEH_FINALLY_STMT;
   }
 
-  static SEHFinallyStmtContainingStmtRange containing(const Decl &decl);
-  static SEHFinallyStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SEHFinallyStmt> containing(const Decl &decl);
+  static gap::generator<SEHFinallyStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

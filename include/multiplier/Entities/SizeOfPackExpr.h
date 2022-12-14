@@ -31,8 +31,6 @@ class Stmt;
 class TemplateArgument;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SizeOfPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SizeOfPackExpr>;
-
 class SizeOfPackExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class SizeOfPackExpr : public Expr {
     return StmtKind::SIZE_OF_PACK_EXPR;
   }
 
-  static SizeOfPackExprContainingStmtRange containing(const Decl &decl);
-  static SizeOfPackExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SizeOfPackExpr> containing(const Decl &decl);
+  static gap::generator<SizeOfPackExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

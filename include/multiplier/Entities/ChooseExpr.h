@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ChooseExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ChooseExpr>;
-
 class ChooseExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ChooseExpr : public Expr {
     return StmtKind::CHOOSE_EXPR;
   }
 
-  static ChooseExprContainingStmtRange containing(const Decl &decl);
-  static ChooseExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ChooseExpr> containing(const Decl &decl);
+  static gap::generator<ChooseExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

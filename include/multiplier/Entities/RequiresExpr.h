@@ -31,8 +31,6 @@ class RequiresExprBodyDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RequiresExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, RequiresExpr>;
-
 class RequiresExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class RequiresExpr : public Expr {
     return StmtKind::REQUIRES_EXPR;
   }
 
-  static RequiresExprContainingStmtRange containing(const Decl &decl);
-  static RequiresExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<RequiresExpr> containing(const Decl &decl);
+  static gap::generator<RequiresExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

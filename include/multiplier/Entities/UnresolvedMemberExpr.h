@@ -31,8 +31,6 @@ class Type;
 class UnresolvedMemberExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedMemberExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnresolvedMemberExpr>;
-
 class UnresolvedMemberExpr : public OverloadExpr {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class UnresolvedMemberExpr : public OverloadExpr {
     return StmtKind::UNRESOLVED_MEMBER_EXPR;
   }
 
-  static UnresolvedMemberExprContainingStmtRange containing(const Decl &decl);
-  static UnresolvedMemberExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<UnresolvedMemberExpr> containing(const Decl &decl);
+  static gap::generator<UnresolvedMemberExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

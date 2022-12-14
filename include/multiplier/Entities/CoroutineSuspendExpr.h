@@ -30,8 +30,6 @@ class OpaqueValueExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoroutineSuspendExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoroutineSuspendExpr>;
-
 class CoroutineSuspendExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class CoroutineSuspendExpr : public Expr {
     return false;
   }
 
-  static CoroutineSuspendExprContainingStmtRange containing(const Decl &decl);
-  static CoroutineSuspendExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CoroutineSuspendExpr> containing(const Decl &decl);
+  static gap::generator<CoroutineSuspendExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

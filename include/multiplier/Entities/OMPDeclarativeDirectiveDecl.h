@@ -27,8 +27,6 @@ namespace mx {
 class Decl;
 class OMPDeclarativeDirectiveDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPDeclarativeDirectiveDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPDeclarativeDirectiveDecl>;
-
 class OMPDeclarativeDirectiveDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -57,8 +55,8 @@ class OMPDeclarativeDirectiveDecl : public Decl {
     return false;
   }
 
-  static OMPDeclarativeDirectiveDeclContainingDeclRange containing(const Decl &decl);
-  static OMPDeclarativeDirectiveDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Decl &decl);
+  static gap::generator<OMPDeclarativeDirectiveDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

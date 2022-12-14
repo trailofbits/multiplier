@@ -28,8 +28,6 @@ namespace mx {
 class CompoundStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundStmt>;
-
 class CompoundStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class CompoundStmt : public Stmt {
     return StmtKind::COMPOUND_STMT;
   }
 
-  static CompoundStmtContainingStmtRange containing(const Decl &decl);
-  static CompoundStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CompoundStmt> containing(const Decl &decl);
+  static gap::generator<CompoundStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

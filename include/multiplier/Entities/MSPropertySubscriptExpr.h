@@ -29,8 +29,6 @@ class MSPropertySubscriptExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertySubscriptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSPropertySubscriptExpr>;
-
 class MSPropertySubscriptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class MSPropertySubscriptExpr : public Expr {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
   }
 
-  static MSPropertySubscriptExprContainingStmtRange containing(const Decl &decl);
-  static MSPropertySubscriptExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MSPropertySubscriptExpr> containing(const Decl &decl);
+  static gap::generator<MSPropertySubscriptExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

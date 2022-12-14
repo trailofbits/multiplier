@@ -29,8 +29,6 @@ class SYCLUniqueStableNameExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SYCLUniqueStableNameExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SYCLUniqueStableNameExpr>;
-
 class SYCLUniqueStableNameExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class SYCLUniqueStableNameExpr : public Expr {
     return StmtKind::SYCL_UNIQUE_STABLE_NAME_EXPR;
   }
 
-  static SYCLUniqueStableNameExprContainingStmtRange containing(const Decl &decl);
-  static SYCLUniqueStableNameExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SYCLUniqueStableNameExpr> containing(const Decl &decl);
+  static gap::generator<SYCLUniqueStableNameExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

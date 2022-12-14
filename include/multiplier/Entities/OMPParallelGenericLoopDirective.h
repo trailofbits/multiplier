@@ -30,8 +30,6 @@ class OMPLoopDirective;
 class OMPParallelGenericLoopDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPParallelGenericLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPParallelGenericLoopDirective>;
-
 class OMPParallelGenericLoopDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class OMPParallelGenericLoopDirective : public OMPLoopDirective {
     return StmtKind::OMP_PARALLEL_GENERIC_LOOP_DIRECTIVE;
   }
 
-  static OMPParallelGenericLoopDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPParallelGenericLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPParallelGenericLoopDirective> containing(const Decl &decl);
+  static gap::generator<OMPParallelGenericLoopDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

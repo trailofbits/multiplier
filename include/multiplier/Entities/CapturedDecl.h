@@ -28,8 +28,6 @@ class CapturedDecl;
 class Decl;
 class ImplicitParamDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CapturedDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CapturedDecl>;
-
 class CapturedDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class CapturedDecl : public Decl {
     return DeclKind::CAPTURED;
   }
 
-  static CapturedDeclContainingDeclRange containing(const Decl &decl);
-  static CapturedDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<CapturedDecl> containing(const Decl &decl);
+  static gap::generator<CapturedDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

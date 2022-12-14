@@ -29,8 +29,6 @@ class Expr;
 class SEHExceptStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHExceptStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHExceptStmt>;
-
 class SEHExceptStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class SEHExceptStmt : public Stmt {
     return StmtKind::SEH_EXCEPT_STMT;
   }
 
-  static SEHExceptStmtContainingStmtRange containing(const Decl &decl);
-  static SEHExceptStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SEHExceptStmt> containing(const Decl &decl);
+  static gap::generator<SEHExceptStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

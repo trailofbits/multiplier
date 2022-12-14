@@ -29,8 +29,6 @@ class MatrixSubscriptExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MatrixSubscriptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MatrixSubscriptExpr>;
-
 class MatrixSubscriptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class MatrixSubscriptExpr : public Expr {
     return StmtKind::MATRIX_SUBSCRIPT_EXPR;
   }
 
-  static MatrixSubscriptExprContainingStmtRange containing(const Decl &decl);
-  static MatrixSubscriptExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MatrixSubscriptExpr> containing(const Decl &decl);
+  static gap::generator<MatrixSubscriptExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

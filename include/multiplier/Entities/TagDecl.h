@@ -33,8 +33,6 @@ class TemplateParameterList;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TagDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TagDecl>;
-
 class TagDecl : public TypeDecl {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class TagDecl : public TypeDecl {
     return DeclKind::TAG;
   }
 
-  static TagDeclContainingDeclRange containing(const Decl &decl);
-  static TagDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<TagDecl> containing(const Decl &decl);
+  static gap::generator<TagDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

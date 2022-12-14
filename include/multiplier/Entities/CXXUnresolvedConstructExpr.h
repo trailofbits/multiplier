@@ -30,8 +30,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXUnresolvedConstructExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXUnresolvedConstructExpr>;
-
 class CXXUnresolvedConstructExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class CXXUnresolvedConstructExpr : public Expr {
     return StmtKind::CXX_UNRESOLVED_CONSTRUCT_EXPR;
   }
 
-  static CXXUnresolvedConstructExprContainingStmtRange containing(const Decl &decl);
-  static CXXUnresolvedConstructExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXUnresolvedConstructExpr> containing(const Decl &decl);
+  static gap::generator<CXXUnresolvedConstructExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

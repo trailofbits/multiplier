@@ -35,8 +35,6 @@ class ParmVarDecl;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXMethodDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXMethodDecl>;
-
 class CXXMethodDecl : public FunctionDecl {
  private:
   friend class FragmentImpl;
@@ -73,8 +71,8 @@ class CXXMethodDecl : public FunctionDecl {
     return DeclKind::CXX_METHOD;
   }
 
-  static CXXMethodDeclContainingDeclRange containing(const Decl &decl);
-  static CXXMethodDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<CXXMethodDecl> containing(const Decl &decl);
+  static gap::generator<CXXMethodDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

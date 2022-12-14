@@ -29,8 +29,6 @@ class ObjCBoolLiteralExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCBoolLiteralExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCBoolLiteralExpr>;
-
 class ObjCBoolLiteralExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ObjCBoolLiteralExpr : public Expr {
     return StmtKind::OBJ_C_BOOL_LITERAL_EXPR;
   }
 
-  static ObjCBoolLiteralExprContainingStmtRange containing(const Decl &decl);
-  static ObjCBoolLiteralExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCBoolLiteralExpr> containing(const Decl &decl);
+  static gap::generator<ObjCBoolLiteralExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

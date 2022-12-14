@@ -29,8 +29,6 @@ class AttributedStmt;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AttributedStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AttributedStmt>;
-
 class AttributedStmt : public ValueStmt {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class AttributedStmt : public ValueStmt {
     return StmtKind::ATTRIBUTED_STMT;
   }
 
-  static AttributedStmtContainingStmtRange containing(const Decl &decl);
-  static AttributedStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<AttributedStmt> containing(const Decl &decl);
+  static gap::generator<AttributedStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

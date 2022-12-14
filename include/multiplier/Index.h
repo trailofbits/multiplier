@@ -46,26 +46,9 @@ using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
 using TypeUse = Use<TypeUseSelector>;
 
-using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
-using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
-
 using FilePathList = std::set<std::pair<std::filesystem::path, RawEntityId>>;
 
 using NamedDeclList = std::vector<NamedDecl>;
-
-template <typename T>
-inline ParentDeclIteratorImpl<T> &
-ParentDeclIteratorImpl<T>::operator++(void) & {
-  impl = impl->parent_declaration();
-  return *this;
-}
-
-template <typename T>
-inline ParentStmtIteratorImpl<T> &
-ParentStmtIteratorImpl<T>::operator++(void) & {
-  impl = impl->parent_statement();
-  return *this;
-}
 
 // Provides the APIs with entities.
 class EntityProvider {

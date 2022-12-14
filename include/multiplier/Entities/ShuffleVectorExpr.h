@@ -29,8 +29,6 @@ class ShuffleVectorExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ShuffleVectorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ShuffleVectorExpr>;
-
 class ShuffleVectorExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ShuffleVectorExpr : public Expr {
     return StmtKind::SHUFFLE_VECTOR_EXPR;
   }
 
-  static ShuffleVectorExprContainingStmtRange containing(const Decl &decl);
-  static ShuffleVectorExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ShuffleVectorExpr> containing(const Decl &decl);
+  static gap::generator<ShuffleVectorExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

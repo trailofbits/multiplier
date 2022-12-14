@@ -29,8 +29,6 @@ class OMPArrayShapingExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPArrayShapingExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPArrayShapingExpr>;
-
 class OMPArrayShapingExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class OMPArrayShapingExpr : public Expr {
     return StmtKind::OMP_ARRAY_SHAPING_EXPR;
   }
 
-  static OMPArrayShapingExprContainingStmtRange containing(const Decl &decl);
-  static OMPArrayShapingExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPArrayShapingExpr> containing(const Decl &decl);
+  static gap::generator<OMPArrayShapingExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

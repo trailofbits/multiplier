@@ -29,8 +29,6 @@ class Stmt;
 class TypoExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypoExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, TypoExpr>;
-
 class TypoExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class TypoExpr : public Expr {
     return StmtKind::TYPO_EXPR;
   }
 
-  static TypoExprContainingStmtRange containing(const Decl &decl);
-  static TypoExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<TypoExpr> containing(const Decl &decl);
+  static gap::generator<TypoExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

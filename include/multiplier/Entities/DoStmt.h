@@ -28,8 +28,6 @@ class DoStmt;
 class Expr;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DoStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DoStmt>;
-
 class DoStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class DoStmt : public Stmt {
     return StmtKind::DO_STMT;
   }
 
-  static DoStmtContainingStmtRange containing(const Decl &decl);
-  static DoStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<DoStmt> containing(const Decl &decl);
+  static gap::generator<DoStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

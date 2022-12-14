@@ -30,8 +30,6 @@ class Expr;
 class NamedDecl;
 class TemplateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConceptDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ConceptDecl>;
-
 class ConceptDecl : public TemplateDecl {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ConceptDecl : public TemplateDecl {
     return DeclKind::CONCEPT;
   }
 
-  static ConceptDeclContainingDeclRange containing(const Decl &decl);
-  static ConceptDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ConceptDecl> containing(const Decl &decl);
+  static gap::generator<ConceptDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

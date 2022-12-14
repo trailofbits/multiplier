@@ -30,8 +30,6 @@ class Stmt;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentCoawaitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DependentCoawaitExpr>;
-
 class DependentCoawaitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class DependentCoawaitExpr : public Expr {
     return StmtKind::DEPENDENT_COAWAIT_EXPR;
   }
 
-  static DependentCoawaitExprContainingStmtRange containing(const Decl &decl);
-  static DependentCoawaitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<DependentCoawaitExpr> containing(const Decl &decl);
+  static gap::generator<DependentCoawaitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

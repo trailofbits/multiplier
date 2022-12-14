@@ -30,8 +30,6 @@ class CapturedStmt;
 class RecordDecl;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CapturedStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CapturedStmt>;
-
 class CapturedStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class CapturedStmt : public Stmt {
     return StmtKind::CAPTURED_STMT;
   }
 
-  static CapturedStmtContainingStmtRange containing(const Decl &decl);
-  static CapturedStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CapturedStmt> containing(const Decl &decl);
+  static gap::generator<CapturedStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

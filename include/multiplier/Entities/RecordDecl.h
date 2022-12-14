@@ -32,8 +32,6 @@ class RecordDecl;
 class TagDecl;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RecordDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, RecordDecl>;
-
 class RecordDecl : public TagDecl {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class RecordDecl : public TagDecl {
     return DeclKind::RECORD;
   }
 
-  static RecordDeclContainingDeclRange containing(const Decl &decl);
-  static RecordDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<RecordDecl> containing(const Decl &decl);
+  static gap::generator<RecordDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

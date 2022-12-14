@@ -29,8 +29,6 @@ class ObjCIndirectCopyRestoreExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIndirectCopyRestoreExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCIndirectCopyRestoreExpr>;
-
 class ObjCIndirectCopyRestoreExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ObjCIndirectCopyRestoreExpr : public Expr {
     return StmtKind::OBJ_C_INDIRECT_COPY_RESTORE_EXPR;
   }
 
-  static ObjCIndirectCopyRestoreExprContainingStmtRange containing(const Decl &decl);
-  static ObjCIndirectCopyRestoreExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Decl &decl);
+  static gap::generator<ObjCIndirectCopyRestoreExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

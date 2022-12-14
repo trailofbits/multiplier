@@ -29,8 +29,6 @@ class OpaqueValueExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpaqueValueExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OpaqueValueExpr>;
-
 class OpaqueValueExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class OpaqueValueExpr : public Expr {
     return StmtKind::OPAQUE_VALUE_EXPR;
   }
 
-  static OpaqueValueExprContainingStmtRange containing(const Decl &decl);
-  static OpaqueValueExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OpaqueValueExpr> containing(const Decl &decl);
+  static gap::generator<OpaqueValueExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -21331,12 +21331,20 @@ std::optional<Decl> Stmt::referenced_declaration(void) const {
   }
 }
 
-StmtContainingStmtRange Stmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<Stmt> Stmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-StmtContainingStmtRange Stmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<Stmt> Stmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool Stmt::contains(const Decl &decl) {
@@ -21389,12 +21397,20 @@ Stmt Stmt::strip_label_like_statements(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-SEHTryStmtContainingStmtRange SEHTryStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SEHTryStmt> SEHTryStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SEHTryStmtContainingStmtRange SEHTryStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SEHTryStmt> SEHTryStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SEHTryStmt::contains(const Decl &decl) {
@@ -21461,12 +21477,20 @@ Token SEHTryStmt::try_token(void) const {
   }
 }
 
-SEHLeaveStmtContainingStmtRange SEHLeaveStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SEHLeaveStmt> SEHLeaveStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SEHLeaveStmtContainingStmtRange SEHLeaveStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SEHLeaveStmt> SEHLeaveStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SEHLeaveStmt::contains(const Decl &decl) {
@@ -21504,12 +21528,20 @@ Token SEHLeaveStmt::leave_token(void) const {
   }
 }
 
-SEHFinallyStmtContainingStmtRange SEHFinallyStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SEHFinallyStmt> SEHFinallyStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SEHFinallyStmtContainingStmtRange SEHFinallyStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SEHFinallyStmt> SEHFinallyStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SEHFinallyStmt::contains(const Decl &decl) {
@@ -21553,12 +21585,20 @@ Token SEHFinallyStmt::finally_token(void) const {
   }
 }
 
-SEHExceptStmtContainingStmtRange SEHExceptStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SEHExceptStmt> SEHExceptStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SEHExceptStmtContainingStmtRange SEHExceptStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SEHExceptStmt> SEHExceptStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SEHExceptStmt::contains(const Decl &decl) {
@@ -21608,12 +21648,20 @@ Expr SEHExceptStmt::filter_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ReturnStmtContainingStmtRange ReturnStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ReturnStmt> ReturnStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ReturnStmtContainingStmtRange ReturnStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ReturnStmt> ReturnStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ReturnStmt::contains(const Decl &decl) {
@@ -21671,12 +21719,20 @@ Token ReturnStmt::return_token(void) const {
   }
 }
 
-ObjCForCollectionStmtContainingStmtRange ObjCForCollectionStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCForCollectionStmtContainingStmtRange ObjCForCollectionStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCForCollectionStmt::contains(const Decl &decl) {
@@ -21741,12 +21797,20 @@ Token ObjCForCollectionStmt::r_paren_token(void) const {
   }
 }
 
-ObjCAutoreleasePoolStmtContainingStmtRange ObjCAutoreleasePoolStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAutoreleasePoolStmtContainingStmtRange ObjCAutoreleasePoolStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAutoreleasePoolStmt::contains(const Decl &decl) {
@@ -21790,12 +21854,20 @@ Stmt ObjCAutoreleasePoolStmt::sub_statement(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-ObjCAtTryStmtContainingStmtRange ObjCAtTryStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAtTryStmtContainingStmtRange ObjCAtTryStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAtTryStmt::contains(const Decl &decl) {
@@ -21861,12 +21933,20 @@ std::vector<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const {
   return vec;
 }
 
-ObjCAtThrowStmtContainingStmtRange ObjCAtThrowStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAtThrowStmtContainingStmtRange ObjCAtThrowStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAtThrowStmt::contains(const Decl &decl) {
@@ -21910,12 +21990,20 @@ Token ObjCAtThrowStmt::throw_token(void) const {
   }
 }
 
-ObjCAtSynchronizedStmtContainingStmtRange ObjCAtSynchronizedStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAtSynchronizedStmtContainingStmtRange ObjCAtSynchronizedStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAtSynchronizedStmt::contains(const Decl &decl) {
@@ -21965,12 +22053,20 @@ Expr ObjCAtSynchronizedStmt::synch_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ObjCAtFinallyStmtContainingStmtRange ObjCAtFinallyStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAtFinallyStmtContainingStmtRange ObjCAtFinallyStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAtFinallyStmt::contains(const Decl &decl) {
@@ -22014,12 +22110,20 @@ Stmt ObjCAtFinallyStmt::finally_body(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-ObjCAtCatchStmtContainingStmtRange ObjCAtCatchStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAtCatchStmtContainingStmtRange ObjCAtCatchStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAtCatchStmt::contains(const Decl &decl) {
@@ -22083,12 +22187,20 @@ bool ObjCAtCatchStmt::has_ellipsis(void) const {
   return self.getVal12();
 }
 
-OMPExecutableDirectiveContainingStmtRange OMPExecutableDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPExecutableDirective> OMPExecutableDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPExecutableDirectiveContainingStmtRange OMPExecutableDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPExecutableDirective> OMPExecutableDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPExecutableDirective::contains(const Decl &decl) {
@@ -22220,12 +22332,20 @@ bool OMPExecutableDirective::is_standalone_directive(void) const {
   return self.getVal15();
 }
 
-OMPDispatchDirectiveContainingStmtRange OMPDispatchDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPDispatchDirective> OMPDispatchDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDispatchDirectiveContainingStmtRange OMPDispatchDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPDispatchDirective> OMPDispatchDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDispatchDirective::contains(const Decl &decl) {
@@ -22267,12 +22387,20 @@ Token OMPDispatchDirective::target_call_token(void) const {
   }
 }
 
-OMPDepobjDirectiveContainingStmtRange OMPDepobjDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPDepobjDirective> OMPDepobjDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDepobjDirectiveContainingStmtRange OMPDepobjDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPDepobjDirective> OMPDepobjDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDepobjDirective::contains(const Decl &decl) {
@@ -22305,12 +22433,20 @@ std::optional<OMPDepobjDirective> OMPDepobjDirective::from(const Stmt &parent) {
   }
 }
 
-OMPCriticalDirectiveContainingStmtRange OMPCriticalDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPCriticalDirective> OMPCriticalDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPCriticalDirectiveContainingStmtRange OMPCriticalDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPCriticalDirective> OMPCriticalDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPCriticalDirective::contains(const Decl &decl) {
@@ -22343,12 +22479,20 @@ std::optional<OMPCriticalDirective> OMPCriticalDirective::from(const Stmt &paren
   }
 }
 
-OMPCancellationPointDirectiveContainingStmtRange OMPCancellationPointDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPCancellationPointDirective> OMPCancellationPointDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPCancellationPointDirectiveContainingStmtRange OMPCancellationPointDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPCancellationPointDirective> OMPCancellationPointDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPCancellationPointDirective::contains(const Decl &decl) {
@@ -22381,12 +22525,20 @@ std::optional<OMPCancellationPointDirective> OMPCancellationPointDirective::from
   }
 }
 
-OMPCancelDirectiveContainingStmtRange OMPCancelDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPCancelDirective> OMPCancelDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPCancelDirectiveContainingStmtRange OMPCancelDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPCancelDirective> OMPCancelDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPCancelDirective::contains(const Decl &decl) {
@@ -22419,12 +22571,20 @@ std::optional<OMPCancelDirective> OMPCancelDirective::from(const Stmt &parent) {
   }
 }
 
-OMPBarrierDirectiveContainingStmtRange OMPBarrierDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPBarrierDirective> OMPBarrierDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPBarrierDirectiveContainingStmtRange OMPBarrierDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPBarrierDirective> OMPBarrierDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPBarrierDirective::contains(const Decl &decl) {
@@ -22457,12 +22617,20 @@ std::optional<OMPBarrierDirective> OMPBarrierDirective::from(const Stmt &parent)
   }
 }
 
-OMPAtomicDirectiveContainingStmtRange OMPAtomicDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPAtomicDirective> OMPAtomicDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPAtomicDirectiveContainingStmtRange OMPAtomicDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPAtomicDirective> OMPAtomicDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPAtomicDirective::contains(const Decl &decl) {
@@ -22552,12 +22720,20 @@ bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const {
   return self.getVal25();
 }
 
-OMPTeamsDirectiveContainingStmtRange OMPTeamsDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTeamsDirective> OMPTeamsDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTeamsDirectiveContainingStmtRange OMPTeamsDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTeamsDirective> OMPTeamsDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTeamsDirective::contains(const Decl &decl) {
@@ -22590,12 +22766,20 @@ std::optional<OMPTeamsDirective> OMPTeamsDirective::from(const Stmt &parent) {
   }
 }
 
-OMPTaskyieldDirectiveContainingStmtRange OMPTaskyieldDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTaskyieldDirective> OMPTaskyieldDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTaskyieldDirectiveContainingStmtRange OMPTaskyieldDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTaskyieldDirective> OMPTaskyieldDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTaskyieldDirective::contains(const Decl &decl) {
@@ -22628,12 +22812,20 @@ std::optional<OMPTaskyieldDirective> OMPTaskyieldDirective::from(const Stmt &par
   }
 }
 
-OMPTaskwaitDirectiveContainingStmtRange OMPTaskwaitDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTaskwaitDirectiveContainingStmtRange OMPTaskwaitDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTaskwaitDirective> OMPTaskwaitDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTaskwaitDirective::contains(const Decl &decl) {
@@ -22666,12 +22858,20 @@ std::optional<OMPTaskwaitDirective> OMPTaskwaitDirective::from(const Stmt &paren
   }
 }
 
-OMPTaskgroupDirectiveContainingStmtRange OMPTaskgroupDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTaskgroupDirective> OMPTaskgroupDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTaskgroupDirectiveContainingStmtRange OMPTaskgroupDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTaskgroupDirective> OMPTaskgroupDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTaskgroupDirective::contains(const Decl &decl) {
@@ -22710,12 +22910,20 @@ Expr OMPTaskgroupDirective::reduction_reference(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-OMPTaskDirectiveContainingStmtRange OMPTaskDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTaskDirective> OMPTaskDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTaskDirectiveContainingStmtRange OMPTaskDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTaskDirective> OMPTaskDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTaskDirective::contains(const Decl &decl) {
@@ -22753,12 +22961,20 @@ bool OMPTaskDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPTargetUpdateDirectiveContainingStmtRange OMPTargetUpdateDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetUpdateDirective> OMPTargetUpdateDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetUpdateDirectiveContainingStmtRange OMPTargetUpdateDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetUpdateDirective> OMPTargetUpdateDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetUpdateDirective::contains(const Decl &decl) {
@@ -22791,12 +23007,20 @@ std::optional<OMPTargetUpdateDirective> OMPTargetUpdateDirective::from(const Stm
   }
 }
 
-OMPTargetTeamsDirectiveContainingStmtRange OMPTargetTeamsDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetTeamsDirective> OMPTargetTeamsDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetTeamsDirectiveContainingStmtRange OMPTargetTeamsDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetTeamsDirective> OMPTargetTeamsDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetTeamsDirective::contains(const Decl &decl) {
@@ -22829,12 +23053,20 @@ std::optional<OMPTargetTeamsDirective> OMPTargetTeamsDirective::from(const Stmt 
   }
 }
 
-OMPTargetParallelDirectiveContainingStmtRange OMPTargetParallelDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetParallelDirective> OMPTargetParallelDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetParallelDirectiveContainingStmtRange OMPTargetParallelDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetParallelDirective> OMPTargetParallelDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetParallelDirective::contains(const Decl &decl) {
@@ -22878,12 +23110,20 @@ bool OMPTargetParallelDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPTargetExitDataDirectiveContainingStmtRange OMPTargetExitDataDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetExitDataDirective> OMPTargetExitDataDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetExitDataDirectiveContainingStmtRange OMPTargetExitDataDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetExitDataDirective> OMPTargetExitDataDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetExitDataDirective::contains(const Decl &decl) {
@@ -22916,12 +23156,20 @@ std::optional<OMPTargetExitDataDirective> OMPTargetExitDataDirective::from(const
   }
 }
 
-OMPTargetEnterDataDirectiveContainingStmtRange OMPTargetEnterDataDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetEnterDataDirectiveContainingStmtRange OMPTargetEnterDataDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetEnterDataDirective::contains(const Decl &decl) {
@@ -22954,12 +23202,20 @@ std::optional<OMPTargetEnterDataDirective> OMPTargetEnterDataDirective::from(con
   }
 }
 
-OMPTargetDirectiveContainingStmtRange OMPTargetDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetDirective> OMPTargetDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetDirectiveContainingStmtRange OMPTargetDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetDirective> OMPTargetDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetDirective::contains(const Decl &decl) {
@@ -22992,12 +23248,20 @@ std::optional<OMPTargetDirective> OMPTargetDirective::from(const Stmt &parent) {
   }
 }
 
-OMPTargetDataDirectiveContainingStmtRange OMPTargetDataDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetDataDirectiveContainingStmtRange OMPTargetDataDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetDataDirective> OMPTargetDataDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetDataDirective::contains(const Decl &decl) {
@@ -23030,12 +23294,20 @@ std::optional<OMPTargetDataDirective> OMPTargetDataDirective::from(const Stmt &p
   }
 }
 
-OMPSingleDirectiveContainingStmtRange OMPSingleDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPSingleDirective> OMPSingleDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPSingleDirectiveContainingStmtRange OMPSingleDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPSingleDirective> OMPSingleDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPSingleDirective::contains(const Decl &decl) {
@@ -23068,12 +23340,20 @@ std::optional<OMPSingleDirective> OMPSingleDirective::from(const Stmt &parent) {
   }
 }
 
-OMPSectionsDirectiveContainingStmtRange OMPSectionsDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPSectionsDirective> OMPSectionsDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPSectionsDirectiveContainingStmtRange OMPSectionsDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPSectionsDirective> OMPSectionsDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPSectionsDirective::contains(const Decl &decl) {
@@ -23117,12 +23397,20 @@ bool OMPSectionsDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPSectionDirectiveContainingStmtRange OMPSectionDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPSectionDirective> OMPSectionDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPSectionDirectiveContainingStmtRange OMPSectionDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPSectionDirective> OMPSectionDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPSectionDirective::contains(const Decl &decl) {
@@ -23160,12 +23448,20 @@ bool OMPSectionDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPScanDirectiveContainingStmtRange OMPScanDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPScanDirective> OMPScanDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPScanDirectiveContainingStmtRange OMPScanDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPScanDirective> OMPScanDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPScanDirective::contains(const Decl &decl) {
@@ -23198,12 +23494,20 @@ std::optional<OMPScanDirective> OMPScanDirective::from(const Stmt &parent) {
   }
 }
 
-OMPParallelSectionsDirectiveContainingStmtRange OMPParallelSectionsDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelSectionsDirectiveContainingStmtRange OMPParallelSectionsDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelSectionsDirective> OMPParallelSectionsDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelSectionsDirective::contains(const Decl &decl) {
@@ -23247,12 +23551,20 @@ bool OMPParallelSectionsDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPParallelMasterDirectiveContainingStmtRange OMPParallelMasterDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelMasterDirective> OMPParallelMasterDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelMasterDirectiveContainingStmtRange OMPParallelMasterDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelMasterDirective> OMPParallelMasterDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelMasterDirective::contains(const Decl &decl) {
@@ -23291,12 +23603,20 @@ Expr OMPParallelMasterDirective::task_reduction_reference_expression(void) const
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-OMPParallelMaskedDirectiveContainingStmtRange OMPParallelMaskedDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelMaskedDirective> OMPParallelMaskedDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelMaskedDirectiveContainingStmtRange OMPParallelMaskedDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelMaskedDirective> OMPParallelMaskedDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelMaskedDirective::contains(const Decl &decl) {
@@ -23335,12 +23655,20 @@ Expr OMPParallelMaskedDirective::task_reduction_reference_expression(void) const
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-OMPParallelDirectiveContainingStmtRange OMPParallelDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelDirective> OMPParallelDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelDirectiveContainingStmtRange OMPParallelDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelDirective> OMPParallelDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelDirective::contains(const Decl &decl) {
@@ -23384,12 +23712,20 @@ bool OMPParallelDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPOrderedDirectiveContainingStmtRange OMPOrderedDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPOrderedDirective> OMPOrderedDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPOrderedDirectiveContainingStmtRange OMPOrderedDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPOrderedDirective> OMPOrderedDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPOrderedDirective::contains(const Decl &decl) {
@@ -23422,12 +23758,20 @@ std::optional<OMPOrderedDirective> OMPOrderedDirective::from(const Stmt &parent)
   }
 }
 
-OMPMetaDirectiveContainingStmtRange OMPMetaDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMetaDirective> OMPMetaDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMetaDirectiveContainingStmtRange OMPMetaDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMetaDirective> OMPMetaDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMetaDirective::contains(const Decl &decl) {
@@ -23466,12 +23810,20 @@ Stmt OMPMetaDirective::if_statement(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-OMPMasterDirectiveContainingStmtRange OMPMasterDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMasterDirective> OMPMasterDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMasterDirectiveContainingStmtRange OMPMasterDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMasterDirective> OMPMasterDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMasterDirective::contains(const Decl &decl) {
@@ -23504,12 +23856,20 @@ std::optional<OMPMasterDirective> OMPMasterDirective::from(const Stmt &parent) {
   }
 }
 
-OMPMaskedDirectiveContainingStmtRange OMPMaskedDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMaskedDirective> OMPMaskedDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMaskedDirectiveContainingStmtRange OMPMaskedDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMaskedDirective> OMPMaskedDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMaskedDirective::contains(const Decl &decl) {
@@ -23542,12 +23902,20 @@ std::optional<OMPMaskedDirective> OMPMaskedDirective::from(const Stmt &parent) {
   }
 }
 
-OMPLoopBasedDirectiveContainingStmtRange OMPLoopBasedDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPLoopBasedDirective> OMPLoopBasedDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPLoopBasedDirectiveContainingStmtRange OMPLoopBasedDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPLoopBasedDirective> OMPLoopBasedDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPLoopBasedDirective::contains(const Decl &decl) {
@@ -23616,12 +23984,20 @@ std::optional<OMPLoopBasedDirective> OMPLoopBasedDirective::from(const Stmt &par
   }
 }
 
-OMPLoopTransformationDirectiveContainingStmtRange OMPLoopTransformationDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPLoopTransformationDirectiveContainingStmtRange OMPLoopTransformationDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPLoopTransformationDirective> OMPLoopTransformationDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPLoopTransformationDirective::contains(const Decl &decl) {
@@ -23671,12 +24047,20 @@ Stmt OMPLoopTransformationDirective::transformed_statement(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-OMPUnrollDirectiveContainingStmtRange OMPUnrollDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPUnrollDirective> OMPUnrollDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPUnrollDirectiveContainingStmtRange OMPUnrollDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPUnrollDirective> OMPUnrollDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPUnrollDirective::contains(const Decl &decl) {
@@ -23717,12 +24101,20 @@ std::optional<OMPUnrollDirective> OMPUnrollDirective::from(const Stmt &parent) {
   }
 }
 
-OMPTileDirectiveContainingStmtRange OMPTileDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTileDirective> OMPTileDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTileDirectiveContainingStmtRange OMPTileDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTileDirective> OMPTileDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTileDirective::contains(const Decl &decl) {
@@ -23763,12 +24155,20 @@ std::optional<OMPTileDirective> OMPTileDirective::from(const Stmt &parent) {
   }
 }
 
-OMPLoopDirectiveContainingStmtRange OMPLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPLoopDirective> OMPLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPLoopDirectiveContainingStmtRange OMPLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPLoopDirective> OMPLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPLoopDirective::contains(const Decl &decl) {
@@ -24147,12 +24547,20 @@ std::vector<Expr> OMPLoopDirective::updates(void) const {
   return vec;
 }
 
-OMPGenericLoopDirectiveContainingStmtRange OMPGenericLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPGenericLoopDirective> OMPGenericLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPGenericLoopDirectiveContainingStmtRange OMPGenericLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPGenericLoopDirective> OMPGenericLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPGenericLoopDirective::contains(const Decl &decl) {
@@ -24193,12 +24601,20 @@ std::optional<OMPGenericLoopDirective> OMPGenericLoopDirective::from(const Stmt 
   }
 }
 
-OMPForSimdDirectiveContainingStmtRange OMPForSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPForSimdDirectiveContainingStmtRange OMPForSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPForSimdDirective> OMPForSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPForSimdDirective::contains(const Decl &decl) {
@@ -24239,12 +24655,20 @@ std::optional<OMPForSimdDirective> OMPForSimdDirective::from(const Stmt &parent)
   }
 }
 
-OMPForDirectiveContainingStmtRange OMPForDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPForDirective> OMPForDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPForDirectiveContainingStmtRange OMPForDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPForDirective> OMPForDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPForDirective::contains(const Decl &decl) {
@@ -24296,12 +24720,20 @@ bool OMPForDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPDistributeSimdDirectiveContainingStmtRange OMPDistributeSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDistributeSimdDirectiveContainingStmtRange OMPDistributeSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDistributeSimdDirective::contains(const Decl &decl) {
@@ -24342,12 +24774,20 @@ std::optional<OMPDistributeSimdDirective> OMPDistributeSimdDirective::from(const
   }
 }
 
-OMPDistributeParallelForSimdDirectiveContainingStmtRange OMPDistributeParallelForSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDistributeParallelForSimdDirectiveContainingStmtRange OMPDistributeParallelForSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDistributeParallelForSimdDirective::contains(const Decl &decl) {
@@ -24388,12 +24828,20 @@ std::optional<OMPDistributeParallelForSimdDirective> OMPDistributeParallelForSim
   }
 }
 
-OMPDistributeParallelForDirectiveContainingStmtRange OMPDistributeParallelForDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDistributeParallelForDirectiveContainingStmtRange OMPDistributeParallelForDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPDistributeParallelForDirective> OMPDistributeParallelForDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDistributeParallelForDirective::contains(const Decl &decl) {
@@ -24445,12 +24893,20 @@ bool OMPDistributeParallelForDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPDistributeDirectiveContainingStmtRange OMPDistributeDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPDistributeDirective> OMPDistributeDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDistributeDirectiveContainingStmtRange OMPDistributeDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPDistributeDirective> OMPDistributeDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDistributeDirective::contains(const Decl &decl) {
@@ -24491,12 +24947,20 @@ std::optional<OMPDistributeDirective> OMPDistributeDirective::from(const Stmt &p
   }
 }
 
-OMPTeamsGenericLoopDirectiveContainingStmtRange OMPTeamsGenericLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTeamsGenericLoopDirectiveContainingStmtRange OMPTeamsGenericLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTeamsGenericLoopDirective::contains(const Decl &decl) {
@@ -24537,12 +25001,20 @@ std::optional<OMPTeamsGenericLoopDirective> OMPTeamsGenericLoopDirective::from(c
   }
 }
 
-OMPTeamsDistributeSimdDirectiveContainingStmtRange OMPTeamsDistributeSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTeamsDistributeSimdDirectiveContainingStmtRange OMPTeamsDistributeSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTeamsDistributeSimdDirective::contains(const Decl &decl) {
@@ -24583,12 +25055,20 @@ std::optional<OMPTeamsDistributeSimdDirective> OMPTeamsDistributeSimdDirective::
   }
 }
 
-OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTeamsDistributeParallelForSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTeamsDistributeParallelForSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributeParallelForSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
@@ -24629,12 +25109,20 @@ std::optional<OMPTeamsDistributeParallelForSimdDirective> OMPTeamsDistributePara
   }
 }
 
-OMPTeamsDistributeParallelForDirectiveContainingStmtRange OMPTeamsDistributeParallelForDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTeamsDistributeParallelForDirectiveContainingStmtRange OMPTeamsDistributeParallelForDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallelForDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTeamsDistributeParallelForDirective::contains(const Decl &decl) {
@@ -24686,12 +25174,20 @@ bool OMPTeamsDistributeParallelForDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPTeamsDistributeDirectiveContainingStmtRange OMPTeamsDistributeDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTeamsDistributeDirectiveContainingStmtRange OMPTeamsDistributeDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTeamsDistributeDirective::contains(const Decl &decl) {
@@ -24732,12 +25228,20 @@ std::optional<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::from(con
   }
 }
 
-OMPTaskLoopSimdDirectiveContainingStmtRange OMPTaskLoopSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTaskLoopSimdDirectiveContainingStmtRange OMPTaskLoopSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTaskLoopSimdDirective::contains(const Decl &decl) {
@@ -24778,12 +25282,20 @@ std::optional<OMPTaskLoopSimdDirective> OMPTaskLoopSimdDirective::from(const Stm
   }
 }
 
-OMPTaskLoopDirectiveContainingStmtRange OMPTaskLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTaskLoopDirectiveContainingStmtRange OMPTaskLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTaskLoopDirective> OMPTaskLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTaskLoopDirective::contains(const Decl &decl) {
@@ -24829,12 +25341,20 @@ bool OMPTaskLoopDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPTargetTeamsGenericLoopDirectiveContainingStmtRange OMPTargetTeamsGenericLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetTeamsGenericLoopDirectiveContainingStmtRange OMPTargetTeamsGenericLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetTeamsGenericLoopDirective::contains(const Decl &decl) {
@@ -24875,12 +25395,20 @@ std::optional<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirec
   }
 }
 
-OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange OMPTargetTeamsDistributeSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange OMPTargetTeamsDistributeSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetTeamsDistributeSimdDirective::contains(const Decl &decl) {
@@ -24921,12 +25449,20 @@ std::optional<OMPTargetTeamsDistributeSimdDirective> OMPTargetTeamsDistributeSim
   }
 }
 
-OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTargetTeamsDistributeParallelForSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTargetTeamsDistributeParallelForSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDistributeParallelForSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
@@ -24967,12 +25503,20 @@ std::optional<OMPTargetTeamsDistributeParallelForSimdDirective> OMPTargetTeamsDi
   }
 }
 
-OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange OMPTargetTeamsDistributeParallelForDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange OMPTargetTeamsDistributeParallelForDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistributeParallelForDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Decl &decl) {
@@ -25024,12 +25568,20 @@ bool OMPTargetTeamsDistributeParallelForDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPTargetTeamsDistributeDirectiveContainingStmtRange OMPTargetTeamsDistributeDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetTeamsDistributeDirectiveContainingStmtRange OMPTargetTeamsDistributeDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetTeamsDistributeDirective::contains(const Decl &decl) {
@@ -25070,12 +25622,20 @@ std::optional<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirecti
   }
 }
 
-OMPTargetSimdDirectiveContainingStmtRange OMPTargetSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetSimdDirective> OMPTargetSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetSimdDirectiveContainingStmtRange OMPTargetSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetSimdDirective> OMPTargetSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetSimdDirective::contains(const Decl &decl) {
@@ -25116,12 +25676,20 @@ std::optional<OMPTargetSimdDirective> OMPTargetSimdDirective::from(const Stmt &p
   }
 }
 
-OMPTargetParallelGenericLoopDirectiveContainingStmtRange OMPTargetParallelGenericLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetParallelGenericLoopDirectiveContainingStmtRange OMPTargetParallelGenericLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Decl &decl) {
@@ -25162,12 +25730,20 @@ std::optional<OMPTargetParallelGenericLoopDirective> OMPTargetParallelGenericLoo
   }
 }
 
-OMPTargetParallelForSimdDirectiveContainingStmtRange OMPTargetParallelForSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetParallelForSimdDirectiveContainingStmtRange OMPTargetParallelForSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetParallelForSimdDirective::contains(const Decl &decl) {
@@ -25208,12 +25784,20 @@ std::optional<OMPTargetParallelForSimdDirective> OMPTargetParallelForSimdDirecti
   }
 }
 
-OMPTargetParallelForDirectiveContainingStmtRange OMPTargetParallelForDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPTargetParallelForDirectiveContainingStmtRange OMPTargetParallelForDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPTargetParallelForDirective> OMPTargetParallelForDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPTargetParallelForDirective::contains(const Decl &decl) {
@@ -25265,12 +25849,20 @@ bool OMPTargetParallelForDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPSimdDirectiveContainingStmtRange OMPSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPSimdDirective> OMPSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPSimdDirectiveContainingStmtRange OMPSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPSimdDirective> OMPSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPSimdDirective::contains(const Decl &decl) {
@@ -25311,12 +25903,20 @@ std::optional<OMPSimdDirective> OMPSimdDirective::from(const Stmt &parent) {
   }
 }
 
-OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange OMPParallelMasterTaskLoopSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange OMPParallelMasterTaskLoopSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelMasterTaskLoopSimdDirective::contains(const Decl &decl) {
@@ -25357,12 +25957,20 @@ std::optional<OMPParallelMasterTaskLoopSimdDirective> OMPParallelMasterTaskLoopS
   }
 }
 
-OMPParallelMasterTaskLoopDirectiveContainingStmtRange OMPParallelMasterTaskLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelMasterTaskLoopDirectiveContainingStmtRange OMPParallelMasterTaskLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Decl &decl) {
@@ -25408,12 +26016,20 @@ bool OMPParallelMasterTaskLoopDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPParallelMaskedTaskLoopSimdDirectiveContainingStmtRange OMPParallelMaskedTaskLoopSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelMaskedTaskLoopSimdDirectiveContainingStmtRange OMPParallelMaskedTaskLoopSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
@@ -25454,12 +26070,20 @@ std::optional<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopS
   }
 }
 
-OMPParallelMaskedTaskLoopDirectiveContainingStmtRange OMPParallelMaskedTaskLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelMaskedTaskLoopDirective> OMPParallelMaskedTaskLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelMaskedTaskLoopDirectiveContainingStmtRange OMPParallelMaskedTaskLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelMaskedTaskLoopDirective> OMPParallelMaskedTaskLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelMaskedTaskLoopDirective::contains(const Decl &decl) {
@@ -25505,12 +26129,20 @@ bool OMPParallelMaskedTaskLoopDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPParallelGenericLoopDirectiveContainingStmtRange OMPParallelGenericLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelGenericLoopDirectiveContainingStmtRange OMPParallelGenericLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelGenericLoopDirective::contains(const Decl &decl) {
@@ -25551,12 +26183,20 @@ std::optional<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::
   }
 }
 
-OMPParallelForSimdDirectiveContainingStmtRange OMPParallelForSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelForSimdDirective> OMPParallelForSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelForSimdDirectiveContainingStmtRange OMPParallelForSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelForSimdDirective> OMPParallelForSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelForSimdDirective::contains(const Decl &decl) {
@@ -25597,12 +26237,20 @@ std::optional<OMPParallelForSimdDirective> OMPParallelForSimdDirective::from(con
   }
 }
 
-OMPParallelForDirectiveContainingStmtRange OMPParallelForDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPParallelForDirective> OMPParallelForDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPParallelForDirectiveContainingStmtRange OMPParallelForDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPParallelForDirective> OMPParallelForDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPParallelForDirective::contains(const Decl &decl) {
@@ -25654,12 +26302,20 @@ bool OMPParallelForDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPMasterTaskLoopSimdDirectiveContainingStmtRange OMPMasterTaskLoopSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMasterTaskLoopSimdDirectiveContainingStmtRange OMPMasterTaskLoopSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMasterTaskLoopSimdDirective::contains(const Decl &decl) {
@@ -25700,12 +26356,20 @@ std::optional<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::fr
   }
 }
 
-OMPMasterTaskLoopDirectiveContainingStmtRange OMPMasterTaskLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMasterTaskLoopDirectiveContainingStmtRange OMPMasterTaskLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMasterTaskLoopDirective::contains(const Decl &decl) {
@@ -25751,12 +26415,20 @@ bool OMPMasterTaskLoopDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPMaskedTaskLoopSimdDirectiveContainingStmtRange OMPMaskedTaskLoopSimdDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMaskedTaskLoopSimdDirectiveContainingStmtRange OMPMaskedTaskLoopSimdDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
@@ -25797,12 +26469,20 @@ std::optional<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::fr
   }
 }
 
-OMPMaskedTaskLoopDirectiveContainingStmtRange OMPMaskedTaskLoopDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPMaskedTaskLoopDirectiveContainingStmtRange OMPMaskedTaskLoopDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPMaskedTaskLoopDirective::contains(const Decl &decl) {
@@ -25848,12 +26528,20 @@ bool OMPMaskedTaskLoopDirective::has_cancel(void) const {
   return self.getVal23();
 }
 
-OMPInteropDirectiveContainingStmtRange OMPInteropDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPInteropDirective> OMPInteropDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPInteropDirectiveContainingStmtRange OMPInteropDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPInteropDirective> OMPInteropDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPInteropDirective::contains(const Decl &decl) {
@@ -25886,12 +26574,20 @@ std::optional<OMPInteropDirective> OMPInteropDirective::from(const Stmt &parent)
   }
 }
 
-OMPFlushDirectiveContainingStmtRange OMPFlushDirective::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPFlushDirective> OMPFlushDirective::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPFlushDirectiveContainingStmtRange OMPFlushDirective::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPFlushDirective> OMPFlushDirective::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPFlushDirective::contains(const Decl &decl) {
@@ -25924,12 +26620,20 @@ std::optional<OMPFlushDirective> OMPFlushDirective::from(const Stmt &parent) {
   }
 }
 
-OMPCanonicalLoopContainingStmtRange OMPCanonicalLoop::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPCanonicalLoopContainingStmtRange OMPCanonicalLoop::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPCanonicalLoop> OMPCanonicalLoop::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPCanonicalLoop::contains(const Decl &decl) {
@@ -25982,12 +26686,20 @@ DeclRefExpr OMPCanonicalLoop::loop_variable_reference(void) const {
   return DeclRefExpr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-NullStmtContainingStmtRange NullStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<NullStmt> NullStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-NullStmtContainingStmtRange NullStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<NullStmt> NullStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool NullStmt::contains(const Decl &decl) {
@@ -26030,12 +26742,20 @@ bool NullStmt::has_leading_empty_macro(void) const {
   return self.getVal12();
 }
 
-MSDependentExistsStmtContainingStmtRange MSDependentExistsStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MSDependentExistsStmt> MSDependentExistsStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MSDependentExistsStmtContainingStmtRange MSDependentExistsStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MSDependentExistsStmt> MSDependentExistsStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MSDependentExistsStmt::contains(const Decl &decl) {
@@ -26089,12 +26809,20 @@ bool MSDependentExistsStmt::is_if_not_exists(void) const {
   return self.getVal15();
 }
 
-IndirectGotoStmtContainingStmtRange IndirectGotoStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<IndirectGotoStmt> IndirectGotoStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-IndirectGotoStmtContainingStmtRange IndirectGotoStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<IndirectGotoStmt> IndirectGotoStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool IndirectGotoStmt::contains(const Decl &decl) {
@@ -26157,12 +26885,20 @@ Expr IndirectGotoStmt::target(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-IfStmtContainingStmtRange IfStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<IfStmt> IfStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-IfStmtContainingStmtRange IfStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<IfStmt> IfStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool IfStmt::contains(const Decl &decl) {
@@ -26324,12 +27060,20 @@ bool IfStmt::is_obj_c_availability_check(void) const {
   return self.getVal64();
 }
 
-GotoStmtContainingStmtRange GotoStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<GotoStmt> GotoStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-GotoStmtContainingStmtRange GotoStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<GotoStmt> GotoStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool GotoStmt::contains(const Decl &decl) {
@@ -26382,12 +27126,20 @@ Token GotoStmt::label_token(void) const {
   }
 }
 
-ForStmtContainingStmtRange ForStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ForStmt> ForStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ForStmtContainingStmtRange ForStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ForStmt> ForStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ForStmt::contains(const Decl &decl) {
@@ -26499,12 +27251,20 @@ Token ForStmt::r_paren_token(void) const {
   }
 }
 
-DoStmtContainingStmtRange DoStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DoStmt> DoStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DoStmtContainingStmtRange DoStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DoStmt> DoStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DoStmt::contains(const Decl &decl) {
@@ -26572,12 +27332,20 @@ Token DoStmt::while_token(void) const {
   }
 }
 
-DeclStmtContainingStmtRange DeclStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DeclStmt> DeclStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DeclStmtContainingStmtRange DeclStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DeclStmt> DeclStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DeclStmt::contains(const Decl &decl) {
@@ -26635,12 +27403,20 @@ bool DeclStmt::is_single_declaration(void) const {
   return self.getVal15();
 }
 
-CoroutineBodyStmtContainingStmtRange CoroutineBodyStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CoroutineBodyStmt> CoroutineBodyStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CoroutineBodyStmtContainingStmtRange CoroutineBodyStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CoroutineBodyStmt> CoroutineBodyStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CoroutineBodyStmt::contains(const Decl &decl) {
@@ -26766,12 +27542,20 @@ bool CoroutineBodyStmt::has_dependent_promise_type(void) const {
   return self.getVal12();
 }
 
-CoreturnStmtContainingStmtRange CoreturnStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CoreturnStmt> CoreturnStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CoreturnStmtContainingStmtRange CoreturnStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CoreturnStmt> CoreturnStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CoreturnStmt::contains(const Decl &decl) {
@@ -26826,12 +27610,20 @@ bool CoreturnStmt::is_implicit(void) const {
   return self.getVal12();
 }
 
-ContinueStmtContainingStmtRange ContinueStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ContinueStmt> ContinueStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ContinueStmtContainingStmtRange ContinueStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ContinueStmt> ContinueStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ContinueStmt::contains(const Decl &decl) {
@@ -26869,12 +27661,20 @@ Token ContinueStmt::continue_token(void) const {
   }
 }
 
-CompoundStmtContainingStmtRange CompoundStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CompoundStmt> CompoundStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CompoundStmtContainingStmtRange CompoundStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CompoundStmt> CompoundStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CompoundStmt::contains(const Decl &decl) {
@@ -26936,12 +27736,20 @@ bool CompoundStmt::has_stored_fp_features(void) const {
   return self.getVal15();
 }
 
-CapturedStmtContainingStmtRange CapturedStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CapturedStmt> CapturedStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CapturedStmtContainingStmtRange CapturedStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CapturedStmt> CapturedStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CapturedStmt::contains(const Decl &decl) {
@@ -26993,12 +27801,20 @@ Stmt CapturedStmt::captured_statement(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-CXXTryStmtContainingStmtRange CXXTryStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXTryStmt> CXXTryStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXTryStmtContainingStmtRange CXXTryStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXTryStmt> CXXTryStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXTryStmt::contains(const Decl &decl) {
@@ -27058,12 +27874,20 @@ std::vector<CXXCatchStmt> CXXTryStmt::handlers(void) const {
   return vec;
 }
 
-CXXForRangeStmtContainingStmtRange CXXForRangeStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXForRangeStmt> CXXForRangeStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXForRangeStmtContainingStmtRange CXXForRangeStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXForRangeStmt> CXXForRangeStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXForRangeStmt::contains(const Decl &decl) {
@@ -27192,12 +28016,20 @@ DeclStmt CXXForRangeStmt::range_statement(void) const {
   return DeclStmt::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-CXXCatchStmtContainingStmtRange CXXCatchStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXCatchStmt> CXXCatchStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXCatchStmtContainingStmtRange CXXCatchStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXCatchStmt> CXXCatchStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXCatchStmt::contains(const Decl &decl) {
@@ -27257,12 +28089,20 @@ Stmt CXXCatchStmt::handler_block(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-BreakStmtContainingStmtRange BreakStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<BreakStmt> BreakStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BreakStmtContainingStmtRange BreakStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<BreakStmt> BreakStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BreakStmt::contains(const Decl &decl) {
@@ -27300,12 +28140,20 @@ Token BreakStmt::break_token(void) const {
   }
 }
 
-AsmStmtContainingStmtRange AsmStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<AsmStmt> AsmStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AsmStmtContainingStmtRange AsmStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<AsmStmt> AsmStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AsmStmt::contains(const Decl &decl) {
@@ -27457,12 +28305,20 @@ vec.emplace_back(v.cStr(), v.size());
   return vec;
 }
 
-MSAsmStmtContainingStmtRange MSAsmStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MSAsmStmt> MSAsmStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MSAsmStmtContainingStmtRange MSAsmStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MSAsmStmt> MSAsmStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MSAsmStmt::contains(const Decl &decl) {
@@ -27542,12 +28398,20 @@ bool MSAsmStmt::has_braces(void) const {
   return self.getVal23();
 }
 
-GCCAsmStmtContainingStmtRange GCCAsmStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-GCCAsmStmtContainingStmtRange GCCAsmStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool GCCAsmStmt::contains(const Decl &decl) {
@@ -27713,12 +28577,20 @@ vec.emplace_back(v.cStr(), v.size());
   return vec;
 }
 
-WhileStmtContainingStmtRange WhileStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<WhileStmt> WhileStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-WhileStmtContainingStmtRange WhileStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<WhileStmt> WhileStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool WhileStmt::contains(const Decl &decl) {
@@ -27811,12 +28683,20 @@ bool WhileStmt::has_variable_storage(void) const {
   return self.getVal23();
 }
 
-ValueStmtContainingStmtRange ValueStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ValueStmt> ValueStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ValueStmtContainingStmtRange ValueStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ValueStmt> ValueStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ValueStmt::contains(const Decl &decl) {
@@ -27979,12 +28859,20 @@ std::optional<Expr> ValueStmt::expression_statement(void) const {
   }
 }
 
-LabelStmtContainingStmtRange LabelStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<LabelStmt> LabelStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-LabelStmtContainingStmtRange LabelStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<LabelStmt> LabelStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool LabelStmt::contains(const Decl &decl) {
@@ -28049,12 +28937,20 @@ bool LabelStmt::is_side_entry(void) const {
   return self.getVal15();
 }
 
-ExprContainingStmtRange Expr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<Expr> Expr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExprContainingStmtRange Expr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<Expr> Expr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool Expr::contains(const Decl &decl) {
@@ -28474,12 +29370,20 @@ bool Expr::refers_to_vector_element(void) const {
   return self.getVal93();
 }
 
-DesignatedInitUpdateExprContainingStmtRange DesignatedInitUpdateExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DesignatedInitUpdateExprContainingStmtRange DesignatedInitUpdateExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DesignatedInitUpdateExpr::contains(const Decl &decl) {
@@ -28528,12 +29432,20 @@ InitListExpr DesignatedInitUpdateExpr::updater(void) const {
   return InitListExpr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-DesignatedInitExprContainingStmtRange DesignatedInitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DesignatedInitExpr> DesignatedInitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DesignatedInitExprContainingStmtRange DesignatedInitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DesignatedInitExpr> DesignatedInitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DesignatedInitExpr::contains(const Decl &decl) {
@@ -28627,12 +29539,20 @@ std::vector<Expr> DesignatedInitExpr::sub_expressions(void) const {
   return vec;
 }
 
-DependentScopeDeclRefExprContainingStmtRange DependentScopeDeclRefExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DependentScopeDeclRefExprContainingStmtRange DependentScopeDeclRefExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DependentScopeDeclRefExpr::contains(const Decl &decl) {
@@ -28706,12 +29626,20 @@ bool DependentScopeDeclRefExpr::has_template_keyword(void) const {
   return self.getVal96();
 }
 
-DependentCoawaitExprContainingStmtRange DependentCoawaitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DependentCoawaitExprContainingStmtRange DependentCoawaitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DependentCoawaitExpr::contains(const Decl &decl) {
@@ -28769,12 +29697,20 @@ UnresolvedLookupExpr DependentCoawaitExpr::operator_coawait_lookup(void) const {
   return UnresolvedLookupExpr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-DeclRefExprContainingStmtRange DeclRefExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DeclRefExpr> DeclRefExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DeclRefExprContainingStmtRange DeclRefExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DeclRefExpr> DeclRefExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DeclRefExpr::contains(const Decl &decl) {
@@ -28885,12 +29821,20 @@ bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
   return self.getVal101();
 }
 
-CoroutineSuspendExprContainingStmtRange CoroutineSuspendExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CoroutineSuspendExprContainingStmtRange CoroutineSuspendExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CoroutineSuspendExpr::contains(const Decl &decl) {
@@ -28973,12 +29917,20 @@ Expr CoroutineSuspendExpr::suspend_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-CoawaitExprContainingStmtRange CoawaitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CoawaitExpr> CoawaitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CoawaitExprContainingStmtRange CoawaitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CoawaitExpr> CoawaitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CoawaitExpr::contains(const Decl &decl) {
@@ -29024,12 +29976,20 @@ bool CoawaitExpr::is_implicit(void) const {
   return self.getVal95();
 }
 
-CoyieldExprContainingStmtRange CoyieldExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CoyieldExpr> CoyieldExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CoyieldExprContainingStmtRange CoyieldExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CoyieldExpr> CoyieldExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CoyieldExpr::contains(const Decl &decl) {
@@ -29070,12 +30030,20 @@ std::optional<CoyieldExpr> CoyieldExpr::from(const Stmt &parent) {
   }
 }
 
-ConvertVectorExprContainingStmtRange ConvertVectorExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ConvertVectorExpr> ConvertVectorExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ConvertVectorExprContainingStmtRange ConvertVectorExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ConvertVectorExpr> ConvertVectorExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ConvertVectorExpr::contains(const Decl &decl) {
@@ -29136,12 +30104,20 @@ Expr ConvertVectorExpr::src_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ConceptSpecializationExprContainingStmtRange ConceptSpecializationExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ConceptSpecializationExprContainingStmtRange ConceptSpecializationExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ConceptSpecializationExpr::contains(const Decl &decl) {
@@ -29194,12 +30170,20 @@ bool ConceptSpecializationExpr::is_satisfied(void) const {
   return self.getVal95();
 }
 
-CompoundLiteralExprContainingStmtRange CompoundLiteralExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CompoundLiteralExprContainingStmtRange CompoundLiteralExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CompoundLiteralExpr::contains(const Decl &decl) {
@@ -29256,12 +30240,20 @@ bool CompoundLiteralExpr::is_file_scope(void) const {
   return self.getVal95();
 }
 
-ChooseExprContainingStmtRange ChooseExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ChooseExpr> ChooseExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ChooseExprContainingStmtRange ChooseExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ChooseExpr> ChooseExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ChooseExpr::contains(const Decl &decl) {
@@ -29350,12 +30342,20 @@ bool ChooseExpr::is_condition_true(void) const {
   return self.getVal96();
 }
 
-CharacterLiteralContainingStmtRange CharacterLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CharacterLiteral> CharacterLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CharacterLiteralContainingStmtRange CharacterLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CharacterLiteral> CharacterLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CharacterLiteral::contains(const Decl &decl) {
@@ -29406,12 +30406,20 @@ Token CharacterLiteral::token(void) const {
   }
 }
 
-CastExprContainingStmtRange CastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CastExpr> CastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CastExprContainingStmtRange CastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CastExpr> CastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CastExpr::contains(const Decl &decl) {
@@ -29505,12 +30513,20 @@ bool CastExpr::has_stored_fp_features(void) const {
   return self.getVal97();
 }
 
-ImplicitCastExprContainingStmtRange ImplicitCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ImplicitCastExpr> ImplicitCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ImplicitCastExprContainingStmtRange ImplicitCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ImplicitCastExpr> ImplicitCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ImplicitCastExpr::contains(const Decl &decl) {
@@ -29556,12 +30572,20 @@ bool ImplicitCastExpr::is_part_of_explicit_cast(void) const {
   return self.getVal98();
 }
 
-ExplicitCastExprContainingStmtRange ExplicitCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ExplicitCastExpr> ExplicitCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExplicitCastExprContainingStmtRange ExplicitCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ExplicitCastExpr> ExplicitCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ExplicitCastExpr::contains(const Decl &decl) {
@@ -29616,12 +30640,20 @@ Type ExplicitCastExpr::type_as_written(void) const {
   return fragment->TypeFor(fragment, id, false).value();
 }
 
-CXXNamedCastExprContainingStmtRange CXXNamedCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXNamedCastExpr> CXXNamedCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXNamedCastExprContainingStmtRange CXXNamedCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXNamedCastExpr> CXXNamedCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXNamedCastExpr::contains(const Decl &decl) {
@@ -29699,12 +30731,20 @@ Token CXXNamedCastExpr::r_paren_token(void) const {
   }
 }
 
-CXXDynamicCastExprContainingStmtRange CXXDynamicCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDynamicCastExprContainingStmtRange CXXDynamicCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDynamicCastExpr::contains(const Decl &decl) {
@@ -29758,12 +30798,20 @@ bool CXXDynamicCastExpr::is_always_null(void) const {
   return self.getVal98();
 }
 
-CXXConstCastExprContainingStmtRange CXXConstCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXConstCastExpr> CXXConstCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXConstCastExprContainingStmtRange CXXConstCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXConstCastExpr> CXXConstCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXConstCastExpr::contains(const Decl &decl) {
@@ -29812,12 +30860,20 @@ std::optional<CXXConstCastExpr> CXXConstCastExpr::from(const Stmt &parent) {
   }
 }
 
-CXXAddrspaceCastExprContainingStmtRange CXXAddrspaceCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXAddrspaceCastExprContainingStmtRange CXXAddrspaceCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXAddrspaceCastExpr::contains(const Decl &decl) {
@@ -29866,12 +30922,20 @@ std::optional<CXXAddrspaceCastExpr> CXXAddrspaceCastExpr::from(const Stmt &paren
   }
 }
 
-CXXStaticCastExprContainingStmtRange CXXStaticCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXStaticCastExpr> CXXStaticCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXStaticCastExprContainingStmtRange CXXStaticCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXStaticCastExpr> CXXStaticCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXStaticCastExpr::contains(const Decl &decl) {
@@ -29920,12 +30984,20 @@ std::optional<CXXStaticCastExpr> CXXStaticCastExpr::from(const Stmt &parent) {
   }
 }
 
-CXXReinterpretCastExprContainingStmtRange CXXReinterpretCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXReinterpretCastExpr> CXXReinterpretCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXReinterpretCastExprContainingStmtRange CXXReinterpretCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXReinterpretCastExpr> CXXReinterpretCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXReinterpretCastExpr::contains(const Decl &decl) {
@@ -29974,12 +31046,20 @@ std::optional<CXXReinterpretCastExpr> CXXReinterpretCastExpr::from(const Stmt &p
   }
 }
 
-CXXFunctionalCastExprContainingStmtRange CXXFunctionalCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXFunctionalCastExprContainingStmtRange CXXFunctionalCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXFunctionalCastExpr> CXXFunctionalCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXFunctionalCastExpr::contains(const Decl &decl) {
@@ -30047,12 +31127,20 @@ bool CXXFunctionalCastExpr::is_list_initialization(void) const {
   return self.getVal98();
 }
 
-CStyleCastExprContainingStmtRange CStyleCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CStyleCastExpr> CStyleCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CStyleCastExprContainingStmtRange CStyleCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CStyleCastExpr> CStyleCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CStyleCastExpr::contains(const Decl &decl) {
@@ -30115,12 +31203,20 @@ Token CStyleCastExpr::r_paren_token(void) const {
   }
 }
 
-BuiltinBitCastExprContainingStmtRange BuiltinBitCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<BuiltinBitCastExpr> BuiltinBitCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BuiltinBitCastExprContainingStmtRange BuiltinBitCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<BuiltinBitCastExpr> BuiltinBitCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BuiltinBitCastExpr::contains(const Decl &decl) {
@@ -30165,12 +31261,20 @@ std::optional<BuiltinBitCastExpr> BuiltinBitCastExpr::from(const Stmt &parent) {
   }
 }
 
-ObjCBridgedCastExprContainingStmtRange ObjCBridgedCastExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCBridgedCastExpr> ObjCBridgedCastExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCBridgedCastExprContainingStmtRange ObjCBridgedCastExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCBridgedCastExpr> ObjCBridgedCastExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCBridgedCastExpr::contains(const Decl &decl) {
@@ -30244,12 +31348,20 @@ Token ObjCBridgedCastExpr::l_paren_token(void) const {
   }
 }
 
-CallExprContainingStmtRange CallExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CallExpr> CallExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CallExprContainingStmtRange CallExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CallExpr> CallExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CallExpr::contains(const Decl &decl) {
@@ -30392,12 +31504,20 @@ bool CallExpr::uses_adl(void) const {
   return self.getVal105();
 }
 
-CXXOperatorCallExprContainingStmtRange CXXOperatorCallExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXOperatorCallExprContainingStmtRange CXXOperatorCallExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXOperatorCallExpr::contains(const Decl &decl) {
@@ -30467,12 +31587,20 @@ bool CXXOperatorCallExpr::is_infix_binary_operation(void) const {
   return self.getVal108();
 }
 
-CXXMemberCallExprContainingStmtRange CXXMemberCallExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXMemberCallExprContainingStmtRange CXXMemberCallExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXMemberCallExpr::contains(const Decl &decl) {
@@ -30541,12 +31669,20 @@ CXXRecordDecl CXXMemberCallExpr::record_declaration(void) const {
   return CXXRecordDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-CUDAKernelCallExprContainingStmtRange CUDAKernelCallExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CUDAKernelCallExprContainingStmtRange CUDAKernelCallExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CUDAKernelCallExpr::contains(const Decl &decl) {
@@ -30593,12 +31729,20 @@ CallExpr CUDAKernelCallExpr::config(void) const {
   return CallExpr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-UserDefinedLiteralContainingStmtRange UserDefinedLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UserDefinedLiteralContainingStmtRange UserDefinedLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UserDefinedLiteral::contains(const Decl &decl) {
@@ -30659,12 +31803,20 @@ Token UserDefinedLiteral::ud_suffix_token(void) const {
   }
 }
 
-CXXUuidofExprContainingStmtRange CXXUuidofExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXUuidofExpr> CXXUuidofExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXUuidofExprContainingStmtRange CXXUuidofExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXUuidofExpr> CXXUuidofExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXUuidofExpr::contains(const Decl &decl) {
@@ -30734,12 +31886,20 @@ bool CXXUuidofExpr::is_type_operand(void) const {
   return self.getVal96();
 }
 
-CXXUnresolvedConstructExprContainingStmtRange CXXUnresolvedConstructExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXUnresolvedConstructExprContainingStmtRange CXXUnresolvedConstructExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXUnresolvedConstructExpr::contains(const Decl &decl) {
@@ -30821,12 +31981,20 @@ bool CXXUnresolvedConstructExpr::is_list_initialization(void) const {
   return self.getVal95();
 }
 
-CXXTypeidExprContainingStmtRange CXXTypeidExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXTypeidExpr> CXXTypeidExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXTypeidExprContainingStmtRange CXXTypeidExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXTypeidExpr> CXXTypeidExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXTypeidExpr::contains(const Decl &decl) {
@@ -30904,12 +32072,20 @@ bool CXXTypeidExpr::is_type_operand(void) const {
   return self.getVal99();
 }
 
-CXXThrowExprContainingStmtRange CXXThrowExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXThrowExpr> CXXThrowExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXThrowExprContainingStmtRange CXXThrowExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXThrowExpr> CXXThrowExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXThrowExpr::contains(const Decl &decl) {
@@ -30970,12 +32146,20 @@ bool CXXThrowExpr::is_thrown_variable_in_scope(void) const {
   return self.getVal96();
 }
 
-CXXThisExprContainingStmtRange CXXThisExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXThisExpr> CXXThisExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXThisExprContainingStmtRange CXXThisExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXThisExpr> CXXThisExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXThisExpr::contains(const Decl &decl) {
@@ -31026,12 +32210,20 @@ bool CXXThisExpr::is_implicit(void) const {
   return self.getVal95();
 }
 
-CXXStdInitializerListExprContainingStmtRange CXXStdInitializerListExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXStdInitializerListExprContainingStmtRange CXXStdInitializerListExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXStdInitializerListExpr::contains(const Decl &decl) {
@@ -31074,12 +32266,20 @@ Expr CXXStdInitializerListExpr::sub_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-CXXScalarValueInitExprContainingStmtRange CXXScalarValueInitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXScalarValueInitExprContainingStmtRange CXXScalarValueInitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXScalarValueInitExpr::contains(const Decl &decl) {
@@ -31125,12 +32325,20 @@ Token CXXScalarValueInitExpr::r_paren_token(void) const {
   }
 }
 
-CXXRewrittenBinaryOperatorContainingStmtRange CXXRewrittenBinaryOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXRewrittenBinaryOperatorContainingStmtRange CXXRewrittenBinaryOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXRewrittenBinaryOperator::contains(const Decl &decl) {
@@ -31225,12 +32433,20 @@ bool CXXRewrittenBinaryOperator::is_reversed(void) const {
   return self.getVal97();
 }
 
-CXXPseudoDestructorExprContainingStmtRange CXXPseudoDestructorExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXPseudoDestructorExprContainingStmtRange CXXPseudoDestructorExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXPseudoDestructorExpr::contains(const Decl &decl) {
@@ -31335,12 +32551,20 @@ bool CXXPseudoDestructorExpr::is_arrow(void) const {
   return self.getVal97();
 }
 
-CXXNullPtrLiteralExprContainingStmtRange CXXNullPtrLiteralExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXNullPtrLiteralExprContainingStmtRange CXXNullPtrLiteralExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXNullPtrLiteralExpr::contains(const Decl &decl) {
@@ -31386,12 +32610,20 @@ Token CXXNullPtrLiteralExpr::token(void) const {
   }
 }
 
-CXXNoexceptExprContainingStmtRange CXXNoexceptExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXNoexceptExprContainingStmtRange CXXNoexceptExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXNoexceptExpr::contains(const Decl &decl) {
@@ -31439,12 +32671,20 @@ bool CXXNoexceptExpr::value(void) const {
   return self.getVal95();
 }
 
-CXXNewExprContainingStmtRange CXXNewExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXNewExpr> CXXNewExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXNewExprContainingStmtRange CXXNewExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXNewExpr> CXXNewExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXNewExpr::contains(const Decl &decl) {
@@ -31595,12 +32835,20 @@ bool CXXNewExpr::should_null_check_allocation(void) const {
   return self.getVal106();
 }
 
-CXXInheritedCtorInitExprContainingStmtRange CXXInheritedCtorInitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXInheritedCtorInitExprContainingStmtRange CXXInheritedCtorInitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXInheritedCtorInitExpr::contains(const Decl &decl) {
@@ -31667,12 +32915,20 @@ bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const {
   return self.getVal96();
 }
 
-CXXFoldExprContainingStmtRange CXXFoldExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXFoldExpr> CXXFoldExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXFoldExprContainingStmtRange CXXFoldExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXFoldExpr> CXXFoldExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXFoldExpr::contains(const Decl &decl) {
@@ -31790,12 +33046,20 @@ bool CXXFoldExpr::is_right_fold(void) const {
   return self.getVal97();
 }
 
-CXXDependentScopeMemberExprContainingStmtRange CXXDependentScopeMemberExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDependentScopeMemberExprContainingStmtRange CXXDependentScopeMemberExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDependentScopeMemberExpr::contains(const Decl &decl) {
@@ -31923,12 +33187,20 @@ bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
   return self.getVal101();
 }
 
-CXXDeleteExprContainingStmtRange CXXDeleteExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXDeleteExpr> CXXDeleteExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDeleteExprContainingStmtRange CXXDeleteExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXDeleteExpr> CXXDeleteExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDeleteExpr::contains(const Decl &decl) {
@@ -32003,12 +33275,20 @@ bool CXXDeleteExpr::is_global_delete(void) const {
   return self.getVal98();
 }
 
-CXXDefaultInitExprContainingStmtRange CXXDefaultInitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDefaultInitExprContainingStmtRange CXXDefaultInitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDefaultInitExpr::contains(const Decl &decl) {
@@ -32070,12 +33350,20 @@ Token CXXDefaultInitExpr::used_token(void) const {
   }
 }
 
-CXXDefaultArgExprContainingStmtRange CXXDefaultArgExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDefaultArgExprContainingStmtRange CXXDefaultArgExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDefaultArgExpr::contains(const Decl &decl) {
@@ -32133,12 +33421,20 @@ Token CXXDefaultArgExpr::used_token(void) const {
   }
 }
 
-CXXConstructExprContainingStmtRange CXXConstructExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXConstructExpr> CXXConstructExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXConstructExprContainingStmtRange CXXConstructExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXConstructExpr> CXXConstructExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXConstructExpr::contains(const Decl &decl) {
@@ -32242,12 +33538,20 @@ bool CXXConstructExpr::requires_zero_initialization(void) const {
   return self.getVal99();
 }
 
-CXXTemporaryObjectExprContainingStmtRange CXXTemporaryObjectExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXTemporaryObjectExprContainingStmtRange CXXTemporaryObjectExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXTemporaryObjectExpr::contains(const Decl &decl) {
@@ -32288,12 +33592,20 @@ std::optional<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::from(const Stmt &p
   }
 }
 
-CXXBoolLiteralExprContainingStmtRange CXXBoolLiteralExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXBoolLiteralExpr> CXXBoolLiteralExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXBoolLiteralExprContainingStmtRange CXXBoolLiteralExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXBoolLiteralExpr> CXXBoolLiteralExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXBoolLiteralExpr::contains(const Decl &decl) {
@@ -32344,12 +33656,20 @@ bool CXXBoolLiteralExpr::value(void) const {
   return self.getVal95();
 }
 
-CXXBindTemporaryExprContainingStmtRange CXXBindTemporaryExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CXXBindTemporaryExpr> CXXBindTemporaryExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXBindTemporaryExprContainingStmtRange CXXBindTemporaryExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CXXBindTemporaryExpr> CXXBindTemporaryExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXBindTemporaryExpr::contains(const Decl &decl) {
@@ -32392,12 +33712,20 @@ Expr CXXBindTemporaryExpr::sub_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-BlockExprContainingStmtRange BlockExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<BlockExpr> BlockExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BlockExprContainingStmtRange BlockExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<BlockExpr> BlockExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BlockExpr::contains(const Decl &decl) {
@@ -32461,12 +33789,20 @@ FunctionProtoType BlockExpr::function_type(void) const {
   return FunctionProtoType::from(fragment->TypeFor(fragment, id, false).value()).value();
 }
 
-BinaryOperatorContainingStmtRange BinaryOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<BinaryOperator> BinaryOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BinaryOperatorContainingStmtRange BinaryOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<BinaryOperator> BinaryOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BinaryOperator::contains(const Decl &decl) {
@@ -32606,12 +33942,20 @@ bool BinaryOperator::is_shift_operation(void) const {
   return self.getVal111();
 }
 
-CompoundAssignOperatorContainingStmtRange CompoundAssignOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CompoundAssignOperator> CompoundAssignOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CompoundAssignOperatorContainingStmtRange CompoundAssignOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CompoundAssignOperator> CompoundAssignOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CompoundAssignOperator::contains(const Decl &decl) {
@@ -32664,12 +34008,20 @@ Type CompoundAssignOperator::computation_result_type(void) const {
   return fragment->TypeFor(fragment, id, false).value();
 }
 
-AtomicExprContainingStmtRange AtomicExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<AtomicExpr> AtomicExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AtomicExprContainingStmtRange AtomicExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<AtomicExpr> AtomicExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AtomicExpr::contains(const Decl &decl) {
@@ -32828,12 +34180,20 @@ std::vector<Expr> AtomicExpr::sub_expressions(void) const {
   return vec;
 }
 
-AsTypeExprContainingStmtRange AsTypeExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<AsTypeExpr> AsTypeExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AsTypeExprContainingStmtRange AsTypeExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<AsTypeExpr> AsTypeExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AsTypeExpr::contains(const Decl &decl) {
@@ -32894,12 +34254,20 @@ Expr AsTypeExpr::src_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ArrayTypeTraitExprContainingStmtRange ArrayTypeTraitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ArrayTypeTraitExprContainingStmtRange ArrayTypeTraitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ArrayTypeTraitExpr::contains(const Decl &decl) {
@@ -32953,12 +34321,20 @@ ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
   return static_cast<ArrayTypeTrait>(self.getVal100());
 }
 
-ArraySubscriptExprContainingStmtRange ArraySubscriptExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ArraySubscriptExprContainingStmtRange ArraySubscriptExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ArraySubscriptExpr::contains(const Decl &decl) {
@@ -33028,12 +34404,20 @@ Expr ArraySubscriptExpr::rhs(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ArrayInitLoopExprContainingStmtRange ArrayInitLoopExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ArrayInitLoopExprContainingStmtRange ArrayInitLoopExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ArrayInitLoopExpr::contains(const Decl &decl) {
@@ -33082,12 +34466,20 @@ Expr ArrayInitLoopExpr::sub_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ArrayInitIndexExprContainingStmtRange ArrayInitIndexExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ArrayInitIndexExprContainingStmtRange ArrayInitIndexExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ArrayInitIndexExpr::contains(const Decl &decl) {
@@ -33124,12 +34516,20 @@ std::optional<ArrayInitIndexExpr> ArrayInitIndexExpr::from(const Stmt &parent) {
   }
 }
 
-AddrLabelExprContainingStmtRange AddrLabelExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<AddrLabelExpr> AddrLabelExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AddrLabelExprContainingStmtRange AddrLabelExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<AddrLabelExpr> AddrLabelExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AddrLabelExpr::contains(const Decl &decl) {
@@ -33190,12 +34590,20 @@ Token AddrLabelExpr::label_token(void) const {
   }
 }
 
-AbstractConditionalOperatorContainingStmtRange AbstractConditionalOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AbstractConditionalOperatorContainingStmtRange AbstractConditionalOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AbstractConditionalOperator::contains(const Decl &decl) {
@@ -33269,12 +34677,20 @@ Expr AbstractConditionalOperator::true_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ConditionalOperatorContainingStmtRange ConditionalOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ConditionalOperator> ConditionalOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ConditionalOperatorContainingStmtRange ConditionalOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ConditionalOperator> ConditionalOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ConditionalOperator::contains(const Decl &decl) {
@@ -33327,12 +34743,20 @@ Expr ConditionalOperator::rhs(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-BinaryConditionalOperatorContainingStmtRange BinaryConditionalOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BinaryConditionalOperatorContainingStmtRange BinaryConditionalOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BinaryConditionalOperator::contains(const Decl &decl) {
@@ -33385,12 +34809,20 @@ OpaqueValueExpr BinaryConditionalOperator::opaque_value(void) const {
   return OpaqueValueExpr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-VAArgExprContainingStmtRange VAArgExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<VAArgExpr> VAArgExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-VAArgExprContainingStmtRange VAArgExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<VAArgExpr> VAArgExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool VAArgExpr::contains(const Decl &decl) {
@@ -33462,12 +34894,20 @@ bool VAArgExpr::is_microsoft_abi(void) const {
   return self.getVal95();
 }
 
-UnaryOperatorContainingStmtRange UnaryOperator::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<UnaryOperator> UnaryOperator::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnaryOperatorContainingStmtRange UnaryOperator::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<UnaryOperator> UnaryOperator::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnaryOperator::contains(const Decl &decl) {
@@ -33564,12 +35004,20 @@ bool UnaryOperator::is_prefix(void) const {
   return self.getVal104();
 }
 
-UnaryExprOrTypeTraitExprContainingStmtRange UnaryExprOrTypeTraitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnaryExprOrTypeTraitExprContainingStmtRange UnaryExprOrTypeTraitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnaryExprOrTypeTraitExpr::contains(const Decl &decl) {
@@ -33660,12 +35108,20 @@ bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const {
   return self.getVal97();
 }
 
-TypoExprContainingStmtRange TypoExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<TypoExpr> TypoExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypoExprContainingStmtRange TypoExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<TypoExpr> TypoExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypoExpr::contains(const Decl &decl) {
@@ -33702,12 +35158,20 @@ std::optional<TypoExpr> TypoExpr::from(const Stmt &parent) {
   }
 }
 
-TypeTraitExprContainingStmtRange TypeTraitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<TypeTraitExpr> TypeTraitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypeTraitExprContainingStmtRange TypeTraitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<TypeTraitExpr> TypeTraitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypeTraitExpr::contains(const Decl &decl) {
@@ -33772,12 +35236,20 @@ std::vector<Type> TypeTraitExpr::arguments(void) const {
   return vec;
 }
 
-SubstNonTypeTemplateParmPackExprContainingStmtRange SubstNonTypeTemplateParmPackExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SubstNonTypeTemplateParmPackExprContainingStmtRange SubstNonTypeTemplateParmPackExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SubstNonTypeTemplateParmPackExpr::contains(const Decl &decl) {
@@ -33829,12 +35301,20 @@ Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const {
   }
 }
 
-SubstNonTypeTemplateParmExprContainingStmtRange SubstNonTypeTemplateParmExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SubstNonTypeTemplateParmExprContainingStmtRange SubstNonTypeTemplateParmExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SubstNonTypeTemplateParmExpr::contains(const Decl &decl) {
@@ -33903,12 +35383,20 @@ bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
   return self.getVal95();
 }
 
-StringLiteralContainingStmtRange StringLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<StringLiteral> StringLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-StringLiteralContainingStmtRange StringLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<StringLiteral> StringLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool StringLiteral::contains(const Decl &decl) {
@@ -34014,12 +35502,20 @@ bool StringLiteral::is_wide(void) const {
   return self.getVal107();
 }
 
-StmtExprContainingStmtRange StmtExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<StmtExpr> StmtExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-StmtExprContainingStmtRange StmtExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<StmtExpr> StmtExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool StmtExpr::contains(const Decl &decl) {
@@ -34080,12 +35576,20 @@ CompoundStmt StmtExpr::sub_statement(void) const {
   return CompoundStmt::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-SourceLocExprContainingStmtRange SourceLocExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SourceLocExpr> SourceLocExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SourceLocExprContainingStmtRange SourceLocExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SourceLocExpr> SourceLocExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SourceLocExpr::contains(const Decl &decl) {
@@ -34147,12 +35651,20 @@ bool SourceLocExpr::is_int_type(void) const {
   return self.getVal95();
 }
 
-SizeOfPackExprContainingStmtRange SizeOfPackExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SizeOfPackExprContainingStmtRange SizeOfPackExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SizeOfPackExpr::contains(const Decl &decl) {
@@ -34250,12 +35762,20 @@ bool SizeOfPackExpr::is_partially_substituted(void) const {
   return self.getVal97();
 }
 
-ShuffleVectorExprContainingStmtRange ShuffleVectorExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ShuffleVectorExprContainingStmtRange ShuffleVectorExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ShuffleVectorExpr::contains(const Decl &decl) {
@@ -34310,12 +35830,20 @@ Token ShuffleVectorExpr::r_paren_token(void) const {
   }
 }
 
-SYCLUniqueStableNameExprContainingStmtRange SYCLUniqueStableNameExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SYCLUniqueStableNameExprContainingStmtRange SYCLUniqueStableNameExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SYCLUniqueStableNameExpr::contains(const Decl &decl) {
@@ -34385,12 +35913,20 @@ Token SYCLUniqueStableNameExpr::r_paren_token(void) const {
   }
 }
 
-RequiresExprContainingStmtRange RequiresExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<RequiresExpr> RequiresExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-RequiresExprContainingStmtRange RequiresExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<RequiresExpr> RequiresExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool RequiresExpr::contains(const Decl &decl) {
@@ -34472,12 +36008,20 @@ bool RequiresExpr::is_satisfied(void) const {
   return self.getVal95();
 }
 
-RecoveryExprContainingStmtRange RecoveryExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<RecoveryExpr> RecoveryExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-RecoveryExprContainingStmtRange RecoveryExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<RecoveryExpr> RecoveryExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool RecoveryExpr::contains(const Decl &decl) {
@@ -34530,12 +36074,20 @@ std::vector<Expr> RecoveryExpr::sub_expressions(void) const {
   return vec;
 }
 
-PseudoObjectExprContainingStmtRange PseudoObjectExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<PseudoObjectExpr> PseudoObjectExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-PseudoObjectExprContainingStmtRange PseudoObjectExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<PseudoObjectExpr> PseudoObjectExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool PseudoObjectExpr::contains(const Decl &decl) {
@@ -34616,12 +36168,20 @@ std::vector<Expr> PseudoObjectExpr::semantic_expressions(void) const {
   return vec;
 }
 
-PredefinedExprContainingStmtRange PredefinedExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<PredefinedExpr> PredefinedExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-PredefinedExprContainingStmtRange PredefinedExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<PredefinedExpr> PredefinedExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool PredefinedExpr::contains(const Decl &decl) {
@@ -34684,12 +36244,20 @@ Token PredefinedExpr::token(void) const {
   }
 }
 
-ParenListExprContainingStmtRange ParenListExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ParenListExpr> ParenListExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ParenListExprContainingStmtRange ParenListExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ParenListExpr> ParenListExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ParenListExpr::contains(const Decl &decl) {
@@ -34760,12 +36328,20 @@ std::vector<Expr> ParenListExpr::expressions(void) const {
   return vec;
 }
 
-ParenExprContainingStmtRange ParenExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ParenExpr> ParenExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ParenExprContainingStmtRange ParenExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ParenExpr> ParenExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ParenExpr::contains(const Decl &decl) {
@@ -34826,12 +36402,20 @@ Expr ParenExpr::sub_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-PackExpansionExprContainingStmtRange PackExpansionExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<PackExpansionExpr> PackExpansionExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-PackExpansionExprContainingStmtRange PackExpansionExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<PackExpansionExpr> PackExpansionExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool PackExpansionExpr::contains(const Decl &decl) {
@@ -34892,12 +36476,20 @@ Expr PackExpansionExpr::pattern(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-OverloadExprContainingStmtRange OverloadExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OverloadExpr> OverloadExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OverloadExprContainingStmtRange OverloadExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OverloadExpr> OverloadExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OverloadExpr::contains(const Decl &decl) {
@@ -34991,12 +36583,20 @@ bool OverloadExpr::has_template_keyword(void) const {
   return self.getVal97();
 }
 
-UnresolvedMemberExprContainingStmtRange UnresolvedMemberExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnresolvedMemberExprContainingStmtRange UnresolvedMemberExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnresolvedMemberExpr::contains(const Decl &decl) {
@@ -35082,12 +36682,20 @@ bool UnresolvedMemberExpr::is_implicit_access(void) const {
   return self.getVal101();
 }
 
-UnresolvedLookupExprContainingStmtRange UnresolvedLookupExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnresolvedLookupExprContainingStmtRange UnresolvedLookupExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnresolvedLookupExpr::contains(const Decl &decl) {
@@ -35138,12 +36746,20 @@ bool UnresolvedLookupExpr::requires_adl(void) const {
   return self.getVal99();
 }
 
-OpaqueValueExprContainingStmtRange OpaqueValueExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OpaqueValueExpr> OpaqueValueExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OpaqueValueExprContainingStmtRange OpaqueValueExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OpaqueValueExpr> OpaqueValueExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OpaqueValueExpr::contains(const Decl &decl) {
@@ -35200,12 +36816,20 @@ bool OpaqueValueExpr::is_unique(void) const {
   return self.getVal95();
 }
 
-OffsetOfExprContainingStmtRange OffsetOfExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OffsetOfExpr> OffsetOfExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OffsetOfExprContainingStmtRange OffsetOfExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OffsetOfExpr> OffsetOfExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OffsetOfExpr::contains(const Decl &decl) {
@@ -35260,12 +36884,20 @@ Token OffsetOfExpr::r_paren_token(void) const {
   }
 }
 
-ObjCSubscriptRefExprContainingStmtRange ObjCSubscriptRefExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCSubscriptRefExprContainingStmtRange ObjCSubscriptRefExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCSubscriptRefExpr::contains(const Decl &decl) {
@@ -35334,12 +36966,20 @@ bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const {
   return self.getVal95();
 }
 
-ObjCStringLiteralContainingStmtRange ObjCStringLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCStringLiteral> ObjCStringLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCStringLiteralContainingStmtRange ObjCStringLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCStringLiteral> ObjCStringLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCStringLiteral::contains(const Decl &decl) {
@@ -35391,12 +37031,20 @@ StringLiteral ObjCStringLiteral::string(void) const {
   return StringLiteral::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ObjCSelectorExprContainingStmtRange ObjCSelectorExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCSelectorExprContainingStmtRange ObjCSelectorExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCSelectorExpr::contains(const Decl &decl) {
@@ -35451,12 +37099,20 @@ Token ObjCSelectorExpr::r_paren_token(void) const {
   }
 }
 
-ObjCProtocolExprContainingStmtRange ObjCProtocolExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCProtocolExprContainingStmtRange ObjCProtocolExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCProtocolExpr::contains(const Decl &decl) {
@@ -35526,12 +37182,20 @@ Token ObjCProtocolExpr::r_paren_token(void) const {
   }
 }
 
-ObjCPropertyRefExprContainingStmtRange ObjCPropertyRefExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCPropertyRefExprContainingStmtRange ObjCPropertyRefExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCPropertyRefExpr::contains(const Decl &decl) {
@@ -35663,12 +37327,20 @@ bool ObjCPropertyRefExpr::is_super_receiver(void) const {
   return self.getVal103();
 }
 
-ObjCMessageExprContainingStmtRange ObjCMessageExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCMessageExprContainingStmtRange ObjCMessageExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCMessageExpr::contains(const Decl &decl) {
@@ -35854,12 +37526,20 @@ std::vector<Token> ObjCMessageExpr::selector_tokens(void) const {
   return vec;
 }
 
-ObjCIvarRefExprContainingStmtRange ObjCIvarRefExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCIvarRefExprContainingStmtRange ObjCIvarRefExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCIvarRefExpr::contains(const Decl &decl) {
@@ -35936,12 +37616,20 @@ bool ObjCIvarRefExpr::is_free_instance_variable(void) const {
   return self.getVal96();
 }
 
-ObjCIsaExprContainingStmtRange ObjCIsaExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCIsaExpr> ObjCIsaExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCIsaExprContainingStmtRange ObjCIsaExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCIsaExpr> ObjCIsaExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCIsaExpr::contains(const Decl &decl) {
@@ -36016,12 +37704,20 @@ bool ObjCIsaExpr::is_arrow(void) const {
   return self.getVal95();
 }
 
-ObjCIndirectCopyRestoreExprContainingStmtRange ObjCIndirectCopyRestoreExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCIndirectCopyRestoreExprContainingStmtRange ObjCIndirectCopyRestoreExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Decl &decl) {
@@ -36069,12 +37765,20 @@ bool ObjCIndirectCopyRestoreExpr::should_copy(void) const {
   return self.getVal95();
 }
 
-ObjCEncodeExprContainingStmtRange ObjCEncodeExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCEncodeExpr> ObjCEncodeExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCEncodeExprContainingStmtRange ObjCEncodeExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCEncodeExpr> ObjCEncodeExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCEncodeExpr::contains(const Decl &decl) {
@@ -36135,12 +37839,20 @@ Token ObjCEncodeExpr::r_paren_token(void) const {
   }
 }
 
-ObjCDictionaryLiteralContainingStmtRange ObjCDictionaryLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCDictionaryLiteralContainingStmtRange ObjCDictionaryLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCDictionaryLiteral::contains(const Decl &decl) {
@@ -36183,12 +37895,20 @@ ObjCMethodDecl ObjCDictionaryLiteral::dictionary_with_objects_method(void) const
   return ObjCMethodDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-ObjCBoxedExprContainingStmtRange ObjCBoxedExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCBoxedExprContainingStmtRange ObjCBoxedExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCBoxedExpr::contains(const Decl &decl) {
@@ -36251,12 +37971,20 @@ bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const {
   return self.getVal95();
 }
 
-ObjCBoolLiteralExprContainingStmtRange ObjCBoolLiteralExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCBoolLiteralExprContainingStmtRange ObjCBoolLiteralExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCBoolLiteralExpr::contains(const Decl &decl) {
@@ -36307,12 +38035,20 @@ bool ObjCBoolLiteralExpr::value(void) const {
   return self.getVal95();
 }
 
-ObjCAvailabilityCheckExprContainingStmtRange ObjCAvailabilityCheckExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAvailabilityCheckExprContainingStmtRange ObjCAvailabilityCheckExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAvailabilityCheckExpr::contains(const Decl &decl) {
@@ -36354,12 +38090,20 @@ bool ObjCAvailabilityCheckExpr::has_version(void) const {
   return self.getVal95();
 }
 
-ObjCArrayLiteralContainingStmtRange ObjCArrayLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCArrayLiteralContainingStmtRange ObjCArrayLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCArrayLiteral::contains(const Decl &decl) {
@@ -36418,12 +38162,20 @@ std::vector<Expr> ObjCArrayLiteral::elements(void) const {
   return vec;
 }
 
-OMPIteratorExprContainingStmtRange OMPIteratorExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPIteratorExpr> OMPIteratorExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPIteratorExprContainingStmtRange OMPIteratorExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPIteratorExpr> OMPIteratorExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPIteratorExpr::contains(const Decl &decl) {
@@ -36487,12 +38239,20 @@ Token OMPIteratorExpr::r_paren_token(void) const {
   }
 }
 
-OMPArrayShapingExprContainingStmtRange OMPArrayShapingExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPArrayShapingExprContainingStmtRange OMPArrayShapingExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPArrayShapingExpr::contains(const Decl &decl) {
@@ -36569,12 +38329,20 @@ Token OMPArrayShapingExpr::r_paren_token(void) const {
   }
 }
 
-OMPArraySectionExprContainingStmtRange OMPArraySectionExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPArraySectionExprContainingStmtRange OMPArraySectionExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPArraySectionExpr::contains(const Decl &decl) {
@@ -36662,12 +38430,20 @@ Expr OMPArraySectionExpr::stride(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-NoInitExprContainingStmtRange NoInitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<NoInitExpr> NoInitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-NoInitExprContainingStmtRange NoInitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<NoInitExpr> NoInitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool NoInitExpr::contains(const Decl &decl) {
@@ -36704,12 +38480,20 @@ std::optional<NoInitExpr> NoInitExpr::from(const Stmt &parent) {
   }
 }
 
-MemberExprContainingStmtRange MemberExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MemberExpr> MemberExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MemberExprContainingStmtRange MemberExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MemberExpr> MemberExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MemberExpr::contains(const Decl &decl) {
@@ -36838,12 +38622,20 @@ NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
   return static_cast<NonOdrUseReason>(self.getVal100());
 }
 
-MatrixSubscriptExprContainingStmtRange MatrixSubscriptExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MatrixSubscriptExprContainingStmtRange MatrixSubscriptExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MatrixSubscriptExpr::contains(const Decl &decl) {
@@ -36912,12 +38704,20 @@ bool MatrixSubscriptExpr::is_incomplete(void) const {
   return self.getVal95();
 }
 
-MaterializeTemporaryExprContainingStmtRange MaterializeTemporaryExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MaterializeTemporaryExprContainingStmtRange MaterializeTemporaryExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MaterializeTemporaryExpr::contains(const Decl &decl) {
@@ -36995,12 +38795,20 @@ bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const {
   return self.getVal98();
 }
 
-MSPropertySubscriptExprContainingStmtRange MSPropertySubscriptExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MSPropertySubscriptExprContainingStmtRange MSPropertySubscriptExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MSPropertySubscriptExpr::contains(const Decl &decl) {
@@ -37058,12 +38866,20 @@ Token MSPropertySubscriptExpr::r_bracket_token(void) const {
   }
 }
 
-MSPropertyRefExprContainingStmtRange MSPropertyRefExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MSPropertyRefExprContainingStmtRange MSPropertyRefExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MSPropertyRefExpr::contains(const Decl &decl) {
@@ -37131,12 +38947,20 @@ bool MSPropertyRefExpr::is_implicit_access(void) const {
   return self.getVal96();
 }
 
-LambdaExprContainingStmtRange LambdaExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<LambdaExpr> LambdaExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-LambdaExprContainingStmtRange LambdaExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<LambdaExpr> LambdaExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool LambdaExpr::contains(const Decl &decl) {
@@ -37271,12 +39095,20 @@ bool LambdaExpr::is_mutable(void) const {
   return self.getVal101();
 }
 
-IntegerLiteralContainingStmtRange IntegerLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<IntegerLiteral> IntegerLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-IntegerLiteralContainingStmtRange IntegerLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<IntegerLiteral> IntegerLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool IntegerLiteral::contains(const Decl &decl) {
@@ -37322,12 +39154,20 @@ Token IntegerLiteral::token(void) const {
   }
 }
 
-InitListExprContainingStmtRange InitListExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<InitListExpr> InitListExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-InitListExprContainingStmtRange InitListExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<InitListExpr> InitListExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool InitListExpr::contains(const Decl &decl) {
@@ -37477,12 +39317,20 @@ std::optional<bool> InitListExpr::is_transparent(void) const {
   }
 }
 
-ImplicitValueInitExprContainingStmtRange ImplicitValueInitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ImplicitValueInitExpr> ImplicitValueInitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ImplicitValueInitExprContainingStmtRange ImplicitValueInitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ImplicitValueInitExpr> ImplicitValueInitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ImplicitValueInitExpr::contains(const Decl &decl) {
@@ -37519,12 +39367,20 @@ std::optional<ImplicitValueInitExpr> ImplicitValueInitExpr::from(const Stmt &par
   }
 }
 
-ImaginaryLiteralContainingStmtRange ImaginaryLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ImaginaryLiteral> ImaginaryLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ImaginaryLiteralContainingStmtRange ImaginaryLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ImaginaryLiteral> ImaginaryLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ImaginaryLiteral::contains(const Decl &decl) {
@@ -37567,12 +39423,20 @@ Expr ImaginaryLiteral::sub_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-GenericSelectionExprContainingStmtRange GenericSelectionExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<GenericSelectionExpr> GenericSelectionExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-GenericSelectionExprContainingStmtRange GenericSelectionExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<GenericSelectionExpr> GenericSelectionExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool GenericSelectionExpr::contains(const Decl &decl) {
@@ -37669,12 +39533,20 @@ bool GenericSelectionExpr::is_result_dependent(void) const {
   return self.getVal95();
 }
 
-GNUNullExprContainingStmtRange GNUNullExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<GNUNullExpr> GNUNullExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-GNUNullExprContainingStmtRange GNUNullExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<GNUNullExpr> GNUNullExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool GNUNullExpr::contains(const Decl &decl) {
@@ -37720,12 +39592,20 @@ Token GNUNullExpr::token_token(void) const {
   }
 }
 
-FunctionParmPackExprContainingStmtRange FunctionParmPackExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FunctionParmPackExprContainingStmtRange FunctionParmPackExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FunctionParmPackExpr::contains(const Decl &decl) {
@@ -37793,12 +39673,20 @@ std::vector<VarDecl> FunctionParmPackExpr::expansions(void) const {
   return vec;
 }
 
-FullExprContainingStmtRange FullExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<FullExpr> FullExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FullExprContainingStmtRange FullExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<FullExpr> FullExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FullExpr::contains(const Decl &decl) {
@@ -37842,12 +39730,20 @@ Expr FullExpr::sub_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ExprWithCleanupsContainingStmtRange ExprWithCleanups::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ExprWithCleanups> ExprWithCleanups::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExprWithCleanupsContainingStmtRange ExprWithCleanups::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ExprWithCleanups> ExprWithCleanups::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ExprWithCleanups::contains(const Decl &decl) {
@@ -37893,12 +39789,20 @@ bool ExprWithCleanups::cleanups_have_side_effects(void) const {
   return self.getVal95();
 }
 
-ConstantExprContainingStmtRange ConstantExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ConstantExpr> ConstantExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ConstantExprContainingStmtRange ConstantExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ConstantExpr> ConstantExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ConstantExpr::contains(const Decl &decl) {
@@ -37954,12 +39858,20 @@ bool ConstantExpr::is_immediate_invocation(void) const {
   return self.getVal96();
 }
 
-FloatingLiteralContainingStmtRange FloatingLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<FloatingLiteral> FloatingLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FloatingLiteralContainingStmtRange FloatingLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<FloatingLiteral> FloatingLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FloatingLiteral::contains(const Decl &decl) {
@@ -38010,12 +39922,20 @@ bool FloatingLiteral::is_exact(void) const {
   return self.getVal95();
 }
 
-FixedPointLiteralContainingStmtRange FixedPointLiteral::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<FixedPointLiteral> FixedPointLiteral::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FixedPointLiteralContainingStmtRange FixedPointLiteral::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<FixedPointLiteral> FixedPointLiteral::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FixedPointLiteral::contains(const Decl &decl) {
@@ -38061,12 +39981,20 @@ Token FixedPointLiteral::token(void) const {
   }
 }
 
-ExtVectorElementExprContainingStmtRange ExtVectorElementExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExtVectorElementExprContainingStmtRange ExtVectorElementExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ExtVectorElementExpr::contains(const Decl &decl) {
@@ -38128,12 +40056,20 @@ bool ExtVectorElementExpr::is_arrow(void) const {
   return self.getVal96();
 }
 
-ExpressionTraitExprContainingStmtRange ExpressionTraitExpr::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<ExpressionTraitExpr> ExpressionTraitExpr::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExpressionTraitExprContainingStmtRange ExpressionTraitExpr::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<ExpressionTraitExpr> ExpressionTraitExpr::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ExpressionTraitExpr::contains(const Decl &decl) {
@@ -38186,12 +40122,20 @@ bool ExpressionTraitExpr::value(void) const {
   return self.getVal95();
 }
 
-AttributedStmtContainingStmtRange AttributedStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<AttributedStmt> AttributedStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AttributedStmtContainingStmtRange AttributedStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<AttributedStmt> AttributedStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AttributedStmt::contains(const Decl &decl) {
@@ -38253,12 +40197,20 @@ Stmt AttributedStmt::sub_statement(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-SwitchStmtContainingStmtRange SwitchStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SwitchStmt> SwitchStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SwitchStmtContainingStmtRange SwitchStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SwitchStmt> SwitchStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SwitchStmt::contains(const Decl &decl) {
@@ -38381,12 +40333,20 @@ bool SwitchStmt::is_all_enum_cases_covered(void) const {
   return self.getVal59();
 }
 
-SwitchCaseContainingStmtRange SwitchCase::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<SwitchCase> SwitchCase::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-SwitchCaseContainingStmtRange SwitchCase::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<SwitchCase> SwitchCase::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool SwitchCase::contains(const Decl &decl) {
@@ -38450,12 +40410,20 @@ Stmt SwitchCase::sub_statement(void) const {
   return fragment->StmtFor(fragment, id, false).value();
 }
 
-DefaultStmtContainingStmtRange DefaultStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<DefaultStmt> DefaultStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DefaultStmtContainingStmtRange DefaultStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<DefaultStmt> DefaultStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DefaultStmt::contains(const Decl &decl) {
@@ -38497,12 +40465,20 @@ Token DefaultStmt::default_token(void) const {
   }
 }
 
-CaseStmtContainingStmtRange CaseStmt::containing(const Decl &decl) {
-  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());
+gap::generator<CaseStmt> CaseStmt::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CaseStmtContainingStmtRange CaseStmt::containing(const Stmt &stmt) {
-  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());
+gap::generator<CaseStmt> CaseStmt::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CaseStmt::contains(const Decl &decl) {
@@ -38597,12 +40573,20 @@ std::optional<Stmt> Decl::parent_statement(void) const {
   }
 }
 
-DeclContainingDeclRange Decl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<Decl> Decl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DeclContainingDeclRange Decl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<Decl> Decl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool Decl::contains(const Decl &decl) {
@@ -38860,12 +40844,20 @@ TokenRange Decl::tokens(void) const {
   return fragment->TokenRangeFor(fragment, self.getVal46(), self.getVal47());
 }
 
-ClassScopeFunctionSpecializationDeclContainingDeclRange ClassScopeFunctionSpecializationDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ClassScopeFunctionSpecializationDeclContainingDeclRange ClassScopeFunctionSpecializationDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Decl &decl) {
@@ -38905,12 +40897,20 @@ bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void)
   return self.getVal49();
 }
 
-CapturedDeclContainingDeclRange CapturedDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CapturedDecl> CapturedDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CapturedDeclContainingDeclRange CapturedDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CapturedDecl> CapturedDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CapturedDecl::contains(const Decl &decl) {
@@ -38980,12 +40980,20 @@ std::vector<Decl> CapturedDecl::declarations_in_context(void) const {
   return vec;
 }
 
-BlockDeclContainingDeclRange BlockDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<BlockDecl> BlockDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BlockDeclContainingDeclRange BlockDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<BlockDecl> BlockDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BlockDecl::contains(const Decl &decl) {
@@ -39126,12 +41134,20 @@ std::vector<Decl> BlockDecl::declarations_in_context(void) const {
   return vec;
 }
 
-AccessSpecDeclContainingDeclRange AccessSpecDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<AccessSpecDecl> AccessSpecDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-AccessSpecDeclContainingDeclRange AccessSpecDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<AccessSpecDecl> AccessSpecDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool AccessSpecDecl::contains(const Decl &decl) {
@@ -39178,12 +41194,20 @@ Token AccessSpecDecl::colon_token(void) const {
   }
 }
 
-OMPDeclarativeDirectiveDeclContainingDeclRange OMPDeclarativeDirectiveDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDeclarativeDirectiveDeclContainingDeclRange OMPDeclarativeDirectiveDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDeclarativeDirectiveDecl::contains(const Decl &decl) {
@@ -39214,12 +41238,20 @@ std::optional<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::from(con
   }
 }
 
-OMPThreadPrivateDeclContainingDeclRange OMPThreadPrivateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPThreadPrivateDeclContainingDeclRange OMPThreadPrivateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPThreadPrivateDecl> OMPThreadPrivateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPThreadPrivateDecl::contains(const Decl &decl) {
@@ -39268,12 +41300,20 @@ std::vector<Expr> OMPThreadPrivateDecl::varlists(void) const {
   return vec;
 }
 
-OMPRequiresDeclContainingDeclRange OMPRequiresDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPRequiresDeclContainingDeclRange OMPRequiresDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPRequiresDecl::contains(const Decl &decl) {
@@ -39306,12 +41346,20 @@ std::optional<OMPRequiresDecl> OMPRequiresDecl::from(const Decl &parent) {
   }
 }
 
-OMPAllocateDeclContainingDeclRange OMPAllocateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPAllocateDecl> OMPAllocateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPAllocateDeclContainingDeclRange OMPAllocateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPAllocateDecl> OMPAllocateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPAllocateDecl::contains(const Decl &decl) {
@@ -39360,12 +41408,20 @@ std::vector<Expr> OMPAllocateDecl::varlists(void) const {
   return vec;
 }
 
-TranslationUnitDeclContainingDeclRange TranslationUnitDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TranslationUnitDecl> TranslationUnitDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TranslationUnitDeclContainingDeclRange TranslationUnitDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TranslationUnitDecl> TranslationUnitDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TranslationUnitDecl::contains(const Decl &decl) {
@@ -39408,12 +41464,20 @@ std::vector<Decl> TranslationUnitDecl::declarations_in_context(void) const {
   return vec;
 }
 
-StaticAssertDeclContainingDeclRange StaticAssertDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<StaticAssertDecl> StaticAssertDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-StaticAssertDeclContainingDeclRange StaticAssertDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<StaticAssertDecl> StaticAssertDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool StaticAssertDecl::contains(const Decl &decl) {
@@ -39468,12 +41532,20 @@ bool StaticAssertDecl::is_failed(void) const {
   return self.getVal49();
 }
 
-RequiresExprBodyDeclContainingDeclRange RequiresExprBodyDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-RequiresExprBodyDeclContainingDeclRange RequiresExprBodyDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool RequiresExprBodyDecl::contains(const Decl &decl) {
@@ -39516,12 +41588,20 @@ std::vector<Decl> RequiresExprBodyDecl::declarations_in_context(void) const {
   return vec;
 }
 
-PragmaDetectMismatchDeclContainingDeclRange PragmaDetectMismatchDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-PragmaDetectMismatchDeclContainingDeclRange PragmaDetectMismatchDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool PragmaDetectMismatchDecl::contains(const Decl &decl) {
@@ -39562,12 +41642,20 @@ std::string_view PragmaDetectMismatchDecl::value(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-PragmaCommentDeclContainingDeclRange PragmaCommentDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<PragmaCommentDecl> PragmaCommentDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-PragmaCommentDeclContainingDeclRange PragmaCommentDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<PragmaCommentDecl> PragmaCommentDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool PragmaCommentDecl::contains(const Decl &decl) {
@@ -39607,12 +41695,20 @@ PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const {
   return static_cast<PragmaMSCommentKind>(self.getVal65());
 }
 
-ObjCPropertyImplDeclContainingDeclRange ObjCPropertyImplDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCPropertyImplDeclContainingDeclRange ObjCPropertyImplDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCPropertyImplDecl::contains(const Decl &decl) {
@@ -39696,12 +41792,20 @@ bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const {
   return self.getVal49();
 }
 
-NamedDeclContainingDeclRange NamedDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<NamedDecl> NamedDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-NamedDeclContainingDeclRange NamedDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<NamedDecl> NamedDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool NamedDecl::contains(const Decl &decl) {
@@ -39879,12 +41983,20 @@ bool NamedDecl::is_linkage_valid(void) const {
   return self.getVal71();
 }
 
-LabelDeclContainingDeclRange LabelDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<LabelDecl> LabelDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-LabelDeclContainingDeclRange LabelDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<LabelDecl> LabelDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool LabelDecl::contains(const Decl &decl) {
@@ -39944,12 +42056,20 @@ bool LabelDecl::is_resolved_ms_assembly_label(void) const {
   return self.getVal75();
 }
 
-BaseUsingDeclContainingDeclRange BaseUsingDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BaseUsingDeclContainingDeclRange BaseUsingDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BaseUsingDecl::contains(const Decl &decl) {
@@ -40000,12 +42120,20 @@ std::vector<UsingShadowDecl> BaseUsingDecl::shadows(void) const {
   return vec;
 }
 
-UsingEnumDeclContainingDeclRange UsingEnumDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UsingEnumDecl> UsingEnumDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UsingEnumDeclContainingDeclRange UsingEnumDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UsingEnumDecl> UsingEnumDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UsingEnumDecl::contains(const Decl &decl) {
@@ -40066,12 +42194,20 @@ Token UsingEnumDecl::using_token(void) const {
   }
 }
 
-UsingDeclContainingDeclRange UsingDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UsingDecl> UsingDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UsingDeclContainingDeclRange UsingDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UsingDecl> UsingDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UsingDecl::contains(const Decl &decl) {
@@ -40127,12 +42263,20 @@ bool UsingDecl::is_access_declaration(void) const {
   return self.getVal74();
 }
 
-ValueDeclContainingDeclRange ValueDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ValueDecl> ValueDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ValueDeclContainingDeclRange ValueDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ValueDecl> ValueDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ValueDecl::contains(const Decl &decl) {
@@ -40204,12 +42348,20 @@ bool ValueDecl::is_weak(void) const {
   return self.getVal73();
 }
 
-UnresolvedUsingValueDeclContainingDeclRange UnresolvedUsingValueDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnresolvedUsingValueDeclContainingDeclRange UnresolvedUsingValueDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnresolvedUsingValueDecl::contains(const Decl &decl) {
@@ -40274,12 +42426,20 @@ bool UnresolvedUsingValueDecl::is_pack_expansion(void) const {
   return self.getVal75();
 }
 
-UnnamedGlobalConstantDeclContainingDeclRange UnnamedGlobalConstantDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnnamedGlobalConstantDeclContainingDeclRange UnnamedGlobalConstantDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnnamedGlobalConstantDecl::contains(const Decl &decl) {
@@ -40316,12 +42476,20 @@ std::optional<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::from(const D
   }
 }
 
-TemplateParamObjectDeclContainingDeclRange TemplateParamObjectDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TemplateParamObjectDeclContainingDeclRange TemplateParamObjectDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TemplateParamObjectDecl> TemplateParamObjectDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TemplateParamObjectDecl::contains(const Decl &decl) {
@@ -40358,12 +42526,20 @@ std::optional<TemplateParamObjectDecl> TemplateParamObjectDecl::from(const Decl 
   }
 }
 
-OMPDeclareReductionDeclContainingDeclRange OMPDeclareReductionDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDeclareReductionDeclContainingDeclRange OMPDeclareReductionDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPDeclareReductionDecl> OMPDeclareReductionDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDeclareReductionDecl::contains(const Decl &decl) {
@@ -40455,12 +42631,20 @@ std::vector<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const {
   return vec;
 }
 
-MSGuidDeclContainingDeclRange MSGuidDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<MSGuidDecl> MSGuidDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MSGuidDeclContainingDeclRange MSGuidDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<MSGuidDecl> MSGuidDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MSGuidDecl::contains(const Decl &decl) {
@@ -40497,12 +42681,20 @@ std::optional<MSGuidDecl> MSGuidDecl::from(const Decl &parent) {
   }
 }
 
-IndirectFieldDeclContainingDeclRange IndirectFieldDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<IndirectFieldDecl> IndirectFieldDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-IndirectFieldDeclContainingDeclRange IndirectFieldDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<IndirectFieldDecl> IndirectFieldDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool IndirectFieldDecl::contains(const Decl &decl) {
@@ -40575,12 +42767,20 @@ std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   }
 }
 
-EnumConstantDeclContainingDeclRange EnumConstantDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<EnumConstantDecl> EnumConstantDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-EnumConstantDeclContainingDeclRange EnumConstantDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<EnumConstantDecl> EnumConstantDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool EnumConstantDecl::contains(const Decl &decl) {
@@ -40627,12 +42827,20 @@ std::optional<Expr> EnumConstantDecl::initializer_expression(void) const {
   }
 }
 
-DeclaratorDeclContainingDeclRange DeclaratorDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DeclaratorDeclContainingDeclRange DeclaratorDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DeclaratorDecl::contains(const Decl &decl) {
@@ -40744,12 +42952,20 @@ vec.emplace_back(fragment, v);
   return vec;
 }
 
-VarDeclContainingDeclRange VarDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<VarDecl> VarDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-VarDeclContainingDeclRange VarDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<VarDecl> VarDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool VarDecl::contains(const Decl &decl) {
@@ -41083,12 +43299,20 @@ QualTypeDestructionKind VarDecl::needs_destruction(void) const {
   return static_cast<QualTypeDestructionKind>(self.getVal132());
 }
 
-ParmVarDeclContainingDeclRange ParmVarDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ParmVarDecl> ParmVarDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ParmVarDeclContainingDeclRange ParmVarDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ParmVarDecl> ParmVarDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ParmVarDecl::contains(const Decl &decl) {
@@ -41204,12 +43428,20 @@ bool ParmVarDecl::is_obj_c_method_parameter(void) const {
   return self.getVal147();
 }
 
-OMPCapturedExprDeclContainingDeclRange OMPCapturedExprDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPCapturedExprDeclContainingDeclRange OMPCapturedExprDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPCapturedExprDecl::contains(const Decl &decl) {
@@ -41254,12 +43486,20 @@ std::optional<OMPCapturedExprDecl> OMPCapturedExprDecl::from(const Decl &parent)
   }
 }
 
-ImplicitParamDeclContainingDeclRange ImplicitParamDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ImplicitParamDecl> ImplicitParamDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ImplicitParamDeclContainingDeclRange ImplicitParamDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ImplicitParamDecl> ImplicitParamDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ImplicitParamDecl::contains(const Decl &decl) {
@@ -41309,12 +43549,20 @@ ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const
   return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal137());
 }
 
-DecompositionDeclContainingDeclRange DecompositionDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<DecompositionDecl> DecompositionDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-DecompositionDeclContainingDeclRange DecompositionDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<DecompositionDecl> DecompositionDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool DecompositionDecl::contains(const Decl &decl) {
@@ -41375,12 +43623,20 @@ std::vector<BindingDecl> DecompositionDecl::bindings(void) const {
   return vec;
 }
 
-VarTemplateSpecializationDeclContainingDeclRange VarTemplateSpecializationDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-VarTemplateSpecializationDeclContainingDeclRange VarTemplateSpecializationDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool VarTemplateSpecializationDecl::contains(const Decl &decl) {
@@ -41492,12 +43748,20 @@ bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
   return self.getVal141();
 }
 
-VarTemplatePartialSpecializationDeclContainingDeclRange VarTemplatePartialSpecializationDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-VarTemplatePartialSpecializationDeclContainingDeclRange VarTemplatePartialSpecializationDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool VarTemplatePartialSpecializationDecl::contains(const Decl &decl) {
@@ -41546,12 +43810,20 @@ std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializa
   }
 }
 
-NonTypeTemplateParmDeclContainingDeclRange NonTypeTemplateParmDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-NonTypeTemplateParmDeclContainingDeclRange NonTypeTemplateParmDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool NonTypeTemplateParmDecl::contains(const Decl &decl) {
@@ -41669,12 +43941,20 @@ std::vector<Type> NonTypeTemplateParmDecl::expansion_types(void) const {
   return vec;
 }
 
-MSPropertyDeclContainingDeclRange MSPropertyDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-MSPropertyDeclContainingDeclRange MSPropertyDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool MSPropertyDecl::contains(const Decl &decl) {
@@ -41725,12 +44005,20 @@ bool MSPropertyDecl::has_setter(void) const {
   return self.getVal80();
 }
 
-FunctionDeclContainingDeclRange FunctionDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<FunctionDecl> FunctionDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FunctionDeclContainingDeclRange FunctionDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<FunctionDecl> FunctionDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FunctionDecl::contains(const Decl &decl) {
@@ -42237,12 +44525,20 @@ std::vector<Decl> FunctionDecl::declarations_in_context(void) const {
   return vec;
 }
 
-CXXMethodDeclContainingDeclRange CXXMethodDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXMethodDeclContainingDeclRange CXXMethodDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXMethodDecl::contains(const Decl &decl) {
@@ -42387,12 +44683,20 @@ std::vector<ParmVarDecl> CXXMethodDecl::parameter_declarations(void) const {
   return vec;
 }
 
-CXXDestructorDeclContainingDeclRange CXXDestructorDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CXXDestructorDecl> CXXDestructorDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDestructorDeclContainingDeclRange CXXDestructorDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CXXDestructorDecl> CXXDestructorDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDestructorDecl::contains(const Decl &decl) {
@@ -42461,12 +44765,20 @@ std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const
   }
 }
 
-CXXConversionDeclContainingDeclRange CXXConversionDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CXXConversionDecl> CXXConversionDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXConversionDeclContainingDeclRange CXXConversionDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CXXConversionDecl> CXXConversionDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXConversionDecl::contains(const Decl &decl) {
@@ -42531,12 +44843,20 @@ bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const {
   return self.getVal183();
 }
 
-CXXConstructorDeclContainingDeclRange CXXConstructorDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CXXConstructorDecl> CXXConstructorDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXConstructorDeclContainingDeclRange CXXConstructorDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CXXConstructorDecl> CXXConstructorDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXConstructorDecl::contains(const Decl &decl) {
@@ -42620,12 +44940,20 @@ bool CXXConstructorDecl::is_specialization_copying_object(void) const {
   return self.getVal187();
 }
 
-CXXDeductionGuideDeclContainingDeclRange CXXDeductionGuideDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXDeductionGuideDeclContainingDeclRange CXXDeductionGuideDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXDeductionGuideDecl::contains(const Decl &decl) {
@@ -42702,12 +45030,20 @@ std::vector<ParmVarDecl> CXXDeductionGuideDecl::parameter_declarations(void) con
   return vec;
 }
 
-FieldDeclContainingDeclRange FieldDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<FieldDecl> FieldDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FieldDeclContainingDeclRange FieldDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<FieldDecl> FieldDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FieldDecl::contains(const Decl &decl) {
@@ -42825,12 +45161,20 @@ bool FieldDecl::is_zero_size(void) const {
   return self.getVal100();
 }
 
-ObjCIvarDeclContainingDeclRange ObjCIvarDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCIvarDecl> ObjCIvarDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCIvarDeclContainingDeclRange ObjCIvarDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCIvarDecl> ObjCIvarDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCIvarDecl::contains(const Decl &decl) {
@@ -42902,12 +45246,20 @@ bool ObjCIvarDecl::synthesize(void) const {
   return self.getVal101();
 }
 
-ObjCAtDefsFieldDeclContainingDeclRange ObjCAtDefsFieldDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCAtDefsFieldDeclContainingDeclRange ObjCAtDefsFieldDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCAtDefsFieldDecl::contains(const Decl &decl) {
@@ -42952,12 +45304,20 @@ std::optional<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::from(const Decl &parent)
   }
 }
 
-BindingDeclContainingDeclRange BindingDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<BindingDecl> BindingDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BindingDeclContainingDeclRange BindingDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<BindingDecl> BindingDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BindingDecl::contains(const Decl &decl) {
@@ -43012,12 +45372,20 @@ VarDecl BindingDecl::holding_variable(void) const {
   return VarDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-OMPDeclarativeDirectiveValueDeclContainingDeclRange OMPDeclarativeDirectiveValueDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDeclarativeDirectiveValueDeclContainingDeclRange OMPDeclarativeDirectiveValueDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Decl &decl) {
@@ -43054,12 +45422,20 @@ std::optional<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl
   }
 }
 
-OMPDeclareMapperDeclContainingDeclRange OMPDeclareMapperDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-OMPDeclareMapperDeclContainingDeclRange OMPDeclareMapperDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<OMPDeclareMapperDecl> OMPDeclareMapperDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool OMPDeclareMapperDecl::contains(const Decl &decl) {
@@ -43120,12 +45496,20 @@ std::vector<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const {
   return vec;
 }
 
-UsingShadowDeclContainingDeclRange UsingShadowDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UsingShadowDecl> UsingShadowDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UsingShadowDeclContainingDeclRange UsingShadowDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UsingShadowDecl> UsingShadowDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UsingShadowDecl::contains(const Decl &decl) {
@@ -43181,12 +45565,20 @@ NamedDecl UsingShadowDecl::target_declaration(void) const {
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-ConstructorUsingShadowDeclContainingDeclRange ConstructorUsingShadowDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ConstructorUsingShadowDeclContainingDeclRange ConstructorUsingShadowDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ConstructorUsingShadowDecl::contains(const Decl &decl) {
@@ -43260,12 +45652,20 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_
   }
 }
 
-UsingPackDeclContainingDeclRange UsingPackDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UsingPackDecl> UsingPackDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UsingPackDeclContainingDeclRange UsingPackDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UsingPackDecl> UsingPackDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UsingPackDecl::contains(const Decl &decl) {
@@ -43320,12 +45720,20 @@ NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-UsingDirectiveDeclContainingDeclRange UsingDirectiveDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UsingDirectiveDeclContainingDeclRange UsingDirectiveDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UsingDirectiveDecl::contains(const Decl &decl) {
@@ -43391,12 +45799,20 @@ Token UsingDirectiveDecl::using_token(void) const {
   }
 }
 
-UnresolvedUsingIfExistsDeclContainingDeclRange UnresolvedUsingIfExistsDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnresolvedUsingIfExistsDeclContainingDeclRange UnresolvedUsingIfExistsDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnresolvedUsingIfExistsDecl::contains(const Decl &decl) {
@@ -43429,12 +45845,20 @@ std::optional<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::from(con
   }
 }
 
-TypeDeclContainingDeclRange TypeDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TypeDecl> TypeDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypeDeclContainingDeclRange TypeDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TypeDecl> TypeDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypeDecl::contains(const Decl &decl) {
@@ -43489,12 +45913,20 @@ std::optional<Type> TypeDecl::type_for_declaration(void) const {
   }
 }
 
-TemplateTypeParmDeclContainingDeclRange TemplateTypeParmDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TemplateTypeParmDeclContainingDeclRange TemplateTypeParmDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TemplateTypeParmDecl::contains(const Decl &decl) {
@@ -43590,12 +46022,20 @@ bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
   return self.getVal96();
 }
 
-TagDeclContainingDeclRange TagDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TagDecl> TagDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TagDeclContainingDeclRange TagDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TagDecl> TagDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TagDecl::contains(const Decl &decl) {
@@ -43770,12 +46210,20 @@ std::vector<Decl> TagDecl::declarations_in_context(void) const {
   return vec;
 }
 
-RecordDeclContainingDeclRange RecordDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<RecordDecl> RecordDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-RecordDeclContainingDeclRange RecordDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<RecordDecl> RecordDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool RecordDecl::contains(const Decl &decl) {
@@ -43940,12 +46388,20 @@ bool RecordDecl::may_insert_extra_padding(void) const {
   return self.getVal123();
 }
 
-CXXRecordDeclContainingDeclRange CXXRecordDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-CXXRecordDeclContainingDeclRange CXXRecordDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool CXXRecordDecl::contains(const Decl &decl) {
@@ -45070,12 +47526,20 @@ vec.emplace_back(fragment, v);
   return vec;
 }
 
-ClassTemplateSpecializationDeclContainingDeclRange ClassTemplateSpecializationDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ClassTemplateSpecializationDeclContainingDeclRange ClassTemplateSpecializationDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ClassTemplateSpecializationDecl::contains(const Decl &decl) {
@@ -45204,12 +47668,20 @@ bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
   return self.getVal357();
 }
 
-ClassTemplatePartialSpecializationDeclContainingDeclRange ClassTemplatePartialSpecializationDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ClassTemplatePartialSpecializationDeclContainingDeclRange ClassTemplatePartialSpecializationDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Decl &decl) {
@@ -45262,12 +47734,20 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
   }
 }
 
-EnumDeclContainingDeclRange EnumDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<EnumDecl> EnumDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-EnumDeclContainingDeclRange EnumDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<EnumDecl> EnumDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool EnumDecl::contains(const Decl &decl) {
@@ -45418,12 +47898,20 @@ bool EnumDecl::is_scoped_using_class_tag(void) const {
   return self.getVal115();
 }
 
-UnresolvedUsingTypenameDeclContainingDeclRange UnresolvedUsingTypenameDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-UnresolvedUsingTypenameDeclContainingDeclRange UnresolvedUsingTypenameDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool UnresolvedUsingTypenameDecl::contains(const Decl &decl) {
@@ -45492,12 +47980,20 @@ bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
   return self.getVal74();
 }
 
-TypedefNameDeclContainingDeclRange TypedefNameDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypedefNameDeclContainingDeclRange TypedefNameDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypedefNameDecl::contains(const Decl &decl) {
@@ -45563,12 +48059,20 @@ bool TypedefNameDecl::is_transparent_tag(void) const {
   return self.getVal80();
 }
 
-TypedefDeclContainingDeclRange TypedefDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TypedefDecl> TypedefDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypedefDeclContainingDeclRange TypedefDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TypedefDecl> TypedefDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypedefDecl::contains(const Decl &decl) {
@@ -45609,12 +48113,20 @@ std::optional<TypedefDecl> TypedefDecl::from(const Decl &parent) {
   }
 }
 
-TypeAliasDeclContainingDeclRange TypeAliasDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TypeAliasDecl> TypeAliasDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypeAliasDeclContainingDeclRange TypeAliasDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TypeAliasDecl> TypeAliasDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypeAliasDecl::contains(const Decl &decl) {
@@ -45665,12 +48177,20 @@ std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(voi
   }
 }
 
-ObjCTypeParamDeclContainingDeclRange ObjCTypeParamDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCTypeParamDeclContainingDeclRange ObjCTypeParamDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCTypeParamDecl::contains(const Decl &decl) {
@@ -45739,12 +48259,20 @@ bool ObjCTypeParamDecl::has_explicit_bound(void) const {
   return self.getVal82();
 }
 
-TemplateDeclContainingDeclRange TemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TemplateDecl> TemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TemplateDeclContainingDeclRange TemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TemplateDecl> TemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TemplateDecl::contains(const Decl &decl) {
@@ -45785,12 +48313,20 @@ std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
   }
 }
 
-RedeclarableTemplateDeclContainingDeclRange RedeclarableTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-RedeclarableTemplateDeclContainingDeclRange RedeclarableTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool RedeclarableTemplateDecl::contains(const Decl &decl) {
@@ -45831,12 +48367,20 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Dec
   }
 }
 
-FunctionTemplateDeclContainingDeclRange FunctionTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FunctionTemplateDeclContainingDeclRange FunctionTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FunctionTemplateDecl::contains(const Decl &decl) {
@@ -45877,12 +48421,20 @@ std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Decl &paren
   }
 }
 
-ClassTemplateDeclContainingDeclRange ClassTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ClassTemplateDeclContainingDeclRange ClassTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ClassTemplateDecl::contains(const Decl &decl) {
@@ -45923,12 +48475,20 @@ std::optional<ClassTemplateDecl> ClassTemplateDecl::from(const Decl &parent) {
   }
 }
 
-VarTemplateDeclContainingDeclRange VarTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<VarTemplateDecl> VarTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-VarTemplateDeclContainingDeclRange VarTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<VarTemplateDecl> VarTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool VarTemplateDecl::contains(const Decl &decl) {
@@ -45969,12 +48529,20 @@ std::optional<VarTemplateDecl> VarTemplateDecl::from(const Decl &parent) {
   }
 }
 
-TypeAliasTemplateDeclContainingDeclRange TypeAliasTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TypeAliasTemplateDeclContainingDeclRange TypeAliasTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TypeAliasTemplateDecl> TypeAliasTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TypeAliasTemplateDecl::contains(const Decl &decl) {
@@ -46031,12 +48599,20 @@ TypeAliasDecl TypeAliasTemplateDecl::templated_declaration(void) const {
   return TypeAliasDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-ConceptDeclContainingDeclRange ConceptDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ConceptDecl> ConceptDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ConceptDeclContainingDeclRange ConceptDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ConceptDecl> ConceptDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ConceptDecl::contains(const Decl &decl) {
@@ -46084,12 +48660,20 @@ bool ConceptDecl::is_type_concept(void) const {
   return self.getVal73();
 }
 
-BuiltinTemplateDeclContainingDeclRange BuiltinTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-BuiltinTemplateDeclContainingDeclRange BuiltinTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool BuiltinTemplateDecl::contains(const Decl &decl) {
@@ -46126,12 +48710,20 @@ std::optional<BuiltinTemplateDecl> BuiltinTemplateDecl::from(const Decl &parent)
   }
 }
 
-TemplateTemplateParmDeclContainingDeclRange TemplateTemplateParmDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-TemplateTemplateParmDeclContainingDeclRange TemplateTemplateParmDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<TemplateTemplateParmDecl> TemplateTemplateParmDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool TemplateTemplateParmDecl::contains(const Decl &decl) {
@@ -46168,12 +48760,20 @@ std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Dec
   }
 }
 
-ObjCPropertyDeclContainingDeclRange ObjCPropertyDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCPropertyDeclContainingDeclRange ObjCPropertyDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCPropertyDecl::contains(const Decl &decl) {
@@ -46316,12 +48916,20 @@ bool ObjCPropertyDecl::is_retaining(void) const {
   return self.getVal92();
 }
 
-ObjCMethodDeclContainingDeclRange ObjCMethodDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCMethodDecl> ObjCMethodDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCMethodDeclContainingDeclRange ObjCMethodDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCMethodDecl> ObjCMethodDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCMethodDecl::contains(const Decl &decl) {
@@ -46551,12 +49159,20 @@ std::vector<Decl> ObjCMethodDecl::declarations_in_context(void) const {
   return vec;
 }
 
-ObjCContainerDeclContainingDeclRange ObjCContainerDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCContainerDeclContainingDeclRange ObjCContainerDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCContainerDecl::contains(const Decl &decl) {
@@ -46719,12 +49335,20 @@ std::vector<Decl> ObjCContainerDecl::declarations_in_context(void) const {
   return vec;
 }
 
-ObjCCategoryDeclContainingDeclRange ObjCCategoryDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCCategoryDeclContainingDeclRange ObjCCategoryDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCCategoryDecl::contains(const Decl &decl) {
@@ -46857,12 +49481,20 @@ std::vector<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
   return vec;
 }
 
-ObjCProtocolDeclContainingDeclRange ObjCProtocolDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCProtocolDeclContainingDeclRange ObjCProtocolDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCProtocolDecl::contains(const Decl &decl) {
@@ -46945,12 +49577,20 @@ std::vector<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
   return vec;
 }
 
-ObjCInterfaceDeclContainingDeclRange ObjCInterfaceDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCInterfaceDeclContainingDeclRange ObjCInterfaceDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCInterfaceDecl::contains(const Decl &decl) {
@@ -47200,12 +49840,20 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const 
   return vec;
 }
 
-ObjCImplDeclContainingDeclRange ObjCImplDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCImplDecl> ObjCImplDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCImplDeclContainingDeclRange ObjCImplDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCImplDecl> ObjCImplDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCImplDecl::contains(const Decl &decl) {
@@ -47266,12 +49914,20 @@ std::vector<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) c
   return vec;
 }
 
-ObjCCategoryImplDeclContainingDeclRange ObjCCategoryImplDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCCategoryImplDeclContainingDeclRange ObjCCategoryImplDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCCategoryImplDecl::contains(const Decl &decl) {
@@ -47327,12 +49983,20 @@ Token ObjCCategoryImplDecl::category_name_token(void) const {
   }
 }
 
-ObjCImplementationDeclContainingDeclRange ObjCImplementationDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCImplementationDeclContainingDeclRange ObjCImplementationDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCImplementationDecl::contains(const Decl &decl) {
@@ -47438,12 +50102,20 @@ std::vector<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const
   return vec;
 }
 
-ObjCCompatibleAliasDeclContainingDeclRange ObjCCompatibleAliasDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ObjCCompatibleAliasDeclContainingDeclRange ObjCCompatibleAliasDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ObjCCompatibleAliasDecl::contains(const Decl &decl) {
@@ -47482,12 +50154,20 @@ ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-NamespaceDeclContainingDeclRange NamespaceDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<NamespaceDecl> NamespaceDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-NamespaceDeclContainingDeclRange NamespaceDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<NamespaceDecl> NamespaceDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool NamespaceDecl::contains(const Decl &decl) {
@@ -47534,12 +50214,20 @@ std::vector<Decl> NamespaceDecl::declarations_in_context(void) const {
   return vec;
 }
 
-NamespaceAliasDeclContainingDeclRange NamespaceAliasDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-NamespaceAliasDeclContainingDeclRange NamespaceAliasDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool NamespaceAliasDecl::contains(const Decl &decl) {
@@ -47605,12 +50293,20 @@ Token NamespaceAliasDecl::target_name_token(void) const {
   }
 }
 
-LinkageSpecDeclContainingDeclRange LinkageSpecDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<LinkageSpecDecl> LinkageSpecDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-LinkageSpecDeclContainingDeclRange LinkageSpecDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<LinkageSpecDecl> LinkageSpecDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool LinkageSpecDecl::contains(const Decl &decl) {
@@ -47653,12 +50349,20 @@ std::vector<Decl> LinkageSpecDecl::declarations_in_context(void) const {
   return vec;
 }
 
-LifetimeExtendedTemporaryDeclContainingDeclRange LifetimeExtendedTemporaryDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-LifetimeExtendedTemporaryDeclContainingDeclRange LifetimeExtendedTemporaryDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool LifetimeExtendedTemporaryDecl::contains(const Decl &decl) {
@@ -47718,12 +50422,20 @@ Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-ImportDeclContainingDeclRange ImportDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ImportDecl> ImportDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ImportDeclContainingDeclRange ImportDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ImportDecl> ImportDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ImportDecl::contains(const Decl &decl) {
@@ -47766,12 +50478,20 @@ std::vector<Token> ImportDecl::identifier_tokens(void) const {
   return vec;
 }
 
-FriendTemplateDeclContainingDeclRange FriendTemplateDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<FriendTemplateDecl> FriendTemplateDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FriendTemplateDeclContainingDeclRange FriendTemplateDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<FriendTemplateDecl> FriendTemplateDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FriendTemplateDecl::contains(const Decl &decl) {
@@ -47800,12 +50520,20 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
   }
 }
 
-FriendDeclContainingDeclRange FriendDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<FriendDecl> FriendDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FriendDeclContainingDeclRange FriendDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<FriendDecl> FriendDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FriendDecl::contains(const Decl &decl) {
@@ -47879,12 +50607,20 @@ vec.emplace_back(fragment, v);
   return vec;
 }
 
-FileScopeAsmDeclContainingDeclRange FileScopeAsmDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-FileScopeAsmDeclContainingDeclRange FileScopeAsmDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool FileScopeAsmDecl::contains(const Decl &decl) {
@@ -47937,12 +50673,20 @@ Token FileScopeAsmDecl::r_paren_token(void) const {
   }
 }
 
-ExternCContextDeclContainingDeclRange ExternCContextDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ExternCContextDecl> ExternCContextDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExternCContextDeclContainingDeclRange ExternCContextDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ExternCContextDecl> ExternCContextDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ExternCContextDecl::contains(const Decl &decl) {
@@ -47985,12 +50729,20 @@ std::vector<Decl> ExternCContextDecl::declarations_in_context(void) const {
   return vec;
 }
 
-ExportDeclContainingDeclRange ExportDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<ExportDecl> ExportDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-ExportDeclContainingDeclRange ExportDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<ExportDecl> ExportDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool ExportDecl::contains(const Decl &decl) {
@@ -48056,12 +50808,20 @@ std::vector<Decl> ExportDecl::declarations_in_context(void) const {
   return vec;
 }
 
-EmptyDeclContainingDeclRange EmptyDecl::containing(const Decl &decl) {
-  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());
+gap::generator<EmptyDecl> EmptyDecl::containing(const Decl &decl) {
+  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
-EmptyDeclContainingDeclRange EmptyDecl::containing(const Stmt &stmt) {
-  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());
+gap::generator<EmptyDecl> EmptyDecl::containing(const Stmt &stmt) {
+  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
+    if(auto d = from(*ancestor)) {
+      co_yield *d;
+    }
+  }
 }
 
 bool EmptyDecl::contains(const Decl &decl) {

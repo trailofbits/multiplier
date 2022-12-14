@@ -37,8 +37,6 @@ class ObjCProtocolDecl;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCInterfaceDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCInterfaceDecl>;
-
 class ObjCInterfaceDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -73,8 +71,8 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     return DeclKind::OBJ_C_INTERFACE;
   }
 
-  static ObjCInterfaceDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCInterfaceDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCInterfaceDecl> containing(const Decl &decl);
+  static gap::generator<ObjCInterfaceDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

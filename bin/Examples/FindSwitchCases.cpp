@@ -18,8 +18,9 @@ static void FindSwitchCases(mx::Fragment fragment) {
   for (mx::SwitchStmt sw : mx::SwitchStmt::in(fragment)) {
     std::cout << fragment.id() << std::endl;
 
-    auto containing_func = mx::FunctionDecl::containing(sw);
-    CHECK(containing_func);
+    auto containing_funcs = mx::FunctionDecl::containing(sw);
+    auto containing_func = containing_funcs.begin();
+    CHECK(containing_func != containing_funcs.end());
 
     for (auto cs = sw.first_switch_case(); cs; cs = cs->next_switch_case()) {
       if (auto case_ = mx::CaseStmt::from(*cs)) {

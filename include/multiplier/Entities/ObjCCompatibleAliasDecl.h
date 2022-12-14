@@ -29,8 +29,6 @@ class NamedDecl;
 class ObjCCompatibleAliasDecl;
 class ObjCInterfaceDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCCompatibleAliasDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCCompatibleAliasDecl>;
-
 class ObjCCompatibleAliasDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
     return DeclKind::OBJ_C_COMPATIBLE_ALIAS;
   }
 
-  static ObjCCompatibleAliasDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCCompatibleAliasDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCCompatibleAliasDecl> containing(const Decl &decl);
+  static gap::generator<ObjCCompatibleAliasDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

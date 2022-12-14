@@ -30,8 +30,6 @@ class LabelDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AddrLabelExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AddrLabelExpr>;
-
 class AddrLabelExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class AddrLabelExpr : public Expr {
     return StmtKind::ADDR_LABEL_EXPR;
   }
 
-  static AddrLabelExprContainingStmtRange containing(const Decl &decl);
-  static AddrLabelExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<AddrLabelExpr> containing(const Decl &decl);
+  static gap::generator<AddrLabelExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

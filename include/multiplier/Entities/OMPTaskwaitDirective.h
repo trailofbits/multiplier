@@ -28,8 +28,6 @@ class OMPExecutableDirective;
 class OMPTaskwaitDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTaskwaitDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTaskwaitDirective>;
-
 class OMPTaskwaitDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class OMPTaskwaitDirective : public OMPExecutableDirective {
     return StmtKind::OMP_TASKWAIT_DIRECTIVE;
   }
 
-  static OMPTaskwaitDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTaskwaitDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTaskwaitDirective> containing(const Decl &decl);
+  static gap::generator<OMPTaskwaitDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

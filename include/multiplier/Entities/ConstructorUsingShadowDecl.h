@@ -31,8 +31,6 @@ class Decl;
 class NamedDecl;
 class UsingShadowDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstructorUsingShadowDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ConstructorUsingShadowDecl>;
-
 class ConstructorUsingShadowDecl : public UsingShadowDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
     return DeclKind::CONSTRUCTOR_USING_SHADOW;
   }
 
-  static ConstructorUsingShadowDeclContainingDeclRange containing(const Decl &decl);
-  static ConstructorUsingShadowDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ConstructorUsingShadowDecl> containing(const Decl &decl);
+  static gap::generator<ConstructorUsingShadowDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

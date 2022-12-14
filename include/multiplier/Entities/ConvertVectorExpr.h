@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConvertVectorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ConvertVectorExpr>;
-
 class ConvertVectorExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ConvertVectorExpr : public Expr {
     return StmtKind::CONVERT_VECTOR_EXPR;
   }
 
-  static ConvertVectorExprContainingStmtRange containing(const Decl &decl);
-  static ConvertVectorExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ConvertVectorExpr> containing(const Decl &decl);
+  static gap::generator<ConvertVectorExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

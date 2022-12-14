@@ -29,8 +29,6 @@ class Decl;
 class NamedDecl;
 class TemplateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BuiltinTemplateDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, BuiltinTemplateDecl>;
-
 class BuiltinTemplateDecl : public TemplateDecl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class BuiltinTemplateDecl : public TemplateDecl {
     return DeclKind::BUILTIN_TEMPLATE;
   }
 
-  static BuiltinTemplateDeclContainingDeclRange containing(const Decl &decl);
-  static BuiltinTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<BuiltinTemplateDecl> containing(const Decl &decl);
+  static gap::generator<BuiltinTemplateDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

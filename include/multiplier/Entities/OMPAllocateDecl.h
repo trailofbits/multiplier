@@ -29,8 +29,6 @@ class Expr;
 class OMPAllocateDecl;
 class OMPDeclarativeDirectiveDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPAllocateDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPAllocateDecl>;
-
 class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_ALLOCATE;
   }
 
-  static OMPAllocateDeclContainingDeclRange containing(const Decl &decl);
-  static OMPAllocateDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPAllocateDecl> containing(const Decl &decl);
+  static gap::generator<OMPAllocateDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

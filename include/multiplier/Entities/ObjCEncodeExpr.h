@@ -30,8 +30,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCEncodeExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCEncodeExpr>;
-
 class ObjCEncodeExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ObjCEncodeExpr : public Expr {
     return StmtKind::OBJ_C_ENCODE_EXPR;
   }
 
-  static ObjCEncodeExprContainingStmtRange containing(const Decl &decl);
-  static ObjCEncodeExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCEncodeExpr> containing(const Decl &decl);
+  static gap::generator<ObjCEncodeExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

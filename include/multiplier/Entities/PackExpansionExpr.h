@@ -29,8 +29,6 @@ class PackExpansionExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PackExpansionExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, PackExpansionExpr>;
-
 class PackExpansionExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class PackExpansionExpr : public Expr {
     return StmtKind::PACK_EXPANSION_EXPR;
   }
 
-  static PackExpansionExprContainingStmtRange containing(const Decl &decl);
-  static PackExpansionExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<PackExpansionExpr> containing(const Decl &decl);
+  static gap::generator<PackExpansionExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

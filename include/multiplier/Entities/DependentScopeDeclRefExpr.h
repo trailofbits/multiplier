@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentScopeDeclRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DependentScopeDeclRefExpr>;
-
 class DependentScopeDeclRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class DependentScopeDeclRefExpr : public Expr {
     return StmtKind::DEPENDENT_SCOPE_DECL_REF_EXPR;
   }
 
-  static DependentScopeDeclRefExprContainingStmtRange containing(const Decl &decl);
-  static DependentScopeDeclRefExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<DependentScopeDeclRefExpr> containing(const Decl &decl);
+  static gap::generator<DependentScopeDeclRefExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

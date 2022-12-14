@@ -28,8 +28,6 @@ class OMPExecutableDirective;
 class OMPTargetDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTargetDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTargetDirective>;
-
 class OMPTargetDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class OMPTargetDirective : public OMPExecutableDirective {
     return StmtKind::OMP_TARGET_DIRECTIVE;
   }
 
-  static OMPTargetDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTargetDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTargetDirective> containing(const Decl &decl);
+  static gap::generator<OMPTargetDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

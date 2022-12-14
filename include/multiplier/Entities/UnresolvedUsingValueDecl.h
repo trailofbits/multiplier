@@ -29,8 +29,6 @@ class NamedDecl;
 class UnresolvedUsingValueDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedUsingValueDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnresolvedUsingValueDecl>;
-
 class UnresolvedUsingValueDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class UnresolvedUsingValueDecl : public ValueDecl {
     return DeclKind::UNRESOLVED_USING_VALUE;
   }
 
-  static UnresolvedUsingValueDeclContainingDeclRange containing(const Decl &decl);
-  static UnresolvedUsingValueDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UnresolvedUsingValueDecl> containing(const Decl &decl);
+  static gap::generator<UnresolvedUsingValueDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

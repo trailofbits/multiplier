@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArraySubscriptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ArraySubscriptExpr>;
-
 class ArraySubscriptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ArraySubscriptExpr : public Expr {
     return StmtKind::ARRAY_SUBSCRIPT_EXPR;
   }
 
-  static ArraySubscriptExprContainingStmtRange containing(const Decl &decl);
-  static ArraySubscriptExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ArraySubscriptExpr> containing(const Decl &decl);
+  static gap::generator<ArraySubscriptExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

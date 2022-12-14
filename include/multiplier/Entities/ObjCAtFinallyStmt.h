@@ -27,8 +27,6 @@ namespace mx {
 class ObjCAtFinallyStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtFinallyStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtFinallyStmt>;
-
 class ObjCAtFinallyStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class ObjCAtFinallyStmt : public Stmt {
     return StmtKind::OBJ_C_AT_FINALLY_STMT;
   }
 
-  static ObjCAtFinallyStmtContainingStmtRange containing(const Decl &decl);
-  static ObjCAtFinallyStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAtFinallyStmt> containing(const Decl &decl);
+  static gap::generator<ObjCAtFinallyStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

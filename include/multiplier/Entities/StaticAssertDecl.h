@@ -29,8 +29,6 @@ class Expr;
 class StaticAssertDecl;
 class StringLiteral;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StaticAssertDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, StaticAssertDecl>;
-
 class StaticAssertDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class StaticAssertDecl : public Decl {
     return DeclKind::STATIC_ASSERT;
   }
 
-  static StaticAssertDeclContainingDeclRange containing(const Decl &decl);
-  static StaticAssertDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<StaticAssertDecl> containing(const Decl &decl);
+  static gap::generator<StaticAssertDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

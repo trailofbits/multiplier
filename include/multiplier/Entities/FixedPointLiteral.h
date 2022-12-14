@@ -29,8 +29,6 @@ class FixedPointLiteral;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FixedPointLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, FixedPointLiteral>;
-
 class FixedPointLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class FixedPointLiteral : public Expr {
     return StmtKind::FIXED_POINT_LITERAL;
   }
 
-  static FixedPointLiteralContainingStmtRange containing(const Decl &decl);
-  static FixedPointLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<FixedPointLiteral> containing(const Decl &decl);
+  static gap::generator<FixedPointLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

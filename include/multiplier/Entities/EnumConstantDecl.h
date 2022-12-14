@@ -31,8 +31,6 @@ class Expr;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EnumConstantDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, EnumConstantDecl>;
-
 class EnumConstantDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class EnumConstantDecl : public ValueDecl {
     return DeclKind::ENUM_CONSTANT;
   }
 
-  static EnumConstantDeclContainingDeclRange containing(const Decl &decl);
-  static EnumConstantDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<EnumConstantDecl> containing(const Decl &decl);
+  static gap::generator<EnumConstantDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -34,8 +34,6 @@ class ValueDecl;
 class VarDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VarTemplateSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, VarTemplateSpecializationDecl>;
-
 class VarTemplateSpecializationDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -72,8 +70,8 @@ class VarTemplateSpecializationDecl : public VarDecl {
     return DeclKind::VAR_TEMPLATE_SPECIALIZATION;
   }
 
-  static VarTemplateSpecializationDeclContainingDeclRange containing(const Decl &decl);
-  static VarTemplateSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<VarTemplateSpecializationDecl> containing(const Decl &decl);
+  static gap::generator<VarTemplateSpecializationDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

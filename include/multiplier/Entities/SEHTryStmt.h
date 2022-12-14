@@ -30,8 +30,6 @@ class SEHFinallyStmt;
 class SEHTryStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHTryStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHTryStmt>;
-
 class SEHTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class SEHTryStmt : public Stmt {
     return StmtKind::SEH_TRY_STMT;
   }
 
-  static SEHTryStmtContainingStmtRange containing(const Decl &decl);
-  static SEHTryStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SEHTryStmt> containing(const Decl &decl);
+  static gap::generator<SEHTryStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

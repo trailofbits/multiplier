@@ -43,8 +43,6 @@ class Stmt;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FunctionDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, FunctionDecl>;
-
 class FunctionDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -80,8 +78,8 @@ class FunctionDecl : public DeclaratorDecl {
     return DeclKind::FUNCTION;
   }
 
-  static FunctionDeclContainingDeclRange containing(const Decl &decl);
-  static FunctionDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<FunctionDecl> containing(const Decl &decl);
+  static gap::generator<FunctionDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

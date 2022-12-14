@@ -31,8 +31,6 @@ class Stmt;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXFoldExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXFoldExpr>;
-
 class CXXFoldExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class CXXFoldExpr : public Expr {
     return StmtKind::CXX_FOLD_EXPR;
   }
 
-  static CXXFoldExprContainingStmtRange containing(const Decl &decl);
-  static CXXFoldExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXFoldExpr> containing(const Decl &decl);
+  static gap::generator<CXXFoldExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

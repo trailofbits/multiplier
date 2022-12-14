@@ -28,8 +28,6 @@ namespace mx {
 class Decl;
 class PragmaCommentDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaCommentDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, PragmaCommentDecl>;
-
 class PragmaCommentDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class PragmaCommentDecl : public Decl {
     return DeclKind::PRAGMA_COMMENT;
   }
 
-  static PragmaCommentDeclContainingDeclRange containing(const Decl &decl);
-  static PragmaCommentDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<PragmaCommentDecl> containing(const Decl &decl);
+  static gap::generator<PragmaCommentDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

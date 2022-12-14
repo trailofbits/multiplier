@@ -27,8 +27,6 @@ namespace mx {
 class Decl;
 class LinkageSpecDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LinkageSpecDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, LinkageSpecDecl>;
-
 class LinkageSpecDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class LinkageSpecDecl : public Decl {
     return DeclKind::LINKAGE_SPEC;
   }
 
-  static LinkageSpecDeclContainingDeclRange containing(const Decl &decl);
-  static LinkageSpecDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<LinkageSpecDecl> containing(const Decl &decl);
+  static gap::generator<LinkageSpecDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

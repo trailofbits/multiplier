@@ -33,8 +33,6 @@ class ObjCInterfaceDecl;
 class ObjCIvarDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIvarDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCIvarDecl>;
-
 class ObjCIvarDecl : public FieldDecl {
  private:
   friend class FragmentImpl;
@@ -71,8 +69,8 @@ class ObjCIvarDecl : public FieldDecl {
     return DeclKind::OBJ_C_IVAR;
   }
 
-  static ObjCIvarDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCIvarDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCIvarDecl> containing(const Decl &decl);
+  static gap::generator<ObjCIvarDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

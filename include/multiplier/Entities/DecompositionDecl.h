@@ -32,8 +32,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DecompositionDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, DecompositionDecl>;
-
 class DecompositionDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -70,8 +68,8 @@ class DecompositionDecl : public VarDecl {
     return DeclKind::DECOMPOSITION;
   }
 
-  static DecompositionDeclContainingDeclRange containing(const Decl &decl);
-  static DecompositionDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<DecompositionDecl> containing(const Decl &decl);
+  static gap::generator<DecompositionDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

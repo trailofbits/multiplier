@@ -501,7 +501,9 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
 static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
                              SeenEntityMap &seen) {
   const UsePath entry{&prev, ret.id()};
-  if (auto func = mx::FunctionDecl::containing(ret)) {
+  auto funcs = mx::FunctionDecl::containing(ret);
+  auto func = funcs.begin();
+  if (func != funcs.end()) {
     TaintTrackFunc(*func, entry, seen);
   }
 }
@@ -636,8 +638,10 @@ void TaintTrackFunc(const mx::FunctionDecl &taint_source,
     if (!AlreadySeen(entry, seen)) {
       for (mx::Reference ref : taint_source.references()) {
         mx::Stmt stmt_taint_source = ref.statement();
-        if (auto call = mx::CallExpr::containing(stmt_taint_source)) {
-          TaintTrackCallRet(call.value(), stmt_taint_source, taint_source,
+        auto calls = mx::CallExpr::containing(stmt_taint_source);
+        auto call = calls.begin();
+        if (call != calls.end()) {
+          TaintTrackCallRet(*call, stmt_taint_source, taint_source,
                             entry, seen);
         }
       }

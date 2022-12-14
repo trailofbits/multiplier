@@ -30,8 +30,6 @@ class OMPLoopTransformationDirective;
 class OMPUnrollDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPUnrollDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPUnrollDirective>;
-
 class OMPUnrollDirective : public OMPLoopTransformationDirective {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
     return StmtKind::OMP_UNROLL_DIRECTIVE;
   }
 
-  static OMPUnrollDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPUnrollDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPUnrollDirective> containing(const Decl &decl);
+  static gap::generator<OMPUnrollDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

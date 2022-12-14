@@ -31,8 +31,6 @@ class FunctionProtoType;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BlockExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BlockExpr>;
-
 class BlockExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class BlockExpr : public Expr {
     return StmtKind::BLOCK_EXPR;
   }
 
-  static BlockExprContainingStmtRange containing(const Decl &decl);
-  static BlockExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<BlockExpr> containing(const Decl &decl);
+  static gap::generator<BlockExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

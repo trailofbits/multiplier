@@ -29,8 +29,6 @@ class NamedDecl;
 class UnnamedGlobalConstantDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnnamedGlobalConstantDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnnamedGlobalConstantDecl>;
-
 class UnnamedGlobalConstantDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
     return DeclKind::UNNAMED_GLOBAL_CONSTANT;
   }
 
-  static UnnamedGlobalConstantDeclContainingDeclRange containing(const Decl &decl);
-  static UnnamedGlobalConstantDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UnnamedGlobalConstantDecl> containing(const Decl &decl);
+  static gap::generator<UnnamedGlobalConstantDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -31,8 +31,6 @@ class SubstNonTypeTemplateParmExpr;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SubstNonTypeTemplateParmExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SubstNonTypeTemplateParmExpr>;
-
 class SubstNonTypeTemplateParmExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class SubstNonTypeTemplateParmExpr : public Expr {
     return StmtKind::SUBST_NON_TYPE_TEMPLATE_PARM_EXPR;
   }
 
-  static SubstNonTypeTemplateParmExprContainingStmtRange containing(const Decl &decl);
-  static SubstNonTypeTemplateParmExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Decl &decl);
+  static gap::generator<SubstNonTypeTemplateParmExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -35,8 +35,6 @@ class FunctionDecl;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXDestructorDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXDestructorDecl>;
-
 class CXXDestructorDecl : public CXXMethodDecl {
  private:
   friend class FragmentImpl;
@@ -74,8 +72,8 @@ class CXXDestructorDecl : public CXXMethodDecl {
     return DeclKind::CXX_DESTRUCTOR;
   }
 
-  static CXXDestructorDeclContainingDeclRange containing(const Decl &decl);
-  static CXXDestructorDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<CXXDestructorDecl> containing(const Decl &decl);
+  static gap::generator<CXXDestructorDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

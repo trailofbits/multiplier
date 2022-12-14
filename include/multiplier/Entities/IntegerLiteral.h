@@ -29,8 +29,6 @@ class IntegerLiteral;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IntegerLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, IntegerLiteral>;
-
 class IntegerLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class IntegerLiteral : public Expr {
     return StmtKind::INTEGER_LITERAL;
   }
 
-  static IntegerLiteralContainingStmtRange containing(const Decl &decl);
-  static IntegerLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<IntegerLiteral> containing(const Decl &decl);
+  static gap::generator<IntegerLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

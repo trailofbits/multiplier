@@ -48,7 +48,9 @@ void PrintCallGraphEdge(const mx::Decl &from_entity, mx::Decl to_entity) {
 }
 
 void PrintCallGraphEdge(const mx::Decl &from_entity, mx::Stmt entity) {
-  if (auto decl = mx::Decl::containing(entity)) {
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
+  if (decl != decls.end()) {
     PrintCallGraphEdge(from_entity, decl->redeclarations()[0]);
   }  
 }
@@ -84,7 +86,9 @@ void PrintCallGraph(mx::Decl entity) {
   }
   std::cout << ";\n";
 
-  if (auto decl = mx::Decl::containing(entity)) {
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
+  if (decl != decls.end()) {
     PrintCallGraphEdge(entity, decl->redeclarations()[0]);
   } else {
     for (const mx::Reference &ref : entity.references()) {
@@ -94,7 +98,9 @@ void PrintCallGraph(mx::Decl entity) {
 }
 
 void PrintCallGraph(mx::Stmt entity) {
-  if (auto decl = mx::Decl::containing(entity)) {
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
+  if (decl != decls.end()) {
     PrintCallGraph(decl->redeclarations()[0]);
   }
 }

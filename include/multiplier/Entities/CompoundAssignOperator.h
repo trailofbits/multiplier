@@ -31,8 +31,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundAssignOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundAssignOperator>;
-
 class CompoundAssignOperator : public BinaryOperator {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class CompoundAssignOperator : public BinaryOperator {
     return StmtKind::COMPOUND_ASSIGN_OPERATOR;
   }
 
-  static CompoundAssignOperatorContainingStmtRange containing(const Decl &decl);
-  static CompoundAssignOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CompoundAssignOperator> containing(const Decl &decl);
+  static gap::generator<CompoundAssignOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

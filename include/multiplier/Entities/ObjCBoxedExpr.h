@@ -30,8 +30,6 @@ class ObjCMethodDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCBoxedExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCBoxedExpr>;
-
 class ObjCBoxedExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ObjCBoxedExpr : public Expr {
     return StmtKind::OBJ_C_BOXED_EXPR;
   }
 
-  static ObjCBoxedExprContainingStmtRange containing(const Decl &decl);
-  static ObjCBoxedExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCBoxedExpr> containing(const Decl &decl);
+  static gap::generator<ObjCBoxedExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

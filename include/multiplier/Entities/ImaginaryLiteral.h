@@ -29,8 +29,6 @@ class ImaginaryLiteral;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImaginaryLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ImaginaryLiteral>;
-
 class ImaginaryLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ImaginaryLiteral : public Expr {
     return StmtKind::IMAGINARY_LITERAL;
   }
 
-  static ImaginaryLiteralContainingStmtRange containing(const Decl &decl);
-  static ImaginaryLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ImaginaryLiteral> containing(const Decl &decl);
+  static gap::generator<ImaginaryLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

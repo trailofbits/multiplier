@@ -28,8 +28,6 @@ class Decl;
 class NamedDecl;
 class UnresolvedUsingIfExistsDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedUsingIfExistsDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnresolvedUsingIfExistsDecl>;
-
 class UnresolvedUsingIfExistsDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
     return DeclKind::UNRESOLVED_USING_IF_EXISTS;
   }
 
-  static UnresolvedUsingIfExistsDeclContainingDeclRange containing(const Decl &decl);
-  static UnresolvedUsingIfExistsDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Decl &decl);
+  static gap::generator<UnresolvedUsingIfExistsDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

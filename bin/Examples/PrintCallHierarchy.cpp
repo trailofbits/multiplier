@@ -91,10 +91,13 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
 
   std::cout << '\n';
 
+
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
   if (enter_entity.IsCycle()) {
     return;
-  } else if (auto decl = mx::Decl::containing(entity)) {
-    PrintCallHierarchy(decl.value(), depth + 1u);
+  } else if (decl != decls.end()) {
+    PrintCallHierarchy(*decl, depth + 1u);
   } else {
     for (const mx::Reference &ref : entity.references()) {
       PrintCallHierarchy(ref, depth + 1u);
@@ -107,9 +110,10 @@ void PrintCallHierarchy(mx::Stmt entity, unsigned depth) {
   if (!enter_entity) {
     return;
   }
-
-  if (auto decl = mx::Decl::containing(entity)) {
-    PrintCallHierarchy(decl.value(), depth);
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
+  if (decl != decls.end()) {
+    PrintCallHierarchy(*decl, depth);
   }
 }
 

@@ -27,8 +27,6 @@ namespace mx {
 class Decl;
 class RequiresExprBodyDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RequiresExprBodyDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, RequiresExprBodyDecl>;
-
 class RequiresExprBodyDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class RequiresExprBodyDecl : public Decl {
     return DeclKind::REQUIRES_EXPR_BODY;
   }
 
-  static RequiresExprBodyDeclContainingDeclRange containing(const Decl &decl);
-  static RequiresExprBodyDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<RequiresExprBodyDecl> containing(const Decl &decl);
+  static gap::generator<RequiresExprBodyDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

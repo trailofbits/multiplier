@@ -28,8 +28,6 @@ class Decl;
 class FileScopeAsmDecl;
 class StringLiteral;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FileScopeAsmDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, FileScopeAsmDecl>;
-
 class FileScopeAsmDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class FileScopeAsmDecl : public Decl {
     return DeclKind::FILE_SCOPE_ASM;
   }
 
-  static FileScopeAsmDeclContainingDeclRange containing(const Decl &decl);
-  static FileScopeAsmDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<FileScopeAsmDecl> containing(const Decl &decl);
+  static gap::generator<FileScopeAsmDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

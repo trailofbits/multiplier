@@ -30,8 +30,6 @@ class SourceLocExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SourceLocExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SourceLocExpr>;
-
 class SourceLocExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class SourceLocExpr : public Expr {
     return StmtKind::SOURCE_LOC_EXPR;
   }
 
-  static SourceLocExprContainingStmtRange containing(const Decl &decl);
-  static SourceLocExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SourceLocExpr> containing(const Decl &decl);
+  static gap::generator<SourceLocExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

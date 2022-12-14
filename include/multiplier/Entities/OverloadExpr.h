@@ -31,8 +31,6 @@ class OverloadExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OverloadExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OverloadExpr>;
-
 class OverloadExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class OverloadExpr : public Expr {
     return false;
   }
 
-  static OverloadExprContainingStmtRange containing(const Decl &decl);
-  static OverloadExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OverloadExpr> containing(const Decl &decl);
+  static gap::generator<OverloadExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

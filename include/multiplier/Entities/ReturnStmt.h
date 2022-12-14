@@ -31,8 +31,6 @@ class ReturnStmt;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReturnStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ReturnStmt>;
-
 class ReturnStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ReturnStmt : public Stmt {
     return StmtKind::RETURN_STMT;
   }
 
-  static ReturnStmtContainingStmtRange containing(const Decl &decl);
-  static ReturnStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ReturnStmt> containing(const Decl &decl);
+  static gap::generator<ReturnStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

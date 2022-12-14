@@ -29,8 +29,6 @@ class DeclRefExpr;
 class OMPCanonicalLoop;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCanonicalLoopContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPCanonicalLoop>;
-
 class OMPCanonicalLoop : public Stmt {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class OMPCanonicalLoop : public Stmt {
     return StmtKind::OMP_CANONICAL_LOOP;
   }
 
-  static OMPCanonicalLoopContainingStmtRange containing(const Decl &decl);
-  static OMPCanonicalLoopContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPCanonicalLoop> containing(const Decl &decl);
+  static gap::generator<OMPCanonicalLoop> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

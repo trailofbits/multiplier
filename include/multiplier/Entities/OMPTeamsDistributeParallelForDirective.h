@@ -31,8 +31,6 @@ class OMPLoopDirective;
 class OMPTeamsDistributeParallelForDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTeamsDistributeParallelForDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTeamsDistributeParallelForDirective>;
-
 class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
     return StmtKind::OMP_TEAMS_DISTRIBUTE_PARALLEL_FOR_DIRECTIVE;
   }
 
-  static OMPTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTeamsDistributeParallelForDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTeamsDistributeParallelForDirective> containing(const Decl &decl);
+  static gap::generator<OMPTeamsDistributeParallelForDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

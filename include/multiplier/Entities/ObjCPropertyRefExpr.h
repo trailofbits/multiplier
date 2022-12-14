@@ -33,8 +33,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCPropertyRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCPropertyRefExpr>;
-
 class ObjCPropertyRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class ObjCPropertyRefExpr : public Expr {
     return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
   }
 
-  static ObjCPropertyRefExprContainingStmtRange containing(const Decl &decl);
-  static ObjCPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCPropertyRefExpr> containing(const Decl &decl);
+  static gap::generator<ObjCPropertyRefExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

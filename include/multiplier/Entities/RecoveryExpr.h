@@ -29,8 +29,6 @@ class RecoveryExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RecoveryExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, RecoveryExpr>;
-
 class RecoveryExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class RecoveryExpr : public Expr {
     return StmtKind::RECOVERY_EXPR;
   }
 
-  static RecoveryExprContainingStmtRange containing(const Decl &decl);
-  static RecoveryExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<RecoveryExpr> containing(const Decl &decl);
+  static gap::generator<RecoveryExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

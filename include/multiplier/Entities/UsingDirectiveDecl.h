@@ -28,8 +28,6 @@ class Decl;
 class NamedDecl;
 class UsingDirectiveDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UsingDirectiveDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UsingDirectiveDecl>;
-
 class UsingDirectiveDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class UsingDirectiveDecl : public NamedDecl {
     return DeclKind::USING_DIRECTIVE;
   }
 
-  static UsingDirectiveDeclContainingDeclRange containing(const Decl &decl);
-  static UsingDirectiveDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UsingDirectiveDecl> containing(const Decl &decl);
+  static gap::generator<UsingDirectiveDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

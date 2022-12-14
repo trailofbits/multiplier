@@ -32,8 +32,6 @@ class InitListExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using InitListExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, InitListExpr>;
-
 class InitListExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class InitListExpr : public Expr {
     return StmtKind::INIT_LIST_EXPR;
   }
 
-  static InitListExprContainingStmtRange containing(const Decl &decl);
-  static InitListExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<InitListExpr> containing(const Decl &decl);
+  static gap::generator<InitListExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

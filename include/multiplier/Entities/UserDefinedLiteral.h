@@ -31,8 +31,6 @@ class Stmt;
 class UserDefinedLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UserDefinedLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UserDefinedLiteral>;
-
 class UserDefinedLiteral : public CallExpr {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class UserDefinedLiteral : public CallExpr {
     return StmtKind::USER_DEFINED_LITERAL;
   }
 
-  static UserDefinedLiteralContainingStmtRange containing(const Decl &decl);
-  static UserDefinedLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<UserDefinedLiteral> containing(const Decl &decl);
+  static gap::generator<UserDefinedLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

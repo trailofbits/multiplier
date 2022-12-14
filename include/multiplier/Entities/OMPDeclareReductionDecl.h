@@ -31,8 +31,6 @@ class NamedDecl;
 class OMPDeclareReductionDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPDeclareReductionDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPDeclareReductionDecl>;
-
 class OMPDeclareReductionDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class OMPDeclareReductionDecl : public ValueDecl {
     return DeclKind::OMP_DECLARE_REDUCTION;
   }
 
-  static OMPDeclareReductionDeclContainingDeclRange containing(const Decl &decl);
-  static OMPDeclareReductionDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPDeclareReductionDecl> containing(const Decl &decl);
+  static gap::generator<OMPDeclareReductionDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

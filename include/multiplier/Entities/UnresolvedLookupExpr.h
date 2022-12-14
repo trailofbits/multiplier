@@ -30,8 +30,6 @@ class Stmt;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedLookupExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnresolvedLookupExpr>;
-
 class UnresolvedLookupExpr : public OverloadExpr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class UnresolvedLookupExpr : public OverloadExpr {
     return StmtKind::UNRESOLVED_LOOKUP_EXPR;
   }
 
-  static UnresolvedLookupExprContainingStmtRange containing(const Decl &decl);
-  static UnresolvedLookupExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<UnresolvedLookupExpr> containing(const Decl &decl);
+  static gap::generator<UnresolvedLookupExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

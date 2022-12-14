@@ -29,8 +29,6 @@ class Expr;
 class ObjCAtSynchronizedStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtSynchronizedStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtSynchronizedStmt>;
-
 class ObjCAtSynchronizedStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class ObjCAtSynchronizedStmt : public Stmt {
     return StmtKind::OBJ_C_AT_SYNCHRONIZED_STMT;
   }
 
-  static ObjCAtSynchronizedStmtContainingStmtRange containing(const Decl &decl);
-  static ObjCAtSynchronizedStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAtSynchronizedStmt> containing(const Decl &decl);
+  static gap::generator<ObjCAtSynchronizedStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

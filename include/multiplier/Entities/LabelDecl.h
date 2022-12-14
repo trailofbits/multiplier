@@ -29,8 +29,6 @@ class LabelDecl;
 class LabelStmt;
 class NamedDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LabelDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, LabelDecl>;
-
 class LabelDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class LabelDecl : public NamedDecl {
     return DeclKind::LABEL;
   }
 
-  static LabelDeclContainingDeclRange containing(const Decl &decl);
-  static LabelDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<LabelDecl> containing(const Decl &decl);
+  static gap::generator<LabelDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

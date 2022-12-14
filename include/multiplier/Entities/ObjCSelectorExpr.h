@@ -29,8 +29,6 @@ class ObjCSelectorExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCSelectorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCSelectorExpr>;
-
 class ObjCSelectorExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ObjCSelectorExpr : public Expr {
     return StmtKind::OBJ_C_SELECTOR_EXPR;
   }
 
-  static ObjCSelectorExprContainingStmtRange containing(const Decl &decl);
-  static ObjCSelectorExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCSelectorExpr> containing(const Decl &decl);
+  static gap::generator<ObjCSelectorExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

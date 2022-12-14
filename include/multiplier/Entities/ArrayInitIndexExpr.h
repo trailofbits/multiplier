@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArrayInitIndexExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ArrayInitIndexExpr>;
-
 class ArrayInitIndexExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ArrayInitIndexExpr : public Expr {
     return StmtKind::ARRAY_INIT_INDEX_EXPR;
   }
 
-  static ArrayInitIndexExprContainingStmtRange containing(const Decl &decl);
-  static ArrayInitIndexExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ArrayInitIndexExpr> containing(const Decl &decl);
+  static gap::generator<ArrayInitIndexExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

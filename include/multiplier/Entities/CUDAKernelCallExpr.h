@@ -30,8 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CUDAKernelCallExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CUDAKernelCallExpr>;
-
 class CUDAKernelCallExpr : public CallExpr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class CUDAKernelCallExpr : public CallExpr {
     return StmtKind::CUDA_KERNEL_CALL_EXPR;
   }
 
-  static CUDAKernelCallExprContainingStmtRange containing(const Decl &decl);
-  static CUDAKernelCallExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CUDAKernelCallExpr> containing(const Decl &decl);
+  static gap::generator<CUDAKernelCallExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

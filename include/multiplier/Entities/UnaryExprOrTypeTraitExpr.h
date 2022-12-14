@@ -33,8 +33,6 @@ class Type;
 class UnaryExprOrTypeTraitExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnaryExprOrTypeTraitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnaryExprOrTypeTraitExpr>;
-
 class UnaryExprOrTypeTraitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class UnaryExprOrTypeTraitExpr : public Expr {
     return StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR;
   }
 
-  static UnaryExprOrTypeTraitExprContainingStmtRange containing(const Decl &decl);
-  static UnaryExprOrTypeTraitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Decl &decl);
+  static gap::generator<UnaryExprOrTypeTraitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

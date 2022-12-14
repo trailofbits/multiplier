@@ -30,8 +30,6 @@ class TypeDecl;
 class TypedefDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypedefDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TypedefDecl>;
-
 class TypedefDecl : public TypedefNameDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class TypedefDecl : public TypedefNameDecl {
     return DeclKind::TYPEDEF;
   }
 
-  static TypedefDeclContainingDeclRange containing(const Decl &decl);
-  static TypedefDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<TypedefDecl> containing(const Decl &decl);
+  static gap::generator<TypedefDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

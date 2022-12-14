@@ -29,8 +29,6 @@ class ObjCAtFinallyStmt;
 class ObjCAtTryStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtTryStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtTryStmt>;
-
 class ObjCAtTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class ObjCAtTryStmt : public Stmt {
     return StmtKind::OBJ_C_AT_TRY_STMT;
   }
 
-  static ObjCAtTryStmtContainingStmtRange containing(const Decl &decl);
-  static ObjCAtTryStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAtTryStmt> containing(const Decl &decl);
+  static gap::generator<ObjCAtTryStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

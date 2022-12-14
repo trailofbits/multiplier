@@ -33,8 +33,6 @@ class NamedDecl;
 class ParmVarDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXDeductionGuideDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXDeductionGuideDecl>;
-
 class CXXDeductionGuideDecl : public FunctionDecl {
  private:
   friend class FragmentImpl;
@@ -71,8 +69,8 @@ class CXXDeductionGuideDecl : public FunctionDecl {
     return DeclKind::CXX_DEDUCTION_GUIDE;
   }
 
-  static CXXDeductionGuideDeclContainingDeclRange containing(const Decl &decl);
-  static CXXDeductionGuideDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<CXXDeductionGuideDecl> containing(const Decl &decl);
+  static gap::generator<CXXDeductionGuideDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

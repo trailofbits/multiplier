@@ -27,8 +27,6 @@ namespace mx {
 class BreakStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BreakStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BreakStmt>;
-
 class BreakStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class BreakStmt : public Stmt {
     return StmtKind::BREAK_STMT;
   }
 
-  static BreakStmtContainingStmtRange containing(const Decl &decl);
-  static BreakStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<BreakStmt> containing(const Decl &decl);
+  static gap::generator<BreakStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

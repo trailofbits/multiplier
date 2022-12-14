@@ -28,8 +28,6 @@ class Decl;
 class NamedDecl;
 class NamespaceAliasDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NamespaceAliasDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, NamespaceAliasDecl>;
-
 class NamespaceAliasDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class NamespaceAliasDecl : public NamedDecl {
     return DeclKind::NAMESPACE_ALIAS;
   }
 
-  static NamespaceAliasDeclContainingDeclRange containing(const Decl &decl);
-  static NamespaceAliasDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<NamespaceAliasDecl> containing(const Decl &decl);
+  static gap::generator<NamespaceAliasDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -29,8 +29,6 @@ class OMPArraySectionExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPArraySectionExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPArraySectionExpr>;
-
 class OMPArraySectionExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class OMPArraySectionExpr : public Expr {
     return StmtKind::OMP_ARRAY_SECTION_EXPR;
   }
 
-  static OMPArraySectionExprContainingStmtRange containing(const Decl &decl);
-  static OMPArraySectionExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPArraySectionExpr> containing(const Decl &decl);
+  static gap::generator<OMPArraySectionExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

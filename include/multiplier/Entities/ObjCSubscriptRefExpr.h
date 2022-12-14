@@ -30,8 +30,6 @@ class ObjCSubscriptRefExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCSubscriptRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCSubscriptRefExpr>;
-
 class ObjCSubscriptRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ObjCSubscriptRefExpr : public Expr {
     return StmtKind::OBJ_C_SUBSCRIPT_REF_EXPR;
   }
 
-  static ObjCSubscriptRefExprContainingStmtRange containing(const Decl &decl);
-  static ObjCSubscriptRefExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCSubscriptRefExpr> containing(const Decl &decl);
+  static gap::generator<ObjCSubscriptRefExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -30,8 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoyieldExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoyieldExpr>;
-
 class CoyieldExpr : public CoroutineSuspendExpr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class CoyieldExpr : public CoroutineSuspendExpr {
     return StmtKind::COYIELD_EXPR;
   }
 
-  static CoyieldExprContainingStmtRange containing(const Decl &decl);
-  static CoyieldExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CoyieldExpr> containing(const Decl &decl);
+  static gap::generator<CoyieldExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

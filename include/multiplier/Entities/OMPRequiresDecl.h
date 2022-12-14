@@ -28,8 +28,6 @@ class Decl;
 class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPRequiresDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPRequiresDecl>;
-
 class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_REQUIRES;
   }
 
-  static OMPRequiresDeclContainingDeclRange containing(const Decl &decl);
-  static OMPRequiresDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPRequiresDecl> containing(const Decl &decl);
+  static gap::generator<OMPRequiresDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

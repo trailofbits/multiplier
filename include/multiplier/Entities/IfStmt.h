@@ -33,8 +33,6 @@ class IfStmt;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IfStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, IfStmt>;
-
 class IfStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class IfStmt : public Stmt {
     return StmtKind::IF_STMT;
   }
 
-  static IfStmtContainingStmtRange containing(const Decl &decl);
-  static IfStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<IfStmt> containing(const Decl &decl);
+  static gap::generator<IfStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

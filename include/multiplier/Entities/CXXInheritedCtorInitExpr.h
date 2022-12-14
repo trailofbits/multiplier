@@ -31,8 +31,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXInheritedCtorInitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXInheritedCtorInitExpr>;
-
 class CXXInheritedCtorInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class CXXInheritedCtorInitExpr : public Expr {
     return StmtKind::CXX_INHERITED_CTOR_INIT_EXPR;
   }
 
-  static CXXInheritedCtorInitExprContainingStmtRange containing(const Decl &decl);
-  static CXXInheritedCtorInitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXInheritedCtorInitExpr> containing(const Decl &decl);
+  static gap::generator<CXXInheritedCtorInitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -32,8 +32,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IndirectFieldDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, IndirectFieldDecl>;
-
 class IndirectFieldDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class IndirectFieldDecl : public ValueDecl {
     return DeclKind::INDIRECT_FIELD;
   }
 
-  static IndirectFieldDeclContainingDeclRange containing(const Decl &decl);
-  static IndirectFieldDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<IndirectFieldDecl> containing(const Decl &decl);
+  static gap::generator<IndirectFieldDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

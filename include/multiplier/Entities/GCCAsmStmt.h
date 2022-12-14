@@ -30,8 +30,6 @@ class GCCAsmStmt;
 class Stmt;
 class StringLiteral;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GCCAsmStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, GCCAsmStmt>;
-
 class GCCAsmStmt : public AsmStmt {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class GCCAsmStmt : public AsmStmt {
     return StmtKind::GCC_ASM_STMT;
   }
 
-  static GCCAsmStmtContainingStmtRange containing(const Decl &decl);
-  static GCCAsmStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<GCCAsmStmt> containing(const Decl &decl);
+  static gap::generator<GCCAsmStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

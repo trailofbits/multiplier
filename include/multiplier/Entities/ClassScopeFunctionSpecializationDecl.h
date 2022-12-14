@@ -28,8 +28,6 @@ class CXXMethodDecl;
 class ClassScopeFunctionSpecializationDecl;
 class Decl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ClassScopeFunctionSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ClassScopeFunctionSpecializationDecl>;
-
 class ClassScopeFunctionSpecializationDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
   }
 
-  static ClassScopeFunctionSpecializationDeclContainingDeclRange containing(const Decl &decl);
-  static ClassScopeFunctionSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Decl &decl);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

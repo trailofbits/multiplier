@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundLiteralExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundLiteralExpr>;
-
 class CompoundLiteralExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class CompoundLiteralExpr : public Expr {
     return StmtKind::COMPOUND_LITERAL_EXPR;
   }
 
-  static CompoundLiteralExprContainingStmtRange containing(const Decl &decl);
-  static CompoundLiteralExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CompoundLiteralExpr> containing(const Decl &decl);
+  static gap::generator<CompoundLiteralExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

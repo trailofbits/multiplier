@@ -30,8 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoawaitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoawaitExpr>;
-
 class CoawaitExpr : public CoroutineSuspendExpr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class CoawaitExpr : public CoroutineSuspendExpr {
     return StmtKind::COAWAIT_EXPR;
   }
 
-  static CoawaitExprContainingStmtRange containing(const Decl &decl);
-  static CoawaitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CoawaitExpr> containing(const Decl &decl);
+  static gap::generator<CoawaitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

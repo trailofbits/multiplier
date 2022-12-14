@@ -26,8 +26,6 @@
 namespace mx {
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, Stmt>;
-
 class Stmt {
  protected:
   friend class Attr;
@@ -104,8 +102,8 @@ class Stmt {
     return false;
   }
 
-  static StmtContainingStmtRange containing(const Decl &decl);
-  static StmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<Stmt> containing(const Decl &decl);
+  static gap::generator<Stmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

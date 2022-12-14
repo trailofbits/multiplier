@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXBoolLiteralExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXBoolLiteralExpr>;
-
 class CXXBoolLiteralExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class CXXBoolLiteralExpr : public Expr {
     return StmtKind::CXX_BOOL_LITERAL_EXPR;
   }
 
-  static CXXBoolLiteralExprContainingStmtRange containing(const Decl &decl);
-  static CXXBoolLiteralExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXBoolLiteralExpr> containing(const Decl &decl);
+  static gap::generator<CXXBoolLiteralExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

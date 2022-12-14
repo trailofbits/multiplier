@@ -30,8 +30,6 @@ class Stmt;
 class UnaryOperator;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnaryOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnaryOperator>;
-
 class UnaryOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class UnaryOperator : public Expr {
     return StmtKind::UNARY_OPERATOR;
   }
 
-  static UnaryOperatorContainingStmtRange containing(const Decl &decl);
-  static UnaryOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<UnaryOperator> containing(const Decl &decl);
+  static gap::generator<UnaryOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

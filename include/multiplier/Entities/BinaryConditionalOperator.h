@@ -31,8 +31,6 @@ class OpaqueValueExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BinaryConditionalOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BinaryConditionalOperator>;
-
 class BinaryConditionalOperator : public AbstractConditionalOperator {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
   }
 
-  static BinaryConditionalOperatorContainingStmtRange containing(const Decl &decl);
-  static BinaryConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<BinaryConditionalOperator> containing(const Decl &decl);
+  static gap::generator<BinaryConditionalOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

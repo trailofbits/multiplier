@@ -29,8 +29,6 @@ class FullExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FullExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, FullExpr>;
-
 class FullExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class FullExpr : public Expr {
     return false;
   }
 
-  static FullExprContainingStmtRange containing(const Decl &decl);
-  static FullExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<FullExpr> containing(const Decl &decl);
+  static gap::generator<FullExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -27,8 +27,6 @@ namespace mx {
 class AccessSpecDecl;
 class Decl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AccessSpecDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, AccessSpecDecl>;
-
 class AccessSpecDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class AccessSpecDecl : public Decl {
     return DeclKind::ACCESS_SPEC;
   }
 
-  static AccessSpecDeclContainingDeclRange containing(const Decl &decl);
-  static AccessSpecDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<AccessSpecDecl> containing(const Decl &decl);
+  static gap::generator<AccessSpecDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

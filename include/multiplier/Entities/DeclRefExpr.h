@@ -32,8 +32,6 @@ class Stmt;
 class ValueDecl;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeclRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DeclRefExpr>;
-
 class DeclRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class DeclRefExpr : public Expr {
     return StmtKind::DECL_REF_EXPR;
   }
 
-  static DeclRefExprContainingStmtRange containing(const Decl &decl);
-  static DeclRefExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<DeclRefExpr> containing(const Decl &decl);
+  static gap::generator<DeclRefExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

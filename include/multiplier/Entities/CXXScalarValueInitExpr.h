@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXScalarValueInitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXScalarValueInitExpr>;
-
 class CXXScalarValueInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class CXXScalarValueInitExpr : public Expr {
     return StmtKind::CXX_SCALAR_VALUE_INIT_EXPR;
   }
 
-  static CXXScalarValueInitExprContainingStmtRange containing(const Decl &decl);
-  static CXXScalarValueInitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXScalarValueInitExpr> containing(const Decl &decl);
+  static gap::generator<CXXScalarValueInitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -27,8 +27,6 @@ namespace mx {
 class ContinueStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ContinueStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ContinueStmt>;
-
 class ContinueStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class ContinueStmt : public Stmt {
     return StmtKind::CONTINUE_STMT;
   }
 
-  static ContinueStmtContainingStmtRange containing(const Decl &decl);
-  static ContinueStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ContinueStmt> containing(const Decl &decl);
+  static gap::generator<ContinueStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

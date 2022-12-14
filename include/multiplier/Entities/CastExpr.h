@@ -33,8 +33,6 @@ class NamedDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CastExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CastExpr>;
-
 class CastExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class CastExpr : public Expr {
     return false;
   }
 
-  static CastExprContainingStmtRange containing(const Decl &decl);
-  static CastExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CastExpr> containing(const Decl &decl);
+  static gap::generator<CastExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -32,8 +32,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AtomicExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AtomicExpr>;
-
 class AtomicExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class AtomicExpr : public Expr {
     return StmtKind::ATOMIC_EXPR;
   }
 
-  static AtomicExprContainingStmtRange containing(const Decl &decl);
-  static AtomicExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<AtomicExpr> containing(const Decl &decl);
+  static gap::generator<AtomicExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

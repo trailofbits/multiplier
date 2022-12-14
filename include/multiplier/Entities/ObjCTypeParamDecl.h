@@ -31,8 +31,6 @@ class ObjCTypeParamDecl;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCTypeParamDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCTypeParamDecl>;
-
 class ObjCTypeParamDecl : public TypedefNameDecl {
  private:
   friend class FragmentImpl;
@@ -68,8 +66,8 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     return DeclKind::OBJ_C_TYPE_PARAM;
   }
 
-  static ObjCTypeParamDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCTypeParamDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCTypeParamDecl> containing(const Decl &decl);
+  static gap::generator<ObjCTypeParamDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

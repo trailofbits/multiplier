@@ -33,8 +33,6 @@ class RecordDecl;
 class TagDecl;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ClassTemplatePartialSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ClassTemplatePartialSpecializationDecl>;
-
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
  private:
   friend class FragmentImpl;
@@ -73,8 +71,8 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
   }
 
-  static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
-  static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Decl &decl);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

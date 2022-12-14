@@ -31,8 +31,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BindingDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, BindingDecl>;
-
 class BindingDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class BindingDecl : public ValueDecl {
     return DeclKind::BINDING;
   }
 
-  static BindingDeclContainingDeclRange containing(const Decl &decl);
-  static BindingDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<BindingDecl> containing(const Decl &decl);
+  static gap::generator<BindingDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

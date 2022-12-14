@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AbstractConditionalOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AbstractConditionalOperator>;
-
 class AbstractConditionalOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class AbstractConditionalOperator : public Expr {
     return false;
   }
 
-  static AbstractConditionalOperatorContainingStmtRange containing(const Decl &decl);
-  static AbstractConditionalOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<AbstractConditionalOperator> containing(const Decl &decl);
+  static gap::generator<AbstractConditionalOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -30,8 +30,6 @@ class MSPropertyDecl;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertyDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, MSPropertyDecl>;
-
 class MSPropertyDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class MSPropertyDecl : public DeclaratorDecl {
     return DeclKind::MS_PROPERTY;
   }
 
-  static MSPropertyDeclContainingDeclRange containing(const Decl &decl);
-  static MSPropertyDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<MSPropertyDecl> containing(const Decl &decl);
+  static gap::generator<MSPropertyDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

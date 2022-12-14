@@ -28,8 +28,6 @@ class GotoStmt;
 class LabelDecl;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GotoStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, GotoStmt>;
-
 class GotoStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class GotoStmt : public Stmt {
     return StmtKind::GOTO_STMT;
   }
 
-  static GotoStmtContainingStmtRange containing(const Decl &decl);
-  static GotoStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<GotoStmt> containing(const Decl &decl);
+  static gap::generator<GotoStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

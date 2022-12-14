@@ -31,8 +31,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArrayTypeTraitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ArrayTypeTraitExpr>;
-
 class ArrayTypeTraitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class ArrayTypeTraitExpr : public Expr {
     return StmtKind::ARRAY_TYPE_TRAIT_EXPR;
   }
 
-  static ArrayTypeTraitExprContainingStmtRange containing(const Decl &decl);
-  static ArrayTypeTraitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ArrayTypeTraitExpr> containing(const Decl &decl);
+  static gap::generator<ArrayTypeTraitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

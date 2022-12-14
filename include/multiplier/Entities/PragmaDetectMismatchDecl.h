@@ -27,8 +27,6 @@ namespace mx {
 class Decl;
 class PragmaDetectMismatchDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaDetectMismatchDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, PragmaDetectMismatchDecl>;
-
 class PragmaDetectMismatchDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class PragmaDetectMismatchDecl : public Decl {
     return DeclKind::PRAGMA_DETECT_MISMATCH;
   }
 
-  static PragmaDetectMismatchDeclContainingDeclRange containing(const Decl &decl);
-  static PragmaDetectMismatchDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<PragmaDetectMismatchDecl> containing(const Decl &decl);
+  static gap::generator<PragmaDetectMismatchDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

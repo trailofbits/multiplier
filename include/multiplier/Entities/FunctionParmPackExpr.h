@@ -30,8 +30,6 @@ class Stmt;
 class ValueStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FunctionParmPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, FunctionParmPackExpr>;
-
 class FunctionParmPackExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class FunctionParmPackExpr : public Expr {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;
   }
 
-  static FunctionParmPackExprContainingStmtRange containing(const Decl &decl);
-  static FunctionParmPackExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<FunctionParmPackExpr> containing(const Decl &decl);
+  static gap::generator<FunctionParmPackExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

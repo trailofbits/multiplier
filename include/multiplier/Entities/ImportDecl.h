@@ -28,8 +28,6 @@ class Decl;
 class ImportDecl;
 class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImportDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ImportDecl>;
-
 class ImportDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class ImportDecl : public Decl {
     return DeclKind::IMPORT;
   }
 
-  static ImportDeclContainingDeclRange containing(const Decl &decl);
-  static ImportDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ImportDecl> containing(const Decl &decl);
+  static gap::generator<ImportDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

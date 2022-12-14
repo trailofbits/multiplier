@@ -45,8 +45,6 @@ class TemplateParameterList;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXRecordDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXRecordDecl>;
-
 class CXXRecordDecl : public RecordDecl {
  private:
   friend class FragmentImpl;
@@ -83,8 +81,8 @@ class CXXRecordDecl : public RecordDecl {
     return DeclKind::CXX_RECORD;
   }
 
-  static CXXRecordDeclContainingDeclRange containing(const Decl &decl);
-  static CXXRecordDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<CXXRecordDecl> containing(const Decl &decl);
+  static gap::generator<CXXRecordDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -28,8 +28,6 @@ class OMPCancellationPointDirective;
 class OMPExecutableDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCancellationPointDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPCancellationPointDirective>;
-
 class OMPCancellationPointDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
     return StmtKind::OMP_CANCELLATION_POINT_DIRECTIVE;
   }
 
-  static OMPCancellationPointDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPCancellationPointDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPCancellationPointDirective> containing(const Decl &decl);
+  static gap::generator<OMPCancellationPointDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

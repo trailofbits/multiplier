@@ -31,8 +31,6 @@ class Decl;
 class ParmVarDecl;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BlockDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, BlockDecl>;
-
 class BlockDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class BlockDecl : public Decl {
     return DeclKind::BLOCK;
   }
 
-  static BlockDeclContainingDeclRange containing(const Decl &decl);
-  static BlockDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<BlockDecl> containing(const Decl &decl);
+  static gap::generator<BlockDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

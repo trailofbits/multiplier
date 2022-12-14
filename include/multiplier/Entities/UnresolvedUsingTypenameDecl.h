@@ -29,8 +29,6 @@ class NamedDecl;
 class TypeDecl;
 class UnresolvedUsingTypenameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedUsingTypenameDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnresolvedUsingTypenameDecl>;
-
 class UnresolvedUsingTypenameDecl : public TypeDecl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
     return DeclKind::UNRESOLVED_USING_TYPENAME;
   }
 
-  static UnresolvedUsingTypenameDeclContainingDeclRange containing(const Decl &decl);
-  static UnresolvedUsingTypenameDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UnresolvedUsingTypenameDecl> containing(const Decl &decl);
+  static gap::generator<UnresolvedUsingTypenameDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

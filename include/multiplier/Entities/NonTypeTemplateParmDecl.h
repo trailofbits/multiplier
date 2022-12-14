@@ -33,8 +33,6 @@ class NonTypeTemplateParmDecl;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NonTypeTemplateParmDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, NonTypeTemplateParmDecl>;
-
 class NonTypeTemplateParmDecl : public DeclaratorDecl {
  private:
   friend class FragmentImpl;
@@ -70,8 +68,8 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
     return DeclKind::NON_TYPE_TEMPLATE_PARM;
   }
 
-  static NonTypeTemplateParmDeclContainingDeclRange containing(const Decl &decl);
-  static NonTypeTemplateParmDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<NonTypeTemplateParmDecl> containing(const Decl &decl);
+  static gap::generator<NonTypeTemplateParmDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

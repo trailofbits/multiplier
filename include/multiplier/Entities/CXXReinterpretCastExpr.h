@@ -32,8 +32,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXReinterpretCastExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXReinterpretCastExpr>;
-
 class CXXReinterpretCastExpr : public CXXNamedCastExpr {
  private:
   friend class FragmentImpl;
@@ -71,8 +69,8 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
     return StmtKind::CXX_REINTERPRET_CAST_EXPR;
   }
 
-  static CXXReinterpretCastExprContainingStmtRange containing(const Decl &decl);
-  static CXXReinterpretCastExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXReinterpretCastExpr> containing(const Decl &decl);
+  static gap::generator<CXXReinterpretCastExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

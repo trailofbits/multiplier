@@ -31,8 +31,6 @@ class Stmt;
 class ValueDecl;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MemberExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MemberExpr>;
-
 class MemberExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class MemberExpr : public Expr {
     return StmtKind::MEMBER_EXPR;
   }
 
-  static MemberExprContainingStmtRange containing(const Decl &decl);
-  static MemberExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MemberExpr> containing(const Decl &decl);
+  static gap::generator<MemberExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

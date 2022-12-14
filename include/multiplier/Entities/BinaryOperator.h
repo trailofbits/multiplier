@@ -30,8 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BinaryOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BinaryOperator>;
-
 class BinaryOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class BinaryOperator : public Expr {
     return StmtKind::BINARY_OPERATOR;
   }
 
-  static BinaryOperatorContainingStmtRange containing(const Decl &decl);
-  static BinaryOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<BinaryOperator> containing(const Decl &decl);
+  static gap::generator<BinaryOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

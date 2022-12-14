@@ -30,8 +30,6 @@ class ObjCMethodDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCDictionaryLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCDictionaryLiteral>;
-
 class ObjCDictionaryLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ObjCDictionaryLiteral : public Expr {
     return StmtKind::OBJ_C_DICTIONARY_LITERAL;
   }
 
-  static ObjCDictionaryLiteralContainingStmtRange containing(const Decl &decl);
-  static ObjCDictionaryLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCDictionaryLiteral> containing(const Decl &decl);
+  static gap::generator<ObjCDictionaryLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

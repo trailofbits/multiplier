@@ -30,8 +30,6 @@ class ObjCProtocolExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCProtocolExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCProtocolExpr>;
-
 class ObjCProtocolExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class ObjCProtocolExpr : public Expr {
     return StmtKind::OBJ_C_PROTOCOL_EXPR;
   }
 
-  static ObjCProtocolExprContainingStmtRange containing(const Decl &decl);
-  static ObjCProtocolExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCProtocolExpr> containing(const Decl &decl);
+  static gap::generator<ObjCProtocolExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -31,8 +31,6 @@ class OMPCapturedExprDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCapturedExprDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPCapturedExprDecl>;
-
 class OMPCapturedExprDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class OMPCapturedExprDecl : public VarDecl {
     return DeclKind::OMP_CAPTURED_EXPR;
   }
 
-  static OMPCapturedExprDeclContainingDeclRange containing(const Decl &decl);
-  static OMPCapturedExprDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPCapturedExprDecl> containing(const Decl &decl);
+  static gap::generator<OMPCapturedExprDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

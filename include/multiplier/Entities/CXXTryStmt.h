@@ -29,8 +29,6 @@ class CXXTryStmt;
 class CompoundStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXTryStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXTryStmt>;
-
 class CXXTryStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class CXXTryStmt : public Stmt {
     return StmtKind::CXX_TRY_STMT;
   }
 
-  static CXXTryStmtContainingStmtRange containing(const Decl &decl);
-  static CXXTryStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXTryStmt> containing(const Decl &decl);
+  static gap::generator<CXXTryStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

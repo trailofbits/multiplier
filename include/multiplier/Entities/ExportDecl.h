@@ -27,8 +27,6 @@ namespace mx {
 class Decl;
 class ExportDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExportDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ExportDecl>;
-
 class ExportDecl : public Decl {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class ExportDecl : public Decl {
     return DeclKind::EXPORT;
   }
 
-  static ExportDeclContainingDeclRange containing(const Decl &decl);
-  static ExportDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ExportDecl> containing(const Decl &decl);
+  static gap::generator<ExportDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

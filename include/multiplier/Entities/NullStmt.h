@@ -27,8 +27,6 @@ namespace mx {
 class NullStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NullStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, NullStmt>;
-
 class NullStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class NullStmt : public Stmt {
     return StmtKind::NULL_STMT;
   }
 
-  static NullStmtContainingStmtRange containing(const Decl &decl);
-  static NullStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<NullStmt> containing(const Decl &decl);
+  static gap::generator<NullStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

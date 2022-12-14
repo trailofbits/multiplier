@@ -30,8 +30,6 @@ class EnumDecl;
 class NamedDecl;
 class UsingEnumDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UsingEnumDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UsingEnumDecl>;
-
 class UsingEnumDecl : public BaseUsingDecl {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class UsingEnumDecl : public BaseUsingDecl {
     return DeclKind::USING_ENUM;
   }
 
-  static UsingEnumDeclContainingDeclRange containing(const Decl &decl);
-  static UsingEnumDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UsingEnumDecl> containing(const Decl &decl);
+  static gap::generator<UsingEnumDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

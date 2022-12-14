@@ -27,8 +27,6 @@ namespace mx {
 class ObjCAutoreleasePoolStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAutoreleasePoolStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAutoreleasePoolStmt>;
-
 class ObjCAutoreleasePoolStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class ObjCAutoreleasePoolStmt : public Stmt {
     return StmtKind::OBJ_C_AUTORELEASE_POOL_STMT;
   }
 
-  static ObjCAutoreleasePoolStmtContainingStmtRange containing(const Decl &decl);
-  static ObjCAutoreleasePoolStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAutoreleasePoolStmt> containing(const Decl &decl);
+  static gap::generator<ObjCAutoreleasePoolStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

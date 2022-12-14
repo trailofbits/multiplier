@@ -31,8 +31,6 @@ class NamedDecl;
 class ObjCAtDefsFieldDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtDefsFieldDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCAtDefsFieldDecl>;
-
 class ObjCAtDefsFieldDecl : public FieldDecl {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;
   }
 
-  static ObjCAtDefsFieldDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCAtDefsFieldDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAtDefsFieldDecl> containing(const Decl &decl);
+  static gap::generator<ObjCAtDefsFieldDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -30,8 +30,6 @@ class Stmt;
 class Type;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXCatchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXCatchStmt>;
-
 class CXXCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class CXXCatchStmt : public Stmt {
     return StmtKind::CXX_CATCH_STMT;
   }
 
-  static CXXCatchStmtContainingStmtRange containing(const Decl &decl);
-  static CXXCatchStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXCatchStmt> containing(const Decl &decl);
+  static gap::generator<CXXCatchStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

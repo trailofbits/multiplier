@@ -29,8 +29,6 @@ class PseudoObjectExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PseudoObjectExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, PseudoObjectExpr>;
-
 class PseudoObjectExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class PseudoObjectExpr : public Expr {
     return StmtKind::PSEUDO_OBJECT_EXPR;
   }
 
-  static PseudoObjectExprContainingStmtRange containing(const Decl &decl);
-  static PseudoObjectExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<PseudoObjectExpr> containing(const Decl &decl);
+  static gap::generator<PseudoObjectExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -29,8 +29,6 @@ class Expr;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoroutineBodyStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoroutineBodyStmt>;
-
 class CoroutineBodyStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class CoroutineBodyStmt : public Stmt {
     return StmtKind::COROUTINE_BODY_STMT;
   }
 
-  static CoroutineBodyStmtContainingStmtRange containing(const Decl &decl);
-  static CoroutineBodyStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CoroutineBodyStmt> containing(const Decl &decl);
+  static gap::generator<CoroutineBodyStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

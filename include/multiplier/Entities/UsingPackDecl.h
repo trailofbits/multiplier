@@ -28,8 +28,6 @@ class Decl;
 class NamedDecl;
 class UsingPackDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UsingPackDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UsingPackDecl>;
-
 class UsingPackDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
@@ -63,8 +61,8 @@ class UsingPackDecl : public NamedDecl {
     return DeclKind::USING_PACK;
   }
 
-  static UsingPackDeclContainingDeclRange containing(const Decl &decl);
-  static UsingPackDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UsingPackDecl> containing(const Decl &decl);
+  static gap::generator<UsingPackDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

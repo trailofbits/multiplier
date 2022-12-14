@@ -29,8 +29,6 @@ class Expr;
 class OMPDeclarativeDirectiveDecl;
 class OMPThreadPrivateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPThreadPrivateDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPThreadPrivateDecl>;
-
 class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
  private:
   friend class FragmentImpl;
@@ -64,8 +62,8 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_THREAD_PRIVATE;
   }
 
-  static OMPThreadPrivateDeclContainingDeclRange containing(const Decl &decl);
-  static OMPThreadPrivateDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPThreadPrivateDecl> containing(const Decl &decl);
+  static gap::generator<OMPThreadPrivateDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

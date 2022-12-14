@@ -28,8 +28,6 @@ class ObjCAtCatchStmt;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtCatchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtCatchStmt>;
-
 class ObjCAtCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class ObjCAtCatchStmt : public Stmt {
     return StmtKind::OBJ_C_AT_CATCH_STMT;
   }
 
-  static ObjCAtCatchStmtContainingStmtRange containing(const Decl &decl);
-  static ObjCAtCatchStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAtCatchStmt> containing(const Decl &decl);
+  static gap::generator<ObjCAtCatchStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

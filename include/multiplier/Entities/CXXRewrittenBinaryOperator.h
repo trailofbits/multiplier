@@ -30,8 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXRewrittenBinaryOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXRewrittenBinaryOperator>;
-
 class CXXRewrittenBinaryOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class CXXRewrittenBinaryOperator : public Expr {
     return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
   }
 
-  static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Decl &decl);
-  static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const Decl &decl);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

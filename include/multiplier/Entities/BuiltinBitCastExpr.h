@@ -31,8 +31,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BuiltinBitCastExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BuiltinBitCastExpr>;
-
 class BuiltinBitCastExpr : public ExplicitCastExpr {
  private:
   friend class FragmentImpl;
@@ -69,8 +67,8 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
     return StmtKind::BUILTIN_BIT_CAST_EXPR;
   }
 
-  static BuiltinBitCastExprContainingStmtRange containing(const Decl &decl);
-  static BuiltinBitCastExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<BuiltinBitCastExpr> containing(const Decl &decl);
+  static gap::generator<BuiltinBitCastExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

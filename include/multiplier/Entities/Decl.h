@@ -37,8 +37,6 @@ class Reference;
 class Stmt;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, Decl>;
-
 class Decl {
  protected:
   friend class Attr;
@@ -118,8 +116,8 @@ class Decl {
     return false;
   }
 
-  static DeclContainingDeclRange containing(const Decl &decl);
-  static DeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<Decl> containing(const Decl &decl);
+  static gap::generator<Decl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -29,8 +29,6 @@ class NamedDecl;
 class RedeclarableTemplateDecl;
 class TemplateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RedeclarableTemplateDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, RedeclarableTemplateDecl>;
-
 class RedeclarableTemplateDecl : public TemplateDecl {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     return DeclKind::REDECLARABLE_TEMPLATE;
   }
 
-  static RedeclarableTemplateDeclContainingDeclRange containing(const Decl &decl);
-  static RedeclarableTemplateDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<RedeclarableTemplateDecl> containing(const Decl &decl);
+  static gap::generator<RedeclarableTemplateDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

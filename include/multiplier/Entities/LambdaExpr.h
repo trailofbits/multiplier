@@ -36,8 +36,6 @@ class Stmt;
 class TemplateParameterList;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LambdaExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, LambdaExpr>;
-
 class LambdaExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -72,8 +70,8 @@ class LambdaExpr : public Expr {
     return StmtKind::LAMBDA_EXPR;
   }
 
-  static LambdaExprContainingStmtRange containing(const Decl &decl);
-  static LambdaExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<LambdaExpr> containing(const Decl &decl);
+  static gap::generator<LambdaExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

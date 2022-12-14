@@ -30,8 +30,6 @@ class OMPLoopDirective;
 class OMPTargetTeamsDistributeSimdDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTargetTeamsDistributeSimdDirective>;
-
 class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class OMPTargetTeamsDistributeSimdDirective : public OMPLoopDirective {
     return StmtKind::OMP_TARGET_TEAMS_DISTRIBUTE_SIMD_DIRECTIVE;
   }
 
-  static OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTargetTeamsDistributeSimdDirective> containing(const Decl &decl);
+  static gap::generator<OMPTargetTeamsDistributeSimdDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -28,8 +28,6 @@ class Expr;
 class ObjCForCollectionStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCForCollectionStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCForCollectionStmt>;
-
 class ObjCForCollectionStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -62,8 +60,8 @@ class ObjCForCollectionStmt : public Stmt {
     return StmtKind::OBJ_C_FOR_COLLECTION_STMT;
   }
 
-  static ObjCForCollectionStmtContainingStmtRange containing(const Decl &decl);
-  static ObjCForCollectionStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCForCollectionStmt> containing(const Decl &decl);
+  static gap::generator<ObjCForCollectionStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

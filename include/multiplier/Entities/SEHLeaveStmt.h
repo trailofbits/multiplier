@@ -27,8 +27,6 @@ namespace mx {
 class SEHLeaveStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHLeaveStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHLeaveStmt>;
-
 class SEHLeaveStmt : public Stmt {
  private:
   friend class FragmentImpl;
@@ -61,8 +59,8 @@ class SEHLeaveStmt : public Stmt {
     return StmtKind::SEH_LEAVE_STMT;
   }
 
-  static SEHLeaveStmtContainingStmtRange containing(const Decl &decl);
-  static SEHLeaveStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SEHLeaveStmt> containing(const Decl &decl);
+  static gap::generator<SEHLeaveStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -35,8 +35,6 @@ class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCMessageExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCMessageExpr>;
-
 class ObjCMessageExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -71,8 +69,8 @@ class ObjCMessageExpr : public Expr {
     return StmtKind::OBJ_C_MESSAGE_EXPR;
   }
 
-  static ObjCMessageExprContainingStmtRange containing(const Decl &decl);
-  static ObjCMessageExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCMessageExpr> containing(const Decl &decl);
+  static gap::generator<ObjCMessageExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

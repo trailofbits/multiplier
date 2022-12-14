@@ -29,8 +29,6 @@ class ObjCAvailabilityCheckExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAvailabilityCheckExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAvailabilityCheckExpr>;
-
 class ObjCAvailabilityCheckExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class ObjCAvailabilityCheckExpr : public Expr {
     return StmtKind::OBJ_C_AVAILABILITY_CHECK_EXPR;
   }
 
-  static ObjCAvailabilityCheckExprContainingStmtRange containing(const Decl &decl);
-  static ObjCAvailabilityCheckExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAvailabilityCheckExpr> containing(const Decl &decl);
+  static gap::generator<ObjCAvailabilityCheckExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

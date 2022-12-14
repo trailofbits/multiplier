@@ -31,8 +31,6 @@ class ObjCImplDecl;
 class ObjCInterfaceDecl;
 class ObjCPropertyImplDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCImplDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCImplDecl>;
-
 class ObjCImplDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -67,8 +65,8 @@ class ObjCImplDecl : public ObjCContainerDecl {
     return DeclKind::OBJ_C_IMPL;
   }
 
-  static ObjCImplDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCImplDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCImplDecl> containing(const Decl &decl);
+  static gap::generator<ObjCImplDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

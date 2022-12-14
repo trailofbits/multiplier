@@ -29,8 +29,6 @@ class OffsetOfExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OffsetOfExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OffsetOfExpr>;
-
 class OffsetOfExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -65,8 +63,8 @@ class OffsetOfExpr : public Expr {
     return StmtKind::OFFSET_OF_EXPR;
   }
 
-  static OffsetOfExprContainingStmtRange containing(const Decl &decl);
-  static OffsetOfExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OffsetOfExpr> containing(const Decl &decl);
+  static gap::generator<OffsetOfExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -30,8 +30,6 @@ class Type;
 class VAArgExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VAArgExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, VAArgExpr>;
-
 class VAArgExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -66,8 +64,8 @@ class VAArgExpr : public Expr {
     return StmtKind::VA_ARG_EXPR;
   }
 
-  static VAArgExprContainingStmtRange containing(const Decl &decl);
-  static VAArgExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<VAArgExpr> containing(const Decl &decl);
+  static gap::generator<VAArgExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
