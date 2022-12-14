@@ -28,7 +28,6 @@ class AlignMac68kAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AlignMac68kAttrRange = DerivedEntityRange<AttrIterator, AlignMac68kAttr>;
 using AlignMac68kAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlignMac68kAttr>;
 class AlignMac68kAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AlignMac68kAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AlignMac68kAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AlignMac68kAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AlignMac68kAttrContainingTokenRange containing(const Token &tok) {

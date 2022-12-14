@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class VecReturnAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VecReturnAttrRange = DerivedEntityRange<AttrIterator, VecReturnAttr>;
 using VecReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VecReturnAttr>;
 class VecReturnAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class VecReturnAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static VecReturnAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VecReturnAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VecReturnAttrContainingTokenRange containing(const Token &tok) {

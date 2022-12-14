@@ -28,7 +28,6 @@ class Decl;
 class FileScopeAsmDecl;
 class StringLiteral;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FileScopeAsmDeclRange = DerivedEntityRange<DeclIterator, FileScopeAsmDecl>;
 using FileScopeAsmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FileScopeAsmDecl>;
 using FileScopeAsmDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, FileScopeAsmDecl>;
 
@@ -37,8 +36,12 @@ class FileScopeAsmDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static FileScopeAsmDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FileScopeAsmDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FileScopeAsmDeclContainingTokenRange containing(const Token &tok) {

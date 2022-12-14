@@ -27,15 +27,18 @@ namespace mx {
 class MatrixType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MatrixTypeRange = DerivedEntityRange<TypeIterator, MatrixType>;
 using MatrixTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, MatrixType>;
 class MatrixType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static MatrixTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MatrixType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MatrixTypeContainingTokenRange containing(const Token &tok) {

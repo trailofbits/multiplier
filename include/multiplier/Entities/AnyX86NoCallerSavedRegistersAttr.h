@@ -28,7 +28,6 @@ class AnyX86NoCallerSavedRegistersAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AnyX86NoCallerSavedRegistersAttrRange = DerivedEntityRange<AttrIterator, AnyX86NoCallerSavedRegistersAttr>;
 using AnyX86NoCallerSavedRegistersAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnyX86NoCallerSavedRegistersAttr>;
 class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AnyX86NoCallerSavedRegistersAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AnyX86NoCallerSavedRegistersAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AnyX86NoCallerSavedRegistersAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AnyX86NoCallerSavedRegistersAttrContainingTokenRange containing(const Token &tok) {

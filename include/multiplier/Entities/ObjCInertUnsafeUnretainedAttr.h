@@ -28,7 +28,6 @@ class Attr;
 class ObjCInertUnsafeUnretainedAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCInertUnsafeUnretainedAttrRange = DerivedEntityRange<AttrIterator, ObjCInertUnsafeUnretainedAttr>;
 using ObjCInertUnsafeUnretainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCInertUnsafeUnretainedAttr>;
 class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCInertUnsafeUnretainedAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static ObjCInertUnsafeUnretainedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCInertUnsafeUnretainedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCInertUnsafeUnretainedAttrContainingTokenRange containing(const Token &tok) {

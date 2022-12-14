@@ -28,7 +28,6 @@ class Attr;
 class ConstAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstAttrRange = DerivedEntityRange<AttrIterator, ConstAttr>;
 using ConstAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstAttr>;
 class ConstAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ConstAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ConstAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConstAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConstAttrContainingTokenRange containing(const Token &tok) {

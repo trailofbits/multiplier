@@ -30,7 +30,6 @@ class OMPLoopDirective;
 class OMPParallelGenericLoopDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPParallelGenericLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelGenericLoopDirective>;
 using OMPParallelGenericLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelGenericLoopDirective>;
 using OMPParallelGenericLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPParallelGenericLoopDirective>;
 
@@ -42,8 +41,12 @@ class OMPParallelGenericLoopDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPParallelGenericLoopDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPParallelGenericLoopDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPParallelGenericLoopDirectiveContainingTokenRange containing(const Token &tok) {

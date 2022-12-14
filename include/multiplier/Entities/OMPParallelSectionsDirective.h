@@ -29,7 +29,6 @@ class OMPExecutableDirective;
 class OMPParallelSectionsDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPParallelSectionsDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelSectionsDirective>;
 using OMPParallelSectionsDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelSectionsDirective>;
 using OMPParallelSectionsDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPParallelSectionsDirective>;
 
@@ -39,8 +38,12 @@ class OMPParallelSectionsDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPParallelSectionsDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPParallelSectionsDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPParallelSectionsDirectiveContainingTokenRange containing(const Token &tok) {

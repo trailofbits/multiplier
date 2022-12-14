@@ -45,7 +45,6 @@ class RecordType;
 class TagDecl;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeRange = DerivedEntityRange<TypeIterator, Type>;
 using TypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, Type>;
 class Type {
  protected:
@@ -94,11 +93,15 @@ class Type {
   UseRange<TypeUseSelector> uses(void) const;
 
  protected:
-  static TypeIterator in_internal(const Fragment &fragment);
+  static gap::generator<Type> in_internal(const Fragment &fragment);
 
  public:
-  inline static TypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Type> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TypeContainingTokenRange containing(const Token &tok) {

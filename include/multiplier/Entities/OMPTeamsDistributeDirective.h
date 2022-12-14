@@ -30,7 +30,6 @@ class OMPLoopDirective;
 class OMPTeamsDistributeDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTeamsDistributeDirectiveRange = DerivedEntityRange<StmtIterator, OMPTeamsDistributeDirective>;
 using OMPTeamsDistributeDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTeamsDistributeDirective>;
 using OMPTeamsDistributeDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTeamsDistributeDirective>;
 
@@ -42,8 +41,12 @@ class OMPTeamsDistributeDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPTeamsDistributeDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPTeamsDistributeDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPTeamsDistributeDirectiveContainingTokenRange containing(const Token &tok) {

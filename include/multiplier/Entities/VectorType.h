@@ -28,15 +28,18 @@ namespace mx {
 class Type;
 class VectorType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VectorTypeRange = DerivedEntityRange<TypeIterator, VectorType>;
 using VectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, VectorType>;
 class VectorType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static VectorTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VectorType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VectorTypeContainingTokenRange containing(const Token &tok) {

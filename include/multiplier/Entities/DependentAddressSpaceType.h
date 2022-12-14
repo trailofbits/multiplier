@@ -28,15 +28,18 @@ class DependentAddressSpaceType;
 class Expr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentAddressSpaceTypeRange = DerivedEntityRange<TypeIterator, DependentAddressSpaceType>;
 using DependentAddressSpaceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentAddressSpaceType>;
 class DependentAddressSpaceType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static DependentAddressSpaceTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DependentAddressSpaceType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DependentAddressSpaceTypeContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class CFConsumedAttr;
 class InheritableAttr;
 class InheritableParamAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CFConsumedAttrRange = DerivedEntityRange<AttrIterator, CFConsumedAttr>;
 using CFConsumedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFConsumedAttr>;
 class CFConsumedAttr : public InheritableParamAttr {
  private:
@@ -38,8 +37,12 @@ class CFConsumedAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CFConsumedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CFConsumedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CFConsumedAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class LeafAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LeafAttrRange = DerivedEntityRange<AttrIterator, LeafAttr>;
 using LeafAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LeafAttr>;
 class LeafAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class LeafAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static LeafAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LeafAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LeafAttrContainingTokenRange containing(const Token &tok) {

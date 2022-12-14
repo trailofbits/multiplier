@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class StmtAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StmtAttrRange = DerivedEntityRange<AttrIterator, StmtAttr>;
 using StmtAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StmtAttr>;
 class StmtAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static StmtAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<StmtAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static StmtAttrContainingTokenRange containing(const Token &tok) {

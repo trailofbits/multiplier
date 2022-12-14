@@ -27,7 +27,6 @@ namespace mx {
 class Decl;
 class ExternCContextDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExternCContextDeclRange = DerivedEntityRange<DeclIterator, ExternCContextDecl>;
 using ExternCContextDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExternCContextDecl>;
 using ExternCContextDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ExternCContextDecl>;
 
@@ -36,8 +35,12 @@ class ExternCContextDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static ExternCContextDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ExternCContextDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ExternCContextDeclContainingTokenRange containing(const Token &tok) {

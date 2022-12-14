@@ -31,7 +31,6 @@ class ObjCImplDecl;
 class ObjCInterfaceDecl;
 class ObjCPropertyImplDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCImplDeclRange = DerivedEntityRange<DeclIterator, ObjCImplDecl>;
 using ObjCImplDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCImplDecl>;
 using ObjCImplDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCImplDecl>;
 
@@ -42,8 +41,12 @@ class ObjCImplDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCImplDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCImplDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCImplDeclContainingTokenRange containing(const Token &tok) {

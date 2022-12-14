@@ -32,7 +32,6 @@ class Stmt;
 class VarDecl;
 class WhileStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WhileStmtRange = DerivedEntityRange<StmtIterator, WhileStmt>;
 using WhileStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, WhileStmt>;
 using WhileStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, WhileStmt>;
 
@@ -41,8 +40,12 @@ class WhileStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static WhileStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<WhileStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static WhileStmtContainingTokenRange containing(const Token &tok) {

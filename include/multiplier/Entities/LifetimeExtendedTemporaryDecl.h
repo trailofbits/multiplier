@@ -31,7 +31,6 @@ class LifetimeExtendedTemporaryDecl;
 class Stmt;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LifetimeExtendedTemporaryDeclRange = DerivedEntityRange<DeclIterator, LifetimeExtendedTemporaryDecl>;
 using LifetimeExtendedTemporaryDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LifetimeExtendedTemporaryDecl>;
 using LifetimeExtendedTemporaryDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, LifetimeExtendedTemporaryDecl>;
 
@@ -40,8 +39,12 @@ class LifetimeExtendedTemporaryDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static LifetimeExtendedTemporaryDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LifetimeExtendedTemporaryDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LifetimeExtendedTemporaryDeclContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class GuardedVarAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GuardedVarAttrRange = DerivedEntityRange<AttrIterator, GuardedVarAttr>;
 using GuardedVarAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, GuardedVarAttr>;
 class GuardedVarAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class GuardedVarAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static GuardedVarAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<GuardedVarAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static GuardedVarAttrContainingTokenRange containing(const Token &tok) {

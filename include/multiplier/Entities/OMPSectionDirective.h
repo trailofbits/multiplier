@@ -28,7 +28,6 @@ class OMPExecutableDirective;
 class OMPSectionDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPSectionDirectiveRange = DerivedEntityRange<StmtIterator, OMPSectionDirective>;
 using OMPSectionDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPSectionDirective>;
 using OMPSectionDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPSectionDirective>;
 
@@ -38,8 +37,12 @@ class OMPSectionDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPSectionDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPSectionDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPSectionDirectiveContainingTokenRange containing(const Token &tok) {

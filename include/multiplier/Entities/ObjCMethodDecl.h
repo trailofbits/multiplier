@@ -37,7 +37,6 @@ class ParmVarDecl;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCMethodDeclRange = DerivedEntityRange<DeclIterator, ObjCMethodDecl>;
 using ObjCMethodDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCMethodDecl>;
 using ObjCMethodDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCMethodDecl>;
 
@@ -47,8 +46,12 @@ class ObjCMethodDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCMethodDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCMethodDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCMethodDeclContainingTokenRange containing(const Token &tok) {

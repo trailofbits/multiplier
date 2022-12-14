@@ -30,7 +30,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class ParameterABIAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ParameterABIAttrRange = DerivedEntityRange<AttrIterator, ParameterABIAttr>;
 using ParameterABIAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParameterABIAttr>;
 class ParameterABIAttr : public InheritableParamAttr {
  private:
@@ -39,8 +38,12 @@ class ParameterABIAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ParameterABIAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ParameterABIAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ParameterABIAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class WorkGroupSizeHintAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WorkGroupSizeHintAttrRange = DerivedEntityRange<AttrIterator, WorkGroupSizeHintAttr>;
 using WorkGroupSizeHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WorkGroupSizeHintAttr>;
 class WorkGroupSizeHintAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class WorkGroupSizeHintAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static WorkGroupSizeHintAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<WorkGroupSizeHintAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static WorkGroupSizeHintAttrContainingTokenRange containing(const Token &tok) {

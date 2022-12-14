@@ -27,7 +27,6 @@ namespace mx {
 class ObjCAutoreleasePoolStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAutoreleasePoolStmtRange = DerivedEntityRange<StmtIterator, ObjCAutoreleasePoolStmt>;
 using ObjCAutoreleasePoolStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAutoreleasePoolStmt>;
 using ObjCAutoreleasePoolStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAutoreleasePoolStmt>;
 
@@ -36,8 +35,12 @@ class ObjCAutoreleasePoolStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static ObjCAutoreleasePoolStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCAutoreleasePoolStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCAutoreleasePoolStmtContainingTokenRange containing(const Token &tok) {

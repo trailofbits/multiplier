@@ -29,7 +29,6 @@ class PseudoObjectExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PseudoObjectExprRange = DerivedEntityRange<StmtIterator, PseudoObjectExpr>;
 using PseudoObjectExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, PseudoObjectExpr>;
 using PseudoObjectExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, PseudoObjectExpr>;
 
@@ -40,8 +39,12 @@ class PseudoObjectExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static PseudoObjectExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PseudoObjectExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PseudoObjectExprContainingTokenRange containing(const Token &tok) {

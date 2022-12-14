@@ -28,7 +28,6 @@ class Attr;
 class CallbackAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CallbackAttrRange = DerivedEntityRange<AttrIterator, CallbackAttr>;
 using CallbackAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CallbackAttr>;
 class CallbackAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CallbackAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CallbackAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CallbackAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CallbackAttrContainingTokenRange containing(const Token &tok) {

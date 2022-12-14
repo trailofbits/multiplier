@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class ReturnTypestateAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReturnTypestateAttrRange = DerivedEntityRange<AttrIterator, ReturnTypestateAttr>;
 using ReturnTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReturnTypestateAttr>;
 class ReturnTypestateAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ReturnTypestateAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ReturnTypestateAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ReturnTypestateAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ReturnTypestateAttrContainingTokenRange containing(const Token &tok) {

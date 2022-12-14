@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class VectorCallAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VectorCallAttrRange = DerivedEntityRange<AttrIterator, VectorCallAttr>;
 using VectorCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VectorCallAttr>;
 class VectorCallAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class VectorCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static VectorCallAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VectorCallAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VectorCallAttrContainingTokenRange containing(const Token &tok) {

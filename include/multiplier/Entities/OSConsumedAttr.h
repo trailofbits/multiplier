@@ -29,7 +29,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class OSConsumedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OSConsumedAttrRange = DerivedEntityRange<AttrIterator, OSConsumedAttr>;
 using OSConsumedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSConsumedAttr>;
 class OSConsumedAttr : public InheritableParamAttr {
  private:
@@ -38,8 +37,12 @@ class OSConsumedAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OSConsumedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OSConsumedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OSConsumedAttrContainingTokenRange containing(const Token &tok) {

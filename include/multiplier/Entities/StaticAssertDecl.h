@@ -29,7 +29,6 @@ class Expr;
 class StaticAssertDecl;
 class StringLiteral;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StaticAssertDeclRange = DerivedEntityRange<DeclIterator, StaticAssertDecl>;
 using StaticAssertDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, StaticAssertDecl>;
 using StaticAssertDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, StaticAssertDecl>;
 
@@ -38,8 +37,12 @@ class StaticAssertDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static StaticAssertDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<StaticAssertDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static StaticAssertDeclContainingTokenRange containing(const Token &tok) {

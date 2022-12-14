@@ -28,7 +28,6 @@ class Attr;
 class CUDADeviceAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CUDADeviceAttrRange = DerivedEntityRange<AttrIterator, CUDADeviceAttr>;
 using CUDADeviceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDADeviceAttr>;
 class CUDADeviceAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CUDADeviceAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CUDADeviceAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CUDADeviceAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CUDADeviceAttrContainingTokenRange containing(const Token &tok) {

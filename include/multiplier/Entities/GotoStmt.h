@@ -28,7 +28,6 @@ class GotoStmt;
 class LabelDecl;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GotoStmtRange = DerivedEntityRange<StmtIterator, GotoStmt>;
 using GotoStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, GotoStmt>;
 using GotoStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, GotoStmt>;
 
@@ -37,8 +36,12 @@ class GotoStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static GotoStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<GotoStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static GotoStmtContainingTokenRange containing(const Token &tok) {

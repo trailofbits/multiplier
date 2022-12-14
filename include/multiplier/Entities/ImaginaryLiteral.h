@@ -29,7 +29,6 @@ class ImaginaryLiteral;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImaginaryLiteralRange = DerivedEntityRange<StmtIterator, ImaginaryLiteral>;
 using ImaginaryLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImaginaryLiteral>;
 using ImaginaryLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ImaginaryLiteral>;
 
@@ -40,8 +39,12 @@ class ImaginaryLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ImaginaryLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ImaginaryLiteral> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ImaginaryLiteralContainingTokenRange containing(const Token &tok) {

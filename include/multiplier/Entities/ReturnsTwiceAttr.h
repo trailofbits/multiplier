@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ReturnsTwiceAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReturnsTwiceAttrRange = DerivedEntityRange<AttrIterator, ReturnsTwiceAttr>;
 using ReturnsTwiceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReturnsTwiceAttr>;
 class ReturnsTwiceAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ReturnsTwiceAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ReturnsTwiceAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ReturnsTwiceAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ReturnsTwiceAttrContainingTokenRange containing(const Token &tok) {

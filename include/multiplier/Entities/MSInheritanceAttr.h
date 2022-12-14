@@ -30,7 +30,6 @@ class Attr;
 class InheritableAttr;
 class MSInheritanceAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSInheritanceAttrRange = DerivedEntityRange<AttrIterator, MSInheritanceAttr>;
 using MSInheritanceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSInheritanceAttr>;
 class MSInheritanceAttr : public InheritableAttr {
  private:
@@ -38,8 +37,12 @@ class MSInheritanceAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MSInheritanceAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSInheritanceAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSInheritanceAttrContainingTokenRange containing(const Token &tok) {

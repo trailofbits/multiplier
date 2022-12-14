@@ -28,7 +28,6 @@ class OMPExecutableDirective;
 class OMPMetaDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPMetaDirectiveRange = DerivedEntityRange<StmtIterator, OMPMetaDirective>;
 using OMPMetaDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPMetaDirective>;
 using OMPMetaDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPMetaDirective>;
 
@@ -38,8 +37,12 @@ class OMPMetaDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPMetaDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPMetaDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPMetaDirectiveContainingTokenRange containing(const Token &tok) {

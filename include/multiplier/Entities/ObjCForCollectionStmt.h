@@ -28,7 +28,6 @@ class Expr;
 class ObjCForCollectionStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCForCollectionStmtRange = DerivedEntityRange<StmtIterator, ObjCForCollectionStmt>;
 using ObjCForCollectionStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCForCollectionStmt>;
 using ObjCForCollectionStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCForCollectionStmt>;
 
@@ -37,8 +36,12 @@ class ObjCForCollectionStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static ObjCForCollectionStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCForCollectionStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCForCollectionStmtContainingTokenRange containing(const Token &tok) {

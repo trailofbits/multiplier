@@ -30,7 +30,6 @@ class Stmt;
 class UnresolvedLookupExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedLookupExprRange = DerivedEntityRange<StmtIterator, UnresolvedLookupExpr>;
 using UnresolvedLookupExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedLookupExpr>;
 using UnresolvedLookupExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnresolvedLookupExpr>;
 
@@ -42,8 +41,12 @@ class UnresolvedLookupExpr : public OverloadExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static UnresolvedLookupExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnresolvedLookupExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnresolvedLookupExprContainingTokenRange containing(const Token &tok) {

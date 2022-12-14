@@ -29,7 +29,6 @@ class DeclOrStmtAttr;
 class InheritableAttr;
 class NoMergeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoMergeAttrRange = DerivedEntityRange<AttrIterator, NoMergeAttr>;
 using NoMergeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoMergeAttr>;
 class NoMergeAttr : public DeclOrStmtAttr {
  private:
@@ -38,8 +37,12 @@ class NoMergeAttr : public DeclOrStmtAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoMergeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoMergeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoMergeAttrContainingTokenRange containing(const Token &tok) {

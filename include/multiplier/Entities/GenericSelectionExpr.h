@@ -29,7 +29,6 @@ class GenericSelectionExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GenericSelectionExprRange = DerivedEntityRange<StmtIterator, GenericSelectionExpr>;
 using GenericSelectionExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, GenericSelectionExpr>;
 using GenericSelectionExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, GenericSelectionExpr>;
 
@@ -40,8 +39,12 @@ class GenericSelectionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static GenericSelectionExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<GenericSelectionExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static GenericSelectionExprContainingTokenRange containing(const Token &tok) {

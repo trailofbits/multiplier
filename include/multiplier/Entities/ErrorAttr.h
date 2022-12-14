@@ -29,7 +29,6 @@ class Attr;
 class ErrorAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ErrorAttrRange = DerivedEntityRange<AttrIterator, ErrorAttr>;
 using ErrorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ErrorAttr>;
 class ErrorAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ErrorAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ErrorAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ErrorAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ErrorAttrContainingTokenRange containing(const Token &tok) {

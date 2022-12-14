@@ -29,7 +29,6 @@ class ArgumentWithTypeTagAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArgumentWithTypeTagAttrRange = DerivedEntityRange<AttrIterator, ArgumentWithTypeTagAttr>;
 using ArgumentWithTypeTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArgumentWithTypeTagAttr>;
 class ArgumentWithTypeTagAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ArgumentWithTypeTagAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ArgumentWithTypeTagAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ArgumentWithTypeTagAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ArgumentWithTypeTagAttrContainingTokenRange containing(const Token &tok) {

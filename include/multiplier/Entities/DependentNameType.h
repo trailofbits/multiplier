@@ -28,7 +28,6 @@ class DependentNameType;
 class Type;
 class TypeWithKeyword;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentNameTypeRange = DerivedEntityRange<TypeIterator, DependentNameType>;
 using DependentNameTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentNameType>;
 class DependentNameType : public TypeWithKeyword {
  private:
@@ -36,8 +35,12 @@ class DependentNameType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  inline static DependentNameTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DependentNameType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DependentNameTypeContainingTokenRange containing(const Token &tok) {

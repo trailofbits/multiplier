@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PreserveMostAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PreserveMostAttrRange = DerivedEntityRange<AttrIterator, PreserveMostAttr>;
 using PreserveMostAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PreserveMostAttr>;
 class PreserveMostAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PreserveMostAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PreserveMostAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PreserveMostAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PreserveMostAttrContainingTokenRange containing(const Token &tok) {

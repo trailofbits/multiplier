@@ -29,7 +29,6 @@ class OMPExecutableDirective;
 class OMPParallelMaskedDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPParallelMaskedDirectiveRange = DerivedEntityRange<StmtIterator, OMPParallelMaskedDirective>;
 using OMPParallelMaskedDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPParallelMaskedDirective>;
 using OMPParallelMaskedDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPParallelMaskedDirective>;
 
@@ -39,8 +38,12 @@ class OMPParallelMaskedDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPParallelMaskedDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPParallelMaskedDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPParallelMaskedDirectiveContainingTokenRange containing(const Token &tok) {

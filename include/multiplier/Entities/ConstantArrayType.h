@@ -30,7 +30,6 @@ class ConstantArrayType;
 class Expr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstantArrayTypeRange = DerivedEntityRange<TypeIterator, ConstantArrayType>;
 using ConstantArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstantArrayType>;
 class ConstantArrayType : public ArrayType {
  private:
@@ -38,8 +37,12 @@ class ConstantArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  inline static ConstantArrayTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConstantArrayType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConstantArrayTypeContainingTokenRange containing(const Token &tok) {

@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeAttrRange = DerivedEntityRange<AttrIterator, TypeAttr>;
 using TypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeAttr>;
 class TypeAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static TypeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TypeAttrContainingTokenRange containing(const Token &tok) {

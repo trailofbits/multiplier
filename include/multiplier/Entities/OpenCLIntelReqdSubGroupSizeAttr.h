@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OpenCLIntelReqdSubGroupSizeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLIntelReqdSubGroupSizeAttrRange = DerivedEntityRange<AttrIterator, OpenCLIntelReqdSubGroupSizeAttr>;
 using OpenCLIntelReqdSubGroupSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLIntelReqdSubGroupSizeAttr>;
 class OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class OpenCLIntelReqdSubGroupSizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OpenCLIntelReqdSubGroupSizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OpenCLIntelReqdSubGroupSizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OpenCLIntelReqdSubGroupSizeAttrContainingTokenRange containing(const Token &tok) {

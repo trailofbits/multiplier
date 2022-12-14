@@ -28,15 +28,18 @@ class Type;
 class UnresolvedUsingType;
 class UnresolvedUsingTypenameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedUsingTypeRange = DerivedEntityRange<TypeIterator, UnresolvedUsingType>;
 using UnresolvedUsingTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingType>;
 class UnresolvedUsingType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static UnresolvedUsingTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnresolvedUsingType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnresolvedUsingTypeContainingTokenRange containing(const Token &tok) {

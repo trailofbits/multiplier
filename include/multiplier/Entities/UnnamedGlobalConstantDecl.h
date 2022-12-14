@@ -29,7 +29,6 @@ class NamedDecl;
 class UnnamedGlobalConstantDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnnamedGlobalConstantDeclRange = DerivedEntityRange<DeclIterator, UnnamedGlobalConstantDecl>;
 using UnnamedGlobalConstantDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnnamedGlobalConstantDecl>;
 using UnnamedGlobalConstantDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnnamedGlobalConstantDecl>;
 
@@ -40,8 +39,12 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static UnnamedGlobalConstantDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnnamedGlobalConstantDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnnamedGlobalConstantDeclContainingTokenRange containing(const Token &tok) {

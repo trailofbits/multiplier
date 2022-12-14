@@ -29,7 +29,6 @@ class MSGuidDecl;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSGuidDeclRange = DerivedEntityRange<DeclIterator, MSGuidDecl>;
 using MSGuidDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSGuidDecl>;
 using MSGuidDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, MSGuidDecl>;
 
@@ -40,8 +39,12 @@ class MSGuidDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static MSGuidDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSGuidDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSGuidDeclContainingTokenRange containing(const Token &tok) {

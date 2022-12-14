@@ -28,15 +28,18 @@ class Expr;
 class Type;
 class TypeOfExprType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeOfExprTypeRange = DerivedEntityRange<TypeIterator, TypeOfExprType>;
 using TypeOfExprTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeOfExprType>;
 class TypeOfExprType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static TypeOfExprTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypeOfExprType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TypeOfExprTypeContainingTokenRange containing(const Token &tok) {

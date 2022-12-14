@@ -31,7 +31,6 @@ class Stmt;
 class TemplateArgument;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SizeOfPackExprRange = DerivedEntityRange<StmtIterator, SizeOfPackExpr>;
 using SizeOfPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SizeOfPackExpr>;
 using SizeOfPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SizeOfPackExpr>;
 
@@ -42,8 +41,12 @@ class SizeOfPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static SizeOfPackExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SizeOfPackExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SizeOfPackExprContainingTokenRange containing(const Token &tok) {

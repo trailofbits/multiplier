@@ -28,7 +28,6 @@ class AVRInterruptAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AVRInterruptAttrRange = DerivedEntityRange<AttrIterator, AVRInterruptAttr>;
 using AVRInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AVRInterruptAttr>;
 class AVRInterruptAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AVRInterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AVRInterruptAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AVRInterruptAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AVRInterruptAttrContainingTokenRange containing(const Token &tok) {

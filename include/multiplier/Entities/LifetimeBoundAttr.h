@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class LifetimeBoundAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LifetimeBoundAttrRange = DerivedEntityRange<AttrIterator, LifetimeBoundAttr>;
 using LifetimeBoundAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LifetimeBoundAttr>;
 class LifetimeBoundAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class LifetimeBoundAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static LifetimeBoundAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LifetimeBoundAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LifetimeBoundAttrContainingTokenRange containing(const Token &tok) {

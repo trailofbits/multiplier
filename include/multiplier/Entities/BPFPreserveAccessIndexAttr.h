@@ -28,7 +28,6 @@ class Attr;
 class BPFPreserveAccessIndexAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BPFPreserveAccessIndexAttrRange = DerivedEntityRange<AttrIterator, BPFPreserveAccessIndexAttr>;
 using BPFPreserveAccessIndexAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BPFPreserveAccessIndexAttr>;
 class BPFPreserveAccessIndexAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class BPFPreserveAccessIndexAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static BPFPreserveAccessIndexAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BPFPreserveAccessIndexAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BPFPreserveAccessIndexAttrContainingTokenRange containing(const Token &tok) {

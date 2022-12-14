@@ -28,7 +28,6 @@ class RecordType;
 class TagType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RecordTypeRange = DerivedEntityRange<TypeIterator, RecordType>;
 using RecordTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, RecordType>;
 class RecordType : public TagType {
  private:
@@ -36,8 +35,12 @@ class RecordType : public TagType {
   friend class TagType;
   friend class Type;
  public:
-  inline static RecordTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<RecordType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static RecordTypeContainingTokenRange containing(const Token &tok) {

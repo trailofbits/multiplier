@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class SwiftObjCMembersAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftObjCMembersAttrRange = DerivedEntityRange<AttrIterator, SwiftObjCMembersAttr>;
 using SwiftObjCMembersAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftObjCMembersAttr>;
 class SwiftObjCMembersAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static SwiftObjCMembersAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftObjCMembersAttrContainingTokenRange containing(const Token &tok) {

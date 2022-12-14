@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoThreadSafetyAnalysisAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoThreadSafetyAnalysisAttrRange = DerivedEntityRange<AttrIterator, NoThreadSafetyAnalysisAttr>;
 using NoThreadSafetyAnalysisAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoThreadSafetyAnalysisAttr>;
 class NoThreadSafetyAnalysisAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoThreadSafetyAnalysisAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoThreadSafetyAnalysisAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoThreadSafetyAnalysisAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoThreadSafetyAnalysisAttrContainingTokenRange containing(const Token &tok) {

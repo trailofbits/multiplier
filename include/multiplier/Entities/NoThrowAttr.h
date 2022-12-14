@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoThrowAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoThrowAttrRange = DerivedEntityRange<AttrIterator, NoThrowAttr>;
 using NoThrowAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoThrowAttr>;
 class NoThrowAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoThrowAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoThrowAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoThrowAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoThrowAttrContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class MSPropertySubscriptExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertySubscriptExprRange = DerivedEntityRange<StmtIterator, MSPropertySubscriptExpr>;
 using MSPropertySubscriptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertySubscriptExpr>;
 using MSPropertySubscriptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSPropertySubscriptExpr>;
 
@@ -40,8 +39,12 @@ class MSPropertySubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static MSPropertySubscriptExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSPropertySubscriptExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSPropertySubscriptExprContainingTokenRange containing(const Token &tok) {

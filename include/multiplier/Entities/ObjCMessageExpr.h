@@ -35,7 +35,6 @@ class Token;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCMessageExprRange = DerivedEntityRange<StmtIterator, ObjCMessageExpr>;
 using ObjCMessageExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCMessageExpr>;
 using ObjCMessageExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCMessageExpr>;
 
@@ -46,8 +45,12 @@ class ObjCMessageExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCMessageExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCMessageExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCMessageExprContainingTokenRange containing(const Token &tok) {

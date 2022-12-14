@@ -28,15 +28,18 @@ class DependentSizedExtVectorType;
 class Expr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentSizedExtVectorTypeRange = DerivedEntityRange<TypeIterator, DependentSizedExtVectorType>;
 using DependentSizedExtVectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentSizedExtVectorType>;
 class DependentSizedExtVectorType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static DependentSizedExtVectorTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DependentSizedExtVectorType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DependentSizedExtVectorTypeContainingTokenRange containing(const Token &tok) {

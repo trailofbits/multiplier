@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SwiftBridgedTypedefAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftBridgedTypedefAttrRange = DerivedEntityRange<AttrIterator, SwiftBridgedTypedefAttr>;
 using SwiftBridgedTypedefAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftBridgedTypedefAttr>;
 class SwiftBridgedTypedefAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftBridgedTypedefAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftBridgedTypedefAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftBridgedTypedefAttrContainingTokenRange containing(const Token &tok) {

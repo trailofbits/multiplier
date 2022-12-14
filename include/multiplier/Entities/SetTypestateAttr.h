@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class SetTypestateAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SetTypestateAttrRange = DerivedEntityRange<AttrIterator, SetTypestateAttr>;
 using SetTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SetTypestateAttr>;
 class SetTypestateAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class SetTypestateAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SetTypestateAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SetTypestateAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SetTypestateAttrContainingTokenRange containing(const Token &tok) {

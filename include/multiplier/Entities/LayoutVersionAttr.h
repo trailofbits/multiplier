@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class LayoutVersionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LayoutVersionAttrRange = DerivedEntityRange<AttrIterator, LayoutVersionAttr>;
 using LayoutVersionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LayoutVersionAttr>;
 class LayoutVersionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class LayoutVersionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static LayoutVersionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LayoutVersionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LayoutVersionAttrContainingTokenRange containing(const Token &tok) {

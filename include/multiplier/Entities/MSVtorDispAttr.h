@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class MSVtorDispAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSVtorDispAttrRange = DerivedEntityRange<AttrIterator, MSVtorDispAttr>;
 using MSVtorDispAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSVtorDispAttr>;
 class MSVtorDispAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class MSVtorDispAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MSVtorDispAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSVtorDispAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSVtorDispAttrContainingTokenRange containing(const Token &tok) {

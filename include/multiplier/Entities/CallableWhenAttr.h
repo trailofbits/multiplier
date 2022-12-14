@@ -28,7 +28,6 @@ class Attr;
 class CallableWhenAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CallableWhenAttrRange = DerivedEntityRange<AttrIterator, CallableWhenAttr>;
 using CallableWhenAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CallableWhenAttr>;
 class CallableWhenAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CallableWhenAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CallableWhenAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CallableWhenAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CallableWhenAttrContainingTokenRange containing(const Token &tok) {

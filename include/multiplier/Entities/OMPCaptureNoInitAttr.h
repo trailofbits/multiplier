@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OMPCaptureNoInitAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCaptureNoInitAttrRange = DerivedEntityRange<AttrIterator, OMPCaptureNoInitAttr>;
 using OMPCaptureNoInitAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCaptureNoInitAttr>;
 class OMPCaptureNoInitAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OMPCaptureNoInitAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPCaptureNoInitAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPCaptureNoInitAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OSReturnsRetainedOnNonZeroAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OSReturnsRetainedOnNonZeroAttrRange = DerivedEntityRange<AttrIterator, OSReturnsRetainedOnNonZeroAttr>;
 using OSReturnsRetainedOnNonZeroAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSReturnsRetainedOnNonZeroAttr>;
 class OSReturnsRetainedOnNonZeroAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class OSReturnsRetainedOnNonZeroAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OSReturnsRetainedOnNonZeroAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OSReturnsRetainedOnNonZeroAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OSReturnsRetainedOnNonZeroAttrContainingTokenRange containing(const Token &tok) {

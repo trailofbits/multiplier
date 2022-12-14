@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OMPThreadPrivateDeclAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPThreadPrivateDeclAttrRange = DerivedEntityRange<AttrIterator, OMPThreadPrivateDeclAttr>;
 using OMPThreadPrivateDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPThreadPrivateDeclAttr>;
 class OMPThreadPrivateDeclAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OMPThreadPrivateDeclAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPThreadPrivateDeclAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPThreadPrivateDeclAttrContainingTokenRange containing(const Token &tok) {

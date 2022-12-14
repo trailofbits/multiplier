@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ObjCRequiresPropertyDefsAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCRequiresPropertyDefsAttrRange = DerivedEntityRange<AttrIterator, ObjCRequiresPropertyDefsAttr>;
 using ObjCRequiresPropertyDefsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCRequiresPropertyDefsAttr>;
 class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ObjCRequiresPropertyDefsAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCRequiresPropertyDefsAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCRequiresPropertyDefsAttrContainingTokenRange containing(const Token &tok) {

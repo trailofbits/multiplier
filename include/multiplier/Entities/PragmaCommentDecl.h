@@ -28,7 +28,6 @@ namespace mx {
 class Decl;
 class PragmaCommentDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaCommentDeclRange = DerivedEntityRange<DeclIterator, PragmaCommentDecl>;
 using PragmaCommentDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaCommentDecl>;
 using PragmaCommentDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, PragmaCommentDecl>;
 
@@ -37,8 +36,12 @@ class PragmaCommentDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static PragmaCommentDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaCommentDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PragmaCommentDeclContainingTokenRange containing(const Token &tok) {

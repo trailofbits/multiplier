@@ -29,7 +29,6 @@ class OMPIteratorExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPIteratorExprRange = DerivedEntityRange<StmtIterator, OMPIteratorExpr>;
 using OMPIteratorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPIteratorExpr>;
 using OMPIteratorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPIteratorExpr>;
 
@@ -40,8 +39,12 @@ class OMPIteratorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static OMPIteratorExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPIteratorExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPIteratorExprContainingTokenRange containing(const Token &tok) {

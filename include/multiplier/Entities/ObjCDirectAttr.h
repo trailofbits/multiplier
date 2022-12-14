@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class ObjCDirectAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCDirectAttrRange = DerivedEntityRange<AttrIterator, ObjCDirectAttr>;
 using ObjCDirectAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCDirectAttr>;
 class ObjCDirectAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static ObjCDirectAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCDirectAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCDirectAttrContainingTokenRange containing(const Token &tok) {

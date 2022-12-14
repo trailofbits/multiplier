@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoAliasAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoAliasAttrRange = DerivedEntityRange<AttrIterator, NoAliasAttr>;
 using NoAliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoAliasAttr>;
 class NoAliasAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoAliasAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoAliasAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoAliasAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoAliasAttrContainingTokenRange containing(const Token &tok) {

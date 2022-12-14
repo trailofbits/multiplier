@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoDuplicateAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoDuplicateAttrRange = DerivedEntityRange<AttrIterator, NoDuplicateAttr>;
 using NoDuplicateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDuplicateAttr>;
 class NoDuplicateAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoDuplicateAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoDuplicateAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoDuplicateAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoDuplicateAttrContainingTokenRange containing(const Token &tok) {

@@ -33,7 +33,6 @@ class SwitchCase;
 class SwitchStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwitchStmtRange = DerivedEntityRange<StmtIterator, SwitchStmt>;
 using SwitchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwitchStmt>;
 using SwitchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SwitchStmt>;
 
@@ -42,8 +41,12 @@ class SwitchStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SwitchStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwitchStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwitchStmtContainingTokenRange containing(const Token &tok) {

@@ -28,15 +28,18 @@ namespace mx {
 class BuiltinType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BuiltinTypeRange = DerivedEntityRange<TypeIterator, BuiltinType>;
 using BuiltinTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinType>;
 class BuiltinType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static BuiltinTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BuiltinType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BuiltinTypeContainingTokenRange containing(const Token &tok) {

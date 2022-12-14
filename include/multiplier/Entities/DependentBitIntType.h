@@ -28,15 +28,18 @@ class DependentBitIntType;
 class Expr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentBitIntTypeRange = DerivedEntityRange<TypeIterator, DependentBitIntType>;
 using DependentBitIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentBitIntType>;
 class DependentBitIntType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static DependentBitIntTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DependentBitIntType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DependentBitIntTypeContainingTokenRange containing(const Token &tok) {

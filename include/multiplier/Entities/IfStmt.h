@@ -33,7 +33,6 @@ class IfStmt;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IfStmtRange = DerivedEntityRange<StmtIterator, IfStmt>;
 using IfStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, IfStmt>;
 using IfStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, IfStmt>;
 
@@ -42,8 +41,12 @@ class IfStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static IfStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IfStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static IfStmtContainingTokenRange containing(const Token &tok) {

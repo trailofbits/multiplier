@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PragmaClangRodataSectionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaClangRodataSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangRodataSectionAttr>;
 using PragmaClangRodataSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangRodataSectionAttr>;
 class PragmaClangRodataSectionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PragmaClangRodataSectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PragmaClangRodataSectionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaClangRodataSectionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PragmaClangRodataSectionAttrContainingTokenRange containing(const Token &tok) {

@@ -30,7 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXRewrittenBinaryOperatorRange = DerivedEntityRange<StmtIterator, CXXRewrittenBinaryOperator>;
 using CXXRewrittenBinaryOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXRewrittenBinaryOperator>;
 using CXXRewrittenBinaryOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXRewrittenBinaryOperator>;
 
@@ -41,8 +40,12 @@ class CXXRewrittenBinaryOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CXXRewrittenBinaryOperatorRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXRewrittenBinaryOperator> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXRewrittenBinaryOperatorContainingTokenRange containing(const Token &tok) {

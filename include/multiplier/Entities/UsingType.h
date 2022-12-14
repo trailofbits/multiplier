@@ -28,15 +28,18 @@ class Type;
 class UsingShadowDecl;
 class UsingType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UsingTypeRange = DerivedEntityRange<TypeIterator, UsingType>;
 using UsingTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingType>;
 class UsingType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static UsingTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UsingType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UsingTypeContainingTokenRange containing(const Token &tok) {

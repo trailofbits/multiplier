@@ -30,7 +30,6 @@ class OpaqueValueExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoroutineSuspendExprRange = DerivedEntityRange<StmtIterator, CoroutineSuspendExpr>;
 using CoroutineSuspendExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoroutineSuspendExpr>;
 using CoroutineSuspendExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoroutineSuspendExpr>;
 
@@ -41,8 +40,12 @@ class CoroutineSuspendExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CoroutineSuspendExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CoroutineSuspendExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CoroutineSuspendExprContainingTokenRange containing(const Token &tok) {

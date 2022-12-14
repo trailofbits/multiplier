@@ -28,7 +28,6 @@ class Attr;
 class GNUInlineAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GNUInlineAttrRange = DerivedEntityRange<AttrIterator, GNUInlineAttr>;
 using GNUInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, GNUInlineAttr>;
 class GNUInlineAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class GNUInlineAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static GNUInlineAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<GNUInlineAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static GNUInlineAttrContainingTokenRange containing(const Token &tok) {

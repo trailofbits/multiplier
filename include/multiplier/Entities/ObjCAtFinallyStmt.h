@@ -27,7 +27,6 @@ namespace mx {
 class ObjCAtFinallyStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtFinallyStmtRange = DerivedEntityRange<StmtIterator, ObjCAtFinallyStmt>;
 using ObjCAtFinallyStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtFinallyStmt>;
 using ObjCAtFinallyStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtFinallyStmt>;
 
@@ -36,8 +35,12 @@ class ObjCAtFinallyStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static ObjCAtFinallyStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCAtFinallyStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCAtFinallyStmtContainingTokenRange containing(const Token &tok) {

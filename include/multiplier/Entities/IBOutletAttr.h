@@ -28,7 +28,6 @@ class Attr;
 class IBOutletAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IBOutletAttrRange = DerivedEntityRange<AttrIterator, IBOutletAttr>;
 using IBOutletAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IBOutletAttr>;
 class IBOutletAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class IBOutletAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static IBOutletAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IBOutletAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static IBOutletAttrContainingTokenRange containing(const Token &tok) {

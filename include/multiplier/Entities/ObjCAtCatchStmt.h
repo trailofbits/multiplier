@@ -28,7 +28,6 @@ class ObjCAtCatchStmt;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtCatchStmtRange = DerivedEntityRange<StmtIterator, ObjCAtCatchStmt>;
 using ObjCAtCatchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtCatchStmt>;
 using ObjCAtCatchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtCatchStmt>;
 
@@ -37,8 +36,12 @@ class ObjCAtCatchStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static ObjCAtCatchStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCAtCatchStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCAtCatchStmtContainingTokenRange containing(const Token &tok) {

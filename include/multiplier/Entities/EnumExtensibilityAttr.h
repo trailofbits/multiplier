@@ -29,7 +29,6 @@ class Attr;
 class EnumExtensibilityAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EnumExtensibilityAttrRange = DerivedEntityRange<AttrIterator, EnumExtensibilityAttr>;
 using EnumExtensibilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumExtensibilityAttr>;
 class EnumExtensibilityAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class EnumExtensibilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static EnumExtensibilityAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<EnumExtensibilityAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static EnumExtensibilityAttrContainingTokenRange containing(const Token &tok) {

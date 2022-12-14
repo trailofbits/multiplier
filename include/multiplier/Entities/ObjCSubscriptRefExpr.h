@@ -30,7 +30,6 @@ class ObjCSubscriptRefExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCSubscriptRefExprRange = DerivedEntityRange<StmtIterator, ObjCSubscriptRefExpr>;
 using ObjCSubscriptRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCSubscriptRefExpr>;
 using ObjCSubscriptRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCSubscriptRefExpr>;
 
@@ -41,8 +40,12 @@ class ObjCSubscriptRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCSubscriptRefExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCSubscriptRefExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCSubscriptRefExprContainingTokenRange containing(const Token &tok) {

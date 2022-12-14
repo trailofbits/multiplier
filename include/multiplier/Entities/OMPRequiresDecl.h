@@ -28,7 +28,6 @@ class Decl;
 class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPRequiresDeclRange = DerivedEntityRange<DeclIterator, OMPRequiresDecl>;
 using OMPRequiresDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPRequiresDecl>;
 using OMPRequiresDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPRequiresDecl>;
 
@@ -38,8 +37,12 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
-  inline static OMPRequiresDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPRequiresDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPRequiresDeclContainingTokenRange containing(const Token &tok) {

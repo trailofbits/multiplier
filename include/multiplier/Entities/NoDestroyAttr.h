@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoDestroyAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoDestroyAttrRange = DerivedEntityRange<AttrIterator, NoDestroyAttr>;
 using NoDestroyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDestroyAttr>;
 class NoDestroyAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoDestroyAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoDestroyAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoDestroyAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoDestroyAttrContainingTokenRange containing(const Token &tok) {

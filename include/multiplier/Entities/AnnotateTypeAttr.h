@@ -28,7 +28,6 @@ class AnnotateTypeAttr;
 class Attr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AnnotateTypeAttrRange = DerivedEntityRange<AttrIterator, AnnotateTypeAttr>;
 using AnnotateTypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnnotateTypeAttr>;
 class AnnotateTypeAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class AnnotateTypeAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static AnnotateTypeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AnnotateTypeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AnnotateTypeAttrContainingTokenRange containing(const Token &tok) {

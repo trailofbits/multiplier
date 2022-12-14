@@ -29,7 +29,6 @@ class NamedDecl;
 class ObjCCompatibleAliasDecl;
 class ObjCInterfaceDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCCompatibleAliasDeclRange = DerivedEntityRange<DeclIterator, ObjCCompatibleAliasDecl>;
 using ObjCCompatibleAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCCompatibleAliasDecl>;
 using ObjCCompatibleAliasDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCCompatibleAliasDecl>;
 
@@ -39,8 +38,12 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCCompatibleAliasDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCCompatibleAliasDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCCompatibleAliasDeclContainingTokenRange containing(const Token &tok) {

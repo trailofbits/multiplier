@@ -28,7 +28,6 @@ class FunctionNoProtoType;
 class FunctionType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FunctionNoProtoTypeRange = DerivedEntityRange<TypeIterator, FunctionNoProtoType>;
 using FunctionNoProtoTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionNoProtoType>;
 class FunctionNoProtoType : public FunctionType {
  private:
@@ -36,8 +35,12 @@ class FunctionNoProtoType : public FunctionType {
   friend class FunctionType;
   friend class Type;
  public:
-  inline static FunctionNoProtoTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FunctionNoProtoType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FunctionNoProtoTypeContainingTokenRange containing(const Token &tok) {

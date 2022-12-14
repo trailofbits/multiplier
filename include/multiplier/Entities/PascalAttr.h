@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PascalAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PascalAttrRange = DerivedEntityRange<AttrIterator, PascalAttr>;
 using PascalAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PascalAttr>;
 class PascalAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PascalAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PascalAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PascalAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PascalAttrContainingTokenRange containing(const Token &tok) {

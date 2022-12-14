@@ -29,7 +29,6 @@ class Expr;
 class Type;
 class VariableArrayType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VariableArrayTypeRange = DerivedEntityRange<TypeIterator, VariableArrayType>;
 using VariableArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, VariableArrayType>;
 class VariableArrayType : public ArrayType {
  private:
@@ -37,8 +36,12 @@ class VariableArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  inline static VariableArrayTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VariableArrayType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VariableArrayTypeContainingTokenRange containing(const Token &tok) {

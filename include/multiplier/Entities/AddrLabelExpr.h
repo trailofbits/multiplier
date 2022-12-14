@@ -30,7 +30,6 @@ class LabelDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AddrLabelExprRange = DerivedEntityRange<StmtIterator, AddrLabelExpr>;
 using AddrLabelExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, AddrLabelExpr>;
 using AddrLabelExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AddrLabelExpr>;
 
@@ -41,8 +40,12 @@ class AddrLabelExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static AddrLabelExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AddrLabelExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AddrLabelExprContainingTokenRange containing(const Token &tok) {

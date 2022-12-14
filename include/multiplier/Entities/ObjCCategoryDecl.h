@@ -34,7 +34,6 @@ class ObjCIvarDecl;
 class ObjCProtocolDecl;
 class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCCategoryDeclRange = DerivedEntityRange<DeclIterator, ObjCCategoryDecl>;
 using ObjCCategoryDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCCategoryDecl>;
 using ObjCCategoryDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCCategoryDecl>;
 
@@ -45,8 +44,12 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCCategoryDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCCategoryDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCCategoryDeclContainingTokenRange containing(const Token &tok) {

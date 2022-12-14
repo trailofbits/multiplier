@@ -29,7 +29,6 @@ class Expr;
 class MSAsmStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSAsmStmtRange = DerivedEntityRange<StmtIterator, MSAsmStmt>;
 using MSAsmStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSAsmStmt>;
 using MSAsmStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSAsmStmt>;
 
@@ -39,8 +38,12 @@ class MSAsmStmt : public AsmStmt {
   friend class AsmStmt;
   friend class Stmt;
  public:
-  inline static MSAsmStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSAsmStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSAsmStmtContainingTokenRange containing(const Token &tok) {

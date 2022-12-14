@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PatchableFunctionEntryAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PatchableFunctionEntryAttrRange = DerivedEntityRange<AttrIterator, PatchableFunctionEntryAttr>;
 using PatchableFunctionEntryAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PatchableFunctionEntryAttr>;
 class PatchableFunctionEntryAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PatchableFunctionEntryAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PatchableFunctionEntryAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PatchableFunctionEntryAttrContainingTokenRange containing(const Token &tok) {

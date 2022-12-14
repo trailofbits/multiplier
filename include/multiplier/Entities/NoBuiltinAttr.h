@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class NoBuiltinAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoBuiltinAttrRange = DerivedEntityRange<AttrIterator, NoBuiltinAttr>;
 using NoBuiltinAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoBuiltinAttr>;
 class NoBuiltinAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static NoBuiltinAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoBuiltinAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoBuiltinAttrContainingTokenRange containing(const Token &tok) {

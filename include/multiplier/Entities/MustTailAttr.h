@@ -28,7 +28,6 @@ class Attr;
 class MustTailAttr;
 class StmtAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MustTailAttrRange = DerivedEntityRange<AttrIterator, MustTailAttr>;
 using MustTailAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MustTailAttr>;
 class MustTailAttr : public StmtAttr {
  private:
@@ -36,8 +35,12 @@ class MustTailAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  inline static MustTailAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MustTailAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MustTailAttrContainingTokenRange containing(const Token &tok) {

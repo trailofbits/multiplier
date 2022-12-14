@@ -30,7 +30,6 @@ class SourceLocExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SourceLocExprRange = DerivedEntityRange<StmtIterator, SourceLocExpr>;
 using SourceLocExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SourceLocExpr>;
 using SourceLocExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SourceLocExpr>;
 
@@ -41,8 +40,12 @@ class SourceLocExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static SourceLocExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SourceLocExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SourceLocExprContainingTokenRange containing(const Token &tok) {

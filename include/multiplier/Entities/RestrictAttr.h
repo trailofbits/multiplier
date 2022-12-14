@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class RestrictAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RestrictAttrRange = DerivedEntityRange<AttrIterator, RestrictAttr>;
 using RestrictAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RestrictAttr>;
 class RestrictAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class RestrictAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static RestrictAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<RestrictAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static RestrictAttrContainingTokenRange containing(const Token &tok) {

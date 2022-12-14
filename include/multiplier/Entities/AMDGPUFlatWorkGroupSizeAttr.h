@@ -29,7 +29,6 @@ class Attr;
 class Expr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AMDGPUFlatWorkGroupSizeAttrRange = DerivedEntityRange<AttrIterator, AMDGPUFlatWorkGroupSizeAttr>;
 using AMDGPUFlatWorkGroupSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUFlatWorkGroupSizeAttr>;
 class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AMDGPUFlatWorkGroupSizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AMDGPUFlatWorkGroupSizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AMDGPUFlatWorkGroupSizeAttrContainingTokenRange containing(const Token &tok) {

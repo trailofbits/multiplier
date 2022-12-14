@@ -31,7 +31,6 @@ class Decl;
 class NamedDecl;
 class UsingShadowDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstructorUsingShadowDeclRange = DerivedEntityRange<DeclIterator, ConstructorUsingShadowDecl>;
 using ConstructorUsingShadowDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstructorUsingShadowDecl>;
 using ConstructorUsingShadowDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ConstructorUsingShadowDecl>;
 
@@ -42,8 +41,12 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ConstructorUsingShadowDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConstructorUsingShadowDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConstructorUsingShadowDeclContainingTokenRange containing(const Token &tok) {

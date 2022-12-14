@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SelectAnyAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SelectAnyAttrRange = DerivedEntityRange<AttrIterator, SelectAnyAttr>;
 using SelectAnyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SelectAnyAttr>;
 class SelectAnyAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SelectAnyAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SelectAnyAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SelectAnyAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SelectAnyAttrContainingTokenRange containing(const Token &tok) {

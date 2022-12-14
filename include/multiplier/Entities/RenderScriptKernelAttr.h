@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class RenderScriptKernelAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RenderScriptKernelAttrRange = DerivedEntityRange<AttrIterator, RenderScriptKernelAttr>;
 using RenderScriptKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RenderScriptKernelAttr>;
 class RenderScriptKernelAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static RenderScriptKernelAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<RenderScriptKernelAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static RenderScriptKernelAttrContainingTokenRange containing(const Token &tok) {

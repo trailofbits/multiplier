@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class WarnUnusedResultAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WarnUnusedResultAttrRange = DerivedEntityRange<AttrIterator, WarnUnusedResultAttr>;
 using WarnUnusedResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WarnUnusedResultAttr>;
 class WarnUnusedResultAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class WarnUnusedResultAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static WarnUnusedResultAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<WarnUnusedResultAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static WarnUnusedResultAttrContainingTokenRange containing(const Token &tok) {

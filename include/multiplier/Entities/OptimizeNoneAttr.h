@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OptimizeNoneAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OptimizeNoneAttrRange = DerivedEntityRange<AttrIterator, OptimizeNoneAttr>;
 using OptimizeNoneAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OptimizeNoneAttr>;
 class OptimizeNoneAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class OptimizeNoneAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OptimizeNoneAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OptimizeNoneAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OptimizeNoneAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MaxFieldAlignmentAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MaxFieldAlignmentAttrRange = DerivedEntityRange<AttrIterator, MaxFieldAlignmentAttr>;
 using MaxFieldAlignmentAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MaxFieldAlignmentAttr>;
 class MaxFieldAlignmentAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MaxFieldAlignmentAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MaxFieldAlignmentAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MaxFieldAlignmentAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class LocksExcludedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LocksExcludedAttrRange = DerivedEntityRange<AttrIterator, LocksExcludedAttr>;
 using LocksExcludedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LocksExcludedAttr>;
 class LocksExcludedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class LocksExcludedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static LocksExcludedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LocksExcludedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LocksExcludedAttrContainingTokenRange containing(const Token &tok) {

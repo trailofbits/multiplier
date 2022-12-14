@@ -35,7 +35,6 @@ class FunctionDecl;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXDestructorDeclRange = DerivedEntityRange<DeclIterator, CXXDestructorDecl>;
 using CXXDestructorDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXDestructorDecl>;
 using CXXDestructorDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXDestructorDecl>;
 
@@ -49,8 +48,12 @@ class CXXDestructorDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static CXXDestructorDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXDestructorDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXDestructorDeclContainingTokenRange containing(const Token &tok) {

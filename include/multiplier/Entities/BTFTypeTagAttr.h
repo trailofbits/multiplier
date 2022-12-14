@@ -28,7 +28,6 @@ class Attr;
 class BTFTypeTagAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BTFTypeTagAttrRange = DerivedEntityRange<AttrIterator, BTFTypeTagAttr>;
 using BTFTypeTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, BTFTypeTagAttr>;
 class BTFTypeTagAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class BTFTypeTagAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static BTFTypeTagAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BTFTypeTagAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BTFTypeTagAttrContainingTokenRange containing(const Token &tok) {

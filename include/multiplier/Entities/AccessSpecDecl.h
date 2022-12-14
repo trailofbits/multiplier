@@ -27,7 +27,6 @@ namespace mx {
 class AccessSpecDecl;
 class Decl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AccessSpecDeclRange = DerivedEntityRange<DeclIterator, AccessSpecDecl>;
 using AccessSpecDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, AccessSpecDecl>;
 using AccessSpecDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, AccessSpecDecl>;
 
@@ -36,8 +35,12 @@ class AccessSpecDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static AccessSpecDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AccessSpecDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AccessSpecDeclContainingTokenRange containing(const Token &tok) {

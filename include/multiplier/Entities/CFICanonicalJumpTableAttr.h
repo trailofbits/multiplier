@@ -28,7 +28,6 @@ class Attr;
 class CFICanonicalJumpTableAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CFICanonicalJumpTableAttrRange = DerivedEntityRange<AttrIterator, CFICanonicalJumpTableAttr>;
 using CFICanonicalJumpTableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFICanonicalJumpTableAttr>;
 class CFICanonicalJumpTableAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CFICanonicalJumpTableAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CFICanonicalJumpTableAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CFICanonicalJumpTableAttrContainingTokenRange containing(const Token &tok) {

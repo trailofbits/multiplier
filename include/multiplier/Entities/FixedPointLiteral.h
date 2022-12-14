@@ -29,7 +29,6 @@ class FixedPointLiteral;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FixedPointLiteralRange = DerivedEntityRange<StmtIterator, FixedPointLiteral>;
 using FixedPointLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, FixedPointLiteral>;
 using FixedPointLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, FixedPointLiteral>;
 
@@ -40,8 +39,12 @@ class FixedPointLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static FixedPointLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FixedPointLiteral> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FixedPointLiteralContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class MipsInterruptAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MipsInterruptAttrRange = DerivedEntityRange<AttrIterator, MipsInterruptAttr>;
 using MipsInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MipsInterruptAttr>;
 class MipsInterruptAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class MipsInterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MipsInterruptAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MipsInterruptAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MipsInterruptAttrContainingTokenRange containing(const Token &tok) {

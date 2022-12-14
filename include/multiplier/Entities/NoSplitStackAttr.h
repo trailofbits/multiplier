@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoSplitStackAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoSplitStackAttrRange = DerivedEntityRange<AttrIterator, NoSplitStackAttr>;
 using NoSplitStackAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoSplitStackAttr>;
 class NoSplitStackAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoSplitStackAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoSplitStackAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoSplitStackAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoSplitStackAttrContainingTokenRange containing(const Token &tok) {

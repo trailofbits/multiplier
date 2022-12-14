@@ -29,7 +29,6 @@ class Expr;
 class Stmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoroutineBodyStmtRange = DerivedEntityRange<StmtIterator, CoroutineBodyStmt>;
 using CoroutineBodyStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoroutineBodyStmt>;
 using CoroutineBodyStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoroutineBodyStmt>;
 
@@ -38,8 +37,12 @@ class CoroutineBodyStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static CoroutineBodyStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CoroutineBodyStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CoroutineBodyStmtContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Attr;
 class OpenCLPrivateAddressSpaceAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLPrivateAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLPrivateAddressSpaceAttr>;
 using OpenCLPrivateAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLPrivateAddressSpaceAttr>;
 class OpenCLPrivateAddressSpaceAttr : public TypeAttr {
  private:
@@ -37,8 +36,12 @@ class OpenCLPrivateAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static OpenCLPrivateAddressSpaceAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OpenCLPrivateAddressSpaceAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OpenCLPrivateAddressSpaceAttrContainingTokenRange containing(const Token &tok) {

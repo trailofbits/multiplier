@@ -28,7 +28,6 @@ class Decl;
 class NamedDecl;
 class UsingDirectiveDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UsingDirectiveDeclRange = DerivedEntityRange<DeclIterator, UsingDirectiveDecl>;
 using UsingDirectiveDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingDirectiveDecl>;
 using UsingDirectiveDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UsingDirectiveDecl>;
 
@@ -38,8 +37,12 @@ class UsingDirectiveDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static UsingDirectiveDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UsingDirectiveDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UsingDirectiveDeclContainingTokenRange containing(const Token &tok) {

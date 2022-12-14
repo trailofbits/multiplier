@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoRandomizeLayoutAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoRandomizeLayoutAttrRange = DerivedEntityRange<AttrIterator, NoRandomizeLayoutAttr>;
 using NoRandomizeLayoutAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoRandomizeLayoutAttr>;
 class NoRandomizeLayoutAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoRandomizeLayoutAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoRandomizeLayoutAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoRandomizeLayoutAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoRandomizeLayoutAttrContainingTokenRange containing(const Token &tok) {

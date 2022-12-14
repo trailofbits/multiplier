@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class OverloadableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OverloadableAttrRange = DerivedEntityRange<AttrIterator, OverloadableAttr>;
 using OverloadableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OverloadableAttr>;
 class OverloadableAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static OverloadableAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OverloadableAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OverloadableAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class CDeclAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CDeclAttrRange = DerivedEntityRange<AttrIterator, CDeclAttr>;
 using CDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CDeclAttr>;
 class CDeclAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CDeclAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CDeclAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CDeclAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CDeclAttrContainingTokenRange containing(const Token &tok) {

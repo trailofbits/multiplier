@@ -30,7 +30,6 @@ class GCCAsmStmt;
 class Stmt;
 class StringLiteral;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using GCCAsmStmtRange = DerivedEntityRange<StmtIterator, GCCAsmStmt>;
 using GCCAsmStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, GCCAsmStmt>;
 using GCCAsmStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, GCCAsmStmt>;
 
@@ -40,8 +39,12 @@ class GCCAsmStmt : public AsmStmt {
   friend class AsmStmt;
   friend class Stmt;
  public:
-  inline static GCCAsmStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<GCCAsmStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static GCCAsmStmtContainingTokenRange containing(const Token &tok) {

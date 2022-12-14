@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MinVectorWidthAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MinVectorWidthAttrRange = DerivedEntityRange<AttrIterator, MinVectorWidthAttr>;
 using MinVectorWidthAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MinVectorWidthAttr>;
 class MinVectorWidthAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MinVectorWidthAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MinVectorWidthAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MinVectorWidthAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MinVectorWidthAttrContainingTokenRange containing(const Token &tok) {

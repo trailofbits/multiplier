@@ -29,7 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXBoolLiteralExprRange = DerivedEntityRange<StmtIterator, CXXBoolLiteralExpr>;
 using CXXBoolLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXBoolLiteralExpr>;
 using CXXBoolLiteralExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXBoolLiteralExpr>;
 
@@ -40,8 +39,12 @@ class CXXBoolLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CXXBoolLiteralExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXBoolLiteralExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXBoolLiteralExprContainingTokenRange containing(const Token &tok) {

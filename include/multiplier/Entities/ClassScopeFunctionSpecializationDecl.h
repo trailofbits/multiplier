@@ -28,7 +28,6 @@ class CXXMethodDecl;
 class ClassScopeFunctionSpecializationDecl;
 class Decl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ClassScopeFunctionSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassScopeFunctionSpecializationDecl>;
 using ClassScopeFunctionSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassScopeFunctionSpecializationDecl>;
 using ClassScopeFunctionSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ClassScopeFunctionSpecializationDecl>;
 
@@ -37,8 +36,12 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static ClassScopeFunctionSpecializationDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ClassScopeFunctionSpecializationDeclContainingTokenRange containing(const Token &tok) {

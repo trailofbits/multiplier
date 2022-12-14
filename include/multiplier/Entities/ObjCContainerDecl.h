@@ -30,7 +30,6 @@ class ObjCContainerDecl;
 class ObjCMethodDecl;
 class ObjCPropertyDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCContainerDeclRange = DerivedEntityRange<DeclIterator, ObjCContainerDecl>;
 using ObjCContainerDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCContainerDecl>;
 using ObjCContainerDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCContainerDecl>;
 
@@ -40,8 +39,12 @@ class ObjCContainerDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCContainerDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCContainerDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCContainerDeclContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundLiteralExprRange = DerivedEntityRange<StmtIterator, CompoundLiteralExpr>;
 using CompoundLiteralExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundLiteralExpr>;
 using CompoundLiteralExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundLiteralExpr>;
 
@@ -40,8 +39,12 @@ class CompoundLiteralExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CompoundLiteralExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CompoundLiteralExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CompoundLiteralExprContainingTokenRange containing(const Token &tok) {

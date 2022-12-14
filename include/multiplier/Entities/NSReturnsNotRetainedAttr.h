@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NSReturnsNotRetainedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NSReturnsNotRetainedAttrRange = DerivedEntityRange<AttrIterator, NSReturnsNotRetainedAttr>;
 using NSReturnsNotRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSReturnsNotRetainedAttr>;
 class NSReturnsNotRetainedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NSReturnsNotRetainedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NSReturnsNotRetainedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NSReturnsNotRetainedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NSReturnsNotRetainedAttrContainingTokenRange containing(const Token &tok) {

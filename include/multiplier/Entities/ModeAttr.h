@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class ModeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ModeAttrRange = DerivedEntityRange<AttrIterator, ModeAttr>;
 using ModeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ModeAttr>;
 class ModeAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static ModeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ModeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ModeAttrContainingTokenRange containing(const Token &tok) {

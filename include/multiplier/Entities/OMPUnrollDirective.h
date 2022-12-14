@@ -30,7 +30,6 @@ class OMPLoopTransformationDirective;
 class OMPUnrollDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPUnrollDirectiveRange = DerivedEntityRange<StmtIterator, OMPUnrollDirective>;
 using OMPUnrollDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPUnrollDirective>;
 using OMPUnrollDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPUnrollDirective>;
 
@@ -42,8 +41,12 @@ class OMPUnrollDirective : public OMPLoopTransformationDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPUnrollDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPUnrollDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPUnrollDirectiveContainingTokenRange containing(const Token &tok) {

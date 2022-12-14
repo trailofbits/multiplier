@@ -31,7 +31,6 @@ class OMPCapturedExprDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPCapturedExprDeclRange = DerivedEntityRange<DeclIterator, OMPCapturedExprDecl>;
 using OMPCapturedExprDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPCapturedExprDecl>;
 using OMPCapturedExprDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPCapturedExprDecl>;
 
@@ -44,8 +43,12 @@ class OMPCapturedExprDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static OMPCapturedExprDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPCapturedExprDeclContainingTokenRange containing(const Token &tok) {

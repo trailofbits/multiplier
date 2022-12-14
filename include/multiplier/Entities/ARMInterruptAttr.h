@@ -29,7 +29,6 @@ class ARMInterruptAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ARMInterruptAttrRange = DerivedEntityRange<AttrIterator, ARMInterruptAttr>;
 using ARMInterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ARMInterruptAttr>;
 class ARMInterruptAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ARMInterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ARMInterruptAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ARMInterruptAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ARMInterruptAttrContainingTokenRange containing(const Token &tok) {

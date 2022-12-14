@@ -29,7 +29,6 @@ class ParenListExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ParenListExprRange = DerivedEntityRange<StmtIterator, ParenListExpr>;
 using ParenListExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParenListExpr>;
 using ParenListExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ParenListExpr>;
 
@@ -40,8 +39,12 @@ class ParenListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ParenListExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ParenListExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ParenListExprContainingTokenRange containing(const Token &tok) {

@@ -30,7 +30,6 @@ class Stmt;
 class StringLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StringLiteralRange = DerivedEntityRange<StmtIterator, StringLiteral>;
 using StringLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, StringLiteral>;
 using StringLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, StringLiteral>;
 
@@ -41,8 +40,12 @@ class StringLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static StringLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<StringLiteral> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static StringLiteralContainingTokenRange containing(const Token &tok) {

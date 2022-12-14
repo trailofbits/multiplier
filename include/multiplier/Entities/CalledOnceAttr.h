@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class CalledOnceAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CalledOnceAttrRange = DerivedEntityRange<AttrIterator, CalledOnceAttr>;
 using CalledOnceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CalledOnceAttr>;
 class CalledOnceAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static CalledOnceAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CalledOnceAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CalledOnceAttrContainingTokenRange containing(const Token &tok) {

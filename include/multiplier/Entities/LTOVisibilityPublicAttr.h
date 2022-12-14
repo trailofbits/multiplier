@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class LTOVisibilityPublicAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LTOVisibilityPublicAttrRange = DerivedEntityRange<AttrIterator, LTOVisibilityPublicAttr>;
 using LTOVisibilityPublicAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, LTOVisibilityPublicAttr>;
 class LTOVisibilityPublicAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static LTOVisibilityPublicAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LTOVisibilityPublicAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LTOVisibilityPublicAttrContainingTokenRange containing(const Token &tok) {

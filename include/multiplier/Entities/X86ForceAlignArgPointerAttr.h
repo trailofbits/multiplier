@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class X86ForceAlignArgPointerAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using X86ForceAlignArgPointerAttrRange = DerivedEntityRange<AttrIterator, X86ForceAlignArgPointerAttr>;
 using X86ForceAlignArgPointerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, X86ForceAlignArgPointerAttr>;
 class X86ForceAlignArgPointerAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static X86ForceAlignArgPointerAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<X86ForceAlignArgPointerAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static X86ForceAlignArgPointerAttrContainingTokenRange containing(const Token &tok) {

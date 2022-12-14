@@ -28,15 +28,18 @@ namespace mx {
 class Type;
 class UnaryTransformType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnaryTransformTypeRange = DerivedEntityRange<TypeIterator, UnaryTransformType>;
 using UnaryTransformTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnaryTransformType>;
 class UnaryTransformType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static UnaryTransformTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnaryTransformType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnaryTransformTypeContainingTokenRange containing(const Token &tok) {

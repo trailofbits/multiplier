@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NSConsumesSelfAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NSConsumesSelfAttrRange = DerivedEntityRange<AttrIterator, NSConsumesSelfAttr>;
 using NSConsumesSelfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSConsumesSelfAttr>;
 class NSConsumesSelfAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NSConsumesSelfAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NSConsumesSelfAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NSConsumesSelfAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NSConsumesSelfAttrContainingTokenRange containing(const Token &tok) {

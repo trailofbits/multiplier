@@ -28,7 +28,6 @@ class Attr;
 class DLLExportAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DLLExportAttrRange = DerivedEntityRange<AttrIterator, DLLExportAttr>;
 using DLLExportAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DLLExportAttr>;
 class DLLExportAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class DLLExportAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static DLLExportAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DLLExportAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DLLExportAttrContainingTokenRange containing(const Token &tok) {

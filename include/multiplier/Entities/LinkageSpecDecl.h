@@ -27,7 +27,6 @@ namespace mx {
 class Decl;
 class LinkageSpecDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LinkageSpecDeclRange = DerivedEntityRange<DeclIterator, LinkageSpecDecl>;
 using LinkageSpecDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LinkageSpecDecl>;
 using LinkageSpecDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, LinkageSpecDecl>;
 
@@ -36,8 +35,12 @@ class LinkageSpecDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static LinkageSpecDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LinkageSpecDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LinkageSpecDeclContainingTokenRange containing(const Token &tok) {

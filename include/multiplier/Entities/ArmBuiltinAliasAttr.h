@@ -28,7 +28,6 @@ class ArmBuiltinAliasAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArmBuiltinAliasAttrRange = DerivedEntityRange<AttrIterator, ArmBuiltinAliasAttr>;
 using ArmBuiltinAliasAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArmBuiltinAliasAttr>;
 class ArmBuiltinAliasAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ArmBuiltinAliasAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ArmBuiltinAliasAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ArmBuiltinAliasAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ArmBuiltinAliasAttrContainingTokenRange containing(const Token &tok) {

@@ -146,38 +146,6 @@ bool MayHaveRemoteUses(const mx::Decl &decl) {
 
 EntityProvider::~EntityProvider(void) noexcept {}
 
-Decl DeclIterator::operator*(void) && noexcept {
-  return Decl(std::move(impl), index);
-}
-
-Decl DeclIterator::operator*(void) const & noexcept {
-  return Decl(impl, index);
-}
-
-Stmt StmtIterator::operator*(void) && noexcept {
-  return Stmt(std::move(impl), index);
-}
-
-Stmt StmtIterator::operator*(void) const & noexcept {
-  return Stmt(impl, index);
-}
-
-Type TypeIterator::operator*(void) && noexcept {
-  return Type(std::move(impl), index);
-}
-
-Type TypeIterator::operator*(void) const & noexcept {
-  return Type(impl, index);
-}
-
-Attr AttrIterator::operator*(void) && noexcept {
-  return Attr(std::move(impl), index);
-}
-
-Attr AttrIterator::operator*(void) const & noexcept {
-  return Attr(impl, index);
-}
-
 EntityId Decl::id(void) const {
   DeclarationId eid;
   eid.fragment_id = fragment->fragment_id;
@@ -319,8 +287,10 @@ gap::generator<Reference> Decl::references(void) const {
   }
 }
 
-DeclIterator Decl::in_internal(const Fragment &fragment) {
-  return DeclIterator(fragment.impl, 0u, fragment.impl->num_decls);
+gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
+  for(size_t i = 0; i < fragment.impl->num_decls; ++i) {
+    co_yield Decl(fragment.impl, i);
+  }
 }
 
 EntityId Stmt::id(void) const {
@@ -331,8 +301,10 @@ EntityId Stmt::id(void) const {
   return eid;
 }
 
-StmtIterator Stmt::in_internal(const Fragment &fragment) {
-  return StmtIterator(fragment.impl, 0u, fragment.impl->num_stmts);
+gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
+  for(size_t i = 0; i < fragment.impl->num_stmts; ++i) {
+    co_yield Stmt(fragment.impl, i);
+  }
 }
 
 UseRange<StmtUseSelector> Stmt::uses(void) const {
@@ -347,8 +319,10 @@ EntityId Type::id(void) const {
   return eid;
 }
 
-TypeIterator Type::in_internal(const Fragment &fragment) {
-  return TypeIterator(fragment.impl, 0u, fragment.impl->num_types);
+gap::generator<Type> Type::in_internal(const Fragment &fragment) {
+  for(size_t i = 0; i < fragment.impl->num_types; ++i) {
+    co_yield Type(fragment.impl, i);
+  }
 }
 
 UseRange<TypeUseSelector> Type::uses(void) const {
@@ -363,8 +337,10 @@ EntityId Attr::id(void) const {
   return eid;
 }
 
-AttrIterator Attr::in_internal(const Fragment &fragment) {
-  return AttrIterator(fragment.impl, 0u, fragment.impl->num_attrs);
+gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
+  for(size_t i = 0; i < fragment.impl->num_attrs; ++i) {
+    co_yield Attr(fragment.impl, i);
+  }
 }
 
 UseRange<AttrUseSelector> Attr::uses(void) const {

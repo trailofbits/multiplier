@@ -29,7 +29,6 @@ class DependentSizedArrayType;
 class Expr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentSizedArrayTypeRange = DerivedEntityRange<TypeIterator, DependentSizedArrayType>;
 using DependentSizedArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentSizedArrayType>;
 class DependentSizedArrayType : public ArrayType {
  private:
@@ -37,8 +36,12 @@ class DependentSizedArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  inline static DependentSizedArrayTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DependentSizedArrayType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DependentSizedArrayTypeContainingTokenRange containing(const Token &tok) {

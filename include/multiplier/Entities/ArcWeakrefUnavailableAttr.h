@@ -28,7 +28,6 @@ class ArcWeakrefUnavailableAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArcWeakrefUnavailableAttrRange = DerivedEntityRange<AttrIterator, ArcWeakrefUnavailableAttr>;
 using ArcWeakrefUnavailableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArcWeakrefUnavailableAttr>;
 class ArcWeakrefUnavailableAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ArcWeakrefUnavailableAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ArcWeakrefUnavailableAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ArcWeakrefUnavailableAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class AssumptionAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AssumptionAttrRange = DerivedEntityRange<AttrIterator, AssumptionAttr>;
 using AssumptionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AssumptionAttr>;
 class AssumptionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AssumptionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AssumptionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AssumptionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AssumptionAttrContainingTokenRange containing(const Token &tok) {

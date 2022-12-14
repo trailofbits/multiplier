@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ObjCExceptionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCExceptionAttrRange = DerivedEntityRange<AttrIterator, ObjCExceptionAttr>;
 using ObjCExceptionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCExceptionAttr>;
 class ObjCExceptionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCExceptionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ObjCExceptionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCExceptionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCExceptionAttrContainingTokenRange containing(const Token &tok) {

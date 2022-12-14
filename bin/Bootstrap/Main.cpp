@@ -1602,9 +1602,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     needed_decls.insert("DeclKind");
     class_os
         << "using " << class_name
-        << "Range = DerivedEntityRange<DeclIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
         << class_name << ">;\n"
         << "using " << class_name
@@ -1637,9 +1634,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     needed_decls.insert("StmtKind");
     class_os
         << "using " << class_name
-        << "Range = DerivedEntityRange<StmtIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
         << class_name << ">;\n"
         << "using " << class_name
@@ -1668,9 +1662,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else if (is_type) {
     needed_decls.insert("TypeKind");
     class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<TypeIterator, " << class_name
-        << ">;\n"
         << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
         << class_name << ">;\n";
@@ -1701,9 +1692,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   } else if (is_attr) {
     needed_decls.insert("AttrKind");
     class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<AttrIterator, " << class_name
-        << ">;\n"
         << "using " << class_name
         << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
         << class_name << ">;\n";
@@ -1916,7 +1904,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  UseRange<DeclUseSelector> uses(void) const;\n"
           << "  gap::generator<Reference> references(void) const;\n\n"
           << " protected:\n"
-          << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       seen_methods->emplace("definition");  // Manual.
@@ -1955,7 +1943,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  EntityId id(void) const;\n"
           << "  UseRange<StmtUseSelector> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Stmt> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       // `Stmt::referenced_declaration`.
@@ -2001,7 +1989,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  EntityId id(void) const;\n"
           << "  UseRange<TypeUseSelector> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static TypeIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Type> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
     
     } else if (class_name == "Attr") {
@@ -2019,7 +2007,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  EntityId id(void) const;\n"
           << "  UseRange<AttrUseSelector> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static AttrIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Attr> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
     }
 
@@ -2036,9 +2024,13 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (is_decl || is_stmt || is_type || is_attr) {
 
     class_os
-        << "  inline static " << class_name
-        << "Range in(const Fragment &frag) {\n"
-        << "    return in_internal(frag);\n"
+        << "  inline static gap::generator<"
+        << class_name << "> in(const Fragment &frag) {\n"
+        << "    for(auto e : in_internal(frag)) {\n"
+        << "      if(auto d = from(e)) {\n"
+        << "        co_yield *d;\n"
+        << "      }\n"
+        << "    }\n"
         << "  }\n\n"
         << "  inline static " << class_name
         << "ContainingTokenRange containing(const Token &tok) {\n"

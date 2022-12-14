@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class UninitializedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UninitializedAttrRange = DerivedEntityRange<AttrIterator, UninitializedAttr>;
 using UninitializedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UninitializedAttr>;
 class UninitializedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class UninitializedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static UninitializedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UninitializedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UninitializedAttrContainingTokenRange containing(const Token &tok) {

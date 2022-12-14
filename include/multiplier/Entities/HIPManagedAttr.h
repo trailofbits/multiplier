@@ -28,7 +28,6 @@ class Attr;
 class HIPManagedAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using HIPManagedAttrRange = DerivedEntityRange<AttrIterator, HIPManagedAttr>;
 using HIPManagedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, HIPManagedAttr>;
 class HIPManagedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class HIPManagedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static HIPManagedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<HIPManagedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static HIPManagedAttrContainingTokenRange containing(const Token &tok) {

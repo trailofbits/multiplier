@@ -29,7 +29,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class NonNullAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NonNullAttrRange = DerivedEntityRange<AttrIterator, NonNullAttr>;
 using NonNullAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NonNullAttr>;
 class NonNullAttr : public InheritableParamAttr {
  private:
@@ -38,8 +37,12 @@ class NonNullAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NonNullAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NonNullAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NonNullAttrContainingTokenRange containing(const Token &tok) {

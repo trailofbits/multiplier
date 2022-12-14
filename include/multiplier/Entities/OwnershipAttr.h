@@ -30,7 +30,6 @@ class Attr;
 class InheritableAttr;
 class OwnershipAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OwnershipAttrRange = DerivedEntityRange<AttrIterator, OwnershipAttr>;
 using OwnershipAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OwnershipAttr>;
 class OwnershipAttr : public InheritableAttr {
  private:
@@ -38,8 +37,12 @@ class OwnershipAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OwnershipAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OwnershipAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OwnershipAttrContainingTokenRange containing(const Token &tok) {

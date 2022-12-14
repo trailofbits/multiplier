@@ -28,7 +28,6 @@ class Attr;
 class CmseNSCallAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CmseNSCallAttrRange = DerivedEntityRange<AttrIterator, CmseNSCallAttr>;
 using CmseNSCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CmseNSCallAttr>;
 class CmseNSCallAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class CmseNSCallAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static CmseNSCallAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CmseNSCallAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CmseNSCallAttrContainingTokenRange containing(const Token &tok) {

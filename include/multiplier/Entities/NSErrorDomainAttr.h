@@ -29,7 +29,6 @@ class InheritableAttr;
 class NSErrorDomainAttr;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NSErrorDomainAttrRange = DerivedEntityRange<AttrIterator, NSErrorDomainAttr>;
 using NSErrorDomainAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NSErrorDomainAttr>;
 class NSErrorDomainAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class NSErrorDomainAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NSErrorDomainAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NSErrorDomainAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NSErrorDomainAttrContainingTokenRange containing(const Token &tok) {

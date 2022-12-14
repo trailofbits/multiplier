@@ -28,7 +28,6 @@ class Attr;
 class OpenCLUnrollHintAttr;
 class StmtAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLUnrollHintAttrRange = DerivedEntityRange<AttrIterator, OpenCLUnrollHintAttr>;
 using OpenCLUnrollHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLUnrollHintAttr>;
 class OpenCLUnrollHintAttr : public StmtAttr {
  private:
@@ -36,8 +35,12 @@ class OpenCLUnrollHintAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  inline static OpenCLUnrollHintAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OpenCLUnrollHintAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OpenCLUnrollHintAttrContainingTokenRange containing(const Token &tok) {

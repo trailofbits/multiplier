@@ -30,7 +30,6 @@ class ObjCIvarRefExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIvarRefExprRange = DerivedEntityRange<StmtIterator, ObjCIvarRefExpr>;
 using ObjCIvarRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIvarRefExpr>;
 using ObjCIvarRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCIvarRefExpr>;
 
@@ -41,8 +40,12 @@ class ObjCIvarRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCIvarRefExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCIvarRefExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCIvarRefExprContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PackedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PackedAttrRange = DerivedEntityRange<AttrIterator, PackedAttr>;
 using PackedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PackedAttr>;
 class PackedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PackedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PackedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PackedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PackedAttrContainingTokenRange containing(const Token &tok) {

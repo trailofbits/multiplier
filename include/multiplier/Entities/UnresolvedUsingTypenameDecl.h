@@ -29,7 +29,6 @@ class NamedDecl;
 class TypeDecl;
 class UnresolvedUsingTypenameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedUsingTypenameDeclRange = DerivedEntityRange<DeclIterator, UnresolvedUsingTypenameDecl>;
 using UnresolvedUsingTypenameDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedUsingTypenameDecl>;
 using UnresolvedUsingTypenameDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnresolvedUsingTypenameDecl>;
 
@@ -40,8 +39,12 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static UnresolvedUsingTypenameDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnresolvedUsingTypenameDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnresolvedUsingTypenameDeclContainingTokenRange containing(const Token &tok) {

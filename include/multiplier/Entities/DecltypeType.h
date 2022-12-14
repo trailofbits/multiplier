@@ -28,15 +28,18 @@ class DecltypeType;
 class Expr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DecltypeTypeRange = DerivedEntityRange<TypeIterator, DecltypeType>;
 using DecltypeTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DecltypeType>;
 class DecltypeType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static DecltypeTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DecltypeType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DecltypeTypeContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Expr;
 class SEHExceptStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHExceptStmtRange = DerivedEntityRange<StmtIterator, SEHExceptStmt>;
 using SEHExceptStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHExceptStmt>;
 using SEHExceptStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHExceptStmt>;
 
@@ -38,8 +37,12 @@ class SEHExceptStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SEHExceptStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SEHExceptStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SEHExceptStmtContainingTokenRange containing(const Token &tok) {

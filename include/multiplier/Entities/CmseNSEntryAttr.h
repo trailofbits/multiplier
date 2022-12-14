@@ -28,7 +28,6 @@ class Attr;
 class CmseNSEntryAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CmseNSEntryAttrRange = DerivedEntityRange<AttrIterator, CmseNSEntryAttr>;
 using CmseNSEntryAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CmseNSEntryAttr>;
 class CmseNSEntryAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CmseNSEntryAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CmseNSEntryAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CmseNSEntryAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CmseNSEntryAttrContainingTokenRange containing(const Token &tok) {

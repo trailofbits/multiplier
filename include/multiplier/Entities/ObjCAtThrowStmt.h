@@ -28,7 +28,6 @@ class Expr;
 class ObjCAtThrowStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtThrowStmtRange = DerivedEntityRange<StmtIterator, ObjCAtThrowStmt>;
 using ObjCAtThrowStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtThrowStmt>;
 using ObjCAtThrowStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCAtThrowStmt>;
 
@@ -37,8 +36,12 @@ class ObjCAtThrowStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static ObjCAtThrowStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCAtThrowStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCAtThrowStmtContainingTokenRange containing(const Token &tok) {

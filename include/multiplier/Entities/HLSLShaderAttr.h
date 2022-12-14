@@ -29,7 +29,6 @@ class Attr;
 class HLSLShaderAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using HLSLShaderAttrRange = DerivedEntityRange<AttrIterator, HLSLShaderAttr>;
 using HLSLShaderAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, HLSLShaderAttr>;
 class HLSLShaderAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class HLSLShaderAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static HLSLShaderAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<HLSLShaderAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static HLSLShaderAttrContainingTokenRange containing(const Token &tok) {

@@ -33,7 +33,6 @@ class Expr;
 class InheritableAttr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AlignedAttrRange = DerivedEntityRange<AttrIterator, AlignedAttr>;
 using AlignedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AlignedAttr>;
 class AlignedAttr : public InheritableAttr {
  private:
@@ -41,8 +40,12 @@ class AlignedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AlignedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AlignedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AlignedAttrContainingTokenRange containing(const Token &tok) {

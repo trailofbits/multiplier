@@ -28,7 +28,6 @@ class Attr;
 class EnforceTCBLeafAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EnforceTCBLeafAttrRange = DerivedEntityRange<AttrIterator, EnforceTCBLeafAttr>;
 using EnforceTCBLeafAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnforceTCBLeafAttr>;
 class EnforceTCBLeafAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class EnforceTCBLeafAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static EnforceTCBLeafAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<EnforceTCBLeafAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static EnforceTCBLeafAttrContainingTokenRange containing(const Token &tok) {

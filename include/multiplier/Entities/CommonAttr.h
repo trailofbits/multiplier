@@ -28,7 +28,6 @@ class Attr;
 class CommonAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CommonAttrRange = DerivedEntityRange<AttrIterator, CommonAttr>;
 using CommonAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CommonAttr>;
 class CommonAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CommonAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CommonAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CommonAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CommonAttrContainingTokenRange containing(const Token &tok) {

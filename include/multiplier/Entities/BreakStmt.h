@@ -27,7 +27,6 @@ namespace mx {
 class BreakStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BreakStmtRange = DerivedEntityRange<StmtIterator, BreakStmt>;
 using BreakStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, BreakStmt>;
 using BreakStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BreakStmt>;
 
@@ -36,8 +35,12 @@ class BreakStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static BreakStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BreakStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BreakStmtContainingTokenRange containing(const Token &tok) {

@@ -30,7 +30,6 @@ class ObjCMethodDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCArrayLiteralRange = DerivedEntityRange<StmtIterator, ObjCArrayLiteral>;
 using ObjCArrayLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCArrayLiteral>;
 using ObjCArrayLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCArrayLiteral>;
 
@@ -41,8 +40,12 @@ class ObjCArrayLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCArrayLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCArrayLiteral> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCArrayLiteralContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class MipsLongCallAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MipsLongCallAttrRange = DerivedEntityRange<AttrIterator, MipsLongCallAttr>;
 using MipsLongCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MipsLongCallAttr>;
 class MipsLongCallAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class MipsLongCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MipsLongCallAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MipsLongCallAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MipsLongCallAttrContainingTokenRange containing(const Token &tok) {

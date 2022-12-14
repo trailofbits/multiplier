@@ -29,7 +29,6 @@ class Expr;
 class InheritableAttr;
 class PtGuardedByAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PtGuardedByAttrRange = DerivedEntityRange<AttrIterator, PtGuardedByAttr>;
 using PtGuardedByAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PtGuardedByAttr>;
 class PtGuardedByAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class PtGuardedByAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PtGuardedByAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PtGuardedByAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PtGuardedByAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoProfileFunctionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoProfileFunctionAttrRange = DerivedEntityRange<AttrIterator, NoProfileFunctionAttr>;
 using NoProfileFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoProfileFunctionAttr>;
 class NoProfileFunctionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoProfileFunctionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoProfileFunctionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoProfileFunctionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoProfileFunctionAttrContainingTokenRange containing(const Token &tok) {

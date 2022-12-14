@@ -27,15 +27,18 @@ namespace mx {
 class BlockPointerType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BlockPointerTypeRange = DerivedEntityRange<TypeIterator, BlockPointerType>;
 using BlockPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlockPointerType>;
 class BlockPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static BlockPointerTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BlockPointerType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BlockPointerTypeContainingTokenRange containing(const Token &tok) {

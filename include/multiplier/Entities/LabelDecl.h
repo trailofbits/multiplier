@@ -29,7 +29,6 @@ class LabelDecl;
 class LabelStmt;
 class NamedDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LabelDeclRange = DerivedEntityRange<DeclIterator, LabelDecl>;
 using LabelDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LabelDecl>;
 using LabelDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, LabelDecl>;
 
@@ -39,8 +38,12 @@ class LabelDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static LabelDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LabelDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LabelDeclContainingTokenRange containing(const Token &tok) {

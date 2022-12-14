@@ -29,7 +29,6 @@ class InheritableAttr;
 class Type;
 class VecTypeHintAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VecTypeHintAttrRange = DerivedEntityRange<AttrIterator, VecTypeHintAttr>;
 using VecTypeHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VecTypeHintAttr>;
 class VecTypeHintAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class VecTypeHintAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static VecTypeHintAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VecTypeHintAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VecTypeHintAttrContainingTokenRange containing(const Token &tok) {

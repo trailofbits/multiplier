@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class SwiftErrorAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftErrorAttrRange = DerivedEntityRange<AttrIterator, SwiftErrorAttr>;
 using SwiftErrorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftErrorAttr>;
 class SwiftErrorAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class SwiftErrorAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftErrorAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftErrorAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftErrorAttrContainingTokenRange containing(const Token &tok) {

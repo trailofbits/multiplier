@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class WeakImportAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WeakImportAttrRange = DerivedEntityRange<AttrIterator, WeakImportAttr>;
 using WeakImportAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WeakImportAttr>;
 class WeakImportAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class WeakImportAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static WeakImportAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<WeakImportAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static WeakImportAttrContainingTokenRange containing(const Token &tok) {

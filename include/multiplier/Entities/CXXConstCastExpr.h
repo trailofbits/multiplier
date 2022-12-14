@@ -32,7 +32,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXConstCastExprRange = DerivedEntityRange<StmtIterator, CXXConstCastExpr>;
 using CXXConstCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXConstCastExpr>;
 using CXXConstCastExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXConstCastExpr>;
 
@@ -46,8 +45,12 @@ class CXXConstCastExpr : public CXXNamedCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CXXConstCastExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXConstCastExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXConstCastExprContainingTokenRange containing(const Token &tok) {

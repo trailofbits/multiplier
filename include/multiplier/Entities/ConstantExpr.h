@@ -31,7 +31,6 @@ class FullExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstantExprRange = DerivedEntityRange<StmtIterator, ConstantExpr>;
 using ConstantExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstantExpr>;
 using ConstantExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ConstantExpr>;
 
@@ -43,8 +42,12 @@ class ConstantExpr : public FullExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ConstantExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConstantExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConstantExprContainingTokenRange containing(const Token &tok) {

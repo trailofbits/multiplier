@@ -28,7 +28,6 @@ class Attr;
 class FallThroughAttr;
 class StmtAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FallThroughAttrRange = DerivedEntityRange<AttrIterator, FallThroughAttr>;
 using FallThroughAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FallThroughAttr>;
 class FallThroughAttr : public StmtAttr {
  private:
@@ -36,8 +35,12 @@ class FallThroughAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  inline static FallThroughAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FallThroughAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FallThroughAttrContainingTokenRange containing(const Token &tok) {

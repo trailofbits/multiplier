@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class UsingIfExistsAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UsingIfExistsAttrRange = DerivedEntityRange<AttrIterator, UsingIfExistsAttr>;
 using UsingIfExistsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UsingIfExistsAttr>;
 class UsingIfExistsAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class UsingIfExistsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static UsingIfExistsAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UsingIfExistsAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UsingIfExistsAttrContainingTokenRange containing(const Token &tok) {

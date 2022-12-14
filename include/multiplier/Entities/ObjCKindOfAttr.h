@@ -28,7 +28,6 @@ class Attr;
 class ObjCKindOfAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCKindOfAttrRange = DerivedEntityRange<AttrIterator, ObjCKindOfAttr>;
 using ObjCKindOfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCKindOfAttr>;
 class ObjCKindOfAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCKindOfAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static ObjCKindOfAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCKindOfAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCKindOfAttrContainingTokenRange containing(const Token &tok) {

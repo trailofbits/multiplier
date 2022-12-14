@@ -29,7 +29,6 @@ class OffsetOfExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OffsetOfExprRange = DerivedEntityRange<StmtIterator, OffsetOfExpr>;
 using OffsetOfExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OffsetOfExpr>;
 using OffsetOfExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OffsetOfExpr>;
 
@@ -40,8 +39,12 @@ class OffsetOfExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static OffsetOfExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OffsetOfExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OffsetOfExprContainingTokenRange containing(const Token &tok) {

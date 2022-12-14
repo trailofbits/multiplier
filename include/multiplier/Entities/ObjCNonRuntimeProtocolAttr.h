@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class ObjCNonRuntimeProtocolAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCNonRuntimeProtocolAttrRange = DerivedEntityRange<AttrIterator, ObjCNonRuntimeProtocolAttr>;
 using ObjCNonRuntimeProtocolAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCNonRuntimeProtocolAttr>;
 class ObjCNonRuntimeProtocolAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static ObjCNonRuntimeProtocolAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCNonRuntimeProtocolAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCNonRuntimeProtocolAttrContainingTokenRange containing(const Token &tok) {

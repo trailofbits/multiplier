@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoSanitizeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoSanitizeAttrRange = DerivedEntityRange<AttrIterator, NoSanitizeAttr>;
 using NoSanitizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoSanitizeAttr>;
 class NoSanitizeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoSanitizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoSanitizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoSanitizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoSanitizeAttrContainingTokenRange containing(const Token &tok) {

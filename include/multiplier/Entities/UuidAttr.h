@@ -29,7 +29,6 @@ class InheritableAttr;
 class MSGuidDecl;
 class UuidAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UuidAttrRange = DerivedEntityRange<AttrIterator, UuidAttr>;
 using UuidAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UuidAttr>;
 class UuidAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class UuidAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static UuidAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UuidAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UuidAttrContainingTokenRange containing(const Token &tok) {

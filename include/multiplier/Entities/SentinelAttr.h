@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SentinelAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SentinelAttrRange = DerivedEntityRange<AttrIterator, SentinelAttr>;
 using SentinelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SentinelAttr>;
 class SentinelAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SentinelAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SentinelAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SentinelAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SentinelAttrContainingTokenRange containing(const Token &tok) {

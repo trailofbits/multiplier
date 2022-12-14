@@ -28,15 +28,18 @@ class Type;
 class TypedefNameDecl;
 class TypedefType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypedefTypeRange = DerivedEntityRange<TypeIterator, TypedefType>;
 using TypedefTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypedefType>;
 class TypedefType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static TypedefTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypedefType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TypedefTypeContainingTokenRange containing(const Token &tok) {

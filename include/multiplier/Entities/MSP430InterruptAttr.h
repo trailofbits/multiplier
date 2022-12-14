@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MSP430InterruptAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSP430InterruptAttrRange = DerivedEntityRange<AttrIterator, MSP430InterruptAttr>;
 using MSP430InterruptAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSP430InterruptAttr>;
 class MSP430InterruptAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MSP430InterruptAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MSP430InterruptAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSP430InterruptAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSP430InterruptAttrContainingTokenRange containing(const Token &tok) {

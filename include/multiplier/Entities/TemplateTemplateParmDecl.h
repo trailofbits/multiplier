@@ -29,7 +29,6 @@ class NamedDecl;
 class TemplateDecl;
 class TemplateTemplateParmDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TemplateTemplateParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTemplateParmDecl>;
 using TemplateTemplateParmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateTemplateParmDecl>;
 using TemplateTemplateParmDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TemplateTemplateParmDecl>;
 
@@ -40,8 +39,12 @@ class TemplateTemplateParmDecl : public TemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static TemplateTemplateParmDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TemplateTemplateParmDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TemplateTemplateParmDeclContainingTokenRange containing(const Token &tok) {

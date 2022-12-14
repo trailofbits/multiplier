@@ -28,7 +28,6 @@ namespace mx {
 class Stmt;
 class SwitchCase;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwitchCaseRange = DerivedEntityRange<StmtIterator, SwitchCase>;
 using SwitchCaseContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwitchCase>;
 using SwitchCaseContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SwitchCase>;
 
@@ -37,8 +36,12 @@ class SwitchCase : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SwitchCaseRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwitchCase> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwitchCaseContainingTokenRange containing(const Token &tok) {

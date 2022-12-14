@@ -31,7 +31,6 @@ class Type;
 class UnresolvedMemberExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnresolvedMemberExprRange = DerivedEntityRange<StmtIterator, UnresolvedMemberExpr>;
 using UnresolvedMemberExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnresolvedMemberExpr>;
 using UnresolvedMemberExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UnresolvedMemberExpr>;
 
@@ -43,8 +42,12 @@ class UnresolvedMemberExpr : public OverloadExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static UnresolvedMemberExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnresolvedMemberExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnresolvedMemberExprContainingTokenRange containing(const Token &tok) {

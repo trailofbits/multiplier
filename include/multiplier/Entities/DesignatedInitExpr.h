@@ -30,7 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DesignatedInitExprRange = DerivedEntityRange<StmtIterator, DesignatedInitExpr>;
 using DesignatedInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DesignatedInitExpr>;
 using DesignatedInitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DesignatedInitExpr>;
 
@@ -41,8 +40,12 @@ class DesignatedInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static DesignatedInitExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DesignatedInitExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DesignatedInitExprContainingTokenRange containing(const Token &tok) {

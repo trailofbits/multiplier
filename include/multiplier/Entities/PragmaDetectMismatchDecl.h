@@ -27,7 +27,6 @@ namespace mx {
 class Decl;
 class PragmaDetectMismatchDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaDetectMismatchDeclRange = DerivedEntityRange<DeclIterator, PragmaDetectMismatchDecl>;
 using PragmaDetectMismatchDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaDetectMismatchDecl>;
 using PragmaDetectMismatchDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, PragmaDetectMismatchDecl>;
 
@@ -36,8 +35,12 @@ class PragmaDetectMismatchDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static PragmaDetectMismatchDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaDetectMismatchDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PragmaDetectMismatchDeclContainingTokenRange containing(const Token &tok) {

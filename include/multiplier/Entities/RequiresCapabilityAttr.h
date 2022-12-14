@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class RequiresCapabilityAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RequiresCapabilityAttrRange = DerivedEntityRange<AttrIterator, RequiresCapabilityAttr>;
 using RequiresCapabilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RequiresCapabilityAttr>;
 class RequiresCapabilityAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class RequiresCapabilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static RequiresCapabilityAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<RequiresCapabilityAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static RequiresCapabilityAttrContainingTokenRange containing(const Token &tok) {

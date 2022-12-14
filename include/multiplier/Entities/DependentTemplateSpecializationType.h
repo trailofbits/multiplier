@@ -29,7 +29,6 @@ class TemplateArgument;
 class Type;
 class TypeWithKeyword;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DependentTemplateSpecializationTypeRange = DerivedEntityRange<TypeIterator, DependentTemplateSpecializationType>;
 using DependentTemplateSpecializationTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DependentTemplateSpecializationType>;
 class DependentTemplateSpecializationType : public TypeWithKeyword {
  private:
@@ -37,8 +36,12 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  inline static DependentTemplateSpecializationTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DependentTemplateSpecializationType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DependentTemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {

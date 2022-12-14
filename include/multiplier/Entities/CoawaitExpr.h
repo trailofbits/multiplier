@@ -30,7 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoawaitExprRange = DerivedEntityRange<StmtIterator, CoawaitExpr>;
 using CoawaitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoawaitExpr>;
 using CoawaitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoawaitExpr>;
 
@@ -42,8 +41,12 @@ class CoawaitExpr : public CoroutineSuspendExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CoawaitExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CoawaitExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CoawaitExprContainingTokenRange containing(const Token &tok) {

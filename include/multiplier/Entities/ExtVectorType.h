@@ -28,7 +28,6 @@ class ExtVectorType;
 class Type;
 class VectorType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExtVectorTypeRange = DerivedEntityRange<TypeIterator, ExtVectorType>;
 using ExtVectorTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExtVectorType>;
 class ExtVectorType : public VectorType {
  private:
@@ -36,8 +35,12 @@ class ExtVectorType : public VectorType {
   friend class VectorType;
   friend class Type;
  public:
-  inline static ExtVectorTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ExtVectorType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ExtVectorTypeContainingTokenRange containing(const Token &tok) {

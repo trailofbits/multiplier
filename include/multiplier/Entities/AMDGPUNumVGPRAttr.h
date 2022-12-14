@@ -28,7 +28,6 @@ class AMDGPUNumVGPRAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AMDGPUNumVGPRAttrRange = DerivedEntityRange<AttrIterator, AMDGPUNumVGPRAttr>;
 using AMDGPUNumVGPRAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUNumVGPRAttr>;
 class AMDGPUNumVGPRAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AMDGPUNumVGPRAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AMDGPUNumVGPRAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AMDGPUNumVGPRAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AMDGPUNumVGPRAttrContainingTokenRange containing(const Token &tok) {

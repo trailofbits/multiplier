@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ObjCBridgeRelatedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCBridgeRelatedAttrRange = DerivedEntityRange<AttrIterator, ObjCBridgeRelatedAttr>;
 using ObjCBridgeRelatedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCBridgeRelatedAttr>;
 class ObjCBridgeRelatedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCBridgeRelatedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ObjCBridgeRelatedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCBridgeRelatedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCBridgeRelatedAttrContainingTokenRange containing(const Token &tok) {

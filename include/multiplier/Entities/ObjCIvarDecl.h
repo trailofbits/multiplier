@@ -33,7 +33,6 @@ class ObjCInterfaceDecl;
 class ObjCIvarDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIvarDeclRange = DerivedEntityRange<DeclIterator, ObjCIvarDecl>;
 using ObjCIvarDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIvarDecl>;
 using ObjCIvarDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCIvarDecl>;
 
@@ -46,8 +45,12 @@ class ObjCIvarDecl : public FieldDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCIvarDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCIvarDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCIvarDeclContainingTokenRange containing(const Token &tok) {

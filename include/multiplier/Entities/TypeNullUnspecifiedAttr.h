@@ -28,7 +28,6 @@ class Attr;
 class TypeAttr;
 class TypeNullUnspecifiedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeNullUnspecifiedAttrRange = DerivedEntityRange<AttrIterator, TypeNullUnspecifiedAttr>;
 using TypeNullUnspecifiedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeNullUnspecifiedAttr>;
 class TypeNullUnspecifiedAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class TypeNullUnspecifiedAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static TypeNullUnspecifiedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypeNullUnspecifiedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TypeNullUnspecifiedAttrContainingTokenRange containing(const Token &tok) {

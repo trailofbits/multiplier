@@ -30,7 +30,6 @@ class TagDecl;
 class Type;
 class TypeWithKeyword;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ElaboratedTypeRange = DerivedEntityRange<TypeIterator, ElaboratedType>;
 using ElaboratedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ElaboratedType>;
 class ElaboratedType : public TypeWithKeyword {
  private:
@@ -38,8 +37,12 @@ class ElaboratedType : public TypeWithKeyword {
   friend class TypeWithKeyword;
   friend class Type;
  public:
-  inline static ElaboratedTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ElaboratedType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ElaboratedTypeContainingTokenRange containing(const Token &tok) {

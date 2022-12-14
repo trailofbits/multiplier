@@ -28,7 +28,6 @@ class Attr;
 class Ptr64Attr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using Ptr64AttrRange = DerivedEntityRange<AttrIterator, Ptr64Attr>;
 using Ptr64AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Ptr64Attr>;
 class Ptr64Attr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class Ptr64Attr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static Ptr64AttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Ptr64Attr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static Ptr64AttrContainingTokenRange containing(const Token &tok) {

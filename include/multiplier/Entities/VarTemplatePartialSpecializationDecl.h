@@ -32,7 +32,6 @@ class VarDecl;
 class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VarTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, VarTemplatePartialSpecializationDecl>;
 using VarTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarTemplatePartialSpecializationDecl>;
 using VarTemplatePartialSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, VarTemplatePartialSpecializationDecl>;
 
@@ -46,8 +45,12 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static VarTemplatePartialSpecializationDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VarTemplatePartialSpecializationDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VarTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {

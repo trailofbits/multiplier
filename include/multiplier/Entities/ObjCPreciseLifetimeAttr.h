@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ObjCPreciseLifetimeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCPreciseLifetimeAttrRange = DerivedEntityRange<AttrIterator, ObjCPreciseLifetimeAttr>;
 using ObjCPreciseLifetimeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPreciseLifetimeAttr>;
 class ObjCPreciseLifetimeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCPreciseLifetimeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ObjCPreciseLifetimeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCPreciseLifetimeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCPreciseLifetimeAttrContainingTokenRange containing(const Token &tok) {

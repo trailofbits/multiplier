@@ -28,7 +28,6 @@ class Attr;
 class ConstructorAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstructorAttrRange = DerivedEntityRange<AttrIterator, ConstructorAttr>;
 using ConstructorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstructorAttr>;
 class ConstructorAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ConstructorAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ConstructorAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConstructorAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConstructorAttrContainingTokenRange containing(const Token &tok) {

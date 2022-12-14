@@ -30,7 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CoyieldExprRange = DerivedEntityRange<StmtIterator, CoyieldExpr>;
 using CoyieldExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CoyieldExpr>;
 using CoyieldExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CoyieldExpr>;
 
@@ -42,8 +41,12 @@ class CoyieldExpr : public CoroutineSuspendExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CoyieldExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CoyieldExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CoyieldExprContainingTokenRange containing(const Token &tok) {

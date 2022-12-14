@@ -28,7 +28,6 @@ class Attr;
 class ExcludeFromExplicitInstantiationAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExcludeFromExplicitInstantiationAttrRange = DerivedEntityRange<AttrIterator, ExcludeFromExplicitInstantiationAttr>;
 using ExcludeFromExplicitInstantiationAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExcludeFromExplicitInstantiationAttr>;
 class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ExcludeFromExplicitInstantiationAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ExcludeFromExplicitInstantiationAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ExcludeFromExplicitInstantiationAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ExcludeFromExplicitInstantiationAttrContainingTokenRange containing(const Token &tok) {

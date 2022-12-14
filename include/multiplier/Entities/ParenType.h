@@ -27,15 +27,18 @@ namespace mx {
 class ParenType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ParenTypeRange = DerivedEntityRange<TypeIterator, ParenType>;
 using ParenTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParenType>;
 class ParenType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static ParenTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ParenType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ParenTypeContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class AcquireHandleAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AcquireHandleAttrRange = DerivedEntityRange<AttrIterator, AcquireHandleAttr>;
 using AcquireHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AcquireHandleAttr>;
 class AcquireHandleAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AcquireHandleAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AcquireHandleAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AcquireHandleAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AcquireHandleAttrContainingTokenRange containing(const Token &tok) {

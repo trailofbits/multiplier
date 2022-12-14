@@ -29,7 +29,6 @@ class Attr;
 class CFGuardAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CFGuardAttrRange = DerivedEntityRange<AttrIterator, CFGuardAttr>;
 using CFGuardAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFGuardAttr>;
 class CFGuardAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class CFGuardAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CFGuardAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CFGuardAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CFGuardAttrContainingTokenRange containing(const Token &tok) {

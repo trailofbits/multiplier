@@ -37,7 +37,6 @@ class Reference;
 class Stmt;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
 using DeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, Decl>;
 using DeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, Decl>;
 
@@ -94,11 +93,15 @@ class Decl {
   gap::generator<Reference> references(void) const;
 
  protected:
-  static DeclIterator in_internal(const Fragment &fragment);
+  static gap::generator<Decl> in_internal(const Fragment &fragment);
 
  public:
-  inline static DeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Decl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DeclContainingTokenRange containing(const Token &tok) {

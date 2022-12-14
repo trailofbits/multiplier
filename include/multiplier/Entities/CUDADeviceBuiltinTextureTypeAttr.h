@@ -28,7 +28,6 @@ class Attr;
 class CUDADeviceBuiltinTextureTypeAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CUDADeviceBuiltinTextureTypeAttrRange = DerivedEntityRange<AttrIterator, CUDADeviceBuiltinTextureTypeAttr>;
 using CUDADeviceBuiltinTextureTypeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDADeviceBuiltinTextureTypeAttr>;
 class CUDADeviceBuiltinTextureTypeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CUDADeviceBuiltinTextureTypeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CUDADeviceBuiltinTextureTypeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CUDADeviceBuiltinTextureTypeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CUDADeviceBuiltinTextureTypeAttrContainingTokenRange containing(const Token &tok) {

@@ -32,7 +32,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImplicitParamDeclRange = DerivedEntityRange<DeclIterator, ImplicitParamDecl>;
 using ImplicitParamDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImplicitParamDecl>;
 using ImplicitParamDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ImplicitParamDecl>;
 
@@ -45,8 +44,12 @@ class ImplicitParamDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ImplicitParamDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ImplicitParamDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ImplicitParamDeclContainingTokenRange containing(const Token &tok) {

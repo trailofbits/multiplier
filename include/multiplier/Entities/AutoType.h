@@ -32,7 +32,6 @@ class DeducedType;
 class TemplateArgument;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AutoTypeRange = DerivedEntityRange<TypeIterator, AutoType>;
 using AutoTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, AutoType>;
 class AutoType : public DeducedType {
  private:
@@ -40,8 +39,12 @@ class AutoType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  inline static AutoTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AutoType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AutoTypeContainingTokenRange containing(const Token &tok) {

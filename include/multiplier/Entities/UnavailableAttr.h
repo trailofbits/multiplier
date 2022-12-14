@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class UnavailableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnavailableAttrRange = DerivedEntityRange<AttrIterator, UnavailableAttr>;
 using UnavailableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnavailableAttr>;
 class UnavailableAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class UnavailableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static UnavailableAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnavailableAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnavailableAttrContainingTokenRange containing(const Token &tok) {

@@ -30,7 +30,6 @@ class Stmt;
 class Type;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXCatchStmtRange = DerivedEntityRange<StmtIterator, CXXCatchStmt>;
 using CXXCatchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXCatchStmt>;
 using CXXCatchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXCatchStmt>;
 
@@ -39,8 +38,12 @@ class CXXCatchStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static CXXCatchStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXCatchStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXCatchStmtContainingTokenRange containing(const Token &tok) {

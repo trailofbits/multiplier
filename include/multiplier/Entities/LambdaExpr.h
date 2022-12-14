@@ -36,7 +36,6 @@ class Stmt;
 class TemplateParameterList;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LambdaExprRange = DerivedEntityRange<StmtIterator, LambdaExpr>;
 using LambdaExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, LambdaExpr>;
 using LambdaExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, LambdaExpr>;
 
@@ -47,8 +46,12 @@ class LambdaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static LambdaExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LambdaExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LambdaExprContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SwiftNameAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftNameAttrRange = DerivedEntityRange<AttrIterator, SwiftNameAttr>;
 using SwiftNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftNameAttr>;
 class SwiftNameAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SwiftNameAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftNameAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftNameAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftNameAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ReinitializesAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReinitializesAttrRange = DerivedEntityRange<AttrIterator, ReinitializesAttr>;
 using ReinitializesAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReinitializesAttr>;
 class ReinitializesAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ReinitializesAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ReinitializesAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ReinitializesAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ReinitializesAttrContainingTokenRange containing(const Token &tok) {

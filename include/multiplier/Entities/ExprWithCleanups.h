@@ -30,7 +30,6 @@ class FullExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExprWithCleanupsRange = DerivedEntityRange<StmtIterator, ExprWithCleanups>;
 using ExprWithCleanupsContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExprWithCleanups>;
 using ExprWithCleanupsContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ExprWithCleanups>;
 
@@ -42,8 +41,12 @@ class ExprWithCleanups : public FullExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ExprWithCleanupsRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ExprWithCleanups> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ExprWithCleanupsContainingTokenRange containing(const Token &tok) {

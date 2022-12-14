@@ -28,7 +28,6 @@ class AArch64VectorPcsAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AArch64VectorPcsAttrRange = DerivedEntityRange<AttrIterator, AArch64VectorPcsAttr>;
 using AArch64VectorPcsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AArch64VectorPcsAttr>;
 class AArch64VectorPcsAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AArch64VectorPcsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AArch64VectorPcsAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AArch64VectorPcsAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AArch64VectorPcsAttrContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class ParamTypestateAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ParamTypestateAttrRange = DerivedEntityRange<AttrIterator, ParamTypestateAttr>;
 using ParamTypestateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParamTypestateAttr>;
 class ParamTypestateAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ParamTypestateAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ParamTypestateAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ParamTypestateAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ParamTypestateAttrContainingTokenRange containing(const Token &tok) {

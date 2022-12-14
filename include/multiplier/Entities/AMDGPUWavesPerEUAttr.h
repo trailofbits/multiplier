@@ -29,7 +29,6 @@ class Attr;
 class Expr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AMDGPUWavesPerEUAttrRange = DerivedEntityRange<AttrIterator, AMDGPUWavesPerEUAttr>;
 using AMDGPUWavesPerEUAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AMDGPUWavesPerEUAttr>;
 class AMDGPUWavesPerEUAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class AMDGPUWavesPerEUAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AMDGPUWavesPerEUAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AMDGPUWavesPerEUAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AMDGPUWavesPerEUAttrContainingTokenRange containing(const Token &tok) {

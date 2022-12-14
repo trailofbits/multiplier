@@ -29,7 +29,6 @@ class MatrixSubscriptExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MatrixSubscriptExprRange = DerivedEntityRange<StmtIterator, MatrixSubscriptExpr>;
 using MatrixSubscriptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MatrixSubscriptExpr>;
 using MatrixSubscriptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MatrixSubscriptExpr>;
 
@@ -40,8 +39,12 @@ class MatrixSubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static MatrixSubscriptExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MatrixSubscriptExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MatrixSubscriptExprContainingTokenRange containing(const Token &tok) {

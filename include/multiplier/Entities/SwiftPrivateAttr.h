@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SwiftPrivateAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftPrivateAttrRange = DerivedEntityRange<AttrIterator, SwiftPrivateAttr>;
 using SwiftPrivateAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftPrivateAttr>;
 class SwiftPrivateAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SwiftPrivateAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftPrivateAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftPrivateAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftPrivateAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class CPUDispatchAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CPUDispatchAttrRange = DerivedEntityRange<AttrIterator, CPUDispatchAttr>;
 using CPUDispatchAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CPUDispatchAttr>;
 class CPUDispatchAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CPUDispatchAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CPUDispatchAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CPUDispatchAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CPUDispatchAttrContainingTokenRange containing(const Token &tok) {

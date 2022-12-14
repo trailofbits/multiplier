@@ -45,7 +45,6 @@ class TemplateParameterList;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXRecordDeclRange = DerivedEntityRange<DeclIterator, CXXRecordDecl>;
 using CXXRecordDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXRecordDecl>;
 using CXXRecordDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, CXXRecordDecl>;
 
@@ -58,8 +57,12 @@ class CXXRecordDecl : public RecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static CXXRecordDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXRecordDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXRecordDeclContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class WarnUnusedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WarnUnusedAttrRange = DerivedEntityRange<AttrIterator, WarnUnusedAttr>;
 using WarnUnusedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WarnUnusedAttr>;
 class WarnUnusedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class WarnUnusedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static WarnUnusedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<WarnUnusedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static WarnUnusedAttrContainingTokenRange containing(const Token &tok) {

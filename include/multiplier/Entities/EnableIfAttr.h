@@ -29,7 +29,6 @@ class EnableIfAttr;
 class Expr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EnableIfAttrRange = DerivedEntityRange<AttrIterator, EnableIfAttr>;
 using EnableIfAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnableIfAttr>;
 class EnableIfAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class EnableIfAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static EnableIfAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<EnableIfAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static EnableIfAttrContainingTokenRange containing(const Token &tok) {

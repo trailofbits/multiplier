@@ -27,7 +27,6 @@ namespace mx {
 class ContinueStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ContinueStmtRange = DerivedEntityRange<StmtIterator, ContinueStmt>;
 using ContinueStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, ContinueStmt>;
 using ContinueStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ContinueStmt>;
 
@@ -36,8 +35,12 @@ class ContinueStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static ContinueStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ContinueStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ContinueStmtContainingTokenRange containing(const Token &tok) {

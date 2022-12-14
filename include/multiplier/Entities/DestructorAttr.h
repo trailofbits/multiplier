@@ -28,7 +28,6 @@ class Attr;
 class DestructorAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DestructorAttrRange = DerivedEntityRange<AttrIterator, DestructorAttr>;
 using DestructorAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DestructorAttr>;
 class DestructorAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class DestructorAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static DestructorAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DestructorAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DestructorAttrContainingTokenRange containing(const Token &tok) {

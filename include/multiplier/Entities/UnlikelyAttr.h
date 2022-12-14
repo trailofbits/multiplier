@@ -28,7 +28,6 @@ class Attr;
 class StmtAttr;
 class UnlikelyAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnlikelyAttrRange = DerivedEntityRange<AttrIterator, UnlikelyAttr>;
 using UnlikelyAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnlikelyAttr>;
 class UnlikelyAttr : public StmtAttr {
  private:
@@ -36,8 +35,12 @@ class UnlikelyAttr : public StmtAttr {
   friend class StmtAttr;
   friend class Attr;
  public:
-  inline static UnlikelyAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnlikelyAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UnlikelyAttrContainingTokenRange containing(const Token &tok) {

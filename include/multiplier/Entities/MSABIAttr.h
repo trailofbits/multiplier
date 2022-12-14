@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MSABIAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSABIAttrRange = DerivedEntityRange<AttrIterator, MSABIAttr>;
 using MSABIAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSABIAttr>;
 class MSABIAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MSABIAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MSABIAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSABIAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSABIAttrContainingTokenRange containing(const Token &tok) {

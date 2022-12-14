@@ -28,7 +28,6 @@ class Attr;
 class CFReturnsNotRetainedAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CFReturnsNotRetainedAttrRange = DerivedEntityRange<AttrIterator, CFReturnsNotRetainedAttr>;
 using CFReturnsNotRetainedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFReturnsNotRetainedAttr>;
 class CFReturnsNotRetainedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CFReturnsNotRetainedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CFReturnsNotRetainedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CFReturnsNotRetainedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CFReturnsNotRetainedAttrContainingTokenRange containing(const Token &tok) {

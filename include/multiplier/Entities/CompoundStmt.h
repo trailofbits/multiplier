@@ -28,7 +28,6 @@ namespace mx {
 class CompoundStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CompoundStmtRange = DerivedEntityRange<StmtIterator, CompoundStmt>;
 using CompoundStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CompoundStmt>;
 using CompoundStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CompoundStmt>;
 
@@ -37,8 +36,12 @@ class CompoundStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static CompoundStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CompoundStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CompoundStmtContainingTokenRange containing(const Token &tok) {

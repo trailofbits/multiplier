@@ -35,7 +35,6 @@ class NamedDecl;
 class ValueDecl;
 class VariableArrayType;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FieldDeclRange = DerivedEntityRange<DeclIterator, FieldDecl>;
 using FieldDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FieldDecl>;
 using FieldDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, FieldDecl>;
 
@@ -47,8 +46,12 @@ class FieldDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static FieldDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FieldDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FieldDeclContainingTokenRange containing(const Token &tok) {

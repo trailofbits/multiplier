@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class IntelOclBiccAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IntelOclBiccAttrRange = DerivedEntityRange<AttrIterator, IntelOclBiccAttr>;
 using IntelOclBiccAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, IntelOclBiccAttr>;
 class IntelOclBiccAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class IntelOclBiccAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static IntelOclBiccAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IntelOclBiccAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static IntelOclBiccAttrContainingTokenRange containing(const Token &tok) {

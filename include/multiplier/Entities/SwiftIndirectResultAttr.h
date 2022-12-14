@@ -30,7 +30,6 @@ class InheritableParamAttr;
 class ParameterABIAttr;
 class SwiftIndirectResultAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftIndirectResultAttrRange = DerivedEntityRange<AttrIterator, SwiftIndirectResultAttr>;
 using SwiftIndirectResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftIndirectResultAttr>;
 class SwiftIndirectResultAttr : public ParameterABIAttr {
  private:
@@ -40,8 +39,12 @@ class SwiftIndirectResultAttr : public ParameterABIAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftIndirectResultAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftIndirectResultAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftIndirectResultAttrContainingTokenRange containing(const Token &tok) {

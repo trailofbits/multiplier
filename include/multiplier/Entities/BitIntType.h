@@ -27,15 +27,18 @@ namespace mx {
 class BitIntType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BitIntTypeRange = DerivedEntityRange<TypeIterator, BitIntType>;
 using BitIntTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, BitIntType>;
 class BitIntType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static BitIntTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BitIntType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BitIntTypeContainingTokenRange containing(const Token &tok) {

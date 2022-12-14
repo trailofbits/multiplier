@@ -27,7 +27,6 @@ namespace mx {
 class SEHLeaveStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHLeaveStmtRange = DerivedEntityRange<StmtIterator, SEHLeaveStmt>;
 using SEHLeaveStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHLeaveStmt>;
 using SEHLeaveStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHLeaveStmt>;
 
@@ -36,8 +35,12 @@ class SEHLeaveStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SEHLeaveStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SEHLeaveStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SEHLeaveStmtContainingTokenRange containing(const Token &tok) {

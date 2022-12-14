@@ -29,7 +29,6 @@ class ExclusiveTrylockFunctionAttr;
 class Expr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ExclusiveTrylockFunctionAttrRange = DerivedEntityRange<AttrIterator, ExclusiveTrylockFunctionAttr>;
 using ExclusiveTrylockFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ExclusiveTrylockFunctionAttr>;
 class ExclusiveTrylockFunctionAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ExclusiveTrylockFunctionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ExclusiveTrylockFunctionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ExclusiveTrylockFunctionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ExclusiveTrylockFunctionAttrContainingTokenRange containing(const Token &tok) {

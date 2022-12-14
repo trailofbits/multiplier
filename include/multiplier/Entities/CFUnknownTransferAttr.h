@@ -28,7 +28,6 @@ class Attr;
 class CFUnknownTransferAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CFUnknownTransferAttrRange = DerivedEntityRange<AttrIterator, CFUnknownTransferAttr>;
 using CFUnknownTransferAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CFUnknownTransferAttr>;
 class CFUnknownTransferAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CFUnknownTransferAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CFUnknownTransferAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CFUnknownTransferAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CFUnknownTransferAttrContainingTokenRange containing(const Token &tok) {

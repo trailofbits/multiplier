@@ -29,7 +29,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class UseHandleAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UseHandleAttrRange = DerivedEntityRange<AttrIterator, UseHandleAttr>;
 using UseHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, UseHandleAttr>;
 class UseHandleAttr : public InheritableParamAttr {
  private:
@@ -38,8 +37,12 @@ class UseHandleAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static UseHandleAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UseHandleAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static UseHandleAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class RegCallAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using RegCallAttrRange = DerivedEntityRange<AttrIterator, RegCallAttr>;
 using RegCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, RegCallAttr>;
 class RegCallAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class RegCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static RegCallAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<RegCallAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static RegCallAttrContainingTokenRange containing(const Token &tok) {

@@ -26,7 +26,6 @@
 namespace mx {
 class Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AttrRange = DerivedEntityRange<AttrIterator, Attr>;
 using AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Attr>;
 class Attr {
  protected:
@@ -75,11 +74,15 @@ class Attr {
   UseRange<AttrUseSelector> uses(void) const;
 
  protected:
-  static AttrIterator in_internal(const Fragment &fragment);
+  static gap::generator<Attr> in_internal(const Fragment &fragment);
 
  public:
-  inline static AttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Attr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AttrContainingTokenRange containing(const Token &tok) {

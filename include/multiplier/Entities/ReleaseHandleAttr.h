@@ -29,7 +29,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class ReleaseHandleAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReleaseHandleAttrRange = DerivedEntityRange<AttrIterator, ReleaseHandleAttr>;
 using ReleaseHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReleaseHandleAttr>;
 class ReleaseHandleAttr : public InheritableParamAttr {
  private:
@@ -38,8 +37,12 @@ class ReleaseHandleAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ReleaseHandleAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ReleaseHandleAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ReleaseHandleAttrContainingTokenRange containing(const Token &tok) {

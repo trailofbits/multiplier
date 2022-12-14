@@ -28,7 +28,6 @@ class DeducedTemplateSpecializationType;
 class DeducedType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeducedTemplateSpecializationTypeRange = DerivedEntityRange<TypeIterator, DeducedTemplateSpecializationType>;
 using DeducedTemplateSpecializationTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeducedTemplateSpecializationType>;
 class DeducedTemplateSpecializationType : public DeducedType {
  private:
@@ -36,8 +35,12 @@ class DeducedTemplateSpecializationType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  inline static DeducedTemplateSpecializationTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DeducedTemplateSpecializationType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DeducedTemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {

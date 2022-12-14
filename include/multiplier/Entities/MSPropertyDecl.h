@@ -30,7 +30,6 @@ class MSPropertyDecl;
 class NamedDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertyDeclRange = DerivedEntityRange<DeclIterator, MSPropertyDecl>;
 using MSPropertyDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertyDecl>;
 using MSPropertyDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, MSPropertyDecl>;
 
@@ -42,8 +41,12 @@ class MSPropertyDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static MSPropertyDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSPropertyDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSPropertyDeclContainingTokenRange containing(const Token &tok) {

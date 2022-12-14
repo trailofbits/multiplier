@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class OverrideAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OverrideAttrRange = DerivedEntityRange<AttrIterator, OverrideAttr>;
 using OverrideAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OverrideAttr>;
 class OverrideAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class OverrideAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OverrideAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OverrideAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OverrideAttrContainingTokenRange containing(const Token &tok) {

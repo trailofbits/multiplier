@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class StdCallAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StdCallAttrRange = DerivedEntityRange<AttrIterator, StdCallAttr>;
 using StdCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StdCallAttr>;
 class StdCallAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class StdCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static StdCallAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<StdCallAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static StdCallAttrContainingTokenRange containing(const Token &tok) {

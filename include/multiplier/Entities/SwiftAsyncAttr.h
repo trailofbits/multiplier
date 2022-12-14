@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SwiftAsyncAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftAsyncAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncAttr>;
 using SwiftAsyncAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncAttr>;
 class SwiftAsyncAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SwiftAsyncAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftAsyncAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftAsyncAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftAsyncAttrContainingTokenRange containing(const Token &tok) {

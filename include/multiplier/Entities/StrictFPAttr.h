@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class StrictFPAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StrictFPAttrRange = DerivedEntityRange<AttrIterator, StrictFPAttr>;
 using StrictFPAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, StrictFPAttr>;
 class StrictFPAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class StrictFPAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static StrictFPAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<StrictFPAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static StrictFPAttrContainingTokenRange containing(const Token &tok) {

@@ -30,7 +30,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class PassObjectSizeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PassObjectSizeAttrRange = DerivedEntityRange<AttrIterator, PassObjectSizeAttr>;
 using PassObjectSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PassObjectSizeAttr>;
 class PassObjectSizeAttr : public InheritableParamAttr {
  private:
@@ -39,8 +38,12 @@ class PassObjectSizeAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PassObjectSizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PassObjectSizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PassObjectSizeAttrContainingTokenRange containing(const Token &tok) {

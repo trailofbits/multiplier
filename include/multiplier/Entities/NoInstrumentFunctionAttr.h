@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoInstrumentFunctionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoInstrumentFunctionAttrRange = DerivedEntityRange<AttrIterator, NoInstrumentFunctionAttr>;
 using NoInstrumentFunctionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInstrumentFunctionAttr>;
 class NoInstrumentFunctionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoInstrumentFunctionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoInstrumentFunctionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoInstrumentFunctionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoInstrumentFunctionAttrContainingTokenRange containing(const Token &tok) {

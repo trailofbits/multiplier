@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MSStructAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSStructAttrRange = DerivedEntityRange<AttrIterator, MSStructAttr>;
 using MSStructAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSStructAttr>;
 class MSStructAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MSStructAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MSStructAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSStructAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MSStructAttrContainingTokenRange containing(const Token &tok) {

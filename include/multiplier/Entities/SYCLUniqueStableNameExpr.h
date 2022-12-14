@@ -29,7 +29,6 @@ class SYCLUniqueStableNameExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SYCLUniqueStableNameExprRange = DerivedEntityRange<StmtIterator, SYCLUniqueStableNameExpr>;
 using SYCLUniqueStableNameExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SYCLUniqueStableNameExpr>;
 using SYCLUniqueStableNameExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SYCLUniqueStableNameExpr>;
 
@@ -40,8 +39,12 @@ class SYCLUniqueStableNameExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static SYCLUniqueStableNameExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SYCLUniqueStableNameExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SYCLUniqueStableNameExprContainingTokenRange containing(const Token &tok) {

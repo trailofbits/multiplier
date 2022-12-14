@@ -27,15 +27,18 @@ namespace mx {
 class AbiTagAttr;
 class Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AbiTagAttrRange = DerivedEntityRange<AttrIterator, AbiTagAttr>;
 using AbiTagAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AbiTagAttr>;
 class AbiTagAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static AbiTagAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AbiTagAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AbiTagAttrContainingTokenRange containing(const Token &tok) {

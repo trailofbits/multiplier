@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ScopedLockableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ScopedLockableAttrRange = DerivedEntityRange<AttrIterator, ScopedLockableAttr>;
 using ScopedLockableAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ScopedLockableAttr>;
 class ScopedLockableAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ScopedLockableAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ScopedLockableAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ScopedLockableAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ScopedLockableAttrContainingTokenRange containing(const Token &tok) {

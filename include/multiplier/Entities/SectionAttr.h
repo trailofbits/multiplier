@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class SectionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SectionAttrRange = DerivedEntityRange<AttrIterator, SectionAttr>;
 using SectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SectionAttr>;
 class SectionAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class SectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SectionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SectionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SectionAttrContainingTokenRange containing(const Token &tok) {

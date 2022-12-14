@@ -30,7 +30,6 @@ class OpaqueValueExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArrayInitLoopExprRange = DerivedEntityRange<StmtIterator, ArrayInitLoopExpr>;
 using ArrayInitLoopExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArrayInitLoopExpr>;
 using ArrayInitLoopExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ArrayInitLoopExpr>;
 
@@ -41,8 +40,12 @@ class ArrayInitLoopExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ArrayInitLoopExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ArrayInitLoopExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ArrayInitLoopExprContainingTokenRange containing(const Token &tok) {

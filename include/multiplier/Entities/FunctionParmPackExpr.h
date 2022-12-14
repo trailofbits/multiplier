@@ -30,7 +30,6 @@ class Stmt;
 class ValueStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FunctionParmPackExprRange = DerivedEntityRange<StmtIterator, FunctionParmPackExpr>;
 using FunctionParmPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionParmPackExpr>;
 using FunctionParmPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, FunctionParmPackExpr>;
 
@@ -41,8 +40,12 @@ class FunctionParmPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static FunctionParmPackExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FunctionParmPackExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FunctionParmPackExprContainingTokenRange containing(const Token &tok) {

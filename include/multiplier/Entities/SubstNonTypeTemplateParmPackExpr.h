@@ -30,7 +30,6 @@ class Stmt;
 class SubstNonTypeTemplateParmPackExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SubstNonTypeTemplateParmPackExprRange = DerivedEntityRange<StmtIterator, SubstNonTypeTemplateParmPackExpr>;
 using SubstNonTypeTemplateParmPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, SubstNonTypeTemplateParmPackExpr>;
 using SubstNonTypeTemplateParmPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SubstNonTypeTemplateParmPackExpr>;
 
@@ -41,8 +40,12 @@ class SubstNonTypeTemplateParmPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static SubstNonTypeTemplateParmPackExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SubstNonTypeTemplateParmPackExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SubstNonTypeTemplateParmPackExprContainingTokenRange containing(const Token &tok) {

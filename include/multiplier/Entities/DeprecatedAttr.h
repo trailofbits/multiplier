@@ -28,7 +28,6 @@ class Attr;
 class DeprecatedAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeprecatedAttrRange = DerivedEntityRange<AttrIterator, DeprecatedAttr>;
 using DeprecatedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeprecatedAttr>;
 class DeprecatedAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class DeprecatedAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static DeprecatedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DeprecatedAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DeprecatedAttrContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class SYCLKernelAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SYCLKernelAttrRange = DerivedEntityRange<AttrIterator, SYCLKernelAttr>;
 using SYCLKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SYCLKernelAttr>;
 class SYCLKernelAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class SYCLKernelAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SYCLKernelAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SYCLKernelAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SYCLKernelAttrContainingTokenRange containing(const Token &tok) {

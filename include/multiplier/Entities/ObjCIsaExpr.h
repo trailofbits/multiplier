@@ -29,7 +29,6 @@ class ObjCIsaExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIsaExprRange = DerivedEntityRange<StmtIterator, ObjCIsaExpr>;
 using ObjCIsaExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIsaExpr>;
 using ObjCIsaExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCIsaExpr>;
 
@@ -40,8 +39,12 @@ class ObjCIsaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCIsaExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCIsaExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCIsaExprContainingTokenRange containing(const Token &tok) {

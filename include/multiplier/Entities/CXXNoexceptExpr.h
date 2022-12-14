@@ -29,7 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXNoexceptExprRange = DerivedEntityRange<StmtIterator, CXXNoexceptExpr>;
 using CXXNoexceptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXNoexceptExpr>;
 using CXXNoexceptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXNoexceptExpr>;
 
@@ -40,8 +39,12 @@ class CXXNoexceptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CXXNoexceptExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXNoexceptExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXXNoexceptExprContainingTokenRange containing(const Token &tok) {

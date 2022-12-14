@@ -29,7 +29,6 @@ class Attr;
 class FunctionReturnThunksAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FunctionReturnThunksAttrRange = DerivedEntityRange<AttrIterator, FunctionReturnThunksAttr>;
 using FunctionReturnThunksAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionReturnThunksAttr>;
 class FunctionReturnThunksAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class FunctionReturnThunksAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static FunctionReturnThunksAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FunctionReturnThunksAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static FunctionReturnThunksAttrContainingTokenRange containing(const Token &tok) {

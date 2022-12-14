@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class WebAssemblyImportNameAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using WebAssemblyImportNameAttrRange = DerivedEntityRange<AttrIterator, WebAssemblyImportNameAttr>;
 using WebAssemblyImportNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, WebAssemblyImportNameAttr>;
 class WebAssemblyImportNameAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class WebAssemblyImportNameAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static WebAssemblyImportNameAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<WebAssemblyImportNameAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static WebAssemblyImportNameAttrContainingTokenRange containing(const Token &tok) {

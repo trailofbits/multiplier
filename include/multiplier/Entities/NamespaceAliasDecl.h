@@ -28,7 +28,6 @@ class Decl;
 class NamedDecl;
 class NamespaceAliasDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NamespaceAliasDeclRange = DerivedEntityRange<DeclIterator, NamespaceAliasDecl>;
 using NamespaceAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NamespaceAliasDecl>;
 using NamespaceAliasDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, NamespaceAliasDecl>;
 
@@ -38,8 +37,12 @@ class NamespaceAliasDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static NamespaceAliasDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NamespaceAliasDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NamespaceAliasDeclContainingTokenRange containing(const Token &tok) {

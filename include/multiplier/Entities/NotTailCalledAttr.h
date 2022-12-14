@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NotTailCalledAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NotTailCalledAttrRange = DerivedEntityRange<AttrIterator, NotTailCalledAttr>;
 using NotTailCalledAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NotTailCalledAttr>;
 class NotTailCalledAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NotTailCalledAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NotTailCalledAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NotTailCalledAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NotTailCalledAttrContainingTokenRange containing(const Token &tok) {

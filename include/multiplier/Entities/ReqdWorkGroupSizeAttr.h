@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ReqdWorkGroupSizeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReqdWorkGroupSizeAttrRange = DerivedEntityRange<AttrIterator, ReqdWorkGroupSizeAttr>;
 using ReqdWorkGroupSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReqdWorkGroupSizeAttr>;
 class ReqdWorkGroupSizeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ReqdWorkGroupSizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ReqdWorkGroupSizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ReqdWorkGroupSizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ReqdWorkGroupSizeAttrContainingTokenRange containing(const Token &tok) {

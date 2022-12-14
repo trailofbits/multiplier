@@ -28,7 +28,6 @@ class ConstantMatrixType;
 class MatrixType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConstantMatrixTypeRange = DerivedEntityRange<TypeIterator, ConstantMatrixType>;
 using ConstantMatrixTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConstantMatrixType>;
 class ConstantMatrixType : public MatrixType {
  private:
@@ -36,8 +35,12 @@ class ConstantMatrixType : public MatrixType {
   friend class MatrixType;
   friend class Type;
  public:
-  inline static ConstantMatrixTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConstantMatrixType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConstantMatrixTypeContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class ObjCGCAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCGCAttrRange = DerivedEntityRange<AttrIterator, ObjCGCAttr>;
 using ObjCGCAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCGCAttr>;
 class ObjCGCAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class ObjCGCAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static ObjCGCAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCGCAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCGCAttrContainingTokenRange containing(const Token &tok) {

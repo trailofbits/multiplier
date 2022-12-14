@@ -29,7 +29,6 @@ class DeclOrStmtAttr;
 class InheritableAttr;
 class NoInlineAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoInlineAttrRange = DerivedEntityRange<AttrIterator, NoInlineAttr>;
 using NoInlineAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInlineAttr>;
 class NoInlineAttr : public DeclOrStmtAttr {
  private:
@@ -38,8 +37,12 @@ class NoInlineAttr : public DeclOrStmtAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoInlineAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoInlineAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoInlineAttrContainingTokenRange containing(const Token &tok) {

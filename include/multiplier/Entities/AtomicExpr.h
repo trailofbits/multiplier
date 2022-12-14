@@ -32,7 +32,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AtomicExprRange = DerivedEntityRange<StmtIterator, AtomicExpr>;
 using AtomicExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, AtomicExpr>;
 using AtomicExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AtomicExpr>;
 
@@ -43,8 +42,12 @@ class AtomicExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static AtomicExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AtomicExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AtomicExprContainingTokenRange containing(const Token &tok) {

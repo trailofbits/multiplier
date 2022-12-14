@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MicroMipsAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MicroMipsAttrRange = DerivedEntityRange<AttrIterator, MicroMipsAttr>;
 using MicroMipsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MicroMipsAttr>;
 class MicroMipsAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MicroMipsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MicroMipsAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MicroMipsAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MicroMipsAttrContainingTokenRange containing(const Token &tok) {

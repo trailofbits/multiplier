@@ -31,7 +31,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BuiltinBitCastExprRange = DerivedEntityRange<StmtIterator, BuiltinBitCastExpr>;
 using BuiltinBitCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, BuiltinBitCastExpr>;
 using BuiltinBitCastExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BuiltinBitCastExpr>;
 
@@ -44,8 +43,12 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static BuiltinBitCastExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BuiltinBitCastExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BuiltinBitCastExprContainingTokenRange containing(const Token &tok) {

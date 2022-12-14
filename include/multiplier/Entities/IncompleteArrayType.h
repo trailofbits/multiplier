@@ -28,7 +28,6 @@ class ArrayType;
 class IncompleteArrayType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IncompleteArrayTypeRange = DerivedEntityRange<TypeIterator, IncompleteArrayType>;
 using IncompleteArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, IncompleteArrayType>;
 class IncompleteArrayType : public ArrayType {
  private:
@@ -36,8 +35,12 @@ class IncompleteArrayType : public ArrayType {
   friend class ArrayType;
   friend class Type;
  public:
-  inline static IncompleteArrayTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IncompleteArrayType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static IncompleteArrayTypeContainingTokenRange containing(const Token &tok) {

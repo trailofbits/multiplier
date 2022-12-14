@@ -28,7 +28,6 @@ class LValueReferenceType;
 class ReferenceType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LValueReferenceTypeRange = DerivedEntityRange<TypeIterator, LValueReferenceType>;
 using LValueReferenceTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, LValueReferenceType>;
 class LValueReferenceType : public ReferenceType {
  private:
@@ -36,8 +35,12 @@ class LValueReferenceType : public ReferenceType {
   friend class ReferenceType;
   friend class Type;
  public:
-  inline static LValueReferenceTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LValueReferenceType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static LValueReferenceTypeContainingTokenRange containing(const Token &tok) {

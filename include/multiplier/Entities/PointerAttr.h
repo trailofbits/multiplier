@@ -29,7 +29,6 @@ class InheritableAttr;
 class PointerAttr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PointerAttrRange = DerivedEntityRange<AttrIterator, PointerAttr>;
 using PointerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PointerAttr>;
 class PointerAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class PointerAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PointerAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PointerAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PointerAttrContainingTokenRange containing(const Token &tok) {

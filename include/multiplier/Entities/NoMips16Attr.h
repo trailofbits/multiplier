@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoMips16Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoMips16AttrRange = DerivedEntityRange<AttrIterator, NoMips16Attr>;
 using NoMips16AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoMips16Attr>;
 class NoMips16Attr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoMips16Attr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoMips16AttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoMips16Attr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoMips16AttrContainingTokenRange containing(const Token &tok) {

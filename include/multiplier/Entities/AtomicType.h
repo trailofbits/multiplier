@@ -27,15 +27,18 @@ namespace mx {
 class AtomicType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AtomicTypeRange = DerivedEntityRange<TypeIterator, AtomicType>;
 using AtomicTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, AtomicType>;
 class AtomicType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static AtomicTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AtomicType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AtomicTypeContainingTokenRange containing(const Token &tok) {

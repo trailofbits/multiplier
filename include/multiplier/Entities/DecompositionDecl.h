@@ -32,7 +32,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DecompositionDeclRange = DerivedEntityRange<DeclIterator, DecompositionDecl>;
 using DecompositionDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, DecompositionDecl>;
 using DecompositionDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, DecompositionDecl>;
 
@@ -45,8 +44,12 @@ class DecompositionDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static DecompositionDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DecompositionDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DecompositionDeclContainingTokenRange containing(const Token &tok) {

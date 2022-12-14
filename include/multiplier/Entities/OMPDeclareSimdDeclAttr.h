@@ -29,15 +29,18 @@ class Attr;
 class Expr;
 class OMPDeclareSimdDeclAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPDeclareSimdDeclAttrRange = DerivedEntityRange<AttrIterator, OMPDeclareSimdDeclAttr>;
 using OMPDeclareSimdDeclAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareSimdDeclAttr>;
 class OMPDeclareSimdDeclAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static OMPDeclareSimdDeclAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPDeclareSimdDeclAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPDeclareSimdDeclAttrContainingTokenRange containing(const Token &tok) {

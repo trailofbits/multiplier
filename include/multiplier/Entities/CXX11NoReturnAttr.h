@@ -29,7 +29,6 @@ class Attr;
 class CXX11NoReturnAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXX11NoReturnAttrRange = DerivedEntityRange<AttrIterator, CXX11NoReturnAttr>;
 using CXX11NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXX11NoReturnAttr>;
 class CXX11NoReturnAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class CXX11NoReturnAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CXX11NoReturnAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXX11NoReturnAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CXX11NoReturnAttrContainingTokenRange containing(const Token &tok) {

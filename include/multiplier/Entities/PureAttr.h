@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PureAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PureAttrRange = DerivedEntityRange<AttrIterator, PureAttr>;
 using PureAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PureAttr>;
 class PureAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PureAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PureAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PureAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PureAttrContainingTokenRange containing(const Token &tok) {

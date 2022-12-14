@@ -29,15 +29,18 @@ class InjectedClassNameType;
 class TemplateSpecializationType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using InjectedClassNameTypeRange = DerivedEntityRange<TypeIterator, InjectedClassNameType>;
 using InjectedClassNameTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, InjectedClassNameType>;
 class InjectedClassNameType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static InjectedClassNameTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<InjectedClassNameType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static InjectedClassNameTypeContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoDebugAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoDebugAttrRange = DerivedEntityRange<AttrIterator, NoDebugAttr>;
 using NoDebugAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDebugAttr>;
 class NoDebugAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoDebugAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoDebugAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoDebugAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoDebugAttrContainingTokenRange containing(const Token &tok) {

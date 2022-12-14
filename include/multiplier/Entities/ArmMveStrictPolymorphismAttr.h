@@ -28,7 +28,6 @@ class ArmMveStrictPolymorphismAttr;
 class Attr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ArmMveStrictPolymorphismAttrRange = DerivedEntityRange<AttrIterator, ArmMveStrictPolymorphismAttr>;
 using ArmMveStrictPolymorphismAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ArmMveStrictPolymorphismAttr>;
 class ArmMveStrictPolymorphismAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static ArmMveStrictPolymorphismAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ArmMveStrictPolymorphismAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ArmMveStrictPolymorphismAttrContainingTokenRange containing(const Token &tok) {

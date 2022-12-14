@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class TransparentUnionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TransparentUnionAttrRange = DerivedEntityRange<AttrIterator, TransparentUnionAttr>;
 using TransparentUnionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TransparentUnionAttr>;
 class TransparentUnionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class TransparentUnionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static TransparentUnionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TransparentUnionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TransparentUnionAttrContainingTokenRange containing(const Token &tok) {

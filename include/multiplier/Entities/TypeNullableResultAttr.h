@@ -28,7 +28,6 @@ class Attr;
 class TypeAttr;
 class TypeNullableResultAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeNullableResultAttrRange = DerivedEntityRange<AttrIterator, TypeNullableResultAttr>;
 using TypeNullableResultAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeNullableResultAttr>;
 class TypeNullableResultAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class TypeNullableResultAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static TypeNullableResultAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypeNullableResultAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static TypeNullableResultAttrContainingTokenRange containing(const Token &tok) {

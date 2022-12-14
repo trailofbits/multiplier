@@ -31,7 +31,6 @@ class FunctionProtoType;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BlockExprRange = DerivedEntityRange<StmtIterator, BlockExpr>;
 using BlockExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlockExpr>;
 using BlockExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, BlockExpr>;
 
@@ -42,8 +41,12 @@ class BlockExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static BlockExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BlockExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BlockExprContainingTokenRange containing(const Token &tok) {

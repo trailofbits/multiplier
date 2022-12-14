@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class MinSizeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MinSizeAttrRange = DerivedEntityRange<AttrIterator, MinSizeAttr>;
 using MinSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MinSizeAttr>;
 class MinSizeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class MinSizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static MinSizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MinSizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MinSizeAttrContainingTokenRange containing(const Token &tok) {

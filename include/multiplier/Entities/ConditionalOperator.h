@@ -30,7 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ConditionalOperatorRange = DerivedEntityRange<StmtIterator, ConditionalOperator>;
 using ConditionalOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, ConditionalOperator>;
 using ConditionalOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ConditionalOperator>;
 
@@ -42,8 +41,12 @@ class ConditionalOperator : public AbstractConditionalOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ConditionalOperatorRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ConditionalOperator> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ConditionalOperatorContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class NoDerefAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoDerefAttrRange = DerivedEntityRange<AttrIterator, NoDerefAttr>;
 using NoDerefAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoDerefAttr>;
 class NoDerefAttr : public TypeAttr {
  private:
@@ -36,8 +35,12 @@ class NoDerefAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static NoDerefAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoDerefAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoDerefAttrContainingTokenRange containing(const Token &tok) {

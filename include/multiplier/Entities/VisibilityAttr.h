@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class VisibilityAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VisibilityAttrRange = DerivedEntityRange<AttrIterator, VisibilityAttr>;
 using VisibilityAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VisibilityAttr>;
 class VisibilityAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class VisibilityAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static VisibilityAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VisibilityAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static VisibilityAttrContainingTokenRange containing(const Token &tok) {

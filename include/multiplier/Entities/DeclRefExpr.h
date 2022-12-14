@@ -32,7 +32,6 @@ class Stmt;
 class ValueDecl;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeclRefExprRange = DerivedEntityRange<StmtIterator, DeclRefExpr>;
 using DeclRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, DeclRefExpr>;
 using DeclRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DeclRefExpr>;
 
@@ -43,8 +42,12 @@ class DeclRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static DeclRefExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DeclRefExpr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static DeclRefExprContainingTokenRange containing(const Token &tok) {

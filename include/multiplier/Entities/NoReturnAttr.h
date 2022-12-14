@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoReturnAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoReturnAttrRange = DerivedEntityRange<AttrIterator, NoReturnAttr>;
 using NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoReturnAttr>;
 class NoReturnAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoReturnAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoReturnAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoReturnAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoReturnAttrContainingTokenRange containing(const Token &tok) {

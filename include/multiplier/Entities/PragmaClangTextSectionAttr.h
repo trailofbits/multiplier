@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PragmaClangTextSectionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaClangTextSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangTextSectionAttr>;
 using PragmaClangTextSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangTextSectionAttr>;
 class PragmaClangTextSectionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PragmaClangTextSectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PragmaClangTextSectionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaClangTextSectionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PragmaClangTextSectionAttrContainingTokenRange containing(const Token &tok) {

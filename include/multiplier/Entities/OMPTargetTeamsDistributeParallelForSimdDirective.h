@@ -30,7 +30,6 @@ class OMPLoopDirective;
 class OMPTargetTeamsDistributeParallelForSimdDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTargetTeamsDistributeParallelForSimdDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetTeamsDistributeParallelForSimdDirective>;
 using OMPTargetTeamsDistributeParallelForSimdDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetTeamsDistributeParallelForSimdDirective>;
 using OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTargetTeamsDistributeParallelForSimdDirective>;
 
@@ -42,8 +41,12 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPTargetTeamsDistributeParallelForSimdDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPTargetTeamsDistributeParallelForSimdDirective> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPTargetTeamsDistributeParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {

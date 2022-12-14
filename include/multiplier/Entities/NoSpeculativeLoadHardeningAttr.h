@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class NoSpeculativeLoadHardeningAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoSpeculativeLoadHardeningAttrRange = DerivedEntityRange<AttrIterator, NoSpeculativeLoadHardeningAttr>;
 using NoSpeculativeLoadHardeningAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoSpeculativeLoadHardeningAttr>;
 class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class NoSpeculativeLoadHardeningAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoSpeculativeLoadHardeningAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoSpeculativeLoadHardeningAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static NoSpeculativeLoadHardeningAttrContainingTokenRange containing(const Token &tok) {

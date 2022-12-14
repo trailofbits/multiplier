@@ -31,15 +31,18 @@ class ObjCObjectType;
 class ObjCProtocolDecl;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCObjectPointerTypeRange = DerivedEntityRange<TypeIterator, ObjCObjectPointerType>;
 using ObjCObjectPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCObjectPointerType>;
 class ObjCObjectPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static ObjCObjectPointerTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCObjectPointerType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCObjectPointerTypeContainingTokenRange containing(const Token &tok) {

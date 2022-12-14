@@ -28,7 +28,6 @@ class AllocSizeAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AllocSizeAttrRange = DerivedEntityRange<AttrIterator, AllocSizeAttr>;
 using AllocSizeAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AllocSizeAttr>;
 class AllocSizeAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class AllocSizeAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AllocSizeAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AllocSizeAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static AllocSizeAttrContainingTokenRange containing(const Token &tok) {

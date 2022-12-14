@@ -30,7 +30,6 @@ class InheritableParamAttr;
 class ParameterABIAttr;
 class SwiftContextAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftContextAttrRange = DerivedEntityRange<AttrIterator, SwiftContextAttr>;
 using SwiftContextAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftContextAttr>;
 class SwiftContextAttr : public ParameterABIAttr {
  private:
@@ -40,8 +39,12 @@ class SwiftContextAttr : public ParameterABIAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftContextAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftContextAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static SwiftContextAttrContainingTokenRange containing(const Token &tok) {

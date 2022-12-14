@@ -26,7 +26,6 @@
 namespace mx {
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StmtRange = DerivedEntityRange<StmtIterator, Stmt>;
 using StmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, Stmt>;
 using StmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, Stmt>;
 
@@ -80,11 +79,15 @@ class Stmt {
   UseRange<StmtUseSelector> uses(void) const;
 
  protected:
-  static StmtIterator in_internal(const Fragment &fragment);
+  static gap::generator<Stmt> in_internal(const Fragment &fragment);
 
  public:
-  inline static StmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Stmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static StmtContainingTokenRange containing(const Token &tok) {

@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class PragmaClangRelroSectionAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaClangRelroSectionAttrRange = DerivedEntityRange<AttrIterator, PragmaClangRelroSectionAttr>;
 using PragmaClangRelroSectionAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaClangRelroSectionAttr>;
 class PragmaClangRelroSectionAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class PragmaClangRelroSectionAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PragmaClangRelroSectionAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaClangRelroSectionAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PragmaClangRelroSectionAttrContainingTokenRange containing(const Token &tok) {

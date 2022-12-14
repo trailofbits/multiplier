@@ -28,15 +28,18 @@ class CXXRecordDecl;
 class MemberPointerType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MemberPointerTypeRange = DerivedEntityRange<TypeIterator, MemberPointerType>;
 using MemberPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, MemberPointerType>;
 class MemberPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static MemberPointerTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MemberPointerType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MemberPointerTypeContainingTokenRange containing(const Token &tok) {

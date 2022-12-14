@@ -30,7 +30,6 @@ class CapturedStmt;
 class RecordDecl;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CapturedStmtRange = DerivedEntityRange<StmtIterator, CapturedStmt>;
 using CapturedStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CapturedStmt>;
 using CapturedStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CapturedStmt>;
 
@@ -39,8 +38,12 @@ class CapturedStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static CapturedStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CapturedStmt> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CapturedStmtContainingTokenRange containing(const Token &tok) {

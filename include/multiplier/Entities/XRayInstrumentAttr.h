@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class XRayInstrumentAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using XRayInstrumentAttrRange = DerivedEntityRange<AttrIterator, XRayInstrumentAttr>;
 using XRayInstrumentAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, XRayInstrumentAttr>;
 class XRayInstrumentAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class XRayInstrumentAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static XRayInstrumentAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<XRayInstrumentAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static XRayInstrumentAttrContainingTokenRange containing(const Token &tok) {

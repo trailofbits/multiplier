@@ -29,7 +29,6 @@ class Attr;
 class OpenCLGlobalAddressSpaceAttr;
 class TypeAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLGlobalAddressSpaceAttrRange = DerivedEntityRange<AttrIterator, OpenCLGlobalAddressSpaceAttr>;
 using OpenCLGlobalAddressSpaceAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLGlobalAddressSpaceAttr>;
 class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
  private:
@@ -37,8 +36,12 @@ class OpenCLGlobalAddressSpaceAttr : public TypeAttr {
   friend class TypeAttr;
   friend class Attr;
  public:
-  inline static OpenCLGlobalAddressSpaceAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OpenCLGlobalAddressSpaceAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OpenCLGlobalAddressSpaceAttrContainingTokenRange containing(const Token &tok) {

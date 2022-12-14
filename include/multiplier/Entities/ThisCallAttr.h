@@ -28,7 +28,6 @@ class Attr;
 class InheritableAttr;
 class ThisCallAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ThisCallAttrRange = DerivedEntityRange<AttrIterator, ThisCallAttr>;
 using ThisCallAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ThisCallAttr>;
 class ThisCallAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class ThisCallAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ThisCallAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ThisCallAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ThisCallAttrContainingTokenRange containing(const Token &tok) {

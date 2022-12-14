@@ -29,7 +29,6 @@ class InheritableAttr;
 class PreferredNameAttr;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PreferredNameAttrRange = DerivedEntityRange<AttrIterator, PreferredNameAttr>;
 using PreferredNameAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, PreferredNameAttr>;
 class PreferredNameAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class PreferredNameAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static PreferredNameAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PreferredNameAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static PreferredNameAttrContainingTokenRange containing(const Token &tok) {

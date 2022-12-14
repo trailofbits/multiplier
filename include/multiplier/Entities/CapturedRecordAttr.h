@@ -28,7 +28,6 @@ class Attr;
 class CapturedRecordAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CapturedRecordAttrRange = DerivedEntityRange<AttrIterator, CapturedRecordAttr>;
 using CapturedRecordAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CapturedRecordAttr>;
 class CapturedRecordAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class CapturedRecordAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CapturedRecordAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CapturedRecordAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static CapturedRecordAttrContainingTokenRange containing(const Token &tok) {

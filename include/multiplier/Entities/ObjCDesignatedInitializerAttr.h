@@ -27,15 +27,18 @@ namespace mx {
 class Attr;
 class ObjCDesignatedInitializerAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCDesignatedInitializerAttrRange = DerivedEntityRange<AttrIterator, ObjCDesignatedInitializerAttr>;
 using ObjCDesignatedInitializerAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCDesignatedInitializerAttr>;
 class ObjCDesignatedInitializerAttr : public Attr {
  private:
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static ObjCDesignatedInitializerAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCDesignatedInitializerAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ObjCDesignatedInitializerAttrContainingTokenRange containing(const Token &tok) {

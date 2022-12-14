@@ -27,15 +27,18 @@ namespace mx {
 class MacroQualifiedType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MacroQualifiedTypeRange = DerivedEntityRange<TypeIterator, MacroQualifiedType>;
 using MacroQualifiedTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, MacroQualifiedType>;
 class MacroQualifiedType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static MacroQualifiedTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MacroQualifiedType> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static MacroQualifiedTypeContainingTokenRange containing(const Token &tok) {

@@ -29,7 +29,6 @@ class Attr;
 class InheritableAttr;
 class ZeroCallUsedRegsAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ZeroCallUsedRegsAttrRange = DerivedEntityRange<AttrIterator, ZeroCallUsedRegsAttr>;
 using ZeroCallUsedRegsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ZeroCallUsedRegsAttr>;
 class ZeroCallUsedRegsAttr : public InheritableAttr {
  private:
@@ -37,8 +36,12 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ZeroCallUsedRegsAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ZeroCallUsedRegsAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static ZeroCallUsedRegsAttrContainingTokenRange containing(const Token &tok) {

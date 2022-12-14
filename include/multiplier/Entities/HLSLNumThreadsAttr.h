@@ -28,7 +28,6 @@ class Attr;
 class HLSLNumThreadsAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using HLSLNumThreadsAttrRange = DerivedEntityRange<AttrIterator, HLSLNumThreadsAttr>;
 using HLSLNumThreadsAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, HLSLNumThreadsAttr>;
 class HLSLNumThreadsAttr : public InheritableAttr {
  private:
@@ -36,8 +35,12 @@ class HLSLNumThreadsAttr : public InheritableAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static HLSLNumThreadsAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<HLSLNumThreadsAttr> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static HLSLNumThreadsAttrContainingTokenRange containing(const Token &tok) {

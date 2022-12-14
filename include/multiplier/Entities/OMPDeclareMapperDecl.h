@@ -31,7 +31,6 @@ class OMPDeclarativeDirectiveValueDecl;
 class OMPDeclareMapperDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPDeclareMapperDeclRange = DerivedEntityRange<DeclIterator, OMPDeclareMapperDecl>;
 using OMPDeclareMapperDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPDeclareMapperDecl>;
 using OMPDeclareMapperDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPDeclareMapperDecl>;
 
@@ -43,8 +42,12 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static OMPDeclareMapperDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPDeclareMapperDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static OMPDeclareMapperDeclContainingTokenRange containing(const Token &tok) {

@@ -31,7 +31,6 @@ class Decl;
 class ParmVarDecl;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using BlockDeclRange = DerivedEntityRange<DeclIterator, BlockDecl>;
 using BlockDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, BlockDecl>;
 using BlockDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, BlockDecl>;
 
@@ -40,8 +39,12 @@ class BlockDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static BlockDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<BlockDecl> in(const Fragment &frag) {
+    for(auto e : in_internal(frag)) {
+      if(auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static BlockDeclContainingTokenRange containing(const Token &tok) {
