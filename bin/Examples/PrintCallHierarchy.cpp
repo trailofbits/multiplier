@@ -140,11 +140,15 @@ extern "C" int main(int argc, char *argv[]) {
 
   } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
     mx::Token token = std::get<mx::Token>(maybe_entity);
-    for (auto stmt : mx::Stmt::containing(token)) {
-      PrintCallHierarchy(stmt, 0u);
-    }
-    for (auto decl : mx::Decl::containing(token)) {
-      PrintCallHierarchy(decl, 0u);
+    auto stmts = mx::Stmt::containing(token);
+    auto decls = mx::Decl::containing(token);
+    auto stmt = stmts.begin();
+    auto decl = decls.begin();
+    if (stmt != stmts.end()) {
+      PrintCallHierarchy(*stmt, 0u);
+
+    } else if (decl != decls.end()) {
+      PrintCallHierarchy(*decl, 0u);
     }
 
   } else {

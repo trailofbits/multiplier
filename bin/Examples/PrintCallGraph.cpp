@@ -130,12 +130,15 @@ extern "C" int main(int argc, char *argv[]) {
 
   } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
     mx::Token token = std::get<mx::Token>(maybe_entity);
-    for (auto stmt : mx::Stmt::containing(token)) {
-      PrintCallGraph(stmt);
+    auto stmts = mx::Stmt::containing(token);
+    auto decls = mx::Decl::containing(token);
+    auto stmt = stmts.begin();
+    auto decl = decls.begin();
+    if (stmt != stmts.end()) {
+      PrintCallGraph(*stmt);
 
-    }
-    for (auto decl : mx::Decl::containing(token)) {
-      PrintCallGraph(decl.redeclarations()[0]);
+    } else if (decl != decls.end()) {
+      PrintCallGraph(decl->redeclarations()[0]);
     }
 
   } else {
