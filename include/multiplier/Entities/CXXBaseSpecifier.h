@@ -42,8 +42,6 @@ class CXXBaseSpecifier {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 

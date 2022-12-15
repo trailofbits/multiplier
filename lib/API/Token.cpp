@@ -202,12 +202,13 @@ std::optional<Token> Token::nearest_file_token(void) const {
 
 // Return the set of all uses of this token within its fragment (if it's a
 // fragment token).
-UseRange<TokenUseSelector> Token::uses(void) const {
+gap::generator<Use<TokenUseSelector>> Token::uses(void) const {
   if (auto frag = Fragment::containing(*this)) {
     FragmentImpl::Ptr frag_ptr = std::move(frag->impl);
-    return std::make_shared<UseIteratorImpl>(std::move(frag_ptr), *this);
+    UseIteratorImpl impl(std::move(frag_ptr), *this);
+    return impl.enumerate<TokenUseSelector>();
   } else {
-    return {};
+    return []() -> gap::generator<Use<TokenUseSelector>> { co_return; }();
   }
 }
 

@@ -11,6 +11,7 @@
 #include <string_view>
 #include <utility>
 #include <variant>
+#include <gap/core/generator.hpp>
 
 #include "Types.h"
 #include "Use.h"
@@ -93,7 +94,7 @@ class Token {
 
   // Return the set of all uses of this token within its fragment (if it's a
   // fragment token).
-  UseRange<TokenUseSelector> uses(void) const;
+  gap::generator<Use<TokenUseSelector>> uses(void) const;
 
   // Return the line and column number for this token, if any.
   std::optional<std::pair<unsigned, unsigned>> location(

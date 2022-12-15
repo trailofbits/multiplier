@@ -38,8 +38,6 @@ class Stmt {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -69,7 +67,7 @@ class Stmt {
   std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> referenced_declaration(void) const;
   EntityId id(void) const;
-  UseRange<StmtUseSelector> uses(void) const;
+  gap::generator<Use<StmtUseSelector>> uses(void) const;
 
  protected:
   static gap::generator<Stmt> in_internal(const Fragment &fragment);

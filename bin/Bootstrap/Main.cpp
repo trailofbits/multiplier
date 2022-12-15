@@ -1842,7 +1842,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "Type")
         << FriendOf(class_os, class_name, "UseBase")
         << FriendOf(class_os, class_name, "UseIteratorImpl")
-        << "  template <typename> friend class UseIterator;\n\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset_;\n\n"
         << " public:\n"
@@ -1875,7 +1874,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  std::vector<Decl> redeclarations(void) const;\n"
           << "  EntityId id(void) const;\n"
-          << "  UseRange<DeclUseSelector> uses(void) const;\n"
+          << "  gap::generator<Use<DeclUseSelector>> uses(void) const;\n"
           << "  gap::generator<Reference> references(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
@@ -1915,7 +1914,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << "  EntityId id(void) const;\n"
-          << "  UseRange<StmtUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<StmtUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Stmt> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -1961,7 +1960,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_type();\n"
           << "  }\n\n"
           << "  EntityId id(void) const;\n"
-          << "  UseRange<TypeUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<TypeUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Type> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -1979,7 +1978,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_attribute();\n"
           << "  }\n\n"
           << "  EntityId id(void) const;\n"
-          << "  UseRange<AttrUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<AttrUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Attr> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";

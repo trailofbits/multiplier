@@ -57,8 +57,6 @@ class Type {
   friend class TokenContext;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -85,7 +83,7 @@ class Type {
   }
 
   EntityId id(void) const;
-  UseRange<TypeUseSelector> uses(void) const;
+  gap::generator<Use<TypeUseSelector>> uses(void) const;
 
  protected:
   static gap::generator<Type> in_internal(const Fragment &fragment);

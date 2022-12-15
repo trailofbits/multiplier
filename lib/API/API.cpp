@@ -186,8 +186,9 @@ std::vector<Decl> Decl::redeclarations(void) const {
   return redecls;
 }
 
-UseRange<DeclUseSelector> Decl::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  return impl.enumerate<DeclUseSelector>();
 }
 
 gap::generator<Reference> Decl::references(void) const {
@@ -307,8 +308,9 @@ gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
   }
 }
 
-UseRange<StmtUseSelector> Stmt::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<StmtUseSelector>> Stmt::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  return impl.enumerate<StmtUseSelector>();
 }
 
 EntityId Type::id(void) const {
@@ -325,8 +327,9 @@ gap::generator<Type> Type::in_internal(const Fragment &fragment) {
   }
 }
 
-UseRange<TypeUseSelector> Type::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<TypeUseSelector>> Type::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  return impl.enumerate<TypeUseSelector>();
 }
 
 EntityId Attr::id(void) const {
@@ -343,8 +346,9 @@ gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
   }
 }
 
-UseRange<AttrUseSelector> Attr::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<AttrUseSelector>> Attr::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  return impl.enumerate<AttrUseSelector>();
 }
 
 

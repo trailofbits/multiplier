@@ -38,8 +38,6 @@ class Attr {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -66,7 +64,7 @@ class Attr {
   }
 
   EntityId id(void) const;
-  UseRange<AttrUseSelector> uses(void) const;
+  gap::generator<Use<AttrUseSelector>> uses(void) const;
 
  protected:
   static gap::generator<Attr> in_internal(const Fragment &fragment);

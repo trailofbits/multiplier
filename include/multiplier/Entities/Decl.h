@@ -49,8 +49,6 @@ class Decl {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -82,7 +80,7 @@ class Decl {
   bool is_definition(void) const;
   std::vector<Decl> redeclarations(void) const;
   EntityId id(void) const;
-  UseRange<DeclUseSelector> uses(void) const;
+  gap::generator<Use<DeclUseSelector>> uses(void) const;
   gap::generator<Reference> references(void) const;
 
  protected:
