@@ -43,7 +43,7 @@ class UseIteratorImpl final {
   template<typename Selector>
   gap::generator<Use<Selector>> enumerate(void) {
     Use<Selector> use;
-    while(!FindNext(use)) {
+    while(FindNext(use)) {
       co_yield use;
     }
   }

@@ -170,13 +170,17 @@ std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
 // Run a Weggli search over this fragment.
 gap::generator<WeggliQueryMatch> Fragment::query(const WeggliQuery &query) const {
   WeggliQueryResultImpl res(query, impl);
-  return res.enumerate();
+  for(auto match : res.enumerate()) {
+    co_yield match;
+  }
 }
 
 // Run a regular expression search over this fragment.
 gap::generator<RegexQueryMatch> Fragment::query(const RegexQuery &query) const {
   RegexQueryResultImpl res(query, impl);
-  return res.enumerate();
+  for(auto match : res.enumerate()) {
+    co_yield match;
+  }
 }
 
 }  // namespace mx

@@ -217,7 +217,9 @@ gap::generator<WeggliQueryMatch> SQLiteEntityProvider::Query(
   fragment_ids.erase(it, fragment_ids.end());
 
   WeggliQueryResultImpl res(query_tree, self, std::move(fragment_ids));
-  return res.enumerate();
+  for(auto match : res.enumerate()) {
+    co_yield match;
+  }
 }
 
 gap::generator<RegexQueryMatch> SQLiteEntityProvider::Query(
@@ -289,7 +291,9 @@ gap::generator<RegexQueryMatch> SQLiteEntityProvider::Query(
   fragment_ids.erase(it, fragment_ids.end());
 
   RegexQueryResultImpl res(regex, self, std::move(fragment_ids));
-  return res.enumerate();
+  for(auto match : res.enumerate()) {
+    co_yield match;
+  }
 }
 
 std::vector<RawEntityId> SQLiteEntityProvider::Redeclarations(

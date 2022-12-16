@@ -206,9 +206,9 @@ gap::generator<Use<TokenUseSelector>> Token::uses(void) const {
   if (auto frag = Fragment::containing(*this)) {
     FragmentImpl::Ptr frag_ptr = std::move(frag->impl);
     UseIteratorImpl impl(std::move(frag_ptr), *this);
-    return impl.enumerate<TokenUseSelector>();
-  } else {
-    return []() -> gap::generator<Use<TokenUseSelector>> { co_return; }();
+    for(auto use : impl.enumerate<TokenUseSelector>()) {
+      co_yield use;
+    }
   }
 }
 

@@ -188,7 +188,9 @@ std::vector<Decl> Decl::redeclarations(void) const {
 
 gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  return impl.enumerate<DeclUseSelector>();
+  for(auto use : impl.enumerate<DeclUseSelector>()) {
+    co_yield use;
+  }
 }
 
 gap::generator<Reference> Decl::references(void) const {
@@ -310,7 +312,9 @@ gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
 
 gap::generator<Use<StmtUseSelector>> Stmt::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  return impl.enumerate<StmtUseSelector>();
+  for(auto use : impl.enumerate<StmtUseSelector>()) {
+    co_yield use;
+  }
 }
 
 EntityId Type::id(void) const {
@@ -329,7 +333,9 @@ gap::generator<Type> Type::in_internal(const Fragment &fragment) {
 
 gap::generator<Use<TypeUseSelector>> Type::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  return impl.enumerate<TypeUseSelector>();
+  for(auto use : impl.enumerate<TypeUseSelector>()) {
+    co_yield use;
+  }
 }
 
 EntityId Attr::id(void) const {
@@ -348,7 +354,9 @@ gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
 
 gap::generator<Use<AttrUseSelector>> Attr::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  return impl.enumerate<AttrUseSelector>();
+  for(auto use : impl.enumerate<AttrUseSelector>()) {
+    co_yield use;
+  }
 }
 
 
