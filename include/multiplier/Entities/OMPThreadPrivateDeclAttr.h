@@ -44,8 +44,8 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPThreadPrivateDeclAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPThreadPrivateDeclAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

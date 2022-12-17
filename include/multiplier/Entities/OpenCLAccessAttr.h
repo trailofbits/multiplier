@@ -43,8 +43,8 @@ class OpenCLAccessAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OpenCLAccessAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OpenCLAccessAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

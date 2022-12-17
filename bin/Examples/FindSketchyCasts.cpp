@@ -152,10 +152,10 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
     found:
 
       mx::Fragment fragment = mx::Fragment::containing(call_expr);
-      mx::File file = mx::File::containing(fragment);
+      auto file = mx::File::containing(fragment);
 
-      if (FLAGS_show_locations) {
-        std::cout << "Location: " << file_paths[file.id()].generic_string();
+      if (FLAGS_show_locations && file) {
+        std::cout << "Location: " << file_paths[file->id()].generic_string();
         if (auto tok = call_expr.tokens()[0]) {
           if (auto line_col = tok.location(location_cache)) {
             std::cout << ':' << line_col->first << ':' << line_col->second;
@@ -164,9 +164,13 @@ static void CheckCallForImplicitCast(const mx::CallExpr call_expr) {
         std::cout << '\n';
       }
 
+      if (file) {
+        std::cout
+            << "File ID: " << file->id() << '\n';
+      }
+
       std::cout
-          << "File ID: " << file.id()
-          << "\nFrag ID: " << fragment.id()
+          << "Frag ID: " << fragment.id()
           << "\nEntity ID: " << cast_expr->id()
           << "\nKind: " << kind << " ("
           << mx::EnumeratorName(source_type_kind)

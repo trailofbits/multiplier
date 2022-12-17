@@ -36,9 +36,10 @@ static void DumpMatch(
   }
 
   // Get the file containing the match, and print out its path.
-  mx::File file = mx::File::containing(match);
-  if (auto path_it = paths.find(file.id()); path_it != paths.end()) {
-    std::cout << "File: " << path_it->second.generic_string() << ":\n";
+  if (auto file = mx::File::containing(match)) {
+    if (auto path_it = paths.find(file->id()); path_it != paths.end()) {
+      std::cout << "File: " << path_it->second.generic_string() << ":\n";
+    }
   }
 
   // Get the file tokens coverage the matched data, then print out the line

@@ -13,6 +13,9 @@ class File;
 }  // namespace pasta
 namespace indexer {
 
+class TokenTree;
+class TokenTreeNode;
+
 // Provides entity IDs and offsets to the serialization code.
 class EntityMapper final {
  public:
@@ -39,8 +42,10 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::Stmt &entity) const;
   mx::RawEntityId EntityId(const pasta::Token &entity);
   mx::RawEntityId EntityId(const pasta::FileToken &entity);
+  mx::RawEntityId EntityId(const pasta::MacroToken &entity);
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
   mx::RawEntityId EntityId(const pasta::Attr &entity) const;
+  mx::RawEntityId EntityId(const pasta::Macro &entity) const;
 
   uint32_t PseudoId(const pasta::TemplateArgument &pseudo) const;
   uint32_t PseudoId(const pasta::TemplateParameterList &pseudo) const;

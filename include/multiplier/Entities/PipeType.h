@@ -42,8 +42,8 @@ class PipeType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : PipeType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : PipeType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -50,8 +50,8 @@ class BlockExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : BlockExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : BlockExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

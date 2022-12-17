@@ -94,12 +94,16 @@ bool PackedFileImpl::Equals(const class TokenReader *that_) const {
     return true;
   }
 
-  auto that = dynamic_cast<const PackedFileImpl *>(that_);
+  auto that = that_->OwningFile();
   if (!that) {
     return false;
   }
 
   return that->file_id == file_id && that->ep.get() == ep.get();
+}
+
+const FileImpl *PackedFileImpl::OwningFile(void) const noexcept {
+  return this;
 }
 
 }  // namespace mx

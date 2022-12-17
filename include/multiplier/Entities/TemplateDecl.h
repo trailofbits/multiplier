@@ -46,8 +46,8 @@ class TemplateDecl : public NamedDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : TemplateDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : TemplateDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

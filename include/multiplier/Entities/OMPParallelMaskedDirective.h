@@ -47,8 +47,8 @@ class OMPParallelMaskedDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPParallelMaskedDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPParallelMaskedDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

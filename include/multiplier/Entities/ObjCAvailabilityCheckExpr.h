@@ -48,8 +48,8 @@ class ObjCAvailabilityCheckExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCAvailabilityCheckExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCAvailabilityCheckExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

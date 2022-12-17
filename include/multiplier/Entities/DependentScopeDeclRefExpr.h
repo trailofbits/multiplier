@@ -48,8 +48,8 @@ class DependentScopeDeclRefExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : DependentScopeDeclRefExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : DependentScopeDeclRefExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

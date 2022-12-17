@@ -49,6 +49,11 @@ namespace {
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Attr::Reader &);
 
+#define MX_BEGIN_VISIT_MACRO(name) \
+    static void FindReferences_ ## name ( \
+        std::unordered_set<mx::RawEntityId> &entity_ids, \
+        const mx::ast::Macro::Reader &);
+
 #define MX_BEGIN_VISIT_PSEUDO(name) \
     static void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
@@ -60,6 +65,7 @@ namespace {
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
 #define MX_END_VISIT_ATTR MX_END_VISIT_DECL
+#define MX_END_VISIT_MACRO MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
 #define MX_BEGIN_VISIT_DECL(name) \
@@ -87,6 +93,13 @@ namespace {
     void FindReferences_ ## name ( \
         std::unordered_set<mx::RawEntityId> &entity_ids, \
         const mx::ast::Attr::Reader &reader) { \
+      (void) entity_ids; \
+      (void) reader;
+
+#define MX_BEGIN_VISIT_MACRO(name) \
+    void FindReferences_ ## name ( \
+        std::unordered_set<mx::RawEntityId> &entity_ids, \
+        const mx::ast::Macro::Reader &reader) { \
       (void) entity_ids; \
       (void) reader;
 
@@ -124,7 +137,8 @@ namespace {
 // Identify all unique entity IDs used by this fragment, and map them to the
 // fragment ID in the data store.
 void PendingFragment::FindDeclarationUses(
-    WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b) {
+    WorkerId worker_id, GlobalIndexingState &context,
+    mx::rpc::Fragment::Builder &b) {
 
   std::unordered_set<mx::RawEntityId> entity_ids;
 
@@ -190,6 +204,35 @@ void PendingFragment::FindDeclarationUses(
     }
 
 #undef MX_VISIT_ATTR
+  }
+
+  // Look for macro methods with a return value of the corresponding
+  // entity ID.
+  for (mx::ast::Macro::Reader entity : b.getMacros().asReader()) {
+#define MX_VISIT_MACRO(type) \
+    case pasta::MacroKind::k ## type: \
+      FindReferences_Macro ## type(entity_ids, entity); \
+      break;
+
+#define MX_VISIT_DIRECTIVE(type) \
+    case pasta::MacroKind::k ## type ## Directive: \
+      FindReferences_ ## type ## MacroDirective(entity_ids, entity); \
+      break;
+
+    switch (Get_Macro_Kind(entity)) {
+
+      // We turn `pasta::MacroToken` into `mx::Token`, as there's a one-to-one
+      // correspondence between a `pasta::MacroToken` and a `pasta::Token`.
+      case pasta::MacroKind::kToken:
+        break;
+
+    PASTA_FOR_EACH_MACRO_IMPL(MX_VISIT_MACRO, PASTA_IGNORE_ABSTRACT,
+                              MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
+                              MX_VISIT_DIRECTIVE, PASTA_IGNORE_ABSTRACT)
+    }
+
+#undef MX_VISIT_DIRECTIVE
+#undef MX_VISIT_MACRO
   }
 
   // Look for pseudo-entity methods with a return value of the corresponding

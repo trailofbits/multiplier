@@ -45,8 +45,8 @@ class SwiftAsyncErrorAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SwiftAsyncErrorAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SwiftAsyncErrorAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -42,8 +42,8 @@ class IFuncAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : IFuncAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : IFuncAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

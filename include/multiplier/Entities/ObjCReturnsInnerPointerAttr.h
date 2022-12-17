@@ -44,8 +44,8 @@ class ObjCReturnsInnerPointerAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCReturnsInnerPointerAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCReturnsInnerPointerAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

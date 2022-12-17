@@ -156,12 +156,12 @@ class File {
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
   friend class FragmentImpl;
+  friend class IncludeLikeMacroDirective;
   friend class Index;
   friend class RemoteEntityProvider;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
   friend class Token;
-  friend class MacroSubstitutionListIterator;
 
   Ptr impl;
 
@@ -171,28 +171,31 @@ class File {
  public:
 
   // Return the file containing a regex match.
-  static File containing(const RegexQueryMatch &match);
+  static std::optional<File> containing(const RegexQueryMatch &match);
 
   // Return the file containing a specific fragment.
-  static File containing(const WeggliQueryMatch &match);
+  static std::optional<File> containing(const WeggliQueryMatch &match);
 
   // Return the file containing a specific fragment.
-  static File containing(const Fragment &fragment);
-
-  // Return the file containing a specific token substitution.
-  static File containing(const MacroSubstitution &entity);
+  static std::optional<File> containing(const Fragment &fragment);
 
   // Return the file containing a specific designator.
-  static File containing(const Designator &entity);
+  static std::optional<File> containing(const Designator &entity);
 
   // Return the file containing the fragment containing a specific entity.
-  static File containing(const Decl &entity);
+  static std::optional<File> containing(const Decl &entity);
 
   // Return the file containing the fragment containing a specific entity.
-  static File containing(const Stmt &entity);
+  static std::optional<File> containing(const Stmt &entity);
 
   // Return the file containing the fragment containing a specific entity.
-  static File containing(const Type &type);
+  static std::optional<File> containing(const Type &type);
+
+  // Return the file containing the fragment containing a specific entity.
+  static std::optional<File> containing(const Attr &type);
+
+  // Return the file containing a specific token substitution.
+  static std::optional<File> containing(const Macro &entity);
 
   // Return the file containing a specific token.
   //
@@ -210,7 +213,7 @@ class File {
   std::vector<EntityId> fragment_ids(void) const;
 
   // Return the file tokens for the file.
-  TokenList tokens(void) const noexcept;
+  TokenRange tokens(void) const noexcept;
 
   // Return the contents of the file as a UTF-8 string.
   std::string_view data(void) const noexcept;

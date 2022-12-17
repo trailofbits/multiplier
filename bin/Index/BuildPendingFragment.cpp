@@ -6,6 +6,7 @@
 
 #include "PendingFragment.h"
 
+#include "Macro.h"
 #include "PASTA.h"
 #include "Util.h"
 
@@ -36,6 +37,7 @@ class FragmentBuilder {
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_MACRO MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
@@ -43,6 +45,7 @@ class FragmentBuilder {
   void Accept(const pasta::Stmt &entity);
   void Accept(const pasta::Type &entity);
   void Accept(const pasta::Attr &entity);
+  void Accept(const pasta::Macro &entity);
   void Accept(const pasta::TemplateArgument &entity);
   void Accept(const pasta::CXXBaseSpecifier &entity);
   void Accept(const pasta::TemplateParameterList &entity);
@@ -54,6 +57,8 @@ class FragmentBuilder {
   void MaybeVisitNext(const pasta::Stmt &entity);
   void MaybeVisitNext(const pasta::Type &entity);
   void MaybeVisitNext(const pasta::Attr &entity);
+  void MaybeVisitNext(const pasta::Macro &entity);
+  void MaybeVisitNext(const pasta::File &entity);
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo);
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo);
@@ -130,6 +135,10 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Type &entity) {
     fragment.types_to_serialize.emplace_back(entity);  // New type found.
   }
 }
+
+
+void FragmentBuilder::MaybeVisitNext(const pasta::Macro &) {}
+void FragmentBuilder::MaybeVisitNext(const pasta::File &) {}
 
 void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
   auto kind = entity.Kind();
@@ -225,6 +234,11 @@ void FragmentBuilder::MaybeVisitNext(
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
+// NOTE(pag): Macro visitors are never reached, so trick the compiler into
+//            dead code elimination.
+#define MX_BEGIN_VISIT_MACRO(name) MX_BEGIN_VISIT_DECL(name) if (1) return;
+#define MX_END_VISIT_MACRO MX_END_VISIT_DECL
+
 #include <multiplier/Visitor.inc.h>
 
 void FragmentBuilder::Accept(const pasta::Decl &entity) {
@@ -294,6 +308,8 @@ void FragmentBuilder::Accept(const pasta::Attr &entity) {
 #undef MX_VISIT_ATTR
   }
 }
+
+void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 }  // namespace
 

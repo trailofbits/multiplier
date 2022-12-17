@@ -47,8 +47,8 @@ class IndirectGotoStmt : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : IndirectGotoStmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : IndirectGotoStmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

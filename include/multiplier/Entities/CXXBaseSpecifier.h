@@ -38,6 +38,7 @@ class CXXBaseSpecifier {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;

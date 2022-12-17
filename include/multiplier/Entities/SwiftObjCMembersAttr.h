@@ -42,8 +42,8 @@ class SwiftObjCMembersAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SwiftObjCMembersAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SwiftObjCMembersAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

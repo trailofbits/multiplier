@@ -48,8 +48,8 @@ class CXXScalarValueInitExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXScalarValueInitExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXScalarValueInitExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

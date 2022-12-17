@@ -51,8 +51,8 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPDeclareMapperDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPDeclareMapperDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

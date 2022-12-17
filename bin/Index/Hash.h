@@ -16,12 +16,12 @@
 namespace pasta {
 class Decl;
 class File;
-class MacroNode;
+class Macro;
 class TokenRange;
 }  // namespace pasta
 namespace indexer {
 
-using Entity = std::variant<pasta::Decl, pasta::MacroNode>;
+using Entity = std::variant<pasta::Decl, pasta::Macro>;
 
 // Compute a SHA256 hash of some data from a file.
 std::string FileHash(std::string_view data);

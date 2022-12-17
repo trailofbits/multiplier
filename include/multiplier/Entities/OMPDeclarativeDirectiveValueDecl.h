@@ -48,8 +48,8 @@ class OMPDeclarativeDirectiveValueDecl : public ValueDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPDeclarativeDirectiveValueDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

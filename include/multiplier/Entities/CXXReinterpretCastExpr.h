@@ -54,8 +54,8 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXReinterpretCastExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXReinterpretCastExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

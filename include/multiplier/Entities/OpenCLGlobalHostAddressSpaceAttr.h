@@ -44,8 +44,8 @@ class OpenCLGlobalHostAddressSpaceAttr : public TypeAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OpenCLGlobalHostAddressSpaceAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OpenCLGlobalHostAddressSpaceAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

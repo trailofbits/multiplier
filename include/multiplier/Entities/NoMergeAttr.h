@@ -46,8 +46,8 @@ class NoMergeAttr : public DeclOrStmtAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : NoMergeAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : NoMergeAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

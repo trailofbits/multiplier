@@ -46,8 +46,8 @@ class NamespaceAliasDecl : public NamedDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : NamespaceAliasDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : NamespaceAliasDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -51,8 +51,8 @@ class FunctionProtoType : public FunctionType {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : FunctionProtoType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : FunctionProtoType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

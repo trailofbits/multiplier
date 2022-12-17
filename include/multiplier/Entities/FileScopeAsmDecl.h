@@ -45,8 +45,8 @@ class FileScopeAsmDecl : public Decl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : FileScopeAsmDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : FileScopeAsmDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

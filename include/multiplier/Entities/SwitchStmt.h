@@ -50,8 +50,8 @@ class SwitchStmt : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SwitchStmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SwitchStmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

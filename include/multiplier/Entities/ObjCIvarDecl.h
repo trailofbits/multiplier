@@ -54,8 +54,8 @@ class ObjCIvarDecl : public FieldDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCIvarDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCIvarDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -51,8 +51,8 @@ class UnresolvedMemberExpr : public OverloadExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UnresolvedMemberExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UnresolvedMemberExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

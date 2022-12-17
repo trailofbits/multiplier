@@ -48,8 +48,8 @@ class TemplateTemplateParmDecl : public TemplateDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : TemplateTemplateParmDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : TemplateTemplateParmDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -45,8 +45,8 @@ class MSDependentExistsStmt : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : MSDependentExistsStmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : MSDependentExistsStmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

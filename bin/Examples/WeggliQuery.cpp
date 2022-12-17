@@ -9,28 +9,16 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <multiplier/Index.h>
 #include <multiplier/Weggli.h>
 #include <fstream>
 #include <sstream>
 
+#include "Index.h"
+
 DECLARE_bool(help);
 DEFINE_bool(c_plus_plus, false, "Should we interpret the query as C++ code?");
-DECLARE_string(db);
 DEFINE_string(query, "", "Query pattern to be searched");
 DEFINE_bool(print_matches, false, "Print variable matches found for the syntax");
-
-static void PrintUnparsedTokens(mx::MacroSubstitutionList nodes) {
-  for (auto node : nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      auto tok = std::get<mx::Token>(node);
-      std::cout << tok.data();
-    } else {
-      auto sub = std::get<mx::MacroSubstitution>(node);
-      PrintUnparsedTokens(sub.before());
-    }
-  }
-}
 
 std::string GetFileContaining(mx::Index &index, mx::RawEntityId file_id) {
   for (auto [path, id] : index.file_paths()) {
@@ -53,9 +41,8 @@ extern "C" int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
 
 
-  if (1 >= argc || FLAGS_help) {
-    std::cerr << google::ProgramUsage() << std::endl;
-    return EXIT_FAILURE;
+  if (1 >= argc) {
+    FLAGS_help = true;
   }
 
   if (FLAGS_query.empty()) {
@@ -66,19 +53,20 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::WeggliQuery query(FLAGS_query, FLAGS_c_plus_plus);
   if (!query.IsValid()) {
-    std::cerr
-        << "Invalid weggli query.\n";
+    std::cerr << "Invalid weggli query.\n";
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index = InitExample();
 
   for (mx::WeggliQueryMatch match : index.query_fragments(query)) {
     mx::Fragment frag = mx::Fragment::containing(match);
-    mx::File file = mx::File::containing(frag);
+    auto file = mx::File::containing(frag);
     auto sep = "\t";
     std::cout
-        << frag.id() << sep << GetFileContaining(index, file.id())
+        << frag.id() << sep
+        << GetFileContaining(
+               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
         << std::endl;
 
     if (FLAGS_print_matches) {
@@ -99,9 +87,7 @@ extern "C" int main(int argc, char *argv[]) {
       }
       std::cout << "\n\n";
     }
-    std::cerr << "TODO\n";
-    return EXIT_FAILURE;
-//    PrintUnparsedTokens(frag.substitutions());
+    PrintUnparsedTokens(std::cout, frag.preprocessed_code());
     std::cout << "\n\n";
   }
   return EXIT_SUCCESS;

@@ -56,8 +56,8 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ClassTemplatePartialSpecializationDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

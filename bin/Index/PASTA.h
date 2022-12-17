@@ -550,7 +550,7 @@ enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
 enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
-enum class MacroNodeKind : unsigned char;
+enum class MacroKind : unsigned char;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;
@@ -2173,8 +2173,8 @@ AttributeSyntax FromPasta(pasta::AttributeSyntax pasta_val);
 enum class DeclCategory : unsigned char;
 DeclCategory FromPasta(pasta::DeclCategory pasta_val);
 
-enum class MacroNodeKind : unsigned char;
-MacroNodeKind FromPasta(pasta::MacroNodeKind pasta_val);
+enum class MacroKind : unsigned char;
+MacroKind FromPasta(pasta::MacroKind pasta_val);
 
 enum class PathKind : unsigned char;
 PathKind FromPasta(pasta::PathKind pasta_val);
@@ -2198,5 +2198,7 @@ enum class DeclUseSelector : unsigned short;
 enum class StmtUseSelector : unsigned short;
 enum class TypeUseSelector : unsigned short;
 enum class TokenUseSelector : unsigned short;
+enum class FileUseSelector : unsigned short;
 enum class AttrUseSelector : unsigned short;
+enum class MacroUseSelector : unsigned short;
 }  // namespace mx

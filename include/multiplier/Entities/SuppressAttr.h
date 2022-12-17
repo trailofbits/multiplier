@@ -44,8 +44,8 @@ class SuppressAttr : public StmtAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SuppressAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SuppressAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

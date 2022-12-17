@@ -106,6 +106,36 @@ static void DispatchSerializeAttr(EntityMapper &em,
 
 }  // namespace
 
+void DispatchSerializeMacro(EntityMapper &em,
+                            mx::ast::Macro::Builder builder,
+                            const pasta::Macro &entity, const TokenTree *tt) {
+
+  // Second pass actually does the real serialization.
+  switch (entity.Kind()) {
+#define MX_VISIT_MACRO(type) \
+  case pasta::MacroKind::k ## type: \
+    SerializeMacro ## type ( \
+        em, builder, \
+        reinterpret_cast<const pasta::Macro ## type &>(entity), tt); \
+    break;
+
+#define MX_VISIT_DIRECTIVE(type) \
+  case pasta::MacroKind::k ## type ## Directive: \
+    Serialize ## type ## MacroDirective( \
+        em, builder, \
+        reinterpret_cast<const pasta::type ## MacroDirective &>(entity), tt); \
+    break;
+
+    PASTA_FOR_EACH_MACRO_IMPL(MX_VISIT_MACRO, PASTA_IGNORE_ABSTRACT,
+                              MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
+                              MX_VISIT_DIRECTIVE, PASTA_IGNORE_ABSTRACT)
+#undef MX_VISIT_ATTR
+    default:
+      assert(false);
+      break;
+  }
+}
+
 void PendingFragment::Serialize(EntityMapper &em,
                                 mx::rpc::Fragment::Builder &b) {
 

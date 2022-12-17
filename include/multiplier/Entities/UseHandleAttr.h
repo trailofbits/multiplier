@@ -46,8 +46,8 @@ class UseHandleAttr : public InheritableParamAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UseHandleAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UseHandleAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

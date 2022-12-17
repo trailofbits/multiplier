@@ -44,8 +44,8 @@ class IncompleteArrayType : public ArrayType {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : IncompleteArrayType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : IncompleteArrayType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

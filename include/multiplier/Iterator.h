@@ -18,6 +18,7 @@ class CXXBaseSpecifier;
 class Decl;
 class Designator;
 class FragmentImpl;
+class Macro;
 class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
@@ -419,6 +420,59 @@ class AttrIterator {
   }
 };
 
+class MacroIterator {
+ private:
+  friend class Macro;
+
+  std::shared_ptr<const FragmentImpl> impl;
+  unsigned index{0};
+  unsigned num_macros{0};
+
+  bool operator==(const MacroIterator &) = delete;
+  bool operator!=(const MacroIterator &) = delete;
+
+  inline MacroIterator(std::shared_ptr<const FragmentImpl> impl_,
+                       unsigned index_, unsigned num_macros_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_macros(num_macros_) {}
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_macros;
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_macros;
+  }
+
+  inline operator bool(void) const noexcept {
+    return index < num_macros;
+  }
+
+  // Return the current type pointed to by the iterator.
+  Macro operator*(void) && noexcept;
+  Macro operator*(void) const & noexcept;
+
+  // Pre-increment.
+  inline MacroIterator &operator++(void) & noexcept {
+    ++index;
+    return *this;
+  }
+
+  // Post-increment.
+  inline MacroIterator operator++(int) && noexcept {
+    return MacroIterator(std::move(impl), index + 1u, num_macros);
+  }
+
+  // Post-increment.
+  inline MacroIterator operator++(int) & noexcept {
+    return MacroIterator(impl, index++, num_macros);
+  }
+};
+
 class TokenContext {
  private:
   std::shared_ptr<const FragmentImpl> impl;
@@ -629,6 +683,48 @@ class ParentStmtIteratorImpl {
 
   // Pre-increment.
   inline ParentStmtIteratorImpl<T> &operator++(void) &;
+};
+
+template <typename T>
+class ParentMacroIteratorImpl {
+ private:
+  std::optional<T> impl;
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline ParentMacroIteratorImpl(std::optional<T> impl_)
+      : impl(std::move(impl_)) {}
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return !impl.has_value();
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return impl.has_value();
+  }
+
+  inline operator bool(void) const noexcept {
+    return impl.has_value();
+  }
+
+  // Return the current statement pointed to by the iterator.
+  T operator*(void) && noexcept {
+    return std::move(impl.value());
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T &operator*(void) const & noexcept {
+    return impl.value();
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T *operator->(void) const & noexcept {
+    return std::addressof(impl.value());
+  }
+
+  // Pre-increment.
+  inline ParentMacroIteratorImpl<T> &operator++(void) &;
 };
 
 }  // namespace mx

@@ -42,8 +42,8 @@ class StmtAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : StmtAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : StmtAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

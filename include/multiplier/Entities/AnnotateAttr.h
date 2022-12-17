@@ -46,8 +46,8 @@ class AnnotateAttr : public InheritableParamAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AnnotateAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : AnnotateAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

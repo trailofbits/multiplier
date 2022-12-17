@@ -45,8 +45,8 @@ class LockReturnedAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : LockReturnedAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : LockReturnedAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

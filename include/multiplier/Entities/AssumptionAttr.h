@@ -44,8 +44,8 @@ class AssumptionAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AssumptionAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : AssumptionAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

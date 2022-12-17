@@ -293,17 +293,18 @@ extern "C" int main(int argc, char *argv[]) {
       sep = ",\n";
 
       mx::Fragment frag = mx::Fragment::containing(decl);
-      mx::File file = mx::File::containing(frag);
-      auto file_path = file_paths.find(file.id());
-
       llvm::outs() << '"' << decl.id().Pack() << "\": ";
 
       llvm::json::Object obj;
       obj["kind"] = mx::EnumeratorName(decl.kind());
-      obj["file"] = file_path->second.generic_string();
-      if (auto line_col = decl.token().nearest_location(cache)) {
-        obj["line"] = line_col->first;
-        obj["column"] = line_col->second;
+
+      if (auto file = mx::File::containing(frag)) {
+        auto file_path = file_paths.find(file->id());
+        obj["file"] = file_path->second.generic_string();
+        if (auto line_col = decl.token().nearest_location(cache)) {
+          obj["line"] = line_col->first;
+          obj["column"] = line_col->second;
+        }
       }
 
       DumpDeclToJSON(obj, std::move(decl), wl);

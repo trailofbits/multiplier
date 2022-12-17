@@ -16,6 +16,7 @@
 #include "Use.h"
 #include "Fragment.h"
 #include "Query.h"
+#include "Entities/Macro.h"
 #include "Entities/NamedDecl.h"
 
 namespace mx {
@@ -29,8 +30,10 @@ class FileImpl;
 class FileListImpl;
 class Fragment;
 class FragmentImpl;
+class IncludeLikeMacroDirective;
 class Index;
 class InvalidEntityProvider;
+class ReadMacroTokensFromFragment;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
@@ -70,6 +73,13 @@ ParentStmtIteratorImpl<T>::operator++(void) & {
   return *this;
 }
 
+template <typename T>
+inline ParentMacroIteratorImpl<T> &
+ParentMacroIteratorImpl<T>::operator++(void) & {
+  impl = impl->parent();
+  return *this;
+}
+
 // Provides the APIs with entities.
 class EntityProvider {
  public:
@@ -92,9 +102,12 @@ class EntityProvider {
   friend class FileListImpl;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class IncludeLikeMacroDirective;
   friend class Index;
+  friend class Macro;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
+  friend class ReadMacroTokensFromFragment;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class RegexQueryResultImpl;
@@ -176,9 +189,8 @@ class EntityProvider {
                           std::vector<RawEntityId> &ids_out) = 0;
 };
 
-using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
-                                   Token, MacroSubstitution,
-                                   Designator, Fragment, File>;
+using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
+                                   Token, Designator, Fragment, File>;
 
 // Access to the indexed code.
 class Index {

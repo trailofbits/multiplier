@@ -43,8 +43,8 @@ class DependentAddressSpaceType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : DependentAddressSpaceType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : DependentAddressSpaceType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

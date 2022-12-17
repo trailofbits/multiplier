@@ -13,7 +13,6 @@
 
 #ifndef MX_DISABLE_RE2
 
-
 #include <re2/re2.h>
 
 namespace mx {

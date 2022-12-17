@@ -24,13 +24,9 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class TokenContext;
-class TokenList;
-class TokenListIterator;
+class TokenRangeIterator;
 class TokenRange;
 class TokenReader;
-class MacroSubstitutionList;
-class MacroSubstitutionListImpl;
-class MacroSubstitutionListIterator;
 
 enum class TokenKind : unsigned short;
 using TokenUse = Use<TokenUseSelector>;
@@ -43,10 +39,8 @@ class Token {
   friend class FragmentImpl;
   friend class Index;
   friend class TokenContext;
-  friend class TokenList;
-  friend class TokenListIterator;
+  friend class TokenRangeIterator;
   friend class TokenRange;
-  friend class MacroSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
   unsigned offset;
@@ -60,15 +54,6 @@ class Token {
 
   // Return `true` if this is a valid token.
   operator bool(void) const;
-
-  // Return the list of parsed tokens in the fragment. This doesn't
-  // include all tokens, i.e. macro use tokens, comments, etc.
-  __attribute__((deprecated("Switch to Fragment::parsed_tokens")))
-  static TokenList in(const Fragment &);
-
-  // Return the list of tokens in this file.
-  __attribute__((deprecated("Switch to File::tokens")))
-  static TokenList in(const File &);
 
   // Kind of this token.
   TokenKind kind(void) const;
@@ -120,18 +105,17 @@ class Token {
 };
 
 // Forward-only iterator over a sequence of tokens.
-class TokenListIterator {
+class TokenRangeIterator {
  private:
-  friend class TokenList;
   friend class TokenRange;
 
   Token impl;
   unsigned num_tokens;
 
-  bool operator==(const TokenListIterator &) = delete;
-  bool operator!=(const TokenListIterator &) = delete;
+  bool operator==(const TokenRangeIterator &) = delete;
+  bool operator!=(const TokenRangeIterator &) = delete;
 
-  inline TokenListIterator(std::shared_ptr<const class TokenReader> impl_,
+  inline TokenRangeIterator(std::shared_ptr<const class TokenReader> impl_,
                            unsigned index_, unsigned num_tokens_)
       : impl(std::move(impl_), index_),
         num_tokens(num_tokens_) {}
@@ -162,20 +146,20 @@ class TokenListIterator {
   }
 
   // Pre-increment.
-  inline TokenListIterator operator++(void) && noexcept {
+  inline TokenRangeIterator operator++(void) && noexcept {
     auto next_offset = impl.offset + 1u;
-    return TokenListIterator(std::move(impl.impl), next_offset, num_tokens);
+    return TokenRangeIterator(std::move(impl.impl), next_offset, num_tokens);
   }
 
   // Pre-increment.
-  inline TokenListIterator &operator++(void) & noexcept {
+  inline TokenRangeIterator &operator++(void) & noexcept {
     ++impl.offset;
     return *this;
   }
 
   // Post-increment.
-  inline TokenListIterator operator++(int) noexcept {
-    return TokenListIterator(impl.impl, impl.offset++, num_tokens);
+  inline TokenRangeIterator operator++(int) noexcept {
+    return TokenRangeIterator(impl.impl, impl.offset++, num_tokens);
   }
 };
 
@@ -185,10 +169,9 @@ class TokenRange {
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class Macro;
   friend class RegexQueryResultIterator;
   friend class WeggliQueryResultIterator;
-  friend class TokenList;
-  friend class MacroSubstitutionListIterator;
 
   std::shared_ptr<const TokenReader> impl;
   unsigned index;
@@ -234,20 +217,20 @@ class TokenRange {
   std::string_view data(void) const &;
 
   // Return an iterator pointing at the first token in this list.
-  inline TokenListIterator begin(void) && noexcept {
-    return TokenListIterator(std::move(impl), index, num_tokens);
+  inline TokenRangeIterator begin(void) && noexcept {
+    return TokenRangeIterator(std::move(impl), index, num_tokens);
   }
 
   // Return an iterator pointing at the first token in this list.
-  inline TokenListIterator begin(void) const & noexcept {
-    return TokenListIterator(impl, index, num_tokens);
+  inline TokenRangeIterator begin(void) const & noexcept {
+    return TokenRangeIterator(impl, index, num_tokens);
   }
 
-  inline TokenListIterator::EndIteratorType end(void) && noexcept {
+  inline TokenRangeIterator::EndIteratorType end(void) && noexcept {
     return {};
   }
 
-  inline TokenListIterator::EndIteratorType end(void) const & noexcept {
+  inline TokenRangeIterator::EndIteratorType end(void) const & noexcept {
     return {};
   }
 
@@ -275,35 +258,6 @@ class TokenRange {
 
   // Strip leading and trailing whitespace.
   TokenRange strip_whitespace(void) const noexcept;
-};
-
-// List of tokens.
-class TokenList : public TokenRange {
- private:
-  friend class File;
-  friend class Fragment;
-  friend class FragmentImpl;
-  friend class Token;
-  friend class MacroSubstitutionListIterator;
-
-  inline TokenList(std::shared_ptr<const TokenReader> impl_,
-                   unsigned num_tokens_)
-      : TokenRange(std::move(impl_), 0, num_tokens_) {}
-
- public:
-  TokenList(void) = default;
-
-  TokenList(const TokenList &) = default;
-  TokenList(TokenList &&) noexcept = default;
-
-  TokenList &operator=(const TokenList &) = default;
-  TokenList &operator=(TokenList &&) noexcept = default;
-
-  // Return the token list containing a particular token.
-  static TokenList containing(Token tok);
-
-  // Return the token list containing a particular token range.
-  static TokenList containing(const TokenRange &range);
 };
 
 }  // namespace mx

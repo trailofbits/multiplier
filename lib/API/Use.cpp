@@ -36,6 +36,7 @@ namespace {
 #define MX_BEGIN_VISIT_STMT(name) DECLARE_FIND_READER_USES(Stmt, name)
 #define MX_BEGIN_VISIT_TYPE(name) DECLARE_FIND_READER_USES(Type, name)
 #define MX_BEGIN_VISIT_ATTR(name) DECLARE_FIND_READER_USES(Attr, name)
+#define MX_BEGIN_VISIT_MACRO(name) DECLARE_FIND_READER_USES(Macro, name)
 #define MX_BEGIN_VISIT_PSEUDO(name) DECLARE_FIND_READER_USES(Pseudo, name)
 
 #include <multiplier/Visitor.inc.h>
@@ -60,15 +61,31 @@ namespace {
 #define MX_BEGIN_VISIT_STMT(name) DEFINE_FIND_READER_KIND_USES(Stmt, name)
 #define MX_BEGIN_VISIT_TYPE(name) DEFINE_FIND_READER_KIND_USES(Type, name)
 #define MX_BEGIN_VISIT_ATTR(name) DEFINE_FIND_READER_KIND_USES(Attr, name)
+#define MX_BEGIN_VISIT_MACRO(name) DEFINE_FIND_READER_KIND_USES(Macro, name)
 #define MX_BEGIN_VISIT_PSEUDO(name) DEFINE_FIND_READER_KIND_USES(Pseudo, name)
 #define MX_END_VISIT_DECL(name) }
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #define MX_END_VISIT_ATTR MX_END_VISIT_DECL
+#define MX_END_VISIT_MACRO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
 }  // namespace
+
+const char *EnumeratorName(UseKind kind) {
+  switch (kind) {
+    case UseKind::DECLARATION: return "DECLARATION";
+    case UseKind::STATEMENT: return "STATEMENT";
+    case UseKind::TYPE: return "TYPE";
+    case UseKind::CXX_BASE_SPECIFIER: return "CXX_BASE_SPECIFIER";
+    case UseKind::TEMPLATE_ARGUMENT: return "TEMPLATE_ARGUMENT";
+    case UseKind::TEMPLATE_PARAMETER_LIST: return "TEMPLATE_PARAMETER_LIST";
+    case UseKind::DESIGNATOR: return "DESIGNATOR";
+    case UseKind::ATTRIBUTE: return "ATTRIBUTE";
+    case UseKind::MACRO: return "MACRO";
+  }
+}
 
 void BaseUseIteratorImpl::FillAndUniqueFragmentIds(void) {
 
@@ -117,6 +134,12 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  search_ids.push_back(entity.id());
+  fragment_ids.push_back(entity.fragment->fragment_id);
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   search_ids.push_back(entity.id());
   fragment_ids.push_back(entity.fragment->fragment_id);
@@ -246,6 +269,35 @@ bool UseIteratorImpl::FindNextAttr(UseIteratorBase &self) {
   return false;
 }
 
+bool UseIteratorImpl::FindNextMacro(UseIteratorBase &self) {
+  while (self.list_offset < self.use.fragment->num_macros) {
+    self.use.offset = self.list_offset++;
+    mx::ast::Macro::Reader reader = self.use.fragment->NthMacro(self.use.offset);
+    bool found = false;
+
+    self.use.selectors.reset();
+
+    for (auto eid : search_ids) {
+      switch (Get_Macro_Kind(reader)) {
+
+#define MX_BEGIN_VISIT_ABSTRACT_MACRO(name)
+#define MX_BEGIN_VISIT_MACRO(name) \
+    case name::static_kind(): \
+      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      break;
+
+#include <multiplier/Visitor.inc.h>
+
+      }
+    }
+
+    if (found) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
   while (self.list_offset < self.use.fragment->num_pseudos) {
@@ -334,6 +386,15 @@ bool UseIteratorImpl::FindNext(UseIteratorBase &self) {
           return true;
         } else {
           // Skip to next list; didn't find.
+          self.use.kind = UseKind::MACRO;
+          self.list_offset = 0u;
+          continue;
+        }
+      case UseKind::MACRO:
+        if (FindNextMacro(self)) {
+          return true;
+        } else {
+          // Skip to next list; didn't find.
           self.use.kind = UseKind::CXX_BASE_SPECIFIER;
           self.list_offset = 0u;
           continue;
@@ -390,6 +451,12 @@ UseBase::UseBase(Attr entity, UseSelectorSet selectors_)
       offset(entity.offset_),
       kind(UseKind::ATTRIBUTE) {}
 
+UseBase::UseBase(Macro entity, UseSelectorSet selectors_)
+    : selectors(std::move(selectors_)),
+      fragment(std::move(entity.fragment)),
+      offset(entity.offset_),
+      kind(UseKind::MACRO) {}
+
 UseBase::UseBase(Designator entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
@@ -434,6 +501,12 @@ VariantUse UseBase::entity(void) const {
     case UseKind::TYPE:
       if (offset < fragment->num_types) {
         return Type(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::MACRO:
+      if (offset < fragment->num_types) {
+        return Macro(fragment, offset);
       } else {
         return NotAnEntity{};
       }
@@ -499,6 +572,14 @@ std::optional<Type> UseBase::as_type(void) const {
 std::optional<Attr> UseBase::as_attribute(void) const {
   if (kind == UseKind::ATTRIBUTE && fragment && offset < fragment->num_attrs) {
     return Attr(fragment, offset);
+  } else {
+    return std::nullopt;
+  }
+}
+
+std::optional<Macro> UseBase::as_macro(void) const {
+  if (kind == UseKind::MACRO && fragment && offset < fragment->num_macros) {
+    return Macro(fragment, offset);
   } else {
     return std::nullopt;
   }

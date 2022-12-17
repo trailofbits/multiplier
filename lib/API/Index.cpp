@@ -13,7 +13,6 @@
 
 #include "File.h"
 #include "Fragment.h"
-#include "Macro.h"
 
 namespace mx {
 
@@ -115,9 +114,9 @@ std::optional<Fragment> Index::fragment_containing(EntityId id) const {
     ptr = impl->FragmentFor(
         impl, std::get<mx::DesignatorId>(opt_id).fragment_id);
 
-  } else if (std::holds_alternative<mx::MacroSubstitutionId>(opt_id)) {
+  } else if (std::holds_alternative<mx::MacroId>(opt_id)) {
     ptr = impl->FragmentFor(
-        impl, std::get<mx::MacroSubstitutionId>(opt_id).fragment_id);
+        impl, std::get<mx::MacroId>(opt_id).fragment_id);
   }
 
   if (ptr) {
@@ -194,7 +193,7 @@ VariantEntity Index::entity(EntityId eid) const {
     assert(id == EntityId(id));
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
         frag_ptr && id.offset < frag_ptr->num_parsed_tokens) {
-      Token tok(frag_ptr->TokenReader(frag_ptr), id.offset);
+      Token tok(frag_ptr->ParsedTokenReader(frag_ptr), id.offset);
       if (tok.id() == eid) {
         return tok;
       } else {
@@ -207,9 +206,8 @@ VariantEntity Index::entity(EntityId eid) const {
     MacroTokenId id = std::get<MacroTokenId>(vid);
     assert(id == EntityId(id));
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
-        frag_ptr && frag_ptr->num_parsed_tokens <= id.offset &&
-        id.offset < frag_ptr->num_tokens) {
-      Token tok(frag_ptr->TokenReader(frag_ptr), id.offset);
+        frag_ptr && id.offset < frag_ptr->num_tokens) {
+      Token tok(frag_ptr->MacroTokenReader(frag_ptr), id.offset);
       if (tok.id() == eid) {
         return tok;
       } else {
@@ -217,15 +215,19 @@ VariantEntity Index::entity(EntityId eid) const {
       }
     }
 
-
   // It's a reference to a token substitution.
-  } else if (std::holds_alternative<MacroSubstitutionId>(vid)) {
-    MacroSubstitutionId id = std::get<MacroSubstitutionId>(vid);
+  } else if (std::holds_alternative<MacroId>(vid)) {
+    MacroId id = std::get<MacroId>(vid);
     assert(id == EntityId(id));
 
     if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, id.fragment_id);
-        frag_ptr && id.offset < frag_ptr->num_substitutions) {
-      return MacroSubstitution(frag_ptr, id.offset, id.kind);
+        frag_ptr && id.offset < frag_ptr->num_macros) {
+      Macro macro(frag_ptr, id.offset);
+      if (macro.id() == eid) {
+        return macro;
+      } else {
+        assert(false);
+      }
     }
 
   // It's a reference to a file token.

@@ -39,7 +39,7 @@ bool IsParsedToken(const pasta::Token &tok) {
   switch (tok.Role()) {
     case pasta::TokenRole::kFileToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
-      return true;
+      return !tok.Data().empty();
 
     default:
       return false;
@@ -231,7 +231,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
   }
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
-    if (IsWhitespaceOrEmpty(entity.Data())) {
+    auto data = entity.Data();
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
       return mx::TokenKind::WHITESPACE;
     }
   }
@@ -255,7 +256,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   }
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
-    if (IsWhitespaceOrEmpty(entity.Data())) {
+    auto data = entity.Data();
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
       return mx::TokenKind::WHITESPACE;
     }
   }
@@ -265,13 +267,7 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
-  auto kind = mx::FromPasta(entity.TokenKind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    if (IsWhitespaceOrEmpty(entity.Data())) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+  return TokenKindFromPasta(entity.ParsedLocation());
 }
 
 namespace {

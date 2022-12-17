@@ -46,8 +46,8 @@ class OMPCanonicalLoop : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPCanonicalLoop::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPCanonicalLoop::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

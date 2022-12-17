@@ -45,8 +45,8 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : DependentTemplateSpecializationType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : DependentTemplateSpecializationType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

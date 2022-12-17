@@ -39,6 +39,7 @@ class Stmt {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class StmtIterator;
@@ -93,8 +94,8 @@ class Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Stmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : Stmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

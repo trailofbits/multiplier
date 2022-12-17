@@ -48,8 +48,8 @@ class SwiftIndirectResultAttr : public ParameterABIAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SwiftIndirectResultAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SwiftIndirectResultAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -6,6 +6,8 @@
 
 #include <glog/logging.h>
 
+#include <multiplier/Entities/MacroKind.h>
+
 #include "Context.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
@@ -65,6 +67,10 @@ class EntityLabeller final : public EntityVisitor {
   //            serialized into fragments, and how token trees are serialized
   //            into fragments.
   bool Label(const pasta::Token &entity);
+
+  // Create initial macro IDs for all of the top-level macros in the range of
+  // this fragment.
+  bool Label(const pasta::Macro &entity);
 };
 
 bool EntityLabeller::Enter(const pasta::Decl &entity) {
@@ -165,8 +171,25 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
   id.fragment_id = fragment.fragment_id;
   id.kind = TokenKindFromPasta(entity);
 
-  if (entity_ids.emplace(entity.RawToken(), id).second) {
+  return entity_ids.emplace(entity.RawToken(), id).second;
+}
+
+// Create initial macro IDs for all of the top-level macros in the range of
+// this fragment.
+bool EntityLabeller::Label(const pasta::Macro &entity) {
+  mx::MacroId id;
+  id.kind = mx::FromPasta(entity.Kind());
+  id.fragment_id = fragment.fragment_id;
+  id.offset = static_cast<uint32_t>(fragment.macros_to_serialize.size());
+
+  // If we added this node (we should have), then add in a `nullopt` reservation
+  // to `macros_to_serialize`.
+  //
+  // NOTE(pag): `CountSubstitutions` in Persist.cpp fills in the empty slots.
+  if (entity_ids.emplace(entity.RawMacro(), id).second) {
+    fragment.macros_to_serialize.emplace_back();
     return true;
+
   } else {
     return false;
   }
@@ -202,6 +225,10 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
   // belong there.
   for (const pasta::Decl &decl : top_level_decls) {
     (void) labeller.Accept(decl);
+  }
+
+  for (const pasta::Macro &macro : top_level_macros) {
+    (void) labeller.Label(macro);
   }
 }
 

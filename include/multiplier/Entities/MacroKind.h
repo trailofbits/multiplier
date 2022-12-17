@@ -11,11 +11,11 @@
 #include <cstdint>
 
 namespace mx {
-enum class MacroNodeKind : unsigned char {
-  INVALID,
-  TOKEN,
-  EXPANSION,
+enum class MacroKind : unsigned char {
   SUBSTITUTION,
+  EXPANSION,
+  ARGUMENT,
+  PARAMETER,
   OTHER_DIRECTIVE,
   IF_DIRECTIVE,
   IF_DEFINED_DIRECTIVE,
@@ -32,18 +32,20 @@ enum class MacroNodeKind : unsigned char {
   INCLUDE_NEXT_DIRECTIVE,
   INCLUDE_MACROS_DIRECTIVE,
   IMPORT_DIRECTIVE,
-  ARGUMENT,
-  PARAMETER,
+  STRINGIFY,
+  CONCATENATE,
+  VA_OPT,
+  VA_OPT_ARGUMENT,
 };
 
-inline static const char *EnumerationName(MacroNodeKind) {
-  return "MacroNodeKind";
+inline static const char *EnumerationName(MacroKind) {
+  return "MacroKind";
 }
 
-inline static constexpr unsigned NumEnumerators(MacroNodeKind) {
-  return 22;
+inline static constexpr unsigned NumEnumerators(MacroKind) {
+  return 24;
 }
 
-const char *EnumeratorName(MacroNodeKind);
+const char *EnumeratorName(MacroKind);
 
 } // namespace mx

@@ -52,8 +52,8 @@ class RecordDecl : public TagDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : RecordDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : RecordDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

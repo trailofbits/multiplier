@@ -50,8 +50,8 @@ class OMPSimdDirective : public OMPLoopDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPSimdDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPSimdDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

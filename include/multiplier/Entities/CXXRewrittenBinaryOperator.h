@@ -49,8 +49,8 @@ class CXXRewrittenBinaryOperator : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXRewrittenBinaryOperator::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXRewrittenBinaryOperator::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

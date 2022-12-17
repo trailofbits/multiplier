@@ -35,10 +35,10 @@ extern "C" int main(int argc, char *argv[]) {
   mx::Decl decl = std::get<mx::Decl>(maybe_decl);
   for (mx::Decl redecl : decl.redeclarations()) {
     mx::Fragment fragment = mx::Fragment::containing(redecl);
-    mx::File file = mx::File::containing(fragment);
+    auto file = mx::File::containing(fragment);
 
     std::cout
-        << file.id() << '\t'
+        << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
         << fragment.id() << '\t'
         << redecl.id() << '\t'
         << (redecl.is_definition() ? "def\t" : "decl\t")
@@ -48,8 +48,8 @@ extern "C" int main(int argc, char *argv[]) {
       std::cout << '\t' << named_redecl->name();
     }
 
-    if (FLAGS_show_locations) {
-      std::cout << '\t' << file_paths[file.id()].generic_string();
+    if (FLAGS_show_locations && file) {
+      std::cout << '\t' << file_paths[file->id()].generic_string();
       if (auto tok = redecl.token()) {
         if (auto line_col = tok.location(location_cache)) {
           std::cout << '\t' << line_col->first << '\t' << line_col->second;

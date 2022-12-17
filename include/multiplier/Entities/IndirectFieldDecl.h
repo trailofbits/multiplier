@@ -51,8 +51,8 @@ class IndirectFieldDecl : public ValueDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : IndirectFieldDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : IndirectFieldDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -434,8 +434,10 @@ extern "C" int main(int argc, char *argv[]) {
     mx::TokenRange frag_file_toks = frag.file_tokens();
     if (frag_file_toks.size()) {
       mx::Token last_frag_file_tok = frag_file_toks.back();
-      mx::TokenRange file_toks =
-          mx::File::containing(last_frag_file_tok)->tokens();
+      mx::TokenRange file_toks;
+      if (auto file = mx::File::containing(last_frag_file_tok)) {
+        file_toks = file->tokens();
+      }
       mx::FileTokenId lti = std::get<mx::FileTokenId>(
           mx::EntityId(last_frag_file_tok.id()).Unpack());
 

@@ -56,6 +56,7 @@ class Type {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
@@ -107,8 +108,8 @@ class Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Type::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : Type::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

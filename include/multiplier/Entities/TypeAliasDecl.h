@@ -52,8 +52,8 @@ class TypeAliasDecl : public TypedefNameDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : TypeAliasDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : TypeAliasDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

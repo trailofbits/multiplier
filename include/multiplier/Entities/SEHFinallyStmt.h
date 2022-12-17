@@ -45,8 +45,8 @@ class SEHFinallyStmt : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SEHFinallyStmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SEHFinallyStmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

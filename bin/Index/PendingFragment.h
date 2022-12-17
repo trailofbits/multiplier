@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "Context.h"
+#include "TokenTree.h"
 
 namespace indexer {
 
@@ -32,6 +33,7 @@ using Pseudo = std::variant<pasta::TemplateArgument,
 class EntityMapper;
 class GlobalIndexingState;
 class NameMangler;
+class TokenTree;
 
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
@@ -48,7 +50,7 @@ class PendingFragment {
 
   // Top-level declarations. These are the roots of serialization.
   std::vector<pasta::Decl> top_level_decls;
-  std::vector<pasta::MacroNode> top_level_macros;
+  std::vector<pasta::Macro> top_level_macros;
 
   // Offsets of the serialized version of types in this fragment.
   //
@@ -71,7 +73,7 @@ class PendingFragment {
 
   // Macros, declarations, statements, types, and pseudo-entities to serialize,
   // in their order of appearance and serialization.
-  std::vector<pasta::MacroNode> macros_to_serialize;
+  std::vector<std::optional<TokenTree>> macros_to_serialize;
   std::vector<pasta::Decl> decls_to_serialize;
   std::vector<pasta::Stmt> stmts_to_serialize;
   std::vector<pasta::Type> types_to_serialize;

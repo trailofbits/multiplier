@@ -48,8 +48,8 @@ class RedeclarableTemplateDecl : public TemplateDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : RedeclarableTemplateDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : RedeclarableTemplateDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

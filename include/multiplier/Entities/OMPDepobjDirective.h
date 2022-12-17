@@ -46,8 +46,8 @@ class OMPDepobjDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPDepobjDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPDepobjDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

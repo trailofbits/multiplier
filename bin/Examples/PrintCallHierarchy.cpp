@@ -68,20 +68,20 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   Indent(std::cout, depth);
     
   mx::Fragment fragment = mx::Fragment::containing(entity);
-  mx::File file = mx::File::containing(fragment);
+  auto file = mx::File::containing(fragment);
 
   if (auto named = mx::NamedDecl::from(entity)) {
     std::cout << named->name() << '\t';
   }
 
   std::cout
-      << file.id() << '\t'
+      << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
       << fragment.id() << '\t'
       << entity.id() << '\t'
       << mx::EnumeratorName(entity.kind());
 
-  if (FLAGS_show_locations) {
-    std::cout << '\t' << file_paths[file.id()].generic_string();
+  if (FLAGS_show_locations && file) {
+    std::cout << '\t' << file_paths[file->id()].generic_string();
     if (auto tok = entity.token()) {
       if (auto line_col = tok.location(location_cache)) {
         std::cout << '\t' << line_col->first << '\t' << line_col->second;

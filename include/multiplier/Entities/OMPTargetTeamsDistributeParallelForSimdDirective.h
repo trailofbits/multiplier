@@ -50,8 +50,8 @@ class OMPTargetTeamsDistributeParallelForSimdDirective : public OMPLoopDirective
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

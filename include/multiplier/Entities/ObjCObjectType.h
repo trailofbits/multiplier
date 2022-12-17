@@ -44,8 +44,8 @@ class ObjCObjectType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCObjectType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCObjectType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

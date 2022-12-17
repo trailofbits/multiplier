@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
+#include <optional>
 
 namespace pasta {
 class Decl;
@@ -784,11 +784,40 @@ class Ptr32Attr;
 class Ptr64Attr;
 class SPtrAttr;
 class AlwaysInlineAttr;
+class Macro;
+class MacroDirective;
+class IncludeLikeMacroDirective;
+class OtherMacroDirective;
+class IfMacroDirective;
+class IfDefinedMacroDirective;
+class IfNotDefinedMacroDirective;
+class ElseIfMacroDirective;
+class ElseIfDefinedMacroDirective;
+class ElseIfNotDefinedMacroDirective;
+class ElseMacroDirective;
+class EndIfMacroDirective;
+class UndefineMacroDirective;
+class PragmaMacroDirective;
+class IncludeMacroDirective;
+class IncludeNextMacroDirective;
+class IncludeMacrosMacroDirective;
+class ImportMacroDirective;
+class MacroParameter;
+class DefineMacroDirective;
+class MacroArgument;
+class MacroSubstitution;
+class MacroExpansion;
+class MacroStringify;
+class MacroConcatenate;
+class MacroVAOpt;
+class MacroVAOptArgument;
 class Token;
 class TokenRange;
 class CXXBaseSpecifier;
 class TemplateArgument;
 class TemplateParameterList;
+class MacroToken;
+class MacroRange;
 class Designator;
 class FileToken;
 enum class TokenRole : unsigned short;
@@ -1332,7 +1361,7 @@ enum class VectorLibrary : unsigned;
 enum class Visibility : unsigned;
 enum class AttributeSyntax : unsigned;
 enum class DeclCategory : unsigned;
-enum class MacroNodeKind : unsigned char;
+enum class MacroKind : unsigned char;
 enum class PathKind : signed char;
 enum class FileType : signed char;
 enum class CompilerName : unsigned;
@@ -1342,6 +1371,7 @@ enum class PseudoKind : unsigned char;
 }  // namespace pasta
 namespace indexer {
 class EntityMapper;
+class TokenTree;
 void SerializeDecl(EntityMapper &, mx::ast::Decl::Builder, const pasta::Decl &);
 void SerializeEmptyDecl(EntityMapper &, mx::ast::Decl::Builder, const pasta::EmptyDecl &);
 void SerializeExportDecl(EntityMapper &, mx::ast::Decl::Builder, const pasta::ExportDecl &);
@@ -2114,6 +2144,33 @@ void SerializePtr32Attr(EntityMapper &, mx::ast::Attr::Builder, const pasta::Ptr
 void SerializePtr64Attr(EntityMapper &, mx::ast::Attr::Builder, const pasta::Ptr64Attr &);
 void SerializeSPtrAttr(EntityMapper &, mx::ast::Attr::Builder, const pasta::SPtrAttr &);
 void SerializeAlwaysInlineAttr(EntityMapper &, mx::ast::Attr::Builder, const pasta::AlwaysInlineAttr &);
+void SerializeMacro(EntityMapper &, mx::ast::Macro::Builder, const pasta::Macro &, const TokenTree *tt);
+void SerializeMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroDirective &, const TokenTree *tt);
+void SerializeIncludeLikeMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IncludeLikeMacroDirective &, const TokenTree *tt);
+void SerializeOtherMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::OtherMacroDirective &, const TokenTree *tt);
+void SerializeIfMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IfMacroDirective &, const TokenTree *tt);
+void SerializeIfDefinedMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IfDefinedMacroDirective &, const TokenTree *tt);
+void SerializeIfNotDefinedMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IfNotDefinedMacroDirective &, const TokenTree *tt);
+void SerializeElseIfMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::ElseIfMacroDirective &, const TokenTree *tt);
+void SerializeElseIfDefinedMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::ElseIfDefinedMacroDirective &, const TokenTree *tt);
+void SerializeElseIfNotDefinedMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::ElseIfNotDefinedMacroDirective &, const TokenTree *tt);
+void SerializeElseMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::ElseMacroDirective &, const TokenTree *tt);
+void SerializeEndIfMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::EndIfMacroDirective &, const TokenTree *tt);
+void SerializeUndefineMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::UndefineMacroDirective &, const TokenTree *tt);
+void SerializePragmaMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::PragmaMacroDirective &, const TokenTree *tt);
+void SerializeIncludeMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IncludeMacroDirective &, const TokenTree *tt);
+void SerializeIncludeNextMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IncludeNextMacroDirective &, const TokenTree *tt);
+void SerializeIncludeMacrosMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IncludeMacrosMacroDirective &, const TokenTree *tt);
+void SerializeImportMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::ImportMacroDirective &, const TokenTree *tt);
+void SerializeMacroParameter(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroParameter &, const TokenTree *tt);
+void SerializeDefineMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::DefineMacroDirective &, const TokenTree *tt);
+void SerializeMacroArgument(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroArgument &, const TokenTree *tt);
+void SerializeMacroSubstitution(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroSubstitution &, const TokenTree *tt);
+void SerializeMacroExpansion(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroExpansion &, const TokenTree *tt);
+void SerializeMacroStringify(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroStringify &, const TokenTree *tt);
+void SerializeMacroConcatenate(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroConcatenate &, const TokenTree *tt);
+void SerializeMacroVAOpt(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroVAOpt &, const TokenTree *tt);
+void SerializeMacroVAOptArgument(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroVAOptArgument &, const TokenTree *tt);
 void SerializeCXXBaseSpecifier(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::CXXBaseSpecifier &);
 void SerializeTemplateArgument(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::TemplateArgument &);
 void SerializeTemplateParameterList(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::TemplateParameterList &);

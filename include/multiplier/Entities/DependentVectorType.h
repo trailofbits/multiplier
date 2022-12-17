@@ -44,8 +44,8 @@ class DependentVectorType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : DependentVectorType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : DependentVectorType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

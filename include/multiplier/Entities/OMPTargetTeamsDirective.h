@@ -46,8 +46,8 @@ class OMPTargetTeamsDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPTargetTeamsDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPTargetTeamsDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

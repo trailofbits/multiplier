@@ -43,8 +43,8 @@ class TagType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : TagType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : TagType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

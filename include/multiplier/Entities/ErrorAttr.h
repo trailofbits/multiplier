@@ -45,8 +45,8 @@ class ErrorAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ErrorAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ErrorAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

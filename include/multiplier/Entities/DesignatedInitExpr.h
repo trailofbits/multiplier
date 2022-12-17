@@ -49,8 +49,8 @@ class DesignatedInitExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : DesignatedInitExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : DesignatedInitExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

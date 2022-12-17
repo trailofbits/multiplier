@@ -44,8 +44,8 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : MaxFieldAlignmentAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : MaxFieldAlignmentAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -44,8 +44,8 @@ class Ptr64Attr : public TypeAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Ptr64Attr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : Ptr64Attr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

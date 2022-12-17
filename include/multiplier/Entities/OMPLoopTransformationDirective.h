@@ -48,8 +48,8 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPLoopTransformationDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPLoopTransformationDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

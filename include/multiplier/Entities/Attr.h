@@ -36,6 +36,7 @@ class Attr {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
@@ -88,8 +89,8 @@ class Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Attr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : Attr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

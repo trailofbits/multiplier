@@ -49,8 +49,8 @@ class MSPropertyRefExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : MSPropertyRefExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : MSPropertyRefExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

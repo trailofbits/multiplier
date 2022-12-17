@@ -46,8 +46,8 @@ class OMPCancellationPointDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPCancellationPointDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPCancellationPointDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

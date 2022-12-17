@@ -9,11 +9,11 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <unordered_map>
+#include <variant>
 #include <vector>
 
 #include "File.h"
-#include "Macro.h"
+#include "Types.h"
 
 namespace mx {
 
@@ -38,7 +38,7 @@ class RegexQueryResultImpl;
 class RegexQueryResultIterator;
 class Stmt;
 class Token;
-class MacroSubstitutionListIterator;
+class Macro;
 class Type;
 class WeggliQuery;
 class WeggliQueryMatch;
@@ -46,6 +46,8 @@ class WeggliQueryResult;
 class WeggliQueryResultImpl;
 class WeggliQueryResultIterator;
 class WeggliQueryResultIterator;
+
+using MacroOrToken = std::variant<Macro, Token>;
 
 // Iterate over the fragments from a file.
 class FileFragmentListIterator {
@@ -152,7 +154,6 @@ class Fragment {
   friend class RegexQueryResultIterator;
   friend class Stmt;
   friend class Token;
-  friend class MacroSubstitutionListIterator;
   friend class Type;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
@@ -177,7 +178,7 @@ class Fragment {
   static Fragment containing(const Attr &);
   static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
-  static Fragment containing(const MacroSubstitution &);
+  static Fragment containing(const Macro &);
   static Fragment containing(const UseBase &);
   static Fragment containing(const Reference &);
 
@@ -188,14 +189,13 @@ class Fragment {
   TokenRange file_tokens(void) const;
 
   // The range of parsed tokens in this fragment.
-  TokenList parsed_tokens(void) const;
-
-  // Return the pre-processed code from this fragment.
-  std::optional<MacroSubstitution> preprocessed_code(void) const &;
-  std::optional<MacroSubstitution> preprocessed_code(void) const &&;
+  TokenRange parsed_tokens(void) const;
 
   // Return the list of top-level declarations in this fragment.
   std::vector<Decl> top_level_declarations(void) const;
+
+  // Return the list of top-level macros or macro tokens in this code.
+  std::vector<MacroOrToken> preprocessed_code(void) const;
 
   // Returns source IR for the fragment.
   std::optional<std::string_view> source_ir(void) const noexcept;

@@ -48,8 +48,8 @@ class ObjCSelectorExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCSelectorExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCSelectorExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

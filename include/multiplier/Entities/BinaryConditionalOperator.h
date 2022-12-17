@@ -51,8 +51,8 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : BinaryConditionalOperator::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : BinaryConditionalOperator::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

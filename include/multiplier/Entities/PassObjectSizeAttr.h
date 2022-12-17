@@ -47,8 +47,8 @@ class PassObjectSizeAttr : public InheritableParamAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : PassObjectSizeAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : PassObjectSizeAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

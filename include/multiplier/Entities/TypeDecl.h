@@ -48,8 +48,8 @@ class TypeDecl : public NamedDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : TypeDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : TypeDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

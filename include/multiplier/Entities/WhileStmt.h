@@ -49,8 +49,8 @@ class WhileStmt : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : WhileStmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : WhileStmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

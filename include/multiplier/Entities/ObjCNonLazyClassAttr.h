@@ -42,8 +42,8 @@ class ObjCNonLazyClassAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCNonLazyClassAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCNonLazyClassAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

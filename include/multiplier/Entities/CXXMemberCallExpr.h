@@ -54,8 +54,8 @@ class CXXMemberCallExpr : public CallExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXMemberCallExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXMemberCallExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

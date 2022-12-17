@@ -45,8 +45,8 @@ class ImportDecl : public Decl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ImportDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ImportDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

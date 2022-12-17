@@ -48,8 +48,8 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UnnamedGlobalConstantDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UnnamedGlobalConstantDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -44,8 +44,8 @@ class Mips16Attr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Mips16Attr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : Mips16Attr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

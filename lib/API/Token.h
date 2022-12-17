@@ -10,6 +10,9 @@
 
 namespace mx {
 
+class FragmentImpl;
+class FileImpl;
+
 class TokenReader {
  public:
   using Ptr = std::shared_ptr<const TokenReader>;
@@ -46,6 +49,9 @@ class TokenReader {
 
   static Ptr ReaderForToken(const Ptr &self, const EntityProvider::Ptr &ep,
                             EntityId eid);
+
+  virtual const FragmentImpl *OwningFragment(void) const noexcept;
+  virtual const FileImpl *OwningFile(void) const noexcept;
 };
 
 // Used for invalid tokens.

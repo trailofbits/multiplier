@@ -52,8 +52,8 @@ class CXXNamedCastExpr : public ExplicitCastExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXNamedCastExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXNamedCastExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

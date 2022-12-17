@@ -46,8 +46,8 @@ class UnresolvedUsingIfExistsDecl : public NamedDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UnresolvedUsingIfExistsDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UnresolvedUsingIfExistsDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

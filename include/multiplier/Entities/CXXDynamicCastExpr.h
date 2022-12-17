@@ -54,8 +54,8 @@ class CXXDynamicCastExpr : public CXXNamedCastExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXDynamicCastExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXDynamicCastExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

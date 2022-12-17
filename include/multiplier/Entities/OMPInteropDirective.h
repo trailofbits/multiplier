@@ -46,8 +46,8 @@ class OMPInteropDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPInteropDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPInteropDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

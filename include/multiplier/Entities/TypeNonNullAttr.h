@@ -44,8 +44,8 @@ class TypeNonNullAttr : public TypeAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : TypeNonNullAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : TypeNonNullAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -47,8 +47,8 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCCompatibleAliasDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCCompatibleAliasDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

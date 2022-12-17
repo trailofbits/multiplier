@@ -45,8 +45,8 @@ class UuidAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UuidAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UuidAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

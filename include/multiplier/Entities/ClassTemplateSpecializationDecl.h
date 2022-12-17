@@ -58,8 +58,8 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ClassTemplateSpecializationDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ClassTemplateSpecializationDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

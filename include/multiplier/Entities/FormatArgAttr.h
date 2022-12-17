@@ -44,8 +44,8 @@ class FormatArgAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : FormatArgAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : FormatArgAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

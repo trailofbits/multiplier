@@ -47,8 +47,8 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AlwaysInlineAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : AlwaysInlineAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

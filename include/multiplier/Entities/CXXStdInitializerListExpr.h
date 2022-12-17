@@ -48,8 +48,8 @@ class CXXStdInitializerListExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXStdInitializerListExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXStdInitializerListExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

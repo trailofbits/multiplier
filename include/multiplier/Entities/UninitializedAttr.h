@@ -44,8 +44,8 @@ class UninitializedAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UninitializedAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UninitializedAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -46,8 +46,8 @@ class OMPTargetExitDataDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPTargetExitDataDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPTargetExitDataDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

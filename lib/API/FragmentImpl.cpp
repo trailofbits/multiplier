@@ -27,7 +27,7 @@ std::optional<Token> FragmentImpl::TokenFor(
     // It's a token inside of the current fragment.
     if (tid.fragment_id == fragment_id) {
       if (tid.offset < num_parsed_tokens) {
-        Token tok(this->TokenReader(self), tid.offset);
+        Token tok(this->ParsedTokenReader(self), tid.offset);
         if (tok.id() == eid) {
           return tok;
         } else {
@@ -46,8 +46,8 @@ std::optional<Token> FragmentImpl::TokenFor(
 
     // It's a token inside of the current fragment.
     if (tid.fragment_id == fragment_id) {
-      if (num_parsed_tokens <= tid.offset && tid.offset < num_tokens) {
-        Token tok(this->TokenReader(self), tid.offset);
+      if (tid.offset < num_tokens) {
+        Token tok(this->MacroTokenReader(self), tid.offset);
         if (tok.id() == eid) {
           return tok;
         } else {
@@ -75,10 +75,10 @@ std::optional<Token> FragmentImpl::TokenFor(
   }
 
   if (can_fail) {
-    assert(false);
     return Token();
   }
 
+  assert(false);
   return std::nullopt;
 }
 
@@ -103,7 +103,7 @@ TokenRange FragmentImpl::TokenRangeFor(
     // It's a token inside of the current fragment.
     if (bfid.fragment_id == fragment_id) {
       if (efid.offset < num_parsed_tokens) {
-        return TokenRange(this->TokenReader(self),
+        return TokenRange(this->ParsedTokenReader(self),
                           bfid.offset, efid.offset + 1u);
       }
 
@@ -129,8 +129,8 @@ TokenRange FragmentImpl::TokenRangeFor(
 
     // It's a token inside of the current fragment.
     if (bfid.fragment_id == fragment_id) {
-      if (bfid.offset >= num_parsed_tokens && efid.offset < num_tokens) {
-        return TokenRange(this->TokenReader(self),
+      if (efid.offset < num_tokens) {
+        return TokenRange(this->MacroTokenReader(self),
                           bfid.offset, efid.offset + 1u);
       }
 
@@ -182,9 +182,8 @@ std::optional<Decl> FragmentImpl::DeclFor(
       }
 
     // It's a decl inside of another fragment, go get the other fragment.
-    } else {
-      auto frag = ep->FragmentFor(ep, decl_id.fragment_id);
-      if (frag && decl_id.offset < frag->num_decls) {
+    } else if (auto frag = ep->FragmentFor(ep, decl_id.fragment_id)) {
+      if (decl_id.offset < frag->num_decls) {
         Decl decl(std::move(frag), decl_id.offset);
         if (decl.id() == eid) {
           return decl;
@@ -195,11 +194,7 @@ std::optional<Decl> FragmentImpl::DeclFor(
     }
   }
 
-  if (!can_fail) {
-    // TODO(pag): Check version number, do back-off to wait for indexer to
-    //            finish. 
-  }
-
+  assert(!can_fail);
   return std::nullopt;
 }
 
@@ -222,9 +217,8 @@ std::optional<Stmt> FragmentImpl::StmtFor(
         }
       }
     // It's a statement inside of another fragment, go get the other fragment.
-    } else {
-      auto frag = ep->FragmentFor(ep, stmt_id.fragment_id);
-      if (frag && stmt_id.offset < frag->num_stmts) {
+    } else if (auto frag = ep->FragmentFor(ep, stmt_id.fragment_id)) {
+      if (stmt_id.offset < frag->num_stmts) {
         Stmt stmt(std::move(frag), stmt_id.offset);
         if (stmt.id() == eid) {
           return stmt;
@@ -235,11 +229,7 @@ std::optional<Stmt> FragmentImpl::StmtFor(
     }
   }
 
-  if (!can_fail) {
-    // TODO(pag): Check version number, do back-off to wait for indexer to
-    //            finish. 
-  }
-
+  assert(!can_fail);
   return std::nullopt;
 }
 
@@ -264,9 +254,8 @@ std::optional<Type> FragmentImpl::TypeFor(
       }
 
     // It's a type inside of another fragment, go get the other fragment.
-    } else {
-      auto frag = ep->FragmentFor(ep, type_id.fragment_id);
-      if (frag && type_id.offset < frag->num_types) {
+    } else if (auto frag = ep->FragmentFor(ep, type_id.fragment_id)) {
+      if (type_id.offset < frag->num_types) {
         Type type(std::move(frag), type_id.offset);
         if (type.id() == eid) {
           return type;
@@ -277,11 +266,44 @@ std::optional<Type> FragmentImpl::TypeFor(
     }
   }
 
-  if (!can_fail) {
-    // TODO(pag): Check version number, do back-off to wait for indexer to
-    //            finish. 
+  assert(!can_fail);
+  return std::nullopt;
+}
+
+// Return the attribute associated with a specific entity ID.
+std::optional<Macro> FragmentImpl::MacroFor(
+    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  VariantId vid = eid.Unpack();
+
+  // It's a fragment token.
+  if (std::holds_alternative<MacroId>(vid)) {
+    MacroId macro_id = std::get<MacroId>(vid);
+
+    // It's a type inside of the current fragment.
+    if (macro_id.fragment_id == fragment_id) {
+      if (macro_id.offset < num_macros) {
+        Macro macro(self, macro_id.offset);
+        if (macro.id() == eid) {
+          return macro;
+        } else {
+          assert(false);
+        }
+      }
+
+    // It's a type inside of another fragment, go get the other fragment.
+    } else if (auto frag = ep->FragmentFor(ep, macro_id.fragment_id)) {
+      if (macro_id.offset < frag->num_macros) {
+        Macro macro(std::move(frag), macro_id.offset);
+        if (macro.id() == eid) {
+          return macro;
+        } else {
+          assert(false);
+        }
+      }
+    }
   }
 
+  assert(!can_fail);
   return std::nullopt;
 }
 

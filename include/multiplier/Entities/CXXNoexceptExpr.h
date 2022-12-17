@@ -48,8 +48,8 @@ class CXXNoexceptExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXNoexceptExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXNoexceptExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

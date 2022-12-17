@@ -7452,30 +7452,28 @@ DeclCategory FromPasta(pasta::DeclCategory e) {
   }
 }
 
-MacroNodeKind FromPasta(pasta::MacroNodeKind e) {
+MacroKind FromPasta(pasta::MacroKind e) {
   switch (static_cast<unsigned char>(e)) {
-    case 0: return MacroNodeKind::INVALID;
-    case 1: return MacroNodeKind::TOKEN;
-    case 2: return MacroNodeKind::EXPANSION;
-    case 3: return MacroNodeKind::SUBSTITUTION;
-    case 4: return MacroNodeKind::OTHER_DIRECTIVE;
-    case 5: return MacroNodeKind::IF_DIRECTIVE;
-    case 6: return MacroNodeKind::IF_DEFINED_DIRECTIVE;
-    case 7: return MacroNodeKind::IF_NOT_DEFINED_DIRECTIVE;
-    case 8: return MacroNodeKind::ELSE_IF_DIRECTIVE;
-    case 9: return MacroNodeKind::ELSE_IF_DEFINED_DIRECTIVE;
-    case 10: return MacroNodeKind::ELSE_IF_NOT_DEFINED_DIRECTIVE;
-    case 11: return MacroNodeKind::ELSE_DIRECTIVE;
-    case 12: return MacroNodeKind::END_IF_DIRECTIVE;
-    case 13: return MacroNodeKind::DEFINE_DIRECTIVE;
-    case 14: return MacroNodeKind::UNDEFINE_DIRECTIVE;
-    case 15: return MacroNodeKind::PRAGMA_DIRECTIVE;
-    case 16: return MacroNodeKind::INCLUDE_DIRECTIVE;
-    case 17: return MacroNodeKind::INCLUDE_NEXT_DIRECTIVE;
-    case 18: return MacroNodeKind::INCLUDE_MACROS_DIRECTIVE;
-    case 19: return MacroNodeKind::IMPORT_DIRECTIVE;
-    case 20: return MacroNodeKind::ARGUMENT;
-    case 21: return MacroNodeKind::PARAMETER;
+    case 1: return MacroKind::SUBSTITUTION;
+    case 2: return MacroKind::EXPANSION;
+    case 3: return MacroKind::ARGUMENT;
+    case 4: return MacroKind::PARAMETER;
+    case 5: return MacroKind::OTHER_DIRECTIVE;
+    case 6: return MacroKind::IF_DIRECTIVE;
+    case 7: return MacroKind::IF_DEFINED_DIRECTIVE;
+    case 8: return MacroKind::IF_NOT_DEFINED_DIRECTIVE;
+    case 9: return MacroKind::ELSE_IF_DIRECTIVE;
+    case 10: return MacroKind::ELSE_IF_DEFINED_DIRECTIVE;
+    case 11: return MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE;
+    case 12: return MacroKind::ELSE_DIRECTIVE;
+    case 13: return MacroKind::END_IF_DIRECTIVE;
+    case 14: return MacroKind::DEFINE_DIRECTIVE;
+    case 15: return MacroKind::UNDEFINE_DIRECTIVE;
+    case 16: return MacroKind::PRAGMA_DIRECTIVE;
+    case 17: return MacroKind::INCLUDE_DIRECTIVE;
+    case 18: return MacroKind::INCLUDE_NEXT_DIRECTIVE;
+    case 19: return MacroKind::INCLUDE_MACROS_DIRECTIVE;
+    case 20: return MacroKind::IMPORT_DIRECTIVE;
     default: __builtin_unreachable();
   }
 }

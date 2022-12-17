@@ -47,8 +47,8 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPAllocateDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPAllocateDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

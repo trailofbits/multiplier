@@ -51,8 +51,8 @@ class DeclRefExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : DeclRefExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : DeclRefExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

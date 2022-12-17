@@ -48,8 +48,8 @@ class GCCAsmStmt : public AsmStmt {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : GCCAsmStmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : GCCAsmStmt::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

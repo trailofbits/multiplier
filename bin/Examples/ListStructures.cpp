@@ -24,12 +24,12 @@ static void PrintStructures(mx::Fragment fragment) {
     auto file = mx::File::containing(fragment);
 
     std::cout
-        << file.id() << '\t'
+        << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
         << fragment.id() << '\t' << tag.id() << '\t'
         << tag.name();
 
-    if (FLAGS_show_locations) {
-      std::cout << '\t' << file_paths[file.id()].generic_string();
+    if (FLAGS_show_locations && file) {
+      std::cout << '\t' << file_paths[file->id()].generic_string();
       if (auto tok = tag.token()) {
         if (auto line_col = tok.location(location_cache)) {
           std::cout << '\t' << line_col->first << '\t' << line_col->second;
@@ -42,8 +42,8 @@ static void PrintStructures(mx::Fragment fragment) {
     for (const mx::Decl &decl : tag.declarations_in_context()) {
       if (auto field = mx::NamedDecl::from(decl)) {
         std::cout << "\t\t" << field->id() << '\t' << field->name();
-        if (FLAGS_show_locations) {
-          std::cout << '\t' << file_paths[file.id()].generic_string();
+        if (FLAGS_show_locations && file) {
+          std::cout << '\t' << file_paths[file->id()].generic_string();
           if (auto tok = field->token()) {
             if (auto line_col = tok.location(location_cache)) {
               std::cout << '\t' << line_col->first << '\t' << line_col->second;

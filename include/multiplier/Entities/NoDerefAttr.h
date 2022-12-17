@@ -44,8 +44,8 @@ class NoDerefAttr : public TypeAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : NoDerefAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : NoDerefAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -42,8 +42,8 @@ class AbiTagAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AbiTagAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : AbiTagAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

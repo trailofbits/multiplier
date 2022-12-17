@@ -22,7 +22,7 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
     return std::nullopt;
   }
 
-  auto frag = dynamic_cast<const PackedFragmentImpl *>(tok.impl.get());
+  const FragmentImpl *frag = tok.impl->OwningFragment();
   if (!frag) {
     return std::nullopt;
   }
@@ -32,15 +32,21 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
     return std::nullopt;
   }
 
-  FragmentReader frag_reader = frag->Fragment();
-  unsigned tagged_offset = frag_reader.getTokenContextOffsets()[tok.offset];
+  // Make sure this is indeed a parsed token.
+  if (!std::holds_alternative<ParsedTokenId>(tok.id().Unpack())) {
+    return std::nullopt;
+  }
+
+  const FragmentReader &frag_reader = frag->Fragment();
+  unsigned tagged_offset =
+      frag_reader.getParsedTokenContextOffsets()[tok.offset];
   if (!(tagged_offset & 1u)) {
     assert(!tagged_offset);
     return std::nullopt;
   }
 
   unsigned offset = tagged_offset >> 1u;
-  auto contexts_reader = frag_reader.getTokenContexts();
+  auto contexts_reader = frag_reader.getParsedTokenContexts();
   if (offset >= contexts_reader.size()) {
     assert(false);
     return std::nullopt;
@@ -125,7 +131,7 @@ std::optional<TokenContext> TokenContext::aliasee(void) const {
     return std::nullopt;
 
   } else {
-    auto tc = impl->Fragment().getTokenContexts()[alias_offset.value()];
+    auto tc = impl->Fragment().getParsedTokenContexts()[alias_offset.value()];
     TokenContext ret(impl);
     assert(entity_id == tc.getEntityId());
     assert(!tc.getAliasIndex());
@@ -142,7 +148,7 @@ std::optional<TokenContext> TokenContext::parent(void) const {
     return std::nullopt;
   }
 
-  auto tc = impl->Fragment().getTokenContexts()[parent_offset.value()];
+  auto tc = impl->Fragment().getParsedTokenContexts()[parent_offset.value()];
 
   // NOTE(pag): `+1` to skip `kInvalid`.
   TokenContext ret(impl);

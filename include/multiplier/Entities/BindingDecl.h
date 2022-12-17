@@ -50,8 +50,8 @@ class BindingDecl : public ValueDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : BindingDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : BindingDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

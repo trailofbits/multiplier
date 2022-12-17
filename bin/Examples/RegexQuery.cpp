@@ -74,9 +74,11 @@ extern "C" int main(int argc, char *argv[]) {
 
   for (const mx::RegexQueryMatch &match : results) {
     mx::Fragment frag = mx::Fragment::containing(match);
-    mx::File file = mx::File::containing(frag);
+    auto file = mx::File::containing(frag);
     std::cout
-        << frag.id() << '\t' << GetFileContaining(index, file.id())
+        << frag.id() << '\t'
+        << GetFileContaining(
+               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
         << std::endl;
 
     for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {

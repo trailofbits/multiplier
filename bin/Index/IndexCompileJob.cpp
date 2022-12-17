@@ -579,9 +579,9 @@ static void AddDeclRangeToEntityList(
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
 
-static pasta::MacroNode RootNodeFrom(pasta::MacroNode node) {
+static pasta::Macro RootMacroFrom(pasta::Macro node) {
   if (auto parent = node.Parent()) {
-    return RootNodeFrom(parent.value());
+    return RootMacroFrom(parent.value());
   } else {
     return node;
   }
@@ -589,14 +589,14 @@ static pasta::MacroNode RootNodeFrom(pasta::MacroNode node) {
 
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
-static std::vector<std::pair<pasta::MacroNode, unsigned>>
+static std::vector<std::pair<pasta::Macro, unsigned>>
 FindTLMs(const pasta::AST &ast) {
-  using OrderedNode = std::pair<pasta::MacroNode, unsigned>;
+  using OrderedNode = std::pair<pasta::Macro, unsigned>;
   std::vector<OrderedNode> tlms;
   std::vector<pasta::DefineMacroDirective> defs;
 
   auto order = 0u;
-  for (pasta::MacroNode mn : ast.Macros()) {
+  for (pasta::Macro mn : ast.Macros()) {
 
     // Include all uses macros, and only those `#define`s for which the
     // macro is used at least once.
@@ -613,7 +613,7 @@ FindTLMs(const pasta::AST &ast) {
         continue;
       }
 
-      for (pasta::MacroNode use : md->Uses()) {
+      for (pasta::Macro use : md->Uses()) {
         tlms.emplace_back(std::move(mn), order++);
         defs.push_back(std::move(md.value()));
         break;
@@ -630,18 +630,18 @@ FindTLMs(const pasta::AST &ast) {
   }
 
   for (pasta::DefineMacroDirective def : defs) {
-    for (pasta::MacroNode use : def.Uses()) {
-      tlms.emplace_back(RootNodeFrom(std::move(use)), order++);
+    for (pasta::Macro use : def.Uses()) {
+      tlms.emplace_back(RootMacroFrom(std::move(use)), order++);
     }
   }
 
   auto eq = +[] (const OrderedNode &a, const OrderedNode &b) {
-    return a.first.RawNode() == b.first.RawNode();
+    return a.first.RawMacro() == b.first.RawMacro();
   };
 
   auto less = +[] (const OrderedNode &a, const OrderedNode &b) {
-    auto a_id = a.first.RawNode();
-    auto b_id = b.first.RawNode();
+    auto a_id = a.first.RawMacro();
+    auto b_id = b.first.RawMacro();
     if (a_id < b_id) {
       return true;
     } else if (a_id > b_id) {
@@ -674,7 +674,7 @@ FindTLMs(const pasta::AST &ast) {
 // the first usage token, and the last one is the last expansion token.
 static void AddMacroRangeToEntityList(
     const pasta::TokenRange &tok_range, std::string_view main_file_path,
-    std::vector<EntityRange> &entity_ranges, pasta::MacroNode node) {
+    std::vector<EntityRange> &entity_ranges, pasta::Macro node) {
 
   std::optional<pasta::MacroToken> bt = node.BeginToken();
   std::optional<pasta::MacroToken> et = node.EndToken();
@@ -770,20 +770,20 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
   return false;
 }
 
-static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
-    const pasta::MacroNode &node) {
+static std::optional<pasta::FileToken> BeginOfMergableMacro(
+    const pasta::Macro &node) {
   switch (node.Kind()) {
-    case pasta::MacroNodeKind::kOtherDirective:
-    case pasta::MacroNodeKind::kIfDirective:
-    case pasta::MacroNodeKind::kIfDefinedDirective:
-    case pasta::MacroNodeKind::kIfNotDefinedDirective:
-    case pasta::MacroNodeKind::kElseIfDirective:
-    case pasta::MacroNodeKind::kElseIfDefinedDirective:
-    case pasta::MacroNodeKind::kElseIfNotDefinedDirective:
-    case pasta::MacroNodeKind::kElseDirective:
-    case pasta::MacroNodeKind::kEndIfDirective:
-    case pasta::MacroNodeKind::kUndefineDirective:
-    case pasta::MacroNodeKind::kPragmaDirective:
+    case pasta::MacroKind::kOtherDirective:
+    case pasta::MacroKind::kIfDirective:
+    case pasta::MacroKind::kIfDefinedDirective:
+    case pasta::MacroKind::kIfNotDefinedDirective:
+    case pasta::MacroKind::kElseIfDirective:
+    case pasta::MacroKind::kElseIfDefinedDirective:
+    case pasta::MacroKind::kElseIfNotDefinedDirective:
+    case pasta::MacroKind::kElseDirective:
+    case pasta::MacroKind::kEndIfDirective:
+    case pasta::MacroKind::kUndefineDirective:
+    case pasta::MacroKind::kPragmaDirective:
       if (auto dir = pasta::MacroDirective::From(node)) {
         return dir->Hash().FileLocation();
       }
@@ -800,11 +800,11 @@ static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
     //                enum ... {
     //                #include ...
     //                };
-    case pasta::MacroNodeKind::kDefineDirective:
-    case pasta::MacroNodeKind::kIncludeDirective:
-    case pasta::MacroNodeKind::kIncludeNextDirective:
-    case pasta::MacroNodeKind::kIncludeMacrosDirective:
-    case pasta::MacroNodeKind::kImportDirective:
+    case pasta::MacroKind::kDefineDirective:
+    case pasta::MacroKind::kIncludeDirective:
+    case pasta::MacroKind::kIncludeNextDirective:
+    case pasta::MacroKind::kIncludeMacrosDirective:
+    case pasta::MacroKind::kImportDirective:
     default:
       return std::nullopt;
   }
@@ -828,8 +828,8 @@ static bool CanMergeNonOverlappingEntitiesIntoFragment(
   auto seen_macro = false;
   std::optional<pasta::FileToken> first_loc;
   std::optional<pasta::FileToken> second_loc;
-  if (std::holds_alternative<pasta::MacroNode>(first)) {
-    first_loc = BeginOfMergableMacroNode(std::get<pasta::MacroNode>(first));
+  if (std::holds_alternative<pasta::Macro>(first)) {
+    first_loc = BeginOfMergableMacro(std::get<pasta::Macro>(first));
     seen_macro = true;
   } else if (std::holds_alternative<pasta::Decl>(first)) {
     first_loc = std::get<pasta::Decl>(first).EndToken().FileLocation();
@@ -839,8 +839,8 @@ static bool CanMergeNonOverlappingEntitiesIntoFragment(
 
   if (!first_loc) {
     return false;
-  } else if (std::holds_alternative<pasta::MacroNode>(second)) {
-    second_loc = BeginOfMergableMacroNode(std::get<pasta::MacroNode>(second));
+  } else if (std::holds_alternative<pasta::Macro>(second)) {
+    second_loc = BeginOfMergableMacro(std::get<pasta::Macro>(second));
   } else if (!seen_macro) {
     return false;
   } else if (std::holds_alternative<pasta::Decl>(second)) {
@@ -967,9 +967,9 @@ static std::vector<PendingFragment> CreatePendingFragments(
             std::get<pasta::Decl>(entity));
         pending_fragment.num_top_level_declarations++;
 
-      } else if (std::holds_alternative<pasta::MacroNode>(entity)) {
+      } else if (std::holds_alternative<pasta::Macro>(entity)) {
         pending_fragment.top_level_macros.push_back(
-            std::get<pasta::MacroNode>(entity));
+            std::get<pasta::Macro>(entity));
         pending_fragment.num_top_level_macros++;
 
       } else {

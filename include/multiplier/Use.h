@@ -20,6 +20,7 @@ class Decl;
 class EntityProvider;
 class File;
 class FragmentImpl;
+class Macro;
 class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
@@ -37,7 +38,8 @@ enum class UseKind : unsigned char {
   TEMPLATE_ARGUMENT,
   TEMPLATE_PARAMETER_LIST,
   DESIGNATOR,
-  ATTRIBUTE
+  ATTRIBUTE,
+  MACRO,
 };
 
 inline static const char *EnumerationName(UseKind) {
@@ -45,12 +47,14 @@ inline static const char *EnumerationName(UseKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(UseKind) {
-  return 6u;
+  return 9u;
 }
+
+const char *EnumeratorName(UseKind);
 
 using NotAnEntity = std::monostate;
 
-using VariantUse = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
+using VariantUse = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
                                 CXXBaseSpecifier, TemplateArgument,
                                 TemplateParameterList, Designator>;
 
@@ -62,6 +66,7 @@ class UseBase {
   friend class Designator;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class Macro;
   friend class Stmt;
   friend class UseIteratorBase;
   friend class UseIteratorImpl;
@@ -79,6 +84,7 @@ class UseBase {
   UseBase(Stmt stmt, UseSelectorSet selectors_);
   UseBase(Type type, UseSelectorSet selectors_);
   UseBase(Attr attr, UseSelectorSet selectors_);
+  UseBase(Macro attr, UseSelectorSet selectors_);
   UseBase(CXXBaseSpecifier decl, UseSelectorSet selectors_);
   UseBase(TemplateArgument decl, UseSelectorSet selectors_);
   UseBase(TemplateParameterList decl, UseSelectorSet selectors_);
@@ -91,6 +97,7 @@ class UseBase {
   std::optional<Stmt> as_statement(void) const;
   std::optional<Type> as_type(void) const;
   std::optional<Attr> as_attribute(void) const;
+  std::optional<Macro> as_macro(void) const;
   std::optional<CXXBaseSpecifier> as_cxx_base_specifier(void) const;
   std::optional<TemplateArgument> as_template_argument(void) const;
   std::optional<TemplateParameterList> as_template_parameter_list(void) const;

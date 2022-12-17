@@ -57,8 +57,8 @@ class CXXDestructorDecl : public CXXMethodDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXDestructorDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXDestructorDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -51,8 +51,8 @@ class UserDefinedLiteral : public CallExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UserDefinedLiteral::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UserDefinedLiteral::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

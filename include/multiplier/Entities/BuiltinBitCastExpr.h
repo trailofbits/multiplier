@@ -52,8 +52,8 @@ class BuiltinBitCastExpr : public ExplicitCastExpr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : BuiltinBitCastExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : BuiltinBitCastExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

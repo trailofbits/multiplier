@@ -9,6 +9,11 @@
 #include <atomic>
 #include <cassert>
 #include <iostream>
+#include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Macro.h>
+#include <multiplier/Entities/Type.h>
+#include <multiplier/Entities/VarDecl.h>
+#include <multiplier/Entities/TokenKind.h>
 #include <multiplier/Compress.h>
 #include <sstream>
 #include <stdexcept>
@@ -23,10 +28,6 @@
 #include "Use.h"
 #include "Weggli.h"
 #include "../Common/Re2.h"
-#include <multiplier/Entities/Attr.h>
-#include <multiplier/Entities/Type.h>
-#include <multiplier/Entities/VarDecl.h>
-#include <multiplier/Entities/TokenKind.h>
 
 namespace mx {
 
@@ -178,6 +179,14 @@ Attr AttrIterator::operator*(void) const & noexcept {
   return Attr(impl, index);
 }
 
+Macro MacroIterator::operator*(void) && noexcept {
+  return Macro(std::move(impl), index);
+}
+
+Macro MacroIterator::operator*(void) const & noexcept {
+  return Macro(impl, index);
+}
+
 EntityId Decl::id(void) const {
   DeclarationId eid;
   eid.fragment_id = fragment->fragment_id;
@@ -278,5 +287,12 @@ UseRange<AttrUseSelector> Attr::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
+EntityId Macro::id(void) const {
+  MacroId eid;
+  eid.fragment_id = fragment->fragment_id;
+  eid.kind = kind();
+  eid.offset = offset_;
+  return eid;
+}
 
 }  // namespace mx

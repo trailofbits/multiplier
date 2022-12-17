@@ -9,6 +9,7 @@
 #include "Token.h"
 
 #include <mutex>
+#include <unordered_map>
 
 namespace mx {
 
@@ -113,6 +114,8 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const final;
+
+  const FileImpl *OwningFile(void) const noexcept final;
 };
 
 }  // namespace mx

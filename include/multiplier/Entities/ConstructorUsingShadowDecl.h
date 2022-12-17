@@ -50,8 +50,8 @@ class ConstructorUsingShadowDecl : public UsingShadowDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ConstructorUsingShadowDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ConstructorUsingShadowDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

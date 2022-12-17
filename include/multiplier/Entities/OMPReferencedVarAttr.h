@@ -43,8 +43,8 @@ class OMPReferencedVarAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPReferencedVarAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPReferencedVarAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

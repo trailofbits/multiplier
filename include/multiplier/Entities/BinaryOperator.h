@@ -49,8 +49,8 @@ class BinaryOperator : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : BinaryOperator::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : BinaryOperator::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

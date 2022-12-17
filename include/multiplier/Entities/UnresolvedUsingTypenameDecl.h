@@ -48,8 +48,8 @@ class UnresolvedUsingTypenameDecl : public TypeDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UnresolvedUsingTypenameDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UnresolvedUsingTypenameDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

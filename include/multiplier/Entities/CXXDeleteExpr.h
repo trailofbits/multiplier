@@ -50,8 +50,8 @@ class CXXDeleteExpr : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXDeleteExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CXXDeleteExpr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

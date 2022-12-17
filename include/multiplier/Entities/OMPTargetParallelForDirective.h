@@ -51,8 +51,8 @@ class OMPTargetParallelForDirective : public OMPLoopDirective {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPTargetParallelForDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : OMPTargetParallelForDirective::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

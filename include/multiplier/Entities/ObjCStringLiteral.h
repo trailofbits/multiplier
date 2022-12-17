@@ -49,8 +49,8 @@ class ObjCStringLiteral : public Expr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCStringLiteral::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCStringLiteral::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

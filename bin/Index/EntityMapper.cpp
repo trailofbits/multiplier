@@ -72,9 +72,46 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
   return EntityId(entity.RawAttr());
 }
 
+mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
+  if (auto mt = pasta::MacroToken::From(entity)) {
+    return EntityId(mt.value());
+  }
+
+  auto ret = EntityId(entity.RawMacro());
+  if (ret || entity.Kind() != pasta::MacroKind::kExpansion) {
+    return ret;
+  }
+
+  // The `TokenTree` merges macro expansions with argument pre-expansions, which
+  // are separately represented in PASTA. The `TokenTree::Macro()` node
+  // preserved is the top-level, non-argument pre-expansion phase of the
+  // expansion, just in case `TokenTree` building fails and we revert to a
+  // backup path of serialization (where we might already have entity IDs for
+  // these top-level expansions from the `EntityLabeller`). However, there
+  // may be children nodes of the argument pre-expansion that point to that
+  // rather than the top-level node, so here we try to recover to enable
+  // `mx::Macro::parent` serialization to succeed.
+
+  auto exp = pasta::MacroExpansion::From(entity);
+  if (!exp || !exp->IsArgumentPreExpansion()) {
+    return ret;
+  }
+
+  if (std::optional<pasta::Macro> parent = exp->Parent()) {
+    ret = EntityId(parent.value());
+  }
+
+  return ret;
+}
+
 mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
   if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
     return it->second;
+
+  // If this token is derived from another one, and we don't have an entity
+  // ID for it, then try to get the entity ID for the derived token.
+  } else if (auto dt = entity.DerivedLocation()) {
+    return EntityId(dt.value());
 
   // If we fail to resolve the parsed token to an entity ID, then try to
   // see if it's associated with a `pasta::FileToken`, and if so, then form
@@ -86,6 +123,10 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
   } else {
     return mx::kInvalidEntityId;
   }
+}
+
+mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
+  return EntityId(entity.ParsedLocation());
 }
 
 mx::RawEntityId EntityMapper::FileId(const pasta::File &file) const {

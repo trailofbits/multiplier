@@ -43,8 +43,8 @@ class UnaryTransformType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UnaryTransformType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : UnaryTransformType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

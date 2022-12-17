@@ -43,8 +43,8 @@ class SubstTemplateTypeParmType : public Type {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : SubstTemplateTypeParmType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : SubstTemplateTypeParmType::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

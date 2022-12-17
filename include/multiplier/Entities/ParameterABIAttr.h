@@ -47,8 +47,8 @@ class ParameterABIAttr : public InheritableParamAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ParameterABIAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ParameterABIAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

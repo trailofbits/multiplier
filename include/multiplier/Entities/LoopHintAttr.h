@@ -46,8 +46,8 @@ class LoopHintAttr : public Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : LoopHintAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : LoopHintAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

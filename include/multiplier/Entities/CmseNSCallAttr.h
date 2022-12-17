@@ -44,8 +44,8 @@ class CmseNSCallAttr : public TypeAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CmseNSCallAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : CmseNSCallAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

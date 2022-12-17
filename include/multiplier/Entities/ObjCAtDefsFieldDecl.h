@@ -52,8 +52,8 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCAtDefsFieldDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ObjCAtDefsFieldDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

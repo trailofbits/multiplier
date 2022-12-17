@@ -55,8 +55,8 @@ class VarTemplateSpecializationDecl : public VarDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : VarTemplateSpecializationDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : VarTemplateSpecializationDecl::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

@@ -22,45 +22,40 @@ static const std::shared_ptr<InvalidTokenReader> kInvalidTokenReader =
 
 TokenReader::~TokenReader(void) noexcept {}
 
+const FragmentImpl *TokenReader::OwningFragment(void) const noexcept {
+  return nullptr;
+}
+
+const FileImpl *TokenReader::OwningFile(void) const noexcept {
+  return nullptr;
+}
+
 TokenReader::Ptr TokenReader::ReaderForToken(
-    const TokenReader::Ptr &self, const EntityProvider::Ptr &ep,
-    EntityId eid) {
+    const TokenReader::Ptr &self, const EntityProvider::Ptr &ep, EntityId eid) {
+
+  // TODO(pag): Optimize for returning `self`?
+
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<FileTokenId>(vid)) {
     FileTokenId tid = std::get<FileTokenId>(vid);
-    if (auto fp = dynamic_cast<const PackedFileImpl *>(self.get());
-        fp && fp->file_id == tid.file_id && tid.offset < fp->num_tokens) {
-      return self;
-
-    } else if (auto file = ep->FileFor(ep, tid.file_id);
+    if (auto file = ep->FileFor(ep, tid.file_id);
                file && tid.offset < file->num_tokens) {
       return file->TokenReader(file);
     }
 
   } else if (std::holds_alternative<ParsedTokenId>(vid)) {
     ParsedTokenId tid = std::get<ParsedTokenId>(vid);
-    if (auto fp = dynamic_cast<const PackedFragmentImpl *>(self.get());
-        fp && fp->fragment_id == tid.fragment_id &&
-        tid.offset < fp->num_parsed_tokens) {
-      return self;
-
-    } else if (auto frag = ep->FragmentFor(ep, tid.fragment_id);
-               frag && tid.offset < frag->num_parsed_tokens) {
-      return frag->TokenReader(frag);
+    if (auto frag = ep->FragmentFor(ep, tid.fragment_id);
+        frag && tid.offset < frag->num_parsed_tokens) {
+      return frag->ParsedTokenReader(frag);
     }
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
     MacroTokenId tid = std::get<MacroTokenId>(vid);
-    if (auto fp = dynamic_cast<const PackedFragmentImpl *>(self.get());
-        fp && fp->fragment_id == tid.fragment_id &&
-        fp->num_parsed_tokens <= tid.offset &&
-        tid.offset < fp->num_tokens) {
-      return self;
-
-    } else if (auto frag = ep->FragmentFor(ep, tid.fragment_id);
-               frag && frag->num_parsed_tokens <= tid.offset &&
-               tid.offset < frag->num_tokens) {
-      return frag->TokenReader(frag);
+    if (auto frag = ep->FragmentFor(ep, tid.fragment_id);
+        frag && frag->num_parsed_tokens <= tid.offset &&
+        tid.offset < frag->num_tokens) {
+      return frag->MacroTokenReader(frag);
     }
   }
 
@@ -211,36 +206,6 @@ UseRange<TokenUseSelector> Token::uses(void) const {
   }
 }
 
-// Return the list of parsed tokens in the fragment. This doesn't
-// include all tokens, i.e. macro use tokens, comments, etc.
-TokenList Token::in(const Fragment &frag) {
-  return frag.parsed_tokens();
-}
-
-// Return the list of tokens in this file.
-TokenList Token::in(const File &file) {
-  return file.tokens();
-}
-
-// Return the token list containing a particular token.
-TokenList TokenList::containing(Token tok) {
-  if (tok) {
-    if (auto num_tokens = tok.impl->NumTokens()) {
-      return TokenList(std::move(tok.impl), num_tokens);
-    }
-  }
-  return TokenList();
-}
-
-// Return the token list containing a particular token range.
-TokenList TokenList::containing(const TokenRange &range) {
-  if (range.impl) {
-    return TokenList(range.impl, range.impl->NumTokens());
-  } else {
-    return TokenList();
-  }
-}
-
 TokenRange::TokenRange(void)
     : impl(kInvalidTokenReader),
       index(0),
@@ -354,7 +319,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
   }
 
   // It's already a file token range.
-  if (dynamic_cast<const PackedFileImpl *>(impl.get())) {
+  if (impl->OwningFile()) {
     return *this;
   }
 

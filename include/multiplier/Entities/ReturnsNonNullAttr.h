@@ -44,8 +44,8 @@ class ReturnsNonNullAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ReturnsNonNullAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    for (auto &parent : ReturnsNonNullAttr::containing(tok)) {
+      if (parent.id() == id()) { return true; }
     }
     return false;
   }

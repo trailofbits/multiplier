@@ -33,10 +33,10 @@ extern "C" int main(int argc, char *argv[]) {
 
     for (const mx::DeclUse &use : decl.uses()) {
       mx::Fragment fragment = mx::Fragment::containing(use);
-      mx::File file = mx::File::containing(fragment);
+      auto file = mx::File::containing(fragment);
 
       std::cout
-          << file.id() << '\t'
+          << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
           << fragment.id();
 
       mx::TokenRange highlight_range;
@@ -67,8 +67,8 @@ extern "C" int main(int argc, char *argv[]) {
       }
 
       // Show the location of the user.
-      if (FLAGS_show_locations && token) {
-        std::cout << '\t' << file_paths[file.id()].generic_string();
+      if (FLAGS_show_locations && file && token) {
+        std::cout << '\t' << file_paths[file->id()].generic_string();
         if (auto line_col = token.location(location_cache)) {
           std::cout << '\t' << line_col->first << '\t' << line_col->second;
         }

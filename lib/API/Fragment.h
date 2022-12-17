@@ -47,10 +47,10 @@ class FragmentImpl {
   unsigned num_stmts{0u};
   unsigned num_types{0u};
   unsigned num_attrs{0u};
+  unsigned num_macros{0u};
   unsigned num_pseudos{0u};
   unsigned num_parsed_tokens{0u};
   unsigned num_tokens{0u};
-  unsigned num_substitutions{0u};
 
   virtual ~FragmentImpl(void) noexcept;
 
@@ -63,10 +63,15 @@ class FragmentImpl {
   // NOTE(pag): This returns the raw, unpacked file id.
   virtual RawEntityId FileContaingFirstToken(void) const = 0;
 
+  // Return a reader for the macro tokens in the fragment. This doesn't
+  // include all tokens, i.e. macro use tokens, comments, etc.
+  virtual std::shared_ptr<const class TokenReader>
+  MacroTokenReader(const FragmentImpl::Ptr &) const = 0;
+
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   virtual std::shared_ptr<const class TokenReader>
-  TokenReader(const FragmentImpl::Ptr &) const = 0;
+  ParsedTokenReader(const FragmentImpl::Ptr &) const = 0;
 
   // Return a reader for the whole fragment.
   virtual const FragmentReader &Fragment(void) const = 0;
@@ -76,6 +81,7 @@ class FragmentImpl {
   virtual StmtReader NthStmt(unsigned offset) const = 0;
   virtual TypeReader NthType(unsigned offset) const = 0;
   virtual AttrReader NthAttr(unsigned offset) const = 0;
+  virtual MacroReader NthMacro(unsigned offset) const = 0;
   virtual PseudoReader NthPseudo(unsigned offset) const = 0;
 
   virtual std::string_view SourceIR(void) const = 0;
@@ -103,32 +109,53 @@ class FragmentImpl {
                               bool can_fail=true) const;
 
   // Return the attribute associated with a specific entity ID.
+  std::optional<Macro> MacroFor(const FragmentImpl::Ptr &, EntityId id,
+                                bool can_fail=true) const;
+
+  // Return the attribute associated with a specific entity ID.
   std::optional<Attr> AttrFor(const FragmentImpl::Ptr &, EntityId id,
                               bool can_fail=true) const;
 };
 
-// A packed fragment of code, i.e. a serialized fragment.
-class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
+class PackedFragmentImpl;
+
+class ReadMacroTokensFromFragment : public TokenReader {
  public:
-  using Ptr = std::shared_ptr<const PackedFragmentImpl>;
+  const FragmentImpl * const fragment;
 
-  PackedReaderState package;
-  const rpc::Fragment::Reader reader;
+  inline ReadMacroTokensFromFragment(FragmentImpl *fragment_)
+      : fragment(fragment_) {}
 
-  virtual ~PackedFragmentImpl(void) noexcept;
+  // Return the number of tokens in the fragment.
+  unsigned NumTokens(void) const override;
 
-  PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
-                     const capnp::Data::Reader &reader_);
+  // Return the kind of the Nth token.
+  TokenKind NthTokenKind(unsigned index) const override;
 
-  // Return the ID of the file containing the first token.
-  //
-  // NOTE(pag): This returns the raw, unpacked file id.
-  RawEntityId FileContaingFirstToken(void) const final;
+  // Return the data of the Nth token.
+  std::string_view NthTokenData(unsigned index) const override;
 
-  // Return a reader for the parsed tokens in the fragment. This doesn't
-  // include all tokens, i.e. macro use tokens, comments, etc.
-  std::shared_ptr<const class TokenReader>
-  TokenReader(const FragmentImpl::Ptr &) const final;
+  // Return the id of the token from which the Nth token is derived.
+  EntityId NthDerivedTokenId(unsigned token_index) const override;
+
+  // Return the id of the Nth token.
+  EntityId NthTokenId(unsigned token_index) const override;
+  EntityId NthFileTokenId(unsigned token_index) const override;
+
+  // Return the token reader for another file.
+  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
+                                  RawEntityId id) const final;
+
+  // Returns `true` if `this` is logically equivalent to `that`.
+  bool Equals(const class TokenReader *that) const override;
+
+  const FragmentImpl *OwningFragment(void) const noexcept final;
+};
+
+class ReadParsedTokensFromFragment final
+    : public ReadMacroTokensFromFragment {
+ public:
+  using ReadMacroTokensFromFragment::ReadMacroTokensFromFragment;
 
   // Return the number of tokens in the fragment.
   unsigned NumTokens(void) const final;
@@ -146,12 +173,38 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   EntityId NthTokenId(unsigned token_index) const final;
   EntityId NthFileTokenId(unsigned token_index) const final;
 
-  // Return the token reader for another file.
-  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
-                                 RawEntityId id) const final;
-
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const final;
+};
+
+// A packed fragment of code, i.e. a serialized fragment.
+class PackedFragmentImpl final : public FragmentImpl {
+ public:
+  using Ptr = std::shared_ptr<const PackedFragmentImpl>;
+
+  PackedReaderState package;
+  const rpc::Fragment::Reader reader;
+  ReadParsedTokensFromFragment parsed_token_reader;
+  ReadMacroTokensFromFragment macro_token_reader;
+
+  virtual ~PackedFragmentImpl(void) noexcept;
+
+  PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
+                     const capnp::Data::Reader &reader_);
+
+  // Return the ID of the file containing the first token.
+  //
+  // NOTE(pag): This returns the raw, unpacked file id.
+  RawEntityId FileContaingFirstToken(void) const final;
+
+  // Return a reader for the parsed tokens in the fragment. This doesn't
+  // include all tokens, i.e. macro use tokens, comments, etc.
+  std::shared_ptr<const class TokenReader>
+  ParsedTokenReader(const FragmentImpl::Ptr &) const final;
+
+  // Return a reader for the macro tokens in the fragment.
+  std::shared_ptr<const class TokenReader>
+  MacroTokenReader(const FragmentImpl::Ptr &) const final;
 
   // Return a reader for the whole fragment.
   const FragmentReader &Fragment(void) const final;
@@ -161,6 +214,7 @@ class PackedFragmentImpl final : public FragmentImpl, public TokenReader {
   StmtReader NthStmt(unsigned offset) const final;
   TypeReader NthType(unsigned offset) const final;
   AttrReader NthAttr(unsigned offset) const final;
+  MacroReader NthMacro(unsigned offset) const final;
   PseudoReader NthPseudo(unsigned offset) const final;
 
   std::string_view SourceIR(void) const final;
