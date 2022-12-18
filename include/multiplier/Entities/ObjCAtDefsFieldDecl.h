@@ -48,7 +48,7 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   }
 
   inline static ObjCAtDefsFieldDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

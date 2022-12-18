@@ -43,7 +43,7 @@ class DiagnoseIfAttr : public InheritableAttr {
   }
 
   inline static DiagnoseIfAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

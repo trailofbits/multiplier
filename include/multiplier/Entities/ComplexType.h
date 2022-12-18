@@ -38,7 +38,7 @@ class ComplexType : public Type {
   }
 
   inline static ComplexTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

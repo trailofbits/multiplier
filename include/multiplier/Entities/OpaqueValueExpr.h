@@ -44,7 +44,7 @@ class OpaqueValueExpr : public Expr {
   }
 
   inline static OpaqueValueExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

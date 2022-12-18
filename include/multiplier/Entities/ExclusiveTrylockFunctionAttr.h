@@ -41,7 +41,7 @@ class ExclusiveTrylockFunctionAttr : public InheritableAttr {
   }
 
   inline static ExclusiveTrylockFunctionAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

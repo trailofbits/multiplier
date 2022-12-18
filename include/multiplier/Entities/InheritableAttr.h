@@ -38,7 +38,7 @@ class InheritableAttr : public Attr {
   }
 
   inline static InheritableAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

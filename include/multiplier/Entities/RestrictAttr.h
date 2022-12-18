@@ -41,7 +41,7 @@ class RestrictAttr : public InheritableAttr {
   }
 
   inline static RestrictAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

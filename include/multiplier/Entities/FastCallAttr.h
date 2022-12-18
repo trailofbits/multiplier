@@ -40,7 +40,7 @@ class FastCallAttr : public InheritableAttr {
   }
 
   inline static FastCallAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

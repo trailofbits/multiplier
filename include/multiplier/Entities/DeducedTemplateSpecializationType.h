@@ -40,7 +40,7 @@ class DeducedTemplateSpecializationType : public DeducedType {
   }
 
   inline static DeducedTemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

@@ -44,7 +44,7 @@ class UsingDecl : public BaseUsingDecl {
   }
 
   inline static UsingDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

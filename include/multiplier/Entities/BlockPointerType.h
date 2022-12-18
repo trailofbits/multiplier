@@ -38,7 +38,7 @@ class BlockPointerType : public Type {
   }
 
   inline static BlockPointerTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

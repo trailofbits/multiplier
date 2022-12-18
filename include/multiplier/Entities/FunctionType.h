@@ -39,7 +39,7 @@ class FunctionType : public Type {
   }
 
   inline static FunctionTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

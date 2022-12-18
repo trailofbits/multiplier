@@ -40,7 +40,7 @@ class BTFDeclTagAttr : public InheritableAttr {
   }
 
   inline static BTFDeclTagAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

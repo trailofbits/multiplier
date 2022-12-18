@@ -40,7 +40,7 @@ class SYCLSpecialClassAttr : public InheritableAttr {
   }
 
   inline static SYCLSpecialClassAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

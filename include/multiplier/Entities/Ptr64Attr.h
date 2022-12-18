@@ -40,7 +40,7 @@ class Ptr64Attr : public TypeAttr {
   }
 
   inline static Ptr64AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

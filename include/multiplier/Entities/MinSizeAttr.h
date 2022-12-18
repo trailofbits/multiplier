@@ -40,7 +40,7 @@ class MinSizeAttr : public InheritableAttr {
   }
 
   inline static MinSizeAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

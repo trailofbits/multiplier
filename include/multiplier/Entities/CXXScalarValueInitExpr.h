@@ -44,7 +44,7 @@ class CXXScalarValueInitExpr : public Expr {
   }
 
   inline static CXXScalarValueInitExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

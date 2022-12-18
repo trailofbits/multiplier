@@ -14,6 +14,7 @@
 
 #include "Fragment.h"
 #include "Re2.h"
+#include "Use.h"
 #include "Weggli.h"
 
 namespace mx {
@@ -298,6 +299,10 @@ TokenRange File::tokens(void) const noexcept {
 // Return the contents of the file as a UTF-8 string.
 std::string_view File::data(void) const noexcept {
   return impl->Data();
+}
+
+UseRange<FileUseSelector> File::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(impl->ep, *this);
 }
 
 }  // namespace mx

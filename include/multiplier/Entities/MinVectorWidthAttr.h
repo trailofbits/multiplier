@@ -40,7 +40,7 @@ class MinVectorWidthAttr : public InheritableAttr {
   }
 
   inline static MinVectorWidthAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

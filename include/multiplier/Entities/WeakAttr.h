@@ -40,7 +40,7 @@ class WeakAttr : public InheritableAttr {
   }
 
   inline static WeakAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

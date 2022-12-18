@@ -41,7 +41,7 @@ class ErrorAttr : public InheritableAttr {
   }
 
   inline static ErrorAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

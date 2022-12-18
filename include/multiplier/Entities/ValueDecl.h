@@ -43,7 +43,7 @@ class ValueDecl : public NamedDecl {
   }
 
   inline static ValueDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

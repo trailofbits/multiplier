@@ -44,7 +44,7 @@ class ConvertVectorExpr : public Expr {
   }
 
   inline static ConvertVectorExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

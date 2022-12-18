@@ -41,7 +41,7 @@ class FinalAttr : public InheritableAttr {
   }
 
   inline static FinalAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

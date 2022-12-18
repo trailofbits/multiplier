@@ -46,7 +46,7 @@ class CXXTemporaryObjectExpr : public CXXConstructExpr {
   }
 
   inline static CXXTemporaryObjectExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

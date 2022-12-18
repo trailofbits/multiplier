@@ -43,7 +43,7 @@ class OMPParallelMasterDirective : public OMPExecutableDirective {
   }
 
   inline static OMPParallelMasterDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

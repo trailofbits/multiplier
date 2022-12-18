@@ -50,7 +50,8 @@ static const std::unordered_set<std::string> gAbstractTypes{
   PASTA_FOR_EACH_STMT_IMPL(IGNORE, IGNORE, IGNORE, IGNORE, IGNORE, STR_NAME)
   PASTA_FOR_EACH_TYPE_IMPL(IGNORE, STR_NAME)
   PASTA_FOR_EACH_ATTR_IMPL(IGNORE, STR_NAME)
-  PASTA_FOR_EACH_MACRO_IMPL(IGNORE, IGNORE, IGNORE, IGNORE, IGNORE, STR_NAME)
+  PASTA_FOR_EACH_MACRO_IMPL(IGNORE, IGNORE, IGNORE, IGNORE, IGNORE,
+                            IGNORE, STR_NAME)
 };
 
 static const std::unordered_set<std::string> gUnserializableTypes{
@@ -102,7 +103,8 @@ static const std::unordered_set<std::string> gAttrNames{
 
 static const std::unordered_set<std::string> gMacroNames{
   PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
-                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME, STR_NAME)
+                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
+                            MACRO_DIRECTIVE_NAME, STR_NAME)
   CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
@@ -173,7 +175,8 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, IGNORE)
   PASTA_FOR_EACH_ATTR_IMPL(ATTR_NAME, IGNORE)
   PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
-                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME, IGNORE)
+                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
+                            MACRO_DIRECTIVE_NAME, IGNORE)
   CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
@@ -181,12 +184,14 @@ static const std::unordered_set<std::string> gEntityClassNames{
   "Token",
   "FileToken",
   "MacroToken",
+  "File",
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, STR_NAME)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME)
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
   PASTA_FOR_EACH_ATTR_IMPL(ATTR_NAME, STR_NAME)
   PASTA_FOR_EACH_MACRO_IMPL(MACRO_NAME, IGNORE, MACRO_DIRECTIVE_NAME,
-                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME, STR_NAME)
+                            MACRO_DIRECTIVE_NAME, MACRO_DIRECTIVE_NAME,
+                            MACRO_DIRECTIVE_NAME, STR_NAME)
   CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
@@ -1192,6 +1197,17 @@ void CodeGenerator::RunOnOptional(
       selector << "TokenUseSelector";
       lib_cpp_os
           << "    return fragment->TokenFor(fragment, id);\n";
+
+    } else if (*element_name == "File") {
+      needed_decls.insert("FileUseSelector");
+      file_use_ids[api_name].SetId(cls, i);
+      selector << "FileUseSelector";
+      lib_cpp_os
+          << "    if (auto file = fragment->ep->FileFor(fragment->ep, id)) {\n"
+          << "      return File(std::move(file));\n"
+          << "    } else {\n"
+          << "      return std::nullopt;\n"
+          << "    }\n";
 
     } else if (*element_name == "Decl") {
       needed_decls.insert("DeclUseSelector");
@@ -2252,7 +2268,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  }\n\n"
         << "  inline static " << class_name
         << "ContainingTokenRange containing(const Token &tok) {\n"
-        << "    return TokenContextIterator(TokenContext::of(tok));\n"
+        << "    return TokenContextIterator(tok.context());\n"
         << "  }\n\n"
         << "  inline bool contains(const Token &tok) {\n"
         << "    auto id_ = id();\n"

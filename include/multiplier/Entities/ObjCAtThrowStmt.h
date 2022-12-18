@@ -41,7 +41,7 @@ class ObjCAtThrowStmt : public Stmt {
   }
 
   inline static ObjCAtThrowStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

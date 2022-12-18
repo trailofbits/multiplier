@@ -40,7 +40,7 @@ class OpenCLKernelAttr : public InheritableAttr {
   }
 
   inline static OpenCLKernelAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

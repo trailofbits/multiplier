@@ -62,7 +62,7 @@ class CXXRecordDecl : public RecordDecl {
   }
 
   inline static CXXRecordDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

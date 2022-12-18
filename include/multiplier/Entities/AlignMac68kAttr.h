@@ -40,7 +40,7 @@ class AlignMac68kAttr : public InheritableAttr {
   }
 
   inline static AlignMac68kAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

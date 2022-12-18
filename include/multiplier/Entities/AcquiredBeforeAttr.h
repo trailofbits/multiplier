@@ -40,7 +40,7 @@ class AcquiredBeforeAttr : public InheritableAttr {
   }
 
   inline static AcquiredBeforeAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

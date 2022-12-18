@@ -71,6 +71,12 @@ class Token {
     return id().Pack() <=> that.id().Pack();
   }
 
+  // Return the context node that identifies how this token relates to the AST.
+  //
+  // NOTE(pag): This only works with parsed tokens, and not all parsed tokens
+  //            are guaranteed to have a context.
+  std::optional<TokenContext> context(void) const;
+
   // Return the version of this token that was actually parsed. If this was a
   // macro token that only relates to a single parsed token, then that is
   // returned. If this is a macro token that doesn't relate to any parsed

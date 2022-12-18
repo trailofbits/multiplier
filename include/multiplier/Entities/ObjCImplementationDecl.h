@@ -48,7 +48,7 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   }
 
   inline static ObjCImplementationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

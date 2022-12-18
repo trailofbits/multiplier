@@ -40,7 +40,7 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
   }
 
   inline static ObjCExplicitProtocolImplAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

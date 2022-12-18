@@ -38,7 +38,7 @@ class InitSegAttr : public Attr {
   }
 
   inline static InitSegAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

@@ -8313,6 +8313,11 @@ std::optional<MacroDirective> MacroDirective::from(const Macro &parent) {
     case mx::MacroKind::DEFINE_DIRECTIVE:
     case mx::MacroKind::PRAGMA_DIRECTIVE:
     case mx::MacroKind::UNDEFINE_DIRECTIVE:
+    case mx::MacroKind::OTHER_DIRECTIVE:
+    case mx::MacroKind::IMPORT_DIRECTIVE:
+    case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
+    case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
+    case mx::MacroKind::INCLUDE_DIRECTIVE:
     case mx::MacroKind::END_IF_DIRECTIVE:
     case mx::MacroKind::ELSE_DIRECTIVE:
     case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
@@ -8321,11 +8326,6 @@ std::optional<MacroDirective> MacroDirective::from(const Macro &parent) {
     case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
     case mx::MacroKind::IF_DEFINED_DIRECTIVE:
     case mx::MacroKind::IF_DIRECTIVE:
-    case mx::MacroKind::OTHER_DIRECTIVE:
-    case mx::MacroKind::IMPORT_DIRECTIVE:
-    case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
-    case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
-    case mx::MacroKind::INCLUDE_DIRECTIVE:
       return reinterpret_cast<const MacroDirective &>(parent);
     default: return std::nullopt;
   }
@@ -8509,294 +8509,6 @@ std::optional<UndefineMacroDirective> UndefineMacroDirective::from(const Macro &
   }
 }
 
-EndIfMacroDirectiveContainingMacroRange EndIfMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool EndIfMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : EndIfMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool EndIfMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : EndIfMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-EndIfMacroDirectiveContainingMacroRange EndIfMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::END_IF_DIRECTIVE:
-      return reinterpret_cast<const EndIfMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-ElseMacroDirectiveContainingMacroRange ElseMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool ElseMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : ElseMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool ElseMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : ElseMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-ElseMacroDirectiveContainingMacroRange ElseMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<ElseMacroDirective> ElseMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<ElseMacroDirective> ElseMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::ELSE_DIRECTIVE:
-      return reinterpret_cast<const ElseMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-ElseIfNotDefinedMacroDirectiveContainingMacroRange ElseIfNotDefinedMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool ElseIfNotDefinedMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : ElseIfNotDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool ElseIfNotDefinedMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : ElseIfNotDefinedMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-ElseIfNotDefinedMacroDirectiveContainingMacroRange ElseIfNotDefinedMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
-      return reinterpret_cast<const ElseIfNotDefinedMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-ElseIfDefinedMacroDirectiveContainingMacroRange ElseIfDefinedMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool ElseIfDefinedMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : ElseIfDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool ElseIfDefinedMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : ElseIfDefinedMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-ElseIfDefinedMacroDirectiveContainingMacroRange ElseIfDefinedMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::ELSE_IF_DEFINED_DIRECTIVE:
-      return reinterpret_cast<const ElseIfDefinedMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-ElseIfMacroDirectiveContainingMacroRange ElseIfMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool ElseIfMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : ElseIfMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool ElseIfMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : ElseIfMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-ElseIfMacroDirectiveContainingMacroRange ElseIfMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::ELSE_IF_DIRECTIVE:
-      return reinterpret_cast<const ElseIfMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-IfNotDefinedMacroDirectiveContainingMacroRange IfNotDefinedMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool IfNotDefinedMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : IfNotDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool IfNotDefinedMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : IfNotDefinedMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-IfNotDefinedMacroDirectiveContainingMacroRange IfNotDefinedMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
-      return reinterpret_cast<const IfNotDefinedMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-IfDefinedMacroDirectiveContainingMacroRange IfDefinedMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool IfDefinedMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : IfDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool IfDefinedMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : IfDefinedMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-IfDefinedMacroDirectiveContainingMacroRange IfDefinedMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::IF_DEFINED_DIRECTIVE:
-      return reinterpret_cast<const IfDefinedMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
-IfMacroDirectiveContainingMacroRange IfMacroDirective::containing(const Macro &macro) {
-  return ParentMacroIteratorImpl<Macro>(macro.parent());
-}
-
-bool IfMacroDirective::contains(const Macro &macro) {
-  auto id_ = id();
-  for (auto &parent : IfMacroDirective::containing(macro)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-bool IfMacroDirective::contains(const Token &token) {
-  auto id_ = id();
-  for (auto &parent : IfMacroDirective::containing(token)) {
-    if (parent.id() == id_) { return true; }
-  }
-  return false;
-}
-
-IfMacroDirectiveContainingMacroRange IfMacroDirective::containing(const Token &token) {
-  return Macro::containing_internal(token);
-}
-
-std::optional<IfMacroDirective> IfMacroDirective::from(const MacroDirective &parent) {
-  return from(reinterpret_cast<const Macro &>(parent));
-}
-
-std::optional<IfMacroDirective> IfMacroDirective::from(const Macro &parent) {
-  switch (parent.kind()) {
-    case mx::MacroKind::IF_DIRECTIVE:
-      return reinterpret_cast<const IfMacroDirective &>(parent);
-    default: return std::nullopt;
-  }
-}
-
 OtherMacroDirectiveContainingMacroRange OtherMacroDirective::containing(const Macro &macro) {
   return ParentMacroIteratorImpl<Macro>(macro.parent());
 }
@@ -8833,49 +8545,43 @@ std::optional<OtherMacroDirective> OtherMacroDirective::from(const Macro &parent
   }
 }
 
-IncludeLikeMacroDirectiveContainingMacroRange IncludeLikeMacroDirective::containing(const Macro &macro) {
+ConditionalMacroDirectiveContainingMacroRange ConditionalMacroDirective::containing(const Macro &macro) {
   return ParentMacroIteratorImpl<Macro>(macro.parent());
 }
 
-bool IncludeLikeMacroDirective::contains(const Macro &macro) {
+bool ConditionalMacroDirective::contains(const Macro &macro) {
   auto id_ = id();
-  for (auto &parent : IncludeLikeMacroDirective::containing(macro)) {
+  for (auto &parent : ConditionalMacroDirective::containing(macro)) {
     if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
-bool IncludeLikeMacroDirective::contains(const Token &token) {
+bool ConditionalMacroDirective::contains(const Token &token) {
   auto id_ = id();
-  for (auto &parent : IncludeLikeMacroDirective::containing(token)) {
+  for (auto &parent : ConditionalMacroDirective::containing(token)) {
     if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
-IncludeLikeMacroDirectiveContainingMacroRange IncludeLikeMacroDirective::containing(const Token &token) {
+ConditionalMacroDirectiveContainingMacroRange ConditionalMacroDirective::containing(const Token &token) {
   return Macro::containing_internal(token);
 }
 
-std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const MacroDirective &parent) {
+std::optional<ConditionalMacroDirective> ConditionalMacroDirective::from(const MacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
 
-std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const Macro &parent) {
+std::optional<ConditionalMacroDirective> ConditionalMacroDirective::from(const Macro &parent) {
   switch (parent.kind()) {
     case mx::MacroKind::IMPORT_DIRECTIVE:
     case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
     case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
     case mx::MacroKind::INCLUDE_DIRECTIVE:
-      return reinterpret_cast<const IncludeLikeMacroDirective &>(parent);
+      return reinterpret_cast<const ConditionalMacroDirective &>(parent);
     default: return std::nullopt;
   }
-}
-
-File IncludeLikeMacroDirective::included_file(void) const {
-  auto self = fragment->NthMacro(offset_);
-  auto file = fragment->ep->FileFor(fragment->ep, self.getVal10());
-  return File(std::move(file));
 }
 
 ImportMacroDirectiveContainingMacroRange ImportMacroDirective::containing(const Macro &macro) {
@@ -8902,7 +8608,7 @@ ImportMacroDirectiveContainingMacroRange ImportMacroDirective::containing(const 
   return Macro::containing_internal(token);
 }
 
-std::optional<ImportMacroDirective> ImportMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+std::optional<ImportMacroDirective> ImportMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
 
@@ -8942,7 +8648,7 @@ IncludeMacrosMacroDirectiveContainingMacroRange IncludeMacrosMacroDirective::con
   return Macro::containing_internal(token);
 }
 
-std::optional<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+std::optional<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
 
@@ -8982,7 +8688,7 @@ IncludeNextMacroDirectiveContainingMacroRange IncludeNextMacroDirective::contain
   return Macro::containing_internal(token);
 }
 
-std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
 
@@ -9022,7 +8728,7 @@ IncludeMacroDirectiveContainingMacroRange IncludeMacroDirective::containing(cons
   return Macro::containing_internal(token);
 }
 
-std::optional<IncludeMacroDirective> IncludeMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+std::optional<IncludeMacroDirective> IncludeMacroDirective::from(const ConditionalMacroDirective &parent) {
   return from(reinterpret_cast<const Macro &>(parent));
 }
 
@@ -9034,6 +8740,381 @@ std::optional<IncludeMacroDirective> IncludeMacroDirective::from(const Macro &pa
   switch (parent.kind()) {
     case mx::MacroKind::INCLUDE_DIRECTIVE:
       return reinterpret_cast<const IncludeMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+IncludeLikeMacroDirectiveContainingMacroRange IncludeLikeMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool IncludeLikeMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : IncludeLikeMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool IncludeLikeMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IncludeLikeMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IncludeLikeMacroDirectiveContainingMacroRange IncludeLikeMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::END_IF_DIRECTIVE:
+    case mx::MacroKind::ELSE_DIRECTIVE:
+    case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
+    case mx::MacroKind::ELSE_IF_DEFINED_DIRECTIVE:
+    case mx::MacroKind::ELSE_IF_DIRECTIVE:
+    case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
+    case mx::MacroKind::IF_DEFINED_DIRECTIVE:
+    case mx::MacroKind::IF_DIRECTIVE:
+      return reinterpret_cast<const IncludeLikeMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
+  auto self = fragment->NthMacro(offset_);
+  if (true) {
+    EntityId id(self.getVal10());
+    if (auto file = fragment->ep->FileFor(fragment->ep, id)) {
+      return File(std::move(file));
+    } else {
+      return std::nullopt;
+    }
+  }
+}
+
+EndIfMacroDirectiveContainingMacroRange EndIfMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool EndIfMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : EndIfMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool EndIfMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : EndIfMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+EndIfMacroDirectiveContainingMacroRange EndIfMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::END_IF_DIRECTIVE:
+      return reinterpret_cast<const EndIfMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ElseMacroDirectiveContainingMacroRange ElseMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool ElseMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : ElseMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool ElseMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseMacroDirectiveContainingMacroRange ElseMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<ElseMacroDirective> ElseMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseMacroDirective> ElseMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseMacroDirective> ElseMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::ELSE_DIRECTIVE:
+      return reinterpret_cast<const ElseMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ElseIfNotDefinedMacroDirectiveContainingMacroRange ElseIfNotDefinedMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool ElseIfNotDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : ElseIfNotDefinedMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool ElseIfNotDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfNotDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseIfNotDefinedMacroDirectiveContainingMacroRange ElseIfNotDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
+      return reinterpret_cast<const ElseIfNotDefinedMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ElseIfDefinedMacroDirectiveContainingMacroRange ElseIfDefinedMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool ElseIfDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : ElseIfDefinedMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool ElseIfDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseIfDefinedMacroDirectiveContainingMacroRange ElseIfDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::ELSE_IF_DEFINED_DIRECTIVE:
+      return reinterpret_cast<const ElseIfDefinedMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+ElseIfMacroDirectiveContainingMacroRange ElseIfMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool ElseIfMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : ElseIfMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool ElseIfMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseIfMacroDirectiveContainingMacroRange ElseIfMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::ELSE_IF_DIRECTIVE:
+      return reinterpret_cast<const ElseIfMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+IfNotDefinedMacroDirectiveContainingMacroRange IfNotDefinedMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool IfNotDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : IfNotDefinedMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool IfNotDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IfNotDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IfNotDefinedMacroDirectiveContainingMacroRange IfNotDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
+      return reinterpret_cast<const IfNotDefinedMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+IfDefinedMacroDirectiveContainingMacroRange IfDefinedMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool IfDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : IfDefinedMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool IfDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IfDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IfDefinedMacroDirectiveContainingMacroRange IfDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::IF_DEFINED_DIRECTIVE:
+      return reinterpret_cast<const IfDefinedMacroDirective &>(parent);
+    default: return std::nullopt;
+  }
+}
+
+IfMacroDirectiveContainingMacroRange IfMacroDirective::containing(const Macro &macro) {
+  return ParentMacroIteratorImpl<Macro>(macro.parent());
+}
+
+bool IfMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
+  for (auto &parent : IfMacroDirective::containing(macro)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+bool IfMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IfMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IfMacroDirectiveContainingMacroRange IfMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
+}
+
+std::optional<IfMacroDirective> IfMacroDirective::from(const IncludeLikeMacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IfMacroDirective> IfMacroDirective::from(const MacroDirective &parent) {
+  return from(reinterpret_cast<const Macro &>(parent));
+}
+
+std::optional<IfMacroDirective> IfMacroDirective::from(const Macro &parent) {
+  switch (parent.kind()) {
+    case mx::MacroKind::IF_DIRECTIVE:
+      return reinterpret_cast<const IfMacroDirective &>(parent);
     default: return std::nullopt;
   }
 }

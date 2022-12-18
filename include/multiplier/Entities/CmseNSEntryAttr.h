@@ -40,7 +40,7 @@ class CmseNSEntryAttr : public InheritableAttr {
   }
 
   inline static CmseNSEntryAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

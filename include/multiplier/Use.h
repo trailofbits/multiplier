@@ -30,6 +30,7 @@ class Type;
 
 using UseSelectorSet = std::bitset<256>;
 
+// NOTE(pag): Files don't use other files, hence the absence.
 enum class UseKind : unsigned char {
   DECLARATION,
   STATEMENT,
@@ -64,6 +65,7 @@ class UseBase {
  private:
   friend class Decl;
   friend class Designator;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Macro;
@@ -109,6 +111,8 @@ enum class DeclUseSelector : unsigned short;
 enum class StmtUseSelector : unsigned short;
 enum class TypeUseSelector : unsigned short;
 enum class TokenUseSelector : unsigned short;
+enum class MacroUseSelector : unsigned short;
+enum class FileUseSelector : unsigned short;
 
 // A declaration or statement use, along with the usage selector.
 template <typename Selector>
@@ -116,8 +120,10 @@ class Use : public UseBase {
  private:
   friend class Attr;
   friend class Decl;
+  friend class File;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class Macro;
   friend class Stmt;
 
  protected:
@@ -213,6 +219,8 @@ class UseRange {
  private:
   friend class Attr;
   friend class Decl;
+  friend class File;
+  friend class Macro;
   friend class Stmt;
   friend class Type;
   friend class Token;

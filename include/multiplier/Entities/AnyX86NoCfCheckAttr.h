@@ -40,7 +40,7 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
   }
 
   inline static AnyX86NoCfCheckAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

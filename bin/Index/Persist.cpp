@@ -68,7 +68,6 @@ struct TokenTreeSerializationSchedule {
     const void *parent;
     mx::RawEntityId parent_id;
     TokenTreeNodeRange nodes;
-    bool is_in_expansion;
   };
 
   PendingFragment &pf;
@@ -168,8 +167,7 @@ struct TokenTreeSerializationSchedule {
   // this so that `fragment.parsed_tokens().data()` reflects the final result
   // of macro expansion.
   void Schedule(const void *parent, mx::RawEntityId parent_id,
-                const TokenTreeNodeRange &nodes,
-                bool is_in_expansion, bool is_deferred) {
+                const TokenTreeNodeRange &nodes) {
 
     for (TokenTreeNode node : nodes) {
       mx::RawEntityId child_id = RecordEntityId(node, parent_id);
@@ -177,35 +175,21 @@ struct TokenTreeSerializationSchedule {
 
         const void *child = sub->RawNode();
         if (sub->HasExpansion()) {
-          Schedule(child, child_id, sub->ReplacementChildren(),
-                   is_in_expansion, false);
-          todo_list.emplace_back(Todo{child, child_id, sub->Children(), false});
+          Schedule(child, child_id, sub->ReplacementChildren());
+          todo_list.emplace_back(Todo{child, child_id, sub->Children()});
         } else {
-          Schedule(child, child_id, sub->Children(), is_in_expansion, false);
+          Schedule(child, child_id, sub->Children());
         }
-#ifndef NDEBUG
-      // Keep track of the parsed tokens.
-      } else if (is_in_expansion) {
-        if (std::optional<pasta::Token> pt = node.Token()) {
-          CHECK(IsParsedToken(pt.value()));
-        }
-
-      } else {
-        if (auto pt = node.Token()) {
-          CHECK(!IsParsedToken(pt.value()));
-        }
-#endif
       }
     }
   }
 
   void Schedule(const Todo &todo) {
-    Schedule(todo.parent, todo.parent_id, todo.nodes,
-             todo.is_in_expansion, true);
+    Schedule(todo.parent, todo.parent_id, todo.nodes);
   }
 
   void Schedule(TokenTreeNodeRange nodes) {
-    Schedule(nullptr, mx::kInvalidEntityId, std::move(nodes), true, false);
+    Schedule(nullptr, mx::kInvalidEntityId, std::move(nodes));
     for (auto i = 0u; i < todo_list.size(); ++i) {
       Schedule(todo_list[i]);
     }

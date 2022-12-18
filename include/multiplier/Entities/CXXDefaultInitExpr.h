@@ -46,7 +46,7 @@ class CXXDefaultInitExpr : public Expr {
   }
 
   inline static CXXDefaultInitExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

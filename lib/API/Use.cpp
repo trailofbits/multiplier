@@ -145,6 +145,13 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
   fragment_ids.push_back(entity.fragment->fragment_id);
 }
 
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  search_ids.push_back(entity.id());
+  assert(false && "Implement this when Francesco's generator work is ready");
+  abort();
+}
+
 UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
     : BaseUseIteratorImpl(frag->ep) {
   search_ids.push_back(entity.id());

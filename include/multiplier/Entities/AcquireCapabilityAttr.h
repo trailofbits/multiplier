@@ -41,7 +41,7 @@ class AcquireCapabilityAttr : public InheritableAttr {
   }
 
   inline static AcquireCapabilityAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

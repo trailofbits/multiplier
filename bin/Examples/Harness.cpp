@@ -79,7 +79,7 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
     bool in_const_array_size = false;
     bool found_entities = false;
-    for (auto tc = mx::TokenContext::of(tok); tc; tc = tc->parent()) {
+    for (auto tc = tok.context(); tc; tc = tc->parent()) {
 
       if (std::optional<mx::Type> ty = tc->as_type()) {
 

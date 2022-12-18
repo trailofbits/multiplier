@@ -44,7 +44,7 @@ class OMPIteratorExpr : public Expr {
   }
 
   inline static OMPIteratorExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

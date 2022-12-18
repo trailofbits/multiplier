@@ -140,6 +140,16 @@ mx::RawEntityId EntityMapper::FileId(const pasta::File &file) const {
   }
 }
 
+mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {
+  if (auto fit = file_ids.find(file); fit != file_ids.end()) {
+    mx::FileId fid(fit->second);
+    return mx::EntityId(fid).Pack();
+
+  } else {
+    return mx::kInvalidEntityId;
+  }
+}
+
 mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) {
   if (auto it = entity_ids.find(entity.RawFileToken());
       it != entity_ids.end()) {

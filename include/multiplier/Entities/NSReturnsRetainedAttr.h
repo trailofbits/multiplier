@@ -40,7 +40,7 @@ class NSReturnsRetainedAttr : public InheritableAttr {
   }
 
   inline static NSReturnsRetainedAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

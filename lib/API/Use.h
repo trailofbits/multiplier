@@ -36,6 +36,7 @@ class UseIteratorImpl : public BaseUseIteratorImpl {
   UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
+  UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
   UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity);
 
   // Methods for finding the next user.

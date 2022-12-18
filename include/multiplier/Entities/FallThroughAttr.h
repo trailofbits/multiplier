@@ -40,7 +40,7 @@ class FallThroughAttr : public StmtAttr {
   }
 
   inline static FallThroughAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

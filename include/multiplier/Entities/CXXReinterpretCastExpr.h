@@ -50,7 +50,7 @@ class CXXReinterpretCastExpr : public CXXNamedCastExpr {
   }
 
   inline static CXXReinterpretCastExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

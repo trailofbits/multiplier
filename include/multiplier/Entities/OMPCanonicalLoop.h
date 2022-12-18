@@ -42,7 +42,7 @@ class OMPCanonicalLoop : public Stmt {
   }
 
   inline static OMPCanonicalLoopContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

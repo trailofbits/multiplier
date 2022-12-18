@@ -19,20 +19,22 @@
 #include "../Token.h"
 #include "../Use.h"
 
-#include "MacroDirective.h"
+#include "IncludeLikeMacroDirective.h"
 #include "MacroKind.h"
 
 namespace mx {
 class IfDefinedMacroDirective;
+class IncludeLikeMacroDirective;
 class Macro;
 class MacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using IfDefinedMacroDirectiveRange = DerivedEntityRange<MacroIterator, IfDefinedMacroDirective>;
 using IfDefinedMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, IfDefinedMacroDirective>;
 
-class IfDefinedMacroDirective : public MacroDirective {
+class IfDefinedMacroDirective : public IncludeLikeMacroDirective {
  private:
   friend class FragmentImpl;
+  friend class IncludeLikeMacroDirective;
   friend class MacroDirective;
   friend class Macro;
  public:
@@ -45,6 +47,16 @@ class IfDefinedMacroDirective : public MacroDirective {
 
   static IfDefinedMacroDirectiveContainingMacroRange containing(const Token &token);
   bool contains(const Token &token);
+
+  static std::optional<IfDefinedMacroDirective> from(const IncludeLikeMacroDirective &parent);
+
+  inline static std::optional<IfDefinedMacroDirective> from(const std::optional<IncludeLikeMacroDirective> &parent) {
+    if (parent) {
+      return IfDefinedMacroDirective::from(parent.value());
+    } else {
+      return std::nullopt;
+    }
+  }
 
   static std::optional<IfDefinedMacroDirective> from(const MacroDirective &parent);
 
@@ -68,7 +80,7 @@ class IfDefinedMacroDirective : public MacroDirective {
 
 };
 
-static_assert(sizeof(IfDefinedMacroDirective) == sizeof(MacroDirective));
+static_assert(sizeof(IfDefinedMacroDirective) == sizeof(IncludeLikeMacroDirective));
 
 #endif
 } // namespace mx

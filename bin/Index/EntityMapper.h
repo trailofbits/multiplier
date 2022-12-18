@@ -43,6 +43,7 @@ class EntityMapper final {
   mx::RawEntityId ParentDeclId(const pasta::Stmt &entity);
   mx::RawEntityId ParentStmtId(const pasta::Decl &entity);
   mx::RawEntityId ParentStmtId(const pasta::Stmt &entity);
+  mx::RawEntityId EntityId(const pasta::File &file) const;
   mx::RawEntityId EntityId(const void *entity) const;
   mx::RawEntityId EntityId(const pasta::Decl &entity) const;
   mx::RawEntityId EntityId(const pasta::Stmt &entity) const;

@@ -41,7 +41,7 @@ class DependentSizedArrayType : public ArrayType {
   }
 
   inline static DependentSizedArrayTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

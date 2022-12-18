@@ -40,7 +40,7 @@ class M68kInterruptAttr : public InheritableAttr {
   }
 
   inline static M68kInterruptAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

@@ -24,6 +24,7 @@
 #include "MacroKind.h"
 
 namespace mx {
+class File;
 class IncludeLikeMacroDirective;
 class Macro;
 class MacroDirective;
@@ -63,7 +64,7 @@ class IncludeLikeMacroDirective : public MacroDirective {
     }
   }
 
-  File included_file(void) const;
+  std::optional<File> included_file(void) const;
 };
 
 static_assert(sizeof(IncludeLikeMacroDirective) == sizeof(MacroDirective));

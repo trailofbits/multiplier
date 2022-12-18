@@ -43,7 +43,7 @@ class OMPDeclareTargetDeclAttr : public InheritableAttr {
   }
 
   inline static OMPDeclareTargetDeclAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

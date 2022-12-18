@@ -787,6 +787,7 @@ class AlwaysInlineAttr;
 class Macro;
 class MacroDirective;
 class IncludeLikeMacroDirective;
+class ConditionalMacroDirective;
 class OtherMacroDirective;
 class IfMacroDirective;
 class IfDefinedMacroDirective;
@@ -2147,6 +2148,7 @@ void SerializeAlwaysInlineAttr(EntityMapper &, mx::ast::Attr::Builder, const pas
 void SerializeMacro(EntityMapper &, mx::ast::Macro::Builder, const pasta::Macro &, const TokenTree *tt);
 void SerializeMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::MacroDirective &, const TokenTree *tt);
 void SerializeIncludeLikeMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IncludeLikeMacroDirective &, const TokenTree *tt);
+void SerializeConditionalMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::ConditionalMacroDirective &, const TokenTree *tt);
 void SerializeOtherMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::OtherMacroDirective &, const TokenTree *tt);
 void SerializeIfMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IfMacroDirective &, const TokenTree *tt);
 void SerializeIfDefinedMacroDirective(EntityMapper &, mx::ast::Macro::Builder, const pasta::IfDefinedMacroDirective &, const TokenTree *tt);

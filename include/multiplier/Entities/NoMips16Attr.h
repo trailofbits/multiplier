@@ -40,7 +40,7 @@ class NoMips16Attr : public InheritableAttr {
   }
 
   inline static NoMips16AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

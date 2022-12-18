@@ -40,7 +40,7 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
   }
 
   inline static X86ForceAlignArgPointerAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

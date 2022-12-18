@@ -42,7 +42,7 @@ class OMPAllocateDeclAttr : public InheritableAttr {
   }
 
   inline static OMPAllocateDeclAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

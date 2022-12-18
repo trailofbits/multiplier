@@ -7,6 +7,7 @@
 #pragma once
 
 #include <memory>
+#include <multiplier/Entities/FileUseSelector.h>
 #include <string_view>
 
 #include "Reference.h"
@@ -222,6 +223,9 @@ class File {
 
   // Return the contents of the file as a UTF-8 string.
   std::string_view data(void) const noexcept;
+
+  // Uses of this file.
+  UseRange<FileUseSelector> uses(void) const;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();

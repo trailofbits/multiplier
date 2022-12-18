@@ -44,7 +44,7 @@ class SwiftErrorResultAttr : public ParameterABIAttr {
   }
 
   inline static SwiftErrorResultAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

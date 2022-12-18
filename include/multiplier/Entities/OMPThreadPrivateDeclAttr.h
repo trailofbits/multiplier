@@ -40,7 +40,7 @@ class OMPThreadPrivateDeclAttr : public InheritableAttr {
   }
 
   inline static OMPThreadPrivateDeclAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

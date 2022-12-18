@@ -40,7 +40,7 @@ class ReturnsTwiceAttr : public InheritableAttr {
   }
 
   inline static ReturnsTwiceAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

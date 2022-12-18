@@ -128,7 +128,8 @@ void DispatchSerializeMacro(EntityMapper &em,
 
     PASTA_FOR_EACH_MACRO_IMPL(MX_VISIT_MACRO, PASTA_IGNORE_ABSTRACT,
                               MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
-                              MX_VISIT_DIRECTIVE, PASTA_IGNORE_ABSTRACT)
+                              MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
+                              PASTA_IGNORE_ABSTRACT)
 #undef MX_VISIT_ATTR
     default:
       assert(false);

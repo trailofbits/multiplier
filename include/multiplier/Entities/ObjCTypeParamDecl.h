@@ -47,7 +47,7 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   }
 
   inline static ObjCTypeParamDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

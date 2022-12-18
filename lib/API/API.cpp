@@ -313,4 +313,8 @@ ParentMacroIteratorImpl<Macro> Macro::containing_internal(const Token &token) {
   return ParentMacroIteratorImpl<Macro>(std::move(macro));
 }
 
+UseRange<MacroUseSelector> Macro::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+}
+
 }  // namespace mx

@@ -375,70 +375,6 @@ void SerializeUndefineMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b
   SerializeMacroDirective(es, b, e, tt);
 }
 
-void SerializeEndIfMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::EndIfMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeElseMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeElseIfNotDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfNotDefinedMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeElseIfDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfDefinedMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeElseIfMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeIfNotDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfNotDefinedMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeIfDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfDefinedMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
-void SerializeIfMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfMacroDirective &e, const TokenTree *tt) {
-  (void) tt;
-  (void) es;
-  (void) b;
-  (void) e;
-  SerializeMacroDirective(es, b, e, tt);
-}
-
 void SerializeOtherMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::OtherMacroDirective &e, const TokenTree *tt) {
   (void) tt;
   (void) es;
@@ -447,14 +383,12 @@ void SerializeOtherMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, c
   SerializeMacroDirective(es, b, e, tt);
 }
 
-void SerializeIncludeLikeMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeLikeMacroDirective &e, const TokenTree *tt) {
+void SerializeConditionalMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ConditionalMacroDirective &e, const TokenTree *tt) {
   (void) tt;
   (void) es;
   (void) b;
   (void) e;
   SerializeMacroDirective(es, b, e, tt);
-  auto f10 = e.IncludedFile();
-  b.setVal10(es.FileId(f10));
 }
 
 void SerializeImportMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ImportMacroDirective &e, const TokenTree *tt) {
@@ -462,7 +396,7 @@ void SerializeImportMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, 
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(es, b, e, tt);
 }
 
 void SerializeIncludeMacrosMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeMacrosMacroDirective &e, const TokenTree *tt) {
@@ -470,7 +404,7 @@ void SerializeIncludeMacrosMacroDirective(EntityMapper &es, mx::ast::Macro::Buil
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(es, b, e, tt);
 }
 
 void SerializeIncludeNextMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeNextMacroDirective &e, const TokenTree *tt) {
@@ -478,10 +412,89 @@ void SerializeIncludeNextMacroDirective(EntityMapper &es, mx::ast::Macro::Builde
   (void) es;
   (void) b;
   (void) e;
-  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+  SerializeConditionalMacroDirective(es, b, e, tt);
 }
 
 void SerializeIncludeMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeConditionalMacroDirective(es, b, e, tt);
+}
+
+void SerializeIncludeLikeMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IncludeLikeMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeMacroDirective(es, b, e, tt);
+  auto v10 = e.IncludedFile();
+  if (v10) {
+    auto id10 = es.EntityId(v10.value());
+    b.setVal10(id10);
+  } else {
+    b.setVal10(mx::kInvalidEntityId);
+  }
+}
+
+void SerializeEndIfMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::EndIfMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeElseMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeElseIfNotDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfNotDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeElseIfDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeElseIfMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::ElseIfMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeIfNotDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfNotDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeIfDefinedMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfDefinedMacroDirective &e, const TokenTree *tt) {
+  (void) tt;
+  (void) es;
+  (void) b;
+  (void) e;
+  SerializeIncludeLikeMacroDirective(es, b, e, tt);
+}
+
+void SerializeIfMacroDirective(EntityMapper &es, mx::ast::Macro::Builder b, const pasta::IfMacroDirective &e, const TokenTree *tt) {
   (void) tt;
   (void) es;
   (void) b;

@@ -38,7 +38,7 @@ class AliasAttr : public Attr {
   }
 
   inline static AliasAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

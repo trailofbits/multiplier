@@ -50,7 +50,7 @@ class ObjCMessageExpr : public Expr {
   }
 
   inline static ObjCMessageExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

@@ -44,7 +44,7 @@ class UnresolvedUsingValueDecl : public ValueDecl {
   }
 
   inline static UnresolvedUsingValueDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

@@ -40,7 +40,7 @@ class MSP430InterruptAttr : public InheritableAttr {
   }
 
   inline static MSP430InterruptAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

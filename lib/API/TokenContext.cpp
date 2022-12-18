@@ -13,33 +13,37 @@
 
 namespace mx {
 
-// Return the token context associated with a token.
+
+std::optional<TokenContext> TokenContext::of(const Token &tok) {
+  return tok.context();
+}
+
+// Return the context node that identifies how this token relates to the AST.
 //
 // NOTE(pag): This only works with parsed tokens, and not all parsed tokens
 //            are guaranteed to have a context.
-std::optional<TokenContext> TokenContext::of(const Token &tok) {
-  if (!tok.impl) {
+std::optional<TokenContext> Token::context(void) const {
+  if (!impl) {
     return std::nullopt;
   }
 
-  const FragmentImpl *frag = tok.impl->OwningFragment();
+  const FragmentImpl *frag = impl->OwningFragment();
   if (!frag) {
     return std::nullopt;
   }
 
   // Only parsed tokens have token contexts.
-  if (tok.offset >= frag->num_parsed_tokens) {
+  if (offset >= frag->num_parsed_tokens) {
     return std::nullopt;
   }
 
   // Make sure this is indeed a parsed token.
-  if (!std::holds_alternative<ParsedTokenId>(tok.id().Unpack())) {
+  if (!std::holds_alternative<ParsedTokenId>(id().Unpack())) {
     return std::nullopt;
   }
 
   const FragmentReader &frag_reader = frag->Fragment();
-  unsigned tagged_offset =
-      frag_reader.getParsedTokenContextOffsets()[tok.offset];
+  unsigned tagged_offset = frag_reader.getParsedTokenContextOffsets()[offset];
   if (!(tagged_offset & 1u)) {
     assert(!tagged_offset);
     return std::nullopt;
@@ -53,7 +57,7 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
   }
 
   mx::rpc::TokenContext::Reader tc = contexts_reader[offset];
-  std::shared_ptr<const FragmentImpl> frag_ptr(tok.impl, frag);
+  std::shared_ptr<const FragmentImpl> frag_ptr(impl, frag);
 
   // NOTE(pag): +1 to skip `kInvalid`.
   TokenContext ret(std::move(frag_ptr));

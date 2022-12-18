@@ -57,7 +57,7 @@ class VarDecl : public DeclaratorDecl {
   }
 
   inline static VarDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

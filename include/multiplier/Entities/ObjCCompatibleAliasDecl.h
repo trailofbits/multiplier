@@ -43,7 +43,7 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   }
 
   inline static ObjCCompatibleAliasDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

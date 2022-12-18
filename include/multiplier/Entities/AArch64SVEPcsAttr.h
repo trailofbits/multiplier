@@ -40,7 +40,7 @@ class AArch64SVEPcsAttr : public InheritableAttr {
   }
 
   inline static AArch64SVEPcsAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

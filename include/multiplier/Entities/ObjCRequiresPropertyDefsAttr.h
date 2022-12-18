@@ -40,7 +40,7 @@ class ObjCRequiresPropertyDefsAttr : public InheritableAttr {
   }
 
   inline static ObjCRequiresPropertyDefsAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

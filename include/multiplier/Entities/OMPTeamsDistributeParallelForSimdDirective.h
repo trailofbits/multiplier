@@ -46,7 +46,7 @@ class OMPTeamsDistributeParallelForSimdDirective : public OMPLoopDirective {
   }
 
   inline static OMPTeamsDistributeParallelForSimdDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

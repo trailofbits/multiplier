@@ -39,7 +39,7 @@ class VectorType : public Type {
   }
 
   inline static VectorTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {

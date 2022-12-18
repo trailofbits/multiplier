@@ -285,7 +285,12 @@ extern "C" int main(int argc, char *argv[]) {
     }
   }
 
+  std::unordered_map<unsigned, mx::TokenContext> contexts;
   for (mx::Token tok : parsed_toks) {
+    for (auto context = tok.context(); context; context = context->parent()) {
+      contexts.emplace(context->index_in_fragment(), context.value());
+    }
+
     PrintToken(os, file_toks, "pt", 0, tok);
   }
 
@@ -299,7 +304,67 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   os
-      << "</TR></TABLE>>];\n"
+      << "</TR></TABLE>>];\n";
+
+  for (const auto &entry : contexts) {
+    const mx::TokenContext &context = entry.second;
+    auto bgcolor = "";
+    auto kind_name = "";
+
+    if (auto stmt = context.as_statement()) {
+      bgcolor = " bgcolor=\"aquamarine\"";
+      kind_name = mx::EnumeratorName(stmt->kind());
+
+    } else if (auto decl = context.as_declaration()) {
+      bgcolor = " bgcolor=\"antiquewhite\"";
+      kind_name = mx::EnumeratorName(decl->kind());
+
+    } else if (auto type = context.as_type()) {
+      bgcolor = " bgcolor=\"cadetblue1\"";
+      kind_name = mx::EnumeratorName(type->kind());
+
+    } else if (auto attr = context.as_attribute()) {
+      bgcolor = " bgcolor=\"cornflowerblue\"";
+      kind_name = mx::EnumeratorName(attr->kind());
+
+    } else if (context.is_alias()) {
+      bgcolor = " bgcolor=\"deepskyblue3\"";
+
+    } else {
+      assert(false);
+    }
+
+    os
+        << "c" << context.index_in_fragment()
+        << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" "
+        << "border=\"1\"><TR><TD" << bgcolor << ">";
+
+    os << kind_name;
+
+    os
+        << "</TD></TR></TABLE>>];\n";
+
+    if (auto parent_context = context.parent()) {
+      os
+          << "c" << context.index_in_fragment() << " -> c" << parent_context->index_in_fragment() << ";\n";
+    }
+
+    if (auto alias_context = context.aliasee()) {
+      os
+          << "c" << context.index_in_fragment() << " -> c" << alias_context->index_in_fragment()
+          << " [style=dashed];\n";
+    }
+  }
+
+  for (const mx::Token &tok : parsed_toks) {
+    if (auto context = tok.context()) {
+      os
+          << "pt0:t" << tok.id().Pack()
+          << " -> c" << context->index_in_fragment() << ";\n";
+    }
+  }
+
+  os
       << "}\n";
   return EXIT_SUCCESS;
 }

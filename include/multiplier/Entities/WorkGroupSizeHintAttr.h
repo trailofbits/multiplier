@@ -40,7 +40,7 @@ class WorkGroupSizeHintAttr : public InheritableAttr {
   }
 
   inline static WorkGroupSizeHintAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
