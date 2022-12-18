@@ -51,8 +51,9 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : ObjCCategoryImplDecl::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

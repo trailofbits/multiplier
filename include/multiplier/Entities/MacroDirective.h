@@ -39,6 +39,9 @@ class MacroDirective : public Macro {
   static MacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroDirective> from(const Macro &parent);
 
   inline static std::optional<MacroDirective> from(const std::optional<Macro> &parent) {

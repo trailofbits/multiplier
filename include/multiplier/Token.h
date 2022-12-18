@@ -23,6 +23,7 @@ class FileLocationCache;
 class Fragment;
 class FragmentImpl;
 class Index;
+class Macro;
 class TokenContext;
 class TokenRangeIterator;
 class TokenRange;
@@ -38,6 +39,7 @@ class Token {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
   friend class TokenContext;
   friend class TokenRangeIterator;
   friend class TokenRange;
@@ -63,6 +65,18 @@ class Token {
 
   // Return the ID of this token.
   EntityId id(void) const;
+
+  inline auto operator<=>(const Token &that) const noexcept
+      -> decltype(mx::RawEntityId() <=> mx::RawEntityId()) {
+    return id().Pack() <=> that.id().Pack();
+  }
+
+  // Return the version of this token that was actually parsed. If this was a
+  // macro token that only relates to a single parsed token, then that is
+  // returned. If this is a macro token that doesn't relate to any parsed
+  // tokens, or relates to more than one, then nothing is returned. If this
+  // is a file token then nothing is returned.
+  std::optional<Token> parsed_token(void) const;
 
   // Return the token from which this token was derived. This can be a macro
   // token or a file token.
@@ -195,7 +209,11 @@ class TokenRange {
   TokenRange &operator=(TokenRange &&) noexcept = default;
 
   inline operator bool(void) const noexcept {
-    return num_tokens && (num_tokens - index);
+    return !empty();
+  }
+
+  inline bool empty(void) const noexcept {
+    return index >= num_tokens;
   }
 
   // Return the number of tokens in this token list.

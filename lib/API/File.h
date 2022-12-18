@@ -102,7 +102,13 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
   std::string_view NthTokenData(unsigned index) const final;
 
   // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(unsigned token_index) const final;
+  EntityId NthDerivedTokenId(unsigned) const final;
+
+  // Return the id of the parsed token which is derived from the Nth token.
+  EntityId NthParsedTokenId(unsigned) const final;
+
+  // Return the id of the macro containing the Nth token.
+  EntityId NthContainingMacroId(unsigned) const final;
 
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;

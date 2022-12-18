@@ -7883,10 +7883,23 @@ MacroContainingMacroRange Macro::containing(const Macro &macro) {
 }
 
 bool Macro::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : Macro::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool Macro::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : Macro::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroContainingMacroRange Macro::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 MacroKind Macro::kind(void) const {
@@ -7926,10 +7939,23 @@ MacroVAOptArgumentContainingMacroRange MacroVAOptArgument::containing(const Macr
 }
 
 bool MacroVAOptArgument::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroVAOptArgument::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroVAOptArgument::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroVAOptArgument::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroVAOptArgumentContainingMacroRange MacroVAOptArgument::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroVAOptArgument> MacroVAOptArgument::from(const Macro &parent) {
@@ -7945,10 +7971,23 @@ MacroSubstitutionContainingMacroRange MacroSubstitution::containing(const Macro 
 }
 
 bool MacroSubstitution::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroSubstitution::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroSubstitution::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroSubstitution::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroSubstitutionContainingMacroRange MacroSubstitution::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroSubstitution> MacroSubstitution::from(const Macro &parent) {
@@ -7987,10 +8026,23 @@ MacroVAOptContainingMacroRange MacroVAOpt::containing(const Macro &macro) {
 }
 
 bool MacroVAOpt::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroVAOpt::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroVAOpt::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroVAOpt::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroVAOptContainingMacroRange MacroVAOpt::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroVAOpt> MacroVAOpt::from(const MacroSubstitution &parent) {
@@ -8010,10 +8062,23 @@ MacroConcatenateContainingMacroRange MacroConcatenate::containing(const Macro &m
 }
 
 bool MacroConcatenate::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroConcatenate::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroConcatenate::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroConcatenate::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroConcatenateContainingMacroRange MacroConcatenate::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroConcatenate> MacroConcatenate::from(const MacroSubstitution &parent) {
@@ -8033,10 +8098,23 @@ MacroStringifyContainingMacroRange MacroStringify::containing(const Macro &macro
 }
 
 bool MacroStringify::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroStringify::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroStringify::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroStringify::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroStringifyContainingMacroRange MacroStringify::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroStringify> MacroStringify::from(const MacroSubstitution &parent) {
@@ -8056,10 +8134,23 @@ MacroExpansionContainingMacroRange MacroExpansion::containing(const Macro &macro
 }
 
 bool MacroExpansion::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroExpansion::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroExpansion::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroExpansion::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroExpansionContainingMacroRange MacroExpansion::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroExpansion> MacroExpansion::from(const MacroSubstitution &parent) {
@@ -8103,10 +8194,23 @@ MacroArgumentContainingMacroRange MacroArgument::containing(const Macro &macro) 
 }
 
 bool MacroArgument::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroArgument::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroArgument::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroArgument::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroArgumentContainingMacroRange MacroArgument::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroArgument> MacroArgument::from(const Macro &parent) {
@@ -8132,10 +8236,23 @@ MacroParameterContainingMacroRange MacroParameter::containing(const Macro &macro
 }
 
 bool MacroParameter::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroParameter::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroParameter::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroParameter::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroParameterContainingMacroRange MacroParameter::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroParameter> MacroParameter::from(const Macro &parent) {
@@ -8172,10 +8289,23 @@ MacroDirectiveContainingMacroRange MacroDirective::containing(const Macro &macro
 }
 
 bool MacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : MacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool MacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : MacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+MacroDirectiveContainingMacroRange MacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<MacroDirective> MacroDirective::from(const Macro &parent) {
@@ -8223,10 +8353,23 @@ DefineMacroDirectiveContainingMacroRange DefineMacroDirective::containing(const 
 }
 
 bool DefineMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : DefineMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool DefineMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : DefineMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+DefineMacroDirectiveContainingMacroRange DefineMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<DefineMacroDirective> DefineMacroDirective::from(const MacroDirective &parent) {
@@ -8299,10 +8442,23 @@ PragmaMacroDirectiveContainingMacroRange PragmaMacroDirective::containing(const 
 }
 
 bool PragmaMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : PragmaMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool PragmaMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : PragmaMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+PragmaMacroDirectiveContainingMacroRange PragmaMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<PragmaMacroDirective> PragmaMacroDirective::from(const MacroDirective &parent) {
@@ -8322,10 +8478,23 @@ UndefineMacroDirectiveContainingMacroRange UndefineMacroDirective::containing(co
 }
 
 bool UndefineMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : UndefineMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool UndefineMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : UndefineMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+UndefineMacroDirectiveContainingMacroRange UndefineMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<UndefineMacroDirective> UndefineMacroDirective::from(const MacroDirective &parent) {
@@ -8345,10 +8514,23 @@ EndIfMacroDirectiveContainingMacroRange EndIfMacroDirective::containing(const Ma
 }
 
 bool EndIfMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : EndIfMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool EndIfMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : EndIfMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+EndIfMacroDirectiveContainingMacroRange EndIfMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<EndIfMacroDirective> EndIfMacroDirective::from(const MacroDirective &parent) {
@@ -8368,10 +8550,23 @@ ElseMacroDirectiveContainingMacroRange ElseMacroDirective::containing(const Macr
 }
 
 bool ElseMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : ElseMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool ElseMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseMacroDirectiveContainingMacroRange ElseMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<ElseMacroDirective> ElseMacroDirective::from(const MacroDirective &parent) {
@@ -8391,10 +8586,23 @@ ElseIfNotDefinedMacroDirectiveContainingMacroRange ElseIfNotDefinedMacroDirectiv
 }
 
 bool ElseIfNotDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : ElseIfNotDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool ElseIfNotDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfNotDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseIfNotDefinedMacroDirectiveContainingMacroRange ElseIfNotDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<ElseIfNotDefinedMacroDirective> ElseIfNotDefinedMacroDirective::from(const MacroDirective &parent) {
@@ -8414,10 +8622,23 @@ ElseIfDefinedMacroDirectiveContainingMacroRange ElseIfDefinedMacroDirective::con
 }
 
 bool ElseIfDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : ElseIfDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool ElseIfDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseIfDefinedMacroDirectiveContainingMacroRange ElseIfDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<ElseIfDefinedMacroDirective> ElseIfDefinedMacroDirective::from(const MacroDirective &parent) {
@@ -8437,10 +8658,23 @@ ElseIfMacroDirectiveContainingMacroRange ElseIfMacroDirective::containing(const 
 }
 
 bool ElseIfMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : ElseIfMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool ElseIfMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ElseIfMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ElseIfMacroDirectiveContainingMacroRange ElseIfMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<ElseIfMacroDirective> ElseIfMacroDirective::from(const MacroDirective &parent) {
@@ -8460,10 +8694,23 @@ IfNotDefinedMacroDirectiveContainingMacroRange IfNotDefinedMacroDirective::conta
 }
 
 bool IfNotDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IfNotDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IfNotDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IfNotDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IfNotDefinedMacroDirectiveContainingMacroRange IfNotDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IfNotDefinedMacroDirective> IfNotDefinedMacroDirective::from(const MacroDirective &parent) {
@@ -8483,10 +8730,23 @@ IfDefinedMacroDirectiveContainingMacroRange IfDefinedMacroDirective::containing(
 }
 
 bool IfDefinedMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IfDefinedMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IfDefinedMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IfDefinedMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IfDefinedMacroDirectiveContainingMacroRange IfDefinedMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IfDefinedMacroDirective> IfDefinedMacroDirective::from(const MacroDirective &parent) {
@@ -8506,10 +8766,23 @@ IfMacroDirectiveContainingMacroRange IfMacroDirective::containing(const Macro &m
 }
 
 bool IfMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IfMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IfMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IfMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IfMacroDirectiveContainingMacroRange IfMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IfMacroDirective> IfMacroDirective::from(const MacroDirective &parent) {
@@ -8529,10 +8802,23 @@ OtherMacroDirectiveContainingMacroRange OtherMacroDirective::containing(const Ma
 }
 
 bool OtherMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : OtherMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool OtherMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : OtherMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+OtherMacroDirectiveContainingMacroRange OtherMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<OtherMacroDirective> OtherMacroDirective::from(const MacroDirective &parent) {
@@ -8552,10 +8838,23 @@ IncludeLikeMacroDirectiveContainingMacroRange IncludeLikeMacroDirective::contain
 }
 
 bool IncludeLikeMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IncludeLikeMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IncludeLikeMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IncludeLikeMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IncludeLikeMacroDirectiveContainingMacroRange IncludeLikeMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const MacroDirective &parent) {
@@ -8584,10 +8883,23 @@ ImportMacroDirectiveContainingMacroRange ImportMacroDirective::containing(const 
 }
 
 bool ImportMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : ImportMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool ImportMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : ImportMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+ImportMacroDirectiveContainingMacroRange ImportMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<ImportMacroDirective> ImportMacroDirective::from(const IncludeLikeMacroDirective &parent) {
@@ -8611,10 +8923,23 @@ IncludeMacrosMacroDirectiveContainingMacroRange IncludeMacrosMacroDirective::con
 }
 
 bool IncludeMacrosMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IncludeMacrosMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IncludeMacrosMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IncludeMacrosMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IncludeMacrosMacroDirectiveContainingMacroRange IncludeMacrosMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IncludeMacrosMacroDirective> IncludeMacrosMacroDirective::from(const IncludeLikeMacroDirective &parent) {
@@ -8638,10 +8963,23 @@ IncludeNextMacroDirectiveContainingMacroRange IncludeNextMacroDirective::contain
 }
 
 bool IncludeNextMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IncludeNextMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IncludeNextMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IncludeNextMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IncludeNextMacroDirectiveContainingMacroRange IncludeNextMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IncludeNextMacroDirective> IncludeNextMacroDirective::from(const IncludeLikeMacroDirective &parent) {
@@ -8665,10 +9003,23 @@ IncludeMacroDirectiveContainingMacroRange IncludeMacroDirective::containing(cons
 }
 
 bool IncludeMacroDirective::contains(const Macro &macro) {
+  auto id_ = id();
   for (auto &parent : IncludeMacroDirective::containing(macro)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
+}
+
+bool IncludeMacroDirective::contains(const Token &token) {
+  auto id_ = id();
+  for (auto &parent : IncludeMacroDirective::containing(token)) {
+    if (parent.id() == id_) { return true; }
+  }
+  return false;
+}
+
+IncludeMacroDirectiveContainingMacroRange IncludeMacroDirective::containing(const Token &token) {
+  return Macro::containing_internal(token);
 }
 
 std::optional<IncludeMacroDirective> IncludeMacroDirective::from(const IncludeLikeMacroDirective &parent) {
@@ -22073,15 +22424,17 @@ StmtContainingStmtRange Stmt::containing(const Stmt &stmt) {
 }
 
 bool Stmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : Stmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool Stmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : Stmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22131,15 +22484,17 @@ SEHTryStmtContainingStmtRange SEHTryStmt::containing(const Stmt &stmt) {
 }
 
 bool SEHTryStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SEHTryStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SEHTryStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SEHTryStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22203,15 +22558,17 @@ SEHLeaveStmtContainingStmtRange SEHLeaveStmt::containing(const Stmt &stmt) {
 }
 
 bool SEHLeaveStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SEHLeaveStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SEHLeaveStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SEHLeaveStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22246,15 +22603,17 @@ SEHFinallyStmtContainingStmtRange SEHFinallyStmt::containing(const Stmt &stmt) {
 }
 
 bool SEHFinallyStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SEHFinallyStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SEHFinallyStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SEHFinallyStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22295,15 +22654,17 @@ SEHExceptStmtContainingStmtRange SEHExceptStmt::containing(const Stmt &stmt) {
 }
 
 bool SEHExceptStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SEHExceptStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SEHExceptStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SEHExceptStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22350,15 +22711,17 @@ ReturnStmtContainingStmtRange ReturnStmt::containing(const Stmt &stmt) {
 }
 
 bool ReturnStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ReturnStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ReturnStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ReturnStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22409,15 +22772,17 @@ ObjCForCollectionStmtContainingStmtRange ObjCForCollectionStmt::containing(const
 }
 
 bool ObjCForCollectionStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCForCollectionStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCForCollectionStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCForCollectionStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22479,15 +22844,17 @@ ObjCAutoreleasePoolStmtContainingStmtRange ObjCAutoreleasePoolStmt::containing(c
 }
 
 bool ObjCAutoreleasePoolStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAutoreleasePoolStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAutoreleasePoolStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAutoreleasePoolStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22528,15 +22895,17 @@ ObjCAtTryStmtContainingStmtRange ObjCAtTryStmt::containing(const Stmt &stmt) {
 }
 
 bool ObjCAtTryStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAtTryStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAtTryStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAtTryStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22599,15 +22968,17 @@ ObjCAtThrowStmtContainingStmtRange ObjCAtThrowStmt::containing(const Stmt &stmt)
 }
 
 bool ObjCAtThrowStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAtThrowStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAtThrowStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAtThrowStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22648,15 +23019,17 @@ ObjCAtSynchronizedStmtContainingStmtRange ObjCAtSynchronizedStmt::containing(con
 }
 
 bool ObjCAtSynchronizedStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAtSynchronizedStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAtSynchronizedStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAtSynchronizedStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22703,15 +23076,17 @@ ObjCAtFinallyStmtContainingStmtRange ObjCAtFinallyStmt::containing(const Stmt &s
 }
 
 bool ObjCAtFinallyStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAtFinallyStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAtFinallyStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAtFinallyStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22752,15 +23127,17 @@ ObjCAtCatchStmtContainingStmtRange ObjCAtCatchStmt::containing(const Stmt &stmt)
 }
 
 bool ObjCAtCatchStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAtCatchStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAtCatchStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAtCatchStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22821,15 +23198,17 @@ OMPExecutableDirectiveContainingStmtRange OMPExecutableDirective::containing(con
 }
 
 bool OMPExecutableDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPExecutableDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPExecutableDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPExecutableDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -22958,15 +23337,17 @@ OMPDispatchDirectiveContainingStmtRange OMPDispatchDirective::containing(const S
 }
 
 bool OMPDispatchDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDispatchDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDispatchDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDispatchDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23005,15 +23386,17 @@ OMPDepobjDirectiveContainingStmtRange OMPDepobjDirective::containing(const Stmt 
 }
 
 bool OMPDepobjDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDepobjDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDepobjDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDepobjDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23043,15 +23426,17 @@ OMPCriticalDirectiveContainingStmtRange OMPCriticalDirective::containing(const S
 }
 
 bool OMPCriticalDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPCriticalDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPCriticalDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPCriticalDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23081,15 +23466,17 @@ OMPCancellationPointDirectiveContainingStmtRange OMPCancellationPointDirective::
 }
 
 bool OMPCancellationPointDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPCancellationPointDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPCancellationPointDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPCancellationPointDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23119,15 +23506,17 @@ OMPCancelDirectiveContainingStmtRange OMPCancelDirective::containing(const Stmt 
 }
 
 bool OMPCancelDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPCancelDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPCancelDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPCancelDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23157,15 +23546,17 @@ OMPBarrierDirectiveContainingStmtRange OMPBarrierDirective::containing(const Stm
 }
 
 bool OMPBarrierDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPBarrierDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPBarrierDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPBarrierDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23195,15 +23586,17 @@ OMPAtomicDirectiveContainingStmtRange OMPAtomicDirective::containing(const Stmt 
 }
 
 bool OMPAtomicDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPAtomicDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPAtomicDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPAtomicDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23290,15 +23683,17 @@ OMPTeamsDirectiveContainingStmtRange OMPTeamsDirective::containing(const Stmt &s
 }
 
 bool OMPTeamsDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23328,15 +23723,17 @@ OMPTaskyieldDirectiveContainingStmtRange OMPTaskyieldDirective::containing(const
 }
 
 bool OMPTaskyieldDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTaskyieldDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTaskyieldDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTaskyieldDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23366,15 +23763,17 @@ OMPTaskwaitDirectiveContainingStmtRange OMPTaskwaitDirective::containing(const S
 }
 
 bool OMPTaskwaitDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTaskwaitDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTaskwaitDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTaskwaitDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23404,15 +23803,17 @@ OMPTaskgroupDirectiveContainingStmtRange OMPTaskgroupDirective::containing(const
 }
 
 bool OMPTaskgroupDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTaskgroupDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTaskgroupDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTaskgroupDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23448,15 +23849,17 @@ OMPTaskDirectiveContainingStmtRange OMPTaskDirective::containing(const Stmt &stm
 }
 
 bool OMPTaskDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTaskDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTaskDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTaskDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23491,15 +23894,17 @@ OMPTargetUpdateDirectiveContainingStmtRange OMPTargetUpdateDirective::containing
 }
 
 bool OMPTargetUpdateDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetUpdateDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetUpdateDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetUpdateDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23529,15 +23934,17 @@ OMPTargetTeamsDirectiveContainingStmtRange OMPTargetTeamsDirective::containing(c
 }
 
 bool OMPTargetTeamsDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23567,15 +23974,17 @@ OMPTargetParallelDirectiveContainingStmtRange OMPTargetParallelDirective::contai
 }
 
 bool OMPTargetParallelDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23616,15 +24025,17 @@ OMPTargetExitDataDirectiveContainingStmtRange OMPTargetExitDataDirective::contai
 }
 
 bool OMPTargetExitDataDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetExitDataDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetExitDataDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetExitDataDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23654,15 +24065,17 @@ OMPTargetEnterDataDirectiveContainingStmtRange OMPTargetEnterDataDirective::cont
 }
 
 bool OMPTargetEnterDataDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetEnterDataDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetEnterDataDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetEnterDataDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23692,15 +24105,17 @@ OMPTargetDirectiveContainingStmtRange OMPTargetDirective::containing(const Stmt 
 }
 
 bool OMPTargetDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23730,15 +24145,17 @@ OMPTargetDataDirectiveContainingStmtRange OMPTargetDataDirective::containing(con
 }
 
 bool OMPTargetDataDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetDataDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetDataDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetDataDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23768,15 +24185,17 @@ OMPSingleDirectiveContainingStmtRange OMPSingleDirective::containing(const Stmt 
 }
 
 bool OMPSingleDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPSingleDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPSingleDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPSingleDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23806,15 +24225,17 @@ OMPSectionsDirectiveContainingStmtRange OMPSectionsDirective::containing(const S
 }
 
 bool OMPSectionsDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPSectionsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPSectionsDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPSectionsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23855,15 +24276,17 @@ OMPSectionDirectiveContainingStmtRange OMPSectionDirective::containing(const Stm
 }
 
 bool OMPSectionDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPSectionDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPSectionDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPSectionDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23898,15 +24321,17 @@ OMPScanDirectiveContainingStmtRange OMPScanDirective::containing(const Stmt &stm
 }
 
 bool OMPScanDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPScanDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPScanDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPScanDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23936,15 +24361,17 @@ OMPParallelSectionsDirectiveContainingStmtRange OMPParallelSectionsDirective::co
 }
 
 bool OMPParallelSectionsDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelSectionsDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelSectionsDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelSectionsDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -23985,15 +24412,17 @@ OMPParallelMasterDirectiveContainingStmtRange OMPParallelMasterDirective::contai
 }
 
 bool OMPParallelMasterDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMasterDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMasterDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24029,15 +24458,17 @@ OMPParallelMaskedDirectiveContainingStmtRange OMPParallelMaskedDirective::contai
 }
 
 bool OMPParallelMaskedDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMaskedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMaskedDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMaskedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24073,15 +24504,17 @@ OMPParallelDirectiveContainingStmtRange OMPParallelDirective::containing(const S
 }
 
 bool OMPParallelDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24122,15 +24555,17 @@ OMPOrderedDirectiveContainingStmtRange OMPOrderedDirective::containing(const Stm
 }
 
 bool OMPOrderedDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPOrderedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPOrderedDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPOrderedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24160,15 +24595,17 @@ OMPMetaDirectiveContainingStmtRange OMPMetaDirective::containing(const Stmt &stm
 }
 
 bool OMPMetaDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMetaDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMetaDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMetaDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24204,15 +24641,17 @@ OMPMasterDirectiveContainingStmtRange OMPMasterDirective::containing(const Stmt 
 }
 
 bool OMPMasterDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMasterDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMasterDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMasterDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24242,15 +24681,17 @@ OMPMaskedDirectiveContainingStmtRange OMPMaskedDirective::containing(const Stmt 
 }
 
 bool OMPMaskedDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMaskedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMaskedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24280,15 +24721,17 @@ OMPLoopBasedDirectiveContainingStmtRange OMPLoopBasedDirective::containing(const
 }
 
 bool OMPLoopBasedDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPLoopBasedDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPLoopBasedDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPLoopBasedDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24354,15 +24797,17 @@ OMPLoopTransformationDirectiveContainingStmtRange OMPLoopTransformationDirective
 }
 
 bool OMPLoopTransformationDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPLoopTransformationDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPLoopTransformationDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPLoopTransformationDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24409,15 +24854,17 @@ OMPUnrollDirectiveContainingStmtRange OMPUnrollDirective::containing(const Stmt 
 }
 
 bool OMPUnrollDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPUnrollDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPUnrollDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPUnrollDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24455,15 +24902,17 @@ OMPTileDirectiveContainingStmtRange OMPTileDirective::containing(const Stmt &stm
 }
 
 bool OMPTileDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTileDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTileDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTileDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24501,15 +24950,17 @@ OMPLoopDirectiveContainingStmtRange OMPLoopDirective::containing(const Stmt &stm
 }
 
 bool OMPLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24885,15 +25336,17 @@ OMPGenericLoopDirectiveContainingStmtRange OMPGenericLoopDirective::containing(c
 }
 
 bool OMPGenericLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPGenericLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24931,15 +25384,17 @@ OMPForSimdDirectiveContainingStmtRange OMPForSimdDirective::containing(const Stm
 }
 
 bool OMPForSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPForSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -24977,15 +25432,17 @@ OMPForDirectiveContainingStmtRange OMPForDirective::containing(const Stmt &stmt)
 }
 
 bool OMPForDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPForDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25034,15 +25491,17 @@ OMPDistributeSimdDirectiveContainingStmtRange OMPDistributeSimdDirective::contai
 }
 
 bool OMPDistributeSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25080,15 +25539,17 @@ OMPDistributeParallelForSimdDirectiveContainingStmtRange OMPDistributeParallelFo
 }
 
 bool OMPDistributeParallelForSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25126,15 +25587,17 @@ OMPDistributeParallelForDirectiveContainingStmtRange OMPDistributeParallelForDir
 }
 
 bool OMPDistributeParallelForDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeParallelForDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25183,15 +25646,17 @@ OMPDistributeDirectiveContainingStmtRange OMPDistributeDirective::containing(con
 }
 
 bool OMPDistributeDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDistributeDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDistributeDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25229,15 +25694,17 @@ OMPTeamsGenericLoopDirectiveContainingStmtRange OMPTeamsGenericLoopDirective::co
 }
 
 bool OMPTeamsGenericLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsGenericLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25275,15 +25742,17 @@ OMPTeamsDistributeSimdDirectiveContainingStmtRange OMPTeamsDistributeSimdDirecti
 }
 
 bool OMPTeamsDistributeSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25321,15 +25790,17 @@ OMPTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTeamsDistribute
 }
 
 bool OMPTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25367,15 +25838,17 @@ OMPTeamsDistributeParallelForDirectiveContainingStmtRange OMPTeamsDistributePara
 }
 
 bool OMPTeamsDistributeParallelForDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25424,15 +25897,17 @@ OMPTeamsDistributeDirectiveContainingStmtRange OMPTeamsDistributeDirective::cont
 }
 
 bool OMPTeamsDistributeDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTeamsDistributeDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTeamsDistributeDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25470,15 +25945,17 @@ OMPTaskLoopSimdDirectiveContainingStmtRange OMPTaskLoopSimdDirective::containing
 }
 
 bool OMPTaskLoopSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25516,15 +25993,17 @@ OMPTaskLoopDirectiveContainingStmtRange OMPTaskLoopDirective::containing(const S
 }
 
 bool OMPTaskLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTaskLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25567,15 +26046,17 @@ OMPTargetTeamsGenericLoopDirectiveContainingStmtRange OMPTargetTeamsGenericLoopD
 }
 
 bool OMPTargetTeamsGenericLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsGenericLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25613,15 +26094,17 @@ OMPTargetTeamsDistributeSimdDirectiveContainingStmtRange OMPTargetTeamsDistribut
 }
 
 bool OMPTargetTeamsDistributeSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25659,15 +26142,17 @@ OMPTargetTeamsDistributeParallelForSimdDirectiveContainingStmtRange OMPTargetTea
 }
 
 bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeParallelForSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25705,15 +26190,17 @@ OMPTargetTeamsDistributeParallelForDirectiveContainingStmtRange OMPTargetTeamsDi
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25762,15 +26249,17 @@ OMPTargetTeamsDistributeDirectiveContainingStmtRange OMPTargetTeamsDistributeDir
 }
 
 bool OMPTargetTeamsDistributeDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetTeamsDistributeDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetTeamsDistributeDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25808,15 +26297,17 @@ OMPTargetSimdDirectiveContainingStmtRange OMPTargetSimdDirective::containing(con
 }
 
 bool OMPTargetSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25854,15 +26345,17 @@ OMPTargetParallelGenericLoopDirectiveContainingStmtRange OMPTargetParallelGeneri
 }
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelGenericLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25900,15 +26393,17 @@ OMPTargetParallelForSimdDirectiveContainingStmtRange OMPTargetParallelForSimdDir
 }
 
 bool OMPTargetParallelForSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelForSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -25946,15 +26441,17 @@ OMPTargetParallelForDirectiveContainingStmtRange OMPTargetParallelForDirective::
 }
 
 bool OMPTargetParallelForDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPTargetParallelForDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPTargetParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26003,15 +26500,17 @@ OMPSimdDirectiveContainingStmtRange OMPSimdDirective::containing(const Stmt &stm
 }
 
 bool OMPSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26049,15 +26548,17 @@ OMPParallelMasterTaskLoopSimdDirectiveContainingStmtRange OMPParallelMasterTaskL
 }
 
 bool OMPParallelMasterTaskLoopSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMasterTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26095,15 +26596,17 @@ OMPParallelMasterTaskLoopDirectiveContainingStmtRange OMPParallelMasterTaskLoopD
 }
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMasterTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMasterTaskLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMasterTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26146,15 +26649,17 @@ OMPParallelMaskedTaskLoopSimdDirectiveContainingStmtRange OMPParallelMaskedTaskL
 }
 
 bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMaskedTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMaskedTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26192,15 +26697,17 @@ OMPParallelMaskedTaskLoopDirectiveContainingStmtRange OMPParallelMaskedTaskLoopD
 }
 
 bool OMPParallelMaskedTaskLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMaskedTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelMaskedTaskLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelMaskedTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26243,15 +26750,17 @@ OMPParallelGenericLoopDirectiveContainingStmtRange OMPParallelGenericLoopDirecti
 }
 
 bool OMPParallelGenericLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelGenericLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelGenericLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelGenericLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26289,15 +26798,17 @@ OMPParallelForSimdDirectiveContainingStmtRange OMPParallelForSimdDirective::cont
 }
 
 bool OMPParallelForSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelForSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelForSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelForSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26335,15 +26846,17 @@ OMPParallelForDirectiveContainingStmtRange OMPParallelForDirective::containing(c
 }
 
 bool OMPParallelForDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPParallelForDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPParallelForDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPParallelForDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26392,15 +26905,17 @@ OMPMasterTaskLoopSimdDirectiveContainingStmtRange OMPMasterTaskLoopSimdDirective
 }
 
 bool OMPMasterTaskLoopSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMasterTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMasterTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMasterTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26438,15 +26953,17 @@ OMPMasterTaskLoopDirectiveContainingStmtRange OMPMasterTaskLoopDirective::contai
 }
 
 bool OMPMasterTaskLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMasterTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMasterTaskLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMasterTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26489,15 +27006,17 @@ OMPMaskedTaskLoopSimdDirectiveContainingStmtRange OMPMaskedTaskLoopSimdDirective
 }
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMaskedTaskLoopSimdDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedTaskLoopSimdDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMaskedTaskLoopSimdDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26535,15 +27054,17 @@ OMPMaskedTaskLoopDirectiveContainingStmtRange OMPMaskedTaskLoopDirective::contai
 }
 
 bool OMPMaskedTaskLoopDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPMaskedTaskLoopDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPMaskedTaskLoopDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPMaskedTaskLoopDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26586,15 +27107,17 @@ OMPInteropDirectiveContainingStmtRange OMPInteropDirective::containing(const Stm
 }
 
 bool OMPInteropDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPInteropDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPInteropDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPInteropDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26624,15 +27147,17 @@ OMPFlushDirectiveContainingStmtRange OMPFlushDirective::containing(const Stmt &s
 }
 
 bool OMPFlushDirective::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPFlushDirective::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPFlushDirective::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPFlushDirective::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26662,15 +27187,17 @@ OMPCanonicalLoopContainingStmtRange OMPCanonicalLoop::containing(const Stmt &stm
 }
 
 bool OMPCanonicalLoop::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPCanonicalLoop::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPCanonicalLoop::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPCanonicalLoop::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26720,15 +27247,17 @@ NullStmtContainingStmtRange NullStmt::containing(const Stmt &stmt) {
 }
 
 bool NullStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : NullStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool NullStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : NullStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26768,15 +27297,17 @@ MSDependentExistsStmtContainingStmtRange MSDependentExistsStmt::containing(const
 }
 
 bool MSDependentExistsStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MSDependentExistsStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MSDependentExistsStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MSDependentExistsStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26827,15 +27358,17 @@ IndirectGotoStmtContainingStmtRange IndirectGotoStmt::containing(const Stmt &stm
 }
 
 bool IndirectGotoStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : IndirectGotoStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool IndirectGotoStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : IndirectGotoStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -26893,15 +27426,17 @@ IfStmtContainingStmtRange IfStmt::containing(const Stmt &stmt) {
 }
 
 bool IfStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : IfStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool IfStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : IfStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27052,15 +27587,17 @@ GotoStmtContainingStmtRange GotoStmt::containing(const Stmt &stmt) {
 }
 
 bool GotoStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : GotoStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool GotoStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : GotoStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27110,15 +27647,17 @@ ForStmtContainingStmtRange ForStmt::containing(const Stmt &stmt) {
 }
 
 bool ForStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ForStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ForStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ForStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27217,15 +27756,17 @@ DoStmtContainingStmtRange DoStmt::containing(const Stmt &stmt) {
 }
 
 bool DoStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DoStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DoStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DoStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27290,15 +27831,17 @@ DeclStmtContainingStmtRange DeclStmt::containing(const Stmt &stmt) {
 }
 
 bool DeclStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DeclStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DeclStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DeclStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27351,15 +27894,17 @@ CoroutineBodyStmtContainingStmtRange CoroutineBodyStmt::containing(const Stmt &s
 }
 
 bool CoroutineBodyStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CoroutineBodyStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CoroutineBodyStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CoroutineBodyStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27482,15 +28027,17 @@ CoreturnStmtContainingStmtRange CoreturnStmt::containing(const Stmt &stmt) {
 }
 
 bool CoreturnStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CoreturnStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CoreturnStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CoreturnStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27542,15 +28089,17 @@ ContinueStmtContainingStmtRange ContinueStmt::containing(const Stmt &stmt) {
 }
 
 bool ContinueStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ContinueStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ContinueStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ContinueStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27585,15 +28134,17 @@ CompoundStmtContainingStmtRange CompoundStmt::containing(const Stmt &stmt) {
 }
 
 bool CompoundStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CompoundStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CompoundStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CompoundStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27650,15 +28201,17 @@ CapturedStmtContainingStmtRange CapturedStmt::containing(const Stmt &stmt) {
 }
 
 bool CapturedStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CapturedStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CapturedStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CapturedStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27707,15 +28260,17 @@ CXXTryStmtContainingStmtRange CXXTryStmt::containing(const Stmt &stmt) {
 }
 
 bool CXXTryStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXTryStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXTryStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXTryStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27772,15 +28327,17 @@ CXXForRangeStmtContainingStmtRange CXXForRangeStmt::containing(const Stmt &stmt)
 }
 
 bool CXXForRangeStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXForRangeStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXForRangeStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXForRangeStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27904,15 +28461,17 @@ CXXCatchStmtContainingStmtRange CXXCatchStmt::containing(const Stmt &stmt) {
 }
 
 bool CXXCatchStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXCatchStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXCatchStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXCatchStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -27967,15 +28526,17 @@ BreakStmtContainingStmtRange BreakStmt::containing(const Stmt &stmt) {
 }
 
 bool BreakStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BreakStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BreakStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BreakStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28010,15 +28571,17 @@ AsmStmtContainingStmtRange AsmStmt::containing(const Stmt &stmt) {
 }
 
 bool AsmStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AsmStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AsmStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AsmStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28167,15 +28730,17 @@ MSAsmStmtContainingStmtRange MSAsmStmt::containing(const Stmt &stmt) {
 }
 
 bool MSAsmStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MSAsmStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MSAsmStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MSAsmStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28252,15 +28817,17 @@ GCCAsmStmtContainingStmtRange GCCAsmStmt::containing(const Stmt &stmt) {
 }
 
 bool GCCAsmStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : GCCAsmStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool GCCAsmStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : GCCAsmStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28423,15 +28990,17 @@ WhileStmtContainingStmtRange WhileStmt::containing(const Stmt &stmt) {
 }
 
 bool WhileStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : WhileStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool WhileStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : WhileStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28517,15 +29086,17 @@ ValueStmtContainingStmtRange ValueStmt::containing(const Stmt &stmt) {
 }
 
 bool ValueStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ValueStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ValueStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ValueStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28683,15 +29254,17 @@ LabelStmtContainingStmtRange LabelStmt::containing(const Stmt &stmt) {
 }
 
 bool LabelStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : LabelStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool LabelStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : LabelStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -28753,15 +29326,17 @@ ExprContainingStmtRange Expr::containing(const Stmt &stmt) {
 }
 
 bool Expr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : Expr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool Expr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : Expr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29170,15 +29745,17 @@ DesignatedInitUpdateExprContainingStmtRange DesignatedInitUpdateExpr::containing
 }
 
 bool DesignatedInitUpdateExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DesignatedInitUpdateExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DesignatedInitUpdateExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DesignatedInitUpdateExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29224,15 +29801,17 @@ DesignatedInitExprContainingStmtRange DesignatedInitExpr::containing(const Stmt 
 }
 
 bool DesignatedInitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DesignatedInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DesignatedInitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DesignatedInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29323,15 +29902,17 @@ DependentScopeDeclRefExprContainingStmtRange DependentScopeDeclRefExpr::containi
 }
 
 bool DependentScopeDeclRefExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DependentScopeDeclRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DependentScopeDeclRefExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DependentScopeDeclRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29402,15 +29983,17 @@ DependentCoawaitExprContainingStmtRange DependentCoawaitExpr::containing(const S
 }
 
 bool DependentCoawaitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DependentCoawaitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DependentCoawaitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DependentCoawaitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29465,15 +30048,17 @@ DeclRefExprContainingStmtRange DeclRefExpr::containing(const Stmt &stmt) {
 }
 
 bool DeclRefExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DeclRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DeclRefExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DeclRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29581,15 +30166,17 @@ CoroutineSuspendExprContainingStmtRange CoroutineSuspendExpr::containing(const S
 }
 
 bool CoroutineSuspendExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CoroutineSuspendExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CoroutineSuspendExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CoroutineSuspendExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29669,15 +30256,17 @@ CoawaitExprContainingStmtRange CoawaitExpr::containing(const Stmt &stmt) {
 }
 
 bool CoawaitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CoawaitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CoawaitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CoawaitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29720,15 +30309,17 @@ CoyieldExprContainingStmtRange CoyieldExpr::containing(const Stmt &stmt) {
 }
 
 bool CoyieldExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CoyieldExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CoyieldExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CoyieldExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29766,15 +30357,17 @@ ConvertVectorExprContainingStmtRange ConvertVectorExpr::containing(const Stmt &s
 }
 
 bool ConvertVectorExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ConvertVectorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ConvertVectorExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ConvertVectorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29832,15 +30425,17 @@ ConceptSpecializationExprContainingStmtRange ConceptSpecializationExpr::containi
 }
 
 bool ConceptSpecializationExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ConceptSpecializationExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ConceptSpecializationExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ConceptSpecializationExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29890,15 +30485,17 @@ CompoundLiteralExprContainingStmtRange CompoundLiteralExpr::containing(const Stm
 }
 
 bool CompoundLiteralExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CompoundLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CompoundLiteralExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CompoundLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -29952,15 +30549,17 @@ ChooseExprContainingStmtRange ChooseExpr::containing(const Stmt &stmt) {
 }
 
 bool ChooseExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ChooseExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ChooseExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ChooseExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30046,15 +30645,17 @@ CharacterLiteralContainingStmtRange CharacterLiteral::containing(const Stmt &stm
 }
 
 bool CharacterLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CharacterLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CharacterLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CharacterLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30102,15 +30703,17 @@ CastExprContainingStmtRange CastExpr::containing(const Stmt &stmt) {
 }
 
 bool CastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30197,15 +30800,17 @@ ImplicitCastExprContainingStmtRange ImplicitCastExpr::containing(const Stmt &stm
 }
 
 bool ImplicitCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ImplicitCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ImplicitCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ImplicitCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30248,15 +30853,17 @@ ExplicitCastExprContainingStmtRange ExplicitCastExpr::containing(const Stmt &stm
 }
 
 bool ExplicitCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ExplicitCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ExplicitCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ExplicitCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30308,15 +30915,17 @@ CXXNamedCastExprContainingStmtRange CXXNamedCastExpr::containing(const Stmt &stm
 }
 
 bool CXXNamedCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXNamedCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXNamedCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXNamedCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30391,15 +31000,17 @@ CXXDynamicCastExprContainingStmtRange CXXDynamicCastExpr::containing(const Stmt 
 }
 
 bool CXXDynamicCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDynamicCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDynamicCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDynamicCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30450,15 +31061,17 @@ CXXConstCastExprContainingStmtRange CXXConstCastExpr::containing(const Stmt &stm
 }
 
 bool CXXConstCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXConstCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXConstCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXConstCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30504,15 +31117,17 @@ CXXAddrspaceCastExprContainingStmtRange CXXAddrspaceCastExpr::containing(const S
 }
 
 bool CXXAddrspaceCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXAddrspaceCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXAddrspaceCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXAddrspaceCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30558,15 +31173,17 @@ CXXStaticCastExprContainingStmtRange CXXStaticCastExpr::containing(const Stmt &s
 }
 
 bool CXXStaticCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXStaticCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXStaticCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXStaticCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30612,15 +31229,17 @@ CXXReinterpretCastExprContainingStmtRange CXXReinterpretCastExpr::containing(con
 }
 
 bool CXXReinterpretCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXReinterpretCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXReinterpretCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXReinterpretCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30666,15 +31285,17 @@ CXXFunctionalCastExprContainingStmtRange CXXFunctionalCastExpr::containing(const
 }
 
 bool CXXFunctionalCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXFunctionalCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXFunctionalCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXFunctionalCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30739,15 +31360,17 @@ CStyleCastExprContainingStmtRange CStyleCastExpr::containing(const Stmt &stmt) {
 }
 
 bool CStyleCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CStyleCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CStyleCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CStyleCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30807,15 +31430,17 @@ BuiltinBitCastExprContainingStmtRange BuiltinBitCastExpr::containing(const Stmt 
 }
 
 bool BuiltinBitCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BuiltinBitCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BuiltinBitCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BuiltinBitCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30857,15 +31482,17 @@ ObjCBridgedCastExprContainingStmtRange ObjCBridgedCastExpr::containing(const Stm
 }
 
 bool ObjCBridgedCastExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCBridgedCastExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCBridgedCastExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCBridgedCastExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -30936,15 +31563,17 @@ CallExprContainingStmtRange CallExpr::containing(const Stmt &stmt) {
 }
 
 bool CallExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CallExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31078,15 +31707,17 @@ CXXOperatorCallExprContainingStmtRange CXXOperatorCallExpr::containing(const Stm
 }
 
 bool CXXOperatorCallExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXOperatorCallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXOperatorCallExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXOperatorCallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31153,15 +31784,17 @@ CXXMemberCallExprContainingStmtRange CXXMemberCallExpr::containing(const Stmt &s
 }
 
 bool CXXMemberCallExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXMemberCallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXMemberCallExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXMemberCallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31225,15 +31858,17 @@ CUDAKernelCallExprContainingStmtRange CUDAKernelCallExpr::containing(const Stmt 
 }
 
 bool CUDAKernelCallExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CUDAKernelCallExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CUDAKernelCallExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CUDAKernelCallExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31277,15 +31912,17 @@ UserDefinedLiteralContainingStmtRange UserDefinedLiteral::containing(const Stmt 
 }
 
 bool UserDefinedLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UserDefinedLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UserDefinedLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UserDefinedLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31343,15 +31980,17 @@ CXXUuidofExprContainingStmtRange CXXUuidofExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXUuidofExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXUuidofExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXUuidofExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXUuidofExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31416,15 +32055,17 @@ CXXUnresolvedConstructExprContainingStmtRange CXXUnresolvedConstructExpr::contai
 }
 
 bool CXXUnresolvedConstructExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXUnresolvedConstructExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXUnresolvedConstructExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXUnresolvedConstructExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31503,15 +32144,17 @@ CXXTypeidExprContainingStmtRange CXXTypeidExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXTypeidExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXTypeidExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXTypeidExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXTypeidExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31584,15 +32227,17 @@ CXXThrowExprContainingStmtRange CXXThrowExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXThrowExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXThrowExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXThrowExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXThrowExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31648,15 +32293,17 @@ CXXThisExprContainingStmtRange CXXThisExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXThisExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXThisExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXThisExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXThisExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31704,15 +32351,17 @@ CXXStdInitializerListExprContainingStmtRange CXXStdInitializerListExpr::containi
 }
 
 bool CXXStdInitializerListExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXStdInitializerListExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXStdInitializerListExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXStdInitializerListExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31752,15 +32401,17 @@ CXXScalarValueInitExprContainingStmtRange CXXScalarValueInitExpr::containing(con
 }
 
 bool CXXScalarValueInitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXScalarValueInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXScalarValueInitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXScalarValueInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31803,15 +32454,17 @@ CXXRewrittenBinaryOperatorContainingStmtRange CXXRewrittenBinaryOperator::contai
 }
 
 bool CXXRewrittenBinaryOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXRewrittenBinaryOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXRewrittenBinaryOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXRewrittenBinaryOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -31903,15 +32556,17 @@ CXXPseudoDestructorExprContainingStmtRange CXXPseudoDestructorExpr::containing(c
 }
 
 bool CXXPseudoDestructorExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXPseudoDestructorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXPseudoDestructorExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXPseudoDestructorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32011,15 +32666,17 @@ CXXNullPtrLiteralExprContainingStmtRange CXXNullPtrLiteralExpr::containing(const
 }
 
 bool CXXNullPtrLiteralExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXNullPtrLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXNullPtrLiteralExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXNullPtrLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32062,15 +32719,17 @@ CXXNoexceptExprContainingStmtRange CXXNoexceptExpr::containing(const Stmt &stmt)
 }
 
 bool CXXNoexceptExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXNoexceptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXNoexceptExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXNoexceptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32115,15 +32774,17 @@ CXXNewExprContainingStmtRange CXXNewExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXNewExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXNewExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXNewExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXNewExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32265,15 +32926,17 @@ CXXInheritedCtorInitExprContainingStmtRange CXXInheritedCtorInitExpr::containing
 }
 
 bool CXXInheritedCtorInitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXInheritedCtorInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXInheritedCtorInitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXInheritedCtorInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32337,15 +33000,17 @@ CXXFoldExprContainingStmtRange CXXFoldExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXFoldExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXFoldExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXFoldExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXFoldExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32460,15 +33125,17 @@ CXXDependentScopeMemberExprContainingStmtRange CXXDependentScopeMemberExpr::cont
 }
 
 bool CXXDependentScopeMemberExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDependentScopeMemberExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDependentScopeMemberExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDependentScopeMemberExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32589,15 +33256,17 @@ CXXDeleteExprContainingStmtRange CXXDeleteExpr::containing(const Stmt &stmt) {
 }
 
 bool CXXDeleteExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDeleteExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDeleteExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDeleteExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32669,15 +33338,17 @@ CXXDefaultInitExprContainingStmtRange CXXDefaultInitExpr::containing(const Stmt 
 }
 
 bool CXXDefaultInitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDefaultInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDefaultInitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDefaultInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32734,15 +33405,17 @@ CXXDefaultArgExprContainingStmtRange CXXDefaultArgExpr::containing(const Stmt &s
 }
 
 bool CXXDefaultArgExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDefaultArgExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDefaultArgExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDefaultArgExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32797,15 +33470,17 @@ CXXConstructExprContainingStmtRange CXXConstructExpr::containing(const Stmt &stm
 }
 
 bool CXXConstructExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXConstructExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXConstructExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXConstructExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32906,15 +33581,17 @@ CXXTemporaryObjectExprContainingStmtRange CXXTemporaryObjectExpr::containing(con
 }
 
 bool CXXTemporaryObjectExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXTemporaryObjectExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXTemporaryObjectExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXTemporaryObjectExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -32952,15 +33629,17 @@ CXXBoolLiteralExprContainingStmtRange CXXBoolLiteralExpr::containing(const Stmt 
 }
 
 bool CXXBoolLiteralExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXBoolLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXBoolLiteralExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXBoolLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33008,15 +33687,17 @@ CXXBindTemporaryExprContainingStmtRange CXXBindTemporaryExpr::containing(const S
 }
 
 bool CXXBindTemporaryExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXBindTemporaryExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXBindTemporaryExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXBindTemporaryExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33056,15 +33737,17 @@ BlockExprContainingStmtRange BlockExpr::containing(const Stmt &stmt) {
 }
 
 bool BlockExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BlockExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BlockExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BlockExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33125,15 +33808,17 @@ BinaryOperatorContainingStmtRange BinaryOperator::containing(const Stmt &stmt) {
 }
 
 bool BinaryOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BinaryOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BinaryOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BinaryOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33270,15 +33955,17 @@ CompoundAssignOperatorContainingStmtRange CompoundAssignOperator::containing(con
 }
 
 bool CompoundAssignOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CompoundAssignOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CompoundAssignOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CompoundAssignOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33328,15 +34015,17 @@ AtomicExprContainingStmtRange AtomicExpr::containing(const Stmt &stmt) {
 }
 
 bool AtomicExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AtomicExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AtomicExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AtomicExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33482,15 +34171,17 @@ AsTypeExprContainingStmtRange AsTypeExpr::containing(const Stmt &stmt) {
 }
 
 bool AsTypeExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AsTypeExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AsTypeExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AsTypeExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33548,15 +34239,17 @@ ArrayTypeTraitExprContainingStmtRange ArrayTypeTraitExpr::containing(const Stmt 
 }
 
 bool ArrayTypeTraitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ArrayTypeTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ArrayTypeTraitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ArrayTypeTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33607,15 +34300,17 @@ ArraySubscriptExprContainingStmtRange ArraySubscriptExpr::containing(const Stmt 
 }
 
 bool ArraySubscriptExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ArraySubscriptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ArraySubscriptExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ArraySubscriptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33682,15 +34377,17 @@ ArrayInitLoopExprContainingStmtRange ArrayInitLoopExpr::containing(const Stmt &s
 }
 
 bool ArrayInitLoopExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ArrayInitLoopExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ArrayInitLoopExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ArrayInitLoopExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33736,15 +34433,17 @@ ArrayInitIndexExprContainingStmtRange ArrayInitIndexExpr::containing(const Stmt 
 }
 
 bool ArrayInitIndexExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ArrayInitIndexExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ArrayInitIndexExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ArrayInitIndexExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33778,15 +34477,17 @@ AddrLabelExprContainingStmtRange AddrLabelExpr::containing(const Stmt &stmt) {
 }
 
 bool AddrLabelExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AddrLabelExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AddrLabelExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AddrLabelExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33844,15 +34545,17 @@ AbstractConditionalOperatorContainingStmtRange AbstractConditionalOperator::cont
 }
 
 bool AbstractConditionalOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AbstractConditionalOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AbstractConditionalOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AbstractConditionalOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33923,15 +34626,17 @@ ConditionalOperatorContainingStmtRange ConditionalOperator::containing(const Stm
 }
 
 bool ConditionalOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ConditionalOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ConditionalOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ConditionalOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -33981,15 +34686,17 @@ BinaryConditionalOperatorContainingStmtRange BinaryConditionalOperator::containi
 }
 
 bool BinaryConditionalOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BinaryConditionalOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BinaryConditionalOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BinaryConditionalOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34039,15 +34746,17 @@ VAArgExprContainingStmtRange VAArgExpr::containing(const Stmt &stmt) {
 }
 
 bool VAArgExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : VAArgExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool VAArgExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : VAArgExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34116,15 +34825,17 @@ UnaryOperatorContainingStmtRange UnaryOperator::containing(const Stmt &stmt) {
 }
 
 bool UnaryOperator::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnaryOperator::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnaryOperator::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnaryOperator::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34218,15 +34929,17 @@ UnaryExprOrTypeTraitExprContainingStmtRange UnaryExprOrTypeTraitExpr::containing
 }
 
 bool UnaryExprOrTypeTraitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnaryExprOrTypeTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnaryExprOrTypeTraitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnaryExprOrTypeTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34310,15 +35023,17 @@ TypoExprContainingStmtRange TypoExpr::containing(const Stmt &stmt) {
 }
 
 bool TypoExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypoExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypoExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypoExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34352,15 +35067,17 @@ TypeTraitExprContainingStmtRange TypeTraitExpr::containing(const Stmt &stmt) {
 }
 
 bool TypeTraitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypeTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypeTraitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypeTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34422,15 +35139,17 @@ SubstNonTypeTemplateParmPackExprContainingStmtRange SubstNonTypeTemplateParmPack
 }
 
 bool SubstNonTypeTemplateParmPackExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SubstNonTypeTemplateParmPackExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SubstNonTypeTemplateParmPackExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SubstNonTypeTemplateParmPackExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34479,15 +35198,17 @@ SubstNonTypeTemplateParmExprContainingStmtRange SubstNonTypeTemplateParmExpr::co
 }
 
 bool SubstNonTypeTemplateParmExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SubstNonTypeTemplateParmExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SubstNonTypeTemplateParmExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SubstNonTypeTemplateParmExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34553,15 +35274,17 @@ StringLiteralContainingStmtRange StringLiteral::containing(const Stmt &stmt) {
 }
 
 bool StringLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : StringLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool StringLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : StringLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34664,15 +35387,17 @@ StmtExprContainingStmtRange StmtExpr::containing(const Stmt &stmt) {
 }
 
 bool StmtExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : StmtExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool StmtExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : StmtExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34730,15 +35455,17 @@ SourceLocExprContainingStmtRange SourceLocExpr::containing(const Stmt &stmt) {
 }
 
 bool SourceLocExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SourceLocExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SourceLocExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SourceLocExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34797,15 +35524,17 @@ SizeOfPackExprContainingStmtRange SizeOfPackExpr::containing(const Stmt &stmt) {
 }
 
 bool SizeOfPackExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SizeOfPackExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SizeOfPackExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SizeOfPackExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34900,15 +35629,17 @@ ShuffleVectorExprContainingStmtRange ShuffleVectorExpr::containing(const Stmt &s
 }
 
 bool ShuffleVectorExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ShuffleVectorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ShuffleVectorExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ShuffleVectorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -34960,15 +35691,17 @@ SYCLUniqueStableNameExprContainingStmtRange SYCLUniqueStableNameExpr::containing
 }
 
 bool SYCLUniqueStableNameExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SYCLUniqueStableNameExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SYCLUniqueStableNameExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SYCLUniqueStableNameExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35035,15 +35768,17 @@ RequiresExprContainingStmtRange RequiresExpr::containing(const Stmt &stmt) {
 }
 
 bool RequiresExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : RequiresExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool RequiresExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : RequiresExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35122,15 +35857,17 @@ RecoveryExprContainingStmtRange RecoveryExpr::containing(const Stmt &stmt) {
 }
 
 bool RecoveryExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : RecoveryExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool RecoveryExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : RecoveryExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35180,15 +35917,17 @@ PseudoObjectExprContainingStmtRange PseudoObjectExpr::containing(const Stmt &stm
 }
 
 bool PseudoObjectExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : PseudoObjectExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool PseudoObjectExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : PseudoObjectExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35266,15 +36005,17 @@ PredefinedExprContainingStmtRange PredefinedExpr::containing(const Stmt &stmt) {
 }
 
 bool PredefinedExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : PredefinedExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool PredefinedExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : PredefinedExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35334,15 +36075,17 @@ ParenListExprContainingStmtRange ParenListExpr::containing(const Stmt &stmt) {
 }
 
 bool ParenListExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ParenListExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ParenListExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ParenListExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35410,15 +36153,17 @@ ParenExprContainingStmtRange ParenExpr::containing(const Stmt &stmt) {
 }
 
 bool ParenExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ParenExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ParenExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ParenExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35476,15 +36221,17 @@ PackExpansionExprContainingStmtRange PackExpansionExpr::containing(const Stmt &s
 }
 
 bool PackExpansionExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : PackExpansionExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool PackExpansionExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : PackExpansionExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35542,15 +36289,17 @@ OverloadExprContainingStmtRange OverloadExpr::containing(const Stmt &stmt) {
 }
 
 bool OverloadExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OverloadExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OverloadExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OverloadExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35639,15 +36388,17 @@ UnresolvedMemberExprContainingStmtRange UnresolvedMemberExpr::containing(const S
 }
 
 bool UnresolvedMemberExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnresolvedMemberExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnresolvedMemberExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnresolvedMemberExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35730,15 +36481,17 @@ UnresolvedLookupExprContainingStmtRange UnresolvedLookupExpr::containing(const S
 }
 
 bool UnresolvedLookupExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnresolvedLookupExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnresolvedLookupExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnresolvedLookupExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35786,15 +36539,17 @@ OpaqueValueExprContainingStmtRange OpaqueValueExpr::containing(const Stmt &stmt)
 }
 
 bool OpaqueValueExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OpaqueValueExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OpaqueValueExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OpaqueValueExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35848,15 +36603,17 @@ OffsetOfExprContainingStmtRange OffsetOfExpr::containing(const Stmt &stmt) {
 }
 
 bool OffsetOfExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OffsetOfExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OffsetOfExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OffsetOfExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35908,15 +36665,17 @@ ObjCSubscriptRefExprContainingStmtRange ObjCSubscriptRefExpr::containing(const S
 }
 
 bool ObjCSubscriptRefExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCSubscriptRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCSubscriptRefExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCSubscriptRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -35982,15 +36741,17 @@ ObjCStringLiteralContainingStmtRange ObjCStringLiteral::containing(const Stmt &s
 }
 
 bool ObjCStringLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCStringLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCStringLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCStringLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36039,15 +36800,17 @@ ObjCSelectorExprContainingStmtRange ObjCSelectorExpr::containing(const Stmt &stm
 }
 
 bool ObjCSelectorExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCSelectorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCSelectorExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCSelectorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36099,15 +36862,17 @@ ObjCProtocolExprContainingStmtRange ObjCProtocolExpr::containing(const Stmt &stm
 }
 
 bool ObjCProtocolExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCProtocolExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCProtocolExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCProtocolExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36174,15 +36939,17 @@ ObjCPropertyRefExprContainingStmtRange ObjCPropertyRefExpr::containing(const Stm
 }
 
 bool ObjCPropertyRefExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCPropertyRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyRefExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCPropertyRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36311,15 +37078,17 @@ ObjCMessageExprContainingStmtRange ObjCMessageExpr::containing(const Stmt &stmt)
 }
 
 bool ObjCMessageExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCMessageExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCMessageExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCMessageExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36502,15 +37271,17 @@ ObjCIvarRefExprContainingStmtRange ObjCIvarRefExpr::containing(const Stmt &stmt)
 }
 
 bool ObjCIvarRefExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCIvarRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCIvarRefExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCIvarRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36584,15 +37355,17 @@ ObjCIsaExprContainingStmtRange ObjCIsaExpr::containing(const Stmt &stmt) {
 }
 
 bool ObjCIsaExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCIsaExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCIsaExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCIsaExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36664,15 +37437,17 @@ ObjCIndirectCopyRestoreExprContainingStmtRange ObjCIndirectCopyRestoreExpr::cont
 }
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCIndirectCopyRestoreExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCIndirectCopyRestoreExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCIndirectCopyRestoreExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36717,15 +37492,17 @@ ObjCEncodeExprContainingStmtRange ObjCEncodeExpr::containing(const Stmt &stmt) {
 }
 
 bool ObjCEncodeExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCEncodeExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCEncodeExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCEncodeExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36783,15 +37560,17 @@ ObjCDictionaryLiteralContainingStmtRange ObjCDictionaryLiteral::containing(const
 }
 
 bool ObjCDictionaryLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCDictionaryLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCDictionaryLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCDictionaryLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36831,15 +37610,17 @@ ObjCBoxedExprContainingStmtRange ObjCBoxedExpr::containing(const Stmt &stmt) {
 }
 
 bool ObjCBoxedExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCBoxedExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCBoxedExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCBoxedExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36899,15 +37680,17 @@ ObjCBoolLiteralExprContainingStmtRange ObjCBoolLiteralExpr::containing(const Stm
 }
 
 bool ObjCBoolLiteralExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCBoolLiteralExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCBoolLiteralExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCBoolLiteralExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -36955,15 +37738,17 @@ ObjCAvailabilityCheckExprContainingStmtRange ObjCAvailabilityCheckExpr::containi
 }
 
 bool ObjCAvailabilityCheckExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAvailabilityCheckExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAvailabilityCheckExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAvailabilityCheckExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37002,15 +37787,17 @@ ObjCArrayLiteralContainingStmtRange ObjCArrayLiteral::containing(const Stmt &stm
 }
 
 bool ObjCArrayLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCArrayLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCArrayLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCArrayLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37066,15 +37853,17 @@ OMPIteratorExprContainingStmtRange OMPIteratorExpr::containing(const Stmt &stmt)
 }
 
 bool OMPIteratorExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPIteratorExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPIteratorExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPIteratorExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37135,15 +37924,17 @@ OMPArrayShapingExprContainingStmtRange OMPArrayShapingExpr::containing(const Stm
 }
 
 bool OMPArrayShapingExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPArrayShapingExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPArrayShapingExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPArrayShapingExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37217,15 +38008,17 @@ OMPArraySectionExprContainingStmtRange OMPArraySectionExpr::containing(const Stm
 }
 
 bool OMPArraySectionExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPArraySectionExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPArraySectionExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPArraySectionExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37310,15 +38103,17 @@ NoInitExprContainingStmtRange NoInitExpr::containing(const Stmt &stmt) {
 }
 
 bool NoInitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : NoInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool NoInitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : NoInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37352,15 +38147,17 @@ MemberExprContainingStmtRange MemberExpr::containing(const Stmt &stmt) {
 }
 
 bool MemberExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MemberExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MemberExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MemberExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37486,15 +38283,17 @@ MatrixSubscriptExprContainingStmtRange MatrixSubscriptExpr::containing(const Stm
 }
 
 bool MatrixSubscriptExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MatrixSubscriptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MatrixSubscriptExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MatrixSubscriptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37560,15 +38359,17 @@ MaterializeTemporaryExprContainingStmtRange MaterializeTemporaryExpr::containing
 }
 
 bool MaterializeTemporaryExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MaterializeTemporaryExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MaterializeTemporaryExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MaterializeTemporaryExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37639,15 +38440,17 @@ MSPropertySubscriptExprContainingStmtRange MSPropertySubscriptExpr::containing(c
 }
 
 bool MSPropertySubscriptExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MSPropertySubscriptExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MSPropertySubscriptExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MSPropertySubscriptExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37702,15 +38505,17 @@ MSPropertyRefExprContainingStmtRange MSPropertyRefExpr::containing(const Stmt &s
 }
 
 bool MSPropertyRefExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MSPropertyRefExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MSPropertyRefExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MSPropertyRefExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37775,15 +38580,17 @@ LambdaExprContainingStmtRange LambdaExpr::containing(const Stmt &stmt) {
 }
 
 bool LambdaExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : LambdaExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool LambdaExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : LambdaExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37913,15 +38720,17 @@ IntegerLiteralContainingStmtRange IntegerLiteral::containing(const Stmt &stmt) {
 }
 
 bool IntegerLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : IntegerLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool IntegerLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : IntegerLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -37964,15 +38773,17 @@ InitListExprContainingStmtRange InitListExpr::containing(const Stmt &stmt) {
 }
 
 bool InitListExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : InitListExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool InitListExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : InitListExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38111,15 +38922,17 @@ ImplicitValueInitExprContainingStmtRange ImplicitValueInitExpr::containing(const
 }
 
 bool ImplicitValueInitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ImplicitValueInitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ImplicitValueInitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ImplicitValueInitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38153,15 +38966,17 @@ ImaginaryLiteralContainingStmtRange ImaginaryLiteral::containing(const Stmt &stm
 }
 
 bool ImaginaryLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ImaginaryLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ImaginaryLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ImaginaryLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38201,15 +39016,17 @@ GenericSelectionExprContainingStmtRange GenericSelectionExpr::containing(const S
 }
 
 bool GenericSelectionExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : GenericSelectionExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool GenericSelectionExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : GenericSelectionExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38303,15 +39120,17 @@ GNUNullExprContainingStmtRange GNUNullExpr::containing(const Stmt &stmt) {
 }
 
 bool GNUNullExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : GNUNullExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool GNUNullExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : GNUNullExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38354,15 +39173,17 @@ FunctionParmPackExprContainingStmtRange FunctionParmPackExpr::containing(const S
 }
 
 bool FunctionParmPackExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FunctionParmPackExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FunctionParmPackExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FunctionParmPackExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38427,15 +39248,17 @@ FullExprContainingStmtRange FullExpr::containing(const Stmt &stmt) {
 }
 
 bool FullExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FullExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FullExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FullExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38476,15 +39299,17 @@ ExprWithCleanupsContainingStmtRange ExprWithCleanups::containing(const Stmt &stm
 }
 
 bool ExprWithCleanups::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ExprWithCleanups::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ExprWithCleanups::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ExprWithCleanups::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38527,15 +39352,17 @@ ConstantExprContainingStmtRange ConstantExpr::containing(const Stmt &stmt) {
 }
 
 bool ConstantExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ConstantExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ConstantExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ConstantExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38588,15 +39415,17 @@ FloatingLiteralContainingStmtRange FloatingLiteral::containing(const Stmt &stmt)
 }
 
 bool FloatingLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FloatingLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FloatingLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FloatingLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38644,15 +39473,17 @@ FixedPointLiteralContainingStmtRange FixedPointLiteral::containing(const Stmt &s
 }
 
 bool FixedPointLiteral::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FixedPointLiteral::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FixedPointLiteral::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FixedPointLiteral::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38695,15 +39526,17 @@ ExtVectorElementExprContainingStmtRange ExtVectorElementExpr::containing(const S
 }
 
 bool ExtVectorElementExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ExtVectorElementExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ExtVectorElementExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ExtVectorElementExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38762,15 +39595,17 @@ ExpressionTraitExprContainingStmtRange ExpressionTraitExpr::containing(const Stm
 }
 
 bool ExpressionTraitExpr::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ExpressionTraitExpr::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ExpressionTraitExpr::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ExpressionTraitExpr::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38820,15 +39655,17 @@ AttributedStmtContainingStmtRange AttributedStmt::containing(const Stmt &stmt) {
 }
 
 bool AttributedStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AttributedStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AttributedStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AttributedStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -38887,15 +39724,17 @@ SwitchStmtContainingStmtRange SwitchStmt::containing(const Stmt &stmt) {
 }
 
 bool SwitchStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SwitchStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SwitchStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SwitchStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39007,15 +39846,17 @@ SwitchCaseContainingStmtRange SwitchCase::containing(const Stmt &stmt) {
 }
 
 bool SwitchCase::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : SwitchCase::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool SwitchCase::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : SwitchCase::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39074,15 +39915,17 @@ DefaultStmtContainingStmtRange DefaultStmt::containing(const Stmt &stmt) {
 }
 
 bool DefaultStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DefaultStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DefaultStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DefaultStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39121,15 +39964,17 @@ CaseStmtContainingStmtRange CaseStmt::containing(const Stmt &stmt) {
 }
 
 bool CaseStmt::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CaseStmt::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CaseStmt::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CaseStmt::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39219,15 +40064,17 @@ DeclContainingDeclRange Decl::containing(const Stmt &stmt) {
 }
 
 bool Decl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : Decl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool Decl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : Decl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39476,15 +40323,17 @@ ClassScopeFunctionSpecializationDeclContainingDeclRange ClassScopeFunctionSpecia
 }
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ClassScopeFunctionSpecializationDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39521,15 +40370,17 @@ CapturedDeclContainingDeclRange CapturedDecl::containing(const Stmt &stmt) {
 }
 
 bool CapturedDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CapturedDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CapturedDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CapturedDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39596,15 +40447,17 @@ BlockDeclContainingDeclRange BlockDecl::containing(const Stmt &stmt) {
 }
 
 bool BlockDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BlockDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BlockDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BlockDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39740,15 +40593,17 @@ AccessSpecDeclContainingDeclRange AccessSpecDecl::containing(const Stmt &stmt) {
 }
 
 bool AccessSpecDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : AccessSpecDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool AccessSpecDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : AccessSpecDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39792,15 +40647,17 @@ OMPDeclarativeDirectiveDeclContainingDeclRange OMPDeclarativeDirectiveDecl::cont
 }
 
 bool OMPDeclarativeDirectiveDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDeclarativeDirectiveDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDeclarativeDirectiveDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDeclarativeDirectiveDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39828,15 +40685,17 @@ OMPThreadPrivateDeclContainingDeclRange OMPThreadPrivateDecl::containing(const S
 }
 
 bool OMPThreadPrivateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPThreadPrivateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPThreadPrivateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPThreadPrivateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39882,15 +40741,17 @@ OMPRequiresDeclContainingDeclRange OMPRequiresDecl::containing(const Stmt &stmt)
 }
 
 bool OMPRequiresDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPRequiresDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPRequiresDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPRequiresDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39920,15 +40781,17 @@ OMPAllocateDeclContainingDeclRange OMPAllocateDecl::containing(const Stmt &stmt)
 }
 
 bool OMPAllocateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPAllocateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPAllocateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPAllocateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -39974,15 +40837,17 @@ TranslationUnitDeclContainingDeclRange TranslationUnitDecl::containing(const Stm
 }
 
 bool TranslationUnitDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TranslationUnitDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TranslationUnitDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TranslationUnitDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40022,15 +40887,17 @@ StaticAssertDeclContainingDeclRange StaticAssertDecl::containing(const Stmt &stm
 }
 
 bool StaticAssertDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : StaticAssertDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool StaticAssertDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : StaticAssertDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40082,15 +40949,17 @@ RequiresExprBodyDeclContainingDeclRange RequiresExprBodyDecl::containing(const S
 }
 
 bool RequiresExprBodyDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : RequiresExprBodyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool RequiresExprBodyDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : RequiresExprBodyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40130,15 +40999,17 @@ PragmaDetectMismatchDeclContainingDeclRange PragmaDetectMismatchDecl::containing
 }
 
 bool PragmaDetectMismatchDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : PragmaDetectMismatchDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool PragmaDetectMismatchDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : PragmaDetectMismatchDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40176,15 +41047,17 @@ PragmaCommentDeclContainingDeclRange PragmaCommentDecl::containing(const Stmt &s
 }
 
 bool PragmaCommentDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : PragmaCommentDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool PragmaCommentDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : PragmaCommentDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40221,15 +41094,17 @@ ObjCPropertyImplDeclContainingDeclRange ObjCPropertyImplDecl::containing(const S
 }
 
 bool ObjCPropertyImplDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCPropertyImplDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyImplDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCPropertyImplDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40310,15 +41185,17 @@ NamedDeclContainingDeclRange NamedDecl::containing(const Stmt &stmt) {
 }
 
 bool NamedDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : NamedDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool NamedDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : NamedDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40493,15 +41370,17 @@ LabelDeclContainingDeclRange LabelDecl::containing(const Stmt &stmt) {
 }
 
 bool LabelDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : LabelDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool LabelDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : LabelDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40558,15 +41437,17 @@ BaseUsingDeclContainingDeclRange BaseUsingDecl::containing(const Stmt &stmt) {
 }
 
 bool BaseUsingDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BaseUsingDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BaseUsingDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BaseUsingDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40614,15 +41495,17 @@ UsingEnumDeclContainingDeclRange UsingEnumDecl::containing(const Stmt &stmt) {
 }
 
 bool UsingEnumDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UsingEnumDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UsingEnumDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UsingEnumDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40680,15 +41563,17 @@ UsingDeclContainingDeclRange UsingDecl::containing(const Stmt &stmt) {
 }
 
 bool UsingDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UsingDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UsingDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UsingDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40741,15 +41626,17 @@ ValueDeclContainingDeclRange ValueDecl::containing(const Stmt &stmt) {
 }
 
 bool ValueDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ValueDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ValueDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ValueDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40818,15 +41705,17 @@ UnresolvedUsingValueDeclContainingDeclRange UnresolvedUsingValueDecl::containing
 }
 
 bool UnresolvedUsingValueDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnresolvedUsingValueDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingValueDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnresolvedUsingValueDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40888,15 +41777,17 @@ UnnamedGlobalConstantDeclContainingDeclRange UnnamedGlobalConstantDecl::containi
 }
 
 bool UnnamedGlobalConstantDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnnamedGlobalConstantDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnnamedGlobalConstantDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnnamedGlobalConstantDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40930,15 +41821,17 @@ TemplateParamObjectDeclContainingDeclRange TemplateParamObjectDecl::containing(c
 }
 
 bool TemplateParamObjectDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TemplateParamObjectDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TemplateParamObjectDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TemplateParamObjectDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -40972,15 +41865,17 @@ OMPDeclareReductionDeclContainingDeclRange OMPDeclareReductionDecl::containing(c
 }
 
 bool OMPDeclareReductionDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDeclareReductionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareReductionDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDeclareReductionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41069,15 +41964,17 @@ MSGuidDeclContainingDeclRange MSGuidDecl::containing(const Stmt &stmt) {
 }
 
 bool MSGuidDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MSGuidDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MSGuidDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MSGuidDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41111,15 +42008,17 @@ IndirectFieldDeclContainingDeclRange IndirectFieldDecl::containing(const Stmt &s
 }
 
 bool IndirectFieldDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : IndirectFieldDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool IndirectFieldDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : IndirectFieldDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41185,15 +42084,17 @@ EnumConstantDeclContainingDeclRange EnumConstantDecl::containing(const Stmt &stm
 }
 
 bool EnumConstantDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : EnumConstantDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool EnumConstantDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : EnumConstantDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41235,15 +42136,17 @@ DeclaratorDeclContainingDeclRange DeclaratorDecl::containing(const Stmt &stmt) {
 }
 
 bool DeclaratorDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DeclaratorDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DeclaratorDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DeclaratorDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41350,15 +42253,17 @@ VarDeclContainingDeclRange VarDecl::containing(const Stmt &stmt) {
 }
 
 bool VarDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : VarDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool VarDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : VarDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41679,15 +42584,17 @@ ParmVarDeclContainingDeclRange ParmVarDecl::containing(const Stmt &stmt) {
 }
 
 bool ParmVarDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ParmVarDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ParmVarDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ParmVarDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41796,15 +42703,17 @@ OMPCapturedExprDeclContainingDeclRange OMPCapturedExprDecl::containing(const Stm
 }
 
 bool OMPCapturedExprDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPCapturedExprDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPCapturedExprDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPCapturedExprDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41846,15 +42755,17 @@ ImplicitParamDeclContainingDeclRange ImplicitParamDecl::containing(const Stmt &s
 }
 
 bool ImplicitParamDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ImplicitParamDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ImplicitParamDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ImplicitParamDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41901,15 +42812,17 @@ DecompositionDeclContainingDeclRange DecompositionDecl::containing(const Stmt &s
 }
 
 bool DecompositionDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : DecompositionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool DecompositionDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : DecompositionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -41967,15 +42880,17 @@ VarTemplateSpecializationDeclContainingDeclRange VarTemplateSpecializationDecl::
 }
 
 bool VarTemplateSpecializationDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : VarTemplateSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool VarTemplateSpecializationDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : VarTemplateSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -42084,15 +42999,17 @@ VarTemplatePartialSpecializationDeclContainingDeclRange VarTemplatePartialSpecia
 }
 
 bool VarTemplatePartialSpecializationDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : VarTemplatePartialSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool VarTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : VarTemplatePartialSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -42138,15 +43055,17 @@ NonTypeTemplateParmDeclContainingDeclRange NonTypeTemplateParmDecl::containing(c
 }
 
 bool NonTypeTemplateParmDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : NonTypeTemplateParmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool NonTypeTemplateParmDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : NonTypeTemplateParmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -42257,15 +43176,17 @@ MSPropertyDeclContainingDeclRange MSPropertyDecl::containing(const Stmt &stmt) {
 }
 
 bool MSPropertyDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : MSPropertyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool MSPropertyDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : MSPropertyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -42313,15 +43234,17 @@ FunctionDeclContainingDeclRange FunctionDecl::containing(const Stmt &stmt) {
 }
 
 bool FunctionDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FunctionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FunctionDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FunctionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -42817,15 +43740,17 @@ CXXMethodDeclContainingDeclRange CXXMethodDecl::containing(const Stmt &stmt) {
 }
 
 bool CXXMethodDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXMethodDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXMethodDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXMethodDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -42963,15 +43888,17 @@ CXXDestructorDeclContainingDeclRange CXXDestructorDecl::containing(const Stmt &s
 }
 
 bool CXXDestructorDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDestructorDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDestructorDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDestructorDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43033,15 +43960,17 @@ CXXConversionDeclContainingDeclRange CXXConversionDecl::containing(const Stmt &s
 }
 
 bool CXXConversionDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXConversionDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXConversionDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXConversionDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43103,15 +44032,17 @@ CXXConstructorDeclContainingDeclRange CXXConstructorDecl::containing(const Stmt 
 }
 
 bool CXXConstructorDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXConstructorDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXConstructorDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXConstructorDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43190,15 +44121,17 @@ CXXDeductionGuideDeclContainingDeclRange CXXDeductionGuideDecl::containing(const
 }
 
 bool CXXDeductionGuideDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXDeductionGuideDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXDeductionGuideDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXDeductionGuideDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43272,15 +44205,17 @@ FieldDeclContainingDeclRange FieldDecl::containing(const Stmt &stmt) {
 }
 
 bool FieldDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FieldDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FieldDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FieldDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43389,15 +44324,17 @@ ObjCIvarDeclContainingDeclRange ObjCIvarDecl::containing(const Stmt &stmt) {
 }
 
 bool ObjCIvarDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCIvarDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCIvarDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCIvarDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43466,15 +44403,17 @@ ObjCAtDefsFieldDeclContainingDeclRange ObjCAtDefsFieldDecl::containing(const Stm
 }
 
 bool ObjCAtDefsFieldDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCAtDefsFieldDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCAtDefsFieldDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCAtDefsFieldDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43516,15 +44455,17 @@ BindingDeclContainingDeclRange BindingDecl::containing(const Stmt &stmt) {
 }
 
 bool BindingDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BindingDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BindingDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BindingDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43576,15 +44517,17 @@ OMPDeclarativeDirectiveValueDeclContainingDeclRange OMPDeclarativeDirectiveValue
 }
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDeclarativeDirectiveValueDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDeclarativeDirectiveValueDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43618,15 +44561,17 @@ OMPDeclareMapperDeclContainingDeclRange OMPDeclareMapperDecl::containing(const S
 }
 
 bool OMPDeclareMapperDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : OMPDeclareMapperDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool OMPDeclareMapperDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : OMPDeclareMapperDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43684,15 +44629,17 @@ UsingShadowDeclContainingDeclRange UsingShadowDecl::containing(const Stmt &stmt)
 }
 
 bool UsingShadowDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UsingShadowDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UsingShadowDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UsingShadowDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43743,15 +44690,17 @@ ConstructorUsingShadowDeclContainingDeclRange ConstructorUsingShadowDecl::contai
 }
 
 bool ConstructorUsingShadowDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ConstructorUsingShadowDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ConstructorUsingShadowDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ConstructorUsingShadowDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43818,15 +44767,17 @@ UsingPackDeclContainingDeclRange UsingPackDecl::containing(const Stmt &stmt) {
 }
 
 bool UsingPackDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UsingPackDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UsingPackDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UsingPackDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43878,15 +44829,17 @@ UsingDirectiveDeclContainingDeclRange UsingDirectiveDecl::containing(const Stmt 
 }
 
 bool UsingDirectiveDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UsingDirectiveDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UsingDirectiveDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UsingDirectiveDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43949,15 +44902,17 @@ UnresolvedUsingIfExistsDeclContainingDeclRange UnresolvedUsingIfExistsDecl::cont
 }
 
 bool UnresolvedUsingIfExistsDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnresolvedUsingIfExistsDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingIfExistsDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnresolvedUsingIfExistsDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -43987,15 +44942,17 @@ TypeDeclContainingDeclRange TypeDecl::containing(const Stmt &stmt) {
 }
 
 bool TypeDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypeDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypeDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypeDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -44045,15 +45002,17 @@ TemplateTypeParmDeclContainingDeclRange TemplateTypeParmDecl::containing(const S
 }
 
 bool TemplateTypeParmDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TemplateTypeParmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TemplateTypeParmDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TemplateTypeParmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -44142,15 +45101,17 @@ TagDeclContainingDeclRange TagDecl::containing(const Stmt &stmt) {
 }
 
 bool TagDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TagDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TagDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TagDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -44320,15 +45281,17 @@ RecordDeclContainingDeclRange RecordDecl::containing(const Stmt &stmt) {
 }
 
 bool RecordDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : RecordDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool RecordDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : RecordDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -44490,15 +45453,17 @@ CXXRecordDeclContainingDeclRange CXXRecordDecl::containing(const Stmt &stmt) {
 }
 
 bool CXXRecordDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : CXXRecordDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool CXXRecordDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : CXXRecordDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -45606,15 +46571,17 @@ ClassTemplateSpecializationDeclContainingDeclRange ClassTemplateSpecializationDe
 }
 
 bool ClassTemplateSpecializationDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ClassTemplateSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ClassTemplateSpecializationDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ClassTemplateSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -45738,15 +46705,17 @@ ClassTemplatePartialSpecializationDeclContainingDeclRange ClassTemplatePartialSp
 }
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ClassTemplatePartialSpecializationDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ClassTemplatePartialSpecializationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -45796,15 +46765,17 @@ EnumDeclContainingDeclRange EnumDecl::containing(const Stmt &stmt) {
 }
 
 bool EnumDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : EnumDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool EnumDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : EnumDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -45944,15 +46915,17 @@ UnresolvedUsingTypenameDeclContainingDeclRange UnresolvedUsingTypenameDecl::cont
 }
 
 bool UnresolvedUsingTypenameDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool UnresolvedUsingTypenameDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : UnresolvedUsingTypenameDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46018,15 +46991,17 @@ TypedefNameDeclContainingDeclRange TypedefNameDecl::containing(const Stmt &stmt)
 }
 
 bool TypedefNameDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypedefNameDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypedefNameDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypedefNameDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46087,15 +47062,17 @@ TypedefDeclContainingDeclRange TypedefDecl::containing(const Stmt &stmt) {
 }
 
 bool TypedefDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypedefDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypedefDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypedefDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46133,15 +47110,17 @@ TypeAliasDeclContainingDeclRange TypeAliasDecl::containing(const Stmt &stmt) {
 }
 
 bool TypeAliasDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypeAliasDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypeAliasDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypeAliasDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46187,15 +47166,17 @@ ObjCTypeParamDeclContainingDeclRange ObjCTypeParamDecl::containing(const Stmt &s
 }
 
 bool ObjCTypeParamDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCTypeParamDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCTypeParamDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCTypeParamDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46261,15 +47242,17 @@ TemplateDeclContainingDeclRange TemplateDecl::containing(const Stmt &stmt) {
 }
 
 bool TemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46307,15 +47290,17 @@ RedeclarableTemplateDeclContainingDeclRange RedeclarableTemplateDecl::containing
 }
 
 bool RedeclarableTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : RedeclarableTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool RedeclarableTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : RedeclarableTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46353,15 +47338,17 @@ FunctionTemplateDeclContainingDeclRange FunctionTemplateDecl::containing(const S
 }
 
 bool FunctionTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FunctionTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FunctionTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FunctionTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46399,15 +47386,17 @@ ClassTemplateDeclContainingDeclRange ClassTemplateDecl::containing(const Stmt &s
 }
 
 bool ClassTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ClassTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ClassTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ClassTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46445,15 +47434,17 @@ VarTemplateDeclContainingDeclRange VarTemplateDecl::containing(const Stmt &stmt)
 }
 
 bool VarTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : VarTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool VarTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : VarTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46491,15 +47482,17 @@ TypeAliasTemplateDeclContainingDeclRange TypeAliasTemplateDecl::containing(const
 }
 
 bool TypeAliasTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TypeAliasTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TypeAliasTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TypeAliasTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46551,15 +47544,17 @@ ConceptDeclContainingDeclRange ConceptDecl::containing(const Stmt &stmt) {
 }
 
 bool ConceptDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ConceptDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ConceptDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ConceptDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46604,15 +47599,17 @@ BuiltinTemplateDeclContainingDeclRange BuiltinTemplateDecl::containing(const Stm
 }
 
 bool BuiltinTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : BuiltinTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool BuiltinTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : BuiltinTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46646,15 +47643,17 @@ TemplateTemplateParmDeclContainingDeclRange TemplateTemplateParmDecl::containing
 }
 
 bool TemplateTemplateParmDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : TemplateTemplateParmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool TemplateTemplateParmDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : TemplateTemplateParmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46688,15 +47687,17 @@ ObjCPropertyDeclContainingDeclRange ObjCPropertyDecl::containing(const Stmt &stm
 }
 
 bool ObjCPropertyDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCPropertyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCPropertyDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCPropertyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -46836,15 +47837,17 @@ ObjCMethodDeclContainingDeclRange ObjCMethodDecl::containing(const Stmt &stmt) {
 }
 
 bool ObjCMethodDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCMethodDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCMethodDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCMethodDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47071,15 +48074,17 @@ ObjCContainerDeclContainingDeclRange ObjCContainerDecl::containing(const Stmt &s
 }
 
 bool ObjCContainerDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCContainerDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCContainerDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCContainerDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47239,15 +48244,17 @@ ObjCCategoryDeclContainingDeclRange ObjCCategoryDecl::containing(const Stmt &stm
 }
 
 bool ObjCCategoryDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCCategoryDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCCategoryDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47377,15 +48384,17 @@ ObjCProtocolDeclContainingDeclRange ObjCProtocolDecl::containing(const Stmt &stm
 }
 
 bool ObjCProtocolDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCProtocolDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCProtocolDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCProtocolDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47465,15 +48474,17 @@ ObjCInterfaceDeclContainingDeclRange ObjCInterfaceDecl::containing(const Stmt &s
 }
 
 bool ObjCInterfaceDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCInterfaceDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCInterfaceDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCInterfaceDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47716,15 +48727,17 @@ ObjCImplDeclContainingDeclRange ObjCImplDecl::containing(const Stmt &stmt) {
 }
 
 bool ObjCImplDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCImplDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCImplDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCImplDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47782,15 +48795,17 @@ ObjCCategoryImplDeclContainingDeclRange ObjCCategoryImplDecl::containing(const S
 }
 
 bool ObjCCategoryImplDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCCategoryImplDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCCategoryImplDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCCategoryImplDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47843,15 +48858,17 @@ ObjCImplementationDeclContainingDeclRange ObjCImplementationDecl::containing(con
 }
 
 bool ObjCImplementationDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCImplementationDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCImplementationDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCImplementationDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47954,15 +48971,17 @@ ObjCCompatibleAliasDeclContainingDeclRange ObjCCompatibleAliasDecl::containing(c
 }
 
 bool ObjCCompatibleAliasDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ObjCCompatibleAliasDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ObjCCompatibleAliasDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ObjCCompatibleAliasDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -47998,15 +49017,17 @@ NamespaceDeclContainingDeclRange NamespaceDecl::containing(const Stmt &stmt) {
 }
 
 bool NamespaceDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : NamespaceDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool NamespaceDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : NamespaceDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48050,15 +49071,17 @@ NamespaceAliasDeclContainingDeclRange NamespaceAliasDecl::containing(const Stmt 
 }
 
 bool NamespaceAliasDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : NamespaceAliasDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool NamespaceAliasDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : NamespaceAliasDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48121,15 +49144,17 @@ LinkageSpecDeclContainingDeclRange LinkageSpecDecl::containing(const Stmt &stmt)
 }
 
 bool LinkageSpecDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : LinkageSpecDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool LinkageSpecDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : LinkageSpecDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48169,15 +49194,17 @@ LifetimeExtendedTemporaryDeclContainingDeclRange LifetimeExtendedTemporaryDecl::
 }
 
 bool LifetimeExtendedTemporaryDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : LifetimeExtendedTemporaryDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool LifetimeExtendedTemporaryDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : LifetimeExtendedTemporaryDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48234,15 +49261,17 @@ ImportDeclContainingDeclRange ImportDecl::containing(const Stmt &stmt) {
 }
 
 bool ImportDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ImportDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ImportDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ImportDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48282,15 +49311,17 @@ FriendTemplateDeclContainingDeclRange FriendTemplateDecl::containing(const Stmt 
 }
 
 bool FriendTemplateDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FriendTemplateDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FriendTemplateDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FriendTemplateDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48316,15 +49347,17 @@ FriendDeclContainingDeclRange FriendDecl::containing(const Stmt &stmt) {
 }
 
 bool FriendDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FriendDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FriendDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FriendDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48391,15 +49424,17 @@ FileScopeAsmDeclContainingDeclRange FileScopeAsmDecl::containing(const Stmt &stm
 }
 
 bool FileScopeAsmDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : FileScopeAsmDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool FileScopeAsmDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : FileScopeAsmDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48449,15 +49484,17 @@ ExternCContextDeclContainingDeclRange ExternCContextDecl::containing(const Stmt 
 }
 
 bool ExternCContextDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ExternCContextDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ExternCContextDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ExternCContextDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48497,15 +49534,17 @@ ExportDeclContainingDeclRange ExportDecl::containing(const Stmt &stmt) {
 }
 
 bool ExportDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : ExportDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool ExportDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : ExportDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
@@ -48568,15 +49607,17 @@ EmptyDeclContainingDeclRange EmptyDecl::containing(const Stmt &stmt) {
 }
 
 bool EmptyDecl::contains(const Decl &decl) {
+  auto id_ = id();
   for (auto &parent : EmptyDecl::containing(decl)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }
 
 bool EmptyDecl::contains(const Stmt &stmt) {
+  auto id_ = id();
   for (auto &parent : EmptyDecl::containing(stmt)) {
-    if (parent.id() == id()) { return true; }
+    if (parent.id() == id_) { return true; }
   }
   return false;
 }

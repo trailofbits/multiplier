@@ -68,13 +68,13 @@ extern "C" int main(int argc, char *argv[]) {
       std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
       return EXIT_FAILURE;
     }
-    for (mx::Fragment fragment : mx::Fragment::in(*file)) {
+    for (mx::Fragment fragment : file->fragments()) {
       PrintVariableNames(std::move(fragment));
     }
 
   } else {
-    for (mx::File file : mx::File::in(index)) {
-      for (mx::Fragment fragment : mx::Fragment::in(file)) {
+    for (mx::File file : index.files()) {
+      for (mx::Fragment fragment : file.fragments()) {
         PrintVariableNames(std::move(fragment));
       }
     }

@@ -266,12 +266,20 @@ std::optional<File> File::containing(const WeggliQueryMatch &match) {
 
 // Return all files in a given index.
 FileList File::in(const Index &index) {
-  return FileList(std::make_shared<FileListImpl>(index.impl));
+  return index.files();
 }
 
 // Return the ID of this file.
 EntityId File::id(void) const noexcept {
   return EntityId(FileId{impl->file_id});
+}
+
+FragmentList File::fragments(void) const {
+  auto &ep = impl->ep;
+  auto list = std::make_shared<FragmentListImpl>(
+      ep, ep->ListFragmentsInFile(ep, impl->file_id));
+  auto num_fragments = list->fragment_ids.size();
+  return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
 }
 
 std::vector<EntityId> File::fragment_ids(void) const {

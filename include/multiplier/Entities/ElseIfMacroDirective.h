@@ -43,6 +43,9 @@ class ElseIfMacroDirective : public MacroDirective {
   static ElseIfMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static ElseIfMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<ElseIfMacroDirective> from(const MacroDirective &parent);
 
   inline static std::optional<ElseIfMacroDirective> from(const std::optional<MacroDirective> &parent) {

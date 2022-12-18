@@ -2224,7 +2224,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  EntityId id(void) const;\n"
           << "  UseRange<MacroUseSelector> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static MacroIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static MacroIterator in_internal(const Fragment &fragment);\n"
+          << "  static ParentMacroIteratorImpl<Macro> containing_internal(const Token &token);\n\n"
           << " public:\n";
 
       // Serialization of these tokens is manually performed in
@@ -2241,7 +2242,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     abort();
   }
 
-  // TODO(pag): Add macros?
+  // NOTE(pag): Macro containing a token is handled later.
   if (is_decl || is_stmt || is_type || is_attr) {
 
     class_os
@@ -2254,8 +2255,9 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "    return TokenContextIterator(TokenContext::of(tok));\n"
         << "  }\n\n"
         << "  inline bool contains(const Token &tok) {\n"
+        << "    auto id_ = id();\n"
         << "    for (auto &parent : " << class_name << "::containing(tok)) {\n"
-        << "      if (parent.id() == id()) { return true; }\n"
+        << "      if (parent.id() == id_) { return true; }\n"
         << "    }\n"
         << "    return false;\n"
         << "  }\n\n";
@@ -2291,14 +2293,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
+        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent.id() == id_) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
+        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent.id() == id_) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2332,14 +2336,16 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
+        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent.id() == id_) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
+        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent.id() == id_) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2401,11 +2407,28 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  return ParentMacroIteratorImpl<Macro>(macro.parent());\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Macro &macro) {\n"
+        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(macro)) {\n"
-        << "    if (parent.id() == id()) { return true; }\n"
+        << "    if (parent.id() == id_) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
+        << "}\n\n"
+        << "bool " << class_name << "::contains(const Token &token) {\n"
+        << "  auto id_ = id();\n"
+        << "  for (auto &parent : " << class_name << "::containing(token)) {\n"
+        << "    if (parent.id() == id_) { return true; }\n"
+        << "  }\n"
+        << "  return false;\n"
+        << "}\n\n"
+        << class_name << "ContainingMacroRange " << class_name
+        << "::containing(const Token &token) {\n"
+        << "  return Macro::containing_internal(token);\n"
         << "}\n\n";
+
+    class_os
+        << "  static " << class_name
+        << "ContainingMacroRange containing(const Token &token);\n"
+        << "  bool contains(const Token &token);\n\n";
 
     // Add in our custom uses iterator. We have a custom definition of this
     // in the API.

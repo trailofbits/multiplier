@@ -52,8 +52,9 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : ObjCImplementationDecl::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

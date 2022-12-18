@@ -31,11 +31,7 @@ void FileFragmentListIterator::Advance(void) {
 
 // Return the list of fragments in a file.
 FragmentList Fragment::in(const File &file) {
-  auto &ep = file.impl->ep;
-  auto list = std::make_shared<FragmentListImpl>(
-      ep, ep->ListFragmentsInFile(ep, file.impl->file_id));
-  auto num_fragments = list->fragment_ids.size();
-  return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
+  return file.fragments();
 }
 
 // Return the fragment containing a query match.

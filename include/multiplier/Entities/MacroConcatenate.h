@@ -43,6 +43,9 @@ class MacroConcatenate : public MacroSubstitution {
   static MacroConcatenateContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroConcatenateContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroConcatenate> from(const MacroSubstitution &parent);
 
   inline static std::optional<MacroConcatenate> from(const std::optional<MacroSubstitution> &parent) {

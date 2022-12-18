@@ -51,8 +51,9 @@ class OMPTeamsDistributeParallelForDirective : public OMPLoopDirective {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : OMPTeamsDistributeParallelForDirective::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

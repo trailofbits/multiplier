@@ -273,8 +273,8 @@ extern "C" int main(int argc, char *argv[]) {
   mx::FileLocationCache cache(config);
 
   // Go find all functions.
-  for (mx::File file : mx::File::in(index)) {
-    for (mx::Fragment frag : mx::Fragment::in(file)) {
+  for (mx::File file : index.files()) {
+    for (mx::Fragment frag : file.fragments()) {
       for (mx::FunctionDecl func : mx::FunctionDecl::in(frag)) {
         wl.emplace_back(LongestDefinition(func));
       }

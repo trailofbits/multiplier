@@ -43,6 +43,9 @@ class PragmaMacroDirective : public MacroDirective {
   static PragmaMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static PragmaMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<PragmaMacroDirective> from(const MacroDirective &parent);
 
   inline static std::optional<PragmaMacroDirective> from(const std::optional<MacroDirective> &parent) {

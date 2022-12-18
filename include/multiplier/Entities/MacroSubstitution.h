@@ -41,6 +41,9 @@ class MacroSubstitution : public Macro {
   static MacroSubstitutionContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroSubstitutionContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroSubstitution> from(const Macro &parent);
 
   inline static std::optional<MacroSubstitution> from(const std::optional<Macro> &parent) {

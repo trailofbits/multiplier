@@ -76,10 +76,14 @@ class Macro {
 
  protected:
   static MacroIterator in_internal(const Fragment &fragment);
+  static ParentMacroIteratorImpl<Macro> containing_internal(const Token &token);
 
  public:
   static MacroContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
+
+  static MacroContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;

@@ -142,15 +142,24 @@ struct Fragment @0xe5f27760091f9a3a {
   # Indexed by `ParsedTokenId::offset`.
   parsedTokenOffsetToIndex @11 :List(UInt32);
   
+  # Inverse of the above. This is to let us get from a "final" macro token
+  # back to a parsed token. There is one for every token. A value is valid
+  # iff parsedTokenOffsetToIndex[macroTokenIndexToParsedTokenOffset[i]] == i.
+  macroTokenIndexToParsedTokenOffset @12 :List(UInt32);
+  
+  # Inverted map of macro tokens -> offset of containing macro. The macro
+  # containing the `i`th token is `macros[macroTokenIndexToMacroOffset[i]]`.
+  macroTokenIndexToMacroOffset @13 :List(UInt32);
+  
   # List of token contexts. There is one token context per parsed token.
   # Non-parsed tokens don't have token contexts. Whitespace doesn't have
   # context.
-  parsedTokenContexts @12 :List(TokenContext);
+  parsedTokenContexts @14 :List(TokenContext);
   
   # List of offsets of token contexts for each of the tokens.
   #
   # Indexed by `ParsedTokenId::offset`.
-  parsedTokenContextOffsets @13 :List(UInt32);
+  parsedTokenContextOffsets @15 :List(UInt32);
   
   # The actual parsed tokens, as a text buffer. Each token is separated by a
   # single space. There are no newlines, except those that might be inside of
@@ -167,14 +176,14 @@ struct Fragment @0xe5f27760091f9a3a {
   #                   A E C D B
   #
   # The parsed tokens correspond to stuff in `A E C D`, and `B` comes after.
-  tokenData @14 :Text;
+  tokenData @16 :Text;
   
   # Offsets of the beginning of tokens into `tokenData`. There is one extra
   # element in here than there are tokens, which represents the size of the data.
-  tokenOffsets @15 :List(UInt32);
+  tokenOffsets @17 :List(UInt32);
   
   # List of macro token kinds in this fragment.
-  tokenKinds @16 :List(UInt16);
+  tokenKinds @18 :List(UInt16);
   
   # Every macro token is associated with an ID. The id is one of:
   #
@@ -182,8 +191,12 @@ struct Fragment @0xe5f27760091f9a3a {
   #   - MacroTokenId:        This macro token is a copy of another macro token.
   #   - MacroId: This macro token is derived in some way from its
   #                          parent substitution. E.g. stringize, concat, etc.
-  derivedTokenIds @17 :List(UInt64);
+  derivedTokenIds @19 :List(UInt64);
+  
+  # The single best related entity ID to the corresponding token. This helps
+  # with improving the speed of syntax highlighting.
+  relatedEntityId @20 :List(UInt64);
 
   # Source IR in text format
-  mlir @18 :Text;
+  mlir @21 :Text;
 }

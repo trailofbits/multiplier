@@ -43,6 +43,9 @@ class OtherMacroDirective : public MacroDirective {
   static OtherMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static OtherMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<OtherMacroDirective> from(const MacroDirective &parent);
 
   inline static std::optional<OtherMacroDirective> from(const std::optional<MacroDirective> &parent) {

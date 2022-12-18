@@ -56,8 +56,9 @@ class CXXMethodDecl : public FunctionDecl {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : CXXMethodDecl::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

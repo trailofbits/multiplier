@@ -47,8 +47,9 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : OMPThreadPrivateDecl::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

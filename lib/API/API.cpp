@@ -295,4 +295,22 @@ EntityId Macro::id(void) const {
   return eid;
 }
 
+MacroIterator Macro::in_internal(const Fragment &fragment) {
+  return MacroIterator(fragment.impl, 0u, fragment.impl->num_macros);
+}
+
+ParentMacroIteratorImpl<Macro> Macro::containing_internal(const Token &token) {
+  std::optional<Macro> macro;
+  if (auto frag = token.impl->OwningFragment()) {
+    auto vid = EntityId(token.impl->NthContainingMacroId(token.offset)).Unpack();
+    if (std::holds_alternative<MacroId>(vid)) {
+      MacroId mid = std::get<MacroId>(vid);
+      if (mid.fragment_id == frag->fragment_id) {
+        macro.emplace(FragmentImpl::Ptr(token.impl, frag), mid.offset);
+      }
+    }
+  }
+  return ParentMacroIteratorImpl<Macro>(std::move(macro));
+}
+
 }  // namespace mx

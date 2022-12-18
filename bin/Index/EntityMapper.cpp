@@ -54,10 +54,13 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) {
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
   if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
-      return it->second;
-    } else {
-      return mx::kInvalidEntityId;
-    }
+    return it->second;
+  } else if (auto it2 = token_tree_ids.find(entity);
+             it2 != token_tree_ids.end()) {
+    return it2->second;
+  } else {
+    return mx::kInvalidEntityId;
+  }
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Decl &entity) const {
@@ -72,9 +75,9 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
   return EntityId(entity.RawAttr());
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
+mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) {
   if (auto mt = pasta::MacroToken::From(entity)) {
-    return EntityId(mt.value());
+    return EntityId(mt->ParsedLocation());
   }
 
   auto ret = EntityId(entity.RawMacro());

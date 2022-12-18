@@ -43,6 +43,9 @@ class EndIfMacroDirective : public MacroDirective {
   static EndIfMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static EndIfMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<EndIfMacroDirective> from(const MacroDirective &parent);
 
   inline static std::optional<EndIfMacroDirective> from(const std::optional<MacroDirective> &parent) {

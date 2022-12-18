@@ -63,6 +63,16 @@ EntityId PackedFileImpl::NthDerivedTokenId(unsigned) const {
   return kInvalidEntityId;
 }
 
+// Return the id of the parsed token which is derived from the Nth token.
+EntityId PackedFileImpl::NthParsedTokenId(unsigned) const {
+  return kInvalidEntityId;
+}
+
+// Return the id of the macro containing the Nth token.
+EntityId PackedFileImpl::NthContainingMacroId(unsigned) const {
+  return kInvalidEntityId;
+}
+
 // Return the id of the Nth token.
 EntityId PackedFileImpl::NthTokenId(unsigned token_index) const {
   if (token_index < num_tokens) {

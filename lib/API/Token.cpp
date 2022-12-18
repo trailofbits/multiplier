@@ -33,28 +33,49 @@ const FileImpl *TokenReader::OwningFile(void) const noexcept {
 TokenReader::Ptr TokenReader::ReaderForToken(
     const TokenReader::Ptr &self, const EntityProvider::Ptr &ep, EntityId eid) {
 
-  // TODO(pag): Optimize for returning `self`?
-
   VariantId vid = eid.Unpack();
   if (std::holds_alternative<FileTokenId>(vid)) {
     FileTokenId tid = std::get<FileTokenId>(vid);
-    if (auto file = ep->FileFor(ep, tid.file_id);
-               file && tid.offset < file->num_tokens) {
+
+    FileImpl::Ptr file;
+    if (auto self_file = self->OwningFile();
+        self_file && self_file->file_id == tid.file_id) {
+      file = FileImpl::Ptr(self, self_file);
+    } else {
+      file = ep->FileFor(ep, tid.file_id);
+    }
+
+    if (file && tid.offset < file->num_tokens) {
       return file->TokenReader(file);
     }
 
   } else if (std::holds_alternative<ParsedTokenId>(vid)) {
     ParsedTokenId tid = std::get<ParsedTokenId>(vid);
-    if (auto frag = ep->FragmentFor(ep, tid.fragment_id);
-        frag && tid.offset < frag->num_parsed_tokens) {
+
+    FragmentImpl::Ptr frag;
+    if (auto self_frag = self->OwningFragment();
+        self_frag && self_frag->fragment_id == tid.fragment_id) {
+      frag = FragmentImpl::Ptr(self, self_frag);
+    } else {
+      frag = ep->FragmentFor(ep, tid.fragment_id);
+    }
+
+    if (frag && tid.offset < frag->num_parsed_tokens) {
       return frag->ParsedTokenReader(frag);
     }
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
     MacroTokenId tid = std::get<MacroTokenId>(vid);
-    if (auto frag = ep->FragmentFor(ep, tid.fragment_id);
-        frag && frag->num_parsed_tokens <= tid.offset &&
-        tid.offset < frag->num_tokens) {
+
+    FragmentImpl::Ptr frag;
+    if (auto self_frag = self->OwningFragment();
+        self_frag && self_frag->fragment_id == tid.fragment_id) {
+      frag = FragmentImpl::Ptr(self, self_frag);
+    } else {
+      frag = ep->FragmentFor(ep, tid.fragment_id);
+    }
+
+    if (frag && tid.offset < frag->num_tokens) {
       return frag->MacroTokenReader(frag);
     }
   }
@@ -81,6 +102,16 @@ std::string_view InvalidTokenReader::NthTokenData(unsigned) const {
 
 // Return the id of the token from which the Nth token is derived.
 EntityId InvalidTokenReader::NthDerivedTokenId(unsigned) const {
+  return kInvalidEntityId;
+}
+
+// Return the id of the parsed token which is derived from the Nth token.
+EntityId InvalidTokenReader::NthParsedTokenId(unsigned) const {
+  return kInvalidEntityId;
+}
+
+// Return the id of the macro containing the Nth token.
+EntityId InvalidTokenReader::NthContainingMacroId(unsigned) const {
   return kInvalidEntityId;
 }
 
@@ -128,6 +159,23 @@ EntityId Token::id(void) const {
   return impl->NthTokenId(offset);
 }
 
+// Return the version of this token that was actually parsed. If this was a
+// macro token that only relates to a single parsed token, then that is
+// returned. If this is a macro token that doesn't relate to any parsed
+// tokens, or relates to more than one, then nothing is returned.
+std::optional<Token> Token::parsed_token(void) const {
+  VariantId vid = impl->NthParsedTokenId(offset).Unpack();
+  if (std::holds_alternative<ParsedTokenId>(vid)) {
+    return *this;
+  } else if (std::holds_alternative<MacroTokenId>(vid)) {
+    FragmentImpl::Ptr frag(impl, impl->OwningFragment());
+    return Token(frag->MacroTokenReader(frag),
+                 std::get<MacroTokenId>(vid).offset);
+  } else {
+    return std::nullopt;
+  }
+}
+
 // Return the token from which this token was derived. This can be a macro
 // token or a file token.
 std::optional<Token> Token::derived_token(void) const {
@@ -150,7 +198,14 @@ std::optional<Token> Token::derived_token(void) const {
   }
 
   auto reader = impl->ReaderForToken(impl, eid);
-  if (!reader || !reader->NumTokens()) {
+  if (!reader) {
+    assert(false);  // Should always get a reader.
+    return std::nullopt;
+  }
+
+  auto num_tokens = reader->NumTokens();
+  if (offset >= num_tokens) {
+    assert(false);
     return std::nullopt;
   }
 

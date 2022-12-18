@@ -43,6 +43,9 @@ class MacroStringify : public MacroSubstitution {
   static MacroStringifyContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroStringifyContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroStringify> from(const MacroSubstitution &parent);
 
   inline static std::optional<MacroStringify> from(const std::optional<MacroSubstitution> &parent) {

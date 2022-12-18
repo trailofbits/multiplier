@@ -44,8 +44,9 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : HLSLSV_GroupIndexAttr::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

@@ -45,8 +45,9 @@ class FinalAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : FinalAttr::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

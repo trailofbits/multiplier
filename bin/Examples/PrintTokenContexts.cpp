@@ -97,6 +97,10 @@ extern "C" int main(int argc, char *argv[]) {
       bgcolor = " bgcolor=\"cadetblue1\"";
       kind_name = mx::EnumeratorName(type->kind());
 
+    } else if (auto attr = context.as_attribute()) {
+      bgcolor = " bgcolor=\"cornflowerblue\"";
+      kind_name = mx::EnumeratorName(attr->kind());
+
     } else if (context.is_alias()) {
       bgcolor = " bgcolor=\"deepskyblue3\"";
 

@@ -45,8 +45,9 @@ class DependentSizedMatrixType : public MatrixType {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : DependentSizedMatrixType::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

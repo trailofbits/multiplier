@@ -43,6 +43,9 @@ class UndefineMacroDirective : public MacroDirective {
   static UndefineMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static UndefineMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<UndefineMacroDirective> from(const MacroDirective &parent);
 
   inline static std::optional<UndefineMacroDirective> from(const std::optional<MacroDirective> &parent) {

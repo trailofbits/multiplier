@@ -27,6 +27,7 @@ class File;
 class FragmentList;
 class FileFragmentListIterator;
 class FileImpl;
+class FileList;
 class FileListImpl;
 class Fragment;
 class FragmentImpl;
@@ -237,6 +238,9 @@ class Index {
 
   // Return an entity given its ID.
   VariantEntity entity(EntityId eid) const;
+
+  // Return all files in the index.
+  FileList files(void) const;
 
   // Return an entity given its ID.
   template <typename T>

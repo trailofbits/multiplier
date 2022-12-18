@@ -21,6 +21,11 @@ class EntityMapper final {
  public:
   EntityIdMap &entity_ids;
 
+  // These are "fresh" for each instance of the entity mapper, because we
+  // create different token trees per fragment, though they may occupy the
+  // same memory locations.
+  EntityIdMap token_tree_ids;
+
   FileIdMap &file_ids;
 
   const PendingFragment &fragment;
@@ -29,6 +34,7 @@ class EntityMapper final {
       EntityIdMap &entity_ids_, FileIdMap &file_ids_,
       const PendingFragment &fragment_)
       : entity_ids(entity_ids_),
+        token_tree_ids(entity_ids_),
         file_ids(file_ids_),
         fragment(fragment_) {}
 
@@ -45,7 +51,7 @@ class EntityMapper final {
   mx::RawEntityId EntityId(const pasta::MacroToken &entity);
   mx::RawEntityId EntityId(const pasta::Type &entity) const;
   mx::RawEntityId EntityId(const pasta::Attr &entity) const;
-  mx::RawEntityId EntityId(const pasta::Macro &entity) const;
+  mx::RawEntityId EntityId(const pasta::Macro &entity);
 
   uint32_t PseudoId(const pasta::TemplateArgument &pseudo) const;
   uint32_t PseudoId(const pasta::TemplateParameterList &pseudo) const;

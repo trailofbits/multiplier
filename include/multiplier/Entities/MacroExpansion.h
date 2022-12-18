@@ -46,6 +46,9 @@ class MacroExpansion : public MacroSubstitution {
   static MacroExpansionContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroExpansionContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroExpansion> from(const MacroSubstitution &parent);
 
   inline static std::optional<MacroExpansion> from(const std::optional<MacroSubstitution> &parent) {

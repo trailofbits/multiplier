@@ -46,8 +46,9 @@ class ObjCAtSynchronizedStmt : public Stmt {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : ObjCAtSynchronizedStmt::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

@@ -56,10 +56,7 @@ template <typename Tok>
 static void AccumulateTokenData(std::string &data, const Tok &tok) {
   llvm::StringRef tok_data = tok.Data();
   if (llvm::json::isUTF8(tok_data)) {
-    auto raw_tok_data = tok_data.data();
-    auto raw_len = strlen(raw_tok_data);
-    DCHECK_LE(raw_len, tok_data.size());
-    data.insert(data.end(), raw_tok_data, raw_tok_data + raw_len);
+    data.insert(data.end(), tok_data.begin(), tok_data.end());
 
   } else {
     data += llvm::json::fixUTF8(tok_data);
@@ -69,6 +66,7 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
 struct TokenTreeSerializationSchedule {
   struct Todo {
     const void *parent;
+    mx::RawEntityId parent_id;
     TokenTreeNodeRange nodes;
     bool is_in_expansion;
   };
@@ -82,11 +80,15 @@ struct TokenTreeSerializationSchedule {
   // Index of a parsed token in `replacement_tokens`.
   std::unordered_map<const void *, size_t> parsed_token_index;
 
+  // Maps parsed tokens to the macro in which they are contained.
+  std::vector<mx::RawEntityId> containing_macro;
+
   mx::RawEntityId RecordEntityId(const TokenTree &tt) {
     const void *raw_tt = tt.RawNode();
     const void *raw_locator = raw_tt;
     std::optional<pasta::Macro> macro = tt.Macro();
     if (macro) {
+      CHECK(tt.Kind() == mx::FromPasta(macro->Kind()));
       raw_locator = macro->RawMacro();
     }
 
@@ -95,10 +97,13 @@ struct TokenTreeSerializationSchedule {
     // NOTE(pag): This is some collusion with `EntityLabeller::Label` in terms
     //            of labelling the top-level macros.
     if (raw_id != mx::kInvalidEntityId) {
-      auto offset = std::get<mx::MacroId>(mx::EntityId(raw_id).Unpack()).offset;
-      CHECK_LT(offset, pf.macros_to_serialize.size());
-      CHECK(!pf.macros_to_serialize[offset].has_value());
-      pf.macros_to_serialize[offset] = tt;
+      CHECK_NE(raw_tt, raw_locator);
+      mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(raw_id).Unpack());
+      CHECK(id.kind == tt.Kind());
+      CHECK_LT(id.offset, pf.top_level_macros.size());
+      CHECK_LT(id.offset, pf.macros_to_serialize.size());
+      CHECK(!pf.macros_to_serialize[id.offset].has_value());
+      pf.macros_to_serialize[id.offset] = tt;
 
     // We need to form a new macro id for something we discovered along the way.
     } else {
@@ -114,13 +119,15 @@ struct TokenTreeSerializationSchedule {
 
     // Save the ID, mapped from both the token tree and the underlying
     // macro, if any.
-    (void) em.entity_ids.emplace(raw_tt, raw_id);
-    (void) em.entity_ids.emplace(raw_locator, raw_id);
-
+    CHECK(em.token_tree_ids.emplace(raw_tt, raw_id).second);
+    if (raw_tt != raw_locator) {
+      (void) em.entity_ids.emplace(raw_locator, raw_id);
+    }
     return raw_id;
   }
 
-  void RecordEntityId(const TokenTreeNode &node) {
+  mx::RawEntityId RecordEntityId(const TokenTreeNode &node,
+                                 mx::RawEntityId parent_id) {
     mx::RawEntityId raw_id = mx::kInvalidEntityId;
     if (std::optional<TokenTree> sub = node.SubTree()) {
       raw_id = RecordEntityId(sub.value());
@@ -131,12 +138,15 @@ struct TokenTreeSerializationSchedule {
       id.kind = mx::TokenKind::UNKNOWN;
       id.fragment_id = em.fragment.fragment_id;
       id.offset = static_cast<unsigned>(tokens.size());
+
       const void *raw_pt = nullptr;
-      if (auto pt = node.Token()) {
+      if (std::optional<pasta::Token> pt = node.Token()) {
         id.kind = TokenKindFromPasta(pt.value());
         raw_pt = pt->RawToken();
+        DCHECK(!IsParsedToken(pt.value()) == !em.entity_ids.count(raw_pt));
+        CHECK(parsed_token_index.emplace(pt->RawToken(), id.offset).second);
 
-      } else if (auto ft = node.FileToken()) {
+      } else if (std::optional<pasta::FileToken> ft = node.FileToken()) {
         id.kind = TokenKindFromPasta(ft.value());
       }
 
@@ -144,55 +154,58 @@ struct TokenTreeSerializationSchedule {
       if (raw_pt) {
         em.entity_ids.emplace(raw_pt, raw_id);
       }
+
+      containing_macro.push_back(parent_id);
+      tokens.emplace_back(node);
     }
 
     CHECK_NE(raw_id, mx::kInvalidEntityId);
-    em.entity_ids.emplace(node.RawNode(), raw_id);
+    CHECK(em.token_tree_ids.emplace(node.RawNode(), raw_id).second);
+    return raw_id;
   }
 
   // Schedule the expansions so that all "afters" are properly nested. We want
   // this so that `fragment.parsed_tokens().data()` reflects the final result
   // of macro expansion.
-  void Schedule(const void *parent, const TokenTreeNodeRange &nodes,
+  void Schedule(const void *parent, mx::RawEntityId parent_id,
+                const TokenTreeNodeRange &nodes,
                 bool is_in_expansion, bool is_deferred) {
 
     for (TokenTreeNode node : nodes) {
-      RecordEntityId(node);
+      mx::RawEntityId child_id = RecordEntityId(node, parent_id);
       if (std::optional<TokenTree> sub = node.SubTree()) {
 
         const void *child = sub->RawNode();
         if (sub->HasExpansion()) {
-          Schedule(child, sub->ReplacementChildren(), is_in_expansion, false);
-          todo_list.emplace_back(Todo{child, sub->Children(), false});
+          Schedule(child, child_id, sub->ReplacementChildren(),
+                   is_in_expansion, false);
+          todo_list.emplace_back(Todo{child, child_id, sub->Children(), false});
         } else {
-          Schedule(child, sub->Children(), is_in_expansion, false);
+          Schedule(child, child_id, sub->Children(), is_in_expansion, false);
         }
-
+#ifndef NDEBUG
       // Keep track of the parsed tokens.
       } else if (is_in_expansion) {
         if (std::optional<pasta::Token> pt = node.Token()) {
-          assert(IsParsedToken(pt.value()));
-          parsed_token_index.emplace(pt->RawToken(), tokens.size());
+          CHECK(IsParsedToken(pt.value()));
         }
-        tokens.emplace_back(std::move(node));
 
       } else {
-#ifndef NDEBUG
         if (auto pt = node.Token()) {
-          assert(!IsParsedToken(pt.value()));
+          CHECK(!IsParsedToken(pt.value()));
         }
 #endif
-        tokens.emplace_back(std::move(node));
       }
     }
   }
 
   void Schedule(const Todo &todo) {
-    Schedule(todo.parent, todo.nodes, todo.is_in_expansion, true);
+    Schedule(todo.parent, todo.parent_id, todo.nodes,
+             todo.is_in_expansion, true);
   }
 
   void Schedule(TokenTreeNodeRange nodes) {
-    Schedule(nullptr, std::move(nodes), true, false);
+    Schedule(nullptr, mx::kInvalidEntityId, std::move(nodes), true, false);
     for (auto i = 0u; i < todo_list.size(); ++i) {
       Schedule(todo_list[i]);
     }
@@ -353,17 +366,35 @@ static void PersistParsedTokens(
     VisitMacros(pf, em, tlm, macros_to_serialize);
   }
 
+  unsigned num_macros = static_cast<unsigned>(macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
   unsigned num_tokens = num_parsed_tokens;
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
   auto dt = fb.initDerivedTokenIds(num_tokens);
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
+  auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
+  auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
   auto i = 0u;
 
   // Serialize the tokens.
   for (const pasta::Token &tok : parsed_tokens) {
-    pto2i.set(i, i);
+    pto2i.set(i, i);  // Parsed tokens to macro tokens.
+    mti2po.set(i, i);  // Macro tokens to parsed tokens.
+    mti2mo.set(i, num_macros);  // Mapping of token to containing macros.
+
+    if (std::optional<pasta::MacroToken> mt = tok.MacroLocation()) {
+      if (auto pm = mt->Parent()) {
+        mx::VariantId vid = mx::EntityId(em.EntityId(pm.value())).Unpack();
+        if (std::holds_alternative<mx::MacroId>(vid)) {
+          mx::MacroId mid = std::get<mx::MacroId>(vid);
+          if (mid.fragment_id == pf.fragment_id) {
+            mti2mo.set(i, mid.offset);
+          }
+        }
+      }
+    }
+
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
     dt.set(i, DerivedTokenId(em, tok));
@@ -375,7 +406,6 @@ static void PersistParsedTokens(
   to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
   fb.setTokenData(utf8_fragment_data);
 
-  auto num_macros = static_cast<unsigned>(macros_to_serialize.size());
   auto ms = fb.initMacros(num_macros);
   for (auto i = 0u; i < num_macros; ++i) {
     mx::ast::Macro::Builder mb = ms[i];
@@ -403,6 +433,7 @@ static void PersistTokenTree(
 
   std::string utf8_fragment_data;
 
+  unsigned num_macros = static_cast<unsigned>(pf.macros_to_serialize.size());
   unsigned num_parsed_tokens = static_cast<unsigned>(parsed_tokens.size());
   unsigned num_tokens = static_cast<unsigned>(sched.tokens.size());
   auto tk = fb.initTokenKinds(num_tokens);
@@ -437,24 +468,71 @@ static void PersistTokenTree(
   to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
   fb.setTokenData(utf8_fragment_data);
 
+  // Map the serialized tokens to the parsed tokens.
+  i = 0u;
+  auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
+  auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
+  for (; i < num_tokens; ++i) {
+    mti2po.set(i, num_parsed_tokens);
+    mti2mo.set(i, num_macros);
+
+    // Map the token to its containing macro.
+    mx::VariantId vid = mx::EntityId(sched.containing_macro[i]).Unpack();
+    if (std::holds_alternative<mx::MacroId>(vid)) {
+      mx::MacroId mid = std::get<mx::MacroId>(vid);
+      CHECK_EQ(mid.fragment_id, pf.fragment_id);
+      mti2mo.set(i, mid.offset);
+    } else {
+      CHECK(std::holds_alternative<mx::InvalidId>(vid));
+    }
+  }
+
   // Map the parsed tokens to serialized tokens.
   //
   // `ParsedTokenId::offset` needs to go through a level of indirection to
   // get into the token kinds/data.
-  i = 0u;
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
+  i = 0u;
   for (const pasta::Token &parsed_tok : parsed_tokens) {
     auto it = sched.parsed_token_index.find(parsed_tok.RawToken());
     if (it != sched.parsed_token_index.end()) {
-      pto2i.set(i++, static_cast<unsigned>(it->second));
+      auto mi = static_cast<unsigned>(it->second);
+      pto2i.set(i, mi);
+      mti2po.set(mi, i);
     } else {
       LOG(FATAL)
           << "TokenTree nodes didn't cover all parsed tokens";
     }
+
+    // Introduce a mapping of macro tokens back to parsed tokens.
+    for (auto dt = parsed_tok.DerivedLocation(); dt;
+         dt = dt->DerivedLocation()) {
+      mx::VariantId vid = mx::EntityId(em.EntityId(dt.value())).Unpack();
+      if (!std::holds_alternative<mx::MacroTokenId>(vid)) {
+        CHECK(!std::holds_alternative<mx::ParsedTokenId>(vid));
+        continue;
+      }
+
+      mx::MacroTokenId mtid = std::get<mx::MacroTokenId>(vid);
+
+      if (mtid.fragment_id == pf.fragment_id) {
+
+        // This macro token hasn't yet been related to any single parsed
+        // token, so relate it to the first one.
+        if (mti2po[mtid.offset] == num_parsed_tokens) {
+          mti2po.set(mtid.offset, i);
+
+        // This macro token ended up being related to multiple parsed tokens.
+        } else {
+          mti2po.set(mtid.offset, num_parsed_tokens + 1u);
+        }
+      }
+    }
+
+    ++i;
   }
 
   // Serialize the token trees / macros.
-  unsigned num_macros = static_cast<unsigned>(pf.macros_to_serialize.size());
   auto ms = fb.initMacros(num_macros);
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
     const void *raw_tt = tt->RawNode();

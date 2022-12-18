@@ -44,8 +44,9 @@ class MustTailAttr : public StmtAttr {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : MustTailAttr::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

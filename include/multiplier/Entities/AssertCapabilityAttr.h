@@ -45,8 +45,9 @@ class AssertCapabilityAttr : public InheritableAttr {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : AssertCapabilityAttr::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

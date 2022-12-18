@@ -48,6 +48,10 @@ FilePathList Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
+FileList Index::files(void) const {
+  return FileList(std::make_shared<FileListImpl>(impl));
+}
+
 std::optional<File> Index::file(FileId id) const {
   if (auto ptr = impl->FileFor(impl, id.file_id)) {
     return File(std::move(ptr));

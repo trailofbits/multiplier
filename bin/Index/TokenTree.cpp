@@ -2453,7 +2453,7 @@ std::optional<pasta::Token> TokenTreeNode::Token(void) const noexcept {
 }
 
 const void *TokenTreeNode::RawNode(void) const noexcept {
-  const auto &ent = (*impl)[offset];
+  const SubstitutionNode &ent = (*impl)[offset];
   return &ent;
 }
 

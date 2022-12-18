@@ -147,6 +147,7 @@ class Fragment {
   friend class FragmentImpl;
   friend class FragmentList;
   friend class Index;
+  friend class Macro;
   friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class RemoteEntityProvider;
@@ -165,6 +166,7 @@ class Fragment {
 
  public:
   // Return the list of fragments in a file.
+  __attribute__((deprecated("Use File::fragments() instead.")))
   static FragmentList in(const File &);
 
   // Return the fragment containing a query match.

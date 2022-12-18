@@ -45,6 +45,9 @@ class IncludeMacrosMacroDirective : public IncludeLikeMacroDirective {
   static IncludeMacrosMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static IncludeMacrosMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<IncludeMacrosMacroDirective> from(const IncludeLikeMacroDirective &parent);
 
   inline static std::optional<IncludeMacrosMacroDirective> from(const std::optional<IncludeLikeMacroDirective> &parent) {

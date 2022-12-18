@@ -48,8 +48,9 @@ class CaseStmt : public SwitchCase {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : CaseStmt::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

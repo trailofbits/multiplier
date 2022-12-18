@@ -46,8 +46,9 @@ class OMPSectionDirective : public OMPExecutableDirective {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : OMPSectionDirective::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

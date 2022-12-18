@@ -50,8 +50,9 @@ class CUDAKernelCallExpr : public CallExpr {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : CUDAKernelCallExpr::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

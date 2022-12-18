@@ -43,6 +43,9 @@ class MacroVAOpt : public MacroSubstitution {
   static MacroVAOptContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroVAOptContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroVAOpt> from(const MacroSubstitution &parent);
 
   inline static std::optional<MacroVAOpt> from(const std::optional<MacroSubstitution> &parent) {

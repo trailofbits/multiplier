@@ -45,8 +45,9 @@ class ObjCInterfaceType : public ObjCObjectType {
   }
 
   inline bool contains(const Token &tok) {
+    auto id_ = id();
     for (auto &parent : ObjCInterfaceType::containing(tok)) {
-      if (parent.id() == id()) { return true; }
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

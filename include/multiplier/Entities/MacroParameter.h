@@ -43,6 +43,9 @@ class MacroParameter : public Macro {
   static MacroParameterContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroParameterContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroParameter> from(const Macro &parent);
 
   inline static std::optional<MacroParameter> from(const std::optional<Macro> &parent) {

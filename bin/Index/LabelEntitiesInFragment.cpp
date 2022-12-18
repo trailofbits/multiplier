@@ -191,6 +191,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
     return true;
 
   } else {
+    LOG(FATAL) << "Top-level macro already labelled?";
     return false;
   }
 }

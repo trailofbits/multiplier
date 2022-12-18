@@ -41,6 +41,9 @@ class MacroArgument : public Macro {
   static MacroArgumentContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static MacroArgumentContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<MacroArgument> from(const Macro &parent);
 
   inline static std::optional<MacroArgument> from(const std::optional<Macro> &parent) {

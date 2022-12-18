@@ -128,6 +128,7 @@ class FileListIterator {
 class FileList {
  private:
   friend class File;
+  friend class Index;
 
   std::shared_ptr<FileListImpl> impl;
 
@@ -204,10 +205,14 @@ class File {
   static std::optional<File> containing(const Token &token);
 
   // Return all files in a given index.
+  __attribute__((deprecated("Use Index::files() instead.")))
   static FileList in(const Index &index);
 
   // Return the entity ID of this file.
   EntityId id(void) const noexcept;
+
+  // Return a list of fragments in this file.
+  FragmentList fragments(void) const;
 
   // Return the list of fragment ids in the file
   std::vector<EntityId> fragment_ids(void) const;

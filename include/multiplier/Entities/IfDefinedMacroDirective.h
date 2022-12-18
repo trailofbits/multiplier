@@ -43,6 +43,9 @@ class IfDefinedMacroDirective : public MacroDirective {
   static IfDefinedMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
+  static IfDefinedMacroDirectiveContainingMacroRange containing(const Token &token);
+  bool contains(const Token &token);
+
   static std::optional<IfDefinedMacroDirective> from(const MacroDirective &parent);
 
   inline static std::optional<IfDefinedMacroDirective> from(const std::optional<MacroDirective> &parent) {
