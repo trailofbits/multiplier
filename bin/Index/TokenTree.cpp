@@ -204,7 +204,7 @@ class TokenTreeImpl {
 
   Substitution *MergeArguments(Substitution *orig, Substitution *pre_arg,
                                std::ostream &err);
-  bool MergeArgPreExpansions(std::ostream &err);
+
   bool MergeArgPreExpansion(Substitution *sub, Substitution *pre_exp,
                             std::ostream &err);
 
@@ -449,12 +449,12 @@ static std::string TokData(const T &tok) {
 }
 
 static void FixupNodeParents(Substitution *sub) {
-  TT_ASSERT(!sub->parent || sub != sub->parent);
+  assert(!sub->parent || sub != sub->parent);
 
   for (Substitution::Node &node : sub->before) {
     if (std::holds_alternative<Substitution *>(node)) {
       Substitution *child_sub = std::get<Substitution *>(node);
-      TT_ASSERT(child_sub != sub);
+      assert(child_sub != sub);
       child_sub->parent = sub;
     }
   }
@@ -462,7 +462,7 @@ static void FixupNodeParents(Substitution *sub) {
   for (Substitution::Node &node : sub->after) {
     if (std::holds_alternative<Substitution *>(node)) {
       Substitution *child_sub = std::get<Substitution *>(node);
-      TT_ASSERT(child_sub != sub);
+      assert(child_sub != sub);
       child_sub->parent = sub;
     }
   }
@@ -679,11 +679,12 @@ void Substitution::Print(std::ostream &os) const {
 }
 
 void Substitution::PrintDOT(std::ostream &os, bool first) const {
+  const auto self = reinterpret_cast<const void *>(this);
+
   if (first) {
     os << "digraph {\n"
        << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
   }
-
 
   auto has_any = false;
   auto dump_tok = [&](TokenInfo *info) {
@@ -720,7 +721,6 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
   };
 
   auto dump_toks = [&](const Substitution::NodeList &nodes) {
-    auto i = 0u;
     for (const Substitution::Node &ent : nodes) {
       if (std::holds_alternative<TokenInfo *>(ent)) {
         TokenInfo *info = std::get<TokenInfo *>(ent);
@@ -736,8 +736,10 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
           default:
             continue;
         }
-      } else {
-        os << "<TD port=\"s" << (i++) << "\"> </TD>";
+      } else if (std::holds_alternative<Substitution *>(ent)) {
+        Substitution *s = std::get<Substitution *>(ent);
+        auto other = reinterpret_cast<const void *>(s);
+        os << "<TD port=\"s" << other << "\"> </TD>";
         has_any = true;
       }
     }
@@ -745,17 +747,13 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 
   auto link_subs = [&](const Substitution::NodeList &nodes,
                        const char *prefix) {
-    auto i = 0u;
-    for (const Substitution::Node &ent : before) {
+    for (const Substitution::Node &ent : nodes) {
       if (std::holds_alternative<Substitution *>(ent)) {
         Substitution *s = std::get<Substitution *>(ent);
+        assert(s->parent == self);
         s->PrintDOT(os, false);
-
-        os << prefix << reinterpret_cast<const void *>(this)
-           << ":s" << i << " -> s"
-           << reinterpret_cast<const void *>(s) << ";\n";
-
-        ++i;
+        auto other = reinterpret_cast<const void *>(s);
+        os << prefix << self << ":s" << other << " -> s" << other << ";\n";
       }
     }
   };
@@ -777,10 +775,8 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
        << "after</TD></TR></TABLE>>];\n";
 
     if (before.size()) {
-      os << "s" << reinterpret_cast<const void *>(this)
-         << ":before -> b" << reinterpret_cast<const void *>(this)
-         << ";\n"
-         << "b" << reinterpret_cast<const void *>(this)
+      os << "s" << self << ":before -> b" << self << ";\n"
+         << "b" << self
          << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
       if (before.has_error) {
         os << " bgcolor=\"red\"";
@@ -804,10 +800,8 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
     }
 
     if (after.size()) {
-      os << "s" << reinterpret_cast<const void *>(this)
-         << ":after -> a" << reinterpret_cast<const void *>(this)
-         << ";\n"
-         << "a" << reinterpret_cast<const void *>(this)
+      os << "s" << self << ":after -> a" << self << ";\n"
+         << "a" << self
          << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
       if (after.has_error) {
         os << " bgcolor=\"red\"";
@@ -827,7 +821,7 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
 
       os << "</TR></TABLE>>];\n";
 
-      link_subs(after, "b");
+      link_subs(after, "a");
     }
 
   // No expansion.
@@ -840,7 +834,7 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
       ++num_cols;
     }
 
-    os << "s" << reinterpret_cast<const void *>(this)
+    os << "s" << self
        << " [label=<<TABLE cellpadding=\"0\" cellspacing=\"0\" border=\"1\"";
     if (before.has_error) {
       os << " bgcolor=\"red\"";
@@ -1079,10 +1073,6 @@ Substitution *TokenTreeImpl::MergeArguments(
   D( std::cerr << indent << "Merge pre expansion argument "
                << orig_arg->Index() << '\n'; )
 
-  Substitution::NodeList new_nodes;
-  new_nodes.prev = sub->before.prev;
-  new_nodes.next = sub->before.next;
-
   // Check if all original argument nodes are tokens.
   bool orig_is_simple = true;
   for (Substitution::Node &orig_node : sub->before) {
@@ -1092,48 +1082,31 @@ Substitution *TokenTreeImpl::MergeArguments(
     }
   }
 
-  pre_exp->before_after_bounds_are_same = true;
-  pre_exp->parent = sub->parent;
-  sub->before.clear();
-  sub->after.clear();
-  sub->macro.reset();
-  sub->parent = nullptr;
-
   // If at least one of the original argument nodes is a substitution, then
   // create a before/after substitution.
   if (!orig_is_simple) {
+    Substitution::NodeList new_nodes;
+    new_nodes.prev = sub->before.prev;
+    new_nodes.next = sub->before.next;
+
     Substitution *new_arg_sub = CreateSubstitution(mx::MacroKind::SUBSTITUTION);
+    new_arg_sub->before_after_bounds_are_same = true;
     new_arg_sub->before = std::move(sub->before);
     new_arg_sub->after = std::move(pre_exp->before);
+    new_arg_sub->parent = sub;
     FixupNodeParents(new_arg_sub);
 
-    new_arg_sub->parent = pre_exp;
-    pre_exp->before.emplace_back(new_arg_sub);
+    new_nodes.emplace_back(new_arg_sub);
+
+    sub->before = std::move(new_nodes);
   }
 
-  return pre_exp;
-}
+  pre_exp->before.clear();
+  pre_exp->after.clear();
+  pre_exp->macro.reset();
+  pre_exp->parent = nullptr;
 
-bool TokenTreeImpl::MergeArgPreExpansions(std::ostream &err) {
-  auto max_i = substitutions_alloc.size();
-  for (auto i = 0u; i < max_i; ++i) {
-    Substitution *sub = &(substitutions_alloc[i]);
-    Substitution *pre_exp = PreExpansionOf(sub);
-    if (!pre_exp) {
-      continue;
-    }
-
-    // Try to merge a pre-argument expansion.
-    D( std::cerr << indent << "Merging pre-expansion " << pre_exp->macro_def->NameToken().Data() << '\n'; )
-    if (MergeArgPreExpansion(sub, pre_exp, err)) {
-      assert(!PreExpansionOf(sub));
-    } else {
-      err << "Unable to merge pre-argument expansion with macro use";
-      return false;
-    }
-  }
-
-  return true;
+  return sub;
 }
 
 // Tries to unify a macro use with its pre-expansion phase, so that we don't
@@ -1145,6 +1118,19 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
 
   D( std::cerr << indent << "Merge pre expansion\n"; )
   D( indent += "  "; )
+
+  // Make sure we calculate the pre-expansion correctly.
+  assert(1u <= sub->after.size());
+  assert(std::holds_alternative<Substitution *>(sub->after.front()));
+  assert(std::get<Substitution *>(sub->after.front()) == pre_exp);
+  assert(sub->kind == mx::MacroKind::EXPANSION);
+  assert(pre_exp->kind == mx::MacroKind::EXPANSION);
+
+  // If we merge the argument pre-expansions, then the before/after won't be
+  // the same anymore.
+  assert(!pre_exp->before_after_bounds_are_same);
+  assert(sub->before_after_bounds_are_same);
+  sub->before_after_bounds_are_same = false;
 
   Substitution::NodeList new_nodes;
   new_nodes.prev = sub->before.prev;
@@ -1257,8 +1243,8 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
       } else {
         Substitution *non_empty_sub = CreateSubstitution(
             mx::MacroKind::SUBSTITUTION);
-        non_empty_sub->parent = sub;
         non_empty_sub->before_after_bounds_are_same = true;
+        non_empty_sub->parent = sub;
         non_empty_sub->before.emplace_back(orig_node);
         non_empty_sub->after.emplace_back(preexp_node);
         FixupNodeParents(non_empty_sub);
@@ -1272,21 +1258,26 @@ bool TokenTreeImpl::MergeArgPreExpansion(Substitution *sub,
     }
 
     // Something that expands to nothing.
-    if (MacroDirective(orig_node) || !orig_rc) {
+    if (!orig_rc) {
       new_nodes.push_back(orig_node);
       changed = true;
       ++orig_i;
       continue;
     }
 
+    // Should be implied by `!orig_rc`.
+    assert(!MacroDirective(orig_node));
+
     // Something that expands to nothing.
-    if (MacroDirective(preexp_node) ||
-        !RightCornerOfExpansionOrUse(preexp_node)) {
+    if (!RightCornerOfExpansionOrUse(preexp_node)) {
       new_nodes.push_back(preexp_node);
       changed = true;
       ++preexp_i;
       continue;
     }
+
+    // Should be implied by `!RightCornerOfExpansionOrUse(preexp_node)`.
+    assert(!MacroDirective(preexp_node));
 
     sub->before.has_error = true;
     pre_exp->before.has_error = true;
@@ -1704,7 +1695,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   nodes.emplace_back(exp);
 
   Substitution *sub_exp = exp;
-  for (const pasta::Macro &use_node : node.Children()) {
+  for (pasta::Macro use_node : node.Children()) {
     sub_exp = BuildMacroSubstitutions(
         prev, curr, exp, exp->before, use_node, err);
     if (!sub_exp) {
@@ -1713,7 +1704,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     assert(sub_exp == exp);
   }
 
-  for (const pasta::Macro &sub_node : node.ReplacementChildren()) {
+  for (pasta::Macro sub_node : node.ReplacementChildren()) {
     sub_exp = BuildMacroSubstitutions(
         prev, curr, exp, exp->after, sub_node, err);
     if (!sub_exp) {
@@ -1768,12 +1759,18 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
 
   // Inherit the `after` bounds from the macro body.
   if (pre_exp) {
-    pre_exp->after.prev = macro_body->before.prev;
-    pre_exp->after.next = macro_body->before.next;
-  } else {
-    exp->after.prev = macro_body->before.prev;
-    exp->after.next = macro_body->before.next;
+    exp->before_after_bounds_are_same = true;
+    if (!MergeArgPreExpansion(exp, pre_exp, err)) {
+      err << "Unable to merge pre-argument expansion with use of macro "
+          << macro_def->Name().Data();
+      return nullptr;
+    }
+
+    assert(!PreExpansionOf(exp));
   }
+
+  exp->after.prev = macro_body->before.prev;
+  exp->after.next = macro_body->before.next;
 
   return sub;
 }
@@ -2068,17 +2065,7 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
   auto ret = FindSubstitutionBoundsRec(sub->before, lower_bound, upper_bound);
 
   if (sub->HasExpansion()) {
-
-    // We're going to go and merge pre-expansions, and the substitution of this
-    // macro is going to be another use of this macro, so let's give it the same
-    // bounds as this macro use, rather than giving it the bounds of the macro
-    // definition's body.
-    if (Substitution *pre_exp_use = PreExpansionOf(sub)) {
-      sub->after.prev = sub->before.prev;
-      sub->after.next = sub->before.next;
-      pre_exp_use->before.prev = sub->before.prev;
-      pre_exp_use->before.next = sub->before.next;
-    }
+    assert(!PreExpansionOf(sub));
 
     // E.g. for macro argument pre-expansions, when we merge arguments, or
     // introduce substitutions of like-for-like.
@@ -2089,6 +2076,8 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
     } else {
       FindSubstitutionBoundsRec(sub->after, nullptr, nullptr);
     }
+  } else {
+    assert(sub->after.empty());
   }
 
   return ret;
@@ -2164,7 +2153,10 @@ bool TokenTreeImpl::FindSubstitutionBoundsRec(
       nodes.has_error = true;
       nodes.prev = orig_bb;
       nodes.next = orig_ab;
-      Die(this);
+
+      // TODO(pag): Re-enable this when we get back into whitespace injection
+      //            and other things.
+      // Die(this);
       return false;
     }
   }
@@ -2403,9 +2395,9 @@ TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
 //      std::shared_ptr<const Substitution> ret(std::move(impl), sub);
 //      return TokenTree(std::move(ret));
 
-    if (!impl->MergeArgPreExpansions(err)) {
-      return std::nullopt;
-    }
+//    if (!impl->MergeArgPreExpansions(err)) {
+//      return std::nullopt;
+//    }
 
 //        std::cerr << "----------------------------------------------------- " << begin_index << " to " << end_index << " ---\n";
 //        std::cerr << "----------------------------------------------------- " << impl->tokens_alloc.size() << " ---\n";
