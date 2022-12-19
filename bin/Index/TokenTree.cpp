@@ -1013,6 +1013,7 @@ static Substitution *MacroArgument(const Substitution::Node &node) {
   return nullptr;
 }
 
+#ifndef NDEBUG
 static Substitution *MacroDirective(const Substitution::Node &node) {
   if (std::holds_alternative<Substitution *>(node)) {
     auto sub = std::get<Substitution *>(node);
@@ -1040,6 +1041,7 @@ static Substitution *MacroDirective(const Substitution::Node &node) {
   }
   return nullptr;
 }
+#endif
 
 // Merge an argument `orig` from the main expansion with the argument `pre_exp`
 // from the pre argumetn expansion phase. E.g. in the following case:
@@ -1617,6 +1619,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     }
     assert(sub_exp == arg_sub);
   }
+  (void) sub_exp;
 
   LabelUseNodesIn(arg_sub->before, InFileBody(arg_sub),
                   ContainingMacroDef(arg_sub));
