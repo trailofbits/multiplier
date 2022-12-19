@@ -10,6 +10,7 @@
 #include <deque>
 #include <glog/logging.h>
 #include <multiplier/Types.h>
+#include <mutex>
 #include <optional>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>

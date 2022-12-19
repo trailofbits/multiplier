@@ -10,6 +10,7 @@
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Macro.h>
+#include <mutex>
 
 #include "Fragment.h"
 #include "Re2.h"

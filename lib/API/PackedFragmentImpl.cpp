@@ -9,6 +9,8 @@
 #include "File.h"
 #include <multiplier/Entities/TokenKind.h>
 
+#include <cassert>
+
 namespace mx {
 
 PackedFragmentImpl::~PackedFragmentImpl(void) noexcept {}
