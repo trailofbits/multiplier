@@ -82,7 +82,7 @@ class PackedFileImpl final : public FileImpl, public TokenReader {
 
   virtual ~PackedFileImpl(void) noexcept;
 
-  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_,
+  PackedFileImpl(FileId id_, EntityProvider::Ptr ep_,
                  const capnp::Data::Reader &reader_);
 
   // Return the data of the file.

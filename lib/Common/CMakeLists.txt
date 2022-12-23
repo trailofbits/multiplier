@@ -60,6 +60,7 @@ set(common_headers
   "${source_include_dir}/Database.h"
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Re2.h"
+  "${source_include_dir}/ThreadLocal.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/Weggli.h"
 )
@@ -72,6 +73,8 @@ add_library("mx-common" STATIC
   "Re2.cpp"
   "Re2.h"
   "SQLiteStore.cpp"
+  "SQLiteStore.h"
+  "ThreadLocal.cpp"
   "Types.cpp"
   "Weggli.cpp"
 

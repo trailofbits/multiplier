@@ -12,6 +12,8 @@ namespace mx {
 
 class FileImpl;
 
+using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
+
 class FragmentListImpl {
  public:
   // Needed for us to be able to look up the file containing this fragment,
@@ -19,10 +21,10 @@ class FragmentListImpl {
   const EntityProvider::Ptr ep;
 
   // List of fragment IDs.
-  std::vector<EntityId> fragment_ids;
+  FragmentIdList fragment_ids;
 
   inline FragmentListImpl(EntityProvider::Ptr ep_,
-                          std::vector<EntityId> fragment_ids_)
+                          FragmentIdList fragment_ids_)
       : ep(std::move(ep_)),
         fragment_ids(std::move(fragment_ids_)) {}
 };
@@ -34,6 +36,8 @@ class FragmentImpl {
 
   // NOTE(pag): This is the fragment identifier without adornment. That is,
   //            it is *NOT* a packed entity ID representation.
+  //
+  // TODO(pag): Rename to `fragment_index`.
   const RawEntityId fragment_id;
 
   // Needed for us to be able to look up the file containing this fragment,
@@ -54,8 +58,8 @@ class FragmentImpl {
 
   virtual ~FragmentImpl(void) noexcept;
 
-  inline FragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_)
-      : fragment_id(id_),
+  inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)
+      : fragment_id(id_.fragment_id),
         ep(std::move(ep_)) {}
 
   // Return the ID of the file containing the first token.
@@ -201,7 +205,7 @@ class PackedFragmentImpl final : public FragmentImpl {
 
   virtual ~PackedFragmentImpl(void) noexcept;
 
-  PackedFragmentImpl(RawEntityId id_, EntityProvider::Ptr ep_,
+  PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
                      const capnp::Data::Reader &reader_);
 
   // Return the ID of the file containing the first token.

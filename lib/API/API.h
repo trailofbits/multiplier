@@ -6,22 +6,21 @@
 
 #pragma once
 
-#include <multiplier/Index.h>
 
+#include <cstdint>
 #include <capnp/message.h>
 #include <capnp/serialize.h>
 #include <capnp/serialize-packed.h>
 #include <kj/io.h>
-#include <multiplier/Weggli.h>
-#include <multiplier/Re2.h>
-#include <mutex>
+#include <multiplier/AST.capnp.h>
+#include <multiplier/Index.h>
+#include <multiplier/RPC.capnp.h>
 #include <optional>
 #include <string>
 
-#include <multiplier/AST.capnp.h>
-#include <multiplier/RPC.capnp.h>
-
 namespace mx {
+
+class Decl;
 
 bool MayHaveRemoteRedeclarations(const mx::Decl &decl);
 bool MayHaveRemoteUses(const mx::Decl &decl);

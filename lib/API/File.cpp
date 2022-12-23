@@ -283,12 +283,8 @@ FragmentList File::fragments(void) const {
   return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
 }
 
-std::vector<EntityId> File::fragment_ids(void) const {
-  auto fragment_ids = impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
-  for (auto &fragment_id : fragment_ids) {
-    fragment_id = EntityId(FragmentId(fragment_id));
-  }
-  return fragment_ids;
+FragmentIdList File::fragment_ids(void) const {
+  return impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
 }
 
 // Return the file tokens for the file.

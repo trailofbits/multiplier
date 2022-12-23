@@ -23,8 +23,7 @@ struct FilePathRecord {
       R"(CREATE TABLE IF NOT EXISTS file_path (
             file_id INT,
             path TEXT,
-            PRIMARY KEY(file_id, path),
-            UNIQUE(file_id, hash)
+            PRIMARY KEY(path)
           ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
@@ -35,48 +34,6 @@ struct FilePathRecord {
   SpecificEntityId<FileId> file_id;
   std::filesystem::path path;
 };
-
-//// Tells us one of the valid file paths associated with a file id.
-//struct FragmentHashRecord {
-//  static constexpr const char *kTableName = "fragment_hash";
-//
-//  static constexpr const char *kInitStatements[] =
-//      {R"(CREATE TABLE IF NOT EXISTS fragment_hash (
-//            fragment_id INT,
-//            hash TEXT,
-//            PRIMARY KEY(hash),
-//            UNIQUE(fragment_id)
-//          ) WITHOUT rowid)"};
-//
-//  static constexpr const char *kExitStatements[] = {nullptr};
-//
-//  static constexpr const char *kInsertStatement =
-//      "INSERT OR IGNORE INTO fragment_hash (fragment_id, hash) VALUES (?1, ?2)";
-//
-//  SpecificEntityId<FileId> file_id;
-//  std::string hash;
-//};
-
-//// Tells us one of the valid file paths associated with a file id.
-//struct FileHashRecord {
-//  static constexpr const char *kTableName = "file_hash";
-//
-//  static constexpr const char *kInitStatements[] =
-//      {R"(CREATE TABLE IF NOT EXISTS file_hash (
-//            file_id INT,
-//            hash TEXT,
-//            PRIMARY KEY(hash),
-//            UNIQUE(file_id)
-//          ) WITHOUT rowid)"};
-//
-//  static constexpr const char *kExitStatements[] = {nullptr};
-//
-//  static constexpr const char *kInsertStatement =
-//      "INSERT OR IGNORE INTO file_hash (file_id, hash) VALUES (?1, ?2)";
-//
-//  SpecificEntityId<FileId> file_id;
-//  std::string hash;
-//};
 
 // Maps a file id to the file's serialized data.
 struct SerializedFileRecord {
@@ -186,7 +143,8 @@ struct MangledNameRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS mangled_name (
             entity_id INT,
-            mangled_name TEXT
+            data TEXT,
+            PRIMARY KEY(entity_id)
           ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {
@@ -194,7 +152,7 @@ struct MangledNameRecord {
          ON mangled_name(data))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO mangled_name (entity_id, mangled_name)
+      R"(INSERT OR IGNORE INTO mangled_name (entity_id, data)
          VALUES (?1, ?2))";
 
   // A `DeclarationId` or a `MacroId`.

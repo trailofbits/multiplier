@@ -22,20 +22,22 @@ unsigned InvalidEntityProvider::VersionNumber(const Ptr &) {
 
 void InvalidEntityProvider::VersionNumberChanged(unsigned) {}
 
-FilePathList InvalidEntityProvider::ListFiles(const Ptr &) {
+FilePathMap InvalidEntityProvider::ListFiles(const Ptr &) {
   return {};
 }
 
-std::vector<EntityId> InvalidEntityProvider::ListFragmentsInFile(
-    const Ptr &, RawEntityId) {
+FragmentIdList InvalidEntityProvider::ListFragmentsInFile(
+    const Ptr &, SpecificEntityId<FileId>) {
   return {};
 }
 
-FileImpl::Ptr InvalidEntityProvider::FileFor(const Ptr &, RawEntityId) {
+FileImpl::Ptr InvalidEntityProvider::FileFor(
+    const Ptr &, SpecificEntityId<FileId>) {
   return {};
 }
 
-FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(const Ptr &, RawEntityId) {
+FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(
+    const Ptr &, SpecificEntityId<FragmentId>) {
   return {};
 }
 
@@ -49,23 +51,23 @@ RegexQueryResultImpl::Ptr InvalidEntityProvider::Query(
   return {};
 }
 
-std::vector<RawEntityId> InvalidEntityProvider::Redeclarations(
-    const Ptr &, RawEntityId) {
+DeclarationIdList InvalidEntityProvider::Redeclarations(
+    const Ptr &, SpecificEntityId<DeclarationId>) {
   return {};
 }
 
 void InvalidEntityProvider::FillUses(
     const Ptr &, RawEntityId eid,
-    std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<RawEntityId> &fragment_ids_out) {
+    DeclarationIdList &redecl_ids_out,
+    FragmentIdList &fragment_ids_out) {
   redecl_ids_out.clear();
   fragment_ids_out.clear();
 }
 
 void InvalidEntityProvider::FillReferences(
     const Ptr &, RawEntityId eid,
-    std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<RawEntityId> &fragment_ids_out) {
+    DeclarationIdList &redecl_ids_out,
+    FragmentIdList &fragment_ids_out) {
   redecl_ids_out.clear();
   fragment_ids_out.clear();
 }

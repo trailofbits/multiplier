@@ -8,287 +8,21 @@
 
 #include <cassert>
 #include <deque>
-#include <multiplier/SQLiteStore.h>
-//#include <multiplier/SymbolDatabase.h>
-//#include <multiplier/Entities/DeclKind.h>
 #include <mutex>
 #include <thread>
 #include <variant>
-
-//#include "PersistentMap.h"
-//#include "PersistentAtomicStorage.h"
-
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <blockingconcurrentqueue.h>
 #pragma GCC diagnostic pop
 
-namespace mx {
-//namespace {
-//
-//enum MetadataName : char {
-//  // The next file ID that we can assign. File IDs are assigned in generally
-//  // increasing order. The assignment isn't necessarily strictly linear, i.e.
-//  // there may be some gaps, mostly just due to benign race conditions when
-//  // multiple indexer threads are used.
-//  kNextFileId,
-//
-//  // The next ID for a "small code" fragment. Small code fragments have less
-//  // than 2^16 tokens in them, i.e. most fragments are small code fragments.
-//  // Fragment IDs for small code fragments fall in the range `[2^16, inf)`.
-//  kNextSmallCodeId,
-//
-//  // The next ID for a "big code" fragment. Big code fragments have at least
-//  // 2^16 tokens in them. Most fragments do not fit this category; likely this
-//  // is the result of auto-generated code. We rely on there being fewer than
-//  // 2^16 of such fragments, and the IDs for these fall in the range of
-//  // `[1, 2^16)`,
-//  kNextBigCodeId,
-//};
-//
-//}  // namespace
-//
-//class SynchronousIndexStorageImpl {
-// public:
-//  sqlite::Connection &db;
-//
-//  // The next file ID that can be assigned. This represents an upper bound on
-//  // the total number of file IDs.
-//  PersistentAtomicStorage<kNextFileId, RawEntityId>
-//      next_file_id;
-//
-//  // The next ID for a "small fragment." A small fragment has fewer than
-//  // `kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
-//  // are more common, and require fewer bits to encode token offsets inside of
-//  // the packed `EntityId` for tokens.
-//  PersistentAtomicStorage<kNextSmallCodeId, RawEntityId>
-//      next_small_fragment_id;
-//
-//  // The next ID for a "big fragment." A big fragment has at least
-//  // `kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
-//  // are less common, so we reserve space for fewer of them (typically there is
-//  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
-//  // to represent token offsets inside of the packed `EntityId` for tokens,
-//  // but because we reserve the low ID space for big fragment IDs, we know that
-//  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
-//  // bit for token offset bits.
-//  PersistentAtomicStorage<kNextBigCodeId, RawEntityId>
-//      next_big_fragment_id;
-//
-//  // The next indexing version number. This is incremented prior to starting
-//  // an indexing run, and just after. The double-increment is there just in
-//  // case some clients come along and issue some queries prior to indexing being
-//  // finished. We want best-effort resolution of definitions/redeclarations
-//  // during this time, but we don't want to commit to those results, just in
-//  // case there are more redeclarations that come in betwween the client request
-//  // and finishing indexing.
-//  PersistentAtomic<kIndexingVersion, unsigned> version_number;
-//
-//  // Maps file IDs to their absolute path, as well as to their token lists.
-//  PersistentSet<kFileIdToPath, RawEntityId, std::string>
-//      file_id_to_path;
-//
-//  // Maps file IDs to a serialized `rpc::File` data structure.
-//  PersistentMap<kFileIdToSerializedFile, RawEntityId, std::string>
-//      file_id_to_serialized_file;
-//
-//  // A set of `(file_id, fragment_id)` pairs for mapping from files to the
-//  // fragments contained in those files.
-//  PersistentSet<kFileIdToFragmentId,
-//                    RawEntityId  /* file id */,
-//                    RawEntityId  /* fragment id */>
-//      file_fragment_ids;
-//
-//  // A set of `(file_id, line number, fragment_id)` triples for mapping from
-//  // search results to the fragments that might overlap with those search
-//  // results.
-//  PersistentSet<kFileIdAndLineNumberToFragmentId,
-//                    RawEntityId  /* file id */,
-//                    unsigned  /* line number */,
-//                    RawEntityId  /* fragment id */>
-//      file_fragment_lines;
-//
-//  // Maps a hash of a file's contents to an ID for that file.
-//  PersistentMap<kFileHashToFileId, std::string, RawEntityId>
-//      file_hash_to_file_id;
-//
-//  // Maps an aggregate key of the form
-//  //
-//  //    <file hash>:<line>:<column>:<tokens hash>:<odr hash 0>:...:<odr hash N>
-//  //
-//  // to "fragment ids," that is, the ID of the serialized code containing one or
-//  // more top-level declarations.
-//  PersistentMap<kFragmentHashToFragmentId, std::string, RawEntityId>
-//      code_hash_to_fragment_id;
-//
-//  // Maps a fragment ID to the serialized `rpc::Fragment` data structure.
-//  PersistentMap<kFragmentIdToSerializedFragment,
-//                    RawEntityId, std::string>
-//      fragment_id_to_serialized_fragment;
-//
-//  // Each time we come across a redeclarable declaration, we add in the TU-
-//  // specific complete graph of `(redecl_i, redecl_j)` pairs to this set, so
-//  // that given a declaration ID, we can try to expand out and find the set of
-//  // all redeclarations by hopping from one of these graphs to another.
-//  PersistentSet<kEntityIdRedecls, RawEntityId, RawEntityId>
-//      entity_redecls;
-//
-//  // Maps entity IDs of functions and (non-local) variables to their mangled
-//  // names. We use this in combination with `mangled_name_to_entity_id` to
-//  // find redeclarations of a given entity.
-//  PersistentSet<kEntityIdToMangledName, RawEntityId, std::string>
-//      entity_id_to_mangled_name;
-//
-//  // Maps mangled names of functions and (non-local) variables to their
-//  // entity IDs.
-//  PersistentSet<kMangledNameToEntityId, std::string, RawEntityId>
-//      mangled_name_to_entity_id;
-//
-//  // Maps uses of entities to the IDs of fragments that use the entities.
-//  PersistentSet<kEntityIdUseToFragmentId, RawEntityId, RawEntityId>
-//      entity_id_use_to_fragment_id;
-//
-//  // Keeps track of references, e.g. `DeclRefExpr`, the fields accessed by
-//  // `MemberExpr`, etc.
-//  PersistentSet<kEntityIdReference, RawEntityId, RawEntityId>
-//      entity_id_reference;
-//
-//  // SQLite database. Used for things like symbol searches.
-//  SymbolDatabase database;
-//};
-//
-//SynchronousIndexStorage::SynchronousIndexStorage(sqlite::Connection &db)
-//    : db(db),
-//      next_file_id(db),
-//      next_small_fragment_id(db),
-//      next_big_fragment_id(db),
-//      version_number(db),
-//      file_id_to_path(db),
-//      file_id_to_serialized_file(db),
-//      file_fragment_ids(db),
-//      file_fragment_lines(db),
-//      file_hash_to_file_id(db),
-//      code_hash_to_fragment_id(db),
-//      fragment_id_to_serialized_fragment(db),
-//      entity_redecls(db),
-//      entity_id_to_mangled_name(db),
-//      mangled_name_to_entity_id(db),
-//      entity_id_use_to_fragment_id(db),
-//      entity_id_reference(db),
-//      database(db) {}
-//
-//SynchronousIndexStorage::~SynchronousIndexStorage(void) {}
-//
-//void SynchronousIndexStorage::Flush(void) {
-//  database.Flush();
-//}
-//
-//// Return the set of redeclarations of an entity.
-//std::vector<RawEntityId> SynchronousIndexStorage::FindRedeclarations(
-//    EntityId eid) {
-//  VariantId vid = eid.Unpack();
-//  assert(std::holds_alternative<DeclarationId>(vid));
-//
-//  // All of the declaration kinds need to actually match.
-//  DeclarationId did = std::get<DeclarationId>(vid);
-//  std::vector<RawEntityId> next_new_ids;
-//  std::vector<RawEntityId> all_ids;
-//  std::vector<RawEntityId> new_ids;
-//  next_new_ids.reserve(16);
-//  all_ids.reserve(16);
-//  new_ids.reserve(16);
-//  next_new_ids.push_back(eid);
-//
-//  // Expand the set of IDs via name mangling.
-//  switch (did.kind) {
-//    case DeclKind::FUNCTION:
-//    case DeclKind::CXX_METHOD:
-//    case DeclKind::CXX_DESTRUCTOR:
-//    case DeclKind::CXX_CONVERSION:
-//    case DeclKind::CXX_CONSTRUCTOR:
-//    case DeclKind::CXX_DEDUCTION_GUIDE:
-//
-//    case DeclKind::VAR:
-//    case DeclKind::DECOMPOSITION:
-//    case DeclKind::IMPLICIT_PARAM:
-//    case DeclKind::OMP_CAPTURED_EXPR:
-//    case DeclKind::PARM_VAR:
-//    case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-//    case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-//      entity_id_to_mangled_name.GetByField<0>(
-//          next_new_ids[0],
-//          [&next_new_ids, this] (RawEntityId, std::string mangled_name) {
-//
-//            mangled_name_to_entity_id.GetByField<0>(
-//                std::move(mangled_name),
-//                [&next_new_ids] (std::string, RawEntityId new_id) {
-//                  next_new_ids.push_back(new_id);
-//                  return true;
-//                });
-//            return true;
-//          });
-//      break;
-//
-//    default:
-//      break;
-//  }
-//
-//  all_ids.reserve(next_new_ids.size());
-//
-//  // Expand the set of declarations via fixpoint using the redeclaration
-//  // graph.
-//  while (!next_new_ids.empty()) {
-//    next_new_ids.swap(new_ids);
-//    next_new_ids.clear();
-//    for (RawEntityId new_id : new_ids) {
-//      if (std::find(all_ids.begin(), all_ids.end(), new_id) != all_ids.end()) {
-//        continue;
-//      }
-//
-//      const EntityId new_eid(new_id);
-//      const VariantId new_vid = new_eid.Unpack();
-//      if (!std::holds_alternative<DeclarationId>(new_vid)) {
-//        assert(false);
-//        continue;
-//      }
-//
-//      const DeclarationId new_did = std::get<DeclarationId>(new_vid);
-//      if (new_did.kind != did.kind) {
-//        assert(false);
-//        continue;
-//      }
-//
-//      all_ids.push_back(new_id);
-//
-//      entity_redecls.GetByField<0>(
-//          new_id,
-//          [&next_new_ids] (RawEntityId, RawEntityId other_id) {
-//            next_new_ids.push_back(other_id);
-//            return true;
-//          });
-//    }
-//  }
-//
-//  // Sort the redeclaration IDs to that they are always in the same order,
-//  // regardless of which one we ask for first, then partition them and move
-//  // the definitions before the declarations.
-//  std::sort(all_ids.begin(), all_ids.end());
-//  std::partition(
-//      all_ids.begin(), all_ids.end(),
-//      [] (RawEntityId eid) {
-//        return std::get<DeclarationId>(
-//            EntityId(eid).Unpack()).is_definition;
-//      });
-//
-//  return all_ids;
-//}
-//
-//std::optional<std::string>
-//SynchronousIndexStorage::GetSerializedFile(RawEntityId file_id) {
-//  return file_id_to_serialized_file.TryGet(file_id);
-//}
+#include "SQLiteStore.h"
+#include "ThreadLocal.h"
 
+namespace mx {
+
+static constexpr size_t kMaxTransactionSize = 10000;
 
 #define MX_RECORD_VARIANT_ENTRY(name) , name
 
@@ -336,8 +70,8 @@ class alignas(64) WriterThreadState {
   }
 
   RawEntityId GetOrCreateFileId(RawEntityId id, std::string hash) {
-    db.Begin(false);
     set_file_id->BindValues(id, hash);
+    db.Begin(false);
     set_file_id->ExecuteStep();
     get_file_id->BindValues(hash);
     get_file_id->ExecuteStep();
@@ -348,8 +82,8 @@ class alignas(64) WriterThreadState {
 
   RawEntityId GetOrCreateFragmentId(RawEntityId frag_id, RawEntityId file_id,
                                     std::string hash) {
-    db.Begin(false);
     set_fragment_id->BindValues(frag_id, file_id, hash);
+    db.Begin(false);
     set_fragment_id->ExecuteStep();
     get_fragment_id->BindValues(hash);
     get_fragment_id->ExecuteStep();
@@ -357,8 +91,6 @@ class alignas(64) WriterThreadState {
     get_file_id->GetResult().Columns(frag_id);
     return frag_id;
   }
-
-  static WriterThreadState &From(const std::shared_ptr<DatabaseWriterImpl> &);
 };
 
 class DatabaseWriterImpl {
@@ -366,24 +98,28 @@ class DatabaseWriterImpl {
   // TODO(pag): This approach precludes having more than one database open.
   static thread_local std::shared_ptr<WriterThreadState> tWriterThreadState;
 
-  std::mutex writer_threads_lock;
-  std::deque<WriterThreadState> writer_thread_state;
-
   const std::filesystem::path db_path;
+
+  // Per-thread connection state with the database.
+  ThreadLocal<WriterThreadState> thread_state;
 
   // The connection used on construction.
   sqlite::Connection init_exit_db;
 
+  // Add some version info to the database. The number of records in the
+  // versions table tells us whether or not we're currently indexing.
+  sqlite::Statement::Ptr add_version;
+
+  // A thread and it's multiple-producer, single-consumer
   std::thread bulk_insertion_thread;
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
 
+  // Conditions on whether or not the bulk insertion queue main loop should
+  // partially or fully exit.
   alignas(64) struct Conditions {
     bool should_exit{false};
     bool should_flush{false};
   } conditions;
-
-  // Are any of the below bits of metadata in a dirty state?
-  std::atomic_flag metadata_is_dirty;
 
   // The next file ID that can be assigned. This represents an upper bound on
   // the total number of file IDs.
@@ -455,27 +191,40 @@ class DatabaseWriterImpl {
 
 // Initialize the metadata table. It only stores one row of data.
 void DatabaseWriterImpl::InitMetadata(void) {
+
+  init_exit_db.Execute(
+      R"(CREATE TABLE IF NOT EXISTS metadata ("
+           next_file_id INT,
+           next_small_fragment_id INT,
+           next_big_fragment_id INT
+       "))");
+
+  init_exit_db.Execute(
+      R"(CREATE TABLE IF NOT EXISTS versions ("
+           description TEXT
+       ") WITHOUT rowid)");
+
+  add_version = init_exit_db.Prepare(
+      R"(INSERT INTO versions (description) VALUES (?1))");
+
   std::optional<sqlite::QueryResult> res;
 
   do {
     sqlite::Transaction transaction(init_exit_db);
-    init_exit_db.Execute(
-        R"(CREATE TABLE metadata IF NOT EXISTS ("
-             next_file_id INT,
-             next_small_fragment_id INT,
-             next_big_fragment_id INT
-         "))");
 
     // Initialize the default metadata. The trick we use here is that we hard-code
     // a `rowid` of `1`, and so the implicit primary key constraint on `rowid`
     // will cause repeated initializations to be ignored.
-    sqlite::Statement::Ptr stmt = init_exit_db.Prepare(
+    sqlite::Statement::Ptr meta_stmt = init_exit_db.Prepare(
         R"(INSERT OR IGNORE INTO metadata 
            (rowid, next_file_id, next_small_fragment_id, next_big_fragment_id)
            VALUES (1, 1, ?1, 1)");
 
-    stmt->BindValues(mx::kMaxBigFragmentId  /* next_small_fragment_id */);
-    stmt->ExecuteStep();
+    meta_stmt->BindValues(mx::kMaxBigFragmentId  /* next_small_fragment_id */);
+    meta_stmt->ExecuteStep();
+
+    init_exit_db.Execute(
+        R"(INSERT INTO versions)");
 
     res.emplace(init_exit_db.ExecuteAndGet(
         R"(SELECT next_file_id, next_small_fragment_id, next_big_fragment_id
@@ -555,7 +304,7 @@ void DatabaseWriterImpl::InitBulkInserter(const std::filesystem::path &path) {
             },
             item);
 
-        if (transaction_size >= 10000) {
+        if (transaction_size >= kMaxTransactionSize) {
           conditions.should_flush = true;
         }
 
@@ -589,7 +338,11 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
 DatabaseWriterImpl::DatabaseWriterImpl(
     const std::filesystem::path &db_path_)
     : db_path(db_path_),
-      init_exit_db(db_path) {
+      init_exit_db(db_path),
+      insertion_queue() {
+
+  // Generated by rolling a 4,294,967,296-sided die. Guaranteed to be random.
+  init_exit_db.Execute("PRAGMA application_id = 0xce9ccea7");
 
   InitMetadata();
   InitRecords();
@@ -677,22 +430,22 @@ void DatabaseWriter::AsyncFlush(void) {
 SpecificEntityId<FileId> DatabaseWriter::GetOrCreateFileIdForHash(
     std::string hash, bool &is_new) {
 
-  WriterThreadState &writer = WriterThreadState::From(impl);
+  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
   RawEntityId proposed_id;
 
   // Try to reuse a previously generated but unused file id.
-  if (!writer.available_file_id) {
+  if (!writer->available_file_id) {
     proposed_id = impl->next_file_id.fetch_add(1u);
   } else {
-    proposed_id = writer.available_file_id.value();
-    writer.available_file_id.reset();
+    proposed_id = writer->available_file_id.value();
+    writer->available_file_id.reset();
   }
 
-  RawEntityId found_id = writer.GetOrCreateFileId(
+  RawEntityId found_id = writer->GetOrCreateFileId(
       proposed_id, std::move(hash));
   is_new = found_id == proposed_id;
   if (!is_new) {
-    writer.available_file_id.emplace(proposed_id);
+    writer->available_file_id.emplace(proposed_id);
   }
 
   return FileId(found_id);
@@ -703,22 +456,22 @@ SpecificEntityId<FragmentId>
 DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
     SpecificEntityId<FileTokenId> tok_id, std::string hash, bool &is_new) {
 
-  WriterThreadState &writer = WriterThreadState::From(impl);
+  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
   RawEntityId proposed_id;
 
   // Try to reuse a previously generated but unused fragment id.
-  if (!writer.available_small_fragment_id) {
+  if (!writer->available_small_fragment_id) {
     proposed_id = impl->next_small_fragment_id.fetch_add(1u);
   } else {
-    proposed_id = writer.available_small_fragment_id.value();
-    writer.available_small_fragment_id.reset();
+    proposed_id = writer->available_small_fragment_id.value();
+    writer->available_small_fragment_id.reset();
   }
 
-  RawEntityId found_id = writer.GetOrCreateFragmentId(
+  RawEntityId found_id = writer->GetOrCreateFragmentId(
       proposed_id, tok_id, std::move(hash));
   is_new = found_id == proposed_id;
   if (!is_new) {
-    writer.available_small_fragment_id.emplace(proposed_id);
+    writer->available_small_fragment_id.emplace(proposed_id);
   }
 
   return FragmentId(found_id);
@@ -729,40 +482,25 @@ SpecificEntityId<FragmentId>
 DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
     SpecificEntityId<FileTokenId> tok_id, std::string hash, bool &is_new) {
 
-  WriterThreadState &writer = WriterThreadState::From(impl);
+  std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
   RawEntityId proposed_id;
 
   // Try to reuse a previously generated but unused fragment id.
-  if (!writer.available_big_fragment_id) {
+  if (!writer->available_big_fragment_id) {
     proposed_id = impl->next_big_fragment_id.fetch_add(1u);
   } else {
-    proposed_id = writer.available_big_fragment_id.value();
-    writer.available_big_fragment_id.reset();
+    proposed_id = writer->available_big_fragment_id.value();
+    writer->available_big_fragment_id.reset();
   }
 
-  RawEntityId found_id = writer.GetOrCreateFragmentId(
+  RawEntityId found_id = writer->GetOrCreateFragmentId(
       proposed_id, tok_id, std::move(hash));
   is_new = found_id == proposed_id;
   if (!is_new) {
-    writer.available_big_fragment_id.emplace(proposed_id);
+    writer->available_big_fragment_id.emplace(proposed_id);
   }
 
   return FragmentId(found_id);
-}
-
-// Return the thread-local writer thread state from this
-WriterThreadState &WriterThreadState::From(
-    const std::shared_ptr<DatabaseWriterImpl> &self) {
-  if (DatabaseWriterImpl::tWriterThreadState) {
-    return *DatabaseWriterImpl::tWriterThreadState;
-  }
-
-  std::lock_guard<std::mutex> locker(self->writer_threads_lock);
-  WriterThreadState &writer =
-      self->writer_thread_state.emplace_back(self->db_path);
-  std::shared_ptr<WriterThreadState> ptr(self, &writer);
-  DatabaseWriterImpl::tWriterThreadState = std::move(ptr);
-  return writer;
 }
 
 void DatabaseWriterImpl::InitRecords(void) {

@@ -6,8 +6,8 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
-#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -56,7 +56,9 @@ using TypeUse = Use<TypeUseSelector>;
 using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
 using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 
-using FilePathList = std::set<std::pair<std::filesystem::path, RawEntityId>>;
+using FilePathMap = std::map<std::filesystem::path, SpecificEntityId<FileId>>;
+using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
+using DeclarationIdList = std::vector<SpecificEntityId<DeclarationId>>;
 
 using NamedDeclList = std::vector<NamedDecl>;
 
@@ -142,25 +144,25 @@ class EntityProvider {
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  virtual FilePathList ListFiles(const Ptr &) = 0;
+  virtual FilePathMap ListFiles(const Ptr &) = 0;
 
   // Download a list of fragment IDs contained in a specific file.
-  virtual std::vector<EntityId>
-  ListFragmentsInFile(const Ptr &, RawEntityId id) = 0;
+  virtual FragmentIdList ListFragmentsInFile(
+      const Ptr &, SpecificEntityId<FileId> id) = 0;
 
   // Download a file by its unique ID.
   //
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
   //            raw file id.
   virtual std::shared_ptr<const FileImpl>
-  FileFor(const Ptr &, RawEntityId id) = 0;
+  FileFor(const Ptr &, SpecificEntityId<FileId> id) = 0;
 
   // Download a fragment by its unique ID.
   //
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
   //            raw fragment id.
   virtual std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, RawEntityId id) = 0;
+  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) = 0;
 
   virtual std::shared_ptr<WeggliQueryResultImpl>
   Query(const Ptr &, const WeggliQuery &query) = 0;
@@ -169,20 +171,20 @@ class EntityProvider {
   Query(const Ptr &, const RegexQuery &query) = 0;
 
   // Return the redeclarations of a given declaration.
-  virtual std::vector<RawEntityId> Redeclarations(
-      const Ptr &, RawEntityId eid) = 0;
+  virtual DeclarationIdList Redeclarations(
+      const Ptr &, SpecificEntityId<DeclarationId> eid) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for uses.
   virtual void FillUses(const Ptr &, RawEntityId eid,
-                        std::vector<RawEntityId> &redecl_ids_out,
-                        std::vector<RawEntityId> &fragment_ids_out) = 0;
+                        DeclarationIdList &redecl_ids_out,
+                        FragmentIdList &fragment_ids_out) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for references.
   virtual void FillReferences(const Ptr &, RawEntityId eid,
-                              std::vector<RawEntityId> &redecl_ids_out,
-                              std::vector<RawEntityId> &fragment_ids_out) = 0;
+                              DeclarationIdList &redecl_ids_out,
+                              FragmentIdList &fragment_ids_out) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
@@ -223,13 +225,15 @@ class Index {
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  FilePathList file_paths(void) const;
+  FilePathMap file_paths(void) const;
 
   // Download a file by its unique ID.
+  std::optional<File> file(SpecificEntityId<FileId> id) const;
   std::optional<File> file(FileId id) const;
   std::optional<File> file(RawEntityId id) const;
 
   // Download a fragment by its unique ID.
+  std::optional<Fragment> fragment(SpecificEntityId<FragmentId> id) const;
   std::optional<Fragment> fragment(FragmentId id) const;
   std::optional<Fragment> fragment(RawEntityId id) const;
 

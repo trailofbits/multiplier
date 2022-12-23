@@ -4,12 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include "SQLiteStore.h"
+
 #include <cassert>
 #include <iostream>
 #include <thread>
 #include <sqlite3.h>
-
-#include <multiplier/SQLiteStore.h>
 
 namespace sqlite {
 

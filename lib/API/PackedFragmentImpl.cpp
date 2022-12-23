@@ -13,7 +13,7 @@ namespace mx {
 
 PackedFragmentImpl::~PackedFragmentImpl(void) noexcept {}
 
-PackedFragmentImpl::PackedFragmentImpl(RawEntityId id_,
+PackedFragmentImpl::PackedFragmentImpl(FragmentId id_,
                                        EntityProvider::Ptr ep_,
                                        const capnp::Data::Reader &reader_)
     : FragmentImpl(id_, std::move(ep_)),

@@ -216,7 +216,7 @@ class File {
   FragmentList fragments(void) const;
 
   // Return the list of fragment ids in the file
-  std::vector<EntityId> fragment_ids(void) const;
+  FragmentIdList fragment_ids(void) const;
 
   // Return the file tokens for the file.
   TokenRange tokens(void) const noexcept;
