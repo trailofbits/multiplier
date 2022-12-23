@@ -91,21 +91,18 @@ struct File @0x987f05f6a48636d5 {
   # Unique ID of this file. This corresponds to an `mx::FileId`.
   id @0 :UInt64;
   
-  # Hash of `data`.
-  hash @1 :Text;
-  
   # The data of the file.
-  data @2 :Text;
+  data @1 :Text;
   
   # Tells us about the tokens inside of `data`. There is one extra element in
   # `tokenOffsets`.
-  tokenKinds @3 :List(UInt16);
-  tokenOffsets @4 :List(UInt32);
+  tokenKinds @2 :List(UInt16);
+  tokenOffsets @3 :List(UInt32);
     
   # Byte offsets of the end of line characters. We use this to map matches in
   # files to matches in fragments, with a persistent set containing <file_id,
   # line_num, fragment_id> triples.
-  eolOffsets @5 :List(UpperBound);
+  eolOffsets @4 :List(UpperBound);
 }
 
 struct FileInfo @0xfd1022cb187f18f8 {

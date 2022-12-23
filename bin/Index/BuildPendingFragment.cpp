@@ -26,11 +26,14 @@ namespace {
 class FragmentBuilder {
  public:
   EntityIdMap &entity_ids;
+  TypeIdMap &type_ids;
   PendingFragment &fragment;
 
   inline explicit FragmentBuilder(EntityIdMap &entity_ids_,
+                                  TypeIdMap &type_ids_,
                                   PendingFragment &fragment_)
       : entity_ids(entity_ids_),
+        type_ids(type_ids_),
         fragment(fragment_) {}
 
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
@@ -83,7 +86,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
   }
 
   mx::DeclarationId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
   id.is_definition = IsDefinition(entity);
@@ -114,7 +117,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
 void FragmentBuilder::MaybeVisitNext(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
   mx::StatementId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
@@ -126,12 +129,12 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Stmt &entity) {
 void FragmentBuilder::MaybeVisitNext(const pasta::Type &entity) {
   auto kind = entity.Kind();
   mx::TypeId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.types_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (fragment.type_ids.emplace(type_key, id).second) {
+  if (type_ids.emplace(type_key, id).second) {
     fragment.types_to_serialize.emplace_back(entity);  // New type found.
   }
 }
@@ -143,7 +146,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::File &) {}
 void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
   auto kind = entity.Kind();
   mx::AttributeId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.attrs_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
@@ -313,15 +316,19 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 }  // namespace
 
-void PendingFragment::Build(EntityIdMap &entity_ids,
-                            const pasta::TokenRange &tokens) {
+// Build the fragment. This fills out the decls/stmts/types to serialize.
+//
+// NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
+void BuildPendingFragment(
+    PendingFragment &pf, EntityIdMap &entity_ids,
+    TypeIdMap &type_ids, const pasta::TokenRange &tokens) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;
   size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
-  FragmentBuilder builder(entity_ids, *this);
+  FragmentBuilder builder(entity_ids, type_ids, *this);
 
   // Make sure to collect everything reachable from token contexts.
   for (auto i = begin_index; i <= end_index; ++i) {

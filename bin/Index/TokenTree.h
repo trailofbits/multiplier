@@ -7,13 +7,18 @@
 #pragma once
 
 #include <iosfwd>
+#include <memory>
 #include <optional>
-#include <pasta/AST/Macro.h>
-#include <pasta/AST/Token.h>
-#include <pasta/Util/File.h>
-#include <string>
-#include <tuple>
 
+namespace pasta {
+class DefineMacroDirective;
+class FileToken;
+class MacroArgument;
+class MacroDirective;
+class MacroExpansion;
+class MacroToken;
+class Token;
+}  // namespace pasta
 namespace mx {
 enum class MacroKind : unsigned char;
 }  // namespace mx

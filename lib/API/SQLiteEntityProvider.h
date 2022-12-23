@@ -17,13 +17,21 @@
 #include <multiplier/SQLiteStore.h>
 #include <filesystem>
 #include <memory>
+#include <shared_mutex>
+#include <vector>
 
 namespace mx {
 
 class SQLiteEntityProvider final : public EntityProvider {
  private:
-  class Impl;
-  std::unique_ptr<Impl> d;
+  class Context;
+
+  std::filesystem::path db_path;
+  std::shared_mutex contexts_lock;
+  std::vector<std::unique_ptr<Context>> contexts;
+
+  Context &ThreadLocalContext(void);
+
  public:
   virtual ~SQLiteEntityProvider(void) noexcept;
   SQLiteEntityProvider(std::filesystem::path path);

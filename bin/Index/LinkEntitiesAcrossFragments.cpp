@@ -4,6 +4,8 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <multiplier/Database.h>
+
 #include "EntityMapper.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
@@ -11,17 +13,20 @@
 namespace indexer {
 namespace {
 
-static void TrackRedeclarations(WorkerId worker_id,
-                                GlobalIndexingState &context, EntityMapper &em,
+static void TrackRedeclarations(mx::DatabaseWriter &database,
+                                const EntityMapper &em,
                                 const std::string &mangled_name,
                                 std::vector<pasta::Decl> redecls) {
   for (const pasta::Decl &redecl_a : redecls) {
-    if (mx::RawEntityId redecl_a_eid = em.EntityId(redecl_a)) {
-      context.LinkMangledName(worker_id, mangled_name,  redecl_a_eid);
+    if (mx::RawEntityId a = em.EntityId(redecl_a)) {
+      database.AddAsync(mx::MangledNameRecord{a, mangled_name});
 
       for (const pasta::Decl &redecl_b : redecls) {
-        if (mx::RawEntityId redecl_b_eid = em.EntityId(redecl_b)) {
-          context.LinkDeclarations(worker_id, redecl_a_eid, redecl_b_eid);
+        if (mx::RawEntityId b = em.EntityId(redecl_b)) {
+          if (a != b) {
+            database.AddAsync(mx::RedeclarationRecord{a, b},
+                              mx::RedeclarationRecord{b, a});
+          }
         }
       }
     }
@@ -32,12 +37,12 @@ static void TrackRedeclarations(WorkerId worker_id,
 
 // Store information persistently to enable linking of declarations across
 // fragments.
-void PendingFragment::LinkDeclarations(WorkerId worker_id,
-                                       GlobalIndexingState &context,
-                                       EntityMapper &em,
-                                       NameMangler &mangler) {
+void LinkEntitiesAcrossFragments(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    const EntityMapper &em, const NameMangler &mangler) {
+
   std::string dummy_mangled_name;
-  for (const pasta::Decl &decl : decls_to_serialize) {
+  for (const pasta::Decl &decl : pf.decls_to_serialize) {
     mx::RawEntityId eid = em.EntityId(decl);
     if (eid == mx::kInvalidEntityId) {
       continue;
@@ -46,9 +51,9 @@ void PendingFragment::LinkDeclarations(WorkerId worker_id,
     if (auto func = pasta::FunctionDecl::From(decl)) {
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-        worker_id, context, em,
-        mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name,
-        func->Redeclarations());
+          database, em,
+          (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+          func->Redeclarations());
 
     } else if (auto var = pasta::VarDecl::From(decl)) {
       if (var->IsLocalVariableDeclaration()) {
@@ -57,16 +62,16 @@ void PendingFragment::LinkDeclarations(WorkerId worker_id,
 
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-        worker_id, context, em,
-        mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name,
-        var->Redeclarations());
+          database, em,
+          (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
+          var->Redeclarations());
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(worker_id, context, em, dummy_mangled_name,
+      TrackRedeclarations(database, em, dummy_mangled_name,
                           tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(worker_id, context, em, dummy_mangled_name,
+      TrackRedeclarations(database, em, dummy_mangled_name,
                           tpl->Redeclarations());
 
     } else {

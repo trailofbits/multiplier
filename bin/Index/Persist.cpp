@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "Persist.h"
+#include "Context.h"
 
 #include <algorithm>
 #include <capnp/common.h>
@@ -13,28 +13,73 @@
 #include <glog/logging.h>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
+#include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Decl.h>
+#include <pasta/Util/File.h>
 #include <sstream>
 #include <utility>
+#include <unordered_set>
 
 #include "Codegen.h"
 #include "Compress.h"
-#include "Context.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
+#include "PendingFragment.h"
 #include "ProgressBar.h"
 #include "Util.h"
 
+namespace capnp {
+class MallocMessageBuilder;
+}  // namespace capnp
+namespace mx {
+namespace rpc {
+class Fragment;
+}  // namespace rpc
+}  // namespace mx
 namespace indexer {
+class TokenTree;
 class TokenTreeNode;
 class TokenTreeNodeRange;
 
+// Dispatch to the right macro serializer.
 extern void DispatchSerializeMacro(EntityMapper &em,
                                    mx::ast::Macro::Builder builder,
                                    const pasta::Macro &entity,
                                    const TokenTree *tt);
+
+// Build the fragment. This fills out the decls/stmts/types to serialize.
+//
+// NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
+extern void BuildPendingFragment(
+    PendingFragment &pf, EntityIdMap &entity_ids,
+    TypeIdMap &type_ids, const pasta::TokenRange &tokens);
+
+// Label the parent entity ids.
+extern void LabelParentsInPendingFragment(const PendingFragment &pf,
+                                          EntityMapper &em);
+
+// Store information persistently to enable linking of declarations across
+// fragments.
+extern void LinkEntitiesAcrossFragments(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    const EntityMapper &em, const NameMangler &mangler);
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+extern void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    mx::rpc::Fragment::Builder &b);
+
+// Serialize all entities into the Cap'n Proto version of the fragment.
+extern void SerializePendingFragment(const PendingFragment &pf,
+                                     const EntityMapper &em,
+                                     mx::rpc::Fragment::Builder &b);
+
+// Save the symbolic names of all declarations into the database.
+extern void LinkEntityNamesToFragment(
+    mx::DatabaseWriter &db, const PendingFragment &pf, EntityMapper &em);
 
 namespace {
 
@@ -52,17 +97,119 @@ using TokenOffsetListBuilder =
 using TokenIdListBuilder =
     capnp::List<uint64_t, ::capnp::Kind::PRIMITIVE>::Builder;
 
+// Accumulate the token data, stripping out some unwanted characters in the
+// process.
+static void AccumulateUTF8Data(std::string &data, llvm::StringRef utf8_data) {
+  data.reserve(data.size() + utf8_data.size());
+  if (!utf8_data.contains('\r')) {
+    data.insert(data.end(), utf8_data.begin(), utf8_data.end());
+
+  } else {
+    for (char ch : utf8_data) {
+      if (ch != '\r') {
+        data += ch;
+      }
+    }
+  }
+}
+
+// Accumulate the token data, encoded as UTF-8, into `data`.
 template <typename Tok>
 static void AccumulateTokenData(std::string &data, const Tok &tok) {
   llvm::StringRef tok_data = tok.Data();
   if (llvm::json::isUTF8(tok_data)) {
-    data.insert(data.end(), tok_data.begin(), tok_data.end());
+    AccumulateUTF8Data(data, tok_data);
 
   } else {
-    data += llvm::json::fixUTF8(tok_data);
+    AccumulateUTF8Data(data, llvm::json::fixUTF8(tok_data));
   }
 }
 
+}  // namespace
+
+
+// Persist a file. Our representation includes stuff not in the file to enable
+// us to improve performance of common operations, like search. That is, we
+// could store a file as a list of tokens, where each token has its own data;
+// however, we want to able to run regular expression searches over files, and
+// so it's convenient to not have to reconstruct the file data from the tokens
+// for every such query. Similarly, we often want to map from matches in files
+// to matches in fragments, and so we create and persist a mapping of file
+// offsets to line numbers here to help us with those translations later.
+void GlobalIndexingState::PersistFile(
+    mx::SpecificEntityId<mx::FileId> file_id, const pasta::File &file) {
+
+  std::filesystem::path file_path = file.Path();
+  auto maybe_file_data = file.Data();
+  LOG_IF(FATAL, !maybe_file_data.Succeeded())
+      << "No data for file " << file_path.generic_string()
+      << ": " << maybe_file_data.TakeError();
+
+  pasta::FileTokenRange file_tokens = file.Tokens();
+  std::string_view file_data = maybe_file_data.TakeValue();
+  capnp::MallocMessageBuilder message;
+  mx::rpc::File::Builder fb = message.initRoot<mx::rpc::File>();
+  fb.setId(file_id.Unpack().file_id);
+
+  std::string utf8_file_data;
+  utf8_file_data.reserve(file_data.size());
+
+  // Encode the token kinds and the offsets of token data. We can't be certain
+  // that the file is in UTF-8, so we re-build the contents on a per-token
+  // basis, because that's the only way to guarantee token offsets in the
+  // presence of UTF-8 issues.
+  auto num_tokens = static_cast<unsigned>(file_tokens.Size());
+  auto tkb = fb.initTokenKinds(num_tokens);
+  auto tob = fb.initTokenOffsets(num_tokens + 1u);
+  auto i = 0u;
+  for (pasta::FileToken ft : file_tokens) {
+    tkb.set(i, static_cast<unsigned short>(TokenKindFromPasta(ft)));
+    tob.set(i, static_cast<unsigned>(utf8_file_data.size()));
+    AccumulateTokenData(utf8_file_data, ft);
+    i += 1u;
+  }
+  tob.set(i, static_cast<unsigned>(utf8_file_data.size()));
+
+  // Cap'n Proto requires that `Text`-typed data is UTF-8.
+  fb.setData(utf8_file_data);
+
+  // Build up and serialize a mapping of offsets of the last byte in a line to
+  // line numbers. This mapping is used during regular expression matches and
+  // Weggli matches over file contents to help us map to fragments whose code
+  // is derived from those files.
+  std::map<unsigned, unsigned> eol_offset_to_line_num;
+  auto line = 1u;
+  auto offset = 0u;
+  for (char ch : file_data) {
+    ++offset;
+    CHECK_NE(ch, '\r');
+    if ('\n' == ch) {
+      eol_offset_to_line_num.emplace(offset, line);
+      ++line;
+    }
+  }
+
+  i = 0u;
+  auto ublb = fb.initEolOffsets(static_cast<unsigned>(
+      eol_offset_to_line_num.size()));
+  for (auto eol_offset_line_num : eol_offset_to_line_num) {
+    mx::rpc::UpperBound::Builder ubb = ublb[i++];
+    ubb.setOffset(eol_offset_line_num.first);
+    ubb.setVal(eol_offset_line_num.second);
+  }
+
+  database.AddAsync(
+      mx::FilePathRecord{file_id, std::move(file_path)},
+      mx::SerializedFileRecord{file_id, CompressedMessage("file", message)});
+}
+
+namespace {
+
+// Schedules the order of serialization of tokens derived from the token tree.
+// The main goal is for all tokens in the final expansion, i.e. all parsed
+// tokens, to be adjacent. The token tree code also tries to inject whitespace
+// that was originall missing between those parsed tokens, so we want to see
+// those too.
 struct TokenTreeSerializationSchedule {
   struct Todo {
     const void *parent;
@@ -107,7 +254,7 @@ struct TokenTreeSerializationSchedule {
     // We need to form a new macro id for something we discovered along the way.
     } else {
       mx::MacroId id;
-      id.fragment_id = em.fragment.fragment_id;
+      id.fragment_id = em.fragment.fragment_index;
       id.kind = tt.Kind();
       id.offset = static_cast<unsigned>(pf.macros_to_serialize.size());
       raw_id = mx::EntityId(id).Pack();
@@ -135,7 +282,7 @@ struct TokenTreeSerializationSchedule {
     } else {
       mx::MacroTokenId id;
       id.kind = mx::TokenKind::UNKNOWN;
-      id.fragment_id = em.fragment.fragment_id;
+      id.fragment_id = em.fragment.fragment_index;
       id.offset = static_cast<unsigned>(tokens.size());
 
       const void *raw_pt = nullptr;
@@ -231,56 +378,6 @@ static std::vector<pasta::Token> FindParsedTokens(
   return parsed_toks;
 }
 
-// Figure out the lines of `file` spanned by `tt`. We use this to help us
-// populate an index (persistent set) of `<file_id, line_num, frag_id>` triples.
-// This index helps us go from matches (e.g. RE2) in files to matches in
-// fragments.
-static void FindFileRange(const pasta::TokenRange &tokens, uint64_t min_index,
-                          uint64_t max_index, const pasta::File &file,
-                          pasta::FileToken *min, pasta::FileToken *max) {
-
-  int ignore = 0;
-  for (auto i = min_index; i <= max_index; ++i) {
-    pasta::Token tok = tokens[i];
-    switch (tok.Role()) {
-      case pasta::TokenRole::kBeginOfFileMarker:
-        ++ignore;
-        continue;
-
-      case pasta::TokenRole::kEndOfFileMarker:
-        --ignore;
-        continue;
-
-      default:
-        continue;
-
-      case pasta::TokenRole::kFileToken:
-      case pasta::TokenRole::kInitialMacroUseToken:
-        DCHECK_LE(0, ignore);
-        if (ignore) {
-          continue;
-        } else {
-          break;
-        }
-    }
-
-    auto ft = tok.FileLocation();
-    if (!ft) {
-      continue;
-    }
-
-    if (ft->RawFile() != file.RawFile()) {
-      continue;
-    }
-    if (ft->Index() < min->Index()) {
-      *min = *ft;
-    }
-    if (ft->Index() > max->Index()) {
-      *max = *ft;
-    }
-  }
-}
-
 static void VisitMacros(
     PendingFragment &pf, EntityMapper &em, const pasta::Macro &macro,
     std::vector<pasta::Macro> &macros_to_serialize);
@@ -319,7 +416,7 @@ void VisitMacros(
       mx::MacroId id;
       id.kind = mx::FromPasta(macro.Kind());
       id.offset = static_cast<unsigned>(macros_to_serialize.size());
-      id.fragment_id = pf.fragment_id;
+      id.fragment_id = pf.fragment_index;
       raw_id = mx::EntityId(id).Pack();
       em.entity_ids.emplace(macro.RawMacro(), raw_id);
       macros_to_serialize.emplace_back(macro);
@@ -372,7 +469,7 @@ static void PersistParsedTokens(
         mx::VariantId vid = mx::EntityId(em.EntityId(pm.value())).Unpack();
         if (std::holds_alternative<mx::MacroId>(vid)) {
           mx::MacroId mid = std::get<mx::MacroId>(vid);
-          if (mid.fragment_id == pf.fragment_id) {
+          if (mid.fragment_id == pf.fragment_index) {
             mti2mo.set(i, mid.offset);
           }
         }
@@ -464,7 +561,7 @@ static void PersistTokenTree(
     mx::VariantId vid = mx::EntityId(sched.containing_macro[i]).Unpack();
     if (std::holds_alternative<mx::MacroId>(vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(vid);
-      CHECK_EQ(mid.fragment_id, pf.fragment_id);
+      CHECK_EQ(mid.fragment_id, pf.fragment_index);
       mti2mo.set(i, mid.offset);
     } else {
       CHECK(std::holds_alternative<mx::InvalidId>(vid));
@@ -757,187 +854,75 @@ static void PersistTokenContexts(
 
     ++num_tokens;
   }
+
+  DCHECK_GT(fb.getTokenKinds().size(), 0u);
 }
 
 }  // namespace
 
-// Persist a file. Our representation includes stuff not in the file to enable
-// us to improve performance of common operations, like search. That is, we
-// could store a file as a list of tokens, where each token has its own data;
-// however, we want to able to run regular expression searches over files, and
-// so it's convenient to not have to reconstruct the file data from the tokens
-// for every such query. Similarly, we often want to map from matches in files
-// to matches in fragments, and so we create and persist a mapping of file
-// offsets to line numbers here to help us with those translations later.
-void PersistFile(WorkerId worker_id, GlobalIndexingState &context,
-                 mx::RawEntityId file_id, std::string file_hash,
-                 pasta::File file) {
-
-  auto maybe_file_data = file.Data();
-  LOG_IF(FATAL, !maybe_file_data.Succeeded())
-      << "No data for file " << file.Path().generic_string()
-      << ": " << maybe_file_data.TakeError();
-
-  pasta::FileTokenRange file_tokens = file.Tokens();
-  std::string_view file_data = maybe_file_data.TakeValue();
-  capnp::MallocMessageBuilder message;
-  mx::rpc::File::Builder fb = message.initRoot<mx::rpc::File>();
-  fb.setId(file_id);
-  fb.setHash(file_hash);
-
-  std::string utf8_file_data;
-  utf8_file_data.reserve(file_data.size());
-
-  // Encode the token kinds and the offsets of token data. We can't be certain
-  // that the file is in UTF-8, so we re-build the contents on a per-token
-  // basis, because that's the only way to guarantee token offsets in the
-  // presence of UTF-8 issues.
-  auto num_tokens = static_cast<unsigned>(file_tokens.Size());
-  auto tkb = fb.initTokenKinds(num_tokens);
-  auto tob = fb.initTokenOffsets(num_tokens + 1u);
-  auto i = 0u;
-  for (pasta::FileToken ft : file_tokens) {
-    tkb.set(i, static_cast<unsigned short>(TokenKindFromPasta(ft)));
-    tob.set(i, static_cast<unsigned>(utf8_file_data.size()));
-    AccumulateTokenData(utf8_file_data, ft);
-    i += 1u;
-  }
-  tob.set(i, static_cast<unsigned>(utf8_file_data.size()));
-
-  // Cap'n Proto requires that `Text`-typed data is UTF-8.
-  fb.setData(utf8_file_data);
-
-  // Build up and serialize a mapping of offsets of the last byte in a line to
-  // line numbers. This mapping is used during regular expression matches and
-  // Weggli matches over file contents to help us map to fragments whose code
-  // is derived from those files.
-  std::map<unsigned, unsigned> eol_offset_to_line_num;
-  auto line = 1u;
-  auto offset = 0u;
-  for (char ch : file_data) {
-    ++offset;
-    if ('\n' == ch) {
-      eol_offset_to_line_num.emplace(offset, line);
-      ++line;
-    }
-  }
-
-  i = 0u;
-  auto ublb = fb.initEolOffsets(static_cast<unsigned>(
-      eol_offset_to_line_num.size()));
-  for (auto eol_offset_line_num : eol_offset_to_line_num) {
-    mx::rpc::UpperBound::Builder ubb = ublb[i++];
-    ubb.setOffset(eol_offset_line_num.first);
-    ubb.setVal(eol_offset_line_num.second);
-  }
-
-  context.PutSerializedFile(worker_id, file_id,
-                            CompressedMessage("file", message));
-}
-
-// Return the file containing this fragment.
-static std::optional<pasta::File> FragmentFile(const pasta::TokenRange &tokens,
-                                               const PendingFragment &frag) {
-  for (auto i = frag.begin_index; i <= frag.end_index; ++i) {
-    auto file_tok = tokens[i].FileLocation();
-    if (file_tok) {
-      return pasta::File::Containing(file_tok.value());
-    }
-  }
-
-  return std::nullopt;
-}
-
 // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
-// deduplication and indexing. It roughly corresponds to a sequence of one-or-
-// more syntactically overlapping "top-level declarations." For us, a top-level
-// declaration is one that only nested inside of a namespace, a linkage
+// de-duplication and indexing. It roughly corresponds to a sequence of one-or-
+// more syntactically overlapping "top-level declarations." For us, a top-
+// level declaration is one that only nested inside of a namespace, a linkage
 // specifier, a translation unit, etc. Thus, things like global variables,
-// functions, and classes are all top-level declarations. These things tend to
-// contain lots of other declarations/statements, and those all get lumped into
-// and persisted a TLD's fragment.
+// functions, and classes are all top-level declarations. These things tend
+// to contain lots of other declarations/statements, and those all get lumped
+// into and persisted a TLD's fragment.
 //
-// Fragments separate out their lists of persistent entities. This enables some
-// downstream benefits. For example, all declarations are persisted in a
+// Fragments separate out their lists of persistent entities. This enables
+// some downstream benefits. For example, all declarations are persisted in a
 // separate list from all statements. This allows us to more easily jump into
-// the middle of the "sub-AST" persisted in a fragment. For example, if we want
-// to find all `VarDecl`s, we can iterate the list of declarations, check the
-// decl kinds, and then yield only the discovered `VarDecl`s. No recursive
+// the middle of the "sub-AST" persisted in a fragment. For example, if we
+// want to find all `VarDecl`s, we can iterate the list of declarations, check
+// the decl kinds, and then yield only the discovered `VarDecl`s. No recursive
 // visitor needed!
 //
 // Fragments also store things like the macro substitution tree, and parsed
-// tokens associated with the covered declarations/statements. This is partially
-// because our serialized decls/stmts/etc. reference these tokens, and partially
-// so that we can do things like print out fragments, or chunks thereof.
-void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
-                     pasta::AST &ast, NameMangler &mangler,
-                     EntityIdMap &entity_ids, FileIdMap &file_ids,
-                     const pasta::TokenRange &tokens, PendingFragment frag) {
+// tokens associated with the covered declarations/statements. This is
+// partially because our serialized decls/stmts/etc. reference these tokens,
+// and partially so that we can do things like print out fragments, or chunks
+// thereof.
+void GlobalIndexingState::PersistFragment(
+    const pasta::AST &ast, const pasta::TokenRange &tokens,
+    NameMangler &mangler, EntityIdMap &entity_ids,
+    PendingFragment &pf) {
 
-  const mx::RawEntityId fragment_id = frag.fragment_id;
-  const uint64_t begin_index = frag.begin_index;
-  const uint64_t end_index = frag.end_index;
-
-  auto maybe_file = FragmentFile(tokens, frag);
-  if (!maybe_file) {
-    auto main_file_path = ast.MainFile().Path().generic_string();
-    if (!frag.top_level_decls.empty()) {
-      const pasta::Decl &leader_decl = frag.top_level_decls.front();
-      LOG(ERROR)
-          << "Unable to locate file containing "
-          << DeclToString(leader_decl)
-          << PrefixedLocation(leader_decl, " at or near ")
-          << " on main job file " << main_file_path;
-    } else {
-      LOG(ERROR)
-          << "Unable to locate file containing macros on main job file "
-          << main_file_path;
-    }
-    return;
-  }
+  TypeIdMap type_ids;
+  const mx::SpecificEntityId<mx::FragmentId> fragment_id = pf.fragment_id;
+  const uint64_t begin_index = pf.begin_index;
+  const uint64_t end_index = pf.end_index;
 
   capnp::MallocMessageBuilder message;
   mx::rpc::Fragment::Builder fb = message.initRoot<mx::rpc::Fragment>();
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  frag.Build(entity_ids, tokens);
+  BuildPendingFragment(pf, entity_ids, type_ids, tokens);
 
-  EntityMapper em(entity_ids, file_ids, frag);
+  EntityMapper em(entity_ids, type_ids, pf);
 
   // Figure out parentage/inheritance between the entities.
-  frag.LabelParents(em);
+  LabelParentsInPendingFragment(pf, em);
 
   // Serialize all discovered entities.
-  frag.Serialize(em, fb);
-
-  // Figure out the lines spanned by this code fragment.
-  //
-  // TODO(pag): Handle sub-ranges for x-macros? Probably should have something
-  //            more robust that handles discontinuous ranges, just in case.
-  pasta::File file = std::move(maybe_file.value());
-  pasta::FileTokenRange file_tokens = file.Tokens();
-  pasta::FileToken min_token = file_tokens[file_tokens.Size() - 1u];
-  pasta::FileToken max_token = file_tokens[0];
-  FindFileRange(tokens, begin_index, end_index, file, &min_token, &max_token);
+  SerializePendingFragment(pf, em, fb);
 
   std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
       tokens, begin_index, end_index);
 
-  mx::RawEntityId file_id = em.FileId(file);
-  fb.setId(fragment_id);
-  fb.setFirstFileTokenId(em.EntityId(min_token));
-  fb.setLastFileTokenId(em.EntityId(max_token));
+  fb.setId(pf.fragment_id.Pack());
+  fb.setFirstFileTokenId(pf.first_file_token_id.Pack());
+  fb.setLastFileTokenId(pf.last_file_token_id.Pack());
 
   // Generate source IR before saving the fragments to the persistent
   // storage.
-  fb.setMlir(context.codegen.GenerateSourceIRFromTLDs(
-      fragment_id, em, frag.top_level_decls,
-      frag.num_top_level_declarations));
+  fb.setMlir(codegen.GenerateSourceIRFromTLDs(
+      fragment_id, em, pf.top_level_decls,
+      pf.num_top_level_declarations));
 
-  auto tlds = fb.initTopLevelDeclarations(frag.num_top_level_declarations);
-  for (auto i = 0u; i < frag.num_top_level_declarations; ++i) {
-    tlds.set(i, em.EntityId(frag.top_level_decls[i]));
+  auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
+  for (auto i = 0u; i < pf.num_top_level_declarations; ++i) {
+    tlds.set(i, em.EntityId(pf.top_level_decls[i]));
   }
 
   // Derive the macro substitution tree. Failing to build the tree is an error
@@ -946,16 +931,17 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
   std::stringstream tok_tree_err;
   std::optional<TokenTreeNodeRange> maybe_tt = TokenTree::Create(
       tokens, begin_index, end_index, tok_tree_err);
+
   if (maybe_tt) {
-    PersistTokenTree(frag, em, fb, std::move(maybe_tt.value()), parsed_tokens);
+    PersistTokenTree(pf, em, fb, std::move(maybe_tt.value()), parsed_tokens);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
   // substitutions because that will just replicate logic from the token
   // tree.
   } else {
-    if (!frag.top_level_decls.empty()) {
-      const pasta::Decl &leader_decl = frag.top_level_decls.front();
+    if (!pf.top_level_decls.empty()) {
+      const pasta::Decl &leader_decl = pf.top_level_decls.front();
       LOG(ERROR)
           << tok_tree_err.str() << " for top-level declaration "
           << DeclToString(leader_decl)
@@ -968,24 +954,20 @@ void PersistFragment(WorkerId worker_id, GlobalIndexingState &context,
           << ast.MainFile().Path().generic_string();
     }
 
-    PersistParsedTokens(frag, em, fb, parsed_tokens);
+    PersistParsedTokens(pf, em, fb, parsed_tokens);
   }
 
   PersistTokenContexts(em, parsed_tokens, fragment_id, fb);
+  LinkEntitiesAcrossFragments(database, pf, em, mangler);
+  LinkExternalUsesInFragment(database, pf, fb);
+  LinkEntityNamesToFragment(database, pf, em);
 
-  DCHECK_GT(fb.getTokenKinds().size(), 0u);
+  database.AddAsync(
+      mx::FragmentLineCoverageRecord{
+          pf.fragment_id, pf.file_id, pf.first_line_number, pf.last_line_number},
+      mx::SerializedFragmentRecord{
+          pf.fragment_id, pf.file_id, CompressedMessage("fragment", message)});
 
-  context.PutFragmentLineCoverage(worker_id, file_id, fragment_id,
-                                  min_token.Line(), max_token.Line());
-
-  frag.LinkDeclarations(worker_id, context, em, mangler);
-  frag.LinkReferences(worker_id, context, em);
-  frag.FindDeclarationUses(worker_id, context, fb);
-
-  context.PutSerializedFragment(
-      worker_id, fragment_id, CompressedMessage("fragment", message));
-
-  frag.PersistDeclarationSymbols(worker_id, context, em);
 }
 
 }  // namespace indexer

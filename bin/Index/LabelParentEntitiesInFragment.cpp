@@ -60,7 +60,7 @@ class ParentTrackerVisitor : public EntityVisitor {
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (eid.fragment_id != fragment.fragment_id) {
+    if (eid.fragment_id != fragment.fragment_index) {
       return;
     }
 
@@ -87,7 +87,7 @@ class ParentTrackerVisitor : public EntityVisitor {
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
-    if (eid.fragment_id != fragment.fragment_id) {
+    if (eid.fragment_id != fragment.fragment_index) {
       return;
     }
 
@@ -120,33 +120,34 @@ class ParentTrackerVisitor : public EntityVisitor {
 
 // Maps the child-to-parent relationships in the fragment, storing the
 // relationships in `parent_decls` and `parent_stmts`.
-void PendingFragment::LabelParents(EntityMapper &em) {
+void LabelParentsInPendingFragment(
+    const PendingFragment &pf, EntityMapper &em) {
   ParentTrackerVisitor vis(em, *this);
-  for (const pasta::Decl &decl : decls_to_serialize) {
+  for (const pasta::Decl &decl : pf.decls_to_serialize) {
     vis.not_yet_seen.emplace(decl.RawDecl());
   }
 
-  for (const pasta::Stmt &stmt : stmts_to_serialize) {
+  for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
     vis.not_yet_seen.emplace(stmt.RawStmt());
   }
 
-  for (const pasta::Type &type : types_to_serialize) {
+  for (const pasta::Type &type : pf.types_to_serialize) {
     vis.not_yet_seen.emplace(type.RawType());
   }
 
   // Visit the top-level decls first.
 
-  for (const pasta::Decl &decl : top_level_decls) {
+  for (const pasta::Decl &decl : pf.top_level_decls) {
     vis.Accept(decl);
   }
 
   // Expand the set of decls.
-  for (size_t i = 0u, max_i = decls_to_serialize.size(); i < max_i; ++i) {
-    pasta::Decl decl = decls_to_serialize[i];
+  for (size_t i = 0u, max_i = pf.decls_to_serialize.size(); i < max_i; ++i) {
+    pasta::Decl decl = pf.decls_to_serialize[i];
     if (vis.not_yet_seen.count(decl.RawDecl())) {
       vis.Accept(decl);
-      DCHECK_EQ(max_i, decls_to_serialize.size());
-      max_i = decls_to_serialize.size();
+      DCHECK_EQ(max_i, pf.decls_to_serialize.size());
+      max_i = pf.decls_to_serialize.size();
     }
   }
 
@@ -159,7 +160,7 @@ void PendingFragment::LabelParents(EntityMapper &em) {
   //            detect them here if possible. Missing things can also be an
   //            indication that we're not fully linking something to its parent
   //            decls/statements.
-  for (const pasta::Decl &decl : decls_to_serialize) {
+  for (const pasta::Decl &decl : pf.decls_to_serialize) {
     assert(!vis.not_yet_seen.count(decl.RawDecl()));
   }
 #endif
@@ -167,7 +168,7 @@ void PendingFragment::LabelParents(EntityMapper &em) {
 // #ifndef NDEBUG
   // TODO(kumarak): Does the manually written Visitor.cpp should have traverse function
   //                for all stmt types. If not then we can probably remove assert here.
-  // for (const pasta::Stmt &stmt : stmts_to_serialize) {
+  // for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
   //   assert(!vis.not_yet_seen.count(stmt.RawStmt()));
   // }
 // #endif

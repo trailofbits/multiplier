@@ -2893,7 +2893,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         serialize_cpp_os
             << "  auto f" << i << " = e." << method_name << "();\n"
-            << "  b." << setter_name << "(es.FileId(f" << i << "));\n";
+            << "  b." << setter_name << "(es.EntityId(f" << i << "));\n";
 
       // Handle `std::string`
       } else if (record_name == "string" || record_name == "basic_string") {

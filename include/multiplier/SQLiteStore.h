@@ -56,6 +56,8 @@ class QueryResult {
         arg = static_cast<arg_t>(getInt64(idx));
       } else if (std::is_same_v<std::string, arg_t>) {
         arg = getText(idx);
+      } else if (std::is_same_v<std::filesystem::path, arg_t>) {
+        arg = getText(idx);
       } else if (std::is_same_v<std::string_view, arg_t>) {
         arg = getBlob(idx);
       } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
@@ -141,6 +143,8 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   void bind(const size_t i, const char *&value);
 
+  void bind(const size_t i, const std::filesystem::path &value);
+
   void bind(const size_t i, const std::string &value);
 
   void bind(const size_t i, const std::string_view &value);
@@ -159,26 +163,22 @@ class Statement : public std::enable_shared_from_this<Statement> {
     bind_many(i, args...);
   }
 
-
   sqlite3_stmt *prepareStatement(void);
 
   // Database connection instance
   Connection &db;
 
   // prepared statement cached
+  //
+  // TODO(pag): Replace with a `unique_ptr`, or just a raw pointer and we'll
+  //            call the appropriate API to destroy it later.
   std::shared_ptr<sqlite3_stmt> prepared_stmt;
+
   std::string query;
   unsigned num_params;
-};
 
-class Transaction {
  public:
-  Transaction(Connection &db);
-  void lock();
-  void unlock();
-
- private:
-  Connection &db;
+  using Ptr = std::shared_ptr<Statement>;
 };
 
 class Connection {
@@ -246,7 +246,37 @@ class Connection {
 
   std::unique_ptr<sqlite3, Deleter> db;
   std::string dbFilename;
-  std::vector<Statement*> stmts;
+  std::vector<std::weak_ptr<Statement>> stmts;
 };
 
-}
+class Transaction {
+ public:
+  inline ~Transaction(void) {
+    db.Commit();
+  }
+
+  inline Transaction(Connection &db_)
+      : db(db_) {
+    db.Begin(false);
+  }
+
+ private:
+  Connection &db;
+};
+
+class ExclusiveTransaction {
+ public:
+  inline ~ExclusiveTransaction(void) {
+    db.Commit();
+  }
+
+  inline ExclusiveTransaction(Connection &db_)
+      : db(db_) {
+    db.Begin(true);
+  }
+
+ private:
+  Connection &db;
+};
+
+}  // namespace sqlite

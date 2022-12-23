@@ -7,6 +7,9 @@
 #include <capnp/common.h>
 #include <capnp/message.h>
 
+#include <multiplier/AST.capnp.h>
+#include <multiplier/RPC.capnp.h>
+
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
@@ -106,6 +109,7 @@ static void DispatchSerializeAttr(EntityMapper &em,
 
 }  // namespace
 
+// Dispatch to the right macro serializer.
 void DispatchSerializeMacro(EntityMapper &em,
                             mx::ast::Macro::Builder builder,
                             const pasta::Macro &entity, const TokenTree *tt) {
@@ -137,41 +141,43 @@ void DispatchSerializeMacro(EntityMapper &em,
   }
 }
 
-void PendingFragment::Serialize(EntityMapper &em,
-                                mx::rpc::Fragment::Builder &b) {
+// Serialize all entities into the Cap'n Proto version of the fragment.
+void SerializePendingFragment(const PendingFragment &pf,
+                              const EntityMapper &em,
+                              mx::rpc::Fragment::Builder &b) {
 
   auto i = 0u;
   auto decl_builder = b.initDeclarations(
-      static_cast<unsigned>(decls_to_serialize.size()));
-  for (const pasta::Decl &entity : decls_to_serialize) {
+      static_cast<unsigned>(pf.decls_to_serialize.size()));
+  for (const pasta::Decl &entity : pf.decls_to_serialize) {
     DispatchSerializeDecl(em, decl_builder[i++], entity);
   }
 
   i = 0u;
   auto stmt_builder = b.initStatements(
-      static_cast<unsigned>(stmts_to_serialize.size()));
-  for (const pasta::Stmt &entity : stmts_to_serialize) {
+      static_cast<unsigned>(pf.stmts_to_serialize.size()));
+  for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
     DispatchSerializeStmt(em, stmt_builder[i++], entity);
   }
 
   i = 0u;
   auto type_builder = b.initTypes(
-      static_cast<unsigned>(types_to_serialize.size()));
-  for (const pasta::Type &entity : types_to_serialize) {
+      static_cast<unsigned>(pf.types_to_serialize.size()));
+  for (const pasta::Type &entity : pf.types_to_serialize) {
     DispatchSerializeType(em, type_builder[i++], entity);
   }
 
   i = 0u;
   auto attr_builder = b.initAttributes(
-      static_cast<unsigned>(attrs_to_serialize.size()));
-  for (const pasta::Attr &entity : attrs_to_serialize) {
+      static_cast<unsigned>(pf.attrs_to_serialize.size()));
+  for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     DispatchSerializeAttr(em, attr_builder[i++], entity);
   }
 
   i = 0u;
   auto pseudo_builder = b.initOthers(
-      static_cast<unsigned>(pseudos_to_serialize.size()));
-  for (const Pseudo &pseudo : pseudos_to_serialize) {
+      static_cast<unsigned>(pf.pseudos_to_serialize.size()));
+  for (const Pseudo &pseudo : pf.pseudos_to_serialize) {
     if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
       SerializeTemplateArgument(
           em, pseudo_builder[i++], std::get<pasta::TemplateArgument>(pseudo));

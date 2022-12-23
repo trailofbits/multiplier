@@ -410,7 +410,7 @@ NameMangler::NameMangler(const pasta::AST &ast)
     : impl(std::make_unique<NameManglerImpl>(ast.UnderlyingAST(),
                                              ast.MainFile().Path())) {}
 
-const std::string &NameMangler::Mangle(const pasta::Decl &decl) {
+const std::string &NameMangler::Mangle(const pasta::Decl &decl) const {
   return impl->GetMangledName(decl.RawDecl());
 }
 

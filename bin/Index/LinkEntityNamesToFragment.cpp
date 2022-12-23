@@ -4,12 +4,12 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-
+#include <multiplier/Database.h>
+#include <multiplier/Entities/DeclKind.h>
+#include <pasta/AST/Decl.h>
+#include <pasta/AST/Macro.h>
 #include <type_traits>
 
-#include <pasta/AST/Stmt.h>
-
-#include "Context.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
@@ -125,19 +125,25 @@ std::string ContextualSymbolName(const pasta::NamedDecl &decl) {
 
 }  // namespace
 
-void PendingFragment::PersistDeclarationSymbols(
-    WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em) {
+// Save the symbolic names of all declarations into the database.
+void LinkEntityNamesToFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf, EntityMapper &em) {
 
-  WorkerIndexingState &worker = context.PerWorkerState(worker_id);
-  mx::IndexStorage &storage = worker.ClientSharedStorage();
-
-  for (const pasta::Decl &decl : decls_to_serialize) {
+  // Declaration names.
+  for (const pasta::Decl &decl : pf.decls_to_serialize) {
     if (auto nd = pasta::NamedDecl::From(decl);
         nd && ShouldGetSymbolName(decl)) {
-      
-      storage.database.StoreSymbolName(
-          em.EntityId(decl), mx::FromPasta(decl.Category()),
-          ContextualSymbolName(nd.value()));
+      database.AddAsync(mx::SymbolNameRecord{
+          em.EntityId(decl), ContextualSymbolName(nd.value())});
+    }
+  }
+
+  // Macro names.
+  for (const pasta::Macro &macro : pf.macros_to_serialize) {
+    if (auto nm = pasta::DefineMacroDirective::From(macro)) {
+      std::string_view name = nm->Name().Data();
+      database.AddAsync(mx::SymbolNameRecord{
+        em.EntityId(macro), std::string(name.data(), name.size())});
     }
   }
 }

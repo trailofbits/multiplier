@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <multiplier/AST.capnp.h>
-#include <multiplier/AST.h>
-#include <multiplier/RPC.capnp.h>
+#include <cassert>
+#include <cstdint>
 #include <multiplier/Types.h>
+#include <optional>
 #include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
@@ -18,10 +18,10 @@
 #include <pasta/AST/Token.h>
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
-#include <cassert>
+#include <variant>
 
-#include "Context.h"
 #include "TokenTree.h"
+#include "Util.h"
 
 namespace indexer {
 
@@ -29,11 +29,6 @@ using Pseudo = std::variant<pasta::TemplateArgument,
                             pasta::CXXBaseSpecifier,
                             pasta::TemplateParameterList,
                             pasta::Designator>;
-
-class EntityMapper;
-class GlobalIndexingState;
-class NameMangler;
-class TokenTree;
 
 // Summary information about a group of top-level declarations that are
 // somehow lexically/syntactically "stuck together" and thus serialized
@@ -46,20 +41,25 @@ class PendingFragment {
  public:
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
-  mx::RawEntityId fragment_id;
+  mx::RawEntityId fragment_index{mx::kInvalidEntityId};
+  mx::SpecificEntityId<mx::FragmentId> fragment_id;
+
+  // Unique ID of the file containing this declaration.
+  mx::RawEntityId file_index{mx::kInvalidEntityId};
+  mx::SpecificEntityId<mx::FileId> file_id;
+  mx::SpecificEntityId<mx::FileTokenId> first_file_token_id;
+  mx::SpecificEntityId<mx::FileTokenId> last_file_token_id;
+
+  unsigned first_line_number{0u};
+  unsigned last_line_number{0u};
+
+  // Inclusive range of indices into the parsed tokens.
+  uint64_t begin_index{0u};
+  uint64_t end_index{0u};
 
   // Top-level declarations. These are the roots of serialization.
   std::vector<pasta::Decl> top_level_decls;
   std::vector<pasta::Macro> top_level_macros;
-
-  // Offsets of the serialized version of types in this fragment.
-  //
-  // NOTE(pag): Types are redundantly represented in/across fragments; no
-  //            de-duplication is done.
-  //
-  // TODO(pag): Eventually split PASTA's `Type` back into a `QualType` and
-  //            a `Type`?
-  TypeIdMap type_ids;
 
   // Entity IDs for parentage tracking.
   EntityIdMap parent_decl_ids;
@@ -85,47 +85,9 @@ class PendingFragment {
   // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
   std::vector<Pseudo> pseudos_to_serialize;
 
-  // Inclusive range of indices into the parsed tokens.
-  uint64_t begin_index;
-  uint64_t end_index;
-
-  // Label the initial entities of this fragment. This focuses on finding the
-  // entities that syntactically belong to this fragment, and assigning them
-  // IDs. Labeling happens first for all fragments, then we run `Build` for
-  // new fragments that we want to serialize.
-  //
-  // NOTE(pag): Implemented in `LabelEntitiesInFragment.cpp`.
-  void Label(EntityIdMap &entity_ids, const pasta::TokenRange &range);
-
-  // Build the fragment. This fills out the decls/stmts/types to serialize.
-  //
-  // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
-  void Build(EntityIdMap &entity_ids, const pasta::TokenRange &tokens);
-
-  // Label the parent entity ids.
-  void LabelParents(EntityMapper &em);
-
-  // Serialize the built-out fragments.
-  void Serialize(EntityMapper &em, mx::rpc::Fragment::Builder &b);
-
-  // Store information persistently to enable linking of declarations across
-  // fragments.
-  void LinkDeclarations(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em,
-                        NameMangler &mangler);
-
-  // Identify all unique entity IDs used by this fragment, and map them to the
-  // fragment ID in the data store.
-  void FindDeclarationUses(
-      WorkerId worker_id, GlobalIndexingState &context, mx::rpc::Fragment::Builder &b);
-
-  // Identify all explicit references to entities.
-  //
-  // TODO(pag): Eventually make this identify the type of reference, or use
-  //            the SourceIR to do so.
-  void LinkReferences(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
-
-  // Store serialized declaration fragments symbol to the persistent store
-  void PersistDeclarationSymbols(WorkerId worker_id, GlobalIndexingState &context, EntityMapper &em);
+  // Find and initialize `parent_decl_ids` and `last_file_token_id`.
+  void InitFileLocationRange(
+      EntityIdMap &entity_ids, const pasta::TokenRange &toks);
 };
 
 }  // namespace indexer

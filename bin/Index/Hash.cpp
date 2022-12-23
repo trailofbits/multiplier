@@ -82,7 +82,7 @@ class HashVisitor final : public pasta::DeclVisitor {
 }  // namespace
 
 // Compute a SHA256 hash of some data.
-std::string FileHash(std::string_view data) {
+std::string HashFile(std::string_view data) {
   llvm::SHA256 hash;
   hash.update(data);
   std::string result;
@@ -110,10 +110,10 @@ std::string FileHash(std::string_view data) {
 //            two different fragments to have the same hash, because their
 //            ASTs might be different, and if their ASTs are different, then
 //            our entity ID numbering scheme will fail horribly.
-std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
-                     const std::vector<Entity> &entities,
-                     const pasta::TokenRange &toks,
-                     uint64_t begin_index, uint64_t end_index) {
+std::string HashFragment(
+    const std::vector<Entity> &entities, const pasta::TokenRange &toks,
+    uint64_t begin_index, uint64_t end_index) {
+
   llvm::FoldingSetNodeID fs;
   if (begin_index > end_index || end_index > toks.size()) {
     return std::string();
@@ -124,26 +124,6 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
   for (uint64_t i = begin_index; i < end_index; i++) {
     pasta::Token token = toks[i];
-
-    // Try to find the first token in the range with a file location, as a kind
-    // of anchor point.
-    //
-    // NOTE(pag): We use the hash of the contents of the file as a part of our
-    //            key, rather than the absolute path. This is so that if we
-    //            are indexing more than one project, then the local copy of a
-    //            header file and the installed copy will resolve to the same
-    //            hash, and so we'll do a better job of deduping top-level
-    //            declarations in that case.
-    if (!seen_floc) {
-      if (auto floc = token.FileLocation()) {
-        auto file = pasta::File::Containing(*floc);
-        if (auto hash_it = file_hashes.find(file);
-            hash_it != file_hashes.end()) {
-          ss << hash_it->second << ':' << floc->Line() << ':' << floc->Column();
-          seen_floc = true;
-        }
-      }
-    }
 
     // Mix in generic token/structure/context information.
     switch (token.Role()) {
@@ -191,11 +171,25 @@ std::string CodeHash(std::unordered_map<pasta::File, std::string> file_hashes,
 
   ss << std::hex;
 
-  // Mix in ODR hashes.
   HashVisitor visitor(ss);
   for (const Entity &entity : entities) {
+
+    // Mix in ODR hashes.
     if (std::holds_alternative<pasta::Decl>(entity)) {
       visitor.Accept(std::get<pasta::Decl>(entity));
+
+    // Mix in macro info. Note that any macro names and such are already
+    // integrated from the token values themselves.
+    //
+    // TODO(pag): Should really have a `MacroVisitor` in pasta, then separately
+    //            visit and hash each top-level macro entity. The saving factor
+    //            for now is probably that the above token hashing operates on
+    //            the parsed and intermediate tokens, which is a good enough
+    //            proxy.
+    } else if (std::holds_alternative<pasta::Macro>(entity)) {
+      const pasta::Macro &macro = std::get<pasta::Macro>(entity);
+      fs.AddInteger(static_cast<uint16_t>(macro.Kind()));
+      fs.AddInteger(macro.Children().Size());
     }
   }
 

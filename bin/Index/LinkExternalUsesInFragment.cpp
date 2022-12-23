@@ -5,10 +5,15 @@
 // the LICENSE file found in the root directory of this source tree.
 
 
+#include <multiplier/AST.capnp.h>
+#include <multiplier/RPC.capnp.h>
+#include <multiplier/Types.h>
 #include <pasta/AST/Forward.h>
+#include <pasta/AST/Macro.h>
 #include <type_traits>
+#include <unordered_set>
 
-#include "EntityMapper.h"
+#include "Database.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 #include "Pseudo.h"
@@ -24,7 +29,7 @@ namespace {
     }
 
 #define MX_VISIT_PSEUDO_KIND(cls, storage) \
-    inline static pasta::PseudoKind Get_PseudoKind( \
+    inline static pasta::PseudoKind Get_Pseudo_Kind( \
         const mx::ast::Pseudo::Reader &reader, pasta::cls *) { \
       return static_cast<pasta::PseudoKind>(reader.getVal ## storage()); \
     }
@@ -131,13 +136,19 @@ namespace {
 
 #include <multiplier/Visitor.inc.h>
 
+pasta::DeclKind Get_Decl_Kind(const mx::ast::Decl::Reader &);
+pasta::StmtKind Get_Stmt_Kind(const mx::ast::Stmt::Reader &);
+pasta::TypeKind Get_Type_Kind(const mx::ast::Type::Reader &);
+pasta::AttrKind Get_Attr_Kind(const mx::ast::Attr::Reader &);
+pasta::MacroKind Get_Macro_Kind(const mx::ast::Macro::Reader &);
+pasta::PseudoKind Get_Pseudo_Kind(const mx::ast::Pseudo::Reader &);
 
 }  // namespace
 
 // Identify all unique entity IDs used by this fragment, and map them to the
 // fragment ID in the data store.
-void PendingFragment::FindDeclarationUses(
-    WorkerId worker_id, GlobalIndexingState &context,
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
     mx::rpc::Fragment::Builder &b) {
 
   std::unordered_set<mx::RawEntityId> entity_ids;
@@ -245,18 +256,52 @@ void PendingFragment::FindDeclarationUses(
       FindReferences_ ## pseudo(entity_ids, entity); \
       break;
 
-    switch (Get_PseudoKind(entity, tag)) {
+    switch (Get_Pseudo_Kind(entity, tag)) {
       PSEUDO_ENTITY_TYPES(MX_VISIT_PSEUDO)
     }
 
 #undef MX_VISIT_PSEUDO
   }
 
+  mx::SpecificEntityId<mx::FragmentId> fid = pf.fragment_id;
   for (mx::RawEntityId eid : entity_ids) {
     mx::VariantId vid = mx::EntityId(eid).Unpack();
+
+    // Filter out uses of entities that are themselves located inside this
+    // fragment. We always assume an entity is used within its fragment.
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
-      context.LinkUseInFragment(worker_id, eid, fragment_id);
+      auto id = std::get<mx::DeclarationId>(vid);
+      if (id.fragment_id == pf.fragment_index) {
+        continue;
+      }
+    } else if (std::holds_alternative<mx::TypeId>(vid)) {
+      auto id = std::get<mx::TypeId>(vid);
+      if (id.fragment_id == pf.fragment_index) {
+        continue;
+      }
+    } else if (std::holds_alternative<mx::StatementId>(vid)) {
+      auto id = std::get<mx::StatementId>(vid);
+      if (id.fragment_id == pf.fragment_index) {
+        continue;
+      }
+    } else if (std::holds_alternative<mx::AttributeId>(vid)) {
+      auto id = std::get<mx::AttributeId>(vid);
+      if (id.fragment_id == pf.fragment_index) {
+        continue;
+      }
+    } else if (std::holds_alternative<mx::MacroId>(vid)) {
+      auto id = std::get<mx::MacroId>(vid);
+      if (id.fragment_id == pf.fragment_index) {
+        continue;
+      }
+    } else if (std::holds_alternative<mx::FileId>(vid)) {
+      // Always allow.
+
+    } else {
+      continue; // Skip the rest.
     }
+
+    database.AddAsync(mx::FragmentUsingEntityRecord{fid, eid});
   }
 }
 

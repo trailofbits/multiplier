@@ -153,6 +153,7 @@ struct ParsedTokenId {
 // Identifies a token inside of a `File`.
 struct FileTokenId {
   RawEntityId file_id;
+
   TokenKind kind;
 
   // Offset of this where this token is stored inside of a serialized
@@ -235,7 +236,7 @@ using VariantId = std::variant<InvalidId, FileId, FragmentId,
 
 // An opaque, compressed entity id.
 class EntityId {
- private:
+ protected:
   RawEntityId opaque{kInvalidEntityId};
 
  public:
@@ -330,6 +331,27 @@ class EntityId {
 
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;
+};
+
+template <typename T>
+class SpecificEntityId final : protected EntityId {
+ public:
+  SpecificEntityId(void) = default;
+
+  inline SpecificEntityId(T id_)
+      : EntityId(id_) {}
+
+  T Unpack(void) const noexcept {
+    return std::get<T>(this->EntityId::Unpack());
+  }
+
+  using EntityId::Pack;
+  using EntityId::operator RawEntityId;
+
+  inline auto operator<=>(SpecificEntityId<T> that) const noexcept
+      -> decltype(RawEntityId() <=> RawEntityId()) {
+    return opaque <=> that.opaque;
+  }
 };
 
 }  // namespace mx

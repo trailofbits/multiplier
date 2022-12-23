@@ -6,16 +6,20 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <variant>
 
-#include "Pseudo.h"
+#include <multiplier/Types.h>
 
 namespace pasta {
 class AST;
 class Decl;
 class FileToken;
+class Macro;
 class MacroToken;
 class Stmt;
 class Token;
@@ -25,6 +29,20 @@ namespace mx {
 enum class TokenKind : unsigned short;
 }  // namespace mx
 namespace indexer {
+
+using Entity = std::variant<pasta::Decl, pasta::Macro>;
+struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
+struct FileIdMap final : public std::unordered_map<const void *, mx::SpecificEntityId<mx::FileId>> {};
+struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {};
+using TypeKey = std::pair<const void *, uint32_t>;
+struct TypeIdMap final : public std::map<TypeKey, mx::SpecificEntityId<mx::TypeId>> {};
+struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
+
+// Return `true` of `tok` is in the context of `decl`.
+bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl);
+
+// Returns the `pasta::FileToken` if this is a top-level token in the parse.
+std::optional<pasta::FileToken> AsTopLevelFileToken(const pasta::Token &tok);
 
 // Tell us if this was a token that was actually parsed, and thus should have
 // a fragment token ID.

@@ -5,61 +5,61 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "SQLiteEntityProvider.h"
-#include "API.h"
-#include "Compress.h"
-#include "Re2.h"
+
+#include <multiplier/Database.h>
 #include <multiplier/Index.h>
 #include <multiplier/Re2.h>
 #include <multiplier/Types.h>
 #include <multiplier/SQLiteStore.h>
+
+#include "API.h"
+#include "Compress.h"
+#include "Re2.h"
 #include <memory>
-#include <mutex>
 #include <thread>
-#include <multiplier/IndexStorage.h>
 
 namespace mx {
+namespace {
+static thread_local unsigned tThreadIndex = 0u;
+static std::atomic<unsigned> gNumThreads(1u);
+}  // namespace
 
-struct Context {
+class SQLiteEntityProvider::Context {
+ private:
   sqlite::Connection db;
-  IndexStorage storage;
+  sqlite::Statement::Ptr get_file_by_id;
+  sqlite::Statement::Ptr get_frag_by_id;
+
+ public:
 
   Context(std::filesystem::path path)
-      : db(path, /*readonly=*/true),
-        storage(db) {}
+      : db(path, true  /* read-only */),
+        get_file_by_id(db.Prepare(
+            "SELECT data FROM file WHERE file_id = ?1")),
+        get_frag_by_id(db.Prepare(
+            "SELECT data FROM fragment WHERE fragment_id = ?1")) {}
 };
 
-class SQLiteEntityProvider::Impl {
- public:
-  std::filesystem::path db_path;
-  std::mutex mtx;
-  std::unordered_map<std::thread::id, Context> contexts;
-  mx::RawEntityId next_file_id;
-  mx::RawEntityId next_small_fragment_id;
-  mx::RawEntityId next_big_fragment_id;
+SQLiteEntityProvider::Context &SQLiteEntityProvider::ThreadLocalContext(void) {
+  if (!tThreadIndex) {
+    Context *context_ptr = new Context(db_path);
 
-  Impl(std::filesystem::path path)
-      : db_path(path) {
-        sqlite::Connection db(path, true);
-        mx::PersistentAtomic<mx::kNextFileId, mx::RawEntityId> next_file_id(db);
-        mx::PersistentAtomic<mx::kNextSmallCodeId, mx::RawEntityId> next_small_fragment_id(db);
-        mx::PersistentAtomic<mx::kNextBigCodeId, mx::RawEntityId> next_big_fragment_id(db);
-        this->next_file_id = next_file_id.load();
-        this->next_small_fragment_id = next_small_fragment_id.load();
-        this->next_big_fragment_id = next_big_fragment_id.load();
-      }
+    std::unique_lock<std::shared_mutex> locker(contexts_lock);
+    tThreadIndex = gNumThreads.fetch_add(1u);
+    contexts.resize(tThreadIndex);
+    contexts[tThreadIndex - 1u].reset(context_ptr);
+    return *context_ptr;
 
-  IndexStorage &GetStorage(void) {
-    std::scoped_lock<std::mutex> lock(mtx);
-    auto cur_id = std::this_thread::get_id();
-    if(contexts.find(cur_id) == contexts.end()) {
-      contexts.emplace(cur_id, db_path);
-    }
-    return contexts.at(cur_id).storage;
+  } else {
+    std::shared_lock<std::shared_mutex> locker(contexts_lock);
+    return contexts[tThreadIndex - 1u];
   }
-};
+}
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
-  : d(std::make_unique<Impl>(path)) {}
+    : db_path(path) {
+  contexts.reserve(gNumThreads.load() + 16u);
+}
 
 SQLiteEntityProvider::~SQLiteEntityProvider(void) noexcept {}
 
@@ -91,6 +91,9 @@ std::vector<EntityId> SQLiteEntityProvider::ListFragmentsInFile(
 
   std::vector<EntityId> fragment_ids;
   fragment_ids.reserve(128u);
+
+  Context &context = ThreadLocalContext();
+
 
   // Collect the fragments associated with this file.
   d->GetStorage().file_fragment_ids.GetByField<0>(

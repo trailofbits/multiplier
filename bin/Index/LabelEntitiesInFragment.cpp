@@ -76,7 +76,7 @@ class EntityLabeller final : public EntityVisitor {
 bool EntityLabeller::Enter(const pasta::Decl &entity) {
   auto kind = entity.Kind();
   mx::DeclarationId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
   id.is_definition = IsDefinition(entity);
@@ -94,7 +94,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
 bool EntityLabeller::Enter(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
   mx::StatementId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
@@ -112,7 +112,7 @@ bool EntityLabeller::Enter(const pasta::Stmt &entity) {
 bool EntityLabeller::Enter(const pasta::Type &entity) {
   auto kind = entity.Kind();
   mx::TypeId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.types_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
@@ -168,7 +168,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
       return false;
   }
 
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.kind = TokenKindFromPasta(entity);
 
   return entity_ids.emplace(entity.RawToken(), id).second;
@@ -179,7 +179,7 @@ bool EntityLabeller::Label(const pasta::Token &entity) {
 bool EntityLabeller::Label(const pasta::Macro &entity) {
   mx::MacroId id;
   id.kind = mx::FromPasta(entity.Kind());
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.macros_to_serialize.size());
 
   // If we added this node (we should have), then add in a `nullopt` reservation
@@ -202,11 +202,11 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // entities that syntactically belong to this fragment, and assigning them
 // IDs. Labeling happens first for all fragments, then we run `Build` for
 // new fragments that we want to serialize.
-void PendingFragment::Label(EntityIdMap &entity_ids,
-                            const pasta::TokenRange &tok_range) {
+void LabelEntitiesInFragment(PendingFragment &pf, EntityIdMap &entity_ids,
+                             const pasta::TokenRange &tok_range) {
   EntityLabeller labeller(entity_ids, *this);
 
-  for (uint64_t i = begin_index; i <= end_index; ++i) {
+  for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
     pasta::Token tok = tok_range[i];
     if (IsParsedToken(tok)) {
       (void) labeller.Label(tok);
@@ -224,11 +224,11 @@ void PendingFragment::Label(EntityIdMap &entity_ids,
   // fragment, and stop when we go too far, whereas the automated approach might
   // just scoop everything reachable into a fragment, even if it doesn't really
   // belong there.
-  for (const pasta::Decl &decl : top_level_decls) {
+  for (const pasta::Decl &decl : pf.top_level_decls) {
     (void) labeller.Accept(decl);
   }
 
-  for (const pasta::Macro &macro : top_level_macros) {
+  for (const pasta::Macro &macro : pf.top_level_macros) {
     (void) labeller.Label(macro);
   }
 }
