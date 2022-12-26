@@ -229,6 +229,7 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   {"Decl", "NextDeclarationInContext"},
   {"Decl", "HasDefiningAttribute"},  // Already have `Decl::DefiningAttribute`.
 
+  {"Decl", "Redeclarations"},  // Implement it ourselves.
   {"Decl", "MostRecentDeclaration"},
   {"NamedDecl", "MostRecentDeclaration"},
   {"VarTemplateDecl", "MostRecentDeclaration"},
@@ -1203,7 +1204,7 @@ void CodeGenerator::RunOnOptional(
       file_use_ids[api_name].SetId(cls, i);
       selector << "FileUseSelector";
       lib_cpp_os
-          << "    if (auto file = fragment->ep->FileFor(fragment->ep, id)) {\n"
+          << "    if (auto file = fragment->ep->FileFor(fragment->ep, id.Pack())) {\n"
           << "      return File(std::move(file));\n"
           << "    } else {\n"
           << "      return std::nullopt;\n"
@@ -1770,7 +1771,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
+        << "(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
         << class_name << " &e) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
@@ -1806,7 +1807,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
+        << "(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
         << class_name << " &e) {\n";
 
     if (is_concrete) {
@@ -1835,7 +1836,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
+        << "(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
         << class_name << " &e) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
@@ -1868,7 +1869,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
+        << "(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
         << class_name << " &e) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
@@ -1906,7 +1907,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntityMapper &es, mx::ast::Macro::Builder b, "
+        << "(const EntityMapper &es, mx::ast::Macro::Builder b, "
         << "const pasta::" << class_name << " &e, const TokenTree *tt) {\n"
         << "  (void) tt;\n"
         << "  (void) es;\n"
@@ -1932,9 +1933,11 @@ MethodListPtr CodeGenerator::RunOnClass(
     auto pk = storage.AddMethod("UInt8");  // pseudo kind.
     auto [pk_getter_name, pk_setter_name, pk_init_name] = NamesFor(pk);
 
+    needed_decls.insert("PseudoKind");
+
     serialize_cpp_os
         << "void Serialize" << class_name
-        << "(EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::"
+        << "(const EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::"
         << class_name << " &e) {\n  b." << pk_setter_name
         << "(static_cast<uint8_t>(pasta::PseudoKind::k" << class_name << "));\n";
 
@@ -2118,7 +2121,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Decl> definition(void) const;\n"
           << "  bool is_definition(void) const;\n"
           << "  std::vector<Decl> redeclarations(void) const;\n"
-          << "  EntityId id(void) const;\n"
+          << "  SpecificEntityId<DeclarationId> id(void) const;\n"
           << "  UseRange<DeclUseSelector> uses(void) const;\n"
           << "  ReferenceRange references(void) const;\n\n"
           << " protected:\n"
@@ -2158,7 +2161,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
-          << "  EntityId id(void) const;\n"
+          << "  SpecificEntityId<StatementId> id(void) const;\n"
           << "  UseRange<StmtUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
@@ -2204,7 +2207,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Type> from(const TokenContext &c) {\n"
           << "    return c.as_type();\n"
           << "  }\n\n"
-          << "  EntityId id(void) const;\n"
+          << "  SpecificEntityId<TypeId> id(void) const;\n"
           << "  UseRange<TypeUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static TypeIterator in_internal(const Fragment &fragment);\n\n"
@@ -2222,7 +2225,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Attr> from(const TokenContext &c) {\n"
           << "    return c.as_attribute();\n"
           << "  }\n\n"
-          << "  EntityId id(void) const;\n"
+          << "  SpecificEntityId<AttributeId> id(void) const;\n"
           << "  UseRange<AttrUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static AttrIterator in_internal(const Fragment &fragment);\n\n"
@@ -2237,7 +2240,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Macro> from(const std::optional<Macro> &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
-          << "  EntityId id(void) const;\n"
+          << "  SpecificEntityId<MacroId> id(void) const;\n"
           << "  UseRange<MacroUseSelector> uses(void) const;\n\n"
           << " protected:\n"
           << "  static MacroIterator in_internal(const Fragment &fragment);\n"
@@ -2666,12 +2669,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
 
-    // Make this local. We have a custom implementation of `redeclarations`
-    // that calls `redeclarations_visible_in_translation_unit`, and then
-    // dispatches to the entity provider to query ther server for the full
-    // set of redeclarations.
+    // We have a custom implementation of `redeclarations`.
     if (snake_name == "redeclarations") {
-      snake_name = "redeclarations_visible_in_translation_unit";
+      assert(false);  // In the blacklist.
+      continue;
 
     } else if (snake_name == "is_this_declaration_a_definition") {
       snake_name = "is_definition";
@@ -3341,8 +3342,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#include \"Fragment.h\"\n"
       << "#include <multiplier/AST.h>\n\n"
+      << "#include \"Fragment.h\"\n\n"
       << "namespace mx {\n";
 
   lib_pasta_cpp_os
@@ -3569,6 +3570,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <glog/logging.h>\n"
       << "#include \"EntityMapper.h\"\n"
       << "#include \"PASTA.h\"\n"
+      << "#include \"Pseudo.h\"\n"
       << "#include \"TokenTree.h\"\n"
       << "#include \"Util.h\"\n"
       << "namespace indexer {\n\n";
@@ -3652,7 +3654,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     std::string name = record.Name();
     serialize_h_os
         << "void Serialize" << name
-        << "(EntityMapper &, mx::ast::Decl::Builder, const pasta::"
+        << "(const EntityMapper &, mx::ast::Decl::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -3660,7 +3662,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     std::string name = record.Name();
     serialize_h_os
         << "void Serialize" << name
-        << "(EntityMapper &, mx::ast::Stmt::Builder, const pasta::"
+        << "(const EntityMapper &, mx::ast::Stmt::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -3668,7 +3670,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     std::string name = record.Name();
     serialize_h_os
         << "void Serialize" << name
-        << "(EntityMapper &, mx::ast::Type::Builder, const pasta::"
+        << "(const EntityMapper &, mx::ast::Type::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -3676,7 +3678,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     std::string name = record.Name();
     serialize_h_os
         << "void Serialize" << name
-        << "(EntityMapper &, mx::ast::Attr::Builder, const pasta::"
+        << "(const EntityMapper &, mx::ast::Attr::Builder, const pasta::"
         << name << " &);\n";
   }
 
@@ -3684,7 +3686,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     std::string name = record.Name();
     serialize_h_os
         << "void Serialize" << name
-        << "(EntityMapper &, mx::ast::Macro::Builder, const pasta::"
+        << "(const EntityMapper &, mx::ast::Macro::Builder, const pasta::"
         << name << " &, const TokenTree *tt);\n";
   }
 
@@ -3694,7 +3696,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
         name != "MacroToken" && name != "MacroRange") {
       serialize_h_os
           << "void Serialize" << name
-          << "(EntityMapper &, mx::ast::Pseudo::Builder, const pasta::"
+          << "(const EntityMapper &, mx::ast::Pseudo::Builder, const pasta::"
           << name << " &);\n";
     }
   }

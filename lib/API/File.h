@@ -16,6 +16,7 @@ namespace mx {
 class TokenReader;
 
 using FileLocationVector = std::vector<std::pair<unsigned, unsigned>>;
+using FileIdList = std::vector<SpecificEntityId<FileId>>;
 
 class FileLocationCacheImpl {
  public:
@@ -35,7 +36,7 @@ class FileListImpl {
   const EntityProvider::Ptr ep;
 
   // NOTE(pag): These are `EntityId`-packed file ids.
-  std::vector<RawEntityId> file_ids;
+  FileIdList file_ids;
 
   explicit FileListImpl(EntityProvider::Ptr ep_);
 };

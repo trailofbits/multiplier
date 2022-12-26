@@ -73,7 +73,7 @@ class Attr {
     return c.as_attribute();
   }
 
-  EntityId id(void) const;
+  SpecificEntityId<AttributeId> id(void) const;
   UseRange<AttrUseSelector> uses(void) const;
 
  protected:

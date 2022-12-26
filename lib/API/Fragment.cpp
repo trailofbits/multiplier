@@ -86,8 +86,8 @@ Fragment Fragment::containing(const Reference &ref) {
 }
 
 // Return the ID of this fragment.
-EntityId Fragment::id(void) const noexcept {
-  return EntityId(FragmentId{impl->fragment_id});
+SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
+  return FragmentId{impl->fragment_id};
 }
 
 // The range of file tokens in this fragment.
@@ -107,7 +107,8 @@ TokenRange Fragment::file_tokens(void) const {
     return TokenRange();
   }
 
-  auto file = impl->ep->FileFor(impl->ep, first_fid.file_id);
+  FileId fid(first_fid.file_id);
+  auto file = impl->ep->FileFor(impl->ep, SpecificEntityId<FileId>(fid));
   auto raw_file = file.get();
   return TokenRange(
       raw_file->TokenReader(std::move(file)),

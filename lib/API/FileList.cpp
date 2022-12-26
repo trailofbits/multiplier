@@ -27,12 +27,9 @@ FileListImpl::FileListImpl(EntityProvider::Ptr ep_)
 // Advance to the next valid file.
 void FileListIterator::Advance(void) {
   for (; index < num_files; ++index) {
-    VariantId vid = EntityId(impl->file_ids[index]).Unpack();
-    if (std::holds_alternative<FileId>(vid)) {
-      file = impl->ep->FileFor(impl->ep, std::get<FileId>(vid).file_id);
-      if (file) {
-        return;
-      }
+    file = impl->ep->FileFor(impl->ep, impl->file_ids[index]);
+    if (file) {
+      return;
     }
   }
 }

@@ -46,12 +46,6 @@ class CachingEntityProvider final : public EntityProvider {
   std::unordered_map<RawEntityId, std::shared_ptr<DeclarationIdList>>
       redeclarations;
 
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
-      uses;
-
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
-      references;
-
   void ClearCacheLocked(unsigned new_version_number);
 
   inline CachingEntityProvider(Ptr next_)
@@ -98,7 +92,6 @@ class CachingEntityProvider final : public EntityProvider {
                       FragmentIdList &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
-                  mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
 
 };

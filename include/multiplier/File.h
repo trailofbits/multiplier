@@ -29,6 +29,8 @@ class Index;
 class RegexQueryMatch;
 class WeggliQueryMatch;
 
+using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
+
 class FileLocationConfiguration {
  public:
   // Tab width, in terms of number of spaces.
@@ -210,7 +212,7 @@ class File {
   static FileList in(const Index &index);
 
   // Return the entity ID of this file.
-  EntityId id(void) const noexcept;
+  SpecificEntityId<FileId> id(void) const noexcept;
 
   // Return a list of fragments in this file.
   FragmentList fragments(void) const;

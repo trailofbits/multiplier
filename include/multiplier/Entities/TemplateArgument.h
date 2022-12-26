@@ -20,6 +20,7 @@
 #include "../Use.h"
 
 #include "DeclUseSelector.h"
+#include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
 #include "TypeUseSelector.h"
 

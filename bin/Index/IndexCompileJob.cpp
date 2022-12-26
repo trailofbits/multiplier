@@ -704,12 +704,12 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   std::vector<EntityRange> entity_ranges;
   entity_ranges.reserve(8192u);
 
-  for (OrderedDecl &&ordered_entry : FindTLDs(ast)) {
+  for (OrderedDecl ordered_entry : FindTLDs(ast)) {
     AddDeclRangeToEntityList(tok_range, main_file_path, entity_ranges,
                              std::move(ordered_entry.first));
   }
 
-  for (OrderedMacro &&ordered_entry : FindTLMs(ast)) {
+  for (OrderedMacro ordered_entry : FindTLMs(ast)) {
     AddMacroRangeToEntityList(tok_range, main_file_path, entity_ranges,
                               std::move(ordered_entry.first));
   }
@@ -815,22 +815,23 @@ static std::vector<EntityGroupRange> PartitionEntities(
 //            header file and the installed copy will resolve to the same
 //            hash, and so we'll do a better job of deduping top-level
 //            declarations in that case.
-static void FillFileLocations(
-    PendingFragment &pf, const EntityIdMap &entity_ids,
-    const pasta::TokenRange &toks) {
+static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
+    const EntityIdMap &entity_ids, const pasta::TokenRange &toks,
+    uint64_t begin_index, uint64_t end_index) {
 
-  auto found = false;
+  mx::RawEntityId file_index = 0u;
+  std::optional<pasta::FileToken> begin_tok;
+  std::optional<pasta::FileToken> end_tok;
 
   // Find the first one.
-  uint64_t i = pf.begin_index;
-  for (; i <= pf.end_index; ++i) {
-    std::optional<pasta::FileToken> floc = AsTopLevelFileToken(toks[i]);
-    if (!floc) {
+  uint64_t i = begin_index;
+  for (; i <= end_index; ++i) {
+    begin_tok = AsTopLevelFileToken(toks[i]);
+    if (!begin_tok) {
       continue;
     }
 
-    pasta::File file = pasta::File::Containing(floc.value());
-    auto id_it = entity_ids.find(file.RawFile());
+    auto id_it = entity_ids.find(begin_tok->RawFile());
     if (id_it == entity_ids.end()) {
       continue;
     }
@@ -840,33 +841,22 @@ static void FillFileLocations(
       continue;
     }
 
-    mx::FileId fid = std::get<mx::FileId>(vid);
-    pf.file_index = fid.file_id;
-    pf.file_id = fid;
-
-    mx::FileTokenId tid;
-    tid.file_id = fid.file_id;
-    tid.kind = TokenKindFromPasta(floc.value());
-    tid.offset = static_cast<unsigned>(floc->Index());
-    pf.first_file_token_id = tid;
-    pf.first_line_number = floc->Line();
-
+    file_index = std::get<mx::FileId>(vid).file_id;
     goto find_last_token;
   }
 
-  return;
+  return std::nullopt;
 
 find_last_token:
 
   // Find the last one.
-  for (uint64_t j = pf.end_index; j >= i; --j) {
-    std::optional<pasta::FileToken> floc = AsTopLevelFileToken(toks[j]);
-    if (!floc) {
+  for (uint64_t j = end_index; j >= i; --j) {
+    end_tok = AsTopLevelFileToken(toks[j]);
+    if (!end_tok) {
       continue;
     }
 
-    pasta::File file = pasta::File::Containing(floc.value());
-    auto id_it = entity_ids.find(file.RawFile());
+    auto id_it = entity_ids.find(end_tok->RawFile());
     if (id_it == entity_ids.end()) {
       continue;
     }
@@ -877,45 +867,59 @@ find_last_token:
     }
 
     mx::FileId fid = std::get<mx::FileId>(vid);
-    if (fid.file_id != pf.file_index) {
+    if (fid.file_id != file_index) {
       continue;
     }
 
-    mx::FileTokenId tid;
-    tid.file_id = fid.file_id;
-    tid.kind = TokenKindFromPasta(floc.value());
-    tid.offset = static_cast<unsigned>(floc->Index());
-    pf.last_file_token_id = tid;
-    pf.last_line_number = floc->Line();
-    return;
+    goto found_tokens;
   }
+
+  return std::nullopt;
+
+found_tokens:
+
+  mx::FileId fid(file_index);
+
+  mx::FileTokenId btid;
+  btid.file_id = file_index;
+  btid.kind = TokenKindFromPasta(begin_tok.value());
+  btid.offset = static_cast<unsigned>(begin_tok->Index());
+
+  mx::FileTokenId etid;
+  etid.file_id = file_index;
+  etid.kind = TokenKindFromPasta(end_tok.value());
+  etid.offset = static_cast<unsigned>(end_tok->Index());
+
+  return FileLocationOfFragment(
+      fid, btid, begin_tok.value(), etid, end_tok.value());
 }
 
 static void CreatePendingFragment(
-    mx::DatabaseWriter &database, const EntityIdMap &entity_ids,
+    mx::DatabaseWriter &database, EntityIdMap &entity_ids,
     const pasta::TokenRange &tok_range, const EntityGroupRange &group_range,
     std::vector<PendingFragment> &pending_fragments) {
 
-  PendingFragment pf;
-
   const EntityGroup &entities = std::get<kGroupIndex>(group_range);
-  pf.begin_index = std::get<kBeginIndex>(group_range);
-  pf.end_index = std::get<kEndIndex>(group_range);
+  uint64_t begin_index = std::get<kBeginIndex>(group_range);
+  uint64_t end_index = std::get<kEndIndex>(group_range);
 
   // Locate where this fragment is in its file.
-  FillFileLocations(pf, entity_ids, tok_range);
+  std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
+      entity_ids, tok_range, begin_index, end_index);
 
   // Don't create token `decls_for_chunk` if the decl is already seen. This
   // means it's already been indexed.
   bool is_new_fragment_id = false;
-  pf.fragment_id =
-      database.GetOrCreateFragmentIdForHash(
-          pf.first_file_token_id,
-          HashFragment(entities, tok_range, pf.begin_index, pf.end_index),
-          (pf.end_index - pf.begin_index + 1ul)  /* num_tokens */,
-          is_new_fragment_id  /* mutated by reference */);
 
-  pf.fragment_index = pf.fragment_id.Unpack().fragment_id;
+  PendingFragment pf(
+      database.GetOrCreateFragmentIdForHash(
+          (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
+          HashFragment(entities, tok_range, begin_index, end_index),
+          (end_index - begin_index + 1ul)  /* num_tokens */,
+          is_new_fragment_id  /* mutated by reference */));
+
+  pf.begin_index = begin_index;
+  pf.end_index = end_index;
 
   for (const Entity &entity : entities) {
     if (std::holds_alternative<pasta::Decl>(entity)) {
@@ -966,7 +970,6 @@ static std::vector<PendingFragment> CreatePendingFragments(
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
-  mx::DatabaseWriter &database = context.database;
   pasta::TokenRange tok_range = ast.Tokens();
 
   // Visit decl range groups in reverse order, so that we're more likely to

@@ -6,6 +6,7 @@
 
 
 #include <multiplier/AST.capnp.h>
+#include <multiplier/Database.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/Forward.h>
@@ -13,7 +14,6 @@
 #include <type_traits>
 #include <unordered_set>
 
-#include "Database.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
 #include "Pseudo.h"
@@ -136,12 +136,23 @@ namespace {
 
 #include <multiplier/Visitor.inc.h>
 
-pasta::DeclKind Get_Decl_Kind(const mx::ast::Decl::Reader &);
-pasta::StmtKind Get_Stmt_Kind(const mx::ast::Stmt::Reader &);
-pasta::TypeKind Get_Type_Kind(const mx::ast::Type::Reader &);
-pasta::AttrKind Get_Attr_Kind(const mx::ast::Attr::Reader &);
-pasta::MacroKind Get_Macro_Kind(const mx::ast::Macro::Reader &);
-pasta::PseudoKind Get_Pseudo_Kind(const mx::ast::Pseudo::Reader &);
+template <typename Reader>
+pasta::DeclKind Get_Decl_Kind(const Reader &);
+
+template <typename Reader>
+pasta::StmtKind Get_Stmt_Kind(const Reader &);
+
+template <typename Reader>
+pasta::TypeKind Get_Type_Kind(const Reader &);
+
+template <typename Reader>
+pasta::AttrKind Get_Attr_Kind(const Reader &);
+
+template <typename Reader>
+pasta::MacroKind Get_Macro_Kind(const Reader &);
+
+template <typename Reader>
+pasta::PseudoKind Get_Pseudo_Kind(const Reader &);
 
 }  // namespace
 
@@ -272,27 +283,27 @@ void LinkExternalUsesInFragment(
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
       auto id = std::get<mx::DeclarationId>(vid);
       if (id.fragment_id == pf.fragment_index) {
-        continue;
+        continue;  // Skip if same fragment.
       }
     } else if (std::holds_alternative<mx::TypeId>(vid)) {
       auto id = std::get<mx::TypeId>(vid);
       if (id.fragment_id == pf.fragment_index) {
-        continue;
+        continue;  // Skip if same fragment.
       }
     } else if (std::holds_alternative<mx::StatementId>(vid)) {
       auto id = std::get<mx::StatementId>(vid);
       if (id.fragment_id == pf.fragment_index) {
-        continue;
+        continue;  // Skip if same fragment.
       }
     } else if (std::holds_alternative<mx::AttributeId>(vid)) {
       auto id = std::get<mx::AttributeId>(vid);
       if (id.fragment_id == pf.fragment_index) {
-        continue;
+        continue;  // Skip if same fragment.
       }
     } else if (std::holds_alternative<mx::MacroId>(vid)) {
       auto id = std::get<mx::MacroId>(vid);
       if (id.fragment_id == pf.fragment_index) {
-        continue;
+        continue;  // Skip if same fragment.
       }
     } else if (std::holds_alternative<mx::FileId>(vid)) {
       // Always allow.

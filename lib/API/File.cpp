@@ -271,20 +271,22 @@ FileList File::in(const Index &index) {
 }
 
 // Return the ID of this file.
-EntityId File::id(void) const noexcept {
-  return EntityId(FileId{impl->file_id});
+SpecificEntityId<FileId> File::id(void) const noexcept {
+  return FileId{impl->file_id};
 }
 
 FragmentList File::fragments(void) const {
+  FileId fid(impl->file_id);
   auto &ep = impl->ep;
   auto list = std::make_shared<FragmentListImpl>(
-      ep, ep->ListFragmentsInFile(ep, impl->file_id));
+      ep, ep->ListFragmentsInFile(ep, fid));
   auto num_fragments = list->fragment_ids.size();
   return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
 }
 
 FragmentIdList File::fragment_ids(void) const {
-  return impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
+  FileId fid(impl->file_id);
+  return impl->ep->ListFragmentsInFile(impl->ep, fid);
 }
 
 // Return the file tokens for the file.

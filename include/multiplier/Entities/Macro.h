@@ -71,7 +71,7 @@ class Macro {
     return self;
   }
 
-  EntityId id(void) const;
+  SpecificEntityId<MacroId> id(void) const;
   UseRange<MacroUseSelector> uses(void) const;
 
  protected:

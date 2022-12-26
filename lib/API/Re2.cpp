@@ -22,7 +22,7 @@ RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, EntityProvider::Ptr ep_,
-    std::vector<RawEntityId> fragment_ids)
+    FragmentIdList fragment_ids)
     : query(query_),
       fragment_ids(std::move(fragment_ids)),
       ep(std::move(ep_)) {}
@@ -31,7 +31,8 @@ RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, FragmentImpl::Ptr frag_)
     : query(query_),
       ep(frag_->ep) {
-  fragment_ids.push_back(frag_->fragment_id);
+  FragmentId fid(frag_->fragment_id);
+  fragment_ids.push_back(fid);
   (void) InitForFragment(std::move(frag_));
 }
 
@@ -72,7 +73,8 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   return true;
 }
 
-bool RegexQueryResultImpl::InitForFragment(RawEntityId frag_id) {
+bool RegexQueryResultImpl::InitForFragment(
+    SpecificEntityId<FragmentId> frag_id) {
   return InitForFragment(ep->FragmentFor(ep, frag_id));
 }
 
@@ -305,8 +307,7 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_,
-    std::vector<RawEntityId>)
+    const RegexQuery &query_, EntityProvider::Ptr ep_, FragmentIdList)
     : query(query_),
       ep(std::move(ep_)) {}
 

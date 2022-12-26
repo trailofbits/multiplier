@@ -15,10 +15,6 @@
 #include "Visitor.h"
 
 namespace indexer {
-
-struct EntityIdMap;
-class PendingFragment;
-
 namespace {
 
 // Labels entities (decls, stmts, types, tokens). The idea here is that in
@@ -204,7 +200,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
 // new fragments that we want to serialize.
 void LabelEntitiesInFragment(PendingFragment &pf, EntityIdMap &entity_ids,
                              const pasta::TokenRange &tok_range) {
-  EntityLabeller labeller(entity_ids, *this);
+  EntityLabeller labeller(entity_ids, pf);
 
   for (uint64_t i = pf.begin_index; i <= pf.end_index; ++i) {
     pasta::Token tok = tok_range[i];

@@ -7,17 +7,18 @@
 #pragma once
 
 #include <map>
+#include <multiplier/Types.h>
 #include <optional>
+#include <pasta/Util/File.h>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <variant>
 
-#include <multiplier/Types.h>
-
 namespace pasta {
 class AST;
 class Decl;
+class File;
 class FileToken;
 class Macro;
 class MacroToken;

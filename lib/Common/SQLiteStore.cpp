@@ -83,7 +83,6 @@ std::string_view QueryResult::getBlob(int32_t idx) {
 Statement::Statement(Connection &conn, const std::string &stmt)
     : db(conn),
       query(stmt) {
-  conn.stmts.emplace_back(this->shared_from_this());
 
   auto getPrepareStatement = [this](void) -> std::shared_ptr<sqlite3_stmt> {
     sqlite3_stmt *stmt;
@@ -193,10 +192,6 @@ void Statement::bind(const size_t i, const char *&value) {
                     value, strlen(value), SQLITE_TRANSIENT);
 }
 
-void Statement::bind(const size_t i, const std::filesystem::path &value) {
-  bind(i, value.generic_string());
-}
-
 void Statement::bind(const size_t i, const std::string &value) {
   sqlite3_bind_blob64(prepared_stmt.get(), i + 1,
                       value.data(), value.size(), SQLITE_TRANSIENT);
@@ -205,6 +200,20 @@ void Statement::bind(const size_t i, const std::string &value) {
 void Statement::bind(const size_t i, const std::string_view &value) {
   sqlite3_bind_blob64(prepared_stmt.get(), i + 1,
                       value.data(), value.size(), SQLITE_TRANSIENT);
+}
+
+Connection::Connection(Connection &&that)
+    : db(std::move(that.db)),
+      dbFilename(std::move(that.dbFilename)),
+      stmts(std::move(that.stmts)) {}
+
+Connection &Connection::operator=(Connection &&that_) noexcept {
+  Connection that(std::forward<Connection>(that_));
+  Close();
+  db = std::move(that.db);
+  dbFilename = std::move(that.dbFilename);
+  stmts = std::move(that.stmts);
+  return *this;
 }
 
 Connection::Connection(const std::filesystem::path &db_name,
@@ -248,12 +257,10 @@ Connection::Connection(const std::filesystem::path &db_name,
 };
 
 void Connection::Close(void) noexcept {
-  while (stmts.empty()) {
-    if (auto stmt = stmts.back().lock()) {
-      stmt->Close();
-    }
-    stmts.pop_back();
+  for (const auto &stmt : stmts) {
+    stmt->Close();
   }
+  stmts.clear();
 
   if (auto db_ = GetHandler()) {
     sqlite3_close(db_);
@@ -300,6 +307,7 @@ void Connection::Execute(const std::string &query) {
 
 std::shared_ptr<Statement> Connection::Prepare(const std::string &query) {
   auto stmt = std::make_shared<Statement>(*this, query);
+  stmts.push_back(stmt);
   return std::move(stmt);
 }
 
@@ -314,6 +322,11 @@ void Connection::Deleter::operator()(sqlite3 *db) {
 
 void Connection::Commit(void) {
   Execute("commit transaction");
+}
+
+// Abort the current transaction.
+void Connection::Abort(void) {
+  Execute("rollback transaction");
 }
 
 void Connection::Begin(bool exclusive) {

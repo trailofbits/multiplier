@@ -139,11 +139,17 @@ void LinkEntityNamesToFragment(
   }
 
   // Macro names.
-  for (const pasta::Macro &macro : pf.macros_to_serialize) {
+  //
+  // NOTE(pag): Don't need to descent into the token trees to find the macro
+  //            definitions; they're guaranteed to be top-level.
+  //
+  // TODO(pag): Come up with a name mangling for macros. Clang has something
+  //            like this, I think.
+  for (const pasta::Macro &macro : pf.top_level_macros) {
     if (auto nm = pasta::DefineMacroDirective::From(macro)) {
       std::string_view name = nm->Name().Data();
       database.AddAsync(mx::SymbolNameRecord{
-        em.EntityId(macro), std::string(name.data(), name.size())});
+          em.EntityId(macro), std::string(name.data(), name.size())});
     }
   }
 }

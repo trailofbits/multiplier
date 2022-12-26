@@ -4,6 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <cassert>
 #include <multiplier/Database.h>
 
 #include "EntityMapper.h"
@@ -18,17 +19,36 @@ static void TrackRedeclarations(mx::DatabaseWriter &database,
                                 const std::string &mangled_name,
                                 std::vector<pasta::Decl> redecls) {
   for (const pasta::Decl &redecl_a : redecls) {
-    if (mx::RawEntityId a = em.EntityId(redecl_a)) {
-      database.AddAsync(mx::MangledNameRecord{a, mangled_name});
+    mx::RawEntityId a = em.EntityId(redecl_a);
+    if (!a) {
+      continue;
+    }
 
-      for (const pasta::Decl &redecl_b : redecls) {
-        if (mx::RawEntityId b = em.EntityId(redecl_b)) {
-          if (a != b) {
-            database.AddAsync(mx::RedeclarationRecord{a, b},
-                              mx::RedeclarationRecord{b, a});
-          }
-        }
+    mx::VariantId a_vid = mx::EntityId(a).Unpack();
+    if (!std::holds_alternative<mx::DeclarationId>(a_vid)) {
+      assert(false);
+      continue;
+    }
+
+    mx::DeclarationId a_id = std::get<mx::DeclarationId>(a_vid);
+
+    database.AddAsync(mx::MangledNameRecord{a, mangled_name});
+
+    for (const pasta::Decl &redecl_b : redecls) {
+      mx::RawEntityId b = em.EntityId(redecl_b);
+      if (a == b || !b) {
+        continue;
       }
+
+      mx::VariantId b_vid = mx::EntityId(b).Unpack();
+      if (!std::holds_alternative<mx::DeclarationId>(b_vid)) {
+        assert(false);
+        continue;
+      }
+
+      mx::DeclarationId b_id = std::get<mx::DeclarationId>(b_vid);
+      database.AddAsync(mx::RedeclarationRecord{a_id, b_id},
+                        mx::RedeclarationRecord{b_id, a_id});
     }
   }
 }

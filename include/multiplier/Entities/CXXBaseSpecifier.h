@@ -20,6 +20,7 @@
 #include "../Use.h"
 
 #include "AccessSpecifier.h"
+#include "PseudoKind.h"
 #include "TagTypeKind.h"
 #include "TokenUseSelector.h"
 

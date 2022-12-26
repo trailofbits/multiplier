@@ -25,13 +25,13 @@ class ThreadLocalBase {
 
   ThreadLocalBase(void) = delete;
 
-  explicit ThreadLocalBase(std::function<void *(unsigned)> allocator_);
+  explicit ThreadLocalBase(std::function<void *(unsigned)> allocator_,
+                           std::function<void(void *)> deleter_,
+                           int);
 
-  template <typename Allocator>
-  ThreadLocalBase(Allocator alloc_)
-      : ThreadLocalBase([alloc = std::move(alloc_)] (unsigned index) -> void * {
-          return alloc(index);
-        }) {}
+  template <typename Allocator, typename Deleter>
+  ThreadLocalBase(Allocator alloc_, Deleter deleter_)
+      : ThreadLocalBase(std::move(alloc_), std::move(deleter_), 0) {}
 
   void *GetOrInit(void) &;
 };
@@ -44,13 +44,12 @@ class ThreadLocal : public ThreadLocalBase {
   ThreadLocal(const ThreadLocal<T> &) = delete;
   ThreadLocal<T> &operator=(const ThreadLocal<T> &) = delete;
 
- public:
-  template <typename Allocator>
-  explicit ThreadLocal(Allocator allocator_)
-      : ThreadLocalBase(std::move(allocator_)) {}
+  ThreadLocal(void) = delete;
 
-  ThreadLocal(void)
-      : ThreadLocal([] (unsigned) -> T * { return new T; }) {}
+ public:
+  template <typename Allocator, typename Deleter>
+  explicit ThreadLocal(Allocator allocator_, Deleter deleter_)
+      : ThreadLocalBase(std::move(allocator_), std::move(deleter_)) {}
 
   inline std::shared_ptr<T> Lock(void) & {
     return std::shared_ptr<T>(impl, reinterpret_cast<T *>(GetOrInit()));

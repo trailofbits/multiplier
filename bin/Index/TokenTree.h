@@ -13,11 +13,13 @@
 namespace pasta {
 class DefineMacroDirective;
 class FileToken;
+class Macro;
 class MacroArgument;
 class MacroDirective;
 class MacroExpansion;
 class MacroToken;
 class Token;
+class TokenRange;
 }  // namespace pasta
 namespace mx {
 enum class MacroKind : unsigned char;
@@ -130,8 +132,8 @@ class TokenTree {
   // Create a token tree from the tokens in the inclusive range
   // `[begin_index, end_index]` from `range`.
   static std::optional<TokenTreeNodeRange>
-  Create(pasta::TokenRange range, uint64_t begin_index, uint64_t end_index,
-         std::ostream &err);
+  Create(const pasta::TokenRange &range, uint64_t begin_index,
+         uint64_t end_index, std::ostream &err);
 
   mx::MacroKind Kind(void) const noexcept;
 

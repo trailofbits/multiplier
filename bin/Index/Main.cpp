@@ -19,6 +19,7 @@
 #include <llvm/Support/MemoryBuffer.h>
 #include <memory>
 #include <multiplier/Result.h>
+#include <pasta/Util/FileManager.h>
 #include <pasta/Util/Init.h>
 #include <sstream>
 #include <system_error>

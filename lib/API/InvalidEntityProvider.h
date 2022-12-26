@@ -58,7 +58,6 @@ class InvalidEntityProvider final : public EntityProvider {
                       FragmentIdList &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
-                  mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
 };
 

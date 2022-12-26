@@ -2352,7 +2352,7 @@ TokenTree::~TokenTree(void) {}
 // Create a token tree from the tokens in the inclusive range
 // `[begin_index, end_index]` from `range`.
 std::optional<TokenTreeNodeRange>
-TokenTree::Create(pasta::TokenRange range, uint64_t begin_index,
+TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
                   uint64_t end_index, std::ostream &err) {
 
   if (begin_index > end_index) {

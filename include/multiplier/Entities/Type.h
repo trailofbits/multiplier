@@ -92,7 +92,7 @@ class Type {
     return c.as_type();
   }
 
-  EntityId id(void) const;
+  SpecificEntityId<TypeId> id(void) const;
   UseRange<TypeUseSelector> uses(void) const;
 
  protected:

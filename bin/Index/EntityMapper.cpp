@@ -16,37 +16,37 @@
 
 namespace indexer {
 
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) {
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Decl &entity) const {
   if (auto it = fragment.parent_decl_ids.find(entity.RawDecl());
       it != fragment.parent_decl_ids.end()) {
-    return it->second;
+    return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
   }
 }
 
-mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) {
+mx::RawEntityId EntityMapper::ParentDeclId(const pasta::Stmt &entity) const {
   if (auto it = fragment.parent_decl_ids.find(entity.RawStmt());
       it != fragment.parent_decl_ids.end()) {
-    return it->second;
+    return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
   }
 }
 
-mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) {
+mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Decl &entity) const {
   if (auto it = fragment.parent_stmt_ids.find(entity.RawDecl());
       it != fragment.parent_stmt_ids.end()) {
-    return it->second;
+    return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
   }
 }
 
-mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) {
+mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) const {
   if (auto it = fragment.parent_stmt_ids.find(entity.RawStmt());
       it != fragment.parent_stmt_ids.end()) {
-    return it->second;
+    return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;
   }
@@ -54,10 +54,12 @@ mx::RawEntityId EntityMapper::ParentStmtId(const pasta::Stmt &entity) {
 
 mx::RawEntityId EntityMapper::EntityId(const void *entity) const {
   if (auto it = entity_ids.find(entity); it != entity_ids.end()) {
-    return it->second;
+    return it->second.Pack();
+
   } else if (auto it2 = token_tree_ids.find(entity);
              it2 != token_tree_ids.end()) {
-    return it2->second;
+    return it2->second.Pack();
+
   } else {
     return mx::kInvalidEntityId;
   }
@@ -75,7 +77,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Attr &entity) const {
   return EntityId(entity.RawAttr());
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) {
+mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) const {
   if (auto mt = pasta::MacroToken::From(entity)) {
     return EntityId(mt->ParsedLocation());
   }
@@ -107,9 +109,9 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::Macro &entity) {
   return ret;
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) {
+mx::RawEntityId EntityMapper::EntityId(const pasta::Token &entity) const {
   if (auto it = entity_ids.find(entity.RawToken()); it != entity_ids.end()) {
-    return it->second;
+    return it->second.Pack();
 
   // If this token is derived from another one, and we don't have an entity
   // ID for it, then try to get the entity ID for the derived token.
@@ -133,21 +135,16 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::MacroToken &entity) {
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::File &file) const {
-  if (auto fit = entity_ids.find(file); fit != entity_ids.end()) {
-    return fit->second;
+  if (auto fit = entity_ids.find(file.RawFile()); fit != entity_ids.end()) {
+    return fit->second.Pack();
 
   } else {
     return mx::kInvalidEntityId;
   }
 }
 
-mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) {
-  if (auto it = entity_ids.find(entity.RawFileToken());
-      it != entity_ids.end()) {
-    return it->second;
-  }
-
-  mx::RawEntityId file_id = EntityId(pasta::File::Containing(entity));
+mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
+  mx::RawEntityId file_id = EntityId(entity.RawFile());
   if (file_id == mx::kInvalidEntityId) {
     return mx::kInvalidEntityId;
   }
@@ -162,15 +159,14 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) {
   id.kind = TokenKindFromPasta(entity);
   id.offset = static_cast<uint32_t>(entity.Index());
   ::mx::EntityId ret_id(id);
-  entity_ids.emplace(entity.RawFileToken(), ret_id);
-  return ret_id;
+  return ret_id.Pack();
 }
 
 mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
   assert(type_key.first != nullptr);
   if (auto it = type_ids.find(type_key); it != type_ids.end()) {
-    return it->second;
+    return it->second.Pack();
   } else {
     assert(false);
     return mx::kInvalidEntityId;

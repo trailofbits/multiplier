@@ -104,7 +104,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
     mx::VariantId vid = it->second.Unpack();
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
       auto prev_id = std::get<mx::DeclarationId>(vid);
-      if (prev_id.fragment_id != fragment.fragment_id) {
+      if (prev_id.fragment_id != fragment.fragment_index) {
         entity_ids[entity.RawDecl()] = id;  // Overwrite and force it in.
         fragment.decls_to_serialize.emplace_back(entity);
       }
@@ -328,10 +328,10 @@ void BuildPendingFragment(
   size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
-  FragmentBuilder builder(entity_ids, type_ids, *this);
+  FragmentBuilder builder(entity_ids, type_ids, pf);
 
   // Make sure to collect everything reachable from token contexts.
-  for (auto i = begin_index; i <= end_index; ++i) {
+  for (auto i = pf.begin_index; i <= pf.end_index; ++i) {
     for (auto context = tokens[i].Context(); context;
          context = context->Parent()) {
       if (auto decl = pasta::Decl::From(*context)) {
@@ -355,39 +355,39 @@ void BuildPendingFragment(
   for (auto changed = true; changed; ) {
     changed = false;
 
-    size_t num_decls = decls_to_serialize.size();
-    size_t num_stmts = stmts_to_serialize.size();
-    size_t num_types = types_to_serialize.size();
-    size_t num_attrs = attrs_to_serialize.size();
-    size_t num_pseudos = pseudos_to_serialize.size();
+    size_t num_decls = pf.decls_to_serialize.size();
+    size_t num_stmts = pf.stmts_to_serialize.size();
+    size_t num_types = pf.types_to_serialize.size();
+    size_t num_attrs = pf.attrs_to_serialize.size();
+    size_t num_pseudos = pf.pseudos_to_serialize.size();
 
     for (size_t i = prev_num_decls; i < num_decls; ++i) {
       changed = true;
-      pasta::Decl entity = decls_to_serialize[i];
+      pasta::Decl entity = pf.decls_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_stmts; i < num_stmts; ++i) {
       changed = true;
-      pasta::Stmt entity = stmts_to_serialize[i];
+      pasta::Stmt entity = pf.stmts_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_types; i < num_types; ++i) {
       changed = true;
-      pasta::Type entity = types_to_serialize[i];
+      pasta::Type entity = pf.types_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_attrs; i < num_attrs; ++i) {
       changed = true;
-      pasta::Attr entity = attrs_to_serialize[i];
+      pasta::Attr entity = pf.attrs_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_pseudos; i < num_pseudos; ++i) {
       changed = true;
-      Pseudo pseudo = pseudos_to_serialize[i];
+      Pseudo pseudo = pf.pseudos_to_serialize[i];
       if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
         builder.VisitTemplateArgument(std::get<pasta::TemplateArgument>(pseudo));
       } else if (std::holds_alternative<pasta::CXXBaseSpecifier>(pseudo)) {

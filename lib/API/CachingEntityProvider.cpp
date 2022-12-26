@@ -36,8 +36,6 @@ void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
   file_fragments.clear();
   file_list.clear();
   redeclarations.clear();
-  uses.clear();
-  references.clear();
   has_file_list = false;
   version_number = new_version_number;
   next->VersionNumberChanged(new_version_number);
@@ -154,34 +152,23 @@ void CachingEntityProvider::FillUses(
     DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  auto redecl_it = redeclarations.find(eid);
-  if (redecl_it != redeclarations.end()) {
-    if (auto uses_it = uses.find(eid); uses_it != uses.end()) {
-      redecl_ids_out = *(redecl_it->second);
-      fragment_ids_out = *(uses_it->second);
-      return;
+  std::shared_ptr<DeclarationIdList> redecls;
+
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(eid);
+    auto had_redecls = false;
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
+    } else {
+      redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
+      redeclarations.emplace(eid, redecls);
     }
-  }
 
-  next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
+    next->FillUses(self, eid, *redecls, fragment_ids_out);
+  } while (false);
 
-  // Double check and overwrite the redeclarations.
-  redecl_it = redeclarations.find(eid);
-  if (redecl_it == redeclarations.end()) {
-    auto cached_redecl_eids =
-        std::make_shared<std::vector<RawEntityId>>(redecl_ids_out);
-    for (auto eid : redecl_ids_out) {
-      redeclarations[eid] = cached_redecl_eids;
-    }
-  }
-
-  // Cache the used fragments.
-  auto cached_fragment_ids =
-      std::make_shared<std::vector<RawEntityId>>(fragment_ids_out);
-  for (auto eid : redecl_ids_out) {
-    uses[eid] = cached_fragment_ids;
-  }
+  redecl_ids_out = *redecls;
 }
 
 void CachingEntityProvider::FillReferences(
@@ -189,40 +176,28 @@ void CachingEntityProvider::FillReferences(
     DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  auto redecl_it = redeclarations.find(eid);
-  if (redecl_it != redeclarations.end()) {
-    if (auto refs_it = references.find(eid); refs_it != references.end()) {
-      redecl_ids_out = *(redecl_it->second);
-      fragment_ids_out = *(refs_it->second);
-      return;
+  std::shared_ptr<DeclarationIdList> redecls;
+
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(eid);
+    auto had_redecls = false;
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
+    } else {
+      redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
+      redeclarations.emplace(eid, redecls);
     }
-  }
 
-  next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+  } while (false);
 
-  // Double check and overwrite the redeclarations.
-  redecl_it = redeclarations.find(eid);
-  if (redecl_it == redeclarations.end()) {
-    auto cached_redecl_eids =
-        std::make_shared<DeclarationIdList>(redecl_ids_out);
-    for (SpecificEntityId<DeclarationId> eid : redecl_ids_out) {
-      redeclarations[eid.Pack()] = cached_redecl_eids;
-    }
-  }
-
-  // Cache the referenced fragments.
-  auto cached_fragment_ids =
-      std::make_shared<std::vector<RawEntityId>>(fragment_ids_out);
-  for (SpecificEntityId<DeclarationId> eid : redecl_ids_out) {
-    references[eid.Pack()] = cached_fragment_ids;
-  }
+  redecl_ids_out = *redecls;
 }
 
 void CachingEntityProvider::FindSymbol(
-    const Ptr &self, std::string name,
-    mx::DeclCategory category, std::vector<RawEntityId> &ids_out) {
-  return next->FindSymbol(self, std::move(name), category, ids_out);
+    const Ptr &self, std::string name, std::vector<RawEntityId> &ids_out) {
+  return next->FindSymbol(self, std::move(name), ids_out);
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.

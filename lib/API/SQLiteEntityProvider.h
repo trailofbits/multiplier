@@ -13,6 +13,9 @@
 
 #include "../Common/ThreadLocal.h"
 
+namespace sqlite {
+class Statement;
+}  // namespace sqlite
 namespace mx {
 
 enum class DeclCategory : unsigned char;
@@ -30,6 +33,15 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   const std::filesystem::path db_path;
   ThreadLocal<Context> thread_context;
+
+  void FillEntityIdsWithRedeclarations(
+      Context &context, SpecificEntityId<DeclarationId>);
+
+  DeclarationIdList ReadRedeclarations(Context &context);
+
+  void FillFragments(Context &context, sqlite::Statement *get_fragments,
+                     RawEntityId eid, DeclarationIdList &redecl_ids_out,
+                     FragmentIdList &fragment_ids_out);
 
  public:
   virtual ~SQLiteEntityProvider(void) noexcept;
@@ -71,7 +83,6 @@ class SQLiteEntityProvider final : public EntityProvider {
                       FragmentIdList &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
-                  mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
 };
 

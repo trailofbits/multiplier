@@ -19,6 +19,7 @@
 #include "../Token.h"
 #include "../Use.h"
 
+#include "PseudoKind.h"
 #include "StmtUseSelector.h"
 
 namespace mx {

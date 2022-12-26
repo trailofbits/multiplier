@@ -17,7 +17,7 @@
 namespace indexer {
 namespace {
 
-static void DispatchSerializeDecl(EntityMapper &em,
+static void DispatchSerializeDecl(const EntityMapper &em,
                                   mx::ast::Decl::Builder builder,
                                   const pasta::Decl &entity) {
   switch (entity.Kind()) {
@@ -38,7 +38,7 @@ static void DispatchSerializeDecl(EntityMapper &em,
   }
 }
 
-static void DispatchSerializeStmt(EntityMapper &em,
+static void DispatchSerializeStmt(const EntityMapper &em,
                                   mx::ast::Stmt::Builder builder,
                                   const pasta::Stmt &entity) {
   switch (entity.Kind()) {
@@ -63,7 +63,7 @@ static void DispatchSerializeStmt(EntityMapper &em,
   }
 }
 
-static void DispatchSerializeType(EntityMapper &em,
+static void DispatchSerializeType(const EntityMapper &em,
                                   mx::ast::Type::Builder builder,
                                   const pasta::Type &entity) {
 
@@ -85,7 +85,7 @@ static void DispatchSerializeType(EntityMapper &em,
   }
 }
 
-static void DispatchSerializeAttr(EntityMapper &em,
+static void DispatchSerializeAttr(const EntityMapper &em,
                                   mx::ast::Attr::Builder builder,
                                   const pasta::Attr &entity) {
 
@@ -110,7 +110,7 @@ static void DispatchSerializeAttr(EntityMapper &em,
 }  // namespace
 
 // Dispatch to the right macro serializer.
-void DispatchSerializeMacro(EntityMapper &em,
+void DispatchSerializeMacro(const EntityMapper &em,
                             mx::ast::Macro::Builder builder,
                             const pasta::Macro &entity, const TokenTree *tt) {
 

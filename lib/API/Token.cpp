@@ -42,7 +42,8 @@ TokenReader::Ptr TokenReader::ReaderForToken(
         self_file && self_file->file_id == tid.file_id) {
       file = FileImpl::Ptr(self, self_file);
     } else {
-      file = ep->FileFor(ep, tid.file_id);
+      FileId fid(tid.file_id);
+      file = ep->FileFor(ep, SpecificEntityId<FileId>(fid));
     }
 
     if (file && tid.offset < file->num_tokens) {
@@ -51,13 +52,14 @@ TokenReader::Ptr TokenReader::ReaderForToken(
 
   } else if (std::holds_alternative<ParsedTokenId>(vid)) {
     ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
 
     FragmentImpl::Ptr frag;
     if (auto self_frag = self->OwningFragment();
         self_frag && self_frag->fragment_id == tid.fragment_id) {
       frag = FragmentImpl::Ptr(self, self_frag);
     } else {
-      frag = ep->FragmentFor(ep, tid.fragment_id);
+      frag = ep->FragmentFor(ep, fid);
     }
 
     if (frag && tid.offset < frag->num_parsed_tokens) {
@@ -66,13 +68,14 @@ TokenReader::Ptr TokenReader::ReaderForToken(
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
     MacroTokenId tid = std::get<MacroTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
 
     FragmentImpl::Ptr frag;
     if (auto self_frag = self->OwningFragment();
         self_frag && self_frag->fragment_id == tid.fragment_id) {
       frag = FragmentImpl::Ptr(self, self_frag);
     } else {
-      frag = ep->FragmentFor(ep, tid.fragment_id);
+      frag = ep->FragmentFor(ep, fid);
     }
 
     if (frag && tid.offset < frag->num_tokens) {
@@ -179,8 +182,8 @@ std::optional<Token> Token::parsed_token(void) const {
 // Return the token from which this token was derived. This can be a macro
 // token or a file token.
 std::optional<Token> Token::derived_token(void) const {
-  mx::RawEntityId eid = impl->NthDerivedTokenId(offset);
-  VariantId vid = EntityId(eid).Unpack();
+  EntityId eid = impl->NthDerivedTokenId(offset);
+  VariantId vid = eid.Unpack();
 
   unsigned offset = 0u;
 
@@ -197,7 +200,7 @@ std::optional<Token> Token::derived_token(void) const {
     return std::nullopt;
   }
 
-  auto reader = impl->ReaderForToken(impl, eid);
+  auto reader = impl->ReaderForToken(impl, eid.Pack());
   if (!reader) {
     assert(false);  // Should always get a reader.
     return std::nullopt;
@@ -223,7 +226,7 @@ std::optional<Token> Token::file_token(void) const {
   }
 
   FileTokenId fid = std::get<FileTokenId>(vid);
-  auto fr = impl->ReaderForToken(impl, eid);
+  auto fr = impl->ReaderForToken(impl, eid.Pack());
   if (!fr) {
     return std::nullopt;
   }
@@ -241,7 +244,7 @@ std::optional<Token> Token::nearest_file_token(void) const {
     VariantId vid = eid.Unpack();
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);
-      if (auto fr = impl->ReaderForToken(impl, eid)) {
+      if (auto fr = impl->ReaderForToken(impl, eid.Pack())) {
         return Token(std::move(fr), fid.offset);
       }
     }
@@ -386,7 +389,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
     VariantId vid = eid.Unpack();
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);
-      if (auto fr = impl->ReaderForToken(impl, eid)) {
+      if (auto fr = impl->ReaderForToken(impl, eid.Pack())) {
         ret.impl = std::move(fr);
         ret.index = fid.offset;
         file_id = fid.file_id;
@@ -401,7 +404,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
 
   // Hope for an exact match with the last token in the range.
   if (auto last_fid = impl->NthFileTokenId(num_tokens - 1u);
-      last_fid != kInvalidEntityId) {
+      last_fid != EntityId{}) {
     VariantId vid = EntityId(last_fid).Unpack();
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);

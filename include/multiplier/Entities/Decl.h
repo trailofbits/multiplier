@@ -91,7 +91,7 @@ class Decl {
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
   std::vector<Decl> redeclarations(void) const;
-  EntityId id(void) const;
+  SpecificEntityId<DeclarationId> id(void) const;
   UseRange<DeclUseSelector> uses(void) const;
   ReferenceRange references(void) const;
 
@@ -156,7 +156,6 @@ class Decl {
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;
   bool is_weak_imported(void) const;
-  std::vector<Decl> redeclarations_visible_in_translation_unit(void) const;
   DeclKind kind(void) const;
   DeclCategory category(void) const;
   Token token(void) const;

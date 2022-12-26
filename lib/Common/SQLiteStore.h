@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <multiplier/Types.h>
 #include <iostream>
 #include <optional>
 
@@ -54,12 +55,14 @@ class QueryResult {
       using arg_t = std::decay_t<decltype(arg)>;
       if constexpr (std::is_integral_v<arg_t>) {
         arg = static_cast<arg_t>(getInt64(idx));
-      } else if (std::is_same_v<std::string, arg_t>) {
+      } else if constexpr (std::is_same_v<std::string, arg_t>) {
         arg = getText(idx);
-      } else if (std::is_same_v<std::filesystem::path, arg_t>) {
+      } else if constexpr (std::is_same_v<std::filesystem::path, arg_t>) {
         arg = getText(idx);
-      } else if (std::is_same_v<std::string_view, arg_t>) {
+      } else if constexpr (std::is_same_v<std::string_view, arg_t>) {
         arg = getBlob(idx);
+      } else if constexpr (std::is_same_v<mx::EntityId, arg_t>) {
+        arg = mx::EntityId(static_cast<mx::RawEntityId>(getInt64(idx)));
       } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
         ;
       } else {
@@ -143,11 +146,17 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   void bind(const size_t i, const char *&value);
 
-  void bind(const size_t i, const std::filesystem::path &value);
-
   void bind(const size_t i, const std::string &value);
 
   void bind(const size_t i, const std::string_view &value);
+
+  inline void bind(const size_t i, const std::filesystem::path &value) {
+    bind(i, value.generic_string());
+  }
+
+  inline void bind(const size_t i, const mx::EntityId &value) {
+    bind(i, value.Pack());
+  }
 
   void reset();
 
@@ -181,6 +190,10 @@ class Statement : public std::enable_shared_from_this<Statement> {
   using Ptr = std::shared_ptr<Statement>;
 };
 
+// TODO(pag): Refactor this. A connection should contain a shared pointer for
+//            ease of copying, and then a connection should own the statements,
+//            but statements should wrap a shared pointer that aliases/extends
+//            the connection's lifetime. Destruction should close the database.
 class Connection {
  public:
 
@@ -188,6 +201,9 @@ class Connection {
   Connection(const std::filesystem::path &filename,
              bool readonly = false,
              const int busyTimeouts = 0);
+
+  Connection(Connection &&);
+  Connection &operator=(Connection &&) noexcept;
 
   // non-copyable
   Connection(const Connection &) = delete;
@@ -207,6 +223,9 @@ class Connection {
 
   // Commit transactions to the database
   void Commit(void);
+
+  // Abort the current transaction.
+  void Abort(void);
 
   // Execute a query and fetch the results
   QueryResult ExecuteAndGet(const std::string &query);
@@ -246,7 +265,7 @@ class Connection {
 
   std::unique_ptr<sqlite3, Deleter> db;
   std::string dbFilename;
-  std::vector<std::weak_ptr<Statement>> stmts;
+  std::vector<std::shared_ptr<Statement>> stmts;
 };
 
 class Transaction {

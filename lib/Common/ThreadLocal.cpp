@@ -23,12 +23,24 @@ class ThreadLocalBaseImpl {
  public:
   std::atomic<unsigned> next_worker_index;
   std::shared_mutex data_lock;
-  std::vector<std::unique_ptr<void>> data;
+  std::vector<void *> data;
+  std::function<void(void *)> deleter;
+
+  ThreadLocalBaseImpl(std::function<void(void *)> deleter_)
+      : deleter(std::move(deleter_)) {}
+
+  ~ThreadLocalBaseImpl(void) {
+    for (auto ptr : data) {
+      deleter(ptr);
+    }
+  }
 };
 
-ThreadLocalBase::ThreadLocalBase(std::function<void *(unsigned)> allocator_)
+ThreadLocalBase::ThreadLocalBase(std::function<void *(unsigned)> allocator_,
+                                 std::function<void(void *)> deleter_,
+                                 int)
     : allocator(std::move(allocator_)),
-      impl(std::make_shared<ThreadLocalBaseImpl>()) {
+      impl(std::make_shared<ThreadLocalBaseImpl>(std::move(deleter_))) {
   impl->data.reserve(gNextWorkerId.load() + 64u);
 }
 
@@ -39,11 +51,11 @@ void *ThreadLocalBase::GetOrInit(void) & {
     std::unique_lock<std::shared_mutex> locker(self.data_lock);
     tThreadId = gNextWorkerId.fetch_add(1u);
     self.data.resize(tThreadId);
-    self.data[tThreadId - 1u].reset(new_data);
+    self.data[tThreadId - 1u] = new_data;
     return new_data;
   } else {
     std::shared_lock<std::shared_mutex> locker(self.data_lock);
-    return self.data[tThreadId].get();
+    return self.data[tThreadId];
   }
 }
 

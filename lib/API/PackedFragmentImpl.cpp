@@ -181,34 +181,36 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(unsigned ti) const {
       //            token, or a file token.
       assert(false);
 
-      mx::ParsedTokenId fid = std::get<mx::ParsedTokenId>(vid);
-      if (fid.fragment_id == fragment->fragment_id) {
-        if (fid.offset < fragment->num_parsed_tokens) {
+      mx::ParsedTokenId tid = std::get<mx::ParsedTokenId>(vid);
+      FragmentId fid(tid.fragment_id);
+      if (tid.fragment_id == fragment->fragment_id) {
+        if (tid.offset < fragment->num_parsed_tokens) {
           // Follow to the next one.
-          ti = reader.getParsedTokenOffsetToIndex()[fid.offset];
+          ti = reader.getParsedTokenOffsetToIndex()[tid.offset];
         } else {
           assert(false);
           return kInvalidEntityId;
         }
 
       } else if (FragmentImpl::Ptr frag = fragment->ep->FragmentFor(
-          fragment->ep, fid.fragment_id)) {
+          fragment->ep, fid)) {
         assert(false);
-        return frag->ParsedTokenReader(frag)->NthFileTokenId(fid.offset);
+        return frag->ParsedTokenReader(frag)->NthFileTokenId(tid.offset);
       } else {
         assert(false);
         return kInvalidEntityId;
       }
 
     } else if (std::holds_alternative<mx::MacroTokenId>(vid)) {
-      mx::MacroTokenId fid = std::get<mx::MacroTokenId>(vid);
-      if (fid.fragment_id == fragment->fragment_id) {
-        ti = fid.offset;  // Follow to the next one.
+      mx::MacroTokenId tid = std::get<mx::MacroTokenId>(vid);
+      FragmentId fid(tid.fragment_id);
+      if (tid.fragment_id == fragment->fragment_id) {
+        ti = tid.offset;  // Follow to the next one.
 
       } else if (FragmentImpl::Ptr frag =
-          fragment->ep->FragmentFor(fragment->ep, fid.fragment_id)) {
+          fragment->ep->FragmentFor(fragment->ep, fid)) {
         assert(false);
-        return frag->MacroTokenReader(frag)->NthFileTokenId(fid.offset);
+        return frag->MacroTokenReader(frag)->NthFileTokenId(tid.offset);
       } else {
         assert(false);
         return kInvalidEntityId;

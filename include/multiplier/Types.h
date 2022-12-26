@@ -235,7 +235,7 @@ using VariantId = std::variant<InvalidId, FileId, FragmentId,
                                MacroId, DesignatorId>;
 
 // An opaque, compressed entity id.
-class EntityId {
+class EntityId final {
  protected:
   RawEntityId opaque{kInvalidEntityId};
 
@@ -305,50 +305,76 @@ class EntityId {
     return *this;
   }
 
+  // Unpack this entity ID into a concrete type.
+  VariantId Unpack(void) const noexcept;
+
   inline RawEntityId Pack(void) const noexcept {
     return opaque;
   }
 
-  inline operator RawEntityId(void) const noexcept {
-    return opaque;
-  }
-
-  inline bool operator==(RawEntityId that) const noexcept {
-    return opaque == that;
-  }
-
-  inline bool operator!=(RawEntityId that) const noexcept {
-    return opaque != that;
-  }
-
-  inline bool operator==(EntityId that) const noexcept {
+  inline bool operator==(const EntityId &that) const noexcept {
     return opaque == that.opaque;
   }
 
-  inline bool operator!=(EntityId that) const noexcept {
+  inline bool operator!=(const EntityId &that) const noexcept {
     return opaque != that.opaque;
   }
 
-  // Unpack this entity ID into a concrete type.
-  VariantId Unpack(void) const noexcept;
+  inline auto operator<=>(const EntityId &that) const noexcept
+      -> decltype(RawEntityId() <=> RawEntityId()) {
+    return opaque <=> that.opaque;
+  }
 };
 
+// This contains an opaque representation of an entity ID, with the requirement
+// that it always contains that particular kind of entity.
 template <typename T>
-class SpecificEntityId final : protected EntityId {
+class SpecificEntityId final {
+ private:
+  RawEntityId opaque;
+
+  SpecificEntityId(void) = delete;
+
  public:
-  SpecificEntityId(void) = default;
 
-  inline SpecificEntityId(T id_)
-      : EntityId(id_) {}
+  inline SpecificEntityId(const T &id_)
+      : opaque(EntityId(id_).Pack()) {}
 
-  T Unpack(void) const noexcept {
-    return std::get<T>(this->EntityId::Unpack());
+  inline SpecificEntityId<T> &operator=(const T &id) {
+    opaque = EntityId(id).Pack();
+    return *this;
   }
 
-  using EntityId::Pack;
-  using EntityId::operator RawEntityId;
+  inline SpecificEntityId<T> &operator=(const SpecificEntityId<T> &that) {
+    opaque = that.opaque;
+    return *this;
+  }
 
-  inline auto operator<=>(SpecificEntityId<T> that) const noexcept
+  T Unpack(void) const noexcept {
+    return std::get<T>(EntityId(opaque).Unpack());
+  }
+
+  inline RawEntityId Pack(void) const noexcept {
+    return opaque;
+  }
+
+  inline bool operator==(const EntityId &that) const noexcept {
+    return opaque == that.Pack();
+  }
+
+  inline bool operator!=(const EntityId &that) const noexcept {
+    return opaque != that.Pack();
+  }
+
+  inline bool operator==(const SpecificEntityId<T> &that) const noexcept {
+    return opaque == that.opaque;
+  }
+
+  inline bool operator!=(const SpecificEntityId<T> &that) const noexcept {
+    return opaque != that.opaque;
+  }
+
+  inline auto operator<=>(const SpecificEntityId<T> &that) const noexcept
       -> decltype(RawEntityId() <=> RawEntityId()) {
     return opaque <=> that.opaque;
   }

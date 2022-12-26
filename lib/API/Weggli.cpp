@@ -17,7 +17,7 @@ WeggliQueryResultImpl::~WeggliQueryResultImpl(void) noexcept {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(
     const WeggliQuery &query_, EntityProvider::Ptr ep_,
-    std::vector<RawEntityId> fragment_ids)
+    FragmentIdList fragment_ids)
     : query(query_),
       ep(std::move(ep_)),
       fragments(std::move(fragment_ids)) {}
@@ -27,7 +27,8 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
     : query(query_),
       ep(frag_->ep) {
 
-  fragments.push_back(frag_->fragment_id);
+  FragmentId fid(frag_->fragment_id);
+  fragments.push_back(fid);
   (void) InitForFragment(std::move(frag_));
 }
 

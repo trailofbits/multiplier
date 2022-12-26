@@ -44,7 +44,7 @@ class TokenTreeNode;
 class TokenTreeNodeRange;
 
 // Dispatch to the right macro serializer.
-extern void DispatchSerializeMacro(EntityMapper &em,
+extern void DispatchSerializeMacro(const EntityMapper &em,
                                    mx::ast::Macro::Builder builder,
                                    const pasta::Macro &entity,
                                    const TokenTree *tt);
@@ -57,7 +57,7 @@ extern void BuildPendingFragment(
     TypeIdMap &type_ids, const pasta::TokenRange &tokens);
 
 // Label the parent entity ids.
-extern void LabelParentsInPendingFragment(const PendingFragment &pf,
+extern void LabelParentsInPendingFragment(PendingFragment &pf,
                                           EntityMapper &em);
 
 // Store information persistently to enable linking of declarations across
@@ -71,6 +71,12 @@ extern void LinkEntitiesAcrossFragments(
 extern void LinkExternalUsesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
     mx::rpc::Fragment::Builder &b);
+
+// Identify all unique entity IDs referenced by this fragment,
+// and map them to the fragment ID in the data store.
+extern void LinkExternalReferencesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityMapper &em);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
 extern void SerializePendingFragment(const PendingFragment &pf,
@@ -596,7 +602,7 @@ static void PersistTokenTree(
 
       mx::MacroTokenId mtid = std::get<mx::MacroTokenId>(vid);
 
-      if (mtid.fragment_id == pf.fragment_id) {
+      if (mtid.fragment_id == pf.fragment_index) {
 
         // This macro token hasn't yet been related to any single parsed
         // token, so relate it to the first one.
@@ -648,17 +654,17 @@ static void PersistTokenTree(
 //            to go canonical->specific in the first place, and why a failure to
 //            do so results in `kInvalidEntityId` instead of just falling back
 //            on the ID of the canonical decl.
-static uint64_t IdOfRedeclInFragment(EntityMapper &em, mx::RawEntityId frag_id,
-                                     pasta::Decl canon_decl) {
+static mx::RawEntityId IdOfRedeclInFragment(
+    const EntityMapper &em, mx::RawEntityId frag_index, pasta::Decl canon_decl) {
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
-    mx::EntityId eid = em.EntityId(redecl);
+    mx::RawEntityId eid = em.EntityId(redecl);
     if (eid == mx::kInvalidEntityId) {
       continue;
     }
-    mx::VariantId vid = eid.Unpack();
+    mx::VariantId vid = mx::EntityId(eid).Unpack();
     CHECK(std::holds_alternative<mx::DeclarationId>(vid));
     mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
-    if (id.fragment_id == frag_id) {
+    if (id.fragment_id == frag_index) {
       return eid;
     }
   }
@@ -686,7 +692,7 @@ static uint64_t IdOfRedeclInFragment(EntityMapper &em, mx::RawEntityId frag_id,
 // down the lists, and so that takes some special handling.
 static void PersistTokenContexts(
     EntityMapper &em, const std::vector<pasta::Token> &parsed_tokens,
-    mx::RawEntityId frag_id, mx::rpc::Fragment::Builder &fb) {
+    mx::RawEntityId frag_index, mx::rpc::Fragment::Builder &fb) {
 
   using DeclContextSet = std::unordered_set<pasta::TokenContext>;
   std::map<mx::RawEntityId, DeclContextSet> contexts;
@@ -707,7 +713,7 @@ static void PersistTokenContexts(
       // NOTE(pag): PASTA stored the canonical decl in the decl context, so
       //            it's not likely to be in the current fragment.
       if (auto decl = pasta::Decl::From(c)) {
-        const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_id, *decl);
+        const mx::RawEntityId eid = IdOfRedeclInFragment(em, frag_index, *decl);
         if (eid != mx::kInvalidEntityId) {
           contexts[eid].insert(context.value());
         }
@@ -733,9 +739,9 @@ static void PersistTokenContexts(
       } else if (auto designator = pasta::Designator::From(c)) {
         const uint32_t offset = em.PseudoId(*designator);
         mx::DesignatorId did;
-        did.fragment_id = frag_id;
+        did.fragment_id = frag_index;
         did.offset = offset;
-        const mx::RawEntityId eid = mx::EntityId(did);
+        const mx::RawEntityId eid = mx::EntityId(did).Pack();
         if (eid != mx::kInvalidEntityId) {
           contexts[eid].insert(context.value());
         }
@@ -911,13 +917,20 @@ void GlobalIndexingState::PersistFragment(
       tokens, begin_index, end_index);
 
   fb.setId(pf.fragment_id.Pack());
-  fb.setFirstFileTokenId(pf.first_file_token_id.Pack());
-  fb.setLastFileTokenId(pf.last_file_token_id.Pack());
+  if (pf.file_location) {
+    fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
+    fb.setLastFileTokenId(pf.file_location->last_file_token_id.Pack());
+    database.AddAsync(
+        mx::FragmentLineCoverageRecord{
+            pf.fragment_id, pf.file_location->file_id,
+            pf.file_location->first_line_number,
+            pf.file_location->last_line_number});
+  }
 
   // Generate source IR before saving the fragments to the persistent
   // storage.
   fb.setMlir(codegen.GenerateSourceIRFromTLDs(
-      fragment_id, em, pf.top_level_decls,
+      fragment_id.Pack(), em, pf.top_level_decls,
       pf.num_top_level_declarations));
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
@@ -957,16 +970,14 @@ void GlobalIndexingState::PersistFragment(
     PersistParsedTokens(pf, em, fb, parsed_tokens);
   }
 
-  PersistTokenContexts(em, parsed_tokens, fragment_id, fb);
+  PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalUsesInFragment(database, pf, fb);
   LinkEntityNamesToFragment(database, pf, em);
 
   database.AddAsync(
-      mx::FragmentLineCoverageRecord{
-          pf.fragment_id, pf.file_id, pf.first_line_number, pf.last_line_number},
       mx::SerializedFragmentRecord{
-          pf.fragment_id, pf.file_id, CompressedMessage("fragment", message)});
+          pf.fragment_id, CompressedMessage("fragment", message)});
 
 }
 

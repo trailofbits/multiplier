@@ -78,7 +78,7 @@ class Stmt {
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> referenced_declaration(void) const;
-  EntityId id(void) const;
+  SpecificEntityId<StatementId> id(void) const;
   UseRange<StmtUseSelector> uses(void) const;
 
  protected:

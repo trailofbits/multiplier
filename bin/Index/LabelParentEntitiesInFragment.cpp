@@ -121,8 +121,8 @@ class ParentTrackerVisitor : public EntityVisitor {
 // Maps the child-to-parent relationships in the fragment, storing the
 // relationships in `parent_decls` and `parent_stmts`.
 void LabelParentsInPendingFragment(
-    const PendingFragment &pf, EntityMapper &em) {
-  ParentTrackerVisitor vis(em, *this);
+    PendingFragment &pf, EntityMapper &em) {
+  ParentTrackerVisitor vis(em, pf);
   for (const pasta::Decl &decl : pf.decls_to_serialize) {
     vis.not_yet_seen.emplace(decl.RawDecl());
   }

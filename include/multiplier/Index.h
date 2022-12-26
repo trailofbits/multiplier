@@ -16,6 +16,7 @@
 #include "Use.h"
 #include "Fragment.h"
 #include "Query.h"
+#include "Entities/DefineMacroDirective.h"
 #include "Entities/Macro.h"
 #include "Entities/NamedDecl.h"
 
@@ -60,7 +61,8 @@ using FilePathMap = std::map<std::filesystem::path, SpecificEntityId<FileId>>;
 using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
 using DeclarationIdList = std::vector<SpecificEntityId<DeclarationId>>;
 
-using NamedDeclList = std::vector<NamedDecl>;
+using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
+using NamedEntityList = std::vector<NamedEntity>;
 
 template <typename T>
 inline ParentDeclIteratorImpl<T> &
@@ -150,6 +152,26 @@ class EntityProvider {
   virtual FragmentIdList ListFragmentsInFile(
       const Ptr &, SpecificEntityId<FileId> id) = 0;
 
+  std::shared_ptr<const FileImpl> FileFor(const Ptr &self, RawEntityId id) {
+    VariantId vid = EntityId(id).Unpack();
+    if (std::holds_alternative<FileId>(vid)) {
+      return FileFor(self, SpecificEntityId<FileId>(std::get<FileId>(vid)));
+    } else {
+      return {};
+    }
+  }
+
+  std::shared_ptr<const FragmentImpl> FragmentFor(
+      const Ptr &self, RawEntityId id) {
+    VariantId vid = EntityId(id).Unpack();
+    if (std::holds_alternative<FragmentId>(vid)) {
+      return FragmentFor(
+          self, SpecificEntityId<FragmentId>(std::get<FragmentId>(vid)));
+    } else {
+      return {};
+    }
+  }
+
   // Download a file by its unique ID.
   //
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
@@ -176,24 +198,45 @@ class EntityProvider {
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for uses.
+  //
+  // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
+  //            with `eid` if `eid` resides in a fragment.
   virtual void FillUses(const Ptr &, RawEntityId eid,
                         DeclarationIdList &redecl_ids_out,
                         FragmentIdList &fragment_ids_out) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for references.
+  //
+  // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
+  //            with `eid` if `eid` resides in a fragment.
   virtual void FillReferences(const Ptr &, RawEntityId eid,
                               DeclarationIdList &redecl_ids_out,
                               FragmentIdList &fragment_ids_out) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
-                          mx::DeclCategory category,
                           std::vector<RawEntityId> &ids_out) = 0;
 };
 
 using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
                                    Token, Designator, Fragment, File>;
+
+enum class IndexStatus : unsigned {
+  UNINITIALIZED,
+  INDEXING_IN_PROGRESS,
+  INDEXED
+};
+
+inline static const char *EnumerationName(IndexStatus) {
+  return "IndexStatus";
+}
+
+inline constexpr unsigned NumEnumerators(IndexStatus) {
+  return 3u;
+}
+
+const char *EnumeratorName(IndexStatus);
 
 // Access to the indexed code.
 class Index {
@@ -213,12 +256,8 @@ class Index {
   static Index containing(const Fragment &fragment);
   static Index containing(const File &file);
 
-  // Return the version number of the index. A version number of `0` is
-  // invalid, a version number of `1` means we've connected to a fresh/empty
-  // indexer with nothing indexed, a version number `2 * n` for `n >= 1` means
-  // that indexing is underway, and a version number of `(2 * n) + 1` for
-  // `n >= 1` means that indexing is done.
-  unsigned version_number(bool block=false) const;
+  // Return the status of the index.
+  IndexStatus status(bool block=false) const;
 
   // Clear any internal caches.
   void clear_caches(void) const;
@@ -268,8 +307,7 @@ class Index {
   RegexQueryResult query_fragments(const RegexQuery &query) const;
 
   // Search for entities by their name and category.
-  NamedDeclList query_entities(std::string name,
-                               mx::DeclCategory category) const;
+  NamedEntityList query_entities(std::string name) const;
 };
 
 }  // namespace mx

@@ -31,8 +31,6 @@
 
 namespace mx {
 
-// NOTE(pag): Keep in sync with `../bin/Index/LinkRerencesInFragment.cpp`
-//            version of the same function.
 bool MayHaveRemoteRedeclarations(const mx::Decl &decl) {
   switch (decl.kind()) {
     // Functions.
@@ -80,8 +78,6 @@ bool MayHaveRemoteRedeclarations(const mx::Decl &decl) {
   }
 }
 
-// NOTE(pag): Keep in sync with `../bin/Index/LinkRerencesInFragment.cpp`
-//            version of the same function.
 bool MayHaveRemoteUses(const mx::Decl &decl) {
   switch (decl.kind()) {
     // Functions.
@@ -187,7 +183,7 @@ Macro MacroIterator::operator*(void) const & noexcept {
   return Macro(impl, index);
 }
 
-EntityId Decl::id(void) const {
+SpecificEntityId<DeclarationId> Decl::id(void) const {
   DeclarationId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.is_definition = is_definition();
@@ -206,20 +202,11 @@ std::optional<Decl> Decl::definition(void) const {
 }
 
 std::vector<Decl> Decl::redeclarations(void) const {
-  if (!MayHaveRemoteRedeclarations(*this)) {
-    return redeclarations_visible_in_translation_unit();
-  }
-
-  auto redecl_ids = fragment->ep->Redeclarations(fragment->ep, id());
-  if (redecl_ids.empty()) {
-    return redeclarations_visible_in_translation_unit();
-  }
-
   std::vector<Decl> redecls;
-  redecls.reserve(redecl_ids.size());
-
-  for (mx::RawEntityId eid : redecl_ids) {
-    if (auto redecl = fragment->DeclFor(fragment, eid)) {
+  for (SpecificEntityId<DeclarationId> eid :
+           fragment->ep->Redeclarations(fragment->ep, id())) {
+    if (std::optional<Decl> redecl =
+            fragment->DeclFor(fragment, eid.Pack())) {
       redecls.emplace_back(std::move(redecl.value()));
     }
   }
@@ -239,7 +226,7 @@ DeclIterator Decl::in_internal(const Fragment &fragment) {
   return DeclIterator(fragment.impl, 0u, fragment.impl->num_decls);
 }
 
-EntityId Stmt::id(void) const {
+SpecificEntityId<StatementId> Stmt::id(void) const {
   StatementId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.kind = kind();
@@ -255,7 +242,7 @@ UseRange<StmtUseSelector> Stmt::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
-EntityId Type::id(void) const {
+SpecificEntityId<TypeId> Type::id(void) const {
   TypeId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.kind = kind();
@@ -271,7 +258,7 @@ UseRange<TypeUseSelector> Type::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
-EntityId Attr::id(void) const {
+SpecificEntityId<AttributeId> Attr::id(void) const {
   AttributeId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.kind = kind();
@@ -287,7 +274,7 @@ UseRange<AttrUseSelector> Attr::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
-EntityId Macro::id(void) const {
+SpecificEntityId<MacroId> Macro::id(void) const {
   MacroId eid;
   eid.fragment_id = fragment->fragment_id;
   eid.kind = kind();
