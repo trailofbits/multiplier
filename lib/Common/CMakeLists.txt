@@ -91,8 +91,8 @@ add_dependencies("mx-common"
 target_link_libraries("mx-common"
   PUBLIC
     "CapnProto::capnp-rpc"
-    SQLite::SQLite3
   PRIVATE
+    $<BUILD_INTERFACE:SQLite::SQLite3>
     $<BUILD_INTERFACE:concurrentqueue>
     "ZLIB::ZLIB"
 )

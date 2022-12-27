@@ -50,7 +50,7 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
 
   int ret = sqlite3_open_v2(
       db_path.generic_string().c_str(), &db,
-      ro_flag | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_WAL,
+      ro_flag | SQLITE_OPEN_NOMUTEX,
       nullptr);
 
 #ifndef NDEBUG

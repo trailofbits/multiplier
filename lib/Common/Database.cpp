@@ -72,11 +72,11 @@ class WriterThreadState {
         get_fragment_id(db.Prepare(
             "SELECT fragment_id FROM fragment_hash WHERE hash = ?1")) {
 
-    db.SetBusyHandler([] (unsigned num_times) -> int {
-      num_times %= 16;
-      std::this_thread::sleep_for(std::chrono::milliseconds(num_times + 1));
-      return 1;
-    });
+//    db.SetBusyHandler([] (unsigned num_times) -> int {
+//      num_times %= 16;
+//      std::this_thread::sleep_for(std::chrono::milliseconds(num_times + 1));
+//      return 1;
+//    });
   }
 
   RawEntityId GetOrCreateFileId(RawEntityId id, const std::string &hash) {
@@ -257,7 +257,7 @@ void DatabaseWriterImpl::BulkInserter(void) {
     insertion_queue.wait_dequeue(item);
 
     saved_entries.clear();
-//    sqlite::ConcurrentTransaction transaction(async.db);
+    sqlite::ConcurrentTransaction transaction(async.db);
 
     do {
       std::visit(
@@ -348,9 +348,9 @@ DatabaseWriterImpl::DatabaseWriterImpl(
 
   InitMetadata();
   InitRecords();
-//  bulk_insertion_thread = std::thread([this] (void) {
-//    this->BulkInserter();
-//  });
+  bulk_insertion_thread = std::thread([this] (void) {
+    this->BulkInserter();
+  });
 }
 
 bool BulkInserterState::InsertAsync(

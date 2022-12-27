@@ -12,7 +12,7 @@
 
 #include "Types.h"
 
-#define MX_SQLITE_HAS_FTS5 0
+#define MX_SQLITE_HAS_FTS5 1
 
 namespace mx {
 class DatabaseWriterImpl;

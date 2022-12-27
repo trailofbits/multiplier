@@ -45,6 +45,8 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
+DownloadSQLite3()
+
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
 find_package(CapnProto CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -53,7 +55,6 @@ find_package(glog CONFIG REQUIRED)
 find_package(Z3 CONFIG REQUIRED)
 find_package(LLVM CONFIG REQUIRED)
 find_package(Clang CONFIG REQUIRED)
-find_package(SQLite3 3.35 REQUIRED)
 
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)
