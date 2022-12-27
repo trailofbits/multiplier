@@ -61,14 +61,14 @@ class WriterThreadState {
   WriterThreadState(const std::filesystem::path &path)
       : db(path),
         set_file_id(db.Prepare(
-            R"(INSERT INTO file_hash (file_id, hash) VALUES (?1, ?2)
-               ON CONFLICT DO UPDATE SET file_id=file_id
-               RETURNING file_id, hash)")),
+            R"(INSERT INTO file_hash (file_index, hash) VALUES (?1, ?2)
+               ON CONFLICT DO NOTHING
+               RETURNING file_index, hash)")),
         set_fragment_id(db.Prepare(
-            R"(INSERT INTO fragment_hash (fragment_id, file_token_id, hash)
+            R"(INSERT INTO fragment_hash (fragment_index, file_token_id, hash)
                VALUES (?1, ?2, ?3)
-               ON CONFLICT DO UPDATE SET fragment_id=fragment_id
-               RETURNING fragment_id, file_token_id, hash)")) {
+               ON CONFLICT DO NOTHING
+               RETURNING fragment_index, file_token_id, hash)")) {
 
 //    db.SetBusyHandler([] (unsigned num_times) -> int {
 //      num_times %= 16;
@@ -340,9 +340,9 @@ DatabaseWriterImpl::DatabaseWriterImpl(
 
   InitMetadata();
   InitRecords();
-  bulk_insertion_thread = std::thread([this] (void) {
-    this->BulkInserter();
-  });
+//  bulk_insertion_thread = std::thread([this] (void) {
+//    this->BulkInserter();
+//  });
 }
 
 bool BulkInserterState::InsertAsync(
@@ -434,25 +434,25 @@ SpecificEntityId<FileId> DatabaseWriter::GetOrCreateFileIdForHash(
   }
 
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_id = kInvalidEntityId;
+  RawEntityId proposed_index = kInvalidEntityId;
 
   // Try to reuse a previously generated but unused file id.
   if (!writer->available_file_index) {
-    proposed_id = impl->next_file_index.fetch_add(1u);
+    proposed_index = impl->next_file_index.fetch_add(1u);
   } else {
-    proposed_id = writer->available_file_index.value();
+    proposed_index = writer->available_file_index.value();
     writer->available_file_index.reset();
   }
 
-  RawEntityId found_id = writer->GetOrCreateFileId(proposed_id, hash);
-  is_new = found_id == proposed_id;
+  RawEntityId found_index = writer->GetOrCreateFileId(proposed_index, hash);
+  is_new = found_index == proposed_index;
   if (!is_new) {
-    writer->available_file_index.emplace(proposed_id);
+    writer->available_file_index.emplace(proposed_index);
   }
 
-  assert(found_id != kInvalidEntityId);
+  assert(found_index != kInvalidEntityId);
 
-  FileId ret(found_id);
+  FileId ret(found_index);
   hash_cache.emplace(std::move(hash), ret);
   return ret;
 }
@@ -463,26 +463,26 @@ DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
     RawEntityId tok_id, std::string hash, bool &is_new) {
 
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_id = kInvalidEntityId;
+  RawEntityId proposed_index = kInvalidEntityId;
 
   // Try to reuse a previously generated but unused fragment id.
   if (!writer->available_small_fragment_index) {
-    proposed_id = impl->next_small_fragment_index.fetch_add(1u);
+    proposed_index = impl->next_small_fragment_index.fetch_add(1u);
   } else {
-    proposed_id = writer->available_small_fragment_index.value();
+    proposed_index = writer->available_small_fragment_index.value();
     writer->available_small_fragment_index.reset();
   }
 
-  RawEntityId found_id = writer->GetOrCreateFragmentId(
-      proposed_id, tok_id, std::move(hash));
-  is_new = found_id == proposed_id;
+  RawEntityId found_index = writer->GetOrCreateFragmentId(
+      proposed_index, tok_id, std::move(hash));
+  is_new = found_index == proposed_index;
   if (!is_new) {
-    writer->available_small_fragment_index.emplace(proposed_id);
+    writer->available_small_fragment_index.emplace(proposed_index);
   }
 
-  assert(found_id != kInvalidEntityId);
+  assert(found_index != kInvalidEntityId);
 
-  return FragmentId(found_id);
+  return FragmentId(found_index);
 }
 
 // Get, or create and return, a fragment ID for the specific fragment hash.
@@ -491,26 +491,26 @@ DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
     RawEntityId tok_id, std::string hash, bool &is_new) {
 
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
-  RawEntityId proposed_id = kInvalidEntityId;
+  RawEntityId proposed_index = kInvalidEntityId;
 
   // Try to reuse a previously generated but unused fragment id.
   if (!writer->available_big_fragment_index) {
-    proposed_id = impl->next_big_fragment_index.fetch_add(1u);
+    proposed_index = impl->next_big_fragment_index.fetch_add(1u);
   } else {
-    proposed_id = writer->available_big_fragment_index.value();
+    proposed_index = writer->available_big_fragment_index.value();
     writer->available_big_fragment_index.reset();
   }
 
-  RawEntityId found_id = writer->GetOrCreateFragmentId(
-      proposed_id, tok_id, std::move(hash));
-  is_new = found_id == proposed_id;
+  RawEntityId found_index = writer->GetOrCreateFragmentId(
+      proposed_index, tok_id, std::move(hash));
+  is_new = found_index == proposed_index;
   if (!is_new) {
-    writer->available_big_fragment_index.emplace(proposed_id);
+    writer->available_big_fragment_index.emplace(proposed_index);
   }
 
-  assert(found_id != kInvalidEntityId);
+  assert(found_index != kInvalidEntityId);
 
-  return FragmentId(found_id);
+  return FragmentId(found_index);
 }
 
 void DatabaseWriterImpl::InitRecords(void) {

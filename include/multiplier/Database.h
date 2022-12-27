@@ -285,13 +285,13 @@ class DatabaseWriter final {
       R"(CREATE INDEX IF NOT EXISTS version_action ON version(action))",
 
       R"(CREATE TABLE IF NOT EXISTS file_hash (
-           file_id INT NOT NULL,
+           file_index INT NOT NULL,
            hash BLOB NOT NULL,
            PRIMARY KEY(hash)
          ) WITHOUT rowid)",
 
       R"(CREATE TABLE IF NOT EXISTS fragment_hash (
-           fragment_id INT NOT NULL,
+           fragment_index INT NOT NULL,
            file_token_id INT NOT NULL,
            hash BLOB NOT NULL,
            PRIMARY KEY(file_token_id, hash)
