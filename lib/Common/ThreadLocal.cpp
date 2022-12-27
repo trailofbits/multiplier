@@ -7,14 +7,19 @@
 #include "ThreadLocal.h"
 
 #include <atomic>
+#include <mutex>
 #include <shared_mutex>
+#include <thread>
 #include <vector>
+
+#include <iostream>
 
 namespace mx {
 namespace {
 
 static thread_local unsigned tThreadId = 0u;
-
+static thread_local void *tInstance = nullptr;
+static thread_local void *tThreadData = nullptr;
 static std::atomic<unsigned> gNextWorkerId(1u);
 
 }  // namespace
@@ -27,7 +32,8 @@ class ThreadLocalBaseImpl {
   std::function<void(void *)> deleter;
 
   ThreadLocalBaseImpl(std::function<void(void *)> deleter_)
-      : deleter(std::move(deleter_)) {}
+      : next_worker_index(0u),
+        deleter(std::move(deleter_)) {}
 
   ~ThreadLocalBaseImpl(void) {
     for (auto ptr : data) {
@@ -45,18 +51,28 @@ ThreadLocalBase::ThreadLocalBase(std::function<void *(unsigned)> allocator_,
 }
 
 void *ThreadLocalBase::GetOrInit(void) & {
+  if (tInstance == this) {
+    return tThreadData;
+  }
+
   ThreadLocalBaseImpl &self = *impl;
   if (!tThreadId) {
-    void *new_data = allocator(self.next_worker_index.fetch_add(1u));
-    std::unique_lock<std::shared_mutex> locker(self.data_lock);
+    tThreadData = allocator(self.next_worker_index.fetch_add(1u));
+
+    std::lock_guard<std::shared_mutex> locker(self.data_lock);
     tThreadId = gNextWorkerId.fetch_add(1u);
+    assert(tThreadId != 0u);
+    assert(tThreadId > self.data.size());
     self.data.resize(tThreadId);
-    self.data[tThreadId - 1u] = new_data;
-    return new_data;
+    self.data[tThreadId - 1u] = tThreadData;
+
   } else {
     std::shared_lock<std::shared_mutex> locker(self.data_lock);
-    return self.data[tThreadId - 1u];
+    tThreadData = self.data[tThreadId - 1u];
   }
+
+  tInstance = this;
+  return tThreadData;
 }
 
 }  // namespace mx

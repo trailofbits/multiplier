@@ -6,16 +6,16 @@
 
 #pragma once
 
+#include <chrono>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
-#include <string.h>
-#include <map>
-#include <queue>
-#include <vector>
-#include <string>
+#include <functional>
 #include <memory>
 #include <multiplier/Types.h>
-#include <iostream>
 #include <optional>
+#include <string>
 
 extern "C" {
 struct sqlite3;
@@ -26,29 +26,39 @@ struct sqlite3_value;
 namespace sqlite {
 
 class Connection;
+class ConnectionImpl;
 class Statement;
 
 class Error : public std::runtime_error {
  public:
-  Error(const std::string &msg) : runtime_error("[SQLite Error] " + msg) {}
+  Error(const std::string &msg) : std::runtime_error("[SQLite Error] " + msg) {}
   Error(const std::string &msg, sqlite3 *db);
 };
 
 class QueryResult {
+ private:
+  friend class Statement;
+
+  std::shared_ptr<sqlite3_stmt> impl;
+
+  inline QueryResult(std::shared_ptr<sqlite3_stmt> impl_)
+      : impl(std::move(impl_)) {}
+
+  int64_t getInt64(int32_t idx);
+  std::string getText(int32_t idx);
+  std::string_view getBlob(int32_t idx);
+
  public:
-  ~QueryResult() = default;
-
-  std::vector<std::string> GetColumnNames(void);
-
   uint32_t NumColumns(void);
 
-  bool Columns(std::vector<std::string> &row);
-
+  // Typed.
   template <typename... Ts>
   void Columns(Ts &&...args) {
+#ifndef NDEBUG
     if (static_cast<int>(sizeof...(args)) > NumColumns()) {
       throw Error("Failed to read columns; no of arguments are less than column size");
     }
+#endif
 
     int idx = 0;
     auto column_dispatcher = [this, &idx] (auto &&arg) {
@@ -63,7 +73,8 @@ class QueryResult {
         arg = getBlob(idx);
       } else if constexpr (std::is_same_v<mx::EntityId, arg_t>) {
         arg = mx::EntityId(static_cast<mx::RawEntityId>(getInt64(idx)));
-      } else if constexpr (std::is_same_v<std::nullopt_t, arg_t>) {
+      } else if constexpr (std::is_same_v<std::nullopt_t, arg_t> ||
+                           std::is_same_v<std::nullptr_t, arg_t>) {
         ;
       } else {
         throw Error("Can't read column data; Type not supported!");
@@ -73,46 +84,33 @@ class QueryResult {
 
     (column_dispatcher(std::forward<Ts>(args)), ...);
   }
-
- private:
-  friend class Statement;
-  friend class Connection;
-
-  QueryResult(Connection &conn, const std::string &query);
-
-  QueryResult(std::shared_ptr<Statement> stmt_);
-
-  int64_t getInt64(int32_t idx);
-
-  std::string getText(int32_t idx);
-  std::string_view getBlob(int32_t idx);
-
-  std::shared_ptr<Statement> stmt;
 };
 
-class Statement : public std::enable_shared_from_this<Statement> {
+class Statement {
+ private:
+  friend class Connection;
+
+  std::shared_ptr<sqlite3_stmt> impl;
+
+  inline Statement(std::shared_ptr<sqlite3_stmt> impl_)
+      : impl(std::move(impl_)) {}
+
  public:
-
-  // Compile and register a sqlite query with the database connection
-  Statement(Connection &conn, const std::string &stmt);
-
-  // non-copyable
-  Statement(const Statement &) = delete;
-  Statement &operator=(const Statement &) = delete;
-
-  ~Statement();
 
   // Bind values with a sqlite statement. It does not
   // support binding to a blob yet
   template<typename... Args>
   void BindValues(Args... args) {
-    if (sizeof...(Args) > num_params) {
-      std::string msg = "Too many arguments to bind() " + std::to_string(num_params) +
+#ifndef NDEBUG
+    if (auto num_params = NumParams(); sizeof...(Args) > num_params) {
+      std::string msg =
+          "Too many arguments to bind() " + std::to_string(num_params) +
           " expected " + std::to_string(sizeof...(Args)) + " specified";
       throw Error(msg);
     }
+#endif
     size_t i = 0;
-    reset();
+    Reset();
     bind_many(i, args...);
   }
 
@@ -120,16 +118,16 @@ class Statement : public std::enable_shared_from_this<Statement> {
 
   bool ExecuteStep(void);
 
-  QueryResult GetResult(void);
+  QueryResult Row(void);
 
-  void Close() noexcept;
-
-  void Reset();
+  void Reset(void);
 
  private:
   friend class QueryResult;
 
-  int tryExecuteStep(void);
+  size_t NumParams(void) const noexcept;
+
+  int TryExecuteStep(void);
 
   // Binding functions for the statements
   void bind(const size_t i, const int32_t &value);
@@ -158,8 +156,6 @@ class Statement : public std::enable_shared_from_this<Statement> {
     bind(i, value.Pack());
   }
 
-  void reset();
-
   template<typename T>
   void bind_many(size_t i, T &value) {
     bind(i, value);
@@ -172,22 +168,14 @@ class Statement : public std::enable_shared_from_this<Statement> {
     bind_many(i, args...);
   }
 
-  sqlite3_stmt *prepareStatement(void);
-
-  // Database connection instance
-  Connection &db;
-
-  // prepared statement cached
-  //
-  // TODO(pag): Replace with a `unique_ptr`, or just a raw pointer and we'll
-  //            call the appropriate API to destroy it later.
-  std::shared_ptr<sqlite3_stmt> prepared_stmt;
-
-  std::string query;
-  unsigned num_params;
-
  public:
   using Ptr = std::shared_ptr<Statement>;
+};
+
+enum class TransactionKind {
+  kNormal,
+  kExclusive,
+  kConcurrent
 };
 
 // TODO(pag): Refactor this. A connection should contain a shared pointer for
@@ -195,31 +183,31 @@ class Statement : public std::enable_shared_from_this<Statement> {
 //            but statements should wrap a shared pointer that aliases/extends
 //            the connection's lifetime. Destruction should close the database.
 class Connection {
+ private:
+  std::shared_ptr<ConnectionImpl> impl;
+
+  Connection(void) = delete;
+
  public:
 
   // Uses sqlite3_open to open the database at the specified path
-  Connection(const std::filesystem::path &filename,
-             bool readonly = false,
-             const int busyTimeouts = 0);
+  explicit Connection(const std::filesystem::path &db_path,
+                      bool read_only = false);
 
-  Connection(Connection &&);
-  Connection &operator=(Connection &&) noexcept;
+  Connection(const Connection &) = default;
+  Connection &operator=(const Connection &) = default;
 
-  // non-copyable
-  Connection(const Connection &) = delete;
-  Connection &operator=(const Connection &) = delete;
-
-  // Close the database connection and cleanup all cached statements
-  ~Connection(void) = default;
+  Connection(Connection &&) = default;
+  Connection &operator=(Connection &&) noexcept = default;
 
   // Execute statements without results
   void Execute(const std::string &query);
 
   // Get prepared statements before executing to database
-  std::shared_ptr<Statement> Prepare(const std::string &stmt);
+  Statement Prepare(const std::string &stmt);
 
   // Begin transactions to the database
-  void Begin(bool exclusive = false);
+  void Begin(TransactionKind);
 
   // Commit transactions to the database
   void Commit(void);
@@ -227,11 +215,20 @@ class Connection {
   // Abort the current transaction.
   void Abort(void);
 
-  // Execute a query and fetch the results
-  QueryResult ExecuteAndGet(const std::string &query);
+  // Optimize the database.
+  void Optimize(void);
+
+  // Return the raw SQLite handle.
+  std::shared_ptr<sqlite3> Handle(void);
+
+  // Set a busy handler when the table is locked. If `func` returns `0` then
+  // SQLite will only call it once. If `func` returns non-zero then SQLite can
+  // call it an arbitrary number of times. The argument to `func` is the number
+  // of times this function has already been called for a given locking event.
+  void SetBusyHandler(std::function<int(unsigned)> func);
 
    // Set a busy timeout when the table is locked.
-  void SetBusyTimeout(const int timeouts);
+  void SetBusyTimeout(std::chrono::milliseconds ms);
 
   // Attach custom function to your sqlite database
   void CreateFunction(std::string func_name, unsigned n_args, unsigned flags,
@@ -243,29 +240,8 @@ class Connection {
   // Delete custom function from the sqlite database
   void DeleteFunction(std::string func_name, unsigned n_args, unsigned flags);
 
-   // Get the filename used to open the database
-  std::string GetFilename(void) const {
-      return dbFilename;
-  }
-
-  // close database connection
-  void Close(void) noexcept;
-
-  struct Deleter {
-    void operator()(sqlite3 *db);
-  };
-
- private:
-  friend class Statement;
-
-   // Get the raw pointer to SQLite connection handler
-  sqlite3 *GetHandler(void) const {
-    return db.get();
-  }
-
-  std::unique_ptr<sqlite3, Deleter> db;
-  std::string dbFilename;
-  std::vector<std::shared_ptr<Statement>> stmts;
+  // Get the filename used to open the database
+  std::filesystem::path GetFilename(void) const;
 };
 
 class Transaction {
@@ -276,7 +252,22 @@ class Transaction {
 
   inline Transaction(Connection &db_)
       : db(db_) {
-    db.Begin(false);
+    db.Begin(TransactionKind::kNormal);
+  }
+
+ private:
+  Connection &db;
+};
+
+class ConcurrentTransaction {
+ public:
+  inline ~ConcurrentTransaction(void) {
+    db.Commit();
+  }
+
+  inline ConcurrentTransaction(Connection &db_)
+      : db(db_) {
+    db.Begin(TransactionKind::kConcurrent);
   }
 
  private:
@@ -291,7 +282,7 @@ class ExclusiveTransaction {
 
   inline ExclusiveTransaction(Connection &db_)
       : db(db_) {
-    db.Begin(true);
+    db.Begin(TransactionKind::kExclusive);
   }
 
  private:

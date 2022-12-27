@@ -22,6 +22,9 @@ namespace {
 static sqlite::Connection Connect(std::filesystem::path path,
                                   const std::string &entity_id_list) {
   sqlite::Connection db(path);
+  db.Execute("pragma synchronous = off");
+  db.Execute("pragma temp_store = memory");
+  db.Execute("pragma journal_mode = memory");
   db.Execute(
       "CREATE TABLE IF NOT EXISTS " + entity_id_list + " ("
       "  entity_id INT NOT NULL,"
@@ -37,21 +40,21 @@ class SQLiteEntityProvider::Context {
  public:
   const std::string entity_id_list;
   sqlite::Connection db;
-  const sqlite::Statement::Ptr get_file_by_id;
-  const sqlite::Statement::Ptr get_frag_by_id;
-  const sqlite::Statement::Ptr get_version_number;
-  const sqlite::Statement::Ptr get_file_paths;
-  const sqlite::Statement::Ptr get_file_fragments;
-  const sqlite::Statement::Ptr get_file_data;
-  const sqlite::Statement::Ptr get_fragment_data;
-  const sqlite::Statement::Ptr clear_entity_id_list;
-  const sqlite::Statement::Ptr add_entity_id_to_list;
-  const sqlite::Statement::Ptr get_entity_ids;
-  const sqlite::Statement::Ptr get_redecls_by_mangled_name;
-  const sqlite::Statement::Ptr get_redecls_by_entity_id;
-  const sqlite::Statement::Ptr get_entities_by_name;
-  const sqlite::Statement::Ptr get_uses;
-  const sqlite::Statement::Ptr get_references;
+  sqlite::Statement get_file_by_id;
+  sqlite::Statement get_frag_by_id;
+  sqlite::Statement get_version_number;
+  sqlite::Statement get_file_paths;
+  sqlite::Statement get_file_fragments;
+  sqlite::Statement get_file_data;
+  sqlite::Statement get_fragment_data;
+  sqlite::Statement clear_entity_id_list;
+  sqlite::Statement add_entity_id_to_list;
+  sqlite::Statement get_entity_ids;
+  sqlite::Statement get_redecls_by_mangled_name;
+  sqlite::Statement get_redecls_by_entity_id;
+  sqlite::Statement get_entities_by_name;
+  sqlite::Statement get_uses;
+  sqlite::Statement get_references;
 
   Context(unsigned worker_index, std::filesystem::path path)
       : entity_id_list("entity_id_list_" + std::to_string(worker_index)),
@@ -132,20 +135,20 @@ unsigned SQLiteEntityProvider::VersionNumber(void) {
 
 //  try {
     sqlite::Transaction locker(context->db);
-    auto stmt = context->get_version_number.get();
-    stmt->BindValues(0u);
-    if (!stmt->ExecuteStep()) {
+    sqlite::Statement &stmt = context->get_version_number;
+    stmt.BindValues(0u);
+    if (!stmt.ExecuteStep()) {
       return 0u;
     }
 
-    auto result = stmt->GetResult();
+    auto result = stmt.Row();
     result.Columns(start_version_number);
 
-    stmt->BindValues(1u);
-    if (!stmt->ExecuteStep()) {
+    stmt.BindValues(1u);
+    if (!stmt.ExecuteStep()) {
       return 0u;
     }
-    result = stmt->GetResult();
+    result = stmt.Row();
     result.Columns(end_version_number);
 
 //  } catch (...) {
@@ -173,11 +176,11 @@ void SQLiteEntityProvider::VersionNumberChanged(unsigned) {}
 FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
   FilePathMap res;
   std::shared_ptr<Context> context = thread_context.Lock();
-  auto query = context->get_file_paths.get();
-  while (query->ExecuteStep()) {
+  sqlite::Statement &query = context->get_file_paths;
+  while (query.ExecuteStep()) {
     RawEntityId id = kInvalidEntityId;
     std::filesystem::path path;
-    query->GetResult().Columns(id, path);
+    query.Row().Columns(id, path);
 
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<FileId>(vid)) {
@@ -197,12 +200,12 @@ FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
   res.reserve(128u);
 
   std::shared_ptr<Context> context = thread_context.Lock();
-  auto query = context->get_file_fragments.get();
-  query->BindValues(file_id.Pack());
+  sqlite::Statement &query = context->get_file_fragments;
+  query.BindValues(file_id.Pack());
 
-  while (query->ExecuteStep()) {
+  while (query.ExecuteStep()) {
     RawEntityId id = kInvalidEntityId;
-    query->GetResult().Columns(id);
+    query.Row().Columns(id);
 
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<FragmentId>(vid)) {
@@ -219,15 +222,15 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
     const Ptr &self, SpecificEntityId<FileId> file_id) {
 
   std::shared_ptr<Context> context = thread_context.Lock();
-  auto query = context->get_file_data.get();
-  query->BindValues(file_id.Pack());
+  sqlite::Statement &query = context->get_file_data;
+  query.BindValues(file_id.Pack());
 
-  if (!query->ExecuteStep()) {
+  if (!query.ExecuteStep()) {
     return {};
   }
 
   std::string data;
-  query->GetResult().Columns(data);
+  query.Row().Columns(data);
   if (data.empty()) {
     return {};
   }
@@ -248,14 +251,14 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
     const Ptr &self, SpecificEntityId<FragmentId> fragment_id) {
 
   std::shared_ptr<Context> context = thread_context.Lock();
-  auto query = context->get_file_data.get();
-  query->BindValues(fragment_id.Pack());
-  if (!query->ExecuteStep()) {
+  sqlite::Statement &query = context->get_file_data;
+  query.BindValues(fragment_id.Pack());
+  if (!query.ExecuteStep()) {
     return {};
   }
 
   std::string data;
-  query->GetResult().Columns(data);
+  query.Row().Columns(data);
   if (data.empty()) {
     return {};
   }
@@ -429,20 +432,18 @@ DeclarationIdList SQLiteEntityProvider::Redeclarations(
 
   std::shared_ptr<Context> context = thread_context.Lock();
   auto add_entity_id = context->add_entity_id_to_list;
-  context->db.Begin();
+  sqlite::Transaction transaction(context->db);
 
   // Clear our old entity id list.
-  context->clear_entity_id_list->Execute();
+  context->clear_entity_id_list.Execute();
 
   // Initialize the new entity ID list.
-  add_entity_id->BindValues(id.Pack());
-  add_entity_id->Execute();
+  add_entity_id.BindValues(id.Pack());
+  add_entity_id.Execute();
 
   FillEntityIdsWithRedeclarations(*context, id);
 
   auto ret = ReadRedeclarations(*context);
-
-  context->db.Abort();
 
   return ret;
 }
@@ -450,8 +451,8 @@ DeclarationIdList SQLiteEntityProvider::Redeclarations(
 void SQLiteEntityProvider::FillEntityIdsWithRedeclarations(
       Context &context, SpecificEntityId<DeclarationId> id) {
   RawEntityId raw_id = id.Pack();
-  auto mangled_name_query = context.get_redecls_by_mangled_name.get();
-  auto redecl_query = context.get_redecls_by_entity_id.get();
+  sqlite::Statement &mangled_name_query = context.get_redecls_by_mangled_name;
+  sqlite::Statement &redecl_query = context.get_redecls_by_entity_id;
 
   // Expand the set of IDs via name mangling.
   switch (id.Unpack().kind) {
@@ -469,25 +470,24 @@ void SQLiteEntityProvider::FillEntityIdsWithRedeclarations(
     case DeclKind::PARM_VAR:
     case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
     case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      mangled_name_query->Execute();
+      mangled_name_query.Execute();
       break;
 
     default:
       break;
   }
 
-  redecl_query->Execute();
+  redecl_query.Execute();
 }
 
 DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
   DeclarationIdList ret;
   ret.reserve(8u);
 
-  auto get_entity_ids = context.get_entity_ids.get();
-
-  while (get_entity_ids->ExecuteStep()) {
+  sqlite::Statement &get_entity_ids = context.get_entity_ids;
+  while (get_entity_ids.ExecuteStep()) {
     RawEntityId raw_id = kInvalidEntityId;
-    get_entity_ids->GetResult().Columns(raw_id);
+    get_entity_ids.Row().Columns(raw_id);
 
     VariantId vid = EntityId(raw_id).Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
@@ -513,16 +513,16 @@ DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
 }
 
 void SQLiteEntityProvider::FillFragments(
-    Context &context, sqlite::Statement *get_fragments,
+    Context &context, sqlite::Statement &get_fragments,
     RawEntityId raw_id, DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
-  auto add_entity_id = context.add_entity_id_to_list.get();
-  auto get_entity_ids = context.get_entity_ids.get();
+  sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
+  sqlite::Statement &get_entity_ids = context.get_entity_ids;
 
-  context.db.Begin();
+  sqlite::Transaction transaction(context.db);
 
   // Clear our old entity id list.
-  context.clear_entity_id_list->Execute();
+  context.clear_entity_id_list.Execute();
 
   fragment_ids_out.clear();
   fragment_ids_out.reserve(16u);
@@ -536,8 +536,8 @@ void SQLiteEntityProvider::FillFragments(
 
     // If we don't have a set of redeclarations, then calculate them.
     if (redecl_ids_out.empty()) {
-      add_entity_id->BindValues(eid);
-      add_entity_id->Execute();
+      add_entity_id.BindValues(eid);
+      add_entity_id.Execute();
       FillEntityIdsWithRedeclarations(context, id);
       redecl_ids_out = ReadRedeclarations(context);
       assert(!redecl_ids_out.empty());
@@ -547,8 +547,8 @@ void SQLiteEntityProvider::FillFragments(
     // If we already have a set then use them.
     } else {
       for (SpecificEntityId<DeclarationId> did : redecl_ids_out) {
-        add_entity_id->BindValues(did.Pack());
-        add_entity_id->Execute();
+        add_entity_id.BindValues(did.Pack());
+        add_entity_id.Execute();
       }
     }
 
@@ -563,13 +563,13 @@ void SQLiteEntityProvider::FillFragments(
     MacroId id = std::get<MacroId>(vid);
 
     fragment_ids_out.emplace_back(FragmentId(id.fragment_id));
-    add_entity_id->BindValues(raw_id);
-    add_entity_id->Execute();
+    add_entity_id.BindValues(raw_id);
+    add_entity_id.Execute();
 
   // We need to find uses of files.
   } else if (std::holds_alternative<FileId>(vid)) {
-    add_entity_id->BindValues(raw_id);
-    add_entity_id->Execute();
+    add_entity_id.BindValues(raw_id);
+    add_entity_id.Execute();
 
   } else {
     assert(false);
@@ -577,9 +577,9 @@ void SQLiteEntityProvider::FillFragments(
   }
 
   // Get the using fragments.
-  while (get_fragments->ExecuteStep()) {
+  while (get_fragments.ExecuteStep()) {
     RawEntityId raw_id = kInvalidEntityId;
-    get_fragments->GetResult().Columns(raw_id);
+    get_fragments.Row().Columns(raw_id);
 
     VariantId vid = EntityId(raw_id).Unpack();
     if (std::holds_alternative<FragmentId>(vid)) {
@@ -588,8 +588,6 @@ void SQLiteEntityProvider::FillFragments(
       assert(false);
     }
   }
-
-  context.db.Abort();
 
   // Keep only unique fragment IDs.
   std::sort(fragment_ids_out.begin(), fragment_ids_out.end());
@@ -606,7 +604,7 @@ void SQLiteEntityProvider::FillUses(
     const Ptr &self, RawEntityId eid, DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   std::shared_ptr<Context> context = thread_context.Lock();
-  FillFragments(*context, context->get_uses.get(), eid, redecl_ids_out,
+  FillFragments(*context, context->get_uses, eid, redecl_ids_out,
                 fragment_ids_out);
 }
 
@@ -620,7 +618,7 @@ void SQLiteEntityProvider::FillReferences(
     FragmentIdList &fragment_ids_out) {
 
   std::shared_ptr<Context> context = thread_context.Lock();
-  FillFragments(*context, context->get_references.get(), eid, redecl_ids_out,
+  FillFragments(*context, context->get_references, eid, redecl_ids_out,
                 fragment_ids_out);
 }
 
@@ -629,10 +627,10 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
   entity_ids.clear();
 
   std::shared_ptr<Context> context = thread_context.Lock();
-  auto symbol_query = context->get_entities_by_name.get();
-  for (symbol_query->BindValues(symbol); symbol_query->ExecuteStep(); ) {
+  sqlite::Statement &symbol_query = context->get_entities_by_name;
+  for (symbol_query.BindValues(symbol); symbol_query.ExecuteStep(); ) {
     RawEntityId entity_id = kInvalidEntityId;
-    symbol_query->BindValues(entity_id);
+    symbol_query.BindValues(entity_id);
     VariantId vid = EntityId(entity_id).Unpack();
     if (std::holds_alternative<MacroId>(vid) ||
         std::holds_alternative<DeclarationId>(vid)) {

@@ -39,7 +39,7 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   DeclarationIdList ReadRedeclarations(Context &context);
 
-  void FillFragments(Context &context, sqlite::Statement *get_fragments,
+  void FillFragments(Context &context, sqlite::Statement &get_fragments,
                      RawEntityId eid, DeclarationIdList &redecl_ids_out,
                      FragmentIdList &fragment_ids_out);
 
