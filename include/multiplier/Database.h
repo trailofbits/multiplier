@@ -270,8 +270,7 @@ class DatabaseWriter final {
       "PRAGMA application_id = 0xce9ccea7",
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",
-      "PRAGMA journal_mode = DELETE",
-      "PRAGMA journal_mode = WAL2",
+      "PRAGMA journal_mode = MEMORY",
 
       R"(CREATE TABLE IF NOT EXISTS metadata (
            next_file_index INT NOT NULL,
@@ -295,7 +294,7 @@ class DatabaseWriter final {
            fragment_id INT NOT NULL,
            file_token_id INT NOT NULL,
            hash BLOB NOT NULL,
-           PRIMARY KEY(hash, file_token_id)
+           PRIMARY KEY(file_token_id, hash)
          ) WITHOUT rowid)"};
 
 //  static constexpr const char *kExitStatments[] = {

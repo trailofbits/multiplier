@@ -322,13 +322,13 @@ std::shared_ptr<sqlite3> Connection::Handle(void) {
 void Connection::Begin(TransactionKind kind) {
   switch (kind) {
     case TransactionKind::kNormal:
-      Execute("begin transaction");
+      Execute("BEGIN TRANSACTION");
       return;
     case TransactionKind::kExclusive:
-      Execute("begin exclusive transaction");
+      Execute("BEGIN EXCLUSIVE TRANSACTION");
       return;
     case TransactionKind::kConcurrent:
-      Execute("begin concurrent transaction");
+      Execute("BEGIN CONCURRENT");
       return;
   }
 }

@@ -52,25 +52,23 @@ class WriterThreadState {
 
   // Get a file ID given a file hash.
   sqlite::Statement set_file_id;
-  sqlite::Statement get_file_id;
 
   // Get a fragment ID given a file hash.
   sqlite::Statement set_fragment_id;
-  sqlite::Statement get_fragment_id;
 
   ~WriterThreadState(void) {}
 
   WriterThreadState(const std::filesystem::path &path)
       : db(path),
         set_file_id(db.Prepare(
-            "INSERT OR IGNORE INTO file_hash (file_id, hash) VALUES (?1, ?2)")),
-        get_file_id(db.Prepare(
-            "SELECT file_id FROM file_hash WHERE hash = ?1")),
+            R"(INSERT INTO file_hash (file_id, hash) VALUES (?1, ?2)
+               ON CONFLICT DO UPDATE SET file_id=file_id
+               RETURNING file_id, hash)")),
         set_fragment_id(db.Prepare(
-            R"(INSERT OR IGNORE INTO fragment_hash (fragment_id, file_token_id, hash)
-               VALUES (?1, ?2, ?3))")),
-        get_fragment_id(db.Prepare(
-            "SELECT fragment_id FROM fragment_hash WHERE hash = ?1")) {
+            R"(INSERT INTO fragment_hash (fragment_id, file_token_id, hash)
+               VALUES (?1, ?2, ?3)
+               ON CONFLICT DO UPDATE SET fragment_id=fragment_id
+               RETURNING fragment_id, file_token_id, hash)")) {
 
 //    db.SetBusyHandler([] (unsigned num_times) -> int {
 //      num_times %= 16;
@@ -80,23 +78,17 @@ class WriterThreadState {
   }
 
   RawEntityId GetOrCreateFileId(RawEntityId id, const std::string &hash) {
-    get_file_id.BindValues(hash);
-    while (!get_file_id.ExecuteStep()) {
-      set_file_id.BindValues(id, hash);
-      set_file_id.Execute();
-    }
-    get_file_id.Row().Columns(id);
+    set_file_id.BindValues(id, hash);
+    set_file_id.ExecuteStep();
+    set_file_id.Row().Columns(id);
     return id;
   }
 
   RawEntityId GetOrCreateFragmentId(
       RawEntityId frag_id, RawEntityId file_tok_id, std::string hash) {
-    get_fragment_id.BindValues(hash);
-    while (!get_fragment_id.ExecuteStep()) {
-      set_fragment_id.BindValues(frag_id, file_tok_id, hash);
-      set_fragment_id.Execute();
-    }
-    get_fragment_id.Row().Columns(frag_id);
+    set_fragment_id.BindValues(frag_id, file_tok_id, hash);
+    set_fragment_id.ExecuteStep();
+    set_fragment_id.Row().Columns(frag_id);
     return frag_id;
   }
 };
@@ -257,7 +249,7 @@ void DatabaseWriterImpl::BulkInserter(void) {
     insertion_queue.wait_dequeue(item);
 
     saved_entries.clear();
-    sqlite::ConcurrentTransaction transaction(async.db);
+//    sqlite::Transaction transaction(async.db);
 
     do {
       std::visit(
