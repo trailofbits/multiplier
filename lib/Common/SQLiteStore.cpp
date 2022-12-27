@@ -18,7 +18,9 @@ Error::Error(const std::string &msg, sqlite3 *db)
                   std::string(sqlite3_errmsg(db))) {};
 
 QueryResult::QueryResult(Connection &conn, const std::string &query)
-    : stmt(std::make_shared<Statement>(conn, query)){}
+    : stmt(std::make_shared<Statement>(conn, query)) {
+  stmt->ExecuteStep();
+}
 
 QueryResult::QueryResult(std::shared_ptr<Statement> stmt_)
     : stmt(stmt_) {}

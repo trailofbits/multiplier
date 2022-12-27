@@ -55,7 +55,7 @@ void *ThreadLocalBase::GetOrInit(void) & {
     return new_data;
   } else {
     std::shared_lock<std::shared_mutex> locker(self.data_lock);
-    return self.data[tThreadId];
+    return self.data[tThreadId - 1u];
   }
 }
 

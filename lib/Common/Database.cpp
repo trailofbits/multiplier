@@ -71,11 +71,14 @@ class alignas(64) WriterThreadState {
 
   RawEntityId GetOrCreateFileId(RawEntityId id, std::string hash) {
     set_file_id->BindValues(id, hash);
-    db.Begin(false);
-    set_file_id->ExecuteStep();
+    set_file_id->Execute();
+
     get_file_id->BindValues(hash);
-    get_file_id->ExecuteStep();
-    db.Commit();
+    if (!get_file_id->ExecuteStep()) {
+      assert(false);
+      return kInvalidEntityId;
+    }
+
     get_file_id->GetResult().Columns(id);
     return id;
   }
@@ -83,12 +86,15 @@ class alignas(64) WriterThreadState {
   RawEntityId GetOrCreateFragmentId(
       RawEntityId frag_id, RawEntityId file_tok_id, std::string hash) {
     set_fragment_id->BindValues(frag_id, file_tok_id, hash);
-    db.Begin(false);
-    set_fragment_id->ExecuteStep();
+    set_fragment_id->Execute();
+
     get_fragment_id->BindValues(hash);
-    get_fragment_id->ExecuteStep();
-    db.Commit();
-    get_file_id->GetResult().Columns(frag_id);
+    if (!get_fragment_id->ExecuteStep()) {
+      assert(false);
+      return kInvalidEntityId;
+    }
+
+    get_fragment_id->GetResult().Columns(frag_id);
     return frag_id;
   }
 };
@@ -200,35 +206,42 @@ void DatabaseWriterImpl::InitMetadata(void) {
   add_version = init_exit_db.Prepare(
       R"(INSERT INTO version (action) VALUES (?1))");
 
-  std::optional<sqlite::QueryResult> res;
+  // Initialize the default metadata. The trick we use here is that we hard-code
+  // a `rowid` of `1`, and so the implicit primary key constraint on `rowid`
+  // will cause repeated initializations to be ignored.
+  sqlite::Statement::Ptr set_meta_stmt = init_exit_db.Prepare(
+      R"(INSERT OR IGNORE INTO metadata 
+         (rowid, next_file_id, next_small_fragment_id, next_big_fragment_id)
+         VALUES (1, 1, ?1, 1))");
 
-  do {
-    sqlite::Transaction transaction(init_exit_db);
+  set_meta_stmt->BindValues(
+      mx::kMaxBigFragmentId  /* next_small_fragment_id */);
+  set_meta_stmt->ExecuteStep();
 
-    // Initialize the default metadata. The trick we use here is that we hard-code
-    // a `rowid` of `1`, and so the implicit primary key constraint on `rowid`
-    // will cause repeated initializations to be ignored.
-    sqlite::Statement::Ptr meta_stmt = init_exit_db.Prepare(
-        R"(INSERT OR IGNORE INTO metadata 
-           (rowid, next_file_id, next_small_fragment_id, next_big_fragment_id)
-           VALUES (1, 1, ?1, 1))");
+  add_version->BindValues(1u);
+  add_version->Execute();
 
-    meta_stmt->BindValues(mx::kMaxBigFragmentId  /* next_small_fragment_id */);
-    meta_stmt->ExecuteStep();
-
-    add_version->BindValues(1u);
-    add_version->Execute();
-
-    res.emplace(init_exit_db.ExecuteAndGet(
-        R"(SELECT next_file_id, next_small_fragment_id, next_big_fragment_id
-           FROM metadata
-           WHERE rowid = 1)"));
-  } while (false);
+  // TODO(pag): Really, we need a way to "reserve" some ranges of IDs for
+  //            use to support concurrent writers. We could achieve this by
+  //            doing an UPDATE that atomically increments all the IDs by
+  //            the reservation amount, or having multiple rows in the
+  //            metadata table, where each row is a reservation.
+  sqlite::QueryResult meta_values = init_exit_db.ExecuteAndGet(
+      R"(SELECT next_file_id, next_small_fragment_id, next_big_fragment_id
+         FROM metadata
+         WHERE rowid = 1
+         LIMIT 1)");
 
   RawEntityId file_id = kInvalidEntityId;
   RawEntityId small_id = kInvalidEntityId;
   RawEntityId big_id = kInvalidEntityId;
-  res->Columns(file_id, small_id, big_id);
+  meta_values.Columns(file_id, small_id, big_id);
+
+  assert(1u <= file_id);
+  assert(mx::kMaxBigFragmentId <= small_id);
+  assert(1u <= big_id);
+  assert(big_id < mx::kMaxBigFragmentId);
+
   next_file_id.store(file_id);
   next_small_fragment_id.store(small_id);
   next_big_fragment_id.store(big_id);
@@ -452,6 +465,8 @@ SpecificEntityId<FileId> DatabaseWriter::GetOrCreateFileIdForHash(
     writer->available_file_id.emplace(proposed_id);
   }
 
+  assert(found_id != kInvalidEntityId);
+
   return FileId(found_id);
 }
 
@@ -478,6 +493,8 @@ DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
     writer->available_small_fragment_id.emplace(proposed_id);
   }
 
+  assert(found_id != kInvalidEntityId);
+
   return FragmentId(found_id);
 }
 
@@ -503,6 +520,8 @@ DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
   if (!is_new) {
     writer->available_big_fragment_id.emplace(proposed_id);
   }
+
+  assert(found_id != kInvalidEntityId);
 
   return FragmentId(found_id);
 }
