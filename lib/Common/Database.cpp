@@ -158,8 +158,6 @@ class DatabaseWriterImpl {
  public:
   const std::filesystem::path db_path;
 
-  std::mutex db_lock;
-
   // The connection used on construction.
   sqlite::Connection db;
 
@@ -278,7 +276,7 @@ void DatabaseWriterImpl::BulkInserter(void) {
     insertion_queue.wait_dequeue(item);
 
     saved_entries.clear();
-//    sqlite::Transaction transaction(async.db);
+    sqlite::Transaction transaction(async.db);
 
     do {
       std::visit(
@@ -357,10 +355,7 @@ DatabaseWriterImpl::DatabaseWriterImpl(
              LIMIT 1)")),
       thread_state(
           [this] (unsigned i) -> WriterThreadState * {
-             auto ret = new WriterThreadState(db_path);
-             std::lock_guard<std::mutex> locker(db_lock);
-             std::cerr << "Initialized thread " << i << '\n';
-             return ret;
+             return new WriterThreadState(db_path);
           },
           [] (void *ptr) {
             delete reinterpret_cast<WriterThreadState *>(ptr);

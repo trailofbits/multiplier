@@ -108,9 +108,9 @@ class QueuePointer {
 class BlockingConcurrentQueue : public BlockingQueue<QueuePointer> {};
 
 // Data that lets the worker pool syncrhonize and manage itself.
-class WorkerThreadPoolBase::Impl {
+class WorkerThreadPoolBaseImpl {
  public:
-  Impl(WorkerThreadPoolBase *pool_, unsigned num_workers_);
+  WorkerThreadPoolBaseImpl(WorkerThreadPoolBase *pool_, unsigned num_workers_);
 
   // Initialize the implementation. This is split from the constructor
   // as the workers need to be able to call back into `pool`.
@@ -149,14 +149,13 @@ class WorkerThreadPoolBase::Impl {
   // workers after setting `should_synchronize` or `is_running`.
   void EnqueueDummyWorkItems(void);
 
- private:
-  Impl(void) = delete;
-  Impl(const Impl &) = delete;
-  Impl(Impl &&) noexcept = delete;
+  // Invoked by a signal observer. This triggers the worker threads to
+  // stop, but it doesn't trigger the `is_joined` state change.
+  void OnSignalToStopInternal(void);
 };
 
-WorkerThreadPoolBase::Impl::Impl(WorkerThreadPoolBase *pool_,
-                                 unsigned num_workers_)
+WorkerThreadPoolBaseImpl::WorkerThreadPoolBaseImpl(
+    WorkerThreadPoolBase *pool_, unsigned num_workers_)
     : pool(pool_),
       num_workers(num_workers_),
       should_synchronize(false),
@@ -172,7 +171,7 @@ WorkerThreadPoolBase::Impl::Impl(WorkerThreadPoolBase *pool_,
 
 // Initialize the implementation. This is split from the constructor
 // as the workers need to be able to call back into `pool`.
-void WorkerThreadPoolBase::Impl::Start(void) {
+void WorkerThreadPoolBaseImpl::Start(void) {
   if (is_running.exchange(true)) {
     return;
   }
@@ -190,21 +189,22 @@ void WorkerThreadPoolBase::Impl::Start(void) {
   num_joined.store(0);
   is_joined.store(false);
 
-  for (auto &worker : workers) {
+  for (Worker &worker : workers) {
     pthread_attr_t attrs;
     pthread_attr_init(&attrs);
     pthread_attr_setstacksize(&attrs, 8UL << 20UL  /* 8 MiB */);
-    pthread_create(&(worker.thread), &attrs, &ThreadMain, &worker);
+    pthread_create(
+        &(worker.thread), &attrs, &WorkerThreadPoolBase::ThreadMain, &worker);
   }
 }
 
-void WorkerThreadPoolBase::Impl::SignalWaiters(void) {
+void WorkerThreadPoolBaseImpl::SignalWaiters(void) {
   if (auto num_waiters = queue_waiters.exchange(0)) {
     queue_empty_sem->signal(static_cast<ssize_t>(num_waiters));
   }
 }
 
-void WorkerThreadPoolBase::Impl::EnqueueDummyWorkItems(void) {
+void WorkerThreadPoolBaseImpl::EnqueueDummyWorkItems(void) {
   for (auto i = 0U; i < num_workers; i++) {
     if (queue) {
       (void) queue->enqueue(nullptr);
@@ -217,10 +217,13 @@ WorkerThreadPoolBase::~WorkerThreadPoolBase(void) {
 }
 
 WorkerThreadPoolBase::WorkerThreadPoolBase(unsigned num_workers_)
-    : d(new Impl(this, num_workers_)) {
+    : d(std::make_shared<WorkerThreadPoolBaseImpl>(this, num_workers_)) {
 
-  auto stop_work = [this] (int) {
-    OnSignalToStopInternal();
+  std::weak_ptr<WorkerThreadPoolBaseImpl> weak(d);
+  auto stop_work = [weak = std::move(weak)] (int) {
+    if (auto d = weak.lock()) {
+      d->OnSignalToStopInternal();
+    }
   };
 
   Signal::AddAsyncObserver(SIGINT, stop_work);
@@ -286,7 +289,7 @@ void WorkerThreadPoolBase::Stop(void) {
   if (!gInWorkerThread) {
     Join();
   } else {
-    OnSignalToStopInternal();
+    d->OnSignalToStopInternal();
   }
 }
 
@@ -389,17 +392,16 @@ void WorkerThreadPoolBase::DoWork(unsigned worker_id) {
 
 // Invoked by a signal observer. This triggers the worker threads to
 // stop, but it doesn't trigger the `is_joined` state change.
-void WorkerThreadPoolBase::OnSignalToStopInternal(void) {
+void WorkerThreadPoolBaseImpl::OnSignalToStopInternal(void) {
   auto expected = false;
-  if (!d->signal_handled.compare_exchange_strong(expected, true)) {
+  if (!signal_handled.compare_exchange_strong(expected, true)) {
     return;
   }
 
-  std::lock_guard<std::mutex> locker(d->state_lock);
-
-  OnSignalToStop();
-  d->is_running.store(false);
-  d->EnqueueDummyWorkItems();
+  std::lock_guard<std::mutex> locker(state_lock);
+  pool->OnSignalToStop();
+  is_running.store(false);
+  EnqueueDummyWorkItems();
 }
 
 }  // namespace indexer

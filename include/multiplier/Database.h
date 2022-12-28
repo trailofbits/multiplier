@@ -268,13 +268,13 @@ class DatabaseWriter final {
  public:
   static constexpr const char *kInitStatements[] = {
       "PRAGMA application_id = 0xce9ccea7",
-//      "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
-//      "PRAGMA page_size = 8192",
+      "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
+      "PRAGMA page_size = 8192",
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",
 //      "PRAGMA journal_mode = MEMORY",
       "PRAGMA journal_mode = DELETE",
-      "PRAGMA journal_mode = WAL2",
+      "PRAGMA journal_mode = WAL",
 
       R"(CREATE TABLE IF NOT EXISTS metadata (
            next_file_index INT NOT NULL,
