@@ -40,9 +40,10 @@ class CXXBaseSpecifier {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIterator;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;

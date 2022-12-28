@@ -110,14 +110,15 @@ class EntityProvider {
   friend class IncludeLikeMacroDirective;
   friend class Index;
   friend class Macro;
+  friend class MacroReferenceIterator;
   friend class PackedFileImpl;
   friend class PackedFragmentImpl;
   friend class ReadMacroTokensFromFragment;
-  friend class ReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
+  friend class StmtReferenceIterator;
   friend class TokenReader;
   friend class UseIteratorImpl;
   friend class WeggliQueryResultImpl;

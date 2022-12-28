@@ -81,7 +81,7 @@ Fragment Fragment::containing(const UseBase &use) {
   return Fragment(use.fragment);
 }
 
-Fragment Fragment::containing(const Reference &ref) {
+Fragment Fragment::containing(const StmtReference &ref) {
   return Fragment(ref.fragment);
 }
 

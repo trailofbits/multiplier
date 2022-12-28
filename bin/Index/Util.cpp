@@ -460,10 +460,15 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
   
   // If we have `(T *) b` then mark `T` as being referenced in this fragment.
   } else if (auto cast = pasta::CastExpr::From(stmt)) {
-    if (auto casted_type = cast->Type()) {
-      if (auto used_decl = ReferencedDecl(casted_type.value())) {
-        return used_decl.value();
-      }   
+
+    // TODO(pag): If we want to allow implicit casts, then update
+    //            `ReferenceIterator::Advance`.
+    if (stmt.Kind() != pasta::StmtKind::kImplicitCastExpr) {
+      if (auto casted_type = cast->Type()) {
+        if (auto used_decl = ReferencedDecl(casted_type.value())) {
+          return used_decl.value();
+        }
+      }
     }
   
   // If we have `sizeof(T)` or `alignof(T)` or something like these then

@@ -303,4 +303,9 @@ UseRange<FileUseSelector> File::uses(void) const {
   return std::make_shared<UseIteratorImpl>(impl->ep, *this);
 }
 
+// References of this file.
+MacroReferenceRange File::references(void) const {
+  return std::make_shared<ReferenceIteratorImpl>(impl->ep, *this);
+}
+
 }  // namespace mx

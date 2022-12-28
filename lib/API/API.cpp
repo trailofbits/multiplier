@@ -10,7 +10,7 @@
 #include <cassert>
 #include <iostream>
 #include <multiplier/Entities/Attr.h>
-#include <multiplier/Entities/Macro.h>
+#include <multiplier/Entities/DefineMacroDirective.h>
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/VarDecl.h>
 #include <multiplier/Entities/TokenKind.h>
@@ -218,7 +218,7 @@ UseRange<DeclUseSelector> Decl::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
 
-ReferenceRange Decl::references(void) const {
+StmtReferenceRange Decl::references(void) const {
   return std::make_shared<ReferenceIteratorImpl>(fragment->ep, *this);
 }
 
@@ -303,5 +303,11 @@ ParentMacroIteratorImpl<Macro> Macro::containing_internal(const Token &token) {
 UseRange<MacroUseSelector> Macro::uses(void) const {
   return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
 }
+
+
+MacroReferenceRange DefineMacroDirective::references(void) const {
+  return std::make_shared<ReferenceIteratorImpl>(fragment->ep, *this);
+}
+
 
 }  // namespace mx

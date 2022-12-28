@@ -86,7 +86,7 @@ extern "C" int main(int argc, char *argv[]) {
       if (std::holds_alternative<mx::Decl>(ent)) {
         mx::Decl decl = std::get<mx::Decl>(ent);
 
-        for (mx::Reference ref : decl.references()) {
+        for (mx::StmtReference ref : decl.references()) {
           add_edge(ref.statement().id(), user_id, "reference", path_len);
         }
 

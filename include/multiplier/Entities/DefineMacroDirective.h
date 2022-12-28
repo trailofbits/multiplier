@@ -26,7 +26,7 @@ namespace mx {
 class DefineMacroDirective;
 class Macro;
 class MacroDirective;
-class ReferenceRange;
+class MacroReferenceRange;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using DefineMacroDirectiveRange = DerivedEntityRange<MacroIterator, DefineMacroDirective>;
 using DefineMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, DefineMacroDirective>;
@@ -47,7 +47,7 @@ class DefineMacroDirective : public MacroDirective {
   static DefineMacroDirectiveContainingMacroRange containing(const Token &token);
   bool contains(const Token &token);
 
-  ReferenceRange references(void) const;
+  MacroReferenceRange references(void) const;
 
   static std::optional<DefineMacroDirective> from(const MacroDirective &parent);
 

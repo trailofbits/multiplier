@@ -2080,9 +2080,10 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "FragmentImpl")
         << FriendOf(class_os, class_name, "Index")
         << FriendOf(class_os, class_name, "Macro")
-        << FriendOf(class_os, class_name, "ReferenceIterator")
+        << FriendOf(class_os, class_name, "MacroReferenceIterator")
         << FriendOf(class_os, class_name, "ReferenceIteratorImpl")
         << FriendOf(class_os, class_name, "Stmt")
+        << FriendOf(class_os, class_name, "StmtReferenceIterator")
         << FriendOf(class_os, class_name, "StmtIterator")
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
@@ -2103,7 +2104,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "        offset_(offset__) {}\n\n";
 
     if (class_name == "Decl") {
-      forward_decls.insert("ReferenceRange");
+      forward_decls.insert("StmtReferenceRange");
       needed_decls.insert("DeclUseSelector");
       forward_decls.insert("Stmt");
       class_os
@@ -2123,7 +2124,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::vector<Decl> redeclarations(void) const;\n"
           << "  SpecificEntityId<DeclarationId> id(void) const;\n"
           << "  UseRange<DeclUseSelector> uses(void) const;\n"
-          << "  ReferenceRange references(void) const;\n\n"
+          << "  StmtReferenceRange references(void) const;\n\n"
           << " protected:\n"
           << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -2452,9 +2453,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     // Add in our custom uses iterator. We have a custom definition of this
     // in the API.
     if (class_name == "DefineMacroDirective") {
-      forward_decls.insert("ReferenceRange");
+      forward_decls.insert("MacroReferenceRange");
       class_os
-          << "  ReferenceRange references(void) const;\n\n";
+          << "  MacroReferenceRange references(void) const;\n\n";
     }
   }
 

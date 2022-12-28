@@ -32,8 +32,8 @@ namespace mx {
 class Attr;
 class Decl;
 class ExternalSourceSymbolAttr;
-class ReferenceRange;
 class Stmt;
+class StmtReferenceRange;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
@@ -50,9 +50,10 @@ class Decl {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIterator;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
@@ -93,7 +94,7 @@ class Decl {
   std::vector<Decl> redeclarations(void) const;
   SpecificEntityId<DeclarationId> id(void) const;
   UseRange<DeclUseSelector> uses(void) const;
-  ReferenceRange references(void) const;
+  StmtReferenceRange references(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);

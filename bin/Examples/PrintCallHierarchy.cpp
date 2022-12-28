@@ -96,7 +96,7 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   } else if (auto decl = mx::Decl::containing(entity)) {
     PrintCallHierarchy(decl.value(), depth + 1u);
   } else {
-    for (const mx::Reference &ref : entity.references()) {
+    for (const mx::StmtReference &ref : entity.references()) {
       PrintCallHierarchy(ref, depth + 1u);
     }
   }

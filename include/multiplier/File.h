@@ -8,9 +8,9 @@
 
 #include <memory>
 #include <multiplier/Entities/FileUseSelector.h>
+#include <multiplier/Reference.h>
 #include <string_view>
 
-#include "Reference.h"
 #include "Token.h"
 
 namespace mx {
@@ -26,6 +26,7 @@ class Fragment;
 class FragmentImpl;
 class FragmentList;
 class Index;
+class MacroReferenceRange;
 class RegexQueryMatch;
 class WeggliQueryMatch;
 
@@ -43,6 +44,8 @@ class FileLocationConfiguration {
 };
 
 // Represents a cache of files to pre-computed line/column number locations.
+// The purpose of the cache is to allow us to configure a specific
+// interpretation of tab width, as well as tab stop behavior.
 class FileLocationCache {
  private:
   friend class Token;
@@ -162,6 +165,7 @@ class File {
   friend class FragmentImpl;
   friend class IncludeLikeMacroDirective;
   friend class Index;
+  friend class MacroReferenceRange;
   friend class RemoteEntityProvider;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
@@ -228,6 +232,9 @@ class File {
 
   // Uses of this file.
   UseRange<FileUseSelector> uses(void) const;
+
+  // References of this file.
+  MacroReferenceRange references(void) const;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();

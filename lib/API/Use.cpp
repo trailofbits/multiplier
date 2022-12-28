@@ -701,10 +701,42 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   fragment_ids.erase(it2, fragment_ids.end());
 }
 
-ReferenceIterator::~ReferenceIterator(void) {}
+ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
+                                             const Macro &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  SpecificEntityId<MacroId> sid = entity.id();
+  DeclarationIdList redecl_ids;
+  ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
+  assert(redecl_ids.empty());
 
-void ReferenceIterator::Advance(void) {
-  if (!impl) {
+  search_ids.emplace_back(sid.Pack());
+  fragment_ids.emplace_back(FragmentId(sid.Unpack().fragment_id));
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it2, fragment_ids.end());
+}
+
+ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
+                                             const File &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+
+  SpecificEntityId<FileId> sid = entity.id();
+  DeclarationIdList redecl_ids;
+  ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
+  assert(redecl_ids.empty());
+
+  search_ids.emplace_back(sid.Pack());
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it2, fragment_ids.end());
+}
+
+StmtReferenceIterator::~StmtReferenceIterator(void) {}
+
+void StmtReferenceIterator::Advance(void) {
+  if (!impl || impl->search_ids.empty() || impl->fragment_ids.empty()) {
     return;
   }
 
@@ -739,6 +771,8 @@ void ReferenceIterator::Advance(void) {
 
     Stmt stmt(std::move(user.fragment), user.offset);
     switch (stmt.kind()) {
+      // Has to match with what is supported by `ReferencedDecl` in
+      // `bin/Index/Util.cpp`.
       case StmtKind::DECL_REF_EXPR:
       case StmtKind::MEMBER_EXPR:
       case StmtKind::CXX_CONSTRUCT_EXPR:
@@ -754,7 +788,12 @@ void ReferenceIterator::Advance(void) {
       case StmtKind::CXX_REINTERPRET_CAST_EXPR:
       case StmtKind::CXX_STATIC_CAST_EXPR:
       case StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
-      case StmtKind::IMPLICIT_CAST_EXPR:
+
+      // TODO(pag): Do we want implicit casts? They end up being quite "verbose"
+      //            in terms of quantities of outputs. If so, make sure to
+      //            update `ReferencedDecl`.
+      // case StmtKind::IMPLICIT_CAST_EXPR:
+
         if (std::optional<Decl> ref_decl = stmt.referenced_declaration()) {
           SpecificEntityId<DeclarationId> referenced_id = ref_decl->id();
           for (RawEntityId search_id : impl->search_ids) {
@@ -773,20 +812,114 @@ void ReferenceIterator::Advance(void) {
   }
 }
 
-Stmt Reference::statement(void) && noexcept {
+Stmt StmtReference::statement(void) && noexcept {
   return Stmt(std::move(fragment), offset);
 }
 
-Stmt Reference::statement(void) const & noexcept {
+Stmt StmtReference::statement(void) const & noexcept {
   return Stmt(fragment, offset);
 }
 
-Reference::operator Stmt(void) && noexcept {
+StmtReference::operator Stmt(void) && noexcept {
   return Stmt(std::move(fragment), offset);
 }
 
-Reference::operator Stmt(void) const & noexcept {
+StmtReference::operator Stmt(void) const & noexcept {
   return Stmt(fragment, offset);
+}
+
+MacroReferenceIterator::~MacroReferenceIterator(void) {}
+
+void MacroReferenceIterator::Advance(void) {
+  if (!impl || impl->search_ids.empty() || impl->fragment_ids.empty()) {
+    return;
+  }
+
+  assert(impl->search_ids.size() == 1u);
+  RawEntityId search_id = impl->search_ids[0];
+
+  for (;;) {
+    // Initialize to the first statement of the fragment.
+    if (!user.fragment) {
+      if (fragment_offset >= impl->fragment_ids.size()) {
+        impl.reset();  // Done.
+        return;
+      }
+
+      auto frag_id = impl->fragment_ids[fragment_offset++];
+      user.fragment = impl->ep->FragmentFor(impl->ep, frag_id);
+      if (!user.fragment) {
+        continue;
+      }
+
+      user.offset = 0u;
+
+    // Skip to the next statement.
+    } else {
+      ++user.offset;
+    }
+
+    // We've exhausted the statements in this fragment; skip to the next
+    // fragment.
+    if (user.offset >= user.fragment->num_macros) {
+      user.fragment.reset();
+      user.offset = 0u;
+      continue;
+    }
+
+    Macro macro(std::move(user.fragment), user.offset);
+
+    // Needs to match what is in `LinkExternalReferencesInFragment` in
+    // `bin/Index/LinkExternalReferencesInFragment.cpp`.
+    switch (macro.kind()) {
+      case mx::MacroKind::EXPANSION: {
+        auto &exp = reinterpret_cast<const MacroExpansion &>(macro);
+        if (auto def = exp.definition()) {
+          SpecificEntityId<MacroId> referenced_id = def->id();
+          if (referenced_id.Pack() == search_id) {
+            user.fragment = std::move(macro.fragment);  // Take it back.
+            return;  // Hit!
+          }
+        }
+        break;
+      }
+      case mx::MacroKind::INCLUDE_DIRECTIVE:
+      case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
+      case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
+      case mx::MacroKind::IMPORT_DIRECTIVE: {
+        auto &inc = reinterpret_cast<const IncludeLikeMacroDirective &>(macro);
+        if (auto file = inc.included_file()) {
+          SpecificEntityId<FileId> referenced_id = file->id();
+          if (referenced_id.Pack() == search_id) {
+            user.fragment = std::move(macro.fragment);  // Take it back.
+            return;  // Hit!
+          }
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    user.fragment = std::move(macro.fragment);  // Take it back.
+  }
+}
+
+Macro MacroReference::macro(void) && noexcept {
+  return Macro(std::move(fragment), offset);
+}
+
+Macro MacroReference::macro(void) const & noexcept {
+  return Macro(fragment, offset);
+}
+
+MacroReference::operator Macro(void) && noexcept {
+  return Macro(std::move(fragment), offset);
+}
+
+MacroReference::operator Macro(void) const & noexcept {
+  return Macro(fragment, offset);
 }
 
 }  // namespace mx

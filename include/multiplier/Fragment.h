@@ -28,7 +28,7 @@ class FragmentList;
 class FragmentListImpl;
 class Index;
 class InvalidEntityProvider;
-class ReferenceIterator;
+class StmtReferenceIterator;
 class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
@@ -148,7 +148,7 @@ class Fragment {
   friend class FragmentList;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIterator;
+  friend class StmtReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class RemoteEntityProvider;
   friend class RegexQueryResultImpl;
@@ -182,7 +182,7 @@ class Fragment {
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const Macro &);
   static Fragment containing(const UseBase &);
-  static Fragment containing(const Reference &);
+  static Fragment containing(const StmtReference &);
 
   // Return the entity ID of this fragment.
   SpecificEntityId<FragmentId> id(void) const noexcept;

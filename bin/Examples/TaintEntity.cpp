@@ -634,7 +634,7 @@ void TaintTrackFunc(const mx::FunctionDecl &taint_source,
   if (!taint_source.return_type().unqualified_desugared_type().is_void_type()) {
     UsePath entry{&prev, PreferDefinition(taint_source).id()};
     if (!AlreadySeen(entry, seen)) {
-      for (mx::Reference ref : taint_source.references()) {
+      for (mx::StmtReference ref : taint_source.references()) {
         mx::Stmt stmt_taint_source = ref.statement();
         if (auto call = mx::CallExpr::containing(stmt_taint_source)) {
           TaintTrackCallRet(call.value(), stmt_taint_source, taint_source,
@@ -652,7 +652,7 @@ void TaintTrackVarOrVarLike(const mx::Decl &taint_source,
 
   UsePath entry{&prev, PreferDefinition(taint_source).id()};
   if (!AlreadySeen(entry, seen)) {
-    for (mx::Reference ref : taint_source.references()) {
+    for (mx::StmtReference ref : taint_source.references()) {
       mx::Stmt stmt = ref.statement();
       if (std::optional<mx::Expr> expr = mx::Expr::from(stmt)) {
         TaintTrackExpr(*expr, entry, seen);

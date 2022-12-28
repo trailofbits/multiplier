@@ -7,8 +7,8 @@
 #pragma once
 
 #include <multiplier/Use.h>
-#include <multiplier/Reference.h>
 
+#include <multiplier/Reference.h>
 #include <vector>
 
 #include "API.h"
@@ -49,8 +49,9 @@ class UseIteratorImpl : public BaseUseIteratorImpl {
 
 class ReferenceIteratorImpl : public BaseUseIteratorImpl {
  public:
-
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
+  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
+  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
 };
 
 }  // namespace mx

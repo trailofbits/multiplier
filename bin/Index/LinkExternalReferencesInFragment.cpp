@@ -11,6 +11,7 @@
 #include <pasta/AST/Macro.h>
 #include <pasta/AST/Stmt.h>
 #include <pasta/Util/File.h>
+#include <unordered_set>
 
 #include "EntityMapper.h"
 #include "PASTA.h"
@@ -25,6 +26,8 @@ namespace indexer {
 void LinkExternalReferencesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
     EntityMapper &em) {
+
+  std::unordered_set<mx::RawEntityId> referenced_entities;
 
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
     std::optional<pasta::Decl> ref_decl = ReferencedDecl(stmt);
@@ -43,7 +46,7 @@ void LinkExternalReferencesInFragment(
     // an external reference.
     mx::DeclarationId did = std::get<mx::DeclarationId>(vid);
     if (did.fragment_id != pf.fragment_index) {
-      database.AddAsync(mx::ReferenceRecord{pf.fragment_id, raw_id});
+      referenced_entities.insert(raw_id);
     }
   }
 
@@ -100,7 +103,7 @@ void LinkExternalReferencesInFragment(
 
           mid = std::get<mx::MacroId>(vid);
           if (mid.fragment_id != pf.fragment_index) {
-            database.AddAsync(mx::ReferenceRecord{pf.fragment_id, raw_id});
+            referenced_entities.insert(raw_id);
           }
         }
         break;
@@ -123,10 +126,14 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          database.AddAsync(mx::ReferenceRecord{pf.fragment_id, raw_id});
+          referenced_entities.insert(raw_id);
         }
         break;
     }
+  }
+
+  for (mx::RawEntityId raw_id : referenced_entities) {
+    database.AddAsync(mx::ReferenceRecord{pf.fragment_id, raw_id});
   }
 }
 

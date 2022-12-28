@@ -87,7 +87,7 @@ void PrintCallGraph(mx::Decl entity) {
   if (auto decl = mx::Decl::containing(entity)) {
     PrintCallGraphEdge(entity, decl->redeclarations()[0]);
   } else {
-    for (const mx::Reference &ref : entity.references()) {
+    for (const mx::StmtReference &ref : entity.references()) {
       PrintCallGraphEdge(entity, ref);
     }
   }
