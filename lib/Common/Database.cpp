@@ -367,13 +367,13 @@ DatabaseWriterImpl::DatabaseWriterImpl(
 }
 
 bool BulkInserterState::InsertAsync(
-    const FilePathRecord &record, sqlite::Statement &insert) {
+    FilePathRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.file_id.Pack(), record.path.lexically_normal());
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    const FragmentLineCoverageRecord &record, sqlite::Statement &insert) {
+    FragmentLineCoverageRecord record, sqlite::Statement &insert) {
   auto raw_file_id = record.file_id.Pack();
   if (raw_file_id != mx::kInvalidEntityId && record.first_line_number &&
       record.first_line_number <= record.last_line_number) {
@@ -385,25 +385,25 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    const SerializedFileRecord &record, sqlite::Statement &insert) {
+    SerializedFileRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.file_id.Pack(), record.data);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    const SerializedFragmentRecord &record, sqlite::Statement &insert) {
+    SerializedFragmentRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.fragment_id.Pack(), record.data);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    const RedeclarationRecord &record, sqlite::Statement &insert) {
+    RedeclarationRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.decl_id.Pack(), record.redecl_id.Pack());
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    const MangledNameRecord &record, sqlite::Statement &insert) {
+    MangledNameRecord record, sqlite::Statement &insert) {
   if (record.entity_id != mx::kInvalidEntityId &&
       !record.mangled_name.empty()) {
     insert.BindValues(record.entity_id, record.mangled_name);
@@ -413,19 +413,19 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    const FragmentUsingEntityRecord &record, sqlite::Statement &insert) {
+    FragmentUsingEntityRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.fragment_id.Pack(), record.entity_id);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    const EntityReferenceRecord &record, sqlite::Statement &insert) {
+    EntityReferenceRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.fragment_id.Pack(), record.entity_id);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    const SymbolNameRecord &record, sqlite::Statement &insert) {
+    SymbolNameRecord record, sqlite::Statement &insert) {
   if (!record.name.empty()) {
     insert.BindValues(record.entity_id, record.name);
     return true;
