@@ -64,11 +64,11 @@ class SQLiteEntityProvider::Context {
         get_frag_by_id(db.Prepare(
             "SELECT data FROM fragment WHERE fragment_id = ?1")),
         get_version_number(db.Prepare(
-            "SELECT COUNT(rowid) FROM version WHERE version = ?1")),
+            "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
         get_file_paths(db.Prepare(
             "SELECT file_id, path FROM file_path")),
         get_file_fragments(db.Prepare(
-            "SELECT UNIQUE(fragment_id) FROM fragment_line WHERE file_id = ?1")),
+            "SELECT DISTINCT(fragment_id) FROM fragment_line WHERE file_id = ?1")),
         get_file_data(db.Prepare(
             "SELECT data FROM file WHERE file_id = ?1")),
         get_fragment_data(db.Prepare(
@@ -102,7 +102,7 @@ class SQLiteEntityProvider::Context {
             "      FROM transitive_redeclaration AS tc2"
             "      JOIN redeclaration AS r2 ON tc2.entity_id = r2.redecl_id"
             "    UNION"
-            "      SELECT mn2.redecl_id"
+            "      SELECT mn2.entity_id"
             "      FROM transitive_redeclaration AS tc3"
             "      JOIN mangled_name AS mn1 ON tc3.entity_id = mn1.entity_id"
             "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
