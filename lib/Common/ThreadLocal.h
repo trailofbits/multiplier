@@ -11,29 +11,36 @@
 
 namespace mx {
 
+template <typename T>
+class ThreadLocal;
+
 class ThreadLocalBaseImpl;
 
 class ThreadLocalBase {
  private:
+  template <typename>
+  friend class ThreadLocal;
+
   ThreadLocalBase(const ThreadLocalBase &) = delete;
   ThreadLocalBase &operator=(const ThreadLocalBase &) = delete;
 
- protected:
-
-  std::function<void *(unsigned)> allocator;
-  std::shared_ptr<ThreadLocalBaseImpl> impl;
-
-  ThreadLocalBase(void) = delete;
-
+  // Initialize with a specific allocator and deleter. Both the allocator
+  // and delete are guaranteed to be called in the thread invoking `GetOrInit`.
   explicit ThreadLocalBase(std::function<void *(unsigned)> allocator_,
                            std::function<void(void *)> deleter_,
                            int);
 
+  // Get or initialize the thread-local data.
+  void *GetOrInit(void) &;
+
+ protected:
+  std::shared_ptr<ThreadLocalBaseImpl> impl;
+
+  ThreadLocalBase(void) = delete;
+
   template <typename Allocator, typename Deleter>
   ThreadLocalBase(Allocator alloc_, Deleter deleter_)
       : ThreadLocalBase(std::move(alloc_), std::move(deleter_), 0) {}
-
-  void *GetOrInit(void) &;
 };
 
 // Allows per-instance thread-local data.

@@ -91,9 +91,22 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
 }
 
 ConnectionImpl::~ConnectionImpl(void) {
+
+  // We may be holding onto state in the old busy handler, so replace it.
+  sqlite3_busy_handler(
+      db,
+      +[](void *, int) -> int {
+        std::this_thread::yield();
+        return 1;
+      },
+      nullptr);
+
   for (sqlite3_stmt *stmt : stmts) {
+    sqlite3_clear_bindings(stmt);
+    sqlite3_reset(stmt);
     sqlite3_finalize(stmt);
   }
+
   stmts.clear();
 
   sqlite3_close(db);
@@ -132,9 +145,13 @@ size_t Statement::NumParams(void) const noexcept {
       sqlite3_bind_parameter_count(impl.get()));
 }
 
-void Statement::Reset(void) {
+void Statement::ClearBoundValues(void) {
   assert(tDatabase == sqlite3_db_handle(impl.get()));
   sqlite3_clear_bindings(impl.get());
+}
+
+void Statement::Reset(void) {
+  ClearBoundValues();
   sqlite3_reset(impl.get());
 }
 
@@ -159,14 +176,7 @@ void Statement::Execute(void) {
 bool Statement::ExecuteStep(void) {
   auto ret = TryExecuteStep();
   if ((SQLITE_ROW != ret) && (SQLITE_DONE != ret)) {
-    auto db = sqlite3_db_handle(impl.get());
-    if (ret == sqlite3_errcode(db)) {
-      throw Error("ExecuteStep failed", db);
-    } else {
-      auto stmt = impl.get();
-      sqlite3_clear_bindings(stmt);
-      sqlite3_reset(stmt);
-    }
+    throw Error("ExecuteStep failed", sqlite3_db_handle(impl.get()));
   }
   return (ret == SQLITE_ROW);
 }

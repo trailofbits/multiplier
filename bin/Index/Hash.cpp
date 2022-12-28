@@ -51,7 +51,7 @@ class HashVisitor final : public pasta::DeclVisitor {
 
   void VisitFunctionDecl(const pasta::FunctionDecl &decl) final {
     if (auto hash = decl.ODRHash()) {
-      ss << ':' << hash.value();
+      ss << hash.value() << ':';
     }
     VisitDeclContext(decl);
   }
@@ -59,7 +59,7 @@ class HashVisitor final : public pasta::DeclVisitor {
   void VisitCXXRecordDecl(const pasta::CXXRecordDecl &decl) final {
     if (decl.HasDefinition()) {
       if (auto hash = decl.ODRHash()) {
-        ss << ':' << hash.value();
+        ss << hash.value() << ':';
       }
       VisitDeclContext(decl);
     }
@@ -67,7 +67,7 @@ class HashVisitor final : public pasta::DeclVisitor {
 
   void VisitEnumDecl(const pasta::EnumDecl &decl) final {
     if (auto hash = decl.ODRHash()) {
-      ss << ':' << hash.value();
+      ss << hash.value() << ':';
     }
   }
 
@@ -120,7 +120,6 @@ std::string HashFragment(
   }
 
   std::stringstream ss;
-  bool seen_floc = false;
 
   for (uint64_t i = begin_index; i < end_index; i++) {
     pasta::Token token = toks[i];
@@ -194,7 +193,7 @@ std::string HashFragment(
   }
 
   // Mix in summarized generic info.
-  ss << ':' << fs.ComputeHash();
+  ss << fs.ComputeHash();
   return ss.str();
 }
 

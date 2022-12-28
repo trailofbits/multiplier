@@ -14,33 +14,39 @@ macro(DownloadSQLite3)
     URL      https://sqlite.org/2022/sqlite-amalgamation-3400000.zip
     URL_HASH SHA3_256=362a64ad2891c6ff7552f039f3f233d49da984446be0862183eb5cef0d665969
   )
+  
   FetchContent_MakeAvailable(sqlite)
 
   add_library(SQLite3 STATIC
     "${sqlite_SOURCE_DIR}/sqlite3.c"
   )
+  
   target_include_directories(SQLite3
     PUBLIC
-      "${sqlite_SOURCE_DIR}")
+      "${sqlite_SOURCE_DIR}"
+  )
 
   target_compile_definitions(SQLite3
     PRIVATE
       $<$<CONFIG:Debug>:SQLITE_DEBUG=1>
-      "-DSQLITE_UNTESTABLE"
       "-DSQLITE_ENABLE_FTS5"
       "-DSQLITE_ENABLE_RTREE"
+      "-DSQLITE_UNTESTABLE"
       "-DSQLITE_OMIT_DECLTYPE"
       "-DSQLITE_OMIT_DEPRECATED"
       "-DSQLITE_OMIT_PROGRESS_CALLBACK"
       "-DSQLITE_OMIT_SHARED_CACHE"
       "-DSQLITE_LIKE_DOESNT_MATCH_BLOBS"
       "-DSQLITE_DEFAULT_MEMSTATUS=0"
-      "-DSQLITE_THREADSAFE=2")
+      "-DSQLITE_THREADSAFE=2"
+  )
+  
   set_target_properties(SQLite3
     PROPERTIES
       C_VISIBILITY_PRESET   default
       CXX_VISIBILITY_PRESET default
   )
+  
   add_library(SQLite::SQLite3 ALIAS SQLite3)
 
   set(SQLite3_VERSION "3.40.0")

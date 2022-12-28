@@ -100,7 +100,7 @@ class Statement {
   // Bind values with a sqlite statement. It does not
   // support binding to a blob yet
   template<typename... Args>
-  void BindValues(Args... args) {
+  void BindValues(const Args&... args) {
 #ifndef NDEBUG
     if (auto num_params = NumParams(); sizeof...(Args) > num_params) {
       std::string msg =
@@ -120,6 +120,7 @@ class Statement {
 
   QueryResult Row(void);
 
+  void ClearBoundValues(void);
   void Reset(void);
 
  private:
@@ -157,12 +158,12 @@ class Statement {
   }
 
   template<typename T>
-  void bind_many(size_t i, T &value) {
+  void bind_many(size_t i, const T &value) {
     bind(i, value);
   }
 
   template<typename T, typename... Args>
-  void bind_many(size_t i, T &value, Args... args) {
+  void bind_many(size_t i, const T &value, Args... args) {
     bind(i, value);
     i++;
     bind_many(i, args...);

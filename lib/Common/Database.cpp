@@ -27,8 +27,6 @@
 
 namespace mx {
 
-static constexpr size_t kNumFileShards = 256u;
-static constexpr std::hash<std::string> kHasher;
 static constexpr size_t kMaxTransactionSize = 10000;
 
 #define MX_RECORD_VARIANT_ENTRY(name) , name
@@ -71,7 +69,7 @@ class WriterThreadState {
                RETURNING fragment_index, file_token_id, hash)")) {
 
 //    db.SetBusyHandler([] (unsigned num_times) -> int {
-//      num_times %= 16;
+////      num_times %= 16;
 //      std::this_thread::sleep_for(std::chrono::milliseconds(num_times + 1));
 //      return 1;
 //    });
@@ -79,17 +77,25 @@ class WriterThreadState {
 
   RawEntityId GetOrCreateFileId(RawEntityId id, const std::string &hash) {
     set_file_id.BindValues(id, hash);
-    set_file_id.ExecuteStep();
-    set_file_id.Row().Columns(id);
-    return id;
+    RawEntityId index_out = kInvalidEntityId;
+    do {
+      set_file_id.ExecuteStep();
+      set_file_id.Row().Columns(index_out);
+    } while (index_out == kInvalidEntityId);
+
+    return index_out;
   }
 
   RawEntityId GetOrCreateFragmentId(
-      RawEntityId frag_id, RawEntityId file_tok_id, std::string hash) {
+      RawEntityId frag_id, RawEntityId file_tok_id, const std::string &hash) {
     set_fragment_id.BindValues(frag_id, file_tok_id, hash);
-    set_fragment_id.ExecuteStep();
-    set_fragment_id.Row().Columns(frag_id);
-    return frag_id;
+    RawEntityId index_out = kInvalidEntityId;
+    do {
+      set_fragment_id.ExecuteStep();
+      set_fragment_id.Row().Columns(index_out);
+    } while (index_out == kInvalidEntityId);
+
+    return index_out;
   }
 };
 
@@ -127,11 +133,6 @@ class DatabaseWriterImpl {
   const std::filesystem::path db_path;
 
   std::mutex db_lock;
-
-  // In-memory cache of file hashes mapping to file IDs.
-  std::mutex file_id_lock[kNumFileShards];
-  std::unordered_map<std::string, mx::SpecificEntityId<FileId>>
-      file_id[kNumFileShards];
 
   // The connection used on construction.
   sqlite::Connection db;
@@ -426,13 +427,6 @@ void DatabaseWriter::AsyncFlush(void) {
 SpecificEntityId<FileId> DatabaseWriter::GetOrCreateFileIdForHash(
     std::string hash, bool &is_new) {
 
-  const size_t shard = kHasher(hash) % kNumFileShards;
-  auto &hash_cache = impl->file_id[shard];
-  std::lock_guard<std::mutex> locker(impl->file_id_lock[shard]);
-  if (auto it = hash_cache.find(hash); it != hash_cache.end()) {
-    return it->second;
-  }
-
   std::shared_ptr<WriterThreadState> writer = impl->thread_state.Lock();
   RawEntityId proposed_index = kInvalidEntityId;
 
@@ -453,7 +447,6 @@ SpecificEntityId<FileId> DatabaseWriter::GetOrCreateFileIdForHash(
   assert(found_index != kInvalidEntityId);
 
   FileId ret(found_index);
-  hash_cache.emplace(std::move(hash), ret);
   return ret;
 }
 
@@ -474,7 +467,7 @@ DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
   }
 
   RawEntityId found_index = writer->GetOrCreateFragmentId(
-      proposed_index, tok_id, std::move(hash));
+      proposed_index, tok_id, hash);
   is_new = found_index == proposed_index;
   if (!is_new) {
     writer->available_small_fragment_index.emplace(proposed_index);

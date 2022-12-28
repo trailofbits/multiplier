@@ -270,7 +270,8 @@ class DatabaseWriter final {
       "PRAGMA application_id = 0xce9ccea7",
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",
-      "PRAGMA journal_mode = MEMORY",
+      "PRAGMA journal_mode = DELETE",
+      "PRAGMA journal_mode = WAL",
 
       R"(CREATE TABLE IF NOT EXISTS metadata (
            next_file_index INT NOT NULL,
