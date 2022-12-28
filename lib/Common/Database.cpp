@@ -134,12 +134,12 @@ class BulkInserterState {
 
 #define MX_DECLARE_INSERT_STMT(record) \
     sqlite::Statement INSERT_INTO_ ## record; \
-    void DoInsertAsync(const record &r) { \
-      if (InsertAsync(r, INSERT_INTO_ ## record)) { \
+    void DoInsertAsync(record r) { \
+      if (InsertAsync(std::move(r), INSERT_INTO_ ## record)) { \
         INSERT_INTO_ ## record.Execute(); \
       } \
     } \
-    bool InsertAsync(const record &, sqlite::Statement &);
+    bool InsertAsync(record, sqlite::Statement &);
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
 #undef MX_DECLARE_INSERT_STMT
 
@@ -262,8 +262,6 @@ void DatabaseWriterImpl::InitMetadata(void) {
 void DatabaseWriterImpl::BulkInserter(void) {
   BulkInserterState async(db_path);
 
-  std::vector<QueueItem> saved_entries;
-  saved_entries.reserve(kMaxTransactionSize);
 
   bool should_exit{false};
   bool should_flush{false};
@@ -275,12 +273,12 @@ void DatabaseWriterImpl::BulkInserter(void) {
     // Go get the first thing.
     insertion_queue.wait_dequeue(item);
 
-    saved_entries.clear();
     sqlite::Transaction transaction(async.db);
+    size_t transaction_size = 0u;
 
     do {
       std::visit(
-          [&] (const auto &arg) {
+          [&] (auto arg) {
             using arg_t = std::decay_t<decltype(arg)>;
 
             // Shouldn't happen.
@@ -296,14 +294,13 @@ void DatabaseWriterImpl::BulkInserter(void) {
               should_flush = true;
 
             } else {
-              async.DoInsertAsync(arg);
+              async.DoInsertAsync(std::move(arg));
             }
           },
-          item);
+          std::move(item));
 
-      saved_entries.emplace_back(std::move(item));
-
-      if (saved_entries.size() >= kMaxTransactionSize) {
+      ++transaction_size;
+      if (transaction_size >= kMaxTransactionSize) {
         should_flush = true;
       }
 

@@ -228,17 +228,17 @@ void Statement::bind(const size_t i, const std::nullptr_t &value) {
 
 void Statement::bind(const size_t i, const char *&value) {
   sqlite3_bind_text(impl.get(), i + 1,
-                    value, strlen(value), SQLITE_STATIC);
+                    value, strlen(value), SQLITE_TRANSIENT);
 }
 
 void Statement::bind(const size_t i, const std::string &value) {
   sqlite3_bind_blob64(impl.get(), i + 1,
-                      value.data(), value.size(), SQLITE_STATIC);
+                      value.data(), value.size(), SQLITE_TRANSIENT);
 }
 
 void Statement::bind(const size_t i, const std::string_view &value) {
   sqlite3_bind_blob64(impl.get(), i + 1,
-                      value.data(), value.size(), SQLITE_STATIC);
+                      value.data(), value.size(), SQLITE_TRANSIENT);
 }
 
 Connection::Connection(const std::filesystem::path &db_path,

@@ -171,7 +171,7 @@ struct SymbolNameRecord {
          USING fts5(name, content=''))"};
 
   static constexpr const char *kExitStatements[] = {
-      R"(INSERT INTO name(name) VALUES('optimize'))"};
+      R"(INSERT INTO symbol(symbol) VALUES('optimize'))"};
 
 #else
   static constexpr const char *kInitStatements[] = {
