@@ -44,7 +44,7 @@ struct SerializedFileRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS file (
             file_id INT NOT NULL,
-            data TEXT NOT NULL,
+            data BLOB NOT NULL,
             PRIMARY KEY(file_id)
           ) WITHOUT rowid)"};
 
@@ -95,7 +95,7 @@ struct SerializedFragmentRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS fragment (
             fragment_id INT NOT NULL,
-            data TEXT NOT NULL,
+            data BLOB NOT NULL,
             PRIMARY KEY(fragment_id)
           ) WITHOUT rowid)"};
 
@@ -268,10 +268,13 @@ class DatabaseWriter final {
  public:
   static constexpr const char *kInitStatements[] = {
       "PRAGMA application_id = 0xce9ccea7",
+//      "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
+//      "PRAGMA page_size = 8192",
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",
+//      "PRAGMA journal_mode = MEMORY",
       "PRAGMA journal_mode = DELETE",
-      "PRAGMA journal_mode = WAL",
+      "PRAGMA journal_mode = WAL2",
 
       R"(CREATE TABLE IF NOT EXISTS metadata (
            next_file_index INT NOT NULL,

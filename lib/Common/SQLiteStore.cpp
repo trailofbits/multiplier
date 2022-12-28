@@ -50,7 +50,7 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
 
   int ret = sqlite3_open_v2(
       db_path.generic_string().c_str(), &db,
-      ro_flag | SQLITE_OPEN_NOMUTEX,
+      ro_flag | SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_PRIVATECACHE,
       nullptr);
 
 #ifndef NDEBUG
@@ -60,10 +60,6 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
 
   if (ret != SQLITE_OK) {
     throw Error("Failed to open database", db);
-  }
-
-  if (read_only) {
-    sqlite3_exec(db, "PRAGMA query_only", nullptr, nullptr, nullptr);
   }
 
   // When the database has been temporarily locked by another process, this
@@ -87,6 +83,10 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
 
   if (ret != SQLITE_OK) {
     throw Error("Failed to install busy handler", db);
+  }
+
+  if (read_only) {
+    sqlite3_exec(db, "PRAGMA query_only", nullptr, nullptr, nullptr);
   }
 }
 
@@ -151,11 +151,18 @@ void Statement::ClearBoundValues(void) {
 }
 
 void Statement::Reset(void) {
+#ifndef NDEBUG
+  needs_reset = false;
+#endif
   ClearBoundValues();
   sqlite3_reset(impl.get());
 }
 
 void Statement::Execute(void) {
+#ifndef NDEBUG
+  needs_reset = false;
+#endif
+
   auto ret = TryExecuteStep();
   if (SQLITE_DONE != ret) {
     auto db = sqlite3_db_handle(impl.get());
@@ -174,6 +181,10 @@ void Statement::Execute(void) {
 }
 
 bool Statement::ExecuteStep(void) {
+#ifndef NDEBUG
+  needs_reset = true;
+#endif
+
   auto ret = TryExecuteStep();
   if ((SQLITE_ROW != ret) && (SQLITE_DONE != ret)) {
     throw Error("ExecuteStep failed", sqlite3_db_handle(impl.get()));
@@ -286,8 +297,8 @@ void Connection::Execute(const std::string &query) {
   assert(tDatabase == impl->db);
 
   char *error_msg = nullptr;
-  if (sqlite3_exec(impl->db, query.c_str(),
-                   nullptr, nullptr, &error_msg)) {
+  int ret = sqlite3_exec(impl->db, query.c_str(), nullptr, nullptr, &error_msg);
+  if (SQLITE_OK != ret) {
     throw Error("Failed to execute query string " + std::string(error_msg));
   }
 }

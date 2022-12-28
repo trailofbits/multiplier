@@ -138,18 +138,21 @@ unsigned SQLiteEntityProvider::VersionNumber(void) {
     sqlite::Statement &stmt = context->get_version_number;
     stmt.BindValues(0u);
     if (!stmt.ExecuteStep()) {
+      stmt.Reset();
       return 0u;
     }
 
-    auto result = stmt.Row();
-    result.Columns(start_version_number);
+    stmt.Row().Columns(start_version_number);
+    stmt.Reset();
 
     stmt.BindValues(1u);
     if (!stmt.ExecuteStep()) {
+      stmt.Reset();
       return 0u;
     }
-    result = stmt.Row();
-    result.Columns(end_version_number);
+
+    stmt.Row().Columns(end_version_number);
+    stmt.Reset();
 
 //  } catch (...) {
 //    assert(false);
@@ -189,6 +192,7 @@ FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
       assert(false);
     }
   }
+  query.Reset();
 
   return res;
 }
@@ -214,6 +218,7 @@ FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
       assert(false);
     }
   }
+  query.Reset();
 
   return res;
 }
@@ -226,11 +231,14 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
   query.BindValues(file_id.Pack());
 
   if (!query.ExecuteStep()) {
+    query.Reset();
     return {};
   }
 
   std::string data;
   query.Row().Columns(data);
+  query.Reset();
+
   if (data.empty()) {
     return {};
   }
@@ -254,11 +262,14 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
   sqlite::Statement &query = context->get_file_data;
   query.BindValues(fragment_id.Pack());
   if (!query.ExecuteStep()) {
+    query.Reset();
     return {};
   }
 
   std::string data;
   query.Row().Columns(data);
+  query.Reset();
+
   if (data.empty()) {
     return {};
   }
@@ -496,6 +507,7 @@ DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
       assert(false);
     }
   }
+  get_entity_ids.Reset();
 
   // Sort the redeclaration IDs to that they are always in the same order,
   // regardless of which one we ask for first, then partition them and move
@@ -588,6 +600,7 @@ void SQLiteEntityProvider::FillFragments(
       assert(false);
     }
   }
+  get_fragments.Reset();
 
   // Keep only unique fragment IDs.
   std::sort(fragment_ids_out.begin(), fragment_ids_out.end());
@@ -640,6 +653,7 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
       assert(false);
     }
   }
+  symbol_query.Reset();
 
   std::sort(entity_ids.begin(), entity_ids.end());
   auto it = std::unique(entity_ids.begin(), entity_ids.end());

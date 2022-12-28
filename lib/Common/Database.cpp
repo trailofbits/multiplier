@@ -48,24 +48,32 @@ class WriterThreadState {
   std::optional<RawEntityId> available_small_fragment_index;
   std::optional<RawEntityId> available_big_fragment_index;
 
-  // Get a file ID given a file hash.
-  sqlite::Statement set_file_id;
+  // Get a file ID index given a file hash.
+  sqlite::Statement get_file_index;
+  sqlite::Statement set_file_index;
 
-  // Get a fragment ID given a file hash.
-  sqlite::Statement set_fragment_id;
+  // Get a fragment ID index given a file hash.
+  sqlite::Statement get_fragment_index;
+  sqlite::Statement set_fragment_index;
 
   ~WriterThreadState(void) {}
 
   WriterThreadState(const std::filesystem::path &path)
       : db(path),
-        set_file_id(db.Prepare(
+        get_file_index(db.Prepare(
+            R"(SELECT file_index FROM file_hash
+               WHERE hash = ?1)")),
+        set_file_index(db.Prepare(
             R"(INSERT INTO file_hash (file_index, hash) VALUES (?1, ?2)
-               ON CONFLICT DO NOTHING
+               ON CONFLICT DO UPDATE SET file_index = file_index
                RETURNING file_index, hash)")),
-        set_fragment_id(db.Prepare(
+        get_fragment_index(db.Prepare(
+            R"(SELECT fragment_index FROM fragment_hash
+               WHERE file_token_id = ?1 AND hash = ?2)")),
+        set_fragment_index(db.Prepare(
             R"(INSERT INTO fragment_hash (fragment_index, file_token_id, hash)
                VALUES (?1, ?2, ?3)
-               ON CONFLICT DO NOTHING
+               ON CONFLICT DO UPDATE SET fragment_index = fragment_index 
                RETURNING fragment_index, file_token_id, hash)")) {
 
 //    db.SetBusyHandler([] (unsigned num_times) -> int {
@@ -75,25 +83,44 @@ class WriterThreadState {
 //    });
   }
 
-  RawEntityId GetOrCreateFileId(RawEntityId id, const std::string &hash) {
-    set_file_id.BindValues(id, hash);
+  RawEntityId GetOrCreateFileId(RawEntityId proposed_index, const std::string &hash) {
     RawEntityId index_out = kInvalidEntityId;
-    do {
-      set_file_id.ExecuteStep();
-      set_file_id.Row().Columns(index_out);
-    } while (index_out == kInvalidEntityId);
+
+    get_file_index.BindValues(hash);
+    if (get_file_index.ExecuteStep()) {
+      get_file_index.Row().Columns(index_out);
+    }
+    get_file_index.Reset();
+
+    while (index_out == kInvalidEntityId) {
+      set_file_index.BindValues(proposed_index, hash);
+      if (set_file_index.ExecuteStep()) {
+        set_file_index.Row().Columns(index_out);
+      }
+      set_file_index.Reset();
+    }
 
     return index_out;
   }
 
   RawEntityId GetOrCreateFragmentId(
-      RawEntityId frag_id, RawEntityId file_tok_id, const std::string &hash) {
-    set_fragment_id.BindValues(frag_id, file_tok_id, hash);
+      RawEntityId proposed_index, RawEntityId file_tok_id,
+      const std::string &hash) {
+
     RawEntityId index_out = kInvalidEntityId;
-    do {
-      set_fragment_id.ExecuteStep();
-      set_fragment_id.Row().Columns(index_out);
-    } while (index_out == kInvalidEntityId);
+    get_fragment_index.BindValues(file_tok_id, hash);
+    if (get_fragment_index.ExecuteStep()) {
+      get_fragment_index.Row().Columns(index_out);
+    }
+    get_fragment_index.Reset();
+
+    while (index_out == kInvalidEntityId) {
+      set_fragment_index.BindValues(proposed_index, file_tok_id, hash);
+      if (set_fragment_index.ExecuteStep()) {
+        set_fragment_index.Row().Columns(index_out);
+      }
+      set_fragment_index.Reset();
+    }
 
     return index_out;
   }
@@ -111,7 +138,6 @@ class BulkInserterState {
       if (InsertAsync(r, INSERT_INTO_ ## record)) { \
         INSERT_INTO_ ## record.Execute(); \
       } \
-      INSERT_INTO_ ## record.Reset(); \
     } \
     bool InsertAsync(const record &, sqlite::Statement &);
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
@@ -201,7 +227,7 @@ void DatabaseWriterImpl::InitMetadata(void) {
 
   set_meta_stmt.BindValues(
       mx::kMaxBigFragmentId  /* next_small_fragment_index */);
-  set_meta_stmt.ExecuteStep();
+  set_meta_stmt.Execute();
 
   add_version.BindValues(1u);
   add_version.Execute();
@@ -231,6 +257,8 @@ void DatabaseWriterImpl::InitMetadata(void) {
   } else {
     assert(false);
   }
+
+  get_ids.Reset();
 }
 
 void DatabaseWriterImpl::BulkInserter(void) {
@@ -341,9 +369,9 @@ DatabaseWriterImpl::DatabaseWriterImpl(
 
   InitMetadata();
   InitRecords();
-//  bulk_insertion_thread = std::thread([this] (void) {
-//    this->BulkInserter();
-//  });
+  bulk_insertion_thread = std::thread([this] (void) {
+    this->BulkInserter();
+  });
 }
 
 bool BulkInserterState::InsertAsync(

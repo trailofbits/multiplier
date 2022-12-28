@@ -92,6 +92,10 @@ class Statement {
 
   std::shared_ptr<sqlite3_stmt> impl;
 
+#ifndef NDEBUG
+  bool needs_reset{false};
+#endif
+
   inline Statement(std::shared_ptr<sqlite3_stmt> impl_)
       : impl(std::move(impl_)) {}
 
@@ -110,7 +114,8 @@ class Statement {
     }
 #endif
     size_t i = 0;
-    Reset();
+//    Reset();
+    assert(!needs_reset);
     bind_many(i, args...);
   }
 
