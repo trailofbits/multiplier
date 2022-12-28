@@ -333,7 +333,7 @@ void Connection::Abort(void) {
 
 // Optimize the database.
 void Connection::Optimize(void) {
-  Execute("pragam optimize");
+  Execute("pragma optimize");
 }
 
 // Return the raw SQLite handle.
