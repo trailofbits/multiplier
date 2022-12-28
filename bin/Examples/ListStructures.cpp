@@ -25,7 +25,7 @@ static void PrintStructures(mx::Fragment fragment) {
 
     std::cout
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
-        << fragment.id() << '\t' << tag.id() << '\t'
+        << fragment.id().Pack() << '\t' << tag.id() << '\t'
         << tag.name();
 
     if (FLAGS_show_locations && file) {

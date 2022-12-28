@@ -59,36 +59,37 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index = InitExample();
 
-  for (mx::WeggliQueryMatch match : index.query_fragments(query)) {
-    mx::Fragment frag = mx::Fragment::containing(match);
-    auto file = mx::File::containing(frag);
-    auto sep = "\t";
-    std::cout
-        << frag.id() << sep
-        << GetFileContaining(
-               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
-        << std::endl;
+//  for (mx::WeggliQueryMatch match : index.query_fragments(query)) {
+//    mx::Fragment frag = mx::Fragment::containing(match);
+//    auto file = mx::File::containing(frag);
+//    auto sep = "\t";
+//    std::cout
+//        << frag.id() << sep
+//        << GetFileContaining(
+//               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
+//        << std::endl;
+//
+//    if (FLAGS_print_matches) {
+//      for (mx::Token tok : match) {
+//        std::cout << sep << tok.data();
+//        sep = " ";
+//      }
+//      for (std::string var : match.captured_variables()) {
+//        std::cout << var;
+//        sep = "\t";
+//        if (auto capture = match.captured_tokens(var)) {
+//          for (mx::Token tok : *capture) {
+//            std::cout << sep << tok.data();
+//            sep = " ";
+//          }
+//        }
+//        std::cout << "\t";
+//      }
+//      std::cout << "\n\n";
+//    }
+//    PrintUnparsedTokens(std::cout, frag.preprocessed_code());
+//    std::cout << "\n\n";
+//  }
 
-    if (FLAGS_print_matches) {
-      for (mx::Token tok : match) {
-        std::cout << sep << tok.data();
-        sep = " ";
-      }
-      for (std::string var : match.captured_variables()) {
-        std::cout << var;
-        sep = "\t";
-        if (auto capture = match.captured_tokens(var)) {
-          for (mx::Token tok : *capture) {
-            std::cout << sep << tok.data();
-            sep = " ";
-          }
-        }
-        std::cout << "\t";
-      }
-      std::cout << "\n\n";
-    }
-    PrintUnparsedTokens(std::cout, frag.preprocessed_code());
-    std::cout << "\n\n";
-  }
   return EXIT_SUCCESS;
 }

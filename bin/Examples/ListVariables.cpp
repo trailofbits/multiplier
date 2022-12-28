@@ -25,8 +25,8 @@ static void PrintVariableNames(mx::Fragment fragment) {
 
     std::cout
         << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
-        << fragment.id() << '\t'
-        << var.id() << '\t'
+        << fragment.id().Pack() << '\t'
+        << var.id().Pack() << '\t'
         << var.name()
         << (var.is_definition() ? "\tdef" : "\tdecl");
 

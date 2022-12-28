@@ -53,7 +53,7 @@ class MacroDirective : public Macro {
   }
 
   Token hash(void) const;
-  std::optional<Token> name(void) const;
+  std::optional<Token> directive_name(void) const;
 };
 
 static_assert(sizeof(MacroDirective) == sizeof(Macro));

@@ -78,7 +78,7 @@ struct FragmentLineCoverageRecord {
          ON fragment_line(file_id, last_line_number))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO fragment_line
+      R"(INSERT INTO fragment_line
          (fragment_id, file_id, first_line_number, last_line_number)
          VALUES (?1, ?2, ?3, ?4))";
 
@@ -122,7 +122,9 @@ struct RedeclarationRecord {
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS redecl_id_from_decl_id
-         ON redeclaration(decl_id))"};
+         ON redeclaration(decl_id))",
+      R"(CREATE INDEX IF NOT EXISTS decl_id_from_redecl_id
+         ON redeclaration(redecl_id))"};
 
   static constexpr const char *kInsertStatement =
       R"(INSERT OR IGNORE INTO redeclaration (decl_id, redecl_id)
@@ -152,7 +154,7 @@ struct MangledNameRecord {
          ON mangled_name(data))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO mangled_name (entity_id, data)
+      R"(INSERT INTO mangled_name (entity_id, data)
          VALUES (?1, ?2))";
 
   // A `DeclarationId` or a `MacroId`.
@@ -216,7 +218,7 @@ struct UseRecord {
          ON use(entity_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO use (fragment_id, entity_id)
+      R"(INSERT INTO use (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
   SpecificEntityId<FragmentId> fragment_id;
@@ -240,7 +242,7 @@ struct ReferenceRecord {
          ON reference(entity_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO reference (fragment_id, entity_id)
+      R"(INSERT INTO reference (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
   SpecificEntityId<FragmentId> fragment_id;
@@ -269,6 +271,7 @@ class DatabaseWriter final {
   static constexpr const char *kInitStatements[] = {
       "PRAGMA application_id = 0xce9ccea7",
       "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
+      "PRAGMA page_size = 16384",  // 16 KiB.
 //      "PRAGMA page_size = 2097152",  // 2 MiB.
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",

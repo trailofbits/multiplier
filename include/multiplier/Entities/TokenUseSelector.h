@@ -42,6 +42,7 @@ enum class TokenUseSelector : unsigned short {
   DEFAULT_ARGUMENT_TOKEN,
   DEFAULT_TOKEN,
   DESTROYED_TYPE_TOKEN,
+  DIRECTIVE_NAME,
   DO_TOKEN,
   DOT_TOKEN,
   ELLIPSIS_TOKEN,
@@ -137,7 +138,7 @@ inline static const char *EnumerationName(TokenUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenUseSelector) {
-  return 118;
+  return 119;
 }
 
 const char *EnumeratorName(TokenUseSelector);

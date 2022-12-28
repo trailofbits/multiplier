@@ -21,7 +21,7 @@
 
 DEFINE_uint32(tab_width, 4, "Number of spaces in a tab");
 
-using SeenSet = std::set<mx::RawEntityId>;
+using SeenSet = std::set<mx::PackedDeclarationId>;
 using WorkList = std::vector<mx::Decl>;
 
 // Sometimes we see two separate definitions of an entity, e.g.

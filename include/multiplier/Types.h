@@ -9,6 +9,8 @@
 #include <compare>
 #include <cstdint>
 #include <functional>
+#include <iosfwd>
+#include <utility>
 #include <variant>
 
 namespace mx {
@@ -16,8 +18,16 @@ namespace rpc {
 class FileInfo;
 }  // namespace rpc
 
+class Attr;
+class Decl;
+class Designator;
+class File;
 class Fragment;
 class FragmentImpl;
+class Macro;
+class Stmt;
+class Token;
+class Type;
 
 enum class AttrKind : unsigned short;
 enum class DeclKind : unsigned char;
@@ -242,6 +252,8 @@ class EntityId final {
  public:
   EntityId(void) = default;
 
+  // TODO(pag): Deprecate this API. Would be a good idea to make all the
+  //            various expanded versions of each type into private APIs.
   /* implicit */ inline EntityId(RawEntityId opaque_)
       : opaque(opaque_) {}
 
@@ -380,6 +392,41 @@ class SpecificEntityId final {
   }
 };
 
+using PackedFragmentId = SpecificEntityId<FragmentId>;
+using PackedFileId = SpecificEntityId<FileId>;
+using PackedDeclarationId = SpecificEntityId<DeclarationId>;
+using PackedStatementId = SpecificEntityId<StatementId>;
+using PackedTypeId = SpecificEntityId<TypeId>;
+using PackedAttributeId = SpecificEntityId<AttributeId>;
+using PackedDesignatorId = SpecificEntityId<DesignatorId>;
+using PackedMacroId = SpecificEntityId<MacroId>;
+
+template <typename T>
+struct EntityTypeImpl;
+
+#define MX_MAP_ENTITY_TYPE(id, t) \
+    template <> \
+    struct EntityTypeImpl<id> { \
+      using Type = t; \
+    }
+
+MX_MAP_ENTITY_TYPE(AttributeId, Attr);
+MX_MAP_ENTITY_TYPE(DeclarationId, Decl);
+MX_MAP_ENTITY_TYPE(DesignatorId, Designator);
+MX_MAP_ENTITY_TYPE(FileId, File);
+MX_MAP_ENTITY_TYPE(FragmentId, Fragment);
+MX_MAP_ENTITY_TYPE(MacroId, Macro);
+MX_MAP_ENTITY_TYPE(StatementId, Stmt);
+MX_MAP_ENTITY_TYPE(MacroTokenId, Token);
+MX_MAP_ENTITY_TYPE(FileTokenId, Token);
+MX_MAP_ENTITY_TYPE(ParsedTokenId, Token);
+MX_MAP_ENTITY_TYPE(TypeId, Type);
+
+#undef MX_MAP_ENTITY_TYPE
+
+template <typename T>
+using EntityType = typename EntityTypeImpl<T>::Type;
+
 }  // namespace mx
 namespace std {
 
@@ -410,5 +457,33 @@ struct less<mx::FragmentId> {
     return a.fragment_id < b.fragment_id;
   }
 };
+
+template <>
+struct hash<mx::EntityId> {
+ public:
+  inline uint64_t operator()(mx::EntityId id) const noexcept {
+    return id.Pack();
+  }
+};
+
+template <typename T>
+struct hash<mx::SpecificEntityId<T>> {
+ public:
+  inline uint64_t operator()(mx::SpecificEntityId<T> id) const noexcept {
+    return id.Pack();
+  }
+};
+
+template<class _CharT, class _Traits>
+inline basic_ostream<_CharT, _Traits> &operator<<(
+    basic_ostream<_CharT, _Traits> &os, mx::EntityId id) {
+  return os << id.Pack();
+}
+
+template<class _CharT, class _Traits, typename T>
+inline basic_ostream<_CharT, _Traits> &operator<<(
+    basic_ostream<_CharT, _Traits> &os, mx::SpecificEntityId<T> id) {
+  return os << id.Pack();
+}
 
 }  // namespace std

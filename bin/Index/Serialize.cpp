@@ -322,7 +322,7 @@ void SerializeMacroDirective(const EntityMapper &es, mx::ast::Macro::Builder b, 
   SerializeMacro(es, b, e, tt);
   auto t4 = e.Hash();
   b.setVal4(es.EntityId(t4));
-  auto v8 = e.Name();
+  auto v8 = e.DirectiveName();
   if (v8) {
     auto id8 = es.EntityId(v8.value());
     b.setVal8(id8);
@@ -337,6 +337,8 @@ void SerializeDefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Build
   (void) b;
   (void) e;
   SerializeMacroDirective(es, b, e, tt);
+  auto t9 = e.Name();
+  b.setVal9(es.EntityId(t9));
   if (true) {
     auto v3 = e.Body();
     auto sv3 = b.initVal3(static_cast<unsigned>(v3.size()));
@@ -348,7 +350,7 @@ void SerializeDefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Build
   }
   b.setVal7(e.NumExplicitParameters());
   b.setVal6(e.IsVariadic());
-  b.setVal9(e.IsFunctionLike());
+  b.setVal10(e.IsFunctionLike());
   if (true) {
     auto v5 = e.Parameters();
     auto sv5 = b.initVal5(static_cast<unsigned>(v5.size()));
@@ -430,12 +432,12 @@ void SerializeIncludeLikeMacroDirective(const EntityMapper &es, mx::ast::Macro::
   (void) b;
   (void) e;
   SerializeMacroDirective(es, b, e, tt);
-  auto v10 = e.IncludedFile();
-  if (v10) {
-    auto id10 = es.EntityId(v10.value());
-    b.setVal10(id10);
+  auto v9 = e.IncludedFile();
+  if (v9) {
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
   } else {
-    b.setVal10(mx::kInvalidEntityId);
+    b.setVal9(mx::kInvalidEntityId);
   }
 }
 

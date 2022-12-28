@@ -6355,7 +6355,7 @@ MX_BEGIN_VISIT_ABSTRACT_MACRO(MacroDirective)
   MX_ENTER_VISIT_MacroDirective
   MX_VISIT_BASE(MacroDirective, Macro)
   MX_VISIT_ENTITY(MacroDirective, hash, 4, MX_APPLY_METHOD, Hash, MacroToken, NthMacro, TokenUseSelector::HASH)
-  MX_VISIT_OPTIONAL_ENTITY(MacroDirective, name, 8, MX_APPLY_METHOD, Name, MacroToken, NthMacro, TokenUseSelector::NAME)
+  MX_VISIT_OPTIONAL_ENTITY(MacroDirective, directive_name, 8, MX_APPLY_METHOD, DirectiveName, MacroToken, NthMacro, TokenUseSelector::DIRECTIVE_NAME)
   MX_EXIT_VISIT_MacroDirective
 MX_END_VISIT_MACRO(MacroDirective)
 
@@ -6369,10 +6369,11 @@ MX_END_VISIT_MACRO(MacroDirective)
 MX_BEGIN_VISIT_MACRO(DefineMacroDirective)
   MX_ENTER_VISIT_DefineMacroDirective
   MX_VISIT_BASE(DefineMacroDirective, MacroDirective)
+  MX_VISIT_ENTITY(DefineMacroDirective, name, 9, MX_APPLY_METHOD, Name, MacroToken, NthMacro, TokenUseSelector::NAME)
   MX_VISIT_MACRO_RANGE(DefineMacroDirective, body, 3, NthMacro)
   MX_VISIT_INT(DefineMacroDirective, num_explicit_parameters, 7, MX_APPLY_METHOD, NumExplicitParameters, unsigned, NthMacro)
   MX_VISIT_BOOL(DefineMacroDirective, is_variadic, 6, MX_APPLY_METHOD, IsVariadic, bool, NthMacro)
-  MX_VISIT_BOOL(DefineMacroDirective, is_function_like, 9, MX_APPLY_METHOD, IsFunctionLike, bool, NthMacro)
+  MX_VISIT_BOOL(DefineMacroDirective, is_function_like, 10, MX_APPLY_METHOD, IsFunctionLike, bool, NthMacro)
   MX_VISIT_MACRO_RANGE(DefineMacroDirective, parameters, 5, NthMacro)
   MX_EXIT_VISIT_DefineMacroDirective
 MX_END_VISIT_MACRO(DefineMacroDirective)
@@ -6491,7 +6492,7 @@ MX_END_VISIT_MACRO(IncludeMacroDirective)
 MX_BEGIN_VISIT_ABSTRACT_MACRO(IncludeLikeMacroDirective)
   MX_ENTER_VISIT_IncludeLikeMacroDirective
   MX_VISIT_BASE(IncludeLikeMacroDirective, MacroDirective)
-  MX_VISIT_OPTIONAL_ENTITY(IncludeLikeMacroDirective, included_file, 10, MX_APPLY_METHOD, IncludedFile, File, NthMacro, FileUseSelector::INCLUDED_FILE)
+  MX_VISIT_OPTIONAL_ENTITY(IncludeLikeMacroDirective, included_file, 9, MX_APPLY_METHOD, IncludedFile, File, NthMacro, FileUseSelector::INCLUDED_FILE)
   MX_EXIT_VISIT_IncludeLikeMacroDirective
 MX_END_VISIT_MACRO(IncludeLikeMacroDirective)
 

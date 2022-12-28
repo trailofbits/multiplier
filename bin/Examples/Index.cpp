@@ -15,7 +15,7 @@
 DECLARE_bool(help);
 DEFINE_string(db, "", "Database file");
 
-std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
+std::unordered_map<mx::PackedFileId, std::filesystem::path> file_paths;
 mx::FileLocationCache location_cache;
 
 mx::Index InitExample(bool fill_locations) {
@@ -24,7 +24,9 @@ mx::Index InitExample(bool fill_locations) {
     exit(EXIT_FAILURE);
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(
+      mx::EntityProvider::in_memory_cache(
+          mx::EntityProvider::from_database(FLAGS_db)));
 
   if (fill_locations) {
     for (auto [path, id] : index.file_paths()) {

@@ -16,9 +16,10 @@
 DEFINE_uint64(entity_id, mx::kInvalidEntityId, "ID of the entity to harness");
 DEFINE_string(entity_name, "", "Name of the entity to harness");
 
-using SeenSet = std::set<mx::RawEntityId>;
-using WorkList = std::vector<mx::RawEntityId>;
-using DepGraph = std::set<std::pair<mx::RawEntityId, mx::RawEntityId>>;
+using SeenSet = std::set<mx::PackedFragmentId>;
+using WorkList = std::vector<mx::PackedFragmentId>;
+using DepGraph = std::set<std::pair<mx::PackedFragmentId,
+                                    mx::PackedFragmentId>>;
 
 // Sometimes we see two separate definitions of an entity, e.g.
 //
@@ -47,8 +48,9 @@ static std::optional<mx::Decl> FindEntity(const mx::Index &index,
                                           mx::RawEntityId id) {
   if (!name.empty()) {
     std::string name_s(name.data(), name.size());
-    for (mx::DeclCategory cat : mx::EnumerationRange<mx::DeclCategory>()) {
-      for (mx::NamedDecl nd : index.query_entities(name_s, cat)) {
+    for (mx::NamedEntity ne : index.query_entities(name_s)) {
+      if (std::holds_alternative<mx::NamedDecl>(ne)) {
+        mx::NamedDecl nd = std::move(std::get<mx::NamedDecl>(ne));
         if (nd.name() == name) {
           return LongestDefinition(nd);
         }
@@ -63,14 +65,15 @@ static std::optional<mx::Decl> FindEntity(const mx::Index &index,
   return std::nullopt;
 }
 
-static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
-                            WorkList &wl, DepGraph &deps) {
+static void CollectEntities(
+    const mx::Index &index, mx::PackedFragmentId frag_id,
+    WorkList &wl, DepGraph &deps) {
 
-  mx::Fragment frag = std::get<mx::Fragment>(index.entity(frag_id));
+  mx::Fragment frag = index.fragment(frag_id).value();
 
-  std::vector<mx::RawEntityId> strong_decl_ids;
-  std::vector<mx::RawEntityId> weak_decl_ids;
-  std::vector<mx::RawEntityId> pending_decl_ids;
+  std::vector<mx::PackedDeclarationId> strong_decl_ids;
+  std::vector<mx::PackedDeclarationId> weak_decl_ids;
+  std::vector<mx::PackedDeclarationId> pending_decl_ids;
 
   for (mx::Token tok : frag.parsed_tokens()) {
     if (tok.kind() != mx::TokenKind::IDENTIFIER) {
@@ -230,8 +233,8 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
   weak_decl_ids.erase(it, weak_decl_ids.end());
 
   // A strong connection requires a definition.
-  for (mx::RawEntityId id : strong_decl_ids) {
-    mx::Decl decl = std::get<mx::Decl>(index.entity(id));
+  for (mx::PackedDeclarationId id : strong_decl_ids) {
+    mx::Decl decl = index.entity(id).value();
 
     // A strong connection back into our own fragment, ignore it.
     if (mx::Fragment::containing(decl).id() == frag_id) {
@@ -240,7 +243,7 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
     decl = LongestDefinition(decl);
 
-    auto strong_frag_id = mx::Fragment::containing(decl).id().Pack();
+    auto strong_frag_id = mx::Fragment::containing(decl).id();
     if (frag_id != strong_frag_id) {
       deps.emplace(frag_id, strong_frag_id);
       wl.push_back(strong_frag_id);
@@ -249,7 +252,7 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 
   // A weak connection requires a declaration, and ideally also brings in
   // a definition.
-  for (mx::RawEntityId id : weak_decl_ids) {
+  for (mx::PackedDeclarationId id : weak_decl_ids) {
 
     // We've already added it as a strong declaration; skip it.
     if (std::find(strong_decl_ids.begin(), strong_decl_ids.end(), id) !=
@@ -257,7 +260,7 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
       continue;
     }
 
-    mx::Decl decl = std::get<mx::Decl>(index.entity(id));
+    mx::Decl decl = index.entity(id).value();
 
     // A weak connection back into our own fragment, ignore it.
     if (mx::Fragment::containing(decl).id() == frag_id) {
@@ -271,8 +274,8 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
       }
     }
 
-    auto strong_frag_id = mx::Fragment::containing(def).id().Pack();
-    auto weak_frag_id = mx::Fragment::containing(decl).id().Pack();
+    auto strong_frag_id = mx::Fragment::containing(def).id();
+    auto weak_frag_id = mx::Fragment::containing(decl).id();
 
     // E.g. `typedef struct foo_s` { struct foo_s *x; ... } foo;`
     if (strong_frag_id == frag_id || weak_frag_id == frag_id) {
@@ -298,20 +301,24 @@ static void CollectEntities(const mx::Index &index, mx::RawEntityId frag_id,
 struct DAG {
   const mx::RawEntityId frag_id{mx::kInvalidEntityId};
   unsigned depth{0u};
-  std::vector<mx::RawEntityId> parents;
-  std::vector<mx::RawEntityId> children;
+  std::vector<mx::PackedFragmentId> parents;
+  std::vector<mx::PackedFragmentId> children;
 
   inline DAG(void) = default;
+
+  inline DAG(mx::PackedFragmentId frag_id_)
+      : frag_id(frag_id_.Pack()) {}
+
   inline DAG(mx::RawEntityId frag_id_)
       : frag_id(frag_id_) {}
 
-  unsigned Depth(std::unordered_map<mx::RawEntityId, DAG> &dag) {
+  unsigned Depth(std::unordered_map<mx::PackedFragmentId, DAG> &dag) {
     if (depth) {
       return depth;
     }
 
     // First get a non-recursive estimate.
-    for (mx::RawEntityId parent_id : parents) {
+    for (mx::PackedFragmentId parent_id : parents) {
       depth = std::max(dag[parent_id].depth + 1u, depth);
     }
 
@@ -320,7 +327,7 @@ struct DAG {
     }
 
     // Next, get a better version via recursion.
-    for (mx::RawEntityId parent_id : parents) {
+    for (mx::PackedFragmentId parent_id : parents) {
       depth = std::max(dag[parent_id].Depth(dag) + 1u, depth);
     }
 
@@ -350,14 +357,15 @@ extern "C" int main(int argc, char *argv[]) {
   SeenSet seen;
   WorkList wl;
   DepGraph deps;
-  std::unordered_map<mx::RawEntityId, DAG> dag;
+  std::unordered_map<mx::PackedFragmentId, DAG> dag;
 
-  auto initial_frag_id = mx::Fragment::containing(entity.value()).id().Pack();
+  mx::PackedFragmentId initial_frag_id =
+      mx::Fragment::containing(entity.value()).id();
   wl.push_back(initial_frag_id);
 
   // Collect the strong fragments that we need.
   for (auto i = 0u; i < wl.size(); ++i) {
-    mx::RawEntityId frag_id = wl[i];
+    mx::PackedFragmentId frag_id = wl[i];
     if (seen.emplace(frag_id).second) {
       dag.emplace(frag_id, frag_id);
       CollectEntities(index, frag_id, wl, deps);
@@ -379,13 +387,13 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   // Sort the fragments in reverse order of their depth.
-  std::vector<mx::RawEntityId> frags;
-  for (mx::RawEntityId frag_id : seen) {
+  std::vector<mx::PackedFragmentId> frags;
+  for (mx::PackedFragmentId frag_id : seen) {
     frags.push_back(frag_id);
     dag[frag_id].Depth(dag);
   }
   std::sort(frags.begin(), frags.end(),
-            [&dag] (mx::RawEntityId a, mx::RawEntityId b) {
+            [&dag] (mx::PackedFragmentId a, mx::PackedFragmentId b) {
               return dag[b].depth < dag[a].depth;
             });
 
@@ -394,7 +402,7 @@ extern "C" int main(int argc, char *argv[]) {
       << "node [shape=none margin=0 nojustify=false labeljust=l font=courier];\n";
 
   auto i = 0u;
-  for (mx::RawEntityId frag_id : frags) {
+  for (mx::PackedFragmentId frag_id : frags) {
     DAG &d = dag[frag_id];
     std::cerr << "f" << d.frag_id << " [label=<<TABLE><TR><TD>";
     for (mx::Decl d : index.fragment(frag_id)->top_level_declarations()) {
@@ -421,8 +429,8 @@ extern "C" int main(int argc, char *argv[]) {
 
   std::cerr << "}\n";
 
-  for (mx::RawEntityId frag_id : frags) {
-    mx::Fragment frag = std::get<mx::Fragment>(index.entity(frag_id));
+  for (mx::PackedFragmentId frag_id : frags) {
+    mx::Fragment frag = index.entity(frag_id).value();
     auto sep = "";
 
     for (mx::Token tok : frag.parsed_tokens()) {

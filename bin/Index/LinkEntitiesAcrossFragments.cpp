@@ -14,42 +14,40 @@
 namespace indexer {
 namespace {
 
-static void TrackRedeclarations(mx::DatabaseWriter &database,
-                                const EntityMapper &em,
-                                const std::string &mangled_name,
-                                std::vector<pasta::Decl> redecls) {
-  for (const pasta::Decl &redecl_a : redecls) {
-    mx::RawEntityId a = em.EntityId(redecl_a);
-    if (!a) {
+static void TrackRedeclarations(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    const EntityMapper &em, const std::string &mangled_name,
+    const pasta::Decl &decl, std::vector<pasta::Decl> redecls) {
+
+  mx::RawEntityId a_id = em.EntityId(decl);
+  mx::VariantId a_vid = mx::EntityId(a_id).Unpack();
+  if (!std::holds_alternative<mx::DeclarationId>(a_vid)) {
+    assert(false);
+    return;
+  }
+
+  mx::DeclarationId decl_id = std::get<mx::DeclarationId>(a_vid);
+  if (decl_id.fragment_id != pf.fragment_index) {
+    assert(false);
+    return;
+  }
+
+  database.AddAsync(mx::MangledNameRecord{a_id, mangled_name});
+
+  for (const pasta::Decl &redecl : redecls) {
+    mx::RawEntityId b_id = em.EntityId(redecl);
+    if (a_id == b_id) {
       continue;
     }
 
-    mx::VariantId a_vid = mx::EntityId(a).Unpack();
-    if (!std::holds_alternative<mx::DeclarationId>(a_vid)) {
+    mx::VariantId b_vid = mx::EntityId(b_id).Unpack();
+    if (!std::holds_alternative<mx::DeclarationId>(b_vid)) {
       assert(false);
       continue;
     }
 
-    mx::DeclarationId a_id = std::get<mx::DeclarationId>(a_vid);
-
-    database.AddAsync(mx::MangledNameRecord{a, mangled_name});
-
-    for (const pasta::Decl &redecl_b : redecls) {
-      mx::RawEntityId b = em.EntityId(redecl_b);
-      if (a == b || !b) {
-        continue;
-      }
-
-      mx::VariantId b_vid = mx::EntityId(b).Unpack();
-      if (!std::holds_alternative<mx::DeclarationId>(b_vid)) {
-        assert(false);
-        continue;
-      }
-
-      mx::DeclarationId b_id = std::get<mx::DeclarationId>(b_vid);
-      database.AddAsync(mx::RedeclarationRecord{a_id, b_id},
-                        mx::RedeclarationRecord{b_id, a_id});
-    }
+    mx::DeclarationId redecl_id = std::get<mx::DeclarationId>(b_vid);
+    database.AddAsync(mx::RedeclarationRecord{decl_id, redecl_id});
   }
 }
 
@@ -71,9 +69,9 @@ void LinkEntitiesAcrossFragments(
     if (auto func = pasta::FunctionDecl::From(decl)) {
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-          database, em,
+          database, pf, em,
           (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
-          func->Redeclarations());
+          decl, func->Redeclarations());
 
     } else if (auto var = pasta::VarDecl::From(decl)) {
       if (var->IsLocalVariableDeclaration()) {
@@ -82,17 +80,17 @@ void LinkEntitiesAcrossFragments(
 
       const auto &mangled_name = mangler.Mangle(decl);
       TrackRedeclarations(
-          database, em,
+          database, pf, em,
           (mangler.MangledNameIsPrecise() ? mangled_name : dummy_mangled_name),
-          var->Redeclarations());
+          decl, var->Redeclarations());
 
     } else if (auto tag = pasta::TagDecl::From(decl)) {
-      TrackRedeclarations(database, em, dummy_mangled_name,
-                          tag->Redeclarations());
+      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+                          decl, tag->Redeclarations());
 
     } else if (auto tpl = pasta::RedeclarableTemplateDecl::From(decl)) {
-      TrackRedeclarations(database, em, dummy_mangled_name,
-                          tpl->Redeclarations());
+      TrackRedeclarations(database, pf, em, dummy_mangled_name,
+                          decl, tpl->Redeclarations());
 
     } else {
       continue;

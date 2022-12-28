@@ -16,9 +16,13 @@
 #include "Use.h"
 #include "Fragment.h"
 #include "Query.h"
+#include "Entities/Attr.h"
 #include "Entities/DefineMacroDirective.h"
+#include "Entities/Designator.h"
 #include "Entities/Macro.h"
 #include "Entities/NamedDecl.h"
+#include "Entities/Stmt.h"
+#include "Entities/Type.h"
 
 namespace mx {
 
@@ -279,6 +283,17 @@ class Index {
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
+
+  // Return a
+  template <typename T>
+  inline std::optional<EntityType<T>> entity(SpecificEntityId<T> eid) const {
+    VariantEntity vent = entity(eid.Pack());
+    if (std::holds_alternative<EntityType<T>>(vent)) {
+      return std::move(std::get<EntityType<T>>(vent));
+    } else {
+      return std::nullopt;
+    }
+  }
 
   // Return an entity given its ID.
   VariantEntity entity(EntityId eid) const;

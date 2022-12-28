@@ -57,38 +57,38 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::RegexQueryResult results;
 
-  // Query a specific fragment.
-  if (FLAGS_fragment_id) {
-    auto fragment = index.fragment(FLAGS_fragment_id);
-    if (!fragment) {
-      std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
-      return EXIT_FAILURE;
-    }
-
-    results = fragment->query(query);
-  
-  // Query the whole index.
-  } else {
-    results = index.query_fragments(query);
-  }
-
-  for (const mx::RegexQueryMatch &match : results) {
-    mx::Fragment frag = mx::Fragment::containing(match);
-    auto file = mx::File::containing(frag);
-    std::cout
-        << frag.id() << '\t'
-        << GetFileContaining(
-               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
-        << std::endl;
-
-    for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
-      if (auto data = match.captured_data(i)) {
-        std::cout << "\t[" << i << "] = \t" << *data << '\n';
-      }
-    }
-
-    std::cout << "\n\n";
-  }
+//  // Query a specific fragment.
+//  if (FLAGS_fragment_id) {
+//    auto fragment = index.fragment(FLAGS_fragment_id);
+//    if (!fragment) {
+//      std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
+//      return EXIT_FAILURE;
+//    }
+//
+//    results = fragment->query(query);
+//
+//  // Query the whole index.
+//  } else {
+//    results = index.query_fragments(query);
+//  }
+//
+//  for (const mx::RegexQueryMatch &match : results) {
+//    mx::Fragment frag = mx::Fragment::containing(match);
+//    auto file = mx::File::containing(frag);
+//    std::cout
+//        << frag.id() << '\t'
+//        << GetFileContaining(
+//               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
+//        << std::endl;
+//
+//    for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
+//      if (auto data = match.captured_data(i)) {
+//        std::cout << "\t[" << i << "] = \t" << *data << '\n';
+//      }
+//    }
+//
+//    std::cout << "\n\n";
+//  }
 
   return EXIT_SUCCESS;
 }

@@ -50,7 +50,7 @@ class SQLiteEntityProvider::Context {
   sqlite::Statement clear_entity_id_list;
   sqlite::Statement add_entity_id_to_list;
   sqlite::Statement get_entity_ids;
-  sqlite::Statement get_redecls_by_mangled_name;
+//  sqlite::Statement get_redecls_by_mangled_name;
   sqlite::Statement get_redecls_by_entity_id;
   sqlite::Statement get_entities_by_name;
   sqlite::Statement get_uses;
@@ -79,24 +79,33 @@ class SQLiteEntityProvider::Context {
             "INSERT INTO " + entity_id_list + " (entity_id) VALUES (?1)")),
         get_entity_ids(db.Prepare(
             "SELECT entity_id FROM " + entity_id_list)),
-        get_redecls_by_mangled_name(db.Prepare(
-            "INSERT INTO " + entity_id_list + " (entity_id) "
-            "WITH RECURSIVE transitive_mangled_names(entity_id) "
-            "AS (SELECT l.entity_id FROM " + entity_id_list + " AS l"
-            "    UNION"
-            "    SELECT r.redecl_id"
-            "    FROM transitive_mangled_names AS tc"
-            "    JOIN mangled_name AS mn1 ON tc.entity_id = mn.entity_id"
-            "    JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
-            ") SELECT entity_id FROM transitive_mangled_names")),
+//        get_redecls_by_mangled_name(db.Prepare(
+//            "INSERT INTO " + entity_id_list + " (entity_id) "
+//            "WITH RECURSIVE transitive_mangled_names(entity_id) "
+//            "AS (SELECT l.entity_id FROM " + entity_id_list + " AS l"
+//            "    UNION"
+//            "      SELECT r.redecl_id"
+//            "      FROM transitive_mangled_names AS tc"
+//            "      JOIN mangled_name AS mn1 ON tc.entity_id = mn.entity_id"
+//            "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
+//            ") SELECT entity_id FROM transitive_mangled_names")),
         get_redecls_by_entity_id(db.Prepare(
             "INSERT INTO " + entity_id_list + " (entity_id) "
             "WITH RECURSIVE transitive_redeclaration(entity_id) "
             "AS (SELECT l.entity_id FROM " + entity_id_list + " AS l"
             "    UNION"
-            "    SELECT r.redecl_id"
-            "    FROM transitive_redeclaration AS tc"
-            "    JOIN redeclaration AS r ON tc.entity_id = r.entity_id"
+            "      SELECT r1.redecl_id"
+            "      FROM transitive_redeclaration AS tc1"
+            "      JOIN redeclaration AS r1 ON tc1.entity_id = r1.decl_id"
+            "    UNION"
+            "      SELECT r2.decl_id"
+            "      FROM transitive_redeclaration AS tc2"
+            "      JOIN redeclaration AS r2 ON tc2.entity_id = r2.redecl_id"
+            "    UNION"
+            "      SELECT mn2.redecl_id"
+            "      FROM transitive_redeclaration AS tc3"
+            "      JOIN mangled_name AS mn1 ON tc3.entity_id = mn1.entity_id"
+            "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
             ") SELECT entity_id FROM transitive_redeclaration")),
 #if MX_SQLITE_HAS_FTS5
         get_entities_by_name(db.Prepare(
@@ -462,31 +471,31 @@ DeclarationIdList SQLiteEntityProvider::Redeclarations(
 void SQLiteEntityProvider::FillEntityIdsWithRedeclarations(
       Context &context, SpecificEntityId<DeclarationId> id) {
   RawEntityId raw_id = id.Pack();
-  sqlite::Statement &mangled_name_query = context.get_redecls_by_mangled_name;
+//  sqlite::Statement &mangled_name_query = context.get_redecls_by_mangled_name;
   sqlite::Statement &redecl_query = context.get_redecls_by_entity_id;
-
-  // Expand the set of IDs via name mangling.
-  switch (id.Unpack().kind) {
-    case DeclKind::FUNCTION:
-    case DeclKind::CXX_METHOD:
-    case DeclKind::CXX_DESTRUCTOR:
-    case DeclKind::CXX_CONVERSION:
-    case DeclKind::CXX_CONSTRUCTOR:
-    case DeclKind::CXX_DEDUCTION_GUIDE:
-
-    case DeclKind::VAR:
-    case DeclKind::DECOMPOSITION:
-    case DeclKind::IMPLICIT_PARAM:
-    case DeclKind::OMP_CAPTURED_EXPR:
-    case DeclKind::PARM_VAR:
-    case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-    case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      mangled_name_query.Execute();
-      break;
-
-    default:
-      break;
-  }
+//
+//  // Expand the set of IDs via name mangling.
+//  switch (id.Unpack().kind) {
+//    case DeclKind::FUNCTION:
+//    case DeclKind::CXX_METHOD:
+//    case DeclKind::CXX_DESTRUCTOR:
+//    case DeclKind::CXX_CONVERSION:
+//    case DeclKind::CXX_CONSTRUCTOR:
+//    case DeclKind::CXX_DEDUCTION_GUIDE:
+//
+//    case DeclKind::VAR:
+//    case DeclKind::DECOMPOSITION:
+//    case DeclKind::IMPLICIT_PARAM:
+//    case DeclKind::OMP_CAPTURED_EXPR:
+//    case DeclKind::PARM_VAR:
+//    case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
+//    case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
+//      mangled_name_query.Execute();
+//      break;
+//
+//    default:
+//      break;
+//  }
 
   redecl_query.Execute();
 }

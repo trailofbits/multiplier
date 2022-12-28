@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-extern std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
+extern std::unordered_map<mx::PackedFileId, std::filesystem::path> file_paths;
 extern mx::FileLocationCache location_cache;
 
 mx::Index InitExample(bool fill_locations=false);

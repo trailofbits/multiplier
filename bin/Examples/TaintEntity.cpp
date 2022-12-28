@@ -128,16 +128,9 @@ inline static bool AlreadySeen(const UsePath &entry, SeenEntityMap &seen) {
 // Go and find the entity that will be the source of our taints.
 static std::optional<mx::ValueDecl> FindEntity(const mx::Index &index) {
   if (!FLAGS_entity_name.empty()) {
-    for (mx::DeclCategory cat : {mx::DeclCategory::FUNCTION,
-                                 mx::DeclCategory::INSTANCE_METHOD,
-                                 mx::DeclCategory::CLASS_METHOD,
-                                 mx::DeclCategory::PARAMETER_VARIABLE,
-                                 mx::DeclCategory::LOCAL_VARIABLE,
-                                 mx::DeclCategory::GLOBAL_VARIABLE,
-                                 mx::DeclCategory::CLASS_MEMBER,
-                                 mx::DeclCategory::INSTANCE_MEMBER,
-                                 mx::DeclCategory::ENUMERATOR}) {
-      for (mx::NamedDecl nd : index.query_entities(FLAGS_entity_name, cat)) {
+    for (mx::NamedEntity ne : index.query_entities(FLAGS_entity_name)) {
+      if (std::holds_alternative<mx::NamedDecl>(ne)) {
+        mx::NamedDecl nd = std::move(std::get<mx::NamedDecl>(ne));
         if (nd.name() == FLAGS_entity_name) {
           return mx::ValueDecl::from(nd);
         }
@@ -205,7 +198,7 @@ static void ReportUnhandledAssign(
 // our analysis bottoms out.
 static void TaintTrackDeref(const mx::Stmt &op, const UsePath &prev,
                             SeenEntityMap &seen) {
-  const UsePath entry{&prev, op.id()};
+  const UsePath entry{&prev, op.id().Pack()};
   UserDAG *dag = AddPathToDAG(entry, seen);
   dag->is_alarming = true;
 }
@@ -218,7 +211,7 @@ static void TaintTrackAssign(const mx::Stmt &assign,
                              const mx::Stmt &taint_source,
                              const UsePath &prev, SeenEntityMap &seen) {
 
-  const UsePath entry{&prev, assign.id()};
+  const UsePath entry{&prev, assign.id().Pack()};
   if (AlreadySeen(entry, seen)) {
     return;
   }
@@ -415,7 +408,7 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
                               const mx::Stmt &taint_source,
                               const UsePath &prev, SeenEntityMap &seen) {
 
-  const UsePath entry{&prev, taint_source.id()};
+  const UsePath entry{&prev, taint_source.id().Pack()};
   if (AlreadySeen(entry, seen)) {
     return;
   }
@@ -500,7 +493,7 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
 // If we find `return taint_source`, then taint the function.
 static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
                              SeenEntityMap &seen) {
-  const UsePath entry{&prev, ret.id()};
+  const UsePath entry{&prev, ret.id().Pack()};
   if (auto func = mx::FunctionDecl::containing(ret)) {
     TaintTrackFunc(*func, entry, seen);
   }
@@ -510,7 +503,7 @@ static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
 // taints to where the expression is used.
 void TaintTrackExpr(const mx::Expr &taint_source,
                            const UsePath &prev, SeenEntityMap &seen) {
-  const UsePath entry{&prev, taint_source.id()};
+  const UsePath entry{&prev, taint_source.id().Pack()};
   if (AlreadySeen(entry, seen)) {
     return;
   }
@@ -632,7 +625,7 @@ static void TaintTrackCallRet(const mx::CallExpr &call,
 void TaintTrackFunc(const mx::FunctionDecl &taint_source,
                     const UsePath &prev, SeenEntityMap &seen) {
   if (!taint_source.return_type().unqualified_desugared_type().is_void_type()) {
-    UsePath entry{&prev, PreferDefinition(taint_source).id()};
+    UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
     if (!AlreadySeen(entry, seen)) {
       for (mx::StmtReference ref : taint_source.references()) {
         mx::Stmt stmt_taint_source = ref.statement();
@@ -650,7 +643,7 @@ void TaintTrackFunc(const mx::FunctionDecl &taint_source,
 void TaintTrackVarOrVarLike(const mx::Decl &taint_source,
                             const UsePath &prev, SeenEntityMap &seen) {
 
-  UsePath entry{&prev, PreferDefinition(taint_source).id()};
+  UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
   if (!AlreadySeen(entry, seen)) {
     for (mx::StmtReference ref : taint_source.references()) {
       mx::Stmt stmt = ref.statement();

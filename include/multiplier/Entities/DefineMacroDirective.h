@@ -69,6 +69,7 @@ class DefineMacroDirective : public MacroDirective {
     }
   }
 
+  Token name(void) const;
   std::vector<MacroOrToken> body(void) const;
   unsigned num_explicit_parameters(void) const;
   bool is_variadic(void) const;

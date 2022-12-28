@@ -8341,7 +8341,7 @@ Token MacroDirective::hash(void) const {
   }
 }
 
-std::optional<Token> MacroDirective::name(void) const {
+std::optional<Token> MacroDirective::directive_name(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal8());
@@ -8385,6 +8385,15 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const Macro &pare
   }
 }
 
+Token DefineMacroDirective::name(void) const {
+  auto self = fragment->NthMacro(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
 std::vector<MacroOrToken> DefineMacroDirective::body(void) const {
   auto self = fragment->NthMacro(offset_);
   auto index = Index(fragment->ep);
@@ -8416,7 +8425,7 @@ bool DefineMacroDirective::is_variadic(void) const {
 
 bool DefineMacroDirective::is_function_like(void) const {
   auto self = fragment->NthMacro(offset_);
-  return self.getVal9();
+  return self.getVal10();
 }
 
 std::vector<MacroOrToken> DefineMacroDirective::parameters(void) const {
@@ -8791,7 +8800,7 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const M
 std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
-    EntityId id(self.getVal10());
+    EntityId id(self.getVal9());
     if (auto file = fragment->ep->FileFor(fragment->ep, id.Pack())) {
       return File(std::move(file));
     } else {
@@ -50188,6 +50197,7 @@ const char *EnumeratorName(TokenUseSelector sel) {
     case TokenUseSelector::DEFAULT_ARGUMENT_TOKEN: return "DEFAULT_ARGUMENT_TOKEN";
     case TokenUseSelector::DEFAULT_TOKEN: return "DEFAULT_TOKEN";
     case TokenUseSelector::DESTROYED_TYPE_TOKEN: return "DESTROYED_TYPE_TOKEN";
+    case TokenUseSelector::DIRECTIVE_NAME: return "DIRECTIVE_NAME";
     case TokenUseSelector::DO_TOKEN: return "DO_TOKEN";
     case TokenUseSelector::DOT_TOKEN: return "DOT_TOKEN";
     case TokenUseSelector::ELLIPSIS_TOKEN: return "ELLIPSIS_TOKEN";

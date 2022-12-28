@@ -40,14 +40,14 @@ extern "C" int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
 
-    for (mx::RawEntityId frag_id : file->fragment_ids()) {
+    for (mx::PackedFragmentId frag_id : file->fragment_ids()) {
       std::cout << frag_id << std::endl;
     }
 
   // List all fragment IDs.
   } else {
     for (mx::File file : index.files()) {
-      for (mx::RawEntityId frag_id : file.fragment_ids()) {
+      for (mx::PackedFragmentId frag_id : file.fragment_ids()) {
         std::cout << frag_id << std::endl;
       }
     }
