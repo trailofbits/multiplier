@@ -269,10 +269,9 @@ class DatabaseWriter final {
   static constexpr const char *kInitStatements[] = {
       "PRAGMA application_id = 0xce9ccea7",
       "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
-      "PRAGMA page_size = 8192",
+//      "PRAGMA page_size = 2097152",  // 2 MiB.
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",
-//      "PRAGMA journal_mode = MEMORY",
       "PRAGMA journal_mode = DELETE",
       "PRAGMA journal_mode = WAL",
 

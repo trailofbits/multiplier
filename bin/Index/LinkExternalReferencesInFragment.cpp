@@ -42,6 +42,8 @@ void LinkExternalReferencesInFragment(
       database.AddAsync(mx::FragmentUsingEntityRecord{pf.fragment_id, raw_id});
     }
   }
+
+  // TODO(pag): Add references for macros and files.
 }
 
 }  // namespace indexer
