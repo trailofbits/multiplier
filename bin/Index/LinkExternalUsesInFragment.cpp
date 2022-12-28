@@ -364,7 +364,7 @@ void LinkExternalUsesInFragment(
       continue; // Skip the rest.
     }
 
-    database.AddAsync(mx::FragmentUsingEntityRecord{fid, eid});
+    database.AddAsync(mx::UseRecord{fid, eid});
   }
 }
 

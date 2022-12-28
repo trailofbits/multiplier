@@ -971,14 +971,14 @@ void GlobalIndexingState::PersistFragment(
   }
 
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
-  LinkEntitiesAcrossFragments(database, pf, em, mangler);
-  LinkExternalUsesInFragment(database, pf, fb);
-  LinkEntityNamesToFragment(database, pf, em);
-
   database.AddAsync(
       mx::SerializedFragmentRecord{
           pf.fragment_id, CompressedMessage("fragment", message)});
 
+  LinkEntitiesAcrossFragments(database, pf, em, mangler);
+  LinkExternalUsesInFragment(database, pf, fb);
+  LinkExternalReferencesInFragment(database, pf, em);
+  LinkEntityNamesToFragment(database, pf, em);
 }
 
 }  // namespace indexer

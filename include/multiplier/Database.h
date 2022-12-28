@@ -202,21 +202,21 @@ struct SymbolNameRecord {
 // NOTE(pag): We opportunistically assume all entities are used by their own
 //            fragments, so we don't record edges between a fragment and its
 //            own entities.
-struct FragmentUsingEntityRecord {
-  static constexpr const char *kTableName = "entity_use";
+struct UseRecord {
+  static constexpr const char *kTableName = "use";
 
   static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS entity_use (
+      {R"(CREATE TABLE IF NOT EXISTS use (
             fragment_id INT NOT NULL,
             entity_id INT NOT NULL
           ))"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_using_entities
-         ON entity_use(entity_id))"};
+         ON use(entity_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO entity_use (fragment_id, entity_id)
+      R"(INSERT OR IGNORE INTO use (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
   SpecificEntityId<FragmentId> fragment_id;
@@ -226,21 +226,21 @@ struct FragmentUsingEntityRecord {
 // Records an entry telling us that one entity references another entity.
 // a reference has a from-entity-specific meaning, and so we don't need an
 // edge label.
-struct EntityReferenceRecord {
-  static constexpr const char *kTableName = "entity_reference";
+struct ReferenceRecord {
+  static constexpr const char *kTableName = "reference";
 
   static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS entity_reference (
+      {R"(CREATE TABLE IF NOT EXISTS reference (
             fragment_id INT NOT NULL,
             entity_id INT NOT NULL
           ))"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_referencing_entities
-         ON entity_reference(entity_id))"};
+         ON reference(entity_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO entity_reference (fragment_id, entity_id)
+      R"(INSERT OR IGNORE INTO reference (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
   SpecificEntityId<FragmentId> fragment_id;
@@ -254,8 +254,8 @@ struct EntityReferenceRecord {
     m(SerializedFragmentRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
-    m(FragmentUsingEntityRecord) \
-    m(EntityReferenceRecord) \
+    m(UseRecord) \
+    m(ReferenceRecord) \
     m(SymbolNameRecord)
 
 // API for write access to the Multiplier database.

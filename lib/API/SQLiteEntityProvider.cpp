@@ -106,10 +106,10 @@ class SQLiteEntityProvider::Context {
             "SELECT rowid FROM symbol WHERE name LIKE '%' || ?1 || '%'")),
 #endif
         get_uses(db.Prepare(
-            "SELECT fragment_id FROM entity_use WHERE entity_id "
+            "SELECT fragment_id FROM use WHERE entity_id "
             "IN (SELECT entity_id FROM " + entity_id_list + ")")),
         get_references(db.Prepare(
-            "SELECT fragment_id FROM entity_reference WHERE entity_id "
+            "SELECT fragment_id FROM reference WHERE entity_id "
             "IN (SELECT entity_id FROM " + entity_id_list + ")")) {}
 };
 

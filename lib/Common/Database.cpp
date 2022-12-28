@@ -413,13 +413,13 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    FragmentUsingEntityRecord record, sqlite::Statement &insert) {
+    UseRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.fragment_id.Pack(), record.entity_id);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    EntityReferenceRecord record, sqlite::Statement &insert) {
+    ReferenceRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.fragment_id.Pack(), record.entity_id);
   return true;
 }
