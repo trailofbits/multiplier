@@ -51,14 +51,14 @@ RegexQueryResultImpl::Ptr InvalidEntityProvider::Query(
   return {};
 }
 
-DeclarationIdList InvalidEntityProvider::Redeclarations(
+RawEntityIdList InvalidEntityProvider::Redeclarations(
     const Ptr &, SpecificEntityId<DeclarationId>) {
   return {};
 }
 
 void InvalidEntityProvider::FillUses(
     const Ptr &, RawEntityId eid,
-    DeclarationIdList &redecl_ids_out,
+    RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   redecl_ids_out.clear();
   fragment_ids_out.clear();
@@ -66,7 +66,7 @@ void InvalidEntityProvider::FillUses(
 
 void InvalidEntityProvider::FillReferences(
     const Ptr &, RawEntityId eid,
-    DeclarationIdList &redecl_ids_out,
+    RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   redecl_ids_out.clear();
   fragment_ids_out.clear();

@@ -31,116 +31,6 @@
 
 namespace mx {
 
-bool MayHaveRemoteRedeclarations(const mx::Decl &decl) {
-  switch (decl.kind()) {
-    // Functions.
-    case mx::DeclKind::FUNCTION:
-    case mx::DeclKind::CXX_METHOD:
-    case mx::DeclKind::CXX_DESTRUCTOR:
-    case mx::DeclKind::CXX_CONVERSION:
-    case mx::DeclKind::CXX_CONSTRUCTOR:
-    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
-      return true;
-
-    // Variables.
-    case mx::DeclKind::VAR:
-    case mx::DeclKind::PARM_VAR:
-    case mx::DeclKind::OMP_CAPTURED_EXPR:
-    case mx::DeclKind::IMPLICIT_PARAM:
-    case mx::DeclKind::DECOMPOSITION:
-    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      if (reinterpret_cast<const VarDecl &>(decl).is_local_variable_declaration()) {
-        return false;
-      } else {
-        return true;
-      }
-
-    // Tags.
-    case mx::DeclKind::TAG:
-    case mx::DeclKind::RECORD:
-    case mx::DeclKind::CXX_RECORD:
-    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
-    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
-    case mx::DeclKind::ENUM:
-      return true;
-
-    // Redeclarable templates.
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
-    case mx::DeclKind::FUNCTION_TEMPLATE:
-    case mx::DeclKind::CLASS_TEMPLATE:
-    case mx::DeclKind::VAR_TEMPLATE:
-    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
-      return true;
-
-    default:
-      return false;
-  }
-}
-
-bool MayHaveRemoteUses(const mx::Decl &decl) {
-  switch (decl.kind()) {
-    // Functions.
-    case mx::DeclKind::FUNCTION:
-    case mx::DeclKind::CXX_METHOD:
-    case mx::DeclKind::CXX_DESTRUCTOR:
-    case mx::DeclKind::CXX_CONVERSION:
-    case mx::DeclKind::CXX_CONSTRUCTOR:
-    case mx::DeclKind::CXX_DEDUCTION_GUIDE:
-      return true;
-
-    // Variables.
-    case mx::DeclKind::VAR:
-    case mx::DeclKind::PARM_VAR:
-    case mx::DeclKind::OMP_CAPTURED_EXPR:
-    case mx::DeclKind::IMPLICIT_PARAM:
-    case mx::DeclKind::DECOMPOSITION:
-    case mx::DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-    case mx::DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-      if (reinterpret_cast<const VarDecl &>(decl).is_local_variable_declaration()) {
-        return false;
-      } else {
-        return true;
-      }
-
-    // Tags.
-    case mx::DeclKind::TAG:
-    case mx::DeclKind::RECORD:
-    case mx::DeclKind::CXX_RECORD:
-    case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
-    case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
-    case mx::DeclKind::ENUM:
-      return true;
-
-    // Enumerators.
-    case mx::DeclKind::ENUM_CONSTANT:
-
-    // Redeclarable templates.
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
-    case mx::DeclKind::FUNCTION_TEMPLATE:
-    case mx::DeclKind::CLASS_TEMPLATE:
-    case mx::DeclKind::VAR_TEMPLATE:
-    case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
-      return true;
-
-    // Fields.
-    case mx::DeclKind::FIELD:
-    case mx::DeclKind::INDIRECT_FIELD:
-      return true;
-
-    // Types.
-    case mx::DeclKind::TYPE_ALIAS:
-    // case mx::DeclKind::TYPE_ALIAS_TEMPLATE:
-    case mx::DeclKind::TYPE:
-    case mx::DeclKind::TYPEDEF:
-    case mx::DeclKind::TYPEDEF_NAME:
-      return true;
-
-    default:
-      return false;
-  }
-}
-
 EntityProvider::~EntityProvider(void) noexcept {}
 
 Decl DeclIterator::operator*(void) && noexcept {
@@ -203,10 +93,8 @@ std::optional<Decl> Decl::definition(void) const {
 
 std::vector<Decl> Decl::redeclarations(void) const {
   std::vector<Decl> redecls;
-  for (SpecificEntityId<DeclarationId> eid :
-           fragment->ep->Redeclarations(fragment->ep, id())) {
-    if (std::optional<Decl> redecl =
-            fragment->DeclFor(fragment, eid.Pack())) {
+  for (RawEntityId raw_id : fragment->ep->Redeclarations(fragment->ep, id())) {
+    if (std::optional<Decl> redecl = fragment->DeclFor(fragment, raw_id)) {
       redecls.emplace_back(std::move(redecl.value()));
     }
   }

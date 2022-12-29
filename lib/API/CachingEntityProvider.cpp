@@ -127,29 +127,34 @@ RegexQueryResultImpl::Ptr CachingEntityProvider::Query(
   return next->Query(self, query);
 }
 
-DeclarationIdList CachingEntityProvider::Redeclarations(
+RawEntityIdList CachingEntityProvider::Redeclarations(
     const Ptr &self, SpecificEntityId<DeclarationId> eid) {
 
   auto raw_id = eid.Pack();
 
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  if (auto it = redeclarations.find(raw_id); it != redeclarations.end()) {
-    return *(it->second);
+  std::shared_ptr<RawEntityIdList> redecls;
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(raw_id);
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
+    }
+  } while (false);
+
+  if (!redecls) {
+    redecls = std::make_shared<RawEntityIdList>(
+        next->Redeclarations(self, eid));
+
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    redeclarations.emplace(raw_id, redecls);
   }
 
-  auto redecl_ids_out = next->Redeclarations(self, eid);
-  auto cached_redecl_eids =
-      std::make_shared<DeclarationIdList>(redecl_ids_out);
-  for (SpecificEntityId<DeclarationId> eid : redecl_ids_out) {
-    redeclarations[eid.Pack()] = cached_redecl_eids;
-  }
-
-  return redecl_ids_out;
+  return *redecls;
 }
 
 void CachingEntityProvider::FillUses(
     const Ptr &self, RawEntityId eid,
-    DeclarationIdList &redecl_ids_out,
+    RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
   if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
@@ -157,7 +162,7 @@ void CachingEntityProvider::FillUses(
     return;
   }
 
-  std::shared_ptr<DeclarationIdList> redecls;
+  std::shared_ptr<RawEntityIdList> redecls;
   do {
     std::lock_guard<std::recursive_mutex> locker(lock);
     auto redecl_it = redeclarations.find(eid);
@@ -168,7 +173,7 @@ void CachingEntityProvider::FillUses(
 
   if (!redecls) {
     next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
-    redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
+    redecls = std::make_shared<RawEntityIdList>(redecl_ids_out);
 
     std::lock_guard<std::recursive_mutex> locker(lock);
     redeclarations.emplace(eid, std::move(redecls));
@@ -181,7 +186,7 @@ void CachingEntityProvider::FillUses(
 
 void CachingEntityProvider::FillReferences(
     const Ptr &self, RawEntityId eid,
-    DeclarationIdList &redecl_ids_out,
+    RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
   if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
@@ -189,7 +194,7 @@ void CachingEntityProvider::FillReferences(
     return;
   }
 
-  std::shared_ptr<DeclarationIdList> redecls;
+  std::shared_ptr<RawEntityIdList> redecls;
   do {
     std::lock_guard<std::recursive_mutex> locker(lock);
     auto redecl_it = redeclarations.find(eid);
@@ -200,7 +205,7 @@ void CachingEntityProvider::FillReferences(
 
   if (!redecls) {
     next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
-    redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
+    redecls = std::make_shared<RawEntityIdList>(redecl_ids_out);
 
     std::lock_guard<std::recursive_mutex> locker(lock);
     redeclarations.emplace(eid, std::move(redecls));

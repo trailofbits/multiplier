@@ -61,6 +61,8 @@ using VariantUse = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
 
 // Base for uses. Uses represent AST methods that return a specific entity
 // ID.
+//
+// TODO(pag): Rename to `UserBase`?
 class UseBase {
  private:
   friend class Decl;
@@ -115,6 +117,8 @@ enum class MacroUseSelector : unsigned short;
 enum class FileUseSelector : unsigned short;
 
 // A declaration or statement use, along with the usage selector.
+//
+// TODO(pag): Rename to `User`?
 template <typename Selector>
 class Use : public UseBase {
  private:

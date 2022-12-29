@@ -64,6 +64,7 @@ using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
 using FilePathMap = std::map<std::filesystem::path, SpecificEntityId<FileId>>;
 using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
 using DeclarationIdList = std::vector<SpecificEntityId<DeclarationId>>;
+using RawEntityIdList = std::vector<RawEntityId>;
 
 using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
 using NamedEntityList = std::vector<NamedEntity>;
@@ -198,7 +199,7 @@ class EntityProvider {
   Query(const Ptr &, const RegexQuery &query) = 0;
 
   // Return the redeclarations of a given declaration.
-  virtual DeclarationIdList Redeclarations(
+  virtual RawEntityIdList Redeclarations(
       const Ptr &, SpecificEntityId<DeclarationId> eid) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
@@ -207,7 +208,7 @@ class EntityProvider {
   // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
   //            with `eid` if `eid` resides in a fragment.
   virtual void FillUses(const Ptr &, RawEntityId eid,
-                        DeclarationIdList &redecl_ids_out,
+                        RawEntityIdList &redecl_ids_out,
                         FragmentIdList &fragment_ids_out) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
@@ -216,12 +217,12 @@ class EntityProvider {
   // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
   //            with `eid` if `eid` resides in a fragment.
   virtual void FillReferences(const Ptr &, RawEntityId eid,
-                              DeclarationIdList &redecl_ids_out,
+                              RawEntityIdList &redecl_ids_out,
                               FragmentIdList &fragment_ids_out) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
-                          std::vector<RawEntityId> &ids_out) = 0;
+                          RawEntityIdList &ids_out) = 0;
 };
 
 using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,

@@ -46,15 +46,15 @@ class InvalidEntityProvider final : public EntityProvider {
   std::shared_ptr<RegexQueryResultImpl> Query(
       const Ptr &, const RegexQuery &) final;
 
-  DeclarationIdList Redeclarations(
+  RawEntityIdList Redeclarations(
       const Ptr &, SpecificEntityId<DeclarationId>) final;
 
   void FillUses(const Ptr &, RawEntityId eid,
-                DeclarationIdList &redecl_ids_out,
+                RawEntityIdList &redecl_ids_out,
                 FragmentIdList &fragment_ids_out) final;
 
   void FillReferences(const Ptr &, RawEntityId eid,
-                      DeclarationIdList &redecl_ids_out,
+                      RawEntityIdList &redecl_ids_out,
                       FragmentIdList &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,

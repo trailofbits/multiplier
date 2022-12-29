@@ -22,9 +22,6 @@ namespace mx {
 
 class Decl;
 
-bool MayHaveRemoteRedeclarations(const mx::Decl &decl);
-bool MayHaveRemoteUses(const mx::Decl &decl);
-
 using NodeReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 using FragmentReader = rpc::Fragment::Reader;
 using DeclReader = ast::Decl::Reader;

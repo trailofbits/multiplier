@@ -6430,57 +6430,109 @@ MX_BEGIN_VISIT_ABSTRACT_MACRO(ConditionalMacroDirective)
   MX_EXIT_VISIT_ConditionalMacroDirective
 MX_END_VISIT_MACRO(ConditionalMacroDirective)
 
-#ifndef MX_ENTER_VISIT_ImportMacroDirective
-#  define MX_ENTER_VISIT_ImportMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#ifndef MX_ENTER_VISIT_EndIfMacroDirective
+#  define MX_ENTER_VISIT_EndIfMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
 #endif
-#ifndef MX_EXIT_VISIT_ImportMacroDirective
-#  define MX_EXIT_VISIT_ImportMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
-#endif
-
-MX_BEGIN_VISIT_MACRO(ImportMacroDirective)
-  MX_ENTER_VISIT_ImportMacroDirective
-  MX_VISIT_BASE(ImportMacroDirective, ConditionalMacroDirective)
-  MX_EXIT_VISIT_ImportMacroDirective
-MX_END_VISIT_MACRO(ImportMacroDirective)
-
-#ifndef MX_ENTER_VISIT_IncludeMacrosMacroDirective
-#  define MX_ENTER_VISIT_IncludeMacrosMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
-#endif
-#ifndef MX_EXIT_VISIT_IncludeMacrosMacroDirective
-#  define MX_EXIT_VISIT_IncludeMacrosMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#ifndef MX_EXIT_VISIT_EndIfMacroDirective
+#  define MX_EXIT_VISIT_EndIfMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
 #endif
 
-MX_BEGIN_VISIT_MACRO(IncludeMacrosMacroDirective)
-  MX_ENTER_VISIT_IncludeMacrosMacroDirective
-  MX_VISIT_BASE(IncludeMacrosMacroDirective, ConditionalMacroDirective)
-  MX_EXIT_VISIT_IncludeMacrosMacroDirective
-MX_END_VISIT_MACRO(IncludeMacrosMacroDirective)
+MX_BEGIN_VISIT_MACRO(EndIfMacroDirective)
+  MX_ENTER_VISIT_EndIfMacroDirective
+  MX_VISIT_BASE(EndIfMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_EndIfMacroDirective
+MX_END_VISIT_MACRO(EndIfMacroDirective)
 
-#ifndef MX_ENTER_VISIT_IncludeNextMacroDirective
-#  define MX_ENTER_VISIT_IncludeNextMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#ifndef MX_ENTER_VISIT_ElseMacroDirective
+#  define MX_ENTER_VISIT_ElseMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
 #endif
-#ifndef MX_EXIT_VISIT_IncludeNextMacroDirective
-#  define MX_EXIT_VISIT_IncludeNextMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
-#endif
-
-MX_BEGIN_VISIT_MACRO(IncludeNextMacroDirective)
-  MX_ENTER_VISIT_IncludeNextMacroDirective
-  MX_VISIT_BASE(IncludeNextMacroDirective, ConditionalMacroDirective)
-  MX_EXIT_VISIT_IncludeNextMacroDirective
-MX_END_VISIT_MACRO(IncludeNextMacroDirective)
-
-#ifndef MX_ENTER_VISIT_IncludeMacroDirective
-#  define MX_ENTER_VISIT_IncludeMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
-#endif
-#ifndef MX_EXIT_VISIT_IncludeMacroDirective
-#  define MX_EXIT_VISIT_IncludeMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#ifndef MX_EXIT_VISIT_ElseMacroDirective
+#  define MX_EXIT_VISIT_ElseMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
 #endif
 
-MX_BEGIN_VISIT_MACRO(IncludeMacroDirective)
-  MX_ENTER_VISIT_IncludeMacroDirective
-  MX_VISIT_BASE(IncludeMacroDirective, ConditionalMacroDirective)
-  MX_EXIT_VISIT_IncludeMacroDirective
-MX_END_VISIT_MACRO(IncludeMacroDirective)
+MX_BEGIN_VISIT_MACRO(ElseMacroDirective)
+  MX_ENTER_VISIT_ElseMacroDirective
+  MX_VISIT_BASE(ElseMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_ElseMacroDirective
+MX_END_VISIT_MACRO(ElseMacroDirective)
+
+#ifndef MX_ENTER_VISIT_ElseIfNotDefinedMacroDirective
+#  define MX_ENTER_VISIT_ElseIfNotDefinedMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#endif
+#ifndef MX_EXIT_VISIT_ElseIfNotDefinedMacroDirective
+#  define MX_EXIT_VISIT_ElseIfNotDefinedMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#endif
+
+MX_BEGIN_VISIT_MACRO(ElseIfNotDefinedMacroDirective)
+  MX_ENTER_VISIT_ElseIfNotDefinedMacroDirective
+  MX_VISIT_BASE(ElseIfNotDefinedMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_ElseIfNotDefinedMacroDirective
+MX_END_VISIT_MACRO(ElseIfNotDefinedMacroDirective)
+
+#ifndef MX_ENTER_VISIT_ElseIfDefinedMacroDirective
+#  define MX_ENTER_VISIT_ElseIfDefinedMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#endif
+#ifndef MX_EXIT_VISIT_ElseIfDefinedMacroDirective
+#  define MX_EXIT_VISIT_ElseIfDefinedMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#endif
+
+MX_BEGIN_VISIT_MACRO(ElseIfDefinedMacroDirective)
+  MX_ENTER_VISIT_ElseIfDefinedMacroDirective
+  MX_VISIT_BASE(ElseIfDefinedMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_ElseIfDefinedMacroDirective
+MX_END_VISIT_MACRO(ElseIfDefinedMacroDirective)
+
+#ifndef MX_ENTER_VISIT_ElseIfMacroDirective
+#  define MX_ENTER_VISIT_ElseIfMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#endif
+#ifndef MX_EXIT_VISIT_ElseIfMacroDirective
+#  define MX_EXIT_VISIT_ElseIfMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#endif
+
+MX_BEGIN_VISIT_MACRO(ElseIfMacroDirective)
+  MX_ENTER_VISIT_ElseIfMacroDirective
+  MX_VISIT_BASE(ElseIfMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_ElseIfMacroDirective
+MX_END_VISIT_MACRO(ElseIfMacroDirective)
+
+#ifndef MX_ENTER_VISIT_IfNotDefinedMacroDirective
+#  define MX_ENTER_VISIT_IfNotDefinedMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#endif
+#ifndef MX_EXIT_VISIT_IfNotDefinedMacroDirective
+#  define MX_EXIT_VISIT_IfNotDefinedMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#endif
+
+MX_BEGIN_VISIT_MACRO(IfNotDefinedMacroDirective)
+  MX_ENTER_VISIT_IfNotDefinedMacroDirective
+  MX_VISIT_BASE(IfNotDefinedMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_IfNotDefinedMacroDirective
+MX_END_VISIT_MACRO(IfNotDefinedMacroDirective)
+
+#ifndef MX_ENTER_VISIT_IfDefinedMacroDirective
+#  define MX_ENTER_VISIT_IfDefinedMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#endif
+#ifndef MX_EXIT_VISIT_IfDefinedMacroDirective
+#  define MX_EXIT_VISIT_IfDefinedMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#endif
+
+MX_BEGIN_VISIT_MACRO(IfDefinedMacroDirective)
+  MX_ENTER_VISIT_IfDefinedMacroDirective
+  MX_VISIT_BASE(IfDefinedMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_IfDefinedMacroDirective
+MX_END_VISIT_MACRO(IfDefinedMacroDirective)
+
+#ifndef MX_ENTER_VISIT_IfMacroDirective
+#  define MX_ENTER_VISIT_IfMacroDirective MX_ENTER_VISIT_ConditionalMacroDirective
+#endif
+#ifndef MX_EXIT_VISIT_IfMacroDirective
+#  define MX_EXIT_VISIT_IfMacroDirective MX_EXIT_VISIT_ConditionalMacroDirective
+#endif
+
+MX_BEGIN_VISIT_MACRO(IfMacroDirective)
+  MX_ENTER_VISIT_IfMacroDirective
+  MX_VISIT_BASE(IfMacroDirective, ConditionalMacroDirective)
+  MX_EXIT_VISIT_IfMacroDirective
+MX_END_VISIT_MACRO(IfMacroDirective)
 
 #ifndef MX_ENTER_VISIT_IncludeLikeMacroDirective
 #  define MX_ENTER_VISIT_IncludeLikeMacroDirective MX_ENTER_VISIT_MacroDirective
@@ -6496,109 +6548,57 @@ MX_BEGIN_VISIT_ABSTRACT_MACRO(IncludeLikeMacroDirective)
   MX_EXIT_VISIT_IncludeLikeMacroDirective
 MX_END_VISIT_MACRO(IncludeLikeMacroDirective)
 
-#ifndef MX_ENTER_VISIT_EndIfMacroDirective
-#  define MX_ENTER_VISIT_EndIfMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
+#ifndef MX_ENTER_VISIT_ImportMacroDirective
+#  define MX_ENTER_VISIT_ImportMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
 #endif
-#ifndef MX_EXIT_VISIT_EndIfMacroDirective
-#  define MX_EXIT_VISIT_EndIfMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
-#endif
-
-MX_BEGIN_VISIT_MACRO(EndIfMacroDirective)
-  MX_ENTER_VISIT_EndIfMacroDirective
-  MX_VISIT_BASE(EndIfMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_EndIfMacroDirective
-MX_END_VISIT_MACRO(EndIfMacroDirective)
-
-#ifndef MX_ENTER_VISIT_ElseMacroDirective
-#  define MX_ENTER_VISIT_ElseMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
-#endif
-#ifndef MX_EXIT_VISIT_ElseMacroDirective
-#  define MX_EXIT_VISIT_ElseMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
+#ifndef MX_EXIT_VISIT_ImportMacroDirective
+#  define MX_EXIT_VISIT_ImportMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
 #endif
 
-MX_BEGIN_VISIT_MACRO(ElseMacroDirective)
-  MX_ENTER_VISIT_ElseMacroDirective
-  MX_VISIT_BASE(ElseMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_ElseMacroDirective
-MX_END_VISIT_MACRO(ElseMacroDirective)
+MX_BEGIN_VISIT_MACRO(ImportMacroDirective)
+  MX_ENTER_VISIT_ImportMacroDirective
+  MX_VISIT_BASE(ImportMacroDirective, IncludeLikeMacroDirective)
+  MX_EXIT_VISIT_ImportMacroDirective
+MX_END_VISIT_MACRO(ImportMacroDirective)
 
-#ifndef MX_ENTER_VISIT_ElseIfNotDefinedMacroDirective
-#  define MX_ENTER_VISIT_ElseIfNotDefinedMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
+#ifndef MX_ENTER_VISIT_IncludeMacrosMacroDirective
+#  define MX_ENTER_VISIT_IncludeMacrosMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
 #endif
-#ifndef MX_EXIT_VISIT_ElseIfNotDefinedMacroDirective
-#  define MX_EXIT_VISIT_ElseIfNotDefinedMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
-#endif
-
-MX_BEGIN_VISIT_MACRO(ElseIfNotDefinedMacroDirective)
-  MX_ENTER_VISIT_ElseIfNotDefinedMacroDirective
-  MX_VISIT_BASE(ElseIfNotDefinedMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_ElseIfNotDefinedMacroDirective
-MX_END_VISIT_MACRO(ElseIfNotDefinedMacroDirective)
-
-#ifndef MX_ENTER_VISIT_ElseIfDefinedMacroDirective
-#  define MX_ENTER_VISIT_ElseIfDefinedMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
-#endif
-#ifndef MX_EXIT_VISIT_ElseIfDefinedMacroDirective
-#  define MX_EXIT_VISIT_ElseIfDefinedMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
+#ifndef MX_EXIT_VISIT_IncludeMacrosMacroDirective
+#  define MX_EXIT_VISIT_IncludeMacrosMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
 #endif
 
-MX_BEGIN_VISIT_MACRO(ElseIfDefinedMacroDirective)
-  MX_ENTER_VISIT_ElseIfDefinedMacroDirective
-  MX_VISIT_BASE(ElseIfDefinedMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_ElseIfDefinedMacroDirective
-MX_END_VISIT_MACRO(ElseIfDefinedMacroDirective)
+MX_BEGIN_VISIT_MACRO(IncludeMacrosMacroDirective)
+  MX_ENTER_VISIT_IncludeMacrosMacroDirective
+  MX_VISIT_BASE(IncludeMacrosMacroDirective, IncludeLikeMacroDirective)
+  MX_EXIT_VISIT_IncludeMacrosMacroDirective
+MX_END_VISIT_MACRO(IncludeMacrosMacroDirective)
 
-#ifndef MX_ENTER_VISIT_ElseIfMacroDirective
-#  define MX_ENTER_VISIT_ElseIfMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
+#ifndef MX_ENTER_VISIT_IncludeNextMacroDirective
+#  define MX_ENTER_VISIT_IncludeNextMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
 #endif
-#ifndef MX_EXIT_VISIT_ElseIfMacroDirective
-#  define MX_EXIT_VISIT_ElseIfMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
-#endif
-
-MX_BEGIN_VISIT_MACRO(ElseIfMacroDirective)
-  MX_ENTER_VISIT_ElseIfMacroDirective
-  MX_VISIT_BASE(ElseIfMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_ElseIfMacroDirective
-MX_END_VISIT_MACRO(ElseIfMacroDirective)
-
-#ifndef MX_ENTER_VISIT_IfNotDefinedMacroDirective
-#  define MX_ENTER_VISIT_IfNotDefinedMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
-#endif
-#ifndef MX_EXIT_VISIT_IfNotDefinedMacroDirective
-#  define MX_EXIT_VISIT_IfNotDefinedMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
+#ifndef MX_EXIT_VISIT_IncludeNextMacroDirective
+#  define MX_EXIT_VISIT_IncludeNextMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
 #endif
 
-MX_BEGIN_VISIT_MACRO(IfNotDefinedMacroDirective)
-  MX_ENTER_VISIT_IfNotDefinedMacroDirective
-  MX_VISIT_BASE(IfNotDefinedMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_IfNotDefinedMacroDirective
-MX_END_VISIT_MACRO(IfNotDefinedMacroDirective)
+MX_BEGIN_VISIT_MACRO(IncludeNextMacroDirective)
+  MX_ENTER_VISIT_IncludeNextMacroDirective
+  MX_VISIT_BASE(IncludeNextMacroDirective, IncludeLikeMacroDirective)
+  MX_EXIT_VISIT_IncludeNextMacroDirective
+MX_END_VISIT_MACRO(IncludeNextMacroDirective)
 
-#ifndef MX_ENTER_VISIT_IfDefinedMacroDirective
-#  define MX_ENTER_VISIT_IfDefinedMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
+#ifndef MX_ENTER_VISIT_IncludeMacroDirective
+#  define MX_ENTER_VISIT_IncludeMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
 #endif
-#ifndef MX_EXIT_VISIT_IfDefinedMacroDirective
-#  define MX_EXIT_VISIT_IfDefinedMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
-#endif
-
-MX_BEGIN_VISIT_MACRO(IfDefinedMacroDirective)
-  MX_ENTER_VISIT_IfDefinedMacroDirective
-  MX_VISIT_BASE(IfDefinedMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_IfDefinedMacroDirective
-MX_END_VISIT_MACRO(IfDefinedMacroDirective)
-
-#ifndef MX_ENTER_VISIT_IfMacroDirective
-#  define MX_ENTER_VISIT_IfMacroDirective MX_ENTER_VISIT_IncludeLikeMacroDirective
-#endif
-#ifndef MX_EXIT_VISIT_IfMacroDirective
-#  define MX_EXIT_VISIT_IfMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
+#ifndef MX_EXIT_VISIT_IncludeMacroDirective
+#  define MX_EXIT_VISIT_IncludeMacroDirective MX_EXIT_VISIT_IncludeLikeMacroDirective
 #endif
 
-MX_BEGIN_VISIT_MACRO(IfMacroDirective)
-  MX_ENTER_VISIT_IfMacroDirective
-  MX_VISIT_BASE(IfMacroDirective, IncludeLikeMacroDirective)
-  MX_EXIT_VISIT_IfMacroDirective
-MX_END_VISIT_MACRO(IfMacroDirective)
+MX_BEGIN_VISIT_MACRO(IncludeMacroDirective)
+  MX_ENTER_VISIT_IncludeMacroDirective
+  MX_VISIT_BASE(IncludeMacroDirective, IncludeLikeMacroDirective)
+  MX_EXIT_VISIT_IncludeMacroDirective
+MX_END_VISIT_MACRO(IncludeMacroDirective)
 
 #ifndef MX_ENTER_VISIT_Attr
 #  define MX_ENTER_VISIT_Attr
@@ -19392,16 +19392,6 @@ MX_END_VISIT_DECL(EmptyDecl)
 #undef MX_EXIT_VISIT_OtherMacroDirective
 #undef MX_ENTER_VISIT_ConditionalMacroDirective
 #undef MX_EXIT_VISIT_ConditionalMacroDirective
-#undef MX_ENTER_VISIT_ImportMacroDirective
-#undef MX_EXIT_VISIT_ImportMacroDirective
-#undef MX_ENTER_VISIT_IncludeMacrosMacroDirective
-#undef MX_EXIT_VISIT_IncludeMacrosMacroDirective
-#undef MX_ENTER_VISIT_IncludeNextMacroDirective
-#undef MX_EXIT_VISIT_IncludeNextMacroDirective
-#undef MX_ENTER_VISIT_IncludeMacroDirective
-#undef MX_EXIT_VISIT_IncludeMacroDirective
-#undef MX_ENTER_VISIT_IncludeLikeMacroDirective
-#undef MX_EXIT_VISIT_IncludeLikeMacroDirective
 #undef MX_ENTER_VISIT_EndIfMacroDirective
 #undef MX_EXIT_VISIT_EndIfMacroDirective
 #undef MX_ENTER_VISIT_ElseMacroDirective
@@ -19418,6 +19408,16 @@ MX_END_VISIT_DECL(EmptyDecl)
 #undef MX_EXIT_VISIT_IfDefinedMacroDirective
 #undef MX_ENTER_VISIT_IfMacroDirective
 #undef MX_EXIT_VISIT_IfMacroDirective
+#undef MX_ENTER_VISIT_IncludeLikeMacroDirective
+#undef MX_EXIT_VISIT_IncludeLikeMacroDirective
+#undef MX_ENTER_VISIT_ImportMacroDirective
+#undef MX_EXIT_VISIT_ImportMacroDirective
+#undef MX_ENTER_VISIT_IncludeMacrosMacroDirective
+#undef MX_EXIT_VISIT_IncludeMacrosMacroDirective
+#undef MX_ENTER_VISIT_IncludeNextMacroDirective
+#undef MX_EXIT_VISIT_IncludeNextMacroDirective
+#undef MX_ENTER_VISIT_IncludeMacroDirective
+#undef MX_EXIT_VISIT_IncludeMacroDirective
 #undef MX_ENTER_VISIT_Attr
 #undef MX_EXIT_VISIT_Attr
 #undef MX_ENTER_VISIT_AlignValueAttr

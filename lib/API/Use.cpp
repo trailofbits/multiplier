@@ -14,6 +14,8 @@
 namespace mx {
 namespace {
 
+static thread_local RawEntityIdList tIgnoredRedecls;
+
 #define MX_VISIT_ENUM(cls, api_name, storage, apply, \
                       pasta_name, type, nth_list) \
     template <typename Reader> \
@@ -106,20 +108,14 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
   DeclarationId did = sid.Unpack();
-  DeclarationIdList redecl_ids;
 
-  if (MayHaveRemoteUses(entity)) {
-    ep->FillUses(ep, sid.Pack(), redecl_ids, fragment_ids);
-
-  } else {
-    redecl_ids = ep->Redeclarations(ep, did);
-  }
+  ep->FillUses(ep, sid.Pack(), search_ids, fragment_ids);
 
   // Make sure all fragments containing each redeclaration is present in
   // the output fragment ID list.
-  for (PackedDeclarationId eid : redecl_ids) {
-    fragment_ids.emplace_back(FragmentId(eid.Unpack().fragment_id));
-    search_ids.push_back(eid.Pack());
+  for (RawEntityId search_id : search_ids) {
+    DeclarationId id = std::get<DeclarationId>(EntityId(search_id).Unpack());
+    fragment_ids.emplace_back(FragmentId(id.fragment_id));
   }
 
   std::sort(search_ids.begin(), search_ids.end());
@@ -160,9 +156,8 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
   search_ids.push_back(raw_id);
 
   // TODO(pag): Support redeclarations of macros.
-  DeclarationIdList redecl_ids;
-  ep->FillUses(ep, raw_id, redecl_ids, fragment_ids);
-  assert(redecl_ids.empty());
+  ep->FillUses(ep, raw_id, tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
 
   fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 
@@ -177,9 +172,8 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity)
   RawEntityId raw_id = entity.id().Pack();
   search_ids.push_back(raw_id);
 
-  DeclarationIdList redecl_ids;
-  ep->FillUses(ep, raw_id, redecl_ids, fragment_ids);
-  assert(redecl_ids.empty());
+  ep->FillUses(ep, raw_id, tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
 }
 
 UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
@@ -189,9 +183,8 @@ UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
   RawEntityId raw_id = eid.Pack();
   search_ids.push_back(raw_id);
 
-  DeclarationIdList redecl_ids;
-  ep->FillUses(ep, raw_id, redecl_ids, fragment_ids);
-  assert(redecl_ids.empty());
+  ep->FillUses(ep, raw_id, tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
 
   // This token might be part of a fragment.
   VariantId vid = eid.Unpack();
@@ -563,7 +556,7 @@ VariantUse UseBase::entity(void) const {
         return NotAnEntity{};
       }
     case UseKind::MACRO:
-      if (offset < fragment->num_types) {
+      if (offset < fragment->num_macros) {
         return Macro(fragment, offset);
       } else {
         return NotAnEntity{};
@@ -685,20 +678,14 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
     : BaseUseIteratorImpl(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
   DeclarationId did = sid.Unpack();
-  DeclarationIdList redecl_ids;
 
-  if (MayHaveRemoteUses(entity)) {
-    ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
-
-  } else {
-    redecl_ids = ep->Redeclarations(ep, did);
-  }
+  ep->FillReferences(ep, sid.Pack(), search_ids, fragment_ids);
 
   // Make sure all fragments containing each redeclaration is present in
   // the output fragment ID list.
-  for (PackedDeclarationId eid : redecl_ids) {
-    fragment_ids.emplace_back(FragmentId(eid.Unpack().fragment_id));
-    search_ids.push_back(eid.Pack());
+  for (RawEntityId search_id : search_ids) {
+    DeclarationId id = std::get<DeclarationId>(EntityId(search_id).Unpack());
+    fragment_ids.emplace_back(FragmentId(id.fragment_id));
   }
 
   std::sort(search_ids.begin(), search_ids.end());
@@ -714,9 +701,8 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Macro &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   SpecificEntityId<MacroId> sid = entity.id();
-  DeclarationIdList redecl_ids;
-  ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
-  assert(redecl_ids.empty());
+  ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
 
   // Make sure the fragments containing the macro is present in
   // the output fragment ID list.
@@ -733,15 +719,16 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
     : BaseUseIteratorImpl(std::move(ep_)) {
 
   SpecificEntityId<FileId> sid = entity.id();
-  DeclarationIdList redecl_ids;
-  ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
-  assert(redecl_ids.empty());
+  ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
 
   search_ids.emplace_back(sid.Pack());
 
   std::sort(fragment_ids.begin(), fragment_ids.end());
   auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it2, fragment_ids.end());
+
+  assert(0u < fragment_ids.size());
 }
 
 StmtReferenceIterator::~StmtReferenceIterator(void) {}
@@ -852,7 +839,7 @@ void MacroReferenceIterator::Advance(void) {
   RawEntityId search_id = impl->search_ids[0];
 
   for (;;) {
-    // Initialize to the first statement of the fragment.
+    // Initialize to the first macro of the fragment.
     if (!user.fragment) {
       if (fragment_offset >= impl->fragment_ids.size()) {
         impl.reset();  // Done.
@@ -867,12 +854,12 @@ void MacroReferenceIterator::Advance(void) {
 
       user.offset = 0u;
 
-    // Skip to the next statement.
+    // Skip to the next macro.
     } else {
       ++user.offset;
     }
 
-    // We've exhausted the statements in this fragment; skip to the next
+    // We've exhausted the macros in this fragment; skip to the next
     // fragment.
     if (user.offset >= user.fragment->num_macros) {
       user.fragment.reset();

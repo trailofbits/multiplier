@@ -19,22 +19,22 @@
 #include "../Token.h"
 #include "../Use.h"
 
-#include "IncludeLikeMacroDirective.h"
+#include "ConditionalMacroDirective.h"
 #include "MacroKind.h"
 
 namespace mx {
+class ConditionalMacroDirective;
 class ElseIfNotDefinedMacroDirective;
-class IncludeLikeMacroDirective;
 class Macro;
 class MacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using ElseIfNotDefinedMacroDirectiveRange = DerivedEntityRange<MacroIterator, ElseIfNotDefinedMacroDirective>;
 using ElseIfNotDefinedMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, ElseIfNotDefinedMacroDirective>;
 
-class ElseIfNotDefinedMacroDirective : public IncludeLikeMacroDirective {
+class ElseIfNotDefinedMacroDirective : public ConditionalMacroDirective {
  private:
   friend class FragmentImpl;
-  friend class IncludeLikeMacroDirective;
+  friend class ConditionalMacroDirective;
   friend class MacroDirective;
   friend class Macro;
  public:
@@ -48,9 +48,9 @@ class ElseIfNotDefinedMacroDirective : public IncludeLikeMacroDirective {
   static ElseIfNotDefinedMacroDirectiveContainingMacroRange containing(const Token &token);
   bool contains(const Token &token);
 
-  static std::optional<ElseIfNotDefinedMacroDirective> from(const IncludeLikeMacroDirective &parent);
+  static std::optional<ElseIfNotDefinedMacroDirective> from(const ConditionalMacroDirective &parent);
 
-  inline static std::optional<ElseIfNotDefinedMacroDirective> from(const std::optional<IncludeLikeMacroDirective> &parent) {
+  inline static std::optional<ElseIfNotDefinedMacroDirective> from(const std::optional<ConditionalMacroDirective> &parent) {
     if (parent) {
       return ElseIfNotDefinedMacroDirective::from(parent.value());
     } else {
@@ -80,7 +80,7 @@ class ElseIfNotDefinedMacroDirective : public IncludeLikeMacroDirective {
 
 };
 
-static_assert(sizeof(ElseIfNotDefinedMacroDirective) == sizeof(IncludeLikeMacroDirective));
+static_assert(sizeof(ElseIfNotDefinedMacroDirective) == sizeof(ConditionalMacroDirective));
 
 #endif
 } // namespace mx

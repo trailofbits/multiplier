@@ -118,12 +118,12 @@ class SQLiteEntityProvider::Context {
 #endif
         get_uses(db.Prepare(
             "SELECT DISTINCT(u.fragment_id) FROM use AS u "
-            "LEFT JOIN " + entity_id_list + " AS l "
+            "JOIN " + entity_id_list + " AS l "
             "ON u.entity_id = l.entity_id")),
 
         get_references(db.Prepare(
             "SELECT DISTINCT(r.fragment_id) FROM reference AS r "
-            "LEFT JOIN " + entity_id_list + " AS l "
+            "JOIN " + entity_id_list + " AS l "
             "ON r.entity_id = l.entity_id")) {}
 };
 
@@ -454,7 +454,7 @@ std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(
 //      regex, self, std::move(fragment_ids));
 }
 
-DeclarationIdList SQLiteEntityProvider::Redeclarations(
+RawEntityIdList SQLiteEntityProvider::Redeclarations(
     const Ptr &, SpecificEntityId<DeclarationId> id) {
 
   std::shared_ptr<Context> context = thread_context.Lock();
@@ -472,8 +472,8 @@ DeclarationIdList SQLiteEntityProvider::Redeclarations(
   return ReadRedeclarations(*context);
 }
 
-DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
-  DeclarationIdList ret;
+RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
+  RawEntityIdList ret;
   ret.reserve(8u);
 
   context.expand_entity_id_list_with_redecls.Execute();
@@ -485,7 +485,7 @@ DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
 
     VariantId vid = EntityId(raw_id).Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
-      ret.emplace_back(std::get<DeclarationId>(vid));
+      ret.emplace_back(raw_id);
     } else {
       assert(false);
     }
@@ -498,10 +498,11 @@ DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
   std::sort(ret.begin(), ret.end());
   auto it = std::unique(ret.begin(), ret.end());
   ret.erase(it, ret.end());
+
   std::partition(
       ret.begin(), ret.end(),
-      [] (SpecificEntityId<DeclarationId> eid) {
-        return eid.Unpack().is_definition;
+      [] (RawEntityId eid) {
+        return std::get<DeclarationId>(EntityId(eid).Unpack()).is_definition;
       });
 
   return ret;
@@ -509,7 +510,7 @@ DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
 
 void SQLiteEntityProvider::FillFragments(
     Context &context, sqlite::Statement &get_fragments,
-    RawEntityId raw_id, DeclarationIdList &redecl_ids_out,
+    RawEntityId raw_id, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
   sqlite::Statement &get_entity_ids = context.get_entity_ids;
@@ -541,8 +542,8 @@ void SQLiteEntityProvider::FillFragments(
 
     // If we already have a set then use them.
     } else {
-      for (SpecificEntityId<DeclarationId> did : redecl_ids_out) {
-        add_entity_id.BindValues(did.Pack());
+      for (RawEntityId raw_redecl_id : redecl_ids_out) {
+        add_entity_id.BindValues(raw_redecl_id);
         add_entity_id.Execute();
       }
     }
@@ -576,7 +577,7 @@ void SQLiteEntityProvider::FillFragments(
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
 void SQLiteEntityProvider::FillUses(
-    const Ptr &self, RawEntityId eid, DeclarationIdList &redecl_ids_out,
+    const Ptr &self, RawEntityId eid, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   std::shared_ptr<Context> context = thread_context.Lock();
   FillFragments(*context, context->get_uses, eid, redecl_ids_out,
@@ -589,7 +590,7 @@ void SQLiteEntityProvider::FillUses(
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
 void SQLiteEntityProvider::FillReferences(
-    const Ptr &self, RawEntityId eid, DeclarationIdList &redecl_ids_out,
+    const Ptr &self, RawEntityId eid, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
   std::shared_ptr<Context> context = thread_context.Lock();
