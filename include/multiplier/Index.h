@@ -316,11 +316,13 @@ class Index {
   // Run a Weggli search over the fragments in the index.
   //
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
+  [[deprecated]]
   WeggliQueryResult query_fragments(const WeggliQuery &query) const;
 
   // Run a regular expression search over the fragments in the index.
   //
   // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
+  [[deprecated]]
   RegexQueryResult query_fragments(const RegexQuery &query) const;
 
   // Search for entities by their name and category.
