@@ -80,6 +80,10 @@ class Macro {
   static ParentMacroIteratorImpl<Macro> containing_internal(const Token &token);
 
  public:
+  inline static MacroRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static MacroContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 

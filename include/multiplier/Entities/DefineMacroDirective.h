@@ -37,6 +37,10 @@ class DefineMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  inline static DefineMacroDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::DEFINE_DIRECTIVE;
   }

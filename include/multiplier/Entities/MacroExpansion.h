@@ -39,6 +39,10 @@ class MacroExpansion : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
+  inline static MacroExpansionRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::EXPANSION;
   }

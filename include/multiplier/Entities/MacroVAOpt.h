@@ -36,6 +36,10 @@ class MacroVAOpt : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
+  inline static MacroVAOptRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::VA_OPT;
   }

@@ -34,6 +34,10 @@ class MacroVAOptArgument : public Macro {
   friend class FragmentImpl;
   friend class Macro;
  public:
+  inline static MacroVAOptArgumentRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::VA_OPT_ARGUMENT;
   }

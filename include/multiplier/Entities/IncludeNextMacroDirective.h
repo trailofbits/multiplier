@@ -38,6 +38,10 @@ class IncludeNextMacroDirective : public IncludeLikeMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  inline static IncludeNextMacroDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::INCLUDE_NEXT_DIRECTIVE;
   }

@@ -36,6 +36,10 @@ class MacroDirective : public Macro {
   friend class FragmentImpl;
   friend class Macro;
  public:
+  inline static MacroDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static MacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 

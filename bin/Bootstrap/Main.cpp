@@ -2281,6 +2281,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "    }\n"
         << "    return false;\n"
         << "  }\n\n";
+
+  } else if (is_macro) {
+    class_os
+        << "  inline static " << class_name
+        << "Range in(const Fragment &frag) {\n"
+        << "    return in_internal(frag);\n"
+        << "  }\n\n";
   }
 
   if (is_decl) {

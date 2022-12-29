@@ -38,6 +38,10 @@ class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  inline static IfNotDefinedMacroDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::IF_NOT_DEFINED_DIRECTIVE;
   }

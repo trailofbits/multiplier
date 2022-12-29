@@ -36,6 +36,10 @@ class OtherMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  inline static OtherMacroDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::OTHER_DIRECTIVE;
   }

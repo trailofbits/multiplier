@@ -36,6 +36,10 @@ class MacroStringify : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
+  inline static MacroStringifyRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::STRINGIFY;
   }

@@ -38,6 +38,10 @@ class IncludeLikeMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
+  inline static IncludeLikeMacroDirectiveRange in(const Fragment &frag) {
+    return in_internal(frag);
+  }
+
   static IncludeLikeMacroDirectiveContainingMacroRange containing(const Macro &macro);
   bool contains(const Macro &macro);
 
