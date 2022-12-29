@@ -53,6 +53,11 @@ void LinkExternalReferencesInFragment(
   // TODO(pag): Add references for macros and files.
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
     if (!tt) {
+
+      // TODO(pag): Remove this assertion later; really it's a failure to
+      //            construct a token tree, and we do have a backup path
+      //            in `Persist.cpp`.
+      assert(false);
       continue;
     }
 
@@ -67,6 +72,7 @@ void LinkExternalReferencesInFragment(
     }
 
     if (raw_id == mx::kInvalidEntityId) {
+      assert(false);
       continue;
     }
 
@@ -113,8 +119,8 @@ void LinkExternalReferencesInFragment(
       case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
       case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
       case mx::MacroKind::IMPORT_DIRECTIVE:
-        if (auto id = pasta::IncludeLikeMacroDirective::From(m.value())) {
-          std::optional<pasta::File> f = id->IncludedFile();
+        if (auto inc = pasta::IncludeLikeMacroDirective::From(m.value())) {
+          std::optional<pasta::File> f = inc->IncludedFile();
           if (!f) {
             continue;
           }

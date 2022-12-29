@@ -151,13 +151,31 @@ void CachingEntityProvider::FillUses(
     const Ptr &self, RawEntityId eid,
     DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
-  
-  next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
 
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  if (redeclarations.find(eid) == redeclarations.end()) {
-    redeclarations.emplace(
-        eid, std::make_shared<DeclarationIdList>(redecl_ids_out));
+  if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
+    next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
+    return;
+  }
+
+  std::shared_ptr<DeclarationIdList> redecls;
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(eid);
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
+    }
+  } while (false);
+
+  if (!redecls) {
+    next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
+    redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
+
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    redeclarations.emplace(eid, std::move(redecls));
+
+  } else {
+    redecl_ids_out = *redecls;
+    next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
   }
 }
 
@@ -166,12 +184,30 @@ void CachingEntityProvider::FillReferences(
     DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
-  next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+  if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+    return;
+  }
 
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  if (redeclarations.find(eid) == redeclarations.end()) {
-    redeclarations.emplace(
-        eid, std::make_shared<DeclarationIdList>(redecl_ids_out));
+  std::shared_ptr<DeclarationIdList> redecls;
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(eid);
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
+    }
+  } while (false);
+
+  if (!redecls) {
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+    redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
+
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    redeclarations.emplace(eid, std::move(redecls));
+
+  } else {
+    redecl_ids_out = *redecls;
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
   }
 }
 

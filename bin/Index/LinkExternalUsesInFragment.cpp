@@ -123,6 +123,20 @@ namespace {
                         pasta_name, type, nth_list, selector) \
     if constexpr (std::is_base_of_v<pasta::Decl, pasta::type>) { \
       entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::File, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::FileToken, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::Macro, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::Token, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::Stmt, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::Type, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
+    } else if constexpr (std::is_base_of_v<pasta::Attr, pasta::type>) { \
+      entity_ids.insert(reader.getVal ## storage()); \
     }
 
 #define MX_VISIT_OPTIONAL_ENTITY MX_VISIT_ENTITY
