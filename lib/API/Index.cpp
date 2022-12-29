@@ -325,44 +325,56 @@ NamedEntityList Index::query_entities(std::string name) const {
 
   for (RawEntityId eid : entity_ids) {
     VariantId vid = EntityId(eid).Unpack();
-    if (!std::holds_alternative<DeclarationId>(vid)) {
-      assert(false);
-      continue;
-    }
+    if (std::holds_alternative<DeclarationId>(vid)) {
 
-    DeclarationId id = std::get<DeclarationId>(vid);
-    FragmentId fid(id.fragment_id);
-    FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-    if (!frag_ptr) {
-      assert(false);
-      continue;
-    }
-
-    if (id.offset >= frag_ptr->num_decls) {
-      assert(false);
-      continue;
-    }
-
-    Decl decl(std::move(frag_ptr), id.offset);
-    if (decl.id() != eid) {
-      assert(false);
-      continue;
-    }
-
-    auto nd = NamedDecl::from(decl);
-    if (!nd) {
-      assert(false);
-      continue;
-    }
-
-    if (!id.is_definition) {
-      if (auto def = decl.definition()) {
-        entities.emplace_back(std::move(NamedDecl::from(def.value()).value()));
-      } else {
-        entities.emplace_back(std::move(nd.value()));
+      DeclarationId id = std::get<DeclarationId>(vid);
+      FragmentId fid(id.fragment_id);
+      FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
+      if (!frag_ptr) {
+        assert(false);
+        continue;
       }
-    } else {
+
+      auto decl_ptr = frag_ptr->DeclFor(frag_ptr, eid);
+      if (!decl_ptr) {
+        assert(false);
+        continue;
+      }
+
+      auto nd = NamedDecl::from(std::move(decl_ptr.value()));
+      if (!nd) {
+        assert(false);
+        continue;
+      }
+
       entities.emplace_back(std::move(nd.value()));
+
+    } else if (std::holds_alternative<MacroId>(vid)) {
+
+      MacroId id = std::get<MacroId>(vid);
+      FragmentId fid(id.fragment_id);
+      FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
+      if (!frag_ptr) {
+        assert(false);
+        continue;
+      }
+
+      auto macro_ptr = frag_ptr->MacroFor(frag_ptr, eid);
+      if (!macro_ptr) {
+        assert(false);
+        continue;
+      }
+
+      auto def = DefineMacroDirective::from(std::move(macro_ptr.value()));
+      if (!def) {
+        assert(false);
+        continue;
+      }
+
+      entities.emplace_back(std::move(def.value()));
+
+    } else {
+      assert(false);
     }
   }
 

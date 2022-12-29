@@ -6,6 +6,7 @@
 
 #include "SQLiteEntityProvider.h"
 
+#include <multiplier/Database.h>
 #include <multiplier/Re2.h>
 #include <multiplier/Types.h>
 
@@ -26,7 +27,7 @@ static sqlite::Connection Connect(std::filesystem::path path,
   db.Execute("pragma temp_store = memory");
   db.Execute("pragma journal_mode = memory");
   db.Execute(
-      "CREATE TABLE IF NOT EXISTS " + entity_id_list + " ("
+      "CREATE TEMPORARY TABLE IF NOT EXISTS " + entity_id_list + " ("
       "  entity_id INT NOT NULL,"
       "  PRIMARY KEY(entity_id)"
       ") WITHOUT rowid");
@@ -606,7 +607,7 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
   sqlite::Statement &symbol_query = context->get_entities_by_name;
   for (symbol_query.BindValues(symbol); symbol_query.ExecuteStep(); ) {
     RawEntityId entity_id = kInvalidEntityId;
-    symbol_query.BindValues(entity_id);
+    symbol_query.Row().Columns(entity_id);
     VariantId vid = EntityId(entity_id).Unpack();
     if (std::holds_alternative<MacroId>(vid) ||
         std::holds_alternative<DeclarationId>(vid)) {
