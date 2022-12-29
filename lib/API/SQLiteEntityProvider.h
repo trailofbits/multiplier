@@ -34,9 +34,6 @@ class SQLiteEntityProvider final : public EntityProvider {
   const std::filesystem::path db_path;
   ThreadLocal<Context> thread_context;
 
-  void FillEntityIdsWithRedeclarations(
-      Context &context, SpecificEntityId<DeclarationId>);
-
   DeclarationIdList ReadRedeclarations(Context &context);
 
   void FillFragments(Context &context, sqlite::Statement &get_fragments,

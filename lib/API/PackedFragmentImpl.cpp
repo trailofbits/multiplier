@@ -46,7 +46,8 @@ RawEntityId PackedFragmentImpl::FileContaingFirstToken(void) const {
   EntityId id(reader.getFirstFileTokenId());
   if (VariantId unpacked_id = id.Unpack();
       std::holds_alternative<FileTokenId>(unpacked_id)) {
-    return std::get<FileTokenId>(unpacked_id).file_id;
+    FileId fid(std::get<FileTokenId>(unpacked_id).file_id);
+    return EntityId(fid).Pack();
   } else {
     return kInvalidEntityId;
   }

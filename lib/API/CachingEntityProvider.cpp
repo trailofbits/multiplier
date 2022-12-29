@@ -152,23 +152,13 @@ void CachingEntityProvider::FillUses(
     DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   
-  std::shared_ptr<DeclarationIdList> redecls;
+  next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
 
-  do {
-    std::lock_guard<std::recursive_mutex> locker(lock);
-    auto redecl_it = redeclarations.find(eid);
-    auto had_redecls = false;
-    if (redecl_it != redeclarations.end()) {
-      redecls = redecl_it->second;
-    } else {
-      redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
-      redeclarations.emplace(eid, redecls);
-    }
-
-    next->FillUses(self, eid, *redecls, fragment_ids_out);
-  } while (false);
-
-  redecl_ids_out = *redecls;
+  std::lock_guard<std::recursive_mutex> locker(lock);
+  if (redeclarations.find(eid) == redeclarations.end()) {
+    redeclarations.emplace(
+        eid, std::make_shared<DeclarationIdList>(redecl_ids_out));
+  }
 }
 
 void CachingEntityProvider::FillReferences(
@@ -176,23 +166,13 @@ void CachingEntityProvider::FillReferences(
     DeclarationIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
-  std::shared_ptr<DeclarationIdList> redecls;
+  next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
 
-  do {
-    std::lock_guard<std::recursive_mutex> locker(lock);
-    auto redecl_it = redeclarations.find(eid);
-    auto had_redecls = false;
-    if (redecl_it != redeclarations.end()) {
-      redecls = redecl_it->second;
-    } else {
-      redecls = std::make_shared<DeclarationIdList>(redecl_ids_out);
-      redeclarations.emplace(eid, redecls);
-    }
-
-    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
-  } while (false);
-
-  redecl_ids_out = *redecls;
+  std::lock_guard<std::recursive_mutex> locker(lock);
+  if (redeclarations.find(eid) == redeclarations.end()) {
+    redeclarations.emplace(
+        eid, std::make_shared<DeclarationIdList>(redecl_ids_out));
+  }
 }
 
 void CachingEntityProvider::FindSymbol(

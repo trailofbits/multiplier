@@ -918,6 +918,7 @@ static void CreatePendingFragment(
           (end_index - begin_index + 1ul)  /* num_tokens */,
           is_new_fragment_id  /* mutated by reference */));
 
+  pf.file_location = std::move(floc);
   pf.begin_index = begin_index;
   pf.end_index = end_index;
 

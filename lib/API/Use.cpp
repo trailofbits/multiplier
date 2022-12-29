@@ -104,7 +104,7 @@ const char *EnumeratorName(UseKind kind) {
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
-  SpecificEntityId<DeclarationId> sid = entity.id();
+  PackedDeclarationId sid = entity.id();
   DeclarationId did = sid.Unpack();
   DeclarationIdList redecl_ids;
 
@@ -115,7 +115,9 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     redecl_ids = ep->Redeclarations(ep, did);
   }
 
-  for (SpecificEntityId<DeclarationId> eid : redecl_ids) {
+  // Make sure all fragments containing each redeclaration is present in
+  // the output fragment ID list.
+  for (PackedDeclarationId eid : redecl_ids) {
     fragment_ids.emplace_back(FragmentId(eid.Unpack().fragment_id));
     search_ids.push_back(eid.Pack());
   }
@@ -131,26 +133,30 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedStatementId id = entity.id();
   search_ids.push_back(entity.id().Pack());
-  fragment_ids.emplace_back(FragmentId(entity.fragment->fragment_id));
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedTypeId id = entity.id();
   search_ids.push_back(entity.id().Pack());
-  fragment_ids.emplace_back(FragmentId(entity.fragment->fragment_id));
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedAttributeId id = entity.id();
   search_ids.push_back(entity.id().Pack());
-  fragment_ids.emplace_back(FragmentId(entity.fragment->fragment_id));
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
 
-  RawEntityId raw_id = entity.id().Pack();
+  PackedMacroId id = entity.id();
+  RawEntityId raw_id = id.Pack();
   search_ids.push_back(raw_id);
 
   // TODO(pag): Support redeclarations of macros.
@@ -158,7 +164,7 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
   ep->FillUses(ep, raw_id, redecl_ids, fragment_ids);
   assert(redecl_ids.empty());
 
-  fragment_ids.emplace_back(FragmentId(entity.fragment->fragment_id));
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 
   std::sort(fragment_ids.begin(), fragment_ids.end());
   auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
@@ -677,9 +683,10 @@ std::optional<Designator> UseBase::as_designator(void) const {
 ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
-  SpecificEntityId<DeclarationId> sid = entity.id();
+  PackedDeclarationId sid = entity.id();
   DeclarationId did = sid.Unpack();
   DeclarationIdList redecl_ids;
+
   if (MayHaveRemoteUses(entity)) {
     ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
 
@@ -687,7 +694,9 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
     redecl_ids = ep->Redeclarations(ep, did);
   }
 
-  for (SpecificEntityId<DeclarationId> eid : redecl_ids) {
+  // Make sure all fragments containing each redeclaration is present in
+  // the output fragment ID list.
+  for (PackedDeclarationId eid : redecl_ids) {
     fragment_ids.emplace_back(FragmentId(eid.Unpack().fragment_id));
     search_ids.push_back(eid.Pack());
   }
@@ -709,6 +718,8 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   ep->FillReferences(ep, sid.Pack(), redecl_ids, fragment_ids);
   assert(redecl_ids.empty());
 
+  // Make sure the fragments containing the macro is present in
+  // the output fragment ID list.
   search_ids.emplace_back(sid.Pack());
   fragment_ids.emplace_back(FragmentId(sid.Unpack().fragment_id));
 
@@ -737,6 +748,7 @@ StmtReferenceIterator::~StmtReferenceIterator(void) {}
 
 void StmtReferenceIterator::Advance(void) {
   if (!impl || impl->search_ids.empty() || impl->fragment_ids.empty()) {
+    impl.reset();
     return;
   }
 
@@ -795,7 +807,7 @@ void StmtReferenceIterator::Advance(void) {
       // case StmtKind::IMPLICIT_CAST_EXPR:
 
         if (std::optional<Decl> ref_decl = stmt.referenced_declaration()) {
-          SpecificEntityId<DeclarationId> referenced_id = ref_decl->id();
+          PackedDeclarationId referenced_id = ref_decl->id();
           for (RawEntityId search_id : impl->search_ids) {
             if (referenced_id == search_id) {
               user.fragment = std::move(stmt.fragment);  // Take it back.
@@ -832,6 +844,7 @@ MacroReferenceIterator::~MacroReferenceIterator(void) {}
 
 void MacroReferenceIterator::Advance(void) {
   if (!impl || impl->search_ids.empty() || impl->fragment_ids.empty()) {
+    impl.reset();
     return;
   }
 

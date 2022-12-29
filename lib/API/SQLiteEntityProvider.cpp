@@ -51,7 +51,7 @@ class SQLiteEntityProvider::Context {
   sqlite::Statement add_entity_id_to_list;
   sqlite::Statement get_entity_ids;
 //  sqlite::Statement get_redecls_by_mangled_name;
-  sqlite::Statement get_redecls_by_entity_id;
+  sqlite::Statement expand_entity_id_list_with_redecls;
   sqlite::Statement get_entities_by_name;
   sqlite::Statement get_uses;
   sqlite::Statement get_references;
@@ -76,7 +76,8 @@ class SQLiteEntityProvider::Context {
         clear_entity_id_list(db.Prepare(
             "DELETE FROM " + entity_id_list)),
         add_entity_id_to_list(db.Prepare(
-            "INSERT INTO " + entity_id_list + " (entity_id) VALUES (?1)")),
+            "INSERT OR IGNORE INTO " + entity_id_list +
+            " (entity_id) VALUES (?1)")),
         get_entity_ids(db.Prepare(
             "SELECT entity_id FROM " + entity_id_list)),
 //        get_redecls_by_mangled_name(db.Prepare(
@@ -89,8 +90,8 @@ class SQLiteEntityProvider::Context {
 //            "      JOIN mangled_name AS mn1 ON tc.entity_id = mn.entity_id"
 //            "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
 //            ") SELECT entity_id FROM transitive_mangled_names")),
-        get_redecls_by_entity_id(db.Prepare(
-            "INSERT INTO " + entity_id_list + " (entity_id) "
+        expand_entity_id_list_with_redecls(db.Prepare(
+            "INSERT OR IGNORE INTO " + entity_id_list  + " (entity_id) "
             "WITH RECURSIVE transitive_redeclaration(entity_id) "
             "AS (SELECT l.entity_id FROM " + entity_id_list + " AS l"
             "    UNION"
@@ -107,6 +108,7 @@ class SQLiteEntityProvider::Context {
             "      JOIN mangled_name AS mn1 ON tc3.entity_id = mn1.entity_id"
             "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
             ") SELECT entity_id FROM transitive_redeclaration")),
+
 #if MX_SQLITE_HAS_FTS5
         get_entities_by_name(db.Prepare(
             "SELECT rowid FROM symbol WHERE name MATCH ?1 || '*'")),
@@ -115,11 +117,14 @@ class SQLiteEntityProvider::Context {
             "SELECT rowid FROM symbol WHERE name LIKE '%' || ?1 || '%'")),
 #endif
         get_uses(db.Prepare(
-            "SELECT fragment_id FROM use WHERE entity_id "
-            "IN (SELECT entity_id FROM " + entity_id_list + ")")),
+            "SELECT DISTINCT(u.fragment_id) FROM use AS u "
+            "LEFT JOIN " + entity_id_list + " AS l "
+            "ON u.entity_id = l.entity_id")),
+
         get_references(db.Prepare(
-            "SELECT fragment_id FROM reference WHERE entity_id "
-            "IN (SELECT entity_id FROM " + entity_id_list + ")")) {}
+            "SELECT DISTINCT(r.fragment_id) FROM reference AS r "
+            "LEFT JOIN " + entity_id_list + " AS l "
+            "ON r.entity_id = l.entity_id")) {}
 };
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
@@ -249,6 +254,7 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
   query.Reset();
 
   if (data.empty()) {
+    assert(false);
     return {};
   }
 
@@ -268,7 +274,7 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
     const Ptr &self, SpecificEntityId<FragmentId> fragment_id) {
 
   std::shared_ptr<Context> context = thread_context.Lock();
-  sqlite::Statement &query = context->get_file_data;
+  sqlite::Statement &query = context->get_fragment_data;
   query.BindValues(fragment_id.Pack());
   if (!query.ExecuteStep()) {
     query.Reset();
@@ -280,6 +286,7 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
   query.Reset();
 
   if (data.empty()) {
+    assert(false);
     return {};
   }
 
@@ -452,7 +459,8 @@ DeclarationIdList SQLiteEntityProvider::Redeclarations(
 
   std::shared_ptr<Context> context = thread_context.Lock();
   auto add_entity_id = context->add_entity_id_to_list;
-  sqlite::Transaction transaction(context->db);
+
+  sqlite::AbortingTransaction temporary_changes_only(context->db);
 
   // Clear our old entity id list.
   context->clear_entity_id_list.Execute();
@@ -461,53 +469,19 @@ DeclarationIdList SQLiteEntityProvider::Redeclarations(
   add_entity_id.BindValues(id.Pack());
   add_entity_id.Execute();
 
-  FillEntityIdsWithRedeclarations(*context, id);
-
-  auto ret = ReadRedeclarations(*context);
-
-  return ret;
-}
-
-void SQLiteEntityProvider::FillEntityIdsWithRedeclarations(
-      Context &context, SpecificEntityId<DeclarationId> id) {
-  RawEntityId raw_id = id.Pack();
-//  sqlite::Statement &mangled_name_query = context.get_redecls_by_mangled_name;
-  sqlite::Statement &redecl_query = context.get_redecls_by_entity_id;
-//
-//  // Expand the set of IDs via name mangling.
-//  switch (id.Unpack().kind) {
-//    case DeclKind::FUNCTION:
-//    case DeclKind::CXX_METHOD:
-//    case DeclKind::CXX_DESTRUCTOR:
-//    case DeclKind::CXX_CONVERSION:
-//    case DeclKind::CXX_CONSTRUCTOR:
-//    case DeclKind::CXX_DEDUCTION_GUIDE:
-//
-//    case DeclKind::VAR:
-//    case DeclKind::DECOMPOSITION:
-//    case DeclKind::IMPLICIT_PARAM:
-//    case DeclKind::OMP_CAPTURED_EXPR:
-//    case DeclKind::PARM_VAR:
-//    case DeclKind::VAR_TEMPLATE_SPECIALIZATION:
-//    case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION:
-//      mangled_name_query.Execute();
-//      break;
-//
-//    default:
-//      break;
-//  }
-
-  redecl_query.Execute();
+  return ReadRedeclarations(*context);
 }
 
 DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
   DeclarationIdList ret;
   ret.reserve(8u);
 
-  sqlite::Statement &get_entity_ids = context.get_entity_ids;
-  while (get_entity_ids.ExecuteStep()) {
+  context.expand_entity_id_list_with_redecls.Execute();
+
+  sqlite::Statement &get_redecl_ids = context.get_entity_ids;
+  while (get_redecl_ids.ExecuteStep()) {
     RawEntityId raw_id = kInvalidEntityId;
-    get_entity_ids.Row().Columns(raw_id);
+    get_redecl_ids.Row().Columns(raw_id);
 
     VariantId vid = EntityId(raw_id).Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
@@ -516,7 +490,7 @@ DeclarationIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
       assert(false);
     }
   }
-  get_entity_ids.Reset();
+  get_redecl_ids.Reset();
 
   // Sort the redeclaration IDs to that they are always in the same order,
   // regardless of which one we ask for first, then partition them and move
@@ -540,7 +514,7 @@ void SQLiteEntityProvider::FillFragments(
   sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
   sqlite::Statement &get_entity_ids = context.get_entity_ids;
 
-  sqlite::Transaction transaction(context.db);
+  sqlite::AbortingTransaction temporary_changes_only(context.db);
 
   // Clear our old entity id list.
   context.clear_entity_id_list.Execute();
@@ -559,7 +533,7 @@ void SQLiteEntityProvider::FillFragments(
     if (redecl_ids_out.empty()) {
       add_entity_id.BindValues(eid);
       add_entity_id.Execute();
-      FillEntityIdsWithRedeclarations(context, id);
+
       redecl_ids_out = ReadRedeclarations(context);
       assert(!redecl_ids_out.empty());
       assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(), eid) !=
@@ -573,28 +547,11 @@ void SQLiteEntityProvider::FillFragments(
       }
     }
 
-    // Make sure all fragments containing each redeclaration are present in
-    // the output fragment ID list.
-    for (SpecificEntityId<DeclarationId> did : redecl_ids_out) {
-      fragment_ids_out.emplace_back(FragmentId(id.fragment_id));
-    }
-
-  // We need to find uses of macros.
-  } else if (std::holds_alternative<MacroId>(vid)) {
-    MacroId id = std::get<MacroId>(vid);
-
-    fragment_ids_out.emplace_back(FragmentId(id.fragment_id));
-    add_entity_id.BindValues(raw_id);
-    add_entity_id.Execute();
-
-  // We need to find uses of files.
-  } else if (std::holds_alternative<FileId>(vid)) {
-    add_entity_id.BindValues(raw_id);
-    add_entity_id.Execute();
-
+  // Macros, files, tokens, etc.
   } else {
-    assert(false);
-    return;
+    assert(redecl_ids_out.empty());
+    add_entity_id.BindValues(raw_id);
+    add_entity_id.Execute();
   }
 
   // Get the using fragments.
@@ -609,12 +566,8 @@ void SQLiteEntityProvider::FillFragments(
       assert(false);
     }
   }
-  get_fragments.Reset();
 
-  // Keep only unique fragment IDs.
-  std::sort(fragment_ids_out.begin(), fragment_ids_out.end());
-  auto it = std::unique(fragment_ids_out.begin(), fragment_ids_out.end());
-  fragment_ids_out.erase(it, fragment_ids_out.end());
+  get_fragments.Reset();
 }
 
 // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things

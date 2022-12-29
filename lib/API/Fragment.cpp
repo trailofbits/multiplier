@@ -108,7 +108,7 @@ TokenRange Fragment::file_tokens(void) const {
   }
 
   FileId fid(first_fid.file_id);
-  auto file = impl->ep->FileFor(impl->ep, SpecificEntityId<FileId>(fid));
+  auto file = impl->ep->FileFor(impl->ep, fid);
   auto raw_file = file.get();
   return TokenRange(
       raw_file->TokenReader(std::move(file)),
