@@ -728,7 +728,8 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it2, fragment_ids.end());
 
-  assert(0u < fragment_ids.size());
+  // NOTE(pag): Not all files will have uses, as some are the main source
+  //            files of the compiler itself.
 }
 
 StmtReferenceIterator::~StmtReferenceIterator(void) {}
