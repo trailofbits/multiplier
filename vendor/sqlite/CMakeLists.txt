@@ -9,6 +9,14 @@
 include(FetchContent)
 
 macro(DownloadSQLite3)
+
+  #FetchContent_Declare(
+  #  sqlite
+  #  GIT_REPOSITORY https://github.com/sqlite/sqlite.git
+  #  GIT_TAG 5dd26c5ed1446616fd3b831a03b718ef6d6ce0c7 # begin-concurrent-3.39
+  #  GIT_SHALLOW
+  #)
+
   FetchContent_Declare(
     sqlite
     URL      https://sqlite.org/2022/sqlite-amalgamation-3400000.zip

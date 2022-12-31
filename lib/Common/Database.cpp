@@ -27,7 +27,14 @@
 
 namespace mx {
 
-static constexpr size_t kMaxTransactionSize = 10000;
+// Fragment hashes are sharded by the file token index and with the file ID.
+//
+// In WAL journalling mode, SQLite locks B-Trees. Each table gets its own
+// B-Tree root, and so by sharding the fragment hash table, which gets a lot
+// of concurrent writes during indexing, we try to spread the load.
+static constexpr size_t kNumFragmentShards = 256u;
+
+static constexpr size_t kMaxTransactionSize = 10000u;
 
 #define MX_RECORD_VARIANT_ENTRY(name) , name
 
@@ -53,8 +60,8 @@ class WriterThreadState {
   sqlite::Statement set_file_index;
 
   // Get a fragment ID index given a file hash.
-  sqlite::Statement get_fragment_index;
-  sqlite::Statement set_fragment_index;
+  std::vector<std::optional<sqlite::Statement>> get_fragment_index;
+  std::vector<std::optional<sqlite::Statement>> set_fragment_index;
 
   ~WriterThreadState(void) {}
 
@@ -66,65 +73,86 @@ class WriterThreadState {
         set_file_index(db.Prepare(
             R"(INSERT INTO file_hash (file_index, hash) VALUES (?1, ?2)
                ON CONFLICT DO UPDATE SET file_index = file_index
-               RETURNING file_index, hash)")),
-        get_fragment_index(db.Prepare(
-            R"(SELECT fragment_index FROM fragment_hash
-               WHERE file_token_id = ?1 AND hash = ?2)")),
-        set_fragment_index(db.Prepare(
-            R"(INSERT INTO fragment_hash (fragment_index, file_token_id, hash)
-               VALUES (?1, ?2, ?3)
-               ON CONFLICT DO UPDATE SET fragment_index = fragment_index 
-               RETURNING fragment_index, file_token_id, hash)")) {
-
-//    db.SetBusyHandler([] (unsigned num_times) -> int {
-////      num_times %= 16;
-//      std::this_thread::sleep_for(std::chrono::milliseconds(num_times + 1));
-//      return 1;
-//    });
+               RETURNING file_index, hash)")) {
+    get_fragment_index.resize(kNumFragmentShards);
+    set_fragment_index.resize(kNumFragmentShards);
   }
 
-  RawEntityId GetOrCreateFileId(RawEntityId proposed_index, const std::string &hash) {
-    RawEntityId index_out = kInvalidEntityId;
 
-    get_file_index.BindValues(hash);
-    if (get_file_index.ExecuteStep()) {
-      get_file_index.Row().Columns(index_out);
-    }
-    get_file_index.Reset();
+  RawEntityId GetOrCreateFileId(RawEntityId proposed_index,
+                                const std::string &hash);
 
-    while (index_out == kInvalidEntityId) {
-      set_file_index.BindValues(proposed_index, hash);
-      if (set_file_index.ExecuteStep()) {
-        set_file_index.Row().Columns(index_out);
-      }
-      set_file_index.Reset();
-    }
-
-    return index_out;
-  }
-
-  RawEntityId GetOrCreateFragmentId(
-      RawEntityId proposed_index, RawEntityId file_tok_id,
-      const std::string &hash) {
-
-    RawEntityId index_out = kInvalidEntityId;
-    get_fragment_index.BindValues(file_tok_id, hash);
-    if (get_fragment_index.ExecuteStep()) {
-      get_fragment_index.Row().Columns(index_out);
-    }
-    get_fragment_index.Reset();
-
-    while (index_out == kInvalidEntityId) {
-      set_fragment_index.BindValues(proposed_index, file_tok_id, hash);
-      if (set_fragment_index.ExecuteStep()) {
-        set_fragment_index.Row().Columns(index_out);
-      }
-      set_fragment_index.Reset();
-    }
-
-    return index_out;
-  }
+  RawEntityId GetOrCreateFragmentId(RawEntityId proposed_index,
+                                    RawEntityId file_tok_id,
+                                    const std::string &hash);
 };
+
+RawEntityId WriterThreadState::GetOrCreateFileId(
+    RawEntityId proposed_index, const std::string &hash) {
+  RawEntityId index_out = kInvalidEntityId;
+
+  get_file_index.BindValues(hash);
+  if (get_file_index.ExecuteStep()) {
+    get_file_index.Row().Columns(index_out);
+  }
+  get_file_index.Reset();
+
+  while (index_out == kInvalidEntityId) {
+    set_file_index.BindValues(proposed_index, hash);
+    if (set_file_index.ExecuteStep()) {
+      set_file_index.Row().Columns(index_out);
+    }
+    set_file_index.Reset();
+  }
+
+  return index_out;
+}
+
+RawEntityId WriterThreadState::GetOrCreateFragmentId(
+    RawEntityId proposed_index, RawEntityId file_tok_id,
+    const std::string &hash) {
+
+  // Calculate which fragment table to index into. Hopefully the XOR of the
+  // file ID and the file token offset is evenly distributed.
+  VariantId vid = EntityId(file_tok_id).Unpack();
+  size_t table = 0u;
+  if (std::holds_alternative<FileTokenId>(vid)) {
+    FileTokenId tid = std::get<FileTokenId>(vid);
+    table = (tid.file_id ^ tid.offset) % kNumFragmentShards;
+  }
+
+  std::optional<sqlite::Statement> &get = get_fragment_index[table];
+  std::optional<sqlite::Statement> &set = set_fragment_index[table];
+
+  if (!get) {
+    auto table_name = "fragment_hash_" + std::to_string(table);
+    get.emplace(db.Prepare(
+        R"(SELECT fragment_index FROM fragment_hash
+           WHERE file_token_id = ?1 AND hash = ?2)")),
+    set.emplace(db.Prepare(
+        R"(INSERT INTO fragment_hash (fragment_index, file_token_id, hash)
+           VALUES (?1, ?2, ?3)
+           ON CONFLICT DO UPDATE SET fragment_index = fragment_index 
+           RETURNING fragment_index, file_token_id, hash)"));
+  }
+
+  RawEntityId index_out = kInvalidEntityId;
+  get->BindValues(file_tok_id, hash);
+  if (get->ExecuteStep()) {
+    get->Row().Columns(index_out);
+  }
+  get->Reset();
+
+  while (index_out == kInvalidEntityId) {
+    set->BindValues(proposed_index, file_tok_id, hash);
+    if (set->ExecuteStep()) {
+      set->Row().Columns(index_out);
+    }
+    set->Reset();
+  }
+
+  return index_out;
+}
 
 class BulkInserterState {
  public:
@@ -320,6 +348,15 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
   sqlite::Connection db(db_path_);
   for (const char *stmt : DatabaseWriter::kInitStatements) {
     db.Execute(std::string(stmt));
+  }
+  for (size_t i = 0u; i < kNumFragmentShards; ++i) {
+    db.Execute(
+        "CREATE TABLE IF NOT EXISTS fragment_hash_" + std::to_string(i) + " ("
+        "  fragment_index INT NOT NULL,"
+        "  file_token_id INT NOT NULL,"
+        "  hash BLOB NOT NULL,"
+        "  PRIMARY KEY(file_token_id, hash)"
+        ") WITHOUT rowid");
   }
   return db;
 }
