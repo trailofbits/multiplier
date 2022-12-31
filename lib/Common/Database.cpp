@@ -34,6 +34,9 @@ namespace mx {
 // of concurrent writes during indexing, we try to spread the load.
 static constexpr size_t kNumFragmentShards = 256u;
 
+// TODO(pag): Use a hash function that is the same across platforms.
+static const std::hash<std::string> kHasher;
+
 static constexpr size_t kMaxTransactionSize = 10000u;
 
 #define MX_RECORD_VARIANT_ENTRY(name) , name
@@ -112,28 +115,23 @@ RawEntityId WriterThreadState::GetOrCreateFragmentId(
     RawEntityId proposed_index, RawEntityId file_tok_id,
     const std::string &hash) {
 
-  // Calculate which fragment table to index into. Hopefully the XOR of the
-  // file ID and the file token offset is evenly distributed.
-  VariantId vid = EntityId(file_tok_id).Unpack();
-  size_t table = 0u;
-  if (std::holds_alternative<FileTokenId>(vid)) {
-    FileTokenId tid = std::get<FileTokenId>(vid);
-    table = (tid.file_id ^ tid.offset) % kNumFragmentShards;
-  }
-
+  // Calculate which fragment table to index into.
+  const size_t table = kHasher(hash) % kNumFragmentShards;
   std::optional<sqlite::Statement> &get = get_fragment_index[table];
   std::optional<sqlite::Statement> &set = set_fragment_index[table];
 
+  // We might not have prepared these statements for the current thread yet.
   if (!get) {
     auto table_name = "fragment_hash_" + std::to_string(table);
     get.emplace(db.Prepare(
-        R"(SELECT fragment_index FROM fragment_hash
-           WHERE file_token_id = ?1 AND hash = ?2)")),
+        "SELECT fragment_index FROM " + table_name +
+        " WHERE file_token_id = ?1 AND hash = ?2")),
+
     set.emplace(db.Prepare(
-        R"(INSERT INTO fragment_hash (fragment_index, file_token_id, hash)
-           VALUES (?1, ?2, ?3)
-           ON CONFLICT DO UPDATE SET fragment_index = fragment_index 
-           RETURNING fragment_index, file_token_id, hash)"));
+        "INSERT INTO " + table_name + " (fragment_index, file_token_id, hash) "
+        "VALUES (?1, ?2, ?3) "
+        "ON CONFLICT DO UPDATE SET fragment_index = fragment_index "
+        "RETURNING fragment_index, file_token_id, hash"));
   }
 
   RawEntityId index_out = kInvalidEntityId;
@@ -196,6 +194,9 @@ class DatabaseWriterImpl {
   // Get the latest copies of file and fragment ids.
   sqlite::Statement get_ids;
 
+  // Update the metadata.
+  sqlite::Statement update_meta_stmt;
+
   // Per-thread connection state with the database.
   ThreadLocal<WriterThreadState> thread_state;
 
@@ -238,6 +239,13 @@ class DatabaseWriterImpl {
 void DatabaseWriterImpl::ExitMetadata(void) {
   add_version.BindValues(0u);
   add_version.Execute();
+
+  // Update the metadata.
+  update_meta_stmt.BindValues(
+      next_file_index.load(),
+      next_small_fragment_index.load(),
+      next_big_fragment_index.load());
+  update_meta_stmt.Execute();
 }
 
 // Initialize the metadata table. It only stores one row of data.
@@ -387,6 +395,12 @@ DatabaseWriterImpl::DatabaseWriterImpl(
              FROM metadata
              WHERE rowid = 1
              LIMIT 1)")),
+      update_meta_stmt(db.Prepare(
+          R"(UPDATE metadata
+             SET next_file_index = ?1,
+                 next_small_fragment_index = ?2,
+                 next_big_fragment_index = ?3
+             WHERE rowid = 1)")),
       thread_state(
           [this] (unsigned i) -> WriterThreadState * {
              return new WriterThreadState(db_path);
