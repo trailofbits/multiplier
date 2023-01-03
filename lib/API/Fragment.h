@@ -12,7 +12,7 @@ namespace mx {
 
 class FileImpl;
 
-using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
+using FragmentIdList = std::vector<PackedFragmentId>;
 
 class FragmentListImpl {
  public:
@@ -28,100 +28,6 @@ class FragmentListImpl {
       : ep(std::move(ep_)),
         fragment_ids(std::move(fragment_ids_)) {}
 };
-
-class FragmentImpl {
- public:
-  using Ptr = std::shared_ptr<const FragmentImpl>;
-  using WeakPtr = std::weak_ptr<const FragmentImpl>;
-
-  // NOTE(pag): This is the fragment identifier without adornment. That is,
-  //            it is *NOT* a packed entity ID representation.
-  //
-  // TODO(pag): Rename to `fragment_index`.
-  const RawEntityId fragment_id;
-
-  // Needed for us to be able to look up the file containing this fragment,
-  // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
-
-  // For bounds checking.
-  //
-  // NOTE(pag): Initialized by derived classes;
-  unsigned num_decls{0u};
-  unsigned num_stmts{0u};
-  unsigned num_types{0u};
-  unsigned num_attrs{0u};
-  unsigned num_macros{0u};
-  unsigned num_pseudos{0u};
-  unsigned num_parsed_tokens{0u};
-  unsigned num_tokens{0u};
-
-  virtual ~FragmentImpl(void) noexcept;
-
-  inline FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_)
-      : fragment_id(id_.fragment_id),
-        ep(std::move(ep_)) {}
-
-  // Return the ID of the file containing the first token.
-  //
-  // NOTE(pag): This returns the raw, unpacked file id.
-  virtual RawEntityId FileContaingFirstToken(void) const = 0;
-
-  // Return a reader for the macro tokens in the fragment. This doesn't
-  // include all tokens, i.e. macro use tokens, comments, etc.
-  virtual std::shared_ptr<const class TokenReader>
-  MacroTokenReader(const FragmentImpl::Ptr &) const = 0;
-
-  // Return a reader for the parsed tokens in the fragment. This doesn't
-  // include all tokens, i.e. macro use tokens, comments, etc.
-  virtual std::shared_ptr<const class TokenReader>
-  ParsedTokenReader(const FragmentImpl::Ptr &) const = 0;
-
-  // Return a reader for the whole fragment.
-  virtual const FragmentReader &Fragment(void) const = 0;
-
-  // Return a specific type of entity.
-  virtual DeclReader NthDecl(unsigned offset) const = 0;
-  virtual StmtReader NthStmt(unsigned offset) const = 0;
-  virtual TypeReader NthType(unsigned offset) const = 0;
-  virtual AttrReader NthAttr(unsigned offset) const = 0;
-  virtual MacroReader NthMacro(unsigned offset) const = 0;
-  virtual PseudoReader NthPseudo(unsigned offset) const = 0;
-
-  virtual std::string_view SourceIR(void) const = 0;
-
-  virtual std::string_view Data(void) const = 0;
-
-  // Return the token associated with a specific entity ID.
-  std::optional<Token> TokenFor(const FragmentImpl::Ptr &, EntityId id,
-                                bool can_fail=false) const;
-
-  // Return the inclusive token range associated with two entity IDs.
-  TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
-                           EntityId end_id) const;
-
-  // Return the declaration associated with a specific entity ID.
-  std::optional<Decl> DeclFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-
-  // Return the statement associated with a specific entity ID.
-  std::optional<Stmt> StmtFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-
-  // Return the type associated with a specific entity ID.
-  std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-
-  // Return the attribute associated with a specific entity ID.
-  std::optional<Macro> MacroFor(const FragmentImpl::Ptr &, EntityId id,
-                                bool can_fail=true) const;
-
-  // Return the attribute associated with a specific entity ID.
-  std::optional<Attr> AttrFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-};
-
-class PackedFragmentImpl;
 
 class ReadMacroTokensFromFragment : public TokenReader {
  public:
@@ -193,49 +99,111 @@ class ReadParsedTokensFromFragment final
   bool Equals(const class TokenReader *that) const final;
 };
 
-// A packed fragment of code, i.e. a serialized fragment.
-class PackedFragmentImpl final : public FragmentImpl {
+class FragmentImpl final {
  public:
-  using Ptr = std::shared_ptr<const PackedFragmentImpl>;
+  using Ptr = std::shared_ptr<const FragmentImpl>;
+  using WeakPtr = std::weak_ptr<const FragmentImpl>;
 
+  // NOTE(pag): This is the fragment identifier without adornment. That is,
+  //            it is *NOT* a packed entity ID representation.
+  //
+  // TODO(pag): Rename to `fragment_index`.
+  const RawEntityId fragment_id;
+
+  // Needed for us to be able to look up the file containing this fragment,
+  // or look up entities related to other fragments.
+  const EntityProvider::Ptr ep;
+
+ private:
+  friend class ReadParsedTokensFromFragment;
+  friend class ReadMacroTokensFromFragment;
+
+  // Stores the Cap'n-Proto serialized data.
   PackedReaderState package;
+
+  // Reader for `package`.
   const rpc::Fragment::Reader reader;
-  ReadParsedTokensFromFragment parsed_token_reader;
-  ReadMacroTokensFromFragment macro_token_reader;
 
-  virtual ~PackedFragmentImpl(void) noexcept;
+  // Token readers for this fragment.
+  const ReadParsedTokensFromFragment parsed_token_reader;
+  const ReadMacroTokensFromFragment macro_token_reader;
 
-  PackedFragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                     const capnp::Data::Reader &reader_);
+ public:
+
+  // For bounds checking.
+  const unsigned num_decls;
+  const unsigned num_stmts;
+  const unsigned num_types;
+  const unsigned num_attrs;
+  const unsigned num_macros;
+  const unsigned num_pseudos;
+  const unsigned num_parsed_tokens;
+  const unsigned num_tokens;
+
+  ~FragmentImpl(void) noexcept;
+
+  explicit FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
+                        const capnp::Data::Reader &reader_);
 
   // Return the ID of the file containing the first token.
   //
   // NOTE(pag): This returns the raw, unpacked file id.
-  RawEntityId FileContaingFirstToken(void) const final;
+  RawEntityId FileContaingFirstToken(void) const;
+
+  // Return a reader for the macro tokens in the fragment. This doesn't
+  // include all tokens, i.e. macro use tokens, comments, etc.
+  std::shared_ptr<const class TokenReader>
+  MacroTokenReader(const FragmentImpl::Ptr &) const;
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   std::shared_ptr<const class TokenReader>
-  ParsedTokenReader(const FragmentImpl::Ptr &) const final;
-
-  // Return a reader for the macro tokens in the fragment.
-  std::shared_ptr<const class TokenReader>
-  MacroTokenReader(const FragmentImpl::Ptr &) const final;
+  ParsedTokenReader(const FragmentImpl::Ptr &) const;
 
   // Return a reader for the whole fragment.
-  const FragmentReader &Fragment(void) const final;
+  inline const FragmentReader &Fragment(void) const noexcept {
+    return reader;
+  }
 
   // Return a specific type of entity.
-  DeclReader NthDecl(unsigned offset) const final;
-  StmtReader NthStmt(unsigned offset) const final;
-  TypeReader NthType(unsigned offset) const final;
-  AttrReader NthAttr(unsigned offset) const final;
-  MacroReader NthMacro(unsigned offset) const final;
-  PseudoReader NthPseudo(unsigned offset) const final;
+  DeclReader NthDecl(unsigned offset) const;
+  StmtReader NthStmt(unsigned offset) const;
+  TypeReader NthType(unsigned offset) const;
+  AttrReader NthAttr(unsigned offset) const;
+  MacroReader NthMacro(unsigned offset) const;
+  PseudoReader NthPseudo(unsigned offset) const;
 
-  std::string_view SourceIR(void) const final;
+  std::string_view SourceIR(void) const;
 
-  std::string_view Data(void) const final;
+  std::string_view Data(void) const;
+
+  // Return the token associated with a specific entity ID.
+  std::optional<Token> TokenFor(const FragmentImpl::Ptr &, EntityId id,
+                                bool can_fail=false) const;
+
+  // Return the inclusive token range associated with two entity IDs.
+  TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
+                           EntityId end_id) const;
+
+  // Return the declaration associated with a specific entity ID.
+  std::optional<Decl> DeclFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
+
+  // Return the statement associated with a specific entity ID.
+  std::optional<Stmt> StmtFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
+
+  // Return the type associated with a specific entity ID.
+  std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
+
+  // Return the attribute associated with a specific entity ID.
+  std::optional<Macro> MacroFor(const FragmentImpl::Ptr &, EntityId id,
+                                bool can_fail=true) const;
+
+  // Return the attribute associated with a specific entity ID.
+  std::optional<Attr> AttrFor(const FragmentImpl::Ptr &, EntityId id,
+                              bool can_fail=true) const;
 };
 
 }  // namespace mx

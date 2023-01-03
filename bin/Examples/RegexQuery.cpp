@@ -13,26 +13,40 @@
 #include <multiplier/Re2.h>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 DECLARE_bool(help);
 DECLARE_string(db);
 DEFINE_string(query, "", "Query pattern to be searched");
+DEFINE_uint64(file_id, 0, "ID of the file in which to perform the search");
 DEFINE_uint64(fragment_id, 0, "ID of the fragment in which to perform the search");
 
-std::string GetFileContaining(mx::Index &index, mx::RawEntityId file_id) {
-  for (auto [path, id] : index.file_paths()) {
-    if (id == file_id) {
-      return path.generic_string();
+static std::unordered_map<mx::PackedFileId, std::filesystem::path>
+    file_id_to_paths;
+
+static void DumpMatch(const mx::RegexQueryMatch &match) {
+  mx::Fragment frag = mx::Fragment::containing(match);
+  std::optional<mx::File> file = mx::File::containing(frag);
+  std::cout
+      << frag.id() << '\t'
+      << file->id() << '\t'
+      << file_id_to_paths.find(file->id())->second
+      << '\n';
+
+  for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
+    if (auto data = match.captured_data(i)) {
+      std::cout << "\t[" << i << "] = \t" << *data << '\n';
     }
   }
-  return {};
+
+  std::cout << "\n\n";
 }
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
   ss
     << "Usage: " << argv[0]
-    << " [--db DATABASE] [--fragment_id ID]\n"
+    << " [--db DATABASE] [--file_id ID] [--fragment_id ID]\n"
     << " --query QUERY_STRING";
 
   google::SetUsageMessage(ss.str());
@@ -53,42 +67,49 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
+  for (auto [path, id] : index.file_paths()) {
+    file_id_to_paths.emplace(id, path);
+  }
+
   mx::RegexQuery query(FLAGS_query);
+  if (!query.is_valid()) {
+    std::cerr
+        << "Invalid regular expresssion string '" << FLAGS_query << "'."
+        << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  mx::RegexQueryResult results;
+  if (FLAGS_file_id) {
+    auto file = index.file(FLAGS_file_id);
+    if (!file) {
+      std::cerr
+          << "Invalid file id '" << FLAGS_file_id << "'." << std::endl;
+      return EXIT_FAILURE;
+    }
 
-//  // Query a specific fragment.
-//  if (FLAGS_fragment_id) {
-//    auto fragment = index.fragment(FLAGS_fragment_id);
-//    if (!fragment) {
-//      std::cerr << "Invalid fragment id " << FLAGS_fragment_id << std::endl;
-//      return EXIT_FAILURE;
-//    }
-//
-//    results = fragment->query(query);
-//
-//  // Query the whole index.
-//  } else {
-//    results = index.query_fragments(query);
-//  }
-//
-//  for (const mx::RegexQueryMatch &match : results) {
-//    mx::Fragment frag = mx::Fragment::containing(match);
-//    auto file = mx::File::containing(frag);
-//    std::cout
-//        << frag.id() << '\t'
-//        << GetFileContaining(
-//               index, (file ? file->id().Pack() : mx::kInvalidEntityId))
-//        << std::endl;
-//
-//    for (size_t i = 0u, max_i = match.num_captures(); i < max_i; ++i) {
-//      if (auto data = match.captured_data(i)) {
-//        std::cout << "\t[" << i << "] = \t" << *data << '\n';
-//      }
-//    }
-//
-//    std::cout << "\n\n";
-//  }
+    for (mx::RegexQueryMatch match : query.match_fragments(file.value())) {
+      DumpMatch(match);
+    }
+
+  } else if (FLAGS_fragment_id) {
+    auto frag = index.fragment(FLAGS_fragment_id);
+    if (!frag) {
+      std::cerr
+          << "Invalid fragment id '" << FLAGS_fragment_id << "'." << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    for (mx::RegexQueryMatch match : query.match_fragments(frag.value())) {
+      DumpMatch(match);
+    }
+
+  } else {
+    for (mx::File file : index.files()) {
+      for (mx::RegexQueryMatch match : query.match_fragments(file)) {
+        DumpMatch(match);
+      }
+    }
+  }
 
   return EXIT_SUCCESS;
 }

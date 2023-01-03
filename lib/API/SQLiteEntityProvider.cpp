@@ -21,15 +21,25 @@ namespace mx {
 namespace {
 
 static sqlite::Connection Connect(std::filesystem::path path,
-                                  const std::string &entity_id_list) {
+                                  const std::string &entity_id_list,
+                                  const std::string &line_number_list) {
   sqlite::Connection db(path);
-  db.Execute("pragma synchronous = off");
-  db.Execute("pragma temp_store = memory");
-  db.Execute("pragma journal_mode = memory");
+
+  db.Execute("PRAGMA synchronous = " MX_DATABASE_PRAGMA_SYNCHRONOUS);
+  db.Execute("PRAGMA temp_store = " MX_DATABASE_TEMP_STORE);
+  db.Execute("PRAGMA journal_mode = " MX_DATABASE_JOURNAL_MODE);
+
   db.Execute(
       "CREATE TEMPORARY TABLE IF NOT EXISTS " + entity_id_list + " ("
       "  entity_id INT NOT NULL,"
       "  PRIMARY KEY(entity_id)"
+      ") WITHOUT rowid");
+
+  db.Execute(
+      "CREATE TEMPORARY TABLE IF NOT EXISTS " + line_number_list + " ("
+      "  file_id INT NOT NULL,"
+      "  line_number INT NOT NULL,"
+      "  PRIMARY KEY(line_number)"
       ") WITHOUT rowid");
 
   return db;
@@ -37,9 +47,10 @@ static sqlite::Connection Connect(std::filesystem::path path,
 
 }  // namespace
 
-class SQLiteEntityProvider::Context {
+class SQLiteEntityProviderImpl {
  public:
   const std::string entity_id_list;
+  const std::string line_number_list;
   sqlite::Connection db;
   sqlite::Statement get_file_by_id;
   sqlite::Statement get_frag_by_id;
@@ -51,15 +62,17 @@ class SQLiteEntityProvider::Context {
   sqlite::Statement clear_entity_id_list;
   sqlite::Statement add_entity_id_to_list;
   sqlite::Statement get_entity_ids;
-//  sqlite::Statement get_redecls_by_mangled_name;
   sqlite::Statement expand_entity_id_list_with_redecls;
   sqlite::Statement get_entities_by_name;
   sqlite::Statement get_uses;
   sqlite::Statement get_references;
+  sqlite::Statement add_line_number_to_list;
+  sqlite::Statement get_fragments_covered_by_lines;
 
-  Context(unsigned worker_index, std::filesystem::path path)
+  SQLiteEntityProviderImpl(unsigned worker_index, std::filesystem::path path)
       : entity_id_list("entity_id_list_" + std::to_string(worker_index)),
-        db(Connect(path, entity_id_list)),
+        line_number_list("line_number_list_" + std::to_string(worker_index)),
+        db(Connect(path, entity_id_list, line_number_list)),
         get_file_by_id(db.Prepare(
             "SELECT data FROM file WHERE file_id = ?1")),
         get_frag_by_id(db.Prepare(
@@ -81,16 +94,6 @@ class SQLiteEntityProvider::Context {
             " (entity_id) VALUES (?1)")),
         get_entity_ids(db.Prepare(
             "SELECT entity_id FROM " + entity_id_list)),
-//        get_redecls_by_mangled_name(db.Prepare(
-//            "INSERT INTO " + entity_id_list + " (entity_id) "
-//            "WITH RECURSIVE transitive_mangled_names(entity_id) "
-//            "AS (SELECT l.entity_id FROM " + entity_id_list + " AS l"
-//            "    UNION"
-//            "      SELECT r.redecl_id"
-//            "      FROM transitive_mangled_names AS tc"
-//            "      JOIN mangled_name AS mn1 ON tc.entity_id = mn.entity_id"
-//            "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
-//            ") SELECT entity_id FROM transitive_mangled_names")),
         expand_entity_id_list_with_redecls(db.Prepare(
             "INSERT OR IGNORE INTO " + entity_id_list  + " (entity_id) "
             "WITH RECURSIVE transitive_redeclaration(entity_id) "
@@ -125,17 +128,27 @@ class SQLiteEntityProvider::Context {
         get_references(db.Prepare(
             "SELECT DISTINCT(r.fragment_id) FROM reference AS r "
             "JOIN " + entity_id_list + " AS l "
-            "ON r.entity_id = l.entity_id")) {}
+            "ON r.entity_id = l.entity_id")),
+        add_line_number_to_list(db.Prepare(
+            "INSERT OR IGNORE INTO " + line_number_list +
+            " (file_id, line_number) VALUES (?1, ?2)")),
+        get_fragments_covered_by_lines(db.Prepare(
+            "SELECT DISTINCT(fln.fragment_id) "
+            "FROM fragment_line AS fln "
+            "JOIN " + line_number_list + " AS lnl "
+            "ON fln.file_id = lnl.file_id "
+            "WHERE fln.first_line_number <= lnl.line_number "
+            "AND fln.last_line_number >= lnl.line_number")) {}
 };
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
     : db_path(path),
-      thread_context(
-          [this] (unsigned worker_id) -> Context * {
-            return new Context(worker_id, db_path);
+      impl(
+          [this] (unsigned worker_id) -> SQLiteEntityProviderImpl * {
+            return new SQLiteEntityProviderImpl(worker_id, db_path);
           },
           [] (void *ptr) {
-            delete reinterpret_cast<Context *>(ptr);
+            delete reinterpret_cast<SQLiteEntityProviderImpl *>(ptr);
           }) {}
 
 SQLiteEntityProvider::~SQLiteEntityProvider(void) noexcept {}
@@ -146,7 +159,7 @@ unsigned SQLiteEntityProvider::VersionNumber(void) {
   unsigned start_version_number = 0u;
   unsigned end_version_number = 0u;
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
 
 //  try {
     sqlite::Transaction locker(context->db);
@@ -193,7 +206,7 @@ void SQLiteEntityProvider::VersionNumberChanged(unsigned) {}
 
 FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
   FilePathMap res;
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   sqlite::Statement &query = context->get_file_paths;
   while (query.ExecuteStep()) {
     RawEntityId id = kInvalidEntityId;
@@ -218,7 +231,7 @@ FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
   FragmentIdList res;
   res.reserve(128u);
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   sqlite::Statement &query = context->get_file_fragments;
   query.BindValues(file_id.Pack());
 
@@ -241,7 +254,7 @@ FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
 std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
     const Ptr &self, SpecificEntityId<FileId> file_id) {
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   sqlite::Statement &query = context->get_file_data;
   query.BindValues(file_id.Pack());
 
@@ -265,7 +278,7 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
       reinterpret_cast<const capnp::byte *>(data.data()),
       data.size());
 
-  auto ret = std::make_shared<PackedFileImpl>(
+  auto ret = std::make_shared<FileImpl>(
       file_id.Unpack(), self, contents_reader);
   auto ret_ptr = ret.get();
   return FileImpl::Ptr(std::move(ret), ret_ptr);
@@ -274,7 +287,7 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
 std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
     const Ptr &self, SpecificEntityId<FragmentId> fragment_id) {
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   sqlite::Statement &query = context->get_fragment_data;
   query.BindValues(fragment_id.Pack());
   if (!query.ExecuteStep()) {
@@ -297,168 +310,53 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
       reinterpret_cast<const capnp::byte *>(data.data()),
       data.size());
 
-  auto ret = std::make_shared<PackedFragmentImpl>(
+  auto ret = std::make_shared<FragmentImpl>(
       fragment_id.Unpack(), self, contents_reader);
   auto ret_ptr = ret.get();
   return FragmentImpl::Ptr(std::move(ret), ret_ptr);
 }
 
-std::shared_ptr<WeggliQueryResultImpl> SQLiteEntityProvider::Query(
-    const Ptr &self, const WeggliQuery &query_tree) {
-  (void) self;
-  (void) query_tree;
-  return {};
+// Return the list of fragments covering / overlapping some lines in a file.
+FragmentIdList SQLiteEntityProvider::FragmentsCoveringLines(
+    const Ptr &self, PackedFileId file_id, std::vector<unsigned> lines) {
 
-//  std::map<unsigned, unsigned> eol_offset_to_line_num;
-//  std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
-//  auto &storage = d->GetStorage();
-//  for(RawEntityId file_id = kMinEntityIdIncrement;
-//        file_id < d->next_file_id;
-//        ++file_id) {
-//
-//    // Get the contents of the file. We may fail, which is OK, and generally
-//    // implies a bad file id. There can be small gaps in the file ID space,
-//    // which otherwise mostly occupies the range `[1, N)`.
-//    auto maybe_contents = storage.GetSerializedFile(file_id);
-//    if (!maybe_contents) {
-//      continue;  // Bad file ID. This is expected for the way we get them.
-//    }
-//
-//    WithUncompressedMessageImpl(
-//      "file", maybe_contents.value(),
-//      [=, this, &eol_offset_to_line_num, &line_results]
-//      (capnp::MessageReader &reader) {
-//        mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
-//        std::string_view file_contents(file.getData().cStr(),
-//                                       file.getData().size());
-//
-//        eol_offset_to_line_num.clear();
-//        for (mx::rpc::UpperBound::Reader ubr : file.getEolOffsets()) {
-//          eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
-//        }
-//
-//        query_tree.ForEachMatch(
-//            file_contents,
-//            [=, this, &line_results] (const mx::WeggliMatchData &match) -> bool {
-//              unsigned prev_line = 0;
-//              for (auto i = match.begin_offset; i < match.end_offset; ++i) {
-//                auto line_it = eol_offset_to_line_num.upper_bound(i);
-//                if (line_it != eol_offset_to_line_num.end()) {
-//                  auto line = line_it->second;
-//                  if (line != prev_line) {
-//                    prev_line = line;
-//                    line_results.emplace(file_id, line);
-//                  }
-//                }
-//              }
-//              return true;
-//            });
-//        });
-//  }
-//
-//  std::vector<mx::RawEntityId> fragment_ids;
-//  fragment_ids.reserve(128u);
-//
-//  // Convert the file file:line pairs into overlapping fragment IDs.
-//  for (auto prefix : line_results) {
-//    storage.file_fragment_lines.GetByPrefix(
-//        prefix,
-//        [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
-//          if (fragment_ids.empty() || fragment_ids.back() != id) {
-//            fragment_ids.push_back(id);
-//          }
-//          return true;
-//        });
-//  }
-//
-//  // Keep only unique fragment ids.
-//  std::sort(fragment_ids.begin(), fragment_ids.end());
-//  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
-//  fragment_ids.erase(it, fragment_ids.end());
-//
-//  return std::make_shared<WeggliQueryResultImpl>(
-//      query_tree, self, std::move(fragment_ids));
-}
+  RawEntityId raw_file_id = file_id.Pack();
 
-std::shared_ptr<RegexQueryResultImpl> SQLiteEntityProvider::Query(
-    const Ptr &self, const RegexQuery &regex) {
-  (void) self;
-  (void) regex;
-  return {};
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &add_line_number = context->add_line_number_to_list;
+  sqlite::Statement &get_fragment_ids = context->get_fragments_covered_by_lines;
 
-//  std::map<unsigned, unsigned> offset_to_line_num;
-//  std::set<std::tuple<mx::RawEntityId, unsigned>> line_results;
-//  auto &storage = d->GetStorage();
-//  for(RawEntityId file_id = kMinEntityIdIncrement;
-//        file_id < d->next_file_id;
-//        ++file_id) {
-//    // Get the contents of the file. We may fail, which is OK, and generally
-//    // implies a bad file id. There can be small gaps in the file ID space, which
-//    // otherwise mostly occupies the range `[1, N)`.
-//    auto maybe_contents = storage.GetSerializedFile(file_id);
-//    if (!maybe_contents) {
-//      continue;  // Bad file ID. This is expected for the way we get them.
-//    }
-//
-//    WithUncompressedMessageImpl(
-//        "file", maybe_contents.value(),
-//        [=, this, &offset_to_line_num, &line_results]
-//        (capnp::MessageReader &reader) {
-//          mx::rpc::File::Reader file = reader.getRoot<mx::rpc::File>();
-//          std::string_view file_contents(file.getData().cStr(),
-//                                         file.getData().size());
-//
-//          offset_to_line_num.clear();
-//          for (mx::rpc::UpperBound::Reader ubr : file.getEolOffsets()) {
-//            offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
-//          }
-//
-//          regex.ForEachMatch(
-//              file_contents,
-//              [=, this, &line_results] (std::string_view, unsigned begin,
-//                                        unsigned end) -> bool {
-//                unsigned prev_line = 0;
-//                for (auto i = begin; i < end; ++i) {
-//                  auto line_it = offset_to_line_num.upper_bound(i);
-//                  if (line_it != offset_to_line_num.end()) {
-//                    auto line = line_it->second;
-//                    if (line != prev_line) {
-//                      prev_line = line;
-//                      line_results.emplace(file_id, line);
-//                    }
-//                  }
-//                }
-//                return true;
-//              });
-//        });
-//  }
-//
-//  std::vector<mx::RawEntityId> fragment_ids;
-//  fragment_ids.reserve(128u);
-//  // Convert the file file:line pairs into overlapping fragment IDs.
-//  for (auto prefix : line_results) {
-//    storage.file_fragment_lines.GetByPrefix(
-//        prefix,
-//        [&fragment_ids] (mx::RawEntityId, unsigned, mx::RawEntityId id) {
-//          if (fragment_ids.empty() || fragment_ids.back() != id) {
-//            fragment_ids.push_back(id);
-//          }
-//          return true;
-//        });
-//  }
-//  // Keep only unique fragment ids.
-//  std::sort(fragment_ids.begin(), fragment_ids.end());
-//  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
-//  fragment_ids.erase(it, fragment_ids.end());
-//
-//  return std::make_shared<RegexQueryResultImpl>(
-//      regex, self, std::move(fragment_ids));
+  sqlite::AbortingTransaction temporary_changes_only(context->db);
+
+  std::sort(lines.begin(), lines.end());
+  auto it = std::unique(lines.begin(), lines.end());
+  lines.erase(it, lines.end());
+
+  for (unsigned line : lines) {
+    add_line_number.BindValues(raw_file_id, line);
+    add_line_number.Execute();
+  }
+
+  FragmentIdList ret;
+  while (get_fragment_ids.ExecuteStep()) {
+    RawEntityId raw_id = kInvalidEntityId;
+    get_fragment_ids.Row().Columns(raw_id);
+
+    VariantId vid = EntityId(raw_id).Unpack();
+    if (std::holds_alternative<FragmentId>(vid)) {
+      ret.emplace_back(std::get<FragmentId>(vid));
+    } else {
+      assert(false);
+    }
+  }
+
+  return ret;
 }
 
 RawEntityIdList SQLiteEntityProvider::Redeclarations(
     const Ptr &, SpecificEntityId<DeclarationId> id) {
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   auto add_entity_id = context->add_entity_id_to_list;
 
   sqlite::AbortingTransaction temporary_changes_only(context->db);
@@ -473,7 +371,7 @@ RawEntityIdList SQLiteEntityProvider::Redeclarations(
   return ReadRedeclarations(*context);
 }
 
-RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
+RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(SQLiteEntityProviderImpl &context) {
   RawEntityIdList ret;
   ret.reserve(8u);
 
@@ -510,7 +408,7 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(Context &context) {
 }
 
 void SQLiteEntityProvider::FillFragments(
-    Context &context, sqlite::Statement &get_fragments,
+    SQLiteEntityProviderImpl &context, sqlite::Statement &get_fragments,
     RawEntityId raw_id, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
@@ -580,7 +478,7 @@ void SQLiteEntityProvider::FillFragments(
 void SQLiteEntityProvider::FillUses(
     const Ptr &self, RawEntityId eid, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   FillFragments(*context, context->get_uses, eid, redecl_ids_out,
                 fragment_ids_out);
 }
@@ -594,7 +492,7 @@ void SQLiteEntityProvider::FillReferences(
     const Ptr &self, RawEntityId eid, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   FillFragments(*context, context->get_references, eid, redecl_ids_out,
                 fragment_ids_out);
 }
@@ -603,7 +501,7 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
                                       std::vector<RawEntityId> &entity_ids) {
   entity_ids.clear();
 
-  std::shared_ptr<Context> context = thread_context.Lock();
+  ImplPtr context = impl.Lock();
   sqlite::Statement &symbol_query = context->get_entities_by_name;
   for (symbol_query.BindValues(symbol); symbol_query.ExecuteStep(); ) {
     RawEntityId entity_id = kInvalidEntityId;

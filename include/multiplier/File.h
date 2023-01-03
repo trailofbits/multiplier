@@ -30,7 +30,7 @@ class MacroReferenceRange;
 class RegexQueryMatch;
 class WeggliQueryMatch;
 
-using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
+using FragmentIdList = std::vector<PackedFragmentId>;
 
 class FileLocationConfiguration {
  public:
@@ -167,9 +167,11 @@ class File {
   friend class Index;
   friend class MacroReferenceRange;
   friend class RemoteEntityProvider;
+  friend class RegexQuery;
   friend class RegexQueryResultIterator;
   friend class RegexQueryResultImpl;
   friend class Token;
+  friend class WeggliQuery;
 
   Ptr impl;
 

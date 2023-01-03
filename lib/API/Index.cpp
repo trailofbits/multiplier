@@ -307,14 +307,6 @@ VariantEntity Index::entity(EntityId eid) const {
   return NotAnEntity{};
 }
 
-WeggliQueryResult Index::query_fragments(const WeggliQuery &query) const {
-  return WeggliQueryResult(impl->Query(impl, query));
-}
-
-RegexQueryResult Index::query_fragments(const RegexQuery &query) const {
-  return RegexQueryResult(impl->Query(impl, query));
-}
-
 // Search for entities by their name and category.
 NamedEntityList Index::query_entities(std::string name) const {
   std::vector<RawEntityId> entity_ids;

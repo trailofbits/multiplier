@@ -57,13 +57,17 @@ class WeggliQueryResultImpl;
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
 using TypeUse = Use<TypeUseSelector>;
+using FileUse = Use<FileUseSelector>;
+using TokenUse = Use<TokenUseSelector>;
+using MacroUse = Use<MacroUseSelector>;
 
 using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
 using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
+using ParentMacroIterator = ParentMacroIteratorImpl<Macro>;
 
-using FilePathMap = std::map<std::filesystem::path, SpecificEntityId<FileId>>;
-using FragmentIdList = std::vector<SpecificEntityId<FragmentId>>;
-using DeclarationIdList = std::vector<SpecificEntityId<DeclarationId>>;
+using FilePathMap = std::map<std::filesystem::path, PackedFileId>;
+using FragmentIdList = std::vector<PackedFragmentId>;
+using DeclarationIdList = std::vector<PackedDeclarationId>;
 using RawEntityIdList = std::vector<RawEntityId>;
 
 using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
@@ -116,16 +120,16 @@ class EntityProvider {
   friend class Index;
   friend class Macro;
   friend class MacroReferenceIterator;
-  friend class PackedFileImpl;
-  friend class PackedFragmentImpl;
   friend class ReadMacroTokensFromFragment;
   friend class ReferenceIteratorImpl;
+  friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
   friend class StmtReferenceIterator;
   friend class TokenReader;
   friend class UseIteratorImpl;
+  friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
 
@@ -155,13 +159,12 @@ class EntityProvider {
   virtual FilePathMap ListFiles(const Ptr &) = 0;
 
   // Download a list of fragment IDs contained in a specific file.
-  virtual FragmentIdList ListFragmentsInFile(
-      const Ptr &, SpecificEntityId<FileId> id) = 0;
+  virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
 
   std::shared_ptr<const FileImpl> FileFor(const Ptr &self, RawEntityId id) {
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<FileId>(vid)) {
-      return FileFor(self, SpecificEntityId<FileId>(std::get<FileId>(vid)));
+      return FileFor(self, PackedFileId(std::get<FileId>(vid)));
     } else {
       return {};
     }
@@ -171,8 +174,7 @@ class EntityProvider {
       const Ptr &self, RawEntityId id) {
     VariantId vid = EntityId(id).Unpack();
     if (std::holds_alternative<FragmentId>(vid)) {
-      return FragmentFor(
-          self, SpecificEntityId<FragmentId>(std::get<FragmentId>(vid)));
+      return FragmentFor(self, PackedFragmentId(std::get<FragmentId>(vid)));
     } else {
       return {};
     }
@@ -183,20 +185,18 @@ class EntityProvider {
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
   //            raw file id.
   virtual std::shared_ptr<const FileImpl>
-  FileFor(const Ptr &, SpecificEntityId<FileId> id) = 0;
+  FileFor(const Ptr &, PackedFileId id) = 0;
 
   // Download a fragment by its unique ID.
   //
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
   //            raw fragment id.
   virtual std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) = 0;
+  FragmentFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual std::shared_ptr<WeggliQueryResultImpl>
-  Query(const Ptr &, const WeggliQuery &query) = 0;
-
-  virtual std::shared_ptr<RegexQueryResultImpl>
-  Query(const Ptr &, const RegexQuery &query) = 0;
+  // Return the list of fragments covering / overlapping some lines in a file.
+  virtual FragmentIdList FragmentsCoveringLines(
+      const Ptr &, PackedFileId file, std::vector<unsigned> lines) = 0;
 
   // Return the redeclarations of a given declaration.
   virtual RawEntityIdList Redeclarations(
@@ -256,6 +256,12 @@ class Index {
   ~Index(void);
   Index(void);
 
+  Index(const Index &) = default;
+  Index(Index &&) noexcept = default;
+
+  Index &operator=(const Index &) = default;
+  Index &operator=(Index &&) noexcept = default;
+
   /* implicit */ inline Index(EntityProvider::Ptr impl_)
       : impl(std::move(impl_)) {}
 
@@ -312,18 +318,6 @@ class Index {
       return NotAnEntity{};
     }
   }
-
-  // Run a Weggli search over the fragments in the index.
-  //
-  // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  [[deprecated]]
-  WeggliQueryResult query_fragments(const WeggliQuery &query) const;
-
-  // Run a regular expression search over the fragments in the index.
-  //
-  // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  [[deprecated]]
-  RegexQueryResult query_fragments(const RegexQuery &query) const;
 
   // Search for entities by their name and category.
   NamedEntityList query_entities(std::string name) const;

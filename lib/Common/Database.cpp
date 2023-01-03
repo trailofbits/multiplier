@@ -447,8 +447,8 @@ bool BulkInserterState::InsertAsync(
   auto raw_file_id = record.file_id.Pack();
   if (raw_file_id != mx::kInvalidEntityId && record.first_line_number &&
       record.first_line_number <= record.last_line_number) {
-    insert.BindValues(record.fragment_id.Pack(), raw_file_id,
-                      record.first_line_number, record.last_line_number);
+    insert.BindValues(record.fragment_id.Pack(), record.first_line_number,
+                      record.last_line_number, raw_file_id);
     return true;
   }
   return false;

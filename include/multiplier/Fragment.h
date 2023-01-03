@@ -151,11 +151,13 @@ class Fragment {
   friend class StmtReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class RemoteEntityProvider;
+  friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class Stmt;
   friend class Token;
   friend class Type;
+  friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
 

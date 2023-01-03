@@ -74,11 +74,9 @@ class CachingEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
 
-  std::shared_ptr<WeggliQueryResultImpl>
-  Query(const Ptr &, const WeggliQuery &) final;
-
-  std::shared_ptr<RegexQueryResultImpl> Query(
-      const Ptr &, const RegexQuery &) final;
+  // Return the list of fragments covering / overlapping some lines in a file.
+  FragmentIdList FragmentsCoveringLines(
+      const Ptr &, PackedFileId file, std::vector<unsigned> lines) final;
 
   RawEntityIdList Redeclarations(
       const Ptr &, SpecificEntityId<DeclarationId>) final;

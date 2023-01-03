@@ -24,10 +24,14 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class Macro;
+class RegexQuery;
+class RegexQueryResultIterator;
 class TokenContext;
 class TokenRangeIterator;
 class TokenRange;
 class TokenReader;
+class WeggliQuery;
+class WeggliQueryResultIterator;
 
 enum class TokenKind : unsigned short;
 using TokenUse = Use<TokenUseSelector>;
@@ -190,7 +194,9 @@ class TokenRange {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Macro;
+  friend class RegexQuery;
   friend class RegexQueryResultIterator;
+  friend class WeggliQuery;
   friend class WeggliQueryResultIterator;
 
   std::shared_ptr<const TokenReader> impl;

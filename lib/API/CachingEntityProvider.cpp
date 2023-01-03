@@ -117,14 +117,10 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
   return ptr;
 }
 
-WeggliQueryResultImpl::Ptr CachingEntityProvider::Query(
-    const Ptr &self, const WeggliQuery &query) {
-  return next->Query(self, query);
-}
-
-RegexQueryResultImpl::Ptr CachingEntityProvider::Query(
-    const Ptr &self, const RegexQuery &query) {
-  return next->Query(self, query);
+// Return the list of fragments covering / overlapping some lines in a file.
+FragmentIdList CachingEntityProvider::FragmentsCoveringLines(
+    const Ptr &self, PackedFileId file, std::vector<unsigned> lines) {
+  return next->FragmentsCoveringLines(self, file, std::move(lines));
 }
 
 RawEntityIdList CachingEntityProvider::Redeclarations(

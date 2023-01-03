@@ -62,24 +62,18 @@ struct FragmentLineCoverageRecord {
   static constexpr const char *kTableName = "fragment_line";
 
   static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS fragment_line (
-            fragment_id INT NOT NULL,
-            file_id INT NOT NULL,
+      {R"(CREATE VIRTUAL TABLE IF NOT EXISTS fragment_line USING rtree_i32(
+            fragment_id INT PRIMARY KEY NOT NULL,
             first_line_number INT NOT NULL,
-            last_line_number INT NOT NULL
+            last_line_number INT NOT NULL,
+            +file_id INT NOT NULL
           ))"};
 
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS file_fragments 
-         ON fragment_line(file_id))",
-      R"(CREATE INDEX IF NOT EXISTS fragment_by_first_line
-         ON fragment_line(file_id, first_line_number))",
-      R"(CREATE INDEX IF NOT EXISTS fragment_by_last_line
-         ON fragment_line(file_id, last_line_number))"};
+  static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT INTO fragment_line
-         (fragment_id, file_id, first_line_number, last_line_number)
+      R"(INSERT OR IGNORE INTO fragment_line
+         (fragment_id, first_line_number, last_line_number, file_id)
          VALUES (?1, ?2, ?3, ?4))";
 
   SpecificEntityId<FragmentId> fragment_id;
@@ -210,8 +204,9 @@ struct UseRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS use (
             fragment_id INT NOT NULL,
-            entity_id INT NOT NULL
-          ))"};
+            entity_id INT NOT NULL,
+            PRIMARY KEY(fragment_id, entity_id)
+          ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_using_entities
@@ -238,8 +233,9 @@ struct ReferenceRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS reference (
             fragment_id INT NOT NULL,
-            entity_id INT NOT NULL
-          ))"};
+            entity_id INT NOT NULL,
+            PRIMARY KEY(fragment_id, entity_id)
+          ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_referencing_entities
@@ -264,6 +260,10 @@ struct ReferenceRecord {
     m(ReferenceRecord) \
     m(SymbolNameRecord)
 
+#define MX_DATABASE_PRAGMA_SYNCHRONOUS "OFF"
+#define MX_DATABASE_TEMP_STORE "MEMORY"
+#define MX_DATABASE_JOURNAL_MODE "WAL"
+
 // API for write access to the Multiplier database.
 class DatabaseWriter final {
  private:
@@ -276,10 +276,10 @@ class DatabaseWriter final {
       "PRAGMA application_id = 0xce9ccea7",
       "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
       "PRAGMA page_size = 16384",  // 16 KiB.
-      "PRAGMA synchronous = OFF",
-      "PRAGMA temp_store = MEMORY",
+      "PRAGMA synchronous = " MX_DATABASE_PRAGMA_SYNCHRONOUS,
+      "PRAGMA temp_store = " MX_DATABASE_TEMP_STORE,
       "PRAGMA journal_mode = DELETE",
-      "PRAGMA journal_mode = WAL",
+      "PRAGMA journal_mode = " MX_DATABASE_JOURNAL_MODE,
 
       R"(CREATE TABLE IF NOT EXISTS metadata (
            next_file_index INT NOT NULL,

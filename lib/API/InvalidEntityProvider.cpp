@@ -41,13 +41,9 @@ FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(
   return {};
 }
 
-WeggliQueryResultImpl::Ptr InvalidEntityProvider::Query(
-    const Ptr &, const WeggliQuery &) {
-  return {};
-}
-
-RegexQueryResultImpl::Ptr InvalidEntityProvider::Query(
-    const Ptr &, const RegexQuery &) {
+// Return the list of fragments covering / overlapping some lines in a file.
+FragmentIdList InvalidEntityProvider::FragmentsCoveringLines(
+    const Ptr &, PackedFileId, std::vector<unsigned>) {
   return {};
 }
 

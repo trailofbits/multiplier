@@ -87,7 +87,7 @@ WeggliQuery::WeggliQuery(std::string query, bool is_cpp)
 
 WeggliQuery::~WeggliQuery(void) {}
 
-void WeggliQuery::ForEachMatch(
+void WeggliQuery::for_each_match(
     std::string_view source,
     std::function<bool(WeggliMatchData)> cb) const {
 
@@ -105,15 +105,15 @@ void WeggliQuery::ForEachMatch(
   weggli_destroy_matches(matches);
 }
 
-std::string_view WeggliQuery::Pattern(void) const {
+std::string_view WeggliQuery::pattern(void) const {
   return impl ? impl->pattern : std::string_view();
 }
 
-bool WeggliQuery::IsValid(void) const {
+bool WeggliQuery::is_valid(void) const {
   return impl && impl->qtree != nullptr;
 }
 
-bool WeggliQuery::IsCPlusPlus(void) const {
+bool WeggliQuery::is_c_plus_plus(void) const {
   return impl && impl->is_cpp;
 }
 
@@ -128,18 +128,18 @@ WeggliQuery::WeggliQuery(std::string, bool)
 
 WeggliQuery::~WeggliQuery(void) {}
 
-void WeggliQuery::ForEachMatch(
+void WeggliQuery::for_each_match(
     std::string_view, std::function<bool(WeggliMatchData)>) const {}
 
-bool WeggliQuery::IsValid(void) const {
+bool WeggliQuery::is_valid(void) const {
   return false;
 }
 
-std::string_view WeggliQuery::Pattern(void) const {
+std::string_view WeggliQuery::pattern(void) const {
   return {};
 }
 
-bool WeggliQuery::IsCPlusPlus(void) const {
+bool WeggliQuery::is_c_plus_plus(void) const {
   return false;
 }
 

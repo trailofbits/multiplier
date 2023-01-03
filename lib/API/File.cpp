@@ -166,8 +166,6 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
   return vec[maybe_file_token->offset + 1u];
 }
 
-FileImpl::~FileImpl(void) noexcept {}
-
 // Return the file containing a specific fragment.
 std::optional<File> File::containing(const Fragment &fragment) {
   const auto &ep = fragment.impl->ep;

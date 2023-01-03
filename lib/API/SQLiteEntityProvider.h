@@ -27,16 +27,20 @@ class RegexQuery;
 class RegexQueryResultImpl;
 class WeggliQueryResultImpl;
 
+class SQLiteEntityProviderImpl;
+
 class SQLiteEntityProvider final : public EntityProvider {
  private:
-  class Context;
+  friend class SQLiteEntityProviderImpl;
+
+  using ImplPtr = std::shared_ptr<SQLiteEntityProviderImpl>;
 
   const std::filesystem::path db_path;
-  ThreadLocal<Context> thread_context;
+  ThreadLocal<SQLiteEntityProviderImpl> impl;
 
-  RawEntityIdList ReadRedeclarations(Context &context);
+  RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context);
 
-  void FillFragments(Context &context, sqlite::Statement &get_fragments,
+  void FillFragments(SQLiteEntityProviderImpl &context, sqlite::Statement &get_fragments,
                      RawEntityId eid, RawEntityIdList &redecl_ids_out,
                      FragmentIdList &fragment_ids_out);
 
@@ -62,11 +66,9 @@ class SQLiteEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
 
-  std::shared_ptr<WeggliQueryResultImpl>
-  Query(const Ptr &, const WeggliQuery &) final;
-
-  std::shared_ptr<RegexQueryResultImpl> Query(
-      const Ptr &, const RegexQuery &) final;
+  // Return the list of fragments covering / overlapping some lines in a file.
+  FragmentIdList FragmentsCoveringLines(
+      const Ptr &, PackedFileId file, std::vector<unsigned> lines) final;
 
   RawEntityIdList Redeclarations(
       const Ptr &, SpecificEntityId<DeclarationId>) final;
