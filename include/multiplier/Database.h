@@ -210,9 +210,8 @@ struct UseRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS use (
             fragment_id INT NOT NULL,
-            entity_id INT NOT NULL,
-            PRIMARY KEY(fragment_id, entity_id)
-          ) WITHOUT rowid)"};
+            entity_id INT NOT NULL
+          ))"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_using_entities
@@ -229,15 +228,18 @@ struct UseRecord {
 // Records an entry telling us that one entity references another entity.
 // a reference has a from-entity-specific meaning, and so we don't need an
 // edge label.
+//
+// NOTE(pag): We opportunistically assume all entities are referenced by their
+//            own fragments, so we don't record edges between a fragment and its
+//            own entities.
 struct ReferenceRecord {
   static constexpr const char *kTableName = "reference";
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS reference (
             fragment_id INT NOT NULL,
-            entity_id INT NOT NULL,
-            PRIMARY KEY(fragment_id, entity_id)
-          ) WITHOUT rowid)"};
+            entity_id INT NOT NULL
+          ))"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_referencing_entities

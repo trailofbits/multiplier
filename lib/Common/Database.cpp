@@ -10,13 +10,10 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
-#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include <vector>
 #include <variant>
-
-#include <iostream>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -68,19 +65,11 @@ class WriterThreadState {
   std::array<std::optional<sqlite::Statement>, kNumFragmentShards>
       get_fragment_index, set_fragment_index;
 
-  // Mutexes for accessing the file and fragment ID tables.
-  std::array<std::mutex, kNumFileShards> &file_mutexes;
-  std::array<std::mutex, kNumFragmentShards> &fragment_mutexes;
-
   ~WriterThreadState(void) {}
 
   WriterThreadState(
-      const std::filesystem::path &path,
-      std::array<std::mutex, kNumFileShards> &file_mutexes_,
-      std::array<std::mutex, kNumFragmentShards> &fragment_mutexes_)
-      : db(path),
-        file_mutexes(file_mutexes_),
-        fragment_mutexes(fragment_mutexes_) {}
+      const std::filesystem::path &path)
+      : db(path) {}
 
   RawEntityId GetOrCreateFileId(RawEntityId proposed_index,
                                 const std::string &hash);
@@ -95,7 +84,6 @@ RawEntityId WriterThreadState::GetOrCreateFileId(
 
   // Calculate which file table to index into.
   const size_t table = kHasher(hash) % kNumFileShards;
-  std::lock_guard<std::mutex> locker(file_mutexes[table]);
   std::optional<sqlite::Statement> &get = get_file_index[table];
   std::optional<sqlite::Statement> &set = set_file_index[table];
 
@@ -137,7 +125,6 @@ RawEntityId WriterThreadState::GetOrCreateFragmentId(
 
   // Calculate which fragment table to index into.
   const size_t table = kHasher(hash) % kNumFragmentShards;
-  std::lock_guard<std::mutex> locker(fragment_mutexes[table]);
   std::optional<sqlite::Statement> &get = get_fragment_index[table];
   std::optional<sqlite::Statement> &set = set_fragment_index[table];
 
@@ -219,10 +206,6 @@ class DatabaseWriterImpl {
 
   // Update the metadata.
   sqlite::Statement update_meta_stmt;
-
-  // Mutexes for accessing the file and fragment ID tables.
-  std::array<std::mutex, kNumFileShards> file_mutexes;
-  std::array<std::mutex, kNumFragmentShards> fragment_mutexes;
 
   // Per-thread connection state with the database.
   ThreadLocal<WriterThreadState> thread_state;
@@ -438,9 +421,8 @@ DatabaseWriterImpl::DatabaseWriterImpl(
                  next_big_fragment_index = ?3
              WHERE rowid = 1)")),
       thread_state(
-          [this] (unsigned i) -> WriterThreadState * {
-             return new WriterThreadState(db_path, file_mutexes,
-                                          fragment_mutexes);
+          [this] (unsigned) -> WriterThreadState * {
+             return new WriterThreadState(db_path);
           },
           [] (void *ptr) {
             delete reinterpret_cast<WriterThreadState *>(ptr);
