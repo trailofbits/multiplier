@@ -280,6 +280,21 @@ class AbortingTransaction {
   Connection &db;
 };
 
+class AbortingConcurrentTransaction {
+ public:
+  inline ~AbortingConcurrentTransaction(void) {
+    db.Abort();
+  }
+
+  inline AbortingConcurrentTransaction(Connection &db_)
+      : db(db_) {
+    db.Begin(TransactionKind::kConcurrent);
+  }
+
+ private:
+  Connection &db;
+};
+
 class ConcurrentTransaction {
  public:
   inline ~ConcurrentTransaction(void) {

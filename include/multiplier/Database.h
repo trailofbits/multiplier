@@ -210,8 +210,9 @@ struct UseRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS use (
             fragment_id INT NOT NULL,
-            entity_id INT NOT NULL
-          ))"};
+            entity_id INT NOT NULL,
+            PRIMARY KEY(fragment_id, entity_id)
+          ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_using_entities
@@ -234,8 +235,9 @@ struct ReferenceRecord {
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS reference (
             fragment_id INT NOT NULL,
-            entity_id INT NOT NULL
-          ))"};
+            entity_id INT NOT NULL,
+            PRIMARY KEY(fragment_id, entity_id)
+          ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_referencing_entities
@@ -272,7 +274,6 @@ class DatabaseWriter final {
       "PRAGMA application_id = 0xce9ccea7",
       "PRAGMA cache_size = -262144",  // 256 MiB / 1 KiB
       "PRAGMA page_size = 16384",  // 16 KiB.
-//      "PRAGMA page_size = 2097152",  // 2 MiB.
       "PRAGMA synchronous = OFF",
       "PRAGMA temp_store = MEMORY",
       "PRAGMA journal_mode = DELETE",
@@ -288,20 +289,7 @@ class DatabaseWriter final {
            action INT NOT NULL
          ))",
 
-      R"(CREATE INDEX IF NOT EXISTS version_action ON version(action))",
-
-      R"(CREATE TABLE IF NOT EXISTS file_hash (
-           file_index INT NOT NULL,
-           hash BLOB NOT NULL,
-           PRIMARY KEY(hash)
-         ) WITHOUT rowid)",
-
-      R"(CREATE TABLE IF NOT EXISTS fragment_hash (
-           fragment_index INT NOT NULL,
-           file_token_id INT NOT NULL,
-           hash BLOB NOT NULL,
-           PRIMARY KEY(file_token_id, hash)
-         ) WITHOUT rowid)"};
+      R"(CREATE INDEX IF NOT EXISTS version_action ON version(action))"};
 
 //  static constexpr const char *kExitStatments[] = {
 //      };

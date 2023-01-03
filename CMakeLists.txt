@@ -45,8 +45,6 @@ endif(MX_ENABLE_INSTALL)
 
 add_subdirectory("vendor")
 
-DownloadSQLite3()
-
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
 find_package(CapnProto CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)

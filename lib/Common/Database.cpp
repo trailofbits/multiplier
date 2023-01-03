@@ -6,6 +6,7 @@
 
 #include <multiplier/Database.h>
 
+#include <array>
 #include <cassert>
 #include <chrono>
 #include <deque>
@@ -32,6 +33,7 @@ namespace mx {
 // In WAL journalling mode, SQLite locks B-Trees. Each table gets its own
 // B-Tree root, and so by sharding the fragment hash table, which gets a lot
 // of concurrent writes during indexing, we try to spread the load.
+static constexpr size_t kNumFileShards = 256u;
 static constexpr size_t kNumFragmentShards = 256u;
 
 // TODO(pag): Use a hash function that is the same across platforms.
@@ -59,28 +61,26 @@ class WriterThreadState {
   std::optional<RawEntityId> available_big_fragment_index;
 
   // Get a file ID index given a file hash.
-  sqlite::Statement get_file_index;
-  sqlite::Statement set_file_index;
+  std::array<std::optional<sqlite::Statement>, kNumFileShards>
+      get_file_index, set_file_index;
 
-  // Get a fragment ID index given a file hash.
-  std::vector<std::optional<sqlite::Statement>> get_fragment_index;
-  std::vector<std::optional<sqlite::Statement>> set_fragment_index;
+  // Get/set a fragment ID index given a file hash.
+  std::array<std::optional<sqlite::Statement>, kNumFragmentShards>
+      get_fragment_index, set_fragment_index;
+
+  // Mutexes for accessing the file and fragment ID tables.
+  std::array<std::mutex, kNumFileShards> &file_mutexes;
+  std::array<std::mutex, kNumFragmentShards> &fragment_mutexes;
 
   ~WriterThreadState(void) {}
 
-  WriterThreadState(const std::filesystem::path &path)
+  WriterThreadState(
+      const std::filesystem::path &path,
+      std::array<std::mutex, kNumFileShards> &file_mutexes_,
+      std::array<std::mutex, kNumFragmentShards> &fragment_mutexes_)
       : db(path),
-        get_file_index(db.Prepare(
-            R"(SELECT file_index FROM file_hash
-               WHERE hash = ?1)")),
-        set_file_index(db.Prepare(
-            R"(INSERT INTO file_hash (file_index, hash) VALUES (?1, ?2)
-               ON CONFLICT DO UPDATE SET file_index = file_index
-               RETURNING file_index, hash)")) {
-    get_fragment_index.resize(kNumFragmentShards);
-    set_fragment_index.resize(kNumFragmentShards);
-  }
-
+        file_mutexes(file_mutexes_),
+        fragment_mutexes(fragment_mutexes_) {}
 
   RawEntityId GetOrCreateFileId(RawEntityId proposed_index,
                                 const std::string &hash);
@@ -92,20 +92,40 @@ class WriterThreadState {
 
 RawEntityId WriterThreadState::GetOrCreateFileId(
     RawEntityId proposed_index, const std::string &hash) {
+
+  // Calculate which file table to index into.
+  const size_t table = kHasher(hash) % kNumFileShards;
+  std::lock_guard<std::mutex> locker(file_mutexes[table]);
+  std::optional<sqlite::Statement> &get = get_file_index[table];
+  std::optional<sqlite::Statement> &set = set_file_index[table];
+
+  // We might not have prepared these statements for the current thread yet.
+  if (!get) {
+    auto table_name = "file_hash_" + std::to_string(table);
+    get.emplace(db.Prepare(
+        "SELECT file_index FROM " + table_name + " WHERE hash = ?1")),
+
+    set.emplace(db.Prepare(
+        "INSERT INTO " + table_name + " (file_index, hash) "
+        "VALUES (?1, ?2) "
+        "ON CONFLICT DO UPDATE SET file_index = file_index "
+        "RETURNING file_index"));
+  }
+
   RawEntityId index_out = kInvalidEntityId;
 
-  get_file_index.BindValues(hash);
-  if (get_file_index.ExecuteStep()) {
-    get_file_index.Row().Columns(index_out);
+  get->BindValues(hash);
+  if (get->ExecuteStep()) {
+    get->Row().Columns(index_out);
   }
-  get_file_index.Reset();
+  get->Reset();
 
   while (index_out == kInvalidEntityId) {
-    set_file_index.BindValues(proposed_index, hash);
-    if (set_file_index.ExecuteStep()) {
-      set_file_index.Row().Columns(index_out);
+    set->BindValues(proposed_index, hash);
+    if (set->ExecuteStep()) {
+      set->Row().Columns(index_out);
     }
-    set_file_index.Reset();
+    set->Reset();
   }
 
   return index_out;
@@ -117,6 +137,7 @@ RawEntityId WriterThreadState::GetOrCreateFragmentId(
 
   // Calculate which fragment table to index into.
   const size_t table = kHasher(hash) % kNumFragmentShards;
+  std::lock_guard<std::mutex> locker(fragment_mutexes[table]);
   std::optional<sqlite::Statement> &get = get_fragment_index[table];
   std::optional<sqlite::Statement> &set = set_fragment_index[table];
 
@@ -131,7 +152,7 @@ RawEntityId WriterThreadState::GetOrCreateFragmentId(
         "INSERT INTO " + table_name + " (fragment_index, file_token_id, hash) "
         "VALUES (?1, ?2, ?3) "
         "ON CONFLICT DO UPDATE SET fragment_index = fragment_index "
-        "RETURNING fragment_index, file_token_id, hash"));
+        "RETURNING fragment_index"));
   }
 
   RawEntityId index_out = kInvalidEntityId;
@@ -163,6 +184,8 @@ class BulkInserterState {
     void DoInsertAsync(record r) { \
       if (InsertAsync(std::move(r), INSERT_INTO_ ## record)) { \
         INSERT_INTO_ ## record.Execute(); \
+      } else { \
+        INSERT_INTO_ ## record.Reset(); \
       } \
     } \
     bool InsertAsync(record, sqlite::Statement &);
@@ -196,6 +219,10 @@ class DatabaseWriterImpl {
 
   // Update the metadata.
   sqlite::Statement update_meta_stmt;
+
+  // Mutexes for accessing the file and fragment ID tables.
+  std::array<std::mutex, kNumFileShards> file_mutexes;
+  std::array<std::mutex, kNumFragmentShards> fragment_mutexes;
 
   // Per-thread connection state with the database.
   ThreadLocal<WriterThreadState> thread_state;
@@ -357,6 +384,15 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
   for (const char *stmt : DatabaseWriter::kInitStatements) {
     db.Execute(std::string(stmt));
   }
+  for (size_t i = 0u; i < kNumFileShards; ++i) {
+    db.Execute(
+        "CREATE TABLE IF NOT EXISTS file_hash_" + std::to_string(i) + " ("
+        "  file_index INT NOT NULL,"
+        "  hash BLOB NOT NULL,"
+        "  PRIMARY KEY(hash)"
+        ") WITHOUT rowid");
+  }
+
   for (size_t i = 0u; i < kNumFragmentShards; ++i) {
     db.Execute(
         "CREATE TABLE IF NOT EXISTS fragment_hash_" + std::to_string(i) + " ("
@@ -403,7 +439,8 @@ DatabaseWriterImpl::DatabaseWriterImpl(
              WHERE rowid = 1)")),
       thread_state(
           [this] (unsigned i) -> WriterThreadState * {
-             return new WriterThreadState(db_path);
+             return new WriterThreadState(db_path, file_mutexes,
+                                          fragment_mutexes);
           },
           [] (void *ptr) {
             delete reinterpret_cast<WriterThreadState *>(ptr);

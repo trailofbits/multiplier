@@ -103,6 +103,20 @@ void LinkExternalReferencesInFragment(
           raw_id = em.EntityId(def.value());
           vid = mx::EntityId(raw_id).Unpack();
           if (!std::holds_alternative<mx::MacroId>(vid)) {
+
+            // Builtin or command-line specified macros have no location.
+            //
+            // NOTE(pag): The persistence for macros re-interprets macros with no
+            //            definition site as substitutions instead of macro
+            //            expansions.
+            //
+            // TODO(pag): Find a way to give these file locations. See related
+            //            issue/condition in `FindTLMs` in file
+            //            `bin/Index/IndexCompileJob.cpp`.
+            if (!def->Name().FileLocation()) {
+              continue;
+            }
+
             assert(false);
             continue;
           }
