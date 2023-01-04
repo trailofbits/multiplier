@@ -40,12 +40,13 @@ class ConstantMatrixType : public MatrixType {
   }
 
   inline static ConstantMatrixTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ConstantMatrixType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ConstantMatrixType::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

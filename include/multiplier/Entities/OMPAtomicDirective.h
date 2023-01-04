@@ -43,12 +43,13 @@ class OMPAtomicDirective : public OMPExecutableDirective {
   }
 
   inline static OMPAtomicDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : OMPAtomicDirective::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : OMPAtomicDirective::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

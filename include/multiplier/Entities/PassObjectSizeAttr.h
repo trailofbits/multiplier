@@ -43,12 +43,13 @@ class PassObjectSizeAttr : public InheritableParamAttr {
   }
 
   inline static PassObjectSizeAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : PassObjectSizeAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : PassObjectSizeAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

@@ -38,14 +38,13 @@ static constexpr uint64_t kNumStmtKinds = NumEnumerators(StmtKind{});
 static constexpr uint64_t kNumTypeKinds = NumEnumerators(TypeKind{});
 static constexpr uint64_t kNumAttrKinds = NumEnumerators(AttrKind{});
 static constexpr uint64_t kNumTokenKinds = NumEnumerators(TokenKind{});
-static constexpr uint64_t kNumMacroSubstitutionKinds =
-    NumEnumerators(MacroSubstitutionKind{});
+static constexpr uint64_t kNumMacroKinds = NumEnumerators(MacroKind{});
 static constexpr uint64_t kNumPseudoKinds = 1u;
 static constexpr unsigned kSubKindNumBits = 11u;
 static_assert((kNumDeclKinds + kNumStmtKinds + kNumTypeKinds + kNumAttrKinds +
                kNumTokenKinds /* fragment tokens */ +
                kNumTokenKinds /* macro tokens */ +
-               kNumMacroSubstitutionKinds +
+               kNumMacroKinds +
                kNumPseudoKinds) <=
               (1u << kSubKindNumBits));
 
@@ -122,55 +121,6 @@ union PackedEntityId {
 static_assert(sizeof(PackedEntityId) == sizeof(uint64_t));
 
 }  // namespace
-
-const char *EnumeratorName(MacroSubstitutionKind kind) {
-  switch (kind) {
-    case MacroSubstitutionKind::PREPROCESSED_CODE:
-      return "PREPROCESSED_CODE";
-    case MacroSubstitutionKind::OTHER_DIRECTIVE:
-      return "OTHER_DIRECTIVE";
-    case MacroSubstitutionKind::DEFINE_DIRECTIVE:
-      return "DEFINE_DIRECTIVE";
-    case MacroSubstitutionKind::UNDEF_DIRECTIVE:
-      return "UNDEF_DIRECTIVE";
-    case MacroSubstitutionKind::PRAGMA_DIRECTIVE:
-      return "PRAGMA_DIRECTIVE";
-    case MacroSubstitutionKind::IF_DIRECTIVE:
-      return "IF_DIRECTIVE";
-    case MacroSubstitutionKind::IFDEF_DIRECTIVE:
-      return "IFDEF_DIRECTIVE";
-    case MacroSubstitutionKind::IFNDEF_DIRECTIVE:
-      return "IFNDEF_DIRECTIVE";
-    case MacroSubstitutionKind::ELIF_DIRECTIVE:
-      return "ELIF_DIRECTIVE";
-    case MacroSubstitutionKind::ELIFDEF_DIRECTIVE:
-      return "ELIFDEF_DIRECTIVE";
-    case MacroSubstitutionKind::ELIFNDEF_DIRECTIVE:
-      return "ELIFNDEF_DIRECTIVE";
-    case MacroSubstitutionKind::ELSE_DIRECTIVE:
-      return "ELSE_DIRECTIVE";
-    case MacroSubstitutionKind::ENDIF_DIRECTIVE:
-      return "ENDIF_DIRECTIVE";
-    case MacroSubstitutionKind::INCLUDE_DIRECTIVE:
-      return "INCLUDE";
-    case MacroSubstitutionKind::MACRO:
-      return "MACRO";
-    case MacroSubstitutionKind::MACRO_PARAMETER:
-      return "MACRO_PARAMETER";
-    case MacroSubstitutionKind::VA_OPT:
-      return "VA_OPT";
-    case MacroSubstitutionKind::VA_OPT_ARGUMENT:
-      return "VA_OPT_ARGUMENT";
-    case MacroSubstitutionKind::MACRO_ARGUMENT:
-      return "MACRO_ARGUMENT";
-    case MacroSubstitutionKind::STRINGIFY:
-      return "STRINGIFY";
-    case MacroSubstitutionKind::CONCATENATE:
-      return "CONCATENATE";
-    case MacroSubstitutionKind::SUBSTITUTE:
-      return "SUBSTITUTE";
-  }
-}
 
 EntityId::EntityId(DeclarationId id) {
   if (id.fragment_id) {
@@ -411,7 +361,7 @@ EntityId::EntityId(MacroTokenId id) {
 
 // Token substitutions are packed in to use the remaining bit space above
 // declaration kinds.
-EntityId::EntityId(MacroSubstitutionId id) {
+EntityId::EntityId(MacroId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
     if (id.fragment_id >= kMaxBigFragmentId) {
@@ -440,8 +390,8 @@ EntityId::EntityId(MacroSubstitutionId id) {
 
 #ifndef NDEBUG
     auto unpacked = Unpack();
-    assert(std::holds_alternative<MacroSubstitutionId>(unpacked));
-    assert(std::get<MacroSubstitutionId>(unpacked) == id);
+    assert(std::holds_alternative<MacroId>(unpacked));
+    assert(std::get<MacroId>(unpacked) == id);
 #endif
   }
 }
@@ -457,7 +407,7 @@ EntityId::EntityId(DesignatorId id) {
       packed.small_entity.is_fragment_entity = 1u;
       packed.small_entity.sub_kind =
           kNumDeclKinds + kNumStmtKinds + kNumTypeKinds + kNumAttrKinds +
-          kNumTokenKinds + kNumTokenKinds + kNumMacroSubstitutionKinds +
+          kNumTokenKinds + kNumTokenKinds + kNumMacroKinds +
           static_cast<uint64_t>(IdentifiedPseudo::kDesignator);
       packed.small_entity.offset = id.offset;
       assert(packed.small_entity.offset == id.offset);
@@ -468,7 +418,7 @@ EntityId::EntityId(DesignatorId id) {
       packed.big_entity.is_fragment_entity = 1u;
       packed.big_entity.sub_kind =
           kNumDeclKinds + kNumStmtKinds + kNumTypeKinds + kNumAttrKinds +
-          kNumTokenKinds + kNumTokenKinds + kNumMacroSubstitutionKinds +
+          kNumTokenKinds + kNumTokenKinds + kNumMacroKinds +
           static_cast<uint64_t>(IdentifiedPseudo::kDesignator);
       packed.big_entity.offset = id.offset;
       assert(packed.big_entity.offset == id.offset);
@@ -582,15 +532,15 @@ VariantId EntityId::Unpack(void) const noexcept {
       }
 
       sub_kind -= kNumTokenKinds;
-      if (sub_kind < kNumMacroSubstitutionKinds) {
-        MacroSubstitutionId id;
+      if (sub_kind < kNumMacroKinds) {
+        MacroId id;
         id.fragment_id = packed.big_entity.code_id;
-        id.kind = static_cast<MacroSubstitutionKind>(sub_kind);
+        id.kind = static_cast<MacroKind>(sub_kind);
         id.offset = packed.big_entity.offset;
         return id;
       }
 
-      sub_kind -= kNumMacroSubstitutionKinds;
+      sub_kind -= kNumMacroKinds;
       if (sub_kind < kNumPseudoKinds) {
         switch (static_cast<IdentifiedPseudo>(sub_kind)) {
           case IdentifiedPseudo::kDesignator: {
@@ -669,15 +619,15 @@ VariantId EntityId::Unpack(void) const noexcept {
       }
 
       sub_kind -= kNumTokenKinds;
-      if (sub_kind < kNumMacroSubstitutionKinds) {
-        MacroSubstitutionId id;
+      if (sub_kind < kNumMacroKinds) {
+        MacroId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
-        id.kind = static_cast<MacroSubstitutionKind>(sub_kind);
+        id.kind = static_cast<MacroKind>(sub_kind);
         id.offset = packed.small_entity.offset;
         return id;
       }
 
-      sub_kind -= kNumMacroSubstitutionKinds;
+      sub_kind -= kNumMacroKinds;
       if (sub_kind < kNumPseudoKinds) {
         switch (static_cast<IdentifiedPseudo>(sub_kind)) {
           case IdentifiedPseudo::kDesignator: {

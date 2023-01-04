@@ -19,6 +19,7 @@
 #include "../Token.h"
 #include "../Use.h"
 
+#include "PseudoKind.h"
 #include "StmtUseSelector.h"
 
 namespace mx {
@@ -36,9 +37,11 @@ class TemplateParameterList {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
+  friend class Macro;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;

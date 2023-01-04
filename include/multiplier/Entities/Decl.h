@@ -32,8 +32,8 @@ namespace mx {
 class Attr;
 class Decl;
 class ExternalSourceSymbolAttr;
-class ReferenceRange;
 class Stmt;
+class StmtReferenceRange;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
@@ -49,9 +49,11 @@ class Decl {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
+  friend class Macro;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
@@ -90,9 +92,9 @@ class Decl {
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
   std::vector<Decl> redeclarations(void) const;
-  EntityId id(void) const;
+  SpecificEntityId<DeclarationId> id(void) const;
   UseRange<DeclUseSelector> uses(void) const;
-  ReferenceRange references(void) const;
+  StmtReferenceRange references(void) const;
 
  protected:
   static DeclIterator in_internal(const Fragment &fragment);
@@ -103,12 +105,13 @@ class Decl {
   }
 
   inline static DeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Decl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : Decl::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }
@@ -154,7 +157,6 @@ class Decl {
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;
   bool is_weak_imported(void) const;
-  std::vector<Decl> redeclarations_visible_in_translation_unit(void) const;
   DeclKind kind(void) const;
   DeclCategory category(void) const;
   Token token(void) const;

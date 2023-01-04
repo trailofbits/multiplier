@@ -49,12 +49,13 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   }
 
   inline static NonTypeTemplateParmDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : NonTypeTemplateParmDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : NonTypeTemplateParmDecl::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

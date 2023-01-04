@@ -38,12 +38,13 @@ class ParenType : public Type {
   }
 
   inline static ParenTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ParenType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ParenType::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

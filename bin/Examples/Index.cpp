@@ -11,12 +11,11 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
-#include <multiplier/Macro.h>
 
 DECLARE_bool(help);
 DEFINE_string(db, "", "Database file");
 
-std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
+std::unordered_map<mx::PackedFileId, std::filesystem::path> file_paths;
 mx::FileLocationCache location_cache;
 
 mx::Index InitExample(bool fill_locations) {
@@ -25,7 +24,9 @@ mx::Index InitExample(bool fill_locations) {
     exit(EXIT_FAILURE);
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(
+      mx::EntityProvider::in_memory_cache(
+          mx::EntityProvider::from_database(FLAGS_db)));
 
   if (fill_locations) {
     for (auto [path, id] : index.file_paths()) {
@@ -44,15 +45,17 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
-bool ContainsHighlightedTokens(mx::MacroSubstitutionList nodes,
+bool ContainsHighlightedTokens(std::vector<mx::MacroOrToken> nodes,
                                const mx::TokenRange &entity_tokens) {
-  for (auto node : nodes) {
+  for (const mx::MacroOrToken &node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
       if (entity_tokens.index_of(std::get<mx::Token>(node))) {
         return true;
       }
-    } else if (auto after = std::get<mx::MacroSubstitution>(node).after()) {
-      if (ContainsHighlightedTokens(*after, entity_tokens)) {
+    } else if (auto sub = mx::MacroSubstitution::from(
+                   std::get<mx::Macro>(node))) {
+      if (ContainsHighlightedTokens(sub->replacement_children(),
+                                    entity_tokens)) {
         return true;
       }
     }
@@ -63,27 +66,29 @@ bool ContainsHighlightedTokens(mx::MacroSubstitutionList nodes,
 // TODO(pag): This whole thing is broken, because you can't ask top-down if a
 //            parsed token is inside of a substitution; you can only ask if a
 //            token derived from a parsed token is in the right range.
-void PrintUnparsedTokens(std::ostream &os, mx::MacroSubstitutionList nodes,
-                         const mx::TokenRange &entity_tokens,
-                         bool force_highlight) {
-  for (auto node : nodes) {
+void PrintUnparsedTokens(
+    std::ostream &os, std::vector<mx::MacroOrToken> nodes,
+    const mx::TokenRange &entity_tokens, bool force_highlight) {
+
+  for (mx::MacroOrToken &node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
-      auto token = std::get<mx::Token>(node);
+      mx::Token &token = std::get<mx::Token>(node);
       if (force_highlight || entity_tokens.index_of(token)) {
         HighlightToken(os, std::move(token));
       } else {
         PrintToken(os, std::move(token));
       }
     } else {
-      auto sub = std::get<mx::MacroSubstitution>(node);
+      mx::Macro &macro = std::get<mx::Macro>(node);
       auto sub_force_highlight = force_highlight;
       if (!sub_force_highlight) {
-        if (auto after = sub.after()) {
+        if (auto sub = mx::MacroSubstitution::from(macro)) {
           sub_force_highlight = ContainsHighlightedTokens(
-              *after, entity_tokens);
+              sub->replacement_children(), entity_tokens);
         }
       }
-      PrintUnparsedTokens(os, sub.before(), entity_tokens, sub_force_highlight);
+      PrintUnparsedTokens(os, macro.children(), entity_tokens,
+                          sub_force_highlight);
     }
   }
 }
@@ -99,11 +104,8 @@ void RenderFragment(std::ostream &os, const mx::Fragment &fragment,
   auto line_number = location->first;
   std::stringstream ss;
   std::string sep = indent;
-  if (auto pp_code = fragment.preprocessed_code()) {
-    PrintUnparsedTokens(ss, pp_code->before(), entity_tokens);
-  } else {
-    // TODO(pag): Do this.
-  }
+  PrintUnparsedTokens(ss, fragment.preprocessed_code(), entity_tokens);
+
   auto render_line_number = print_line_numbers;
 
   if (print_line_numbers) {

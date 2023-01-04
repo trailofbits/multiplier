@@ -10,7 +10,6 @@
 
 #include "Index.h"
 #include <multiplier/AST.h>
-#include <multiplier/Macro.h>
 
 DEFINE_uint64(entity_id, 0, "ID of the entity to print");
 DEFINE_bool(unparsed, false, "Show original source code?");
@@ -55,9 +54,8 @@ extern "C" int main(int argc, char *argv[]) {
 
   // Print out the tokens of this fragment as they appear in the file.
   if (FLAGS_unparsed) {
-    std::cerr << "TODO\n";
-    return EXIT_FAILURE;
-//    PrintUnparsedTokens(std::cout, fragment->substitutions(), entity_tokens);
+    PrintUnparsedTokens(std::cout, fragment->preprocessed_code(),
+                        entity_tokens);
 
   // Print out the tokens of this fragment that were actually parsed. These
   // are post-macro expansion tokens, and generally don't include whitespace

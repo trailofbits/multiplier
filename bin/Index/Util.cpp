@@ -31,6 +31,59 @@
 
 namespace indexer {
 
+// Return `true` of `tok` is in the context of `decl`.
+bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl) {
+  auto cdecl = decl.CanonicalDeclaration();
+  for (auto context = tok.Context(); context; context = context->Parent()) {
+    switch (context->Kind()) {
+      case pasta::TokenContextKind::kTemplateArgument:
+      case pasta::TokenContextKind::kTemplateParameterList:
+        return true;
+      case pasta::TokenContextKind::kDecl:
+        if (auto maybe_decl = pasta::Decl::From(*context)) {
+          pasta::DeclKind dk = maybe_decl->Kind();
+          if (*maybe_decl == cdecl) {
+            return true;
+          } else if (dk == pasta::DeclKind::kClassTemplateSpecialization ||
+                     dk == pasta::DeclKind::kClassTemplatePartialSpecialization ||
+                     dk == pasta::DeclKind::kVarTemplateSpecialization ||
+                     dk == pasta::DeclKind::kVarTemplatePartialSpecialization ||
+                     dk == pasta::DeclKind::kClassScopeFunctionSpecialization) {
+            return true;
+          }
+        }
+        break;  // Keep looking.
+      case pasta::TokenContextKind::kType:
+        if (auto maybe_type = pasta::Type::From(*context)) {
+          pasta::TypeKind tk = maybe_type->Kind();
+          if (tk == pasta::TypeKind::kTemplateSpecialization ||
+              tk == pasta::TypeKind::kElaborated) {
+            return true;
+          }
+        }
+        break;  // Keep looking.
+      default:
+        break;  // Keep looking.
+    }
+  }
+  return false;
+}
+
+// Returns the `pasta::FileToken` if this is a top-level token in the parse.
+std::optional<pasta::FileToken> AsTopLevelFileToken(const pasta::Token &tok) {
+  switch (tok.Role()) {
+    case pasta::TokenRole::kFileToken:
+    case pasta::TokenRole::kInitialMacroUseToken:
+    case pasta::TokenRole::kBeginOfFileMarker:
+    case pasta::TokenRole::kEndOfFileMarker:
+    case pasta::TokenRole::kBeginOfMacroExpansionMarker:
+    case pasta::TokenRole::kEndOfMacroExpansionMarker:
+      return tok.FileLocation();
+    default:
+      return std::nullopt;
+  }
+}
+
 // Tell us if this was a token that was actually parsed, and thus should have
 // a fragment token ID.
 //
@@ -39,7 +92,7 @@ bool IsParsedToken(const pasta::Token &tok) {
   switch (tok.Role()) {
     case pasta::TokenRole::kFileToken:
     case pasta::TokenRole::kFinalMacroExpansionToken:
-      return true;
+      return !tok.Data().empty();
 
     default:
       return false;
@@ -231,7 +284,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::FileToken &entity) {
   }
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
-    if (IsWhitespaceOrEmpty(entity.Data())) {
+    auto data = entity.Data();
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
       return mx::TokenKind::WHITESPACE;
     }
   }
@@ -255,7 +309,8 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
   }
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
-    if (IsWhitespaceOrEmpty(entity.Data())) {
+    auto data = entity.Data();
+    if (!data.empty() && IsWhitespaceOrEmpty(data)) {
       return mx::TokenKind::WHITESPACE;
     }
   }
@@ -265,13 +320,7 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
 
 // Return the token kind.
 mx::TokenKind TokenKindFromPasta(const pasta::MacroToken &entity) {
-  auto kind = mx::FromPasta(entity.TokenKind());
-  if (kind == mx::TokenKind::UNKNOWN) {
-    if (IsWhitespaceOrEmpty(entity.Data())) {
-      return mx::TokenKind::WHITESPACE;
-    }
-  }
-  return kind;
+  return TokenKindFromPasta(entity.ParsedLocation());
 }
 
 namespace {
@@ -411,10 +460,15 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
   
   // If we have `(T *) b` then mark `T` as being referenced in this fragment.
   } else if (auto cast = pasta::CastExpr::From(stmt)) {
-    if (auto casted_type = cast->Type()) {
-      if (auto used_decl = ReferencedDecl(casted_type.value())) {
-        return used_decl.value();
-      }   
+
+    // TODO(pag): If we want to allow implicit casts, then update
+    //            `ReferenceIterator::Advance`.
+    if (stmt.Kind() != pasta::StmtKind::kImplicitCastExpr) {
+      if (auto casted_type = cast->Type()) {
+        if (auto used_decl = ReferencedDecl(casted_type.value())) {
+          return used_decl.value();
+        }
+      }
     }
   
   // If we have `sizeof(T)` or `alignof(T)` or something like these then

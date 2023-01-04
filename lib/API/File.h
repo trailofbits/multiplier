@@ -9,12 +9,14 @@
 #include "Token.h"
 
 #include <mutex>
+#include <unordered_map>
 
 namespace mx {
 
 class TokenReader;
 
 using FileLocationVector = std::vector<std::pair<unsigned, unsigned>>;
+using FileIdList = std::vector<SpecificEntityId<FileId>>;
 
 class FileLocationCacheImpl {
  public:
@@ -34,13 +36,52 @@ class FileListImpl {
   const EntityProvider::Ptr ep;
 
   // NOTE(pag): These are `EntityId`-packed file ids.
-  std::vector<RawEntityId> file_ids;
+  FileIdList file_ids;
 
   explicit FileListImpl(EntityProvider::Ptr ep_);
 };
 
+class ReadFileTokensFromFile final : public TokenReader {
+ public:
+  const FileImpl * const file;
+
+  inline ReadFileTokensFromFile(FileImpl *file_)
+      : file(file_) {}
+
+  // Return the number of tokens in the fragment.
+  unsigned NumTokens(void) const override;
+
+  // Return the kind of the Nth token.
+  TokenKind NthTokenKind(unsigned index) const override;
+
+  // Return the data of the Nth token.
+  std::string_view NthTokenData(unsigned index) const override;
+
+  // Return the id of the token from which the Nth token is derived.
+  EntityId NthDerivedTokenId(unsigned token_index) const override;
+
+  // Return the id of the parsed token which is derived from the Nth token.
+  EntityId NthParsedTokenId(unsigned) const override;
+
+  // Return the id of the macro containing the Nth token.
+  EntityId NthContainingMacroId(unsigned) const override;
+
+  // Return the id of the Nth token.
+  EntityId NthTokenId(unsigned token_index) const override;
+  EntityId NthFileTokenId(unsigned token_index) const override;
+
+  // Return the token reader for another file.
+  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
+                                  RawEntityId id) const final;
+
+  // Returns `true` if `this` is logically equivalent to `that`.
+  bool Equals(const class TokenReader *that) const override;
+
+  const FileImpl *OwningFile(void) const noexcept final;
+};
+
 // Interface for accessing the tokens of a file.
-class FileImpl {
+class FileImpl final {
  public:
   using Ptr = std::shared_ptr<const FileImpl>;
   using WeakPtr = std::weak_ptr<const FileImpl>;
@@ -53,66 +94,40 @@ class FileImpl {
   // or look up entities related to other fragments.
   const EntityProvider::Ptr ep;
 
-  // Number of tokens in this file.
-  unsigned num_tokens{0u};
+ private:
+  friend class ReadFileTokensFromFile;
 
-  virtual ~FileImpl(void) noexcept;
-
-  inline FileImpl(RawEntityId id_, EntityProvider::Ptr ep_)
-      : file_id(id_),
-        ep(std::move(ep_)) {}
-
-  inline FileImpl(FileId id_, EntityProvider::Ptr ep_)
-      : FileImpl(id_.file_id, std::move(ep_)) {}
-
-  // Return a reader for the tokens in the file.
-  virtual std::shared_ptr<const class TokenReader> TokenReader(
-      const FileImpl::Ptr &) const = 0;
-
-  // Return the data of the file.
-  virtual std::string_view Data(void) const = 0;
-};
-
-// A file downloaded as a result of a making an RPC.
-class PackedFileImpl final : public FileImpl, public TokenReader {
- public:
+  // Stores the serialized Cap'n Proto data for this file.
   PackedReaderState package;
+
+  // Reader for the data in `package`.
   const rpc::File::Reader reader;
 
-  virtual ~PackedFileImpl(void) noexcept;
+  // Reads the tokens from `reader`.
+  const ReadFileTokensFromFile file_token_reader;
 
-  PackedFileImpl(RawEntityId id_, EntityProvider::Ptr ep_,
-                 const capnp::Data::Reader &reader_);
+ public:
 
-  // Return the data of the file.
-  std::string_view Data(void) const final;
+  // Number of tokens in this file.
+  const unsigned num_tokens;
+
+  ~FileImpl(void) noexcept;
+
+  explicit FileImpl(FileId id_, EntityProvider::Ptr ep_,
+                    const capnp::Data::Reader &reader_);
 
   // Return a reader for the tokens in the file.
-  std::shared_ptr<const class TokenReader>
-  TokenReader(const FileImpl::Ptr &) const final;
+  inline std::shared_ptr<const class TokenReader> TokenReader(
+      const FileImpl::Ptr &self) const {
+    return TokenReader::Ptr(self, &file_token_reader);
+  }
 
-  // Return the number of tokens in the file.
-  unsigned NumTokens(void) const final;
+  inline const rpc::File::Reader &Reader(void) const noexcept {
+    return reader;
+  }
 
-  // Return the kind of the Nth token.
-  TokenKind NthTokenKind(unsigned index) const final;
-
-  // Return the data of the Nth token.
-  std::string_view NthTokenData(unsigned index) const final;
-
-  // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(unsigned token_index) const final;
-
-  // Return the id of the Nth token.
-  EntityId NthTokenId(unsigned token_index) const final;
-  EntityId NthFileTokenId(unsigned token_index) const final;
-
-  // Return the token reader for another file/fragment.
-  TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
-                                  RawEntityId id) const final;
-
-  // Returns `true` if `this` is logically equivalent to `that`.
-  bool Equals(const class TokenReader *that) const final;
+  // Return the data of the file.
+  std::string_view Data(void) const;
 };
 
 }  // namespace mx

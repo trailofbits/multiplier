@@ -8,12 +8,14 @@
 
 #include <memory>
 #include <multiplier/Types.h>
-#include <pasta/AST/Decl.h>
 #include <string>
 #include <vector>
 
 #include "Action.h"
 
+namespace pasta {
+class Decl;
+}  // namespace pasta
 namespace indexer {
 
 class EntityMapper;

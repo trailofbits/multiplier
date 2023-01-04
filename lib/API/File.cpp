@@ -7,12 +7,14 @@
 #include "File.h"
 
 #include <cctype>
+#include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
 
-#include "Macro.h"
 #include "Fragment.h"
 #include "Re2.h"
+#include "Use.h"
 #include "Weggli.h"
 
 namespace mx {
@@ -123,8 +125,7 @@ std::optional<std::pair<unsigned, unsigned>> Token::location(
     return std::nullopt;
   }
 
-  const PackedFileImpl *file_ptr = dynamic_cast<const PackedFileImpl *>(
-      maybe_file_token->impl.get());
+  const FileImpl *file_ptr = maybe_file_token->impl->OwningFile();
   if (!file_ptr) {
     return std::nullopt;
   }
@@ -149,8 +150,7 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
     return std::nullopt;
   }
 
-  const PackedFileImpl *file_ptr = dynamic_cast<const PackedFileImpl *>(
-      maybe_file_token->impl.get());
+  const FileImpl *file_ptr = maybe_file_token->impl->OwningFile();
   if (!file_ptr) {
     return std::nullopt;
   }
@@ -166,50 +166,76 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
   return vec[maybe_file_token->offset + 1u];
 }
 
-FileImpl::~FileImpl(void) noexcept {}
-
 // Return the file containing a specific fragment.
-File File::containing(const Fragment &fragment) {
+std::optional<File> File::containing(const Fragment &fragment) {
   const auto &ep = fragment.impl->ep;
-  return File(ep->FileFor(ep, fragment.impl->FileContaingFirstToken()));
-}
-
-// Return the file containing a specific fragment.
-File File::containing(const MacroSubstitution &entity) {
-  const auto &ep = entity.impl->ep;
-  return File(ep->FileFor(ep, entity.impl->FileContaingFirstToken()));
+  if (auto fp = ep->FileFor(ep, fragment.impl->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
 }
 
 // Return the file containing a specific token substitution.
-File File::containing(const Designator &entity) {
+std::optional<File> File::containing(const Designator &entity) {
   const auto &ep = entity.fragment->ep;
-  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
 }
 
 // Return the file containing the fragment containing a specific entity.
-File File::containing(const Decl &entity) {
+std::optional<File> File::containing(const Decl &entity) {
   const auto &ep = entity.fragment->ep;
-  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
 }
 
 // Return the file containing the fragment containing a specific entity.
-File File::containing(const Stmt &entity) {
+std::optional<File> File::containing(const Stmt &entity) {
   const auto &ep = entity.fragment->ep;
-  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
 }
 
 // Return the file containing the fragment containing a specific entity.
-File File::containing(const Type &entity) {
+std::optional<File> File::containing(const Type &entity) {
   const auto &ep = entity.fragment->ep;
-  return File(ep->FileFor(ep, entity.fragment->FileContaingFirstToken()));
+  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
+}
+
+// Return the file containing a specific fragment.
+std::optional<File> File::containing(const Attr &entity) {
+  const auto &ep = entity.fragment->ep;
+  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
+}
+
+// Return the file containing a specific fragment.
+std::optional<File> File::containing(const Macro &entity) {
+  const auto &ep = entity.fragment->ep;
+  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+    return File(std::move(fp));
+  }
+  return std::nullopt;
 }
 
 // Return the file containing a specific token.
 std::optional<File> File::containing(const Token &token) {
-  if (auto file = dynamic_cast<const PackedFileImpl *>(token.impl.get())) {
+
+  if (auto file = token.impl->OwningFile()) {
     return File(FileImpl::Ptr(token.impl, file));
 
-  } else if (auto frag = dynamic_cast<const PackedFragmentImpl *>(token.impl.get())) {
+  } else if (auto frag = token.impl->OwningFragment()) {
     return File::containing(Fragment(FragmentImpl::Ptr(token.impl, frag)));
 
   } else {
@@ -218,8 +244,8 @@ std::optional<File> File::containing(const Token &token) {
 }
 
 // Return the file containing a regex match.
-File File::containing(const RegexQueryMatch &match) {
-  if (auto file = dynamic_cast<const PackedFileImpl *>(match.impl.get())) {
+std::optional<File> File::containing(const RegexQueryMatch &match) {
+  if (auto file = match.impl->OwningFile()) {
     return File(FileImpl::Ptr(match.impl, file));
 
   } else {
@@ -228,8 +254,8 @@ File File::containing(const RegexQueryMatch &match) {
 }
 
 // Return the file containing a specific fragment.
-File File::containing(const WeggliQueryMatch &match) {
-  if (auto file = dynamic_cast<const PackedFileImpl *>(match.impl.get())) {
+std::optional<File> File::containing(const WeggliQueryMatch &match) {
+  if (auto file = match.impl->OwningFile()) {
     return File(FileImpl::Ptr(match.impl, file));
 
   } else {
@@ -239,30 +265,45 @@ File File::containing(const WeggliQueryMatch &match) {
 
 // Return all files in a given index.
 FileList File::in(const Index &index) {
-  return FileList(std::make_shared<FileListImpl>(index.impl));
+  return index.files();
 }
 
 // Return the ID of this file.
-EntityId File::id(void) const noexcept {
-  return EntityId(FileId{impl->file_id});
+SpecificEntityId<FileId> File::id(void) const noexcept {
+  return FileId{impl->file_id};
 }
 
-std::vector<EntityId> File::fragment_ids(void) const {
-  auto fragment_ids = impl->ep->ListFragmentsInFile(impl->ep, impl->file_id);
-  for (auto &fragment_id : fragment_ids) {
-    fragment_id = EntityId(FragmentId(fragment_id));
-  }
-  return fragment_ids;
+FragmentList File::fragments(void) const {
+  FileId fid(impl->file_id);
+  auto &ep = impl->ep;
+  auto list = std::make_shared<FragmentListImpl>(
+      ep, ep->ListFragmentsInFile(ep, fid));
+  auto num_fragments = list->fragment_ids.size();
+  return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
+}
+
+FragmentIdList File::fragment_ids(void) const {
+  FileId fid(impl->file_id);
+  return impl->ep->ListFragmentsInFile(impl->ep, fid);
 }
 
 // Return the file tokens for the file.
-TokenList File::tokens(void) const noexcept {
-  return TokenList(impl->TokenReader(impl), impl->num_tokens);
+TokenRange File::tokens(void) const noexcept {
+  return TokenRange(impl->TokenReader(impl), 0u, impl->num_tokens);
 }
 
 // Return the contents of the file as a UTF-8 string.
 std::string_view File::data(void) const noexcept {
   return impl->Data();
+}
+
+UseRange<FileUseSelector> File::uses(void) const {
+  return std::make_shared<UseIteratorImpl>(impl->ep, *this);
+}
+
+// References of this file.
+MacroReferenceRange File::references(void) const {
+  return std::make_shared<ReferenceIteratorImpl>(impl->ep, *this);
 }
 
 }  // namespace mx

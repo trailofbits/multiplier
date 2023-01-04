@@ -40,12 +40,13 @@ class CFReturnsRetainedAttr : public InheritableAttr {
   }
 
   inline static CFReturnsRetainedAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CFReturnsRetainedAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : CFReturnsRetainedAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

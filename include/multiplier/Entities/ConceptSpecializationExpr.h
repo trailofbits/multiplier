@@ -45,12 +45,13 @@ class ConceptSpecializationExpr : public Expr {
   }
 
   inline static ConceptSpecializationExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ConceptSpecializationExpr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ConceptSpecializationExpr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

@@ -40,10 +40,27 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
 
-  for (auto category : mx::EnumerationRange<mx::DeclCategory>()) {
-    auto symbols = index.query_entities(FLAGS_name, category);
-    for (const mx::NamedDecl &decl : symbols) {
-      std::cout << decl.id() << '\t' << decl.name() << std::endl;
+  for (const mx::NamedEntity &ent : index.query_entities(FLAGS_name)) {
+    if (std::holds_alternative<mx::NamedDecl>(ent)) {
+      mx::NamedDecl decl = std::get<mx::NamedDecl>(ent);
+      mx::Fragment frag = mx::Fragment::containing(decl);
+      std::optional<mx::File> file = mx::File::containing(frag);
+      std::cout
+          << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
+          << frag.id() << '\t'
+          << decl.id() << '\t' << decl.name() << '\t'
+          << mx::EnumeratorName(decl.kind()) << std::endl;
+
+    } else if (std::holds_alternative<mx::DefineMacroDirective>(ent)) {
+      mx::DefineMacroDirective macro = std::get<mx::DefineMacroDirective>(ent);
+      mx::Fragment frag = mx::Fragment::containing(macro);
+      std::optional<mx::File> file = mx::File::containing(frag);
+      std::cout
+            << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
+            << frag.id() << '\t'
+            << macro.id() << '\t' << macro.name().data() << '\t'
+            << mx::EnumeratorName(macro.kind()) << std::endl;
+
     }
   }
 

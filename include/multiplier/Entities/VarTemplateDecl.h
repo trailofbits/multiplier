@@ -46,12 +46,13 @@ class VarTemplateDecl : public RedeclarableTemplateDecl {
   }
 
   inline static VarTemplateDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : VarTemplateDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : VarTemplateDecl::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

@@ -6,8 +6,8 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
-#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -16,7 +16,13 @@
 #include "Use.h"
 #include "Fragment.h"
 #include "Query.h"
+#include "Entities/Attr.h"
+#include "Entities/DefineMacroDirective.h"
+#include "Entities/Designator.h"
+#include "Entities/Macro.h"
 #include "Entities/NamedDecl.h"
+#include "Entities/Stmt.h"
+#include "Entities/Type.h"
 
 namespace mx {
 
@@ -26,11 +32,14 @@ class File;
 class FragmentList;
 class FileFragmentListIterator;
 class FileImpl;
+class FileList;
 class FileListImpl;
 class Fragment;
 class FragmentImpl;
+class IncludeLikeMacroDirective;
 class Index;
 class InvalidEntityProvider;
+class ReadMacroTokensFromFragment;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
@@ -48,13 +57,21 @@ class WeggliQueryResultImpl;
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
 using TypeUse = Use<TypeUseSelector>;
+using FileUse = Use<FileUseSelector>;
+using TokenUse = Use<TokenUseSelector>;
+using MacroUse = Use<MacroUseSelector>;
 
 using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
 using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
+using ParentMacroIterator = ParentMacroIteratorImpl<Macro>;
 
-using FilePathList = std::set<std::pair<std::filesystem::path, RawEntityId>>;
+using FilePathMap = std::map<std::filesystem::path, PackedFileId>;
+using FragmentIdList = std::vector<PackedFragmentId>;
+using DeclarationIdList = std::vector<PackedDeclarationId>;
+using RawEntityIdList = std::vector<RawEntityId>;
 
-using NamedDeclList = std::vector<NamedDecl>;
+using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
+using NamedEntityList = std::vector<NamedEntity>;
 
 template <typename T>
 inline ParentDeclIteratorImpl<T> &
@@ -67,6 +84,13 @@ template <typename T>
 inline ParentStmtIteratorImpl<T> &
 ParentStmtIteratorImpl<T>::operator++(void) & {
   impl = impl->parent_statement();
+  return *this;
+}
+
+template <typename T>
+inline ParentMacroIteratorImpl<T> &
+ParentMacroIteratorImpl<T>::operator++(void) & {
+  impl = impl->parent();
   return *this;
 }
 
@@ -92,16 +116,20 @@ class EntityProvider {
   friend class FileListImpl;
   friend class Fragment;
   friend class FragmentImpl;
+  friend class IncludeLikeMacroDirective;
   friend class Index;
-  friend class PackedFileImpl;
-  friend class PackedFragmentImpl;
-  friend class ReferenceIterator;
+  friend class Macro;
+  friend class MacroReferenceIterator;
+  friend class ReadMacroTokensFromFragment;
   friend class ReferenceIteratorImpl;
+  friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
+  friend class StmtReferenceIterator;
   friend class TokenReader;
   friend class UseIteratorImpl;
+  friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
   friend class WeggliQueryResultIterator;
 
@@ -128,57 +156,93 @@ class EntityProvider {
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  virtual FilePathList ListFiles(const Ptr &) = 0;
+  virtual FilePathMap ListFiles(const Ptr &) = 0;
 
   // Download a list of fragment IDs contained in a specific file.
-  virtual std::vector<EntityId>
-  ListFragmentsInFile(const Ptr &, RawEntityId id) = 0;
+  virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
+
+  std::shared_ptr<const FileImpl> FileFor(const Ptr &self, RawEntityId id) {
+    VariantId vid = EntityId(id).Unpack();
+    if (std::holds_alternative<FileId>(vid)) {
+      return FileFor(self, PackedFileId(std::get<FileId>(vid)));
+    } else {
+      return {};
+    }
+  }
+
+  std::shared_ptr<const FragmentImpl> FragmentFor(
+      const Ptr &self, RawEntityId id) {
+    VariantId vid = EntityId(id).Unpack();
+    if (std::holds_alternative<FragmentId>(vid)) {
+      return FragmentFor(self, PackedFragmentId(std::get<FragmentId>(vid)));
+    } else {
+      return {};
+    }
+  }
 
   // Download a file by its unique ID.
   //
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
   //            raw file id.
   virtual std::shared_ptr<const FileImpl>
-  FileFor(const Ptr &, RawEntityId id) = 0;
+  FileFor(const Ptr &, PackedFileId id) = 0;
 
   // Download a fragment by its unique ID.
   //
   // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
   //            raw fragment id.
   virtual std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, RawEntityId id) = 0;
+  FragmentFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual std::shared_ptr<WeggliQueryResultImpl>
-  Query(const Ptr &, const WeggliQuery &query) = 0;
-
-  virtual std::shared_ptr<RegexQueryResultImpl>
-  Query(const Ptr &, const RegexQuery &query) = 0;
+  // Return the list of fragments covering / overlapping some lines in a file.
+  virtual FragmentIdList FragmentsCoveringLines(
+      const Ptr &, PackedFileId file, std::vector<unsigned> lines) = 0;
 
   // Return the redeclarations of a given declaration.
-  virtual std::vector<RawEntityId> Redeclarations(
-      const Ptr &, RawEntityId eid) = 0;
+  virtual RawEntityIdList Redeclarations(
+      const Ptr &, SpecificEntityId<DeclarationId> eid) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for uses.
+  //
+  // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
+  //            with `eid` if `eid` resides in a fragment.
   virtual void FillUses(const Ptr &, RawEntityId eid,
-                        std::vector<RawEntityId> &redecl_ids_out,
-                        std::vector<RawEntityId> &fragment_ids_out) = 0;
+                        RawEntityIdList &redecl_ids_out,
+                        FragmentIdList &fragment_ids_out) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for references.
+  //
+  // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
+  //            with `eid` if `eid` resides in a fragment.
   virtual void FillReferences(const Ptr &, RawEntityId eid,
-                              std::vector<RawEntityId> &redecl_ids_out,
-                              std::vector<RawEntityId> &fragment_ids_out) = 0;
+                              RawEntityIdList &redecl_ids_out,
+                              FragmentIdList &fragment_ids_out) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
-                          mx::DeclCategory category,
-                          std::vector<RawEntityId> &ids_out) = 0;
+                          RawEntityIdList &ids_out) = 0;
 };
 
-using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr,
-                                   Token, MacroSubstitution,
-                                   Designator, Fragment, File>;
+using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
+                                   Token, Designator, Fragment, File>;
+
+enum class IndexStatus : unsigned {
+  UNINITIALIZED,
+  INDEXING_IN_PROGRESS,
+  INDEXED
+};
+
+inline static const char *EnumerationName(IndexStatus) {
+  return "IndexStatus";
+}
+
+inline constexpr unsigned NumEnumerators(IndexStatus) {
+  return 3u;
+}
+
+const char *EnumeratorName(IndexStatus);
 
 // Access to the indexed code.
 class Index {
@@ -192,39 +256,57 @@ class Index {
   ~Index(void);
   Index(void);
 
+  Index(const Index &) = default;
+  Index(Index &&) noexcept = default;
+
+  Index &operator=(const Index &) = default;
+  Index &operator=(Index &&) noexcept = default;
+
   /* implicit */ inline Index(EntityProvider::Ptr impl_)
       : impl(std::move(impl_)) {}
 
   static Index containing(const Fragment &fragment);
   static Index containing(const File &file);
 
-  // Return the version number of the index. A version number of `0` is
-  // invalid, a version number of `1` means we've connected to a fresh/empty
-  // indexer with nothing indexed, a version number `2 * n` for `n >= 1` means
-  // that indexing is underway, and a version number of `(2 * n) + 1` for
-  // `n >= 1` means that indexing is done.
-  unsigned version_number(bool block=false) const;
+  // Return the status of the index.
+  IndexStatus status(bool block=false) const;
 
   // Clear any internal caches.
   void clear_caches(void) const;
 
   // Get the current list of parsed files, where the minimum ID
   // in the returned list of fetched files will be `start_at`.
-  FilePathList file_paths(void) const;
+  FilePathMap file_paths(void) const;
 
   // Download a file by its unique ID.
+  std::optional<File> file(SpecificEntityId<FileId> id) const;
   std::optional<File> file(FileId id) const;
   std::optional<File> file(RawEntityId id) const;
 
   // Download a fragment by its unique ID.
+  std::optional<Fragment> fragment(SpecificEntityId<FragmentId> id) const;
   std::optional<Fragment> fragment(FragmentId id) const;
   std::optional<Fragment> fragment(RawEntityId id) const;
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
 
+  // Return a
+  template <typename T>
+  inline std::optional<EntityType<T>> entity(SpecificEntityId<T> eid) const {
+    VariantEntity vent = entity(eid.Pack());
+    if (std::holds_alternative<EntityType<T>>(vent)) {
+      return std::move(std::get<EntityType<T>>(vent));
+    } else {
+      return std::nullopt;
+    }
+  }
+
   // Return an entity given its ID.
   VariantEntity entity(EntityId eid) const;
+
+  // Return all files in the index.
+  FileList files(void) const;
 
   // Return an entity given its ID.
   template <typename T>
@@ -237,19 +319,8 @@ class Index {
     }
   }
 
-  // Run a Weggli search over the fragments in the index.
-  //
-  // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  WeggliQueryResult query_fragments(const WeggliQuery &query) const;
-
-  // Run a regular expression search over the fragments in the index.
-  //
-  // NOTE(pag): This will only match inside of indexed code, i.e. fragments.
-  RegexQueryResult query_fragments(const RegexQuery &query) const;
-
   // Search for entities by their name and category.
-  NamedDeclList query_entities(std::string name,
-                               mx::DeclCategory category) const;
+  NamedEntityList query_entities(std::string name) const;
 };
 
 }  // namespace mx

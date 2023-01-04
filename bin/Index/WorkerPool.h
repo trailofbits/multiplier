@@ -14,6 +14,7 @@ namespace indexer {
 class BlockingConcurrentQueue;
 class Semaphore;
 class QueuePointer;
+class WorkerThreadPoolBaseImpl;
 
 // The base class of a generic worker pool that can pass around pointers.
 class WorkerThreadPoolBase {
@@ -41,7 +42,7 @@ class WorkerThreadPoolBase {
   void Stop(void);
 
  protected:
-  class Impl;
+  friend class WorkerThreadPoolBaseImpl;
 
   // Invoked when the worker is started.
   virtual void OnStart(unsigned worker_id);
@@ -85,15 +86,11 @@ class WorkerThreadPoolBase {
   WorkerThreadPoolBase &operator=(const WorkerThreadPoolBase &) = delete;
   WorkerThreadPoolBase &operator=(WorkerThreadPoolBase &&) noexcept = delete;
 
-  // Invoked by a signal observer. This triggers the worker threads to
-  // stop, but it doesn't trigger the `is_joined` state change.
-  void OnSignalToStopInternal(void);
-
   // Main loop of the worker thread.
   static void *ThreadMain(void *);
   void DoWork(unsigned worker_id);
 
-  const std::unique_ptr<Impl> d;
+  const std::shared_ptr<WorkerThreadPoolBaseImpl> d;
 };
 
 // Manages a worker pool of threads that listen for a specific type of work.

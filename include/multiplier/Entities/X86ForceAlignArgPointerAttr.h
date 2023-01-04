@@ -40,12 +40,13 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
   }
 
   inline static X86ForceAlignArgPointerAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : X86ForceAlignArgPointerAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : X86ForceAlignArgPointerAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

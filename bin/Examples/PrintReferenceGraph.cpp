@@ -30,6 +30,14 @@ KindAndColor(mx::RawEntityId id) {
   } else if (std::holds_alternative<mx::StatementId>(vid)) {
     auto eid = std::get<mx::StatementId>(vid);
     return {mx::EnumeratorName(eid.kind), "aquamarine"};
+
+  } else if (std::holds_alternative<mx::MacroId>(vid)) {
+    auto eid = std::get<mx::MacroId>(vid);
+    return {mx::EnumeratorName(eid.kind), "darkgoldenrod1"};
+
+  } else if (std::holds_alternative<mx::FileId>(vid)) {
+    auto eid = std::get<mx::FileId>(vid);
+    return {"FILE", "darksalmon"};
   
   } else {
     return {"Other", "darkseagreen2"};
@@ -86,32 +94,61 @@ extern "C" int main(int argc, char *argv[]) {
       if (std::holds_alternative<mx::Decl>(ent)) {
         mx::Decl decl = std::get<mx::Decl>(ent);
 
-        for (mx::Reference ref : decl.references()) {
-          add_edge(ref.statement().id(), user_id, "reference", path_len);
+        for (mx::StmtReference ref : decl.references()) {
+          auto stmt_id = ref.statement().id().Pack();
+          add_edge(stmt_id, user_id, "reference", path_len);
         }
 
         if (auto parent_decl = decl.parent_declaration()) {
-          add_back_edge(parent_decl->id(), user_id, "parent", path_len);
+          auto parent_id = parent_decl->id().Pack();
+          add_back_edge(parent_id, user_id, "parent", path_len);
         }
 
         if (auto parent_stmt = decl.parent_statement()) {
-          add_back_edge(parent_stmt->id(), user_id, "parent", path_len);
+          auto parent_id = parent_stmt->id().Pack();
+          add_back_edge(parent_id, user_id, "parent", path_len);
         }
 
       } else if (std::holds_alternative<mx::Stmt>(ent)) {
         mx::Stmt stmt = std::get<mx::Stmt>(ent);
 
         if (auto dre = mx::DeclRefExpr::from(stmt)) {
-          add_back_edge(dre->declaration().id(), user_id, "declaration",
+          auto decl_id = dre->declaration().id().Pack();
+          add_back_edge(decl_id, user_id, "declaration",
                         path_len);
         }
 
         if (auto parent_decl = stmt.parent_declaration()) {
-          add_back_edge(parent_decl->id(), user_id, "parent", path_len);
+          auto parent_id = parent_decl->id().Pack();
+          add_back_edge(parent_id, user_id, "parent", path_len);
         }
 
         if (auto parent_stmt = stmt.parent_statement()) {
-          add_back_edge(parent_stmt->id(), user_id, "parent", path_len);
+          auto parent_id = parent_stmt->id().Pack();
+          add_back_edge(parent_id, user_id, "parent", path_len);
+        }
+
+      } else if (std::holds_alternative<mx::Macro>(ent)) {
+        mx::Macro macro = std::get<mx::Macro>(ent);
+
+        if (auto def = mx::DefineMacroDirective::from(macro)) {
+          for (mx::MacroReference ref : def->references()) {
+            auto macro_id = ref.macro().id().Pack();  // Expansion.
+            add_back_edge(macro_id, user_id, "reference", path_len);
+          }
+        }
+
+        if (auto parent_macro = macro.parent()) {
+          auto parent_id = parent_macro->id().Pack();
+          add_back_edge(parent_id, user_id, "parent", path_len);
+        }
+
+      } else if (std::holds_alternative<mx::File>(ent)) {
+        mx::File file = std::get<mx::File>(ent);
+
+        for (mx::MacroReference ref : file.references()) {
+          auto macro_id = ref.macro().id().Pack();  // Include.
+          add_back_edge(macro_id, user_id, "reference", path_len);
         }
       }
     }

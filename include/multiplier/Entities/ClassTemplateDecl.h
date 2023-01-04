@@ -46,12 +46,13 @@ class ClassTemplateDecl : public RedeclarableTemplateDecl {
   }
 
   inline static ClassTemplateDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ClassTemplateDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ClassTemplateDecl::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

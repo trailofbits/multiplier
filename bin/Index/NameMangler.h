@@ -30,7 +30,7 @@ class NameMangler {
   // Returns the mangled name of `decl`.
   //
   // NOTE(pag): The same string reference is returned upon each call.
-  const std::string &Mangle(const pasta::Decl &decl);
+  const std::string &Mangle(const pasta::Decl &decl) const;
 
   // This is not a very good API, but basically says that the mangled name
   // can probably be trusted.

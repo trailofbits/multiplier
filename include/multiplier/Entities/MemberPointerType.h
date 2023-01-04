@@ -39,12 +39,13 @@ class MemberPointerType : public Type {
   }
 
   inline static MemberPointerTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : MemberPointerType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : MemberPointerType::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

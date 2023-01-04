@@ -39,12 +39,13 @@ class UnresolvedUsingType : public Type {
   }
 
   inline static UnresolvedUsingTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UnresolvedUsingType::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : UnresolvedUsingType::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

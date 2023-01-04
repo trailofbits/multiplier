@@ -9,6 +9,8 @@
 #include <compare>
 #include <cstdint>
 #include <functional>
+#include <iosfwd>
+#include <utility>
 #include <variant>
 
 namespace mx {
@@ -16,57 +18,23 @@ namespace rpc {
 class FileInfo;
 }  // namespace rpc
 
+class Attr;
+class Decl;
+class Designator;
+class File;
 class Fragment;
 class FragmentImpl;
+class Macro;
+class Stmt;
+class Token;
+class Type;
 
 enum class AttrKind : unsigned short;
 enum class DeclKind : unsigned char;
+enum class MacroKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
-
-// NOTE(pag): Must be kept in sync wiht `RPC.capnp`.
-enum class MacroSubstitutionKind : unsigned char {
-  PREPROCESSED_CODE,
-
-  OTHER_DIRECTIVE,
-  DEFINE_DIRECTIVE,
-  UNDEF_DIRECTIVE,
-  PRAGMA_DIRECTIVE,
-
-  IF_DIRECTIVE,
-  IFDEF_DIRECTIVE,
-  IFNDEF_DIRECTIVE,
-  ELIF_DIRECTIVE,
-  ELIFDEF_DIRECTIVE,
-  ELIFNDEF_DIRECTIVE,
-  ELSE_DIRECTIVE,
-  ENDIF_DIRECTIVE,
-
-  INCLUDE_DIRECTIVE,
-
-  MACRO,
-  MACRO_PARAMETER,
-
-  VA_OPT,
-
-  VA_OPT_ARGUMENT,
-  MACRO_ARGUMENT,
-
-  STRINGIFY,
-  CONCATENATE,
-  SUBSTITUTE,
-};
-
-inline static const char *EnumerationName(MacroSubstitutionKind) {
-  return "MacroSubstitutionKind";
-}
-
-const char *EnumeratorName(MacroSubstitutionKind);
-
-inline static constexpr unsigned NumEnumerators(MacroSubstitutionKind) {
-  return static_cast<unsigned>(MacroSubstitutionKind::SUBSTITUTE) + 1u;
-}
 
 using RawEntityId = uint64_t;
 
@@ -91,7 +59,7 @@ struct TypeId;
 struct FileTokenId;
 struct MacroTokenId;
 struct ParsedTokenId;
-struct MacroSubstitutionId;
+struct MacroId;
 struct DesignatorId;
 
 // Identifies a serialized fragment.
@@ -109,7 +77,7 @@ struct FragmentId {
   inline /* implicit */ FragmentId(const AttributeId &);
   inline /* implicit */ FragmentId(const ParsedTokenId &);
   inline /* implicit */ FragmentId(const MacroTokenId &);
-  inline /* implicit */ FragmentId(const MacroSubstitutionId &);
+  inline /* implicit */ FragmentId(const MacroId &);
   inline /* implicit */ FragmentId(const DesignatorId &);
 };
 
@@ -195,6 +163,7 @@ struct ParsedTokenId {
 // Identifies a token inside of a `File`.
 struct FileTokenId {
   RawEntityId file_id;
+
   TokenKind kind;
 
   // Offset of this where this token is stored inside of a serialized
@@ -218,17 +187,17 @@ struct MacroTokenId {
 };
 
 // The offset of a substitution inside of a fragment.
-struct MacroSubstitutionId {
+struct MacroId {
  public:
   RawEntityId fragment_id;
 
-  MacroSubstitutionKind kind;
+  MacroKind kind;
 
   // Offset of where this token substitution is stored inside of a
   // serialized `rpc::Fragment::tokenSubstitutions`.
   uint32_t offset;
 
-  auto operator<=>(const MacroSubstitutionId &) const noexcept = default;
+  auto operator<=>(const MacroId &) const noexcept = default;
 };
 
 struct DesignatorId {
@@ -256,7 +225,7 @@ inline FragmentId::FragmentId(const ParsedTokenId &id_)
 inline FragmentId::FragmentId(const MacroTokenId &id_)
     : fragment_id(id_.fragment_id) {}
 
-inline FragmentId::FragmentId(const MacroSubstitutionId &id_)
+inline FragmentId::FragmentId(const MacroId &id_)
     : fragment_id(id_.fragment_id) {}
 
 inline FragmentId::FragmentId(const DesignatorId &id_)
@@ -273,16 +242,18 @@ struct InvalidId {};
 using VariantId = std::variant<InvalidId, FileId, FragmentId,
                                DeclarationId, StatementId, TypeId, AttributeId,
                                ParsedTokenId, MacroTokenId, FileTokenId,
-                               MacroSubstitutionId, DesignatorId>;
+                               MacroId, DesignatorId>;
 
 // An opaque, compressed entity id.
-class EntityId {
- private:
+class EntityId final {
+ protected:
   RawEntityId opaque{kInvalidEntityId};
 
  public:
   EntityId(void) = default;
 
+  // TODO(pag): Deprecate this API. Would be a good idea to make all the
+  //            various expanded versions of each type into private APIs.
   /* implicit */ inline EntityId(RawEntityId opaque_)
       : opaque(opaque_) {}
 
@@ -295,7 +266,7 @@ class EntityId {
   /* implicit */ EntityId(AttributeId id);
   /* implicit */ EntityId(ParsedTokenId id);
   /* implicit */ EntityId(MacroTokenId id);
-  /* implicit */ EntityId(MacroSubstitutionId id);
+  /* implicit */ EntityId(MacroId id);
   /* implicit */ EntityId(DesignatorId id);
   /* implicit */ EntityId(FileTokenId id);
 
@@ -323,7 +294,7 @@ class EntityId {
     return *this;
   }
 
-  inline EntityId &operator=(MacroSubstitutionId id) {
+  inline EntityId &operator=(MacroId id) {
     EntityId self(id);
     opaque = self.opaque;
     return *this;
@@ -346,33 +317,115 @@ class EntityId {
     return *this;
   }
 
+  // Unpack this entity ID into a concrete type.
+  VariantId Unpack(void) const noexcept;
+
   inline RawEntityId Pack(void) const noexcept {
     return opaque;
   }
 
-  inline operator RawEntityId(void) const noexcept {
-    return opaque;
-  }
-
-  inline bool operator==(RawEntityId that) const noexcept {
-    return opaque == that;
-  }
-
-  inline bool operator!=(RawEntityId that) const noexcept {
-    return opaque != that;
-  }
-
-  inline bool operator==(EntityId that) const noexcept {
+  inline bool operator==(const EntityId &that) const noexcept {
     return opaque == that.opaque;
   }
 
-  inline bool operator!=(EntityId that) const noexcept {
+  inline bool operator!=(const EntityId &that) const noexcept {
     return opaque != that.opaque;
   }
 
-  // Unpack this entity ID into a concrete type.
-  VariantId Unpack(void) const noexcept;
+  inline auto operator<=>(const EntityId &that) const noexcept
+      -> decltype(RawEntityId() <=> RawEntityId()) {
+    return opaque <=> that.opaque;
+  }
 };
+
+// This contains an opaque representation of an entity ID, with the requirement
+// that it always contains that particular kind of entity.
+template <typename T>
+class SpecificEntityId final {
+ private:
+  RawEntityId opaque;
+
+  SpecificEntityId(void) = delete;
+
+ public:
+
+  inline SpecificEntityId(const T &id_)
+      : opaque(EntityId(id_).Pack()) {}
+
+  inline SpecificEntityId<T> &operator=(const T &id) {
+    opaque = EntityId(id).Pack();
+    return *this;
+  }
+
+  inline SpecificEntityId<T> &operator=(const SpecificEntityId<T> &that) {
+    opaque = that.opaque;
+    return *this;
+  }
+
+  T Unpack(void) const noexcept {
+    return std::get<T>(EntityId(opaque).Unpack());
+  }
+
+  inline RawEntityId Pack(void) const noexcept {
+    return opaque;
+  }
+
+  inline bool operator==(const EntityId &that) const noexcept {
+    return opaque == that.Pack();
+  }
+
+  inline bool operator!=(const EntityId &that) const noexcept {
+    return opaque != that.Pack();
+  }
+
+  inline bool operator==(const SpecificEntityId<T> &that) const noexcept {
+    return opaque == that.opaque;
+  }
+
+  inline bool operator!=(const SpecificEntityId<T> &that) const noexcept {
+    return opaque != that.opaque;
+  }
+
+  inline auto operator<=>(const SpecificEntityId<T> &that) const noexcept
+      -> decltype(RawEntityId() <=> RawEntityId()) {
+    return opaque <=> that.opaque;
+  }
+};
+
+using PackedFragmentId = SpecificEntityId<FragmentId>;
+using PackedFileId = SpecificEntityId<FileId>;
+using PackedDeclarationId = SpecificEntityId<DeclarationId>;
+using PackedStatementId = SpecificEntityId<StatementId>;
+using PackedTypeId = SpecificEntityId<TypeId>;
+using PackedAttributeId = SpecificEntityId<AttributeId>;
+using PackedDesignatorId = SpecificEntityId<DesignatorId>;
+using PackedMacroId = SpecificEntityId<MacroId>;
+
+template <typename T>
+struct EntityTypeImpl;
+
+#define MX_MAP_ENTITY_TYPE(id, t) \
+    template <> \
+    struct EntityTypeImpl<id> { \
+      using Type = t; \
+    }
+
+MX_MAP_ENTITY_TYPE(AttributeId, Attr);
+MX_MAP_ENTITY_TYPE(DeclarationId, Decl);
+MX_MAP_ENTITY_TYPE(DesignatorId, Designator);
+MX_MAP_ENTITY_TYPE(FileId, File);
+MX_MAP_ENTITY_TYPE(FragmentId, Fragment);
+MX_MAP_ENTITY_TYPE(MacroId, Macro);
+MX_MAP_ENTITY_TYPE(StatementId, Stmt);
+MX_MAP_ENTITY_TYPE(MacroTokenId, Token);
+MX_MAP_ENTITY_TYPE(FileTokenId, Token);
+MX_MAP_ENTITY_TYPE(ParsedTokenId, Token);
+MX_MAP_ENTITY_TYPE(TypeId, Type);
+
+#undef MX_MAP_ENTITY_TYPE
+
+template <typename T>
+using EntityType = typename EntityTypeImpl<T>::Type;
 
 }  // namespace mx
 namespace std {
@@ -404,5 +457,33 @@ struct less<mx::FragmentId> {
     return a.fragment_id < b.fragment_id;
   }
 };
+
+template <>
+struct hash<mx::EntityId> {
+ public:
+  inline uint64_t operator()(mx::EntityId id) const noexcept {
+    return id.Pack();
+  }
+};
+
+template <typename T>
+struct hash<mx::SpecificEntityId<T>> {
+ public:
+  inline uint64_t operator()(mx::SpecificEntityId<T> id) const noexcept {
+    return id.Pack();
+  }
+};
+
+template<class _CharT, class _Traits>
+inline basic_ostream<_CharT, _Traits> &operator<<(
+    basic_ostream<_CharT, _Traits> &os, mx::EntityId id) {
+  return os << id.Pack();
+}
+
+template<class _CharT, class _Traits, typename T>
+inline basic_ostream<_CharT, _Traits> &operator<<(
+    basic_ostream<_CharT, _Traits> &os, mx::SpecificEntityId<T> id) {
+  return os << id.Pack();
+}
 
 }  // namespace std

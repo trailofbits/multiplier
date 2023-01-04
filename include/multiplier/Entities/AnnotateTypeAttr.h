@@ -40,12 +40,13 @@ class AnnotateTypeAttr : public TypeAttr {
   }
 
   inline static AnnotateTypeAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AnnotateTypeAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : AnnotateTypeAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

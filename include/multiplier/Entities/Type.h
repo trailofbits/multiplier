@@ -56,9 +56,11 @@ class Type {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
+  friend class Macro;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class TypeIterator;
@@ -91,7 +93,7 @@ class Type {
     return c.as_type();
   }
 
-  EntityId id(void) const;
+  SpecificEntityId<TypeId> id(void) const;
   UseRange<TypeUseSelector> uses(void) const;
 
  protected:
@@ -103,12 +105,13 @@ class Type {
   }
 
   inline static TypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Type::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : Type::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

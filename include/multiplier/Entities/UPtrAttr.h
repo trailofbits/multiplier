@@ -40,12 +40,13 @@ class UPtrAttr : public TypeAttr {
   }
 
   inline static UPtrAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : UPtrAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : UPtrAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

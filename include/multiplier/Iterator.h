@@ -18,6 +18,7 @@ class CXXBaseSpecifier;
 class Decl;
 class Designator;
 class FragmentImpl;
+class Macro;
 class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
@@ -419,8 +420,78 @@ class AttrIterator {
   }
 };
 
+class MacroIterator {
+ private:
+  friend class Macro;
+
+  std::shared_ptr<const FragmentImpl> impl;
+  unsigned index{0};
+  unsigned num_macros{0};
+
+  bool operator==(const MacroIterator &) = delete;
+  bool operator!=(const MacroIterator &) = delete;
+
+  inline MacroIterator(std::shared_ptr<const FragmentImpl> impl_,
+                       unsigned index_, unsigned num_macros_)
+      : impl(std::move(impl_)),
+        index(index_),
+        num_macros(num_macros_) {}
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return index >= num_macros;
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return index < num_macros;
+  }
+
+  inline operator bool(void) const noexcept {
+    return index < num_macros;
+  }
+
+  // Return the current type pointed to by the iterator.
+  Macro operator*(void) && noexcept;
+  Macro operator*(void) const & noexcept;
+
+  // Pre-increment.
+  inline MacroIterator &operator++(void) & noexcept {
+    ++index;
+    return *this;
+  }
+
+  // Post-increment.
+  inline MacroIterator operator++(int) && noexcept {
+    return MacroIterator(std::move(impl), index + 1u, num_macros);
+  }
+
+  // Post-increment.
+  inline MacroIterator operator++(int) & noexcept {
+    return MacroIterator(impl, index++, num_macros);
+  }
+};
+
+// An edge from tokens to AST nodes containing those tokens. Only parsed tokens
+// have token contexts. Multiple contexts may share the same parents. The token
+// context tree is a sort of DAG, via mechanism called "aliases." This is to
+// handle the challenges of C's bizarre declaration syntax. For example:
+//
+//   int foo(void (*func_ptr)(...));
+//
+// This declares `func_ptr` as a function pointer-typed parameter of `foo`. The
+// token contexts for this would have `func_ptr` link to something like:
+//
+//   foo ----------------------------------------------------.
+//   ...                                                     |
+//   func_ptr -> ParmVarDecl -> FunctionType -> ParmVarDecl -+-> FunctionDecl
+//                    |                              ^
+//                    '----------- alias ------------'
 class TokenContext {
  private:
+  friend class Token;
+
   std::shared_ptr<const FragmentImpl> impl;
 
   // Offset of this token context inside of the fragment.
@@ -448,7 +519,9 @@ class TokenContext {
     return alias_offset.has_value();
   }
 
-  inline unsigned id(void) const noexcept {
+  // NOTE(pag): This is sort of an internal API, though it makes it convenient
+  //            to identify token contexts.
+  inline unsigned index_in_fragment(void) const noexcept {
     return offset;
   }
 
@@ -456,6 +529,7 @@ class TokenContext {
   //
   // NOTE(pag): This only works with parsed tokens, and not all parsed tokens
   //            are guaranteed to have a context.
+  __attribute__((deprecated("Use Token::context() instead.")))
   static std::optional<TokenContext> of(const Token &tok);
 
   // Return the declaration associated with this context, if any.
@@ -629,6 +703,48 @@ class ParentStmtIteratorImpl {
 
   // Pre-increment.
   inline ParentStmtIteratorImpl<T> &operator++(void) &;
+};
+
+template <typename T>
+class ParentMacroIteratorImpl {
+ private:
+  std::optional<T> impl;
+
+ public:
+  using EndIteratorType = IteratorEnd;
+
+  inline ParentMacroIteratorImpl(std::optional<T> impl_)
+      : impl(std::move(impl_)) {}
+
+  inline bool operator==(EndIteratorType) const noexcept {
+    return !impl.has_value();
+  }
+
+  inline bool operator!=(EndIteratorType) const noexcept {
+    return impl.has_value();
+  }
+
+  inline operator bool(void) const noexcept {
+    return impl.has_value();
+  }
+
+  // Return the current statement pointed to by the iterator.
+  T operator*(void) && noexcept {
+    return std::move(impl.value());
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T &operator*(void) const & noexcept {
+    return impl.value();
+  }
+
+  // Return the current statement pointed to by the iterator.
+  const T *operator->(void) const & noexcept {
+    return std::addressof(impl.value());
+  }
+
+  // Pre-increment.
+  inline ParentMacroIteratorImpl<T> &operator++(void) &;
 };
 
 }  // namespace mx

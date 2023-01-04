@@ -8,6 +8,7 @@
 
 #include <cassert>
 
+#include "File.h"
 #include "Fragment.h"
 #include "multiplier/Types.h"
 
@@ -17,7 +18,7 @@ WeggliQueryResultImpl::~WeggliQueryResultImpl(void) noexcept {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(
     const WeggliQuery &query_, EntityProvider::Ptr ep_,
-    std::vector<RawEntityId> fragment_ids)
+    FragmentIdList fragment_ids)
     : query(query_),
       ep(std::move(ep_)),
       fragments(std::move(fragment_ids)) {}
@@ -27,7 +28,8 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
     : query(query_),
       ep(frag_->ep) {
 
-  fragments.push_back(frag_->fragment_id);
+  FragmentId fid(frag_->fragment_id);
+  fragments.push_back(fid);
   (void) InitForFragment(std::move(frag_));
 }
 
@@ -37,7 +39,7 @@ bool WeggliQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   weggli_matches.clear();
   offset_to_index.clear();
   frag_file_tokens = Fragment(frag).file_tokens();
-  query.ForEachMatch(
+  query.for_each_match(
       frag_file_tokens.data(),
       [this] (WeggliMatchData match) {
         weggli_matches.emplace_back(std::move(match));
@@ -231,5 +233,63 @@ void WeggliQueryResultIterator::Advance(void) {
     return;
   }
 }
+
+#ifndef MX_DISABLE_WEGGLI
+
+// Match this Weggli query against a file.
+WeggliQueryResult WeggliQuery::match_fragments(const File &file) const {
+  auto &reader = file.impl->Reader();
+
+  std::map<unsigned, unsigned> eol_offset_to_line_num;
+  for (mx::rpc::UpperBound::Reader ubr : reader.getEolOffsets()) {
+    eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
+  }
+
+  std::vector<unsigned> line_nums;
+
+  this->for_each_match(
+      file.data(),
+      [&eol_offset_to_line_num, &line_nums]
+      (WeggliMatchData match) -> bool {
+        unsigned prev_line = 0;
+        for (auto i = match.begin_offset; i < match.end_offset; ++i) {
+          auto line_it = eol_offset_to_line_num.upper_bound(i);
+          if (line_it != eol_offset_to_line_num.end()) {
+            auto line = line_it->second;
+            if (line != prev_line) {
+              prev_line = line;
+              line_nums.push_back(line);
+            }
+          }
+        }
+        return true;
+      });
+
+  if (line_nums.empty()) {
+    return {};
+  }
+
+  const EntityProvider::Ptr &ep = file.impl->ep;
+  return std::make_shared<WeggliQueryResultImpl>(
+      *this, ep,
+      ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
+}
+
+// Match this Weggli query against a fragment.
+WeggliQueryResult WeggliQuery::match_fragments(const Fragment &frag) const {
+  return std::make_shared<WeggliQueryResultImpl>(*this, frag.impl);
+}
+
+#else
+
+WeggliQueryResult WeggliQuery::match_fragments(const File &) const {
+  return {};
+}
+
+WeggliQueryResult WeggliQuery::match_fragments(const Fragment &) const {
+  return {};
+}
+
+#endif  // MX_DISABLE_WEGGLI
 
 }  // namespace mx

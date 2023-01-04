@@ -31,14 +31,26 @@ extern "C" int main(int argc, char *argv[]) {
   }
 
   mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
-  auto file = index.file(FLAGS_file_id);
-  if (!file) {
-    std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
-    return EXIT_FAILURE;
-  }
 
-  for (mx::Fragment frag : mx::Fragment::in(*file)) {
-    std::cout << frag.id() << std::endl;
+  // List all fragment IDs in a specific file.
+  if (FLAGS_file_id) {
+    auto file = index.file(FLAGS_file_id);
+    if (!file) {
+      std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    for (mx::PackedFragmentId frag_id : file->fragment_ids()) {
+      std::cout << frag_id << std::endl;
+    }
+
+  // List all fragment IDs.
+  } else {
+    for (mx::File file : index.files()) {
+      for (mx::PackedFragmentId frag_id : file.fragment_ids()) {
+        std::cout << frag_id << std::endl;
+      }
+    }
   }
 
   return EXIT_SUCCESS;

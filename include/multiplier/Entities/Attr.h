@@ -36,9 +36,11 @@ class Attr {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
+  friend class Macro;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
@@ -72,7 +74,7 @@ class Attr {
     return c.as_attribute();
   }
 
-  EntityId id(void) const;
+  SpecificEntityId<AttributeId> id(void) const;
   UseRange<AttrUseSelector> uses(void) const;
 
  protected:
@@ -84,12 +86,13 @@ class Attr {
   }
 
   inline static AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Attr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : Attr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

@@ -30,7 +30,7 @@ struct SeenEntityTracker {
   SeenEntityTracker(SeenEntityList &seen_, const E &entity)
       : seen(seen_),
         size(seen.size()),
-        eid(entity.id()),
+        eid(entity.id().Pack()),
         count(std::count(seen.begin(), seen.end(), entity.id())) {
     seen.push_back(eid);        
   }
@@ -68,20 +68,20 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   Indent(std::cout, depth);
     
   mx::Fragment fragment = mx::Fragment::containing(entity);
-  mx::File file = mx::File::containing(fragment);
+  auto file = mx::File::containing(fragment);
 
   if (auto named = mx::NamedDecl::from(entity)) {
     std::cout << named->name() << '\t';
   }
 
   std::cout
-      << file.id() << '\t'
+      << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
       << fragment.id() << '\t'
       << entity.id() << '\t'
       << mx::EnumeratorName(entity.kind());
 
-  if (FLAGS_show_locations) {
-    std::cout << '\t' << file_paths[file.id()].generic_string();
+  if (FLAGS_show_locations && file) {
+    std::cout << '\t' << file_paths[file->id()].generic_string();
     if (auto tok = entity.token()) {
       if (auto line_col = tok.location(location_cache)) {
         std::cout << '\t' << line_col->first << '\t' << line_col->second;
@@ -96,7 +96,7 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   } else if (auto decl = mx::Decl::containing(entity)) {
     PrintCallHierarchy(decl.value(), depth + 1u);
   } else {
-    for (const mx::Reference &ref : entity.references()) {
+    for (const mx::StmtReference &ref : entity.references()) {
       PrintCallHierarchy(ref, depth + 1u);
     }
   }
@@ -143,6 +143,7 @@ extern "C" int main(int argc, char *argv[]) {
       PrintCallHierarchy(decl.value(), 0u);
     }
 
+  // TODO(pag): Macros?
   } else {
     std::cerr << "Invalid declaration id " << FLAGS_entity_id << std::endl;
     return EXIT_FAILURE;

@@ -13,9 +13,6 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <map>
-#include <multiplier/AST.h>
-#include <multiplier/AST.capnp.h>
-#include <multiplier/RPC.capnp.h>
 #include <multiplier/Types.h>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Macro.h>
@@ -30,18 +27,22 @@
 #include "Hash.h"
 #include "NameMangler.h"
 #include "PendingFragment.h"
-#include "Persist.h"
 #include "Util.h"
 
 namespace indexer {
 
-struct EntityIdMap;
-struct FileIdMap;
-struct TypeIdMap;
-class PendingFragment;
-struct PseudoOffsetMap;
+// Label the initial entities of this fragment. This focuses on finding the
+// entities that syntactically belong to this fragment, and assigning them
+// IDs. Labeling happens first for all fragments, then we run `Build` for
+// new fragments that we want to serialize.
+extern void LabelEntitiesInFragment(
+    PendingFragment &pf, EntityIdMap &entity_ids,
+    const pasta::TokenRange &tok_range);
 
 namespace {
+
+using OrderedDecl = std::pair<pasta::Decl, unsigned>;
+using OrderedMacro = std::pair<pasta::Macro, unsigned>;
 
 // A declaration, the index of the first token to be saved associated with
 // the decl, and the (inclusive) index of the last token associated with
@@ -60,7 +61,7 @@ static constexpr unsigned kGroupIndex = 0u;
 // Find all top-level declarations.
 class TLDFinder final : public pasta::DeclVisitor {
  private:
-  std::vector<std::pair<pasta::Decl, unsigned>> &tlds;
+  std::vector<OrderedDecl> &tlds;
 
   // Tracks declarations for which we've seen the specializations. This is
   // to prevent us from double-adding specializations.
@@ -71,7 +72,7 @@ class TLDFinder final : public pasta::DeclVisitor {
  public:
   virtual ~TLDFinder(void) = default;
 
-  explicit TLDFinder(std::vector<std::pair<pasta::Decl, unsigned>> &tlds_)
+  explicit TLDFinder(std::vector<OrderedDecl> &tlds_)
       : tlds(tlds_) {}
 
   void VisitDeclContext(const pasta::DeclContext &dc) {;
@@ -166,18 +167,17 @@ class TLDFinder final : public pasta::DeclVisitor {
 };
 
 // Find all top-level declarations.
-static std::vector<std::pair<pasta::Decl, unsigned>>
-FindTLDs(const pasta::AST &ast) {
-  using OrderedNode = std::pair<pasta::Decl, unsigned>;
-  std::vector<OrderedNode> tlds;
+static std::vector<OrderedDecl> FindTLDs(const pasta::AST &ast) {
+
+  std::vector<OrderedDecl> tlds;
   TLDFinder tld_finder(tlds);
   tld_finder.VisitTranslationUnitDecl(ast.TranslationUnit());
 
-  auto eq = +[] (const OrderedNode &a, const OrderedNode &b) {
+  auto eq = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return a.first.RawDecl() == b.first.RawDecl();
   };
 
-  auto less = +[] (const OrderedNode &a, const OrderedNode &b) {
+  auto less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     auto a_id = a.first.RawDecl();
     auto b_id = b.first.RawDecl();
     if (a_id < b_id) {
@@ -189,7 +189,7 @@ FindTLDs(const pasta::AST &ast) {
     }
   };
 
-  auto orig_less = +[] (const OrderedNode &a, const OrderedNode &b) {
+  auto orig_less = +[] (const OrderedDecl &a, const OrderedDecl &b) {
     return a.second < b.second;
   };
 
@@ -206,32 +206,6 @@ FindTLDs(const pasta::AST &ast) {
   std::sort(tlds.begin(), tlds.end(), orig_less);
 
   return tlds;
-}
-
-// Return `true` of `tok` is in the context of `decl`.
-static bool TokenIsInContextOfDecl(const pasta::Token &tok,
-                                   const pasta::Decl &decl) {
-  auto cdecl = decl.CanonicalDeclaration();
-  for (auto context = tok.Context(); context; context = context->Parent()) {
-    if (auto maybe_decl = pasta::Decl::From(*context)) {
-      if (*maybe_decl == cdecl) {
-        return true;
-      } else if (pasta::ClassTemplateSpecializationDecl::From(*maybe_decl) ||
-                 pasta::VarTemplateSpecializationDecl::From(*maybe_decl) ||
-                 pasta::ClassScopeFunctionSpecializationDecl::From(*maybe_decl)) {
-        return true;
-      }
-    } else if (auto maybe_type = pasta::Type::From(*context)) {
-      if (pasta::TemplateSpecializationType::From(*maybe_type) ||
-          pasta::ElaboratedType::From(*maybe_type)) {
-        return true;
-      }
-    } else if (context->Kind() == pasta::TokenContextKind::kTemplateArgument ||
-               context->Kind() == pasta::TokenContextKind::kTemplateParameterList) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // Can we elide this token from the beginning or end of a top-level
@@ -268,7 +242,9 @@ static bool CanElideTokenFromTLD(const pasta::Token &tok) {
 
 // Do some minor stuff to find begin/ending tokens.
 static std::pair<uint64_t, uint64_t> BaselineEntityRange(
-    const pasta::Decl &decl, pasta::Token tok, std::string_view main_file_path) {
+    const pasta::Decl &decl, pasta::Token tok,
+    std::string_view main_file_path) {
+
   DCHECK(tok);  // Make sure we're dealing with a valid token.
 
   auto decl_range = decl.Tokens();
@@ -483,6 +459,9 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
   if (decl.IsImplicit()) {
     return true;
+
+  // Technically we should look for `__builtin_*` but there are other things
+  // that are likely to be `__`-prefixed.
   } else if (auto nd = pasta::NamedDecl::From(decl)) {
     if (nd->Name().starts_with("__")) {
       return true;
@@ -579,9 +558,9 @@ static void AddDeclRangeToEntityList(
   entity_ranges.emplace_back(std::move(decl), begin_index, end_index);
 }
 
-static pasta::MacroNode RootNodeFrom(pasta::MacroNode node) {
+static pasta::Macro RootMacroFrom(pasta::Macro node) {
   if (auto parent = node.Parent()) {
-    return RootNodeFrom(parent.value());
+    return RootMacroFrom(parent.value());
   } else {
     return node;
   }
@@ -589,14 +568,12 @@ static pasta::MacroNode RootNodeFrom(pasta::MacroNode node) {
 
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
-static std::vector<std::pair<pasta::MacroNode, unsigned>>
-FindTLMs(const pasta::AST &ast) {
-  using OrderedNode = std::pair<pasta::MacroNode, unsigned>;
-  std::vector<OrderedNode> tlms;
+static std::vector<OrderedMacro> FindTLMs(const pasta::AST &ast) {
+  std::vector<OrderedMacro> tlms;
   std::vector<pasta::DefineMacroDirective> defs;
 
   auto order = 0u;
-  for (pasta::MacroNode mn : ast.Macros()) {
+  for (pasta::Macro mn : ast.Macros()) {
 
     // Include all uses macros, and only those `#define`s for which the
     // macro is used at least once.
@@ -613,7 +590,7 @@ FindTLMs(const pasta::AST &ast) {
         continue;
       }
 
-      for (pasta::MacroNode use : md->Uses()) {
+      for (pasta::Macro use : md->Uses()) {
         tlms.emplace_back(std::move(mn), order++);
         defs.push_back(std::move(md.value()));
         break;
@@ -630,18 +607,18 @@ FindTLMs(const pasta::AST &ast) {
   }
 
   for (pasta::DefineMacroDirective def : defs) {
-    for (pasta::MacroNode use : def.Uses()) {
-      tlms.emplace_back(RootNodeFrom(std::move(use)), order++);
+    for (pasta::Macro use : def.Uses()) {
+      tlms.emplace_back(RootMacroFrom(std::move(use)), order++);
     }
   }
 
-  auto eq = +[] (const OrderedNode &a, const OrderedNode &b) {
-    return a.first.RawNode() == b.first.RawNode();
+  auto eq = +[] (const OrderedMacro &a, const OrderedMacro &b) {
+    return a.first.RawMacro() == b.first.RawMacro();
   };
 
-  auto less = +[] (const OrderedNode &a, const OrderedNode &b) {
-    auto a_id = a.first.RawNode();
-    auto b_id = b.first.RawNode();
+  auto less = +[] (const OrderedMacro &a, const OrderedMacro &b) {
+    auto a_id = a.first.RawMacro();
+    auto b_id = b.first.RawMacro();
     if (a_id < b_id) {
       return true;
     } else if (a_id > b_id) {
@@ -651,7 +628,7 @@ FindTLMs(const pasta::AST &ast) {
     }
   };
 
-  auto orig_less = +[] (const OrderedNode &a, const OrderedNode &b) {
+  auto orig_less = +[] (const OrderedMacro &a, const OrderedMacro &b) {
     return a.second < b.second;
   };
 
@@ -674,7 +651,7 @@ FindTLMs(const pasta::AST &ast) {
 // the first usage token, and the last one is the last expansion token.
 static void AddMacroRangeToEntityList(
     const pasta::TokenRange &tok_range, std::string_view main_file_path,
-    std::vector<EntityRange> &entity_ranges, pasta::MacroNode node) {
+    std::vector<EntityRange> &entity_ranges, pasta::Macro node) {
 
   std::optional<pasta::MacroToken> bt = node.BeginToken();
   std::optional<pasta::MacroToken> et = node.EndToken();
@@ -727,12 +704,12 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   std::vector<EntityRange> entity_ranges;
   entity_ranges.reserve(8192u);
 
-  for (auto &&ordered_entry : FindTLDs(ast)) {
+  for (OrderedDecl ordered_entry : FindTLDs(ast)) {
     AddDeclRangeToEntityList(tok_range, main_file_path, entity_ranges,
                              std::move(ordered_entry.first));
   }
 
-  for (auto &&ordered_entry : FindTLMs(ast)) {
+  for (OrderedMacro ordered_entry : FindTLMs(ast)) {
     AddMacroRangeToEntityList(tok_range, main_file_path, entity_ranges,
                               std::move(ordered_entry.first));
   }
@@ -770,97 +747,6 @@ static bool StatementsHaveErrors(const pasta::Decl &) {
   return false;
 }
 
-static std::optional<pasta::FileToken> BeginOfMergableMacroNode(
-    const pasta::MacroNode &node) {
-  switch (node.Kind()) {
-    case pasta::MacroNodeKind::kOtherDirective:
-    case pasta::MacroNodeKind::kIfDirective:
-    case pasta::MacroNodeKind::kIfDefinedDirective:
-    case pasta::MacroNodeKind::kIfNotDefinedDirective:
-    case pasta::MacroNodeKind::kElseIfDirective:
-    case pasta::MacroNodeKind::kElseIfDefinedDirective:
-    case pasta::MacroNodeKind::kElseIfNotDefinedDirective:
-    case pasta::MacroNodeKind::kElseDirective:
-    case pasta::MacroNodeKind::kEndIfDirective:
-    case pasta::MacroNodeKind::kUndefineDirective:
-    case pasta::MacroNodeKind::kPragmaDirective:
-      if (auto dir = pasta::MacroDirective::From(node)) {
-        return dir->Hash().FileLocation();
-      }
-      return std::nullopt;
-
-    // `#define`, `#include`, etc.
-    //
-    // NOTE(pag): We don't want to merge adjacent `#include`s, because that
-    //            might accidentally trigger treating included files as part
-    //            of a "top-level" `#include`s expansion, and really we want
-    //            to only see expansions of `#include`s in the case that the
-    //            `#include` is nested inside of a decl, e.g.:
-    //
-    //                enum ... {
-    //                #include ...
-    //                };
-    case pasta::MacroNodeKind::kDefineDirective:
-    case pasta::MacroNodeKind::kIncludeDirective:
-    case pasta::MacroNodeKind::kIncludeNextDirective:
-    case pasta::MacroNodeKind::kIncludeMacrosDirective:
-    case pasta::MacroNodeKind::kImportDirective:
-    default:
-      return std::nullopt;
-  }
-}
-
-// Returns `true` if at least one of the input entities is a macro node that
-// isn't a macro definition or expansion, and if the entities are on adjacent
-// lines.
-//
-// Ideally, we want to be able to merge adjacent macro directives, and then
-// also the macro directives that are adjacent to top-level declarations.
-//
-// TODO(pag): Consider degenerate cases, e.g.:
-//
-//                #if 1
-//                decl0
-//                decl1
-//                #endif
-static bool CanMergeNonOverlappingEntitiesIntoFragment(
-    const Entity &first, const Entity &second) {
-  auto seen_macro = false;
-  std::optional<pasta::FileToken> first_loc;
-  std::optional<pasta::FileToken> second_loc;
-  if (std::holds_alternative<pasta::MacroNode>(first)) {
-    first_loc = BeginOfMergableMacroNode(std::get<pasta::MacroNode>(first));
-    seen_macro = true;
-  } else if (std::holds_alternative<pasta::Decl>(first)) {
-    first_loc = std::get<pasta::Decl>(first).EndToken().FileLocation();
-  } else {
-    return false;
-  }
-
-  if (!first_loc) {
-    return false;
-  } else if (std::holds_alternative<pasta::MacroNode>(second)) {
-    second_loc = BeginOfMergableMacroNode(std::get<pasta::MacroNode>(second));
-  } else if (!seen_macro) {
-    return false;
-  } else if (std::holds_alternative<pasta::Decl>(second)) {
-    second_loc = std::get<pasta::Decl>(second).BeginToken().FileLocation();
-  } else {
-    return false;
-  }
-
-  if (!second_loc) {
-    return false;
-  }
-
-  // Different files.
-  if (first_loc->RawFile() != second_loc->RawFile()) {
-    return false;
-  }
-
-  return (first_loc->Line() + 1u) >= second_loc->Line();
-}
-
 // Try to accumulate the nearby top-level declarations whose token ranges
 // overlap with `decl` into `decls_for_chunk`. For example, this process
 // will accumulate three `VarDecl`s into `decls_for_chunk` in the following
@@ -873,10 +759,11 @@ static bool CanMergeNonOverlappingEntitiesIntoFragment(
 //
 // TODO(pag): Handle top-level statements, e.g. `asm`, `static_assert`, etc.
 static std::vector<EntityGroupRange> PartitionEntities(
-    ProgressBar *partition_progress_bar, std::string_view main_file_path,
-    const pasta::AST &ast) {
+    GlobalIndexingState &context, const pasta::AST &ast) {
 
-  ProgressBarWork partitioning_progress_tracker(partition_progress_bar);
+  std::string main_file_path = ast.MainFile().Path().generic_string();
+
+  ProgressBarWork partitioning_progress_tracker(context.partitioning_progress);
 
   std::vector<EntityRange> entity_ranges = SortEntities(ast, main_file_path);
   std::vector<EntityGroupRange> entity_group_ranges;
@@ -897,11 +784,7 @@ static std::vector<EntityGroupRange> PartitionEntities(
 
       // Doesn't close over.
       if (next_begin > end_index) {
-        if (entities_for_group.empty() ||
-            !CanMergeNonOverlappingEntitiesIntoFragment(
-                entities_for_group.back(), next_entity)) {
-          break;
-        }
+        break;
       }
 
       if (std::holds_alternative<pasta::Decl>(next_entity)) {
@@ -922,20 +805,173 @@ static std::vector<EntityGroupRange> PartitionEntities(
   return entity_group_ranges;
 }
 
+// Try to find the first and last tokens in the range with a file location,
+// as a kind of anchor point of where this fragment is located in its main
+// source file. These begin/end locations also help with search.
+//
+// NOTE(pag): We use the hash of the contents of the file as a part of our
+//            key, rather than the absolute path. This is so that if we
+//            are indexing more than one project, then the local copy of a
+//            header file and the installed copy will resolve to the same
+//            hash, and so we'll do a better job of deduping top-level
+//            declarations in that case.
+static std::optional<FileLocationOfFragment> FindFileLocationOfFragment(
+    const EntityIdMap &entity_ids, const pasta::TokenRange &toks,
+    uint64_t begin_index, uint64_t end_index) {
+
+  mx::RawEntityId file_index = 0u;
+  std::optional<pasta::FileToken> begin_tok;
+  std::optional<pasta::FileToken> end_tok;
+
+  // Find the first one.
+  uint64_t i = begin_index;
+  for (; i <= end_index; ++i) {
+    begin_tok = AsTopLevelFileToken(toks[i]);
+    if (!begin_tok) {
+      continue;
+    }
+
+    auto id_it = entity_ids.find(begin_tok->RawFile());
+    if (id_it == entity_ids.end()) {
+      continue;
+    }
+
+    mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
+    if (!std::holds_alternative<mx::FileId>(vid)) {
+      continue;
+    }
+
+    file_index = std::get<mx::FileId>(vid).file_id;
+    goto find_last_token;
+  }
+
+  return std::nullopt;
+
+find_last_token:
+
+  // Find the last one.
+  for (uint64_t j = end_index; j >= i; --j) {
+    end_tok = AsTopLevelFileToken(toks[j]);
+    if (!end_tok) {
+      continue;
+    }
+
+    auto id_it = entity_ids.find(end_tok->RawFile());
+    if (id_it == entity_ids.end()) {
+      continue;
+    }
+
+    mx::VariantId vid = mx::EntityId(id_it->second).Unpack();
+    if (!std::holds_alternative<mx::FileId>(vid)) {
+      continue;
+    }
+
+    mx::FileId fid = std::get<mx::FileId>(vid);
+    if (fid.file_id != file_index) {
+      continue;
+    }
+
+    goto found_tokens;
+  }
+
+  return std::nullopt;
+
+found_tokens:
+
+  mx::FileId fid(file_index);
+
+  mx::FileTokenId btid;
+  btid.file_id = file_index;
+  btid.kind = TokenKindFromPasta(begin_tok.value());
+  btid.offset = static_cast<unsigned>(begin_tok->Index());
+
+  mx::FileTokenId etid;
+  etid.file_id = file_index;
+  etid.kind = TokenKindFromPasta(end_tok.value());
+  etid.offset = static_cast<unsigned>(end_tok->Index());
+
+  return FileLocationOfFragment(
+      fid, btid, begin_tok.value(), etid, end_tok.value());
+}
+
+static void CreatePendingFragment(
+    mx::DatabaseWriter &database, EntityIdMap &entity_ids,
+    const pasta::TokenRange &tok_range, const EntityGroupRange &group_range,
+    std::vector<PendingFragment> &pending_fragments) {
+
+  const EntityGroup &entities = std::get<kGroupIndex>(group_range);
+  uint64_t begin_index = std::get<kBeginIndex>(group_range);
+  uint64_t end_index = std::get<kEndIndex>(group_range);
+
+  // Locate where this fragment is in its file.
+  std::optional<FileLocationOfFragment> floc = FindFileLocationOfFragment(
+      entity_ids, tok_range, begin_index, end_index);
+
+  // Don't create token `decls_for_chunk` if the decl is already seen. This
+  // means it's already been indexed.
+  bool is_new_fragment_id = false;
+
+  PendingFragment pf(
+      database.GetOrCreateFragmentIdForHash(
+          (floc ? floc->first_file_token_id.Pack() : mx::kInvalidEntityId),
+          HashFragment(entities, tok_range, begin_index, end_index),
+          (end_index - begin_index + 1ul)  /* num_tokens */,
+          is_new_fragment_id  /* mutated by reference */));
+
+  pf.file_location = std::move(floc);
+  pf.begin_index = begin_index;
+  pf.end_index = end_index;
+
+  for (const Entity &entity : entities) {
+    if (std::holds_alternative<pasta::Decl>(entity)) {
+      pf.top_level_decls.push_back(std::get<pasta::Decl>(entity));
+      pf.num_top_level_declarations++;
+
+    } else if (std::holds_alternative<pasta::Macro>(entity)) {
+      pf.top_level_macros.push_back(std::get<pasta::Macro>(entity));
+      pf.num_top_level_macros++;
+
+    } else {
+      LOG(FATAL)
+          << "TODO: Unsupported top-level entity kind";
+    }
+  }
+
+  CHECK_NE((pf.num_top_level_declarations + pf.num_top_level_macros), 0u);
+
+  // We always need to label the entities inside of a fragment, regardless of
+  // if fragment is new. This is because each fragment might have arbitrary
+  // references to other declarations. We need to be able to form cross-
+  // fragment references when serializing things, so we use the labeller to
+  // assign IDs to entities (decls, statements, etc.) in a uniform and
+  // deterministic way so that other threads doing similar indexing will form
+  // identically labelled chunks for the same logical entities.
+  //
+  // Unfortunately, the labeller needs to be manually written as opposed to
+  // auto-generated, as our auto-generation has no concept of which AST
+  // methods descend vs. cross the tree (into other fragments).
+  LabelEntitiesInFragment(pf, entity_ids, tok_range);
+
+  if (is_new_fragment_id) {
+    pending_fragments.emplace_back(std::move(pf));
+  }
+}
+
 // Create fragments in reverse order that we see them in the AST. The hope
 // is that this will reduce contention in trying to create fragment IDs for
 // the redundant declarations that are likely to appear early in ASTs, i.e.
 // in `#include`d headers.
 static std::vector<PendingFragment> CreatePendingFragments(
-    WorkerId worker_id, GlobalIndexingState &context, EntityIdMap &entity_ids,
-    FileHashMap &file_hashes, const pasta::TokenRange &tok_range,
-    std::vector<EntityGroupRange> decl_group_ranges) {
+    GlobalIndexingState &context, EntityIdMap &entity_ids,
+    const pasta::AST &ast, std::vector<EntityGroupRange> decl_group_ranges) {
 
   ProgressBarWork identification_progress_tracker(
-      context.identification_progress.get());
+      context.identification_progress);
 
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
+
+  pasta::TokenRange tok_range = ast.Tokens();
 
   // Visit decl range groups in reverse order, so that we're more likely to
   // see the definitely unique fragments first, as they'll appear in the main
@@ -944,62 +980,89 @@ static std::vector<PendingFragment> CreatePendingFragments(
        it = decl_group_ranges.rbegin(), end = decl_group_ranges.rend();
        it != end; ++it) {
 
-    const EntityGroupRange &group_range = *it;
-    const EntityGroup &entities = std::get<kGroupIndex>(group_range);
-    uint64_t begin_index = std::get<kBeginIndex>(group_range);
-    uint64_t end_index = std::get<kEndIndex>(group_range);
-
-    // Don't create token `decls_for_chunk` if the decl is already seen. This
-    // means it's already been indexed.
-    auto [code_id, is_new] = context.GetOrCreateFragmentId(
-        worker_id,
-        CodeHash(file_hashes, entities, tok_range, begin_index, end_index),
-        end_index - begin_index + 1u);
-
-    PendingFragment pending_fragment;
-    pending_fragment.fragment_id = code_id;
-    pending_fragment.begin_index = begin_index;
-    pending_fragment.end_index = end_index;
-
-    for (const Entity &entity : entities) {
-      if (std::holds_alternative<pasta::Decl>(entity)) {
-        pending_fragment.top_level_decls.push_back(
-            std::get<pasta::Decl>(entity));
-        pending_fragment.num_top_level_declarations++;
-
-      } else if (std::holds_alternative<pasta::MacroNode>(entity)) {
-        pending_fragment.top_level_macros.push_back(
-            std::get<pasta::MacroNode>(entity));
-        pending_fragment.num_top_level_macros++;
-
-      } else {
-        LOG(FATAL)
-            << "TODO: Unsupported top-level entity kind";
-      }
-    }
-
-    CHECK_NE((pending_fragment.num_top_level_declarations +
-              pending_fragment.num_top_level_macros), 0u);
-
-    // We always need to label the entities inside of a fragment, regardless of
-    // if fragment `is_new`. This is because each fragment might have arbitrary
-    // references to other declarations. We need to be able to form cross-
-    // fragment references when serializing things, so we use the labeller to
-    // assign IDs to entities (decls, statements, etc.) in a uniform and
-    // deterministic way so that other threads doing similar indexing will form
-    // identically labelled chunks for the same logical entities.
-    //
-    // Unfortunately, the labeller needs to be manually written as opposed to
-    // auto-generated, as our auto-generation has no concept of which AST
-    // methods descend vs. cross the tree (into other fragments).
-    pending_fragment.Label(entity_ids, tok_range);
-
-    if (is_new) {
-      pending_fragments.emplace_back(std::move(pending_fragment));
-    }
+    const EntityGroupRange &entities_in_fragment = *it;
+    CreatePendingFragment(context.database, entity_ids, tok_range,
+                          entities_in_fragment, pending_fragments);
   }
 
   return pending_fragments;
+}
+
+// Serialize the parsed fragments that were identified as new and/or "won"
+// the race to assign a fragment ID in this thread of execution.
+static void PersistParsedFragments(
+    GlobalIndexingState &context, const pasta::AST &ast,
+    EntityIdMap &entity_ids, std::vector<PendingFragment> pending_fragments) {
+
+  pasta::TokenRange tok_range = ast.Tokens();
+  NameMangler mangler(ast);
+
+  for (PendingFragment &pf : pending_fragments) {
+    ProgressBarWork fragment_progress_tracker(context.serialization_progress);
+    context.PersistFragment(ast, tok_range, mangler, entity_ids, pf);
+  }
+}
+
+// Look through all files referenced by the AST get their unique IDs. If this
+// is the first time seeing a file, then tokenize the file.
+static void MaybePersistParsedFile(
+    GlobalIndexingState &context, const pasta::File &file,
+    EntityIdMap &entity_ids) {
+
+  if (!file.WasParsed()) {
+    return;
+  }
+
+  pasta::Result<std::string_view, std::error_code> maybe_data = file.Data();
+  std::filesystem::path file_path = file.Path();
+  if (!maybe_data.Succeeded()) {
+    LOG(ERROR)
+        << "Unable to get data for file '" << file_path.generic_string()
+        << ": " << maybe_data.TakeError().message();
+  }
+
+  bool is_new_file_id = false;
+  mx::DatabaseWriter &database = context.database;
+  mx::SpecificEntityId<mx::FileId> file_id = database.GetOrCreateFileIdForHash(
+      HashFile(maybe_data.TakeValue()), is_new_file_id);
+
+  if (is_new_file_id) {
+    context.PersistFile(file_id, file);
+  }
+
+  entity_ids.emplace(file.RawFile(), file_id.Pack());
+}
+
+// This persists any not-yet-seen files and their tokens. It also creates the
+// file IDs for those files, so this always must happen.
+static void PersistParsedFiles(
+    GlobalIndexingState &context, const pasta::AST &ast,
+    EntityIdMap &entity_ids) {
+  ProgressBarWork progress_tracker(context.file_progress);
+  auto parsed_files = ast.ParsedFiles();
+  for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
+       it != end; ++it) {
+    const pasta::File &parsed_file = *it;
+    MaybePersistParsedFile(context, parsed_file, entity_ids);
+  }
+}
+
+// Create an AST from a compile job.
+static std::optional<pasta::AST> CompileJobToAST(
+    const std::shared_ptr<GlobalIndexingState> &context,
+    const pasta::CompileJob &job) {
+
+  ProgressBarWork parsing_progress_tracker(context->ast_progress);
+  pasta::Result<pasta::AST, std::string> maybe_ast = job.Run();
+  if (!maybe_ast.Succeeded()) {
+    LOG(ERROR)
+        << "Error building AST for command " << job.Arguments().Join()
+        << " on main file " << job.SourceFile().Path().generic_string()
+        << "; error was: " << maybe_ast.TakeError();
+    return std::nullopt;
+  }
+
+  return maybe_ast.TakeValue();
 }
 
 }  // namespace
@@ -1014,85 +1077,22 @@ IndexCompileJobAction::IndexCompileJobAction(
       file_manager(std::move(file_manager_)),
       job(std::move(job_)) {}
 
-// Look through all files referenced by the AST get their unique IDs. If this
-// is the first time seeing a file, then tokenize the file.
-void IndexCompileJobAction::MaybePersistFile(
-    WorkerId worker_id, pasta::File file) {
-  if (!file.WasParsed()) {
-    return;
-  }
-
-  pasta::Result<std::string_view, std::error_code> maybe_data = file.Data();
-  std::filesystem::path file_path = file.Path();
-  if (!maybe_data.Succeeded()) {
-    LOG(ERROR)
-        << "Unable to get data for file '" << file_path.generic_string()
-        << ": " << maybe_data.TakeError().message();
-  }
-
-  std::string file_hash = FileHash(maybe_data.TakeValue());
-  auto [file_id, is_new_file_id] = context->GetOrCreateFileId(
-      worker_id, file_path, file_hash);
-  if (is_new_file_id) {
-    PersistFile(worker_id, *context, file_id, file_hash, file);
-  }
-
-  file_ids.emplace(file, file_id);
-  file_hashes.emplace(std::move(file), std::move(file_hash));
-}
-
-void IndexCompileJobAction::PersistParsedFiles(const pasta::AST &ast,
-                                               WorkerId worker_id) {
-  ProgressBarWork progress_tracker(context->file_progress.get());
-  auto parsed_files = ast.ParsedFiles();
-  for (auto it = parsed_files.rbegin(), end = parsed_files.rend();
-       it != end; ++it) {
-    const pasta::File &parsed_file = *it;
-    MaybePersistFile(worker_id, parsed_file);
-  }
-}
-
 // Build and index the AST.
 void IndexCompileJobAction::Run(Executor, WorkerId worker_id) {
-  std::optional<ProgressBarWork> parsing_progress_tracker(
-      context->ast_progress.get());
 
-  std::string main_file_path =
-      job.SourceFile().Path().lexically_normal().generic_string();
-  pasta::Result<pasta::AST, std::string> maybe_ast = job.Run();
-  if (!maybe_ast.Succeeded()) {
-    LOG(ERROR)
-        << "Error building AST for command " << job.Arguments().Join()
-        << " on main file " << main_file_path
-        << "; error was: " << maybe_ast.TakeError();
+  std::optional<pasta::AST> maybe_ast = CompileJobToAST(context, job);
+  if (!maybe_ast) {
     return;
   }
 
-  pasta::AST ast = maybe_ast.TakeValue();
-  parsing_progress_tracker.reset();
-  PersistParsedFiles(ast, worker_id);
-
-  std::vector<EntityGroupRange> decl_group_ranges = PartitionEntities(
-      context->partitioning_progress.get(), main_file_path, ast);
-
-  pasta::TokenRange tok_range = ast.Tokens();
-
   EntityIdMap entity_ids;
-
-  std::vector<PendingFragment> pending_fragments = CreatePendingFragments(
-      worker_id, *context, entity_ids, file_hashes, tok_range,
-      std::move(decl_group_ranges));
-
-  // Serialize the new code chunks.
-  ProgressBarWork fragment_progress_tracker(
-      context->serialization_progress.get());
-
-  NameMangler mangler(ast);
-
-  for (PendingFragment &pending_fragment : pending_fragments) {
-    PersistFragment(worker_id, *context, ast, mangler, entity_ids,
-                    file_ids, tok_range, std::move(pending_fragment));
-  }
+  pasta::AST ast = std::move(maybe_ast.value());
+  PersistParsedFiles(*context, ast, entity_ids);
+  PersistParsedFragments(
+      *context, ast, entity_ids,
+      CreatePendingFragments(
+          *context, entity_ids, ast,
+          PartitionEntities(*context, ast)));
 }
 
 }  // namespace indexer

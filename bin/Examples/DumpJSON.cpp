@@ -21,7 +21,7 @@
 
 DEFINE_uint32(tab_width, 4, "Number of spaces in a tab");
 
-using SeenSet = std::set<mx::RawEntityId>;
+using SeenSet = std::set<mx::PackedDeclarationId>;
 using WorkList = std::vector<mx::Decl>;
 
 // Sometimes we see two separate definitions of an entity, e.g.
@@ -273,8 +273,8 @@ extern "C" int main(int argc, char *argv[]) {
   mx::FileLocationCache cache(config);
 
   // Go find all functions.
-  for (mx::File file : mx::File::in(index)) {
-    for (mx::Fragment frag : mx::Fragment::in(file)) {
+  for (mx::File file : index.files()) {
+    for (mx::Fragment frag : file.fragments()) {
       for (mx::FunctionDecl func : mx::FunctionDecl::in(frag)) {
         wl.emplace_back(LongestDefinition(func));
       }
@@ -293,17 +293,18 @@ extern "C" int main(int argc, char *argv[]) {
       sep = ",\n";
 
       mx::Fragment frag = mx::Fragment::containing(decl);
-      mx::File file = mx::File::containing(frag);
-      auto file_path = file_paths.find(file.id());
-
       llvm::outs() << '"' << decl.id().Pack() << "\": ";
 
       llvm::json::Object obj;
       obj["kind"] = mx::EnumeratorName(decl.kind());
-      obj["file"] = file_path->second.generic_string();
-      if (auto line_col = decl.token().nearest_location(cache)) {
-        obj["line"] = line_col->first;
-        obj["column"] = line_col->second;
+
+      if (auto file = mx::File::containing(frag)) {
+        auto file_path = file_paths.find(file->id());
+        obj["file"] = file_path->second.generic_string();
+        if (auto line_col = decl.token().nearest_location(cache)) {
+          obj["line"] = line_col->first;
+          obj["column"] = line_col->second;
+        }
       }
 
       DumpDeclToJSON(obj, std::move(decl), wl);

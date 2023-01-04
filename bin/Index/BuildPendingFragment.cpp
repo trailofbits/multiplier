@@ -6,6 +6,7 @@
 
 #include "PendingFragment.h"
 
+#include "Macro.h"
 #include "PASTA.h"
 #include "Util.h"
 
@@ -25,17 +26,21 @@ namespace {
 class FragmentBuilder {
  public:
   EntityIdMap &entity_ids;
+  TypeIdMap &type_ids;
   PendingFragment &fragment;
 
   inline explicit FragmentBuilder(EntityIdMap &entity_ids_,
+                                  TypeIdMap &type_ids_,
                                   PendingFragment &fragment_)
       : entity_ids(entity_ids_),
+        type_ids(type_ids_),
         fragment(fragment_) {}
 
 #define MX_BEGIN_VISIT_DECL(name) void Visit ## name (const pasta::name &);
 #define MX_BEGIN_VISIT_STMT MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_TYPE MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_ATTR MX_BEGIN_VISIT_DECL
+#define MX_BEGIN_VISIT_MACRO MX_BEGIN_VISIT_DECL
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
 
@@ -43,6 +48,7 @@ class FragmentBuilder {
   void Accept(const pasta::Stmt &entity);
   void Accept(const pasta::Type &entity);
   void Accept(const pasta::Attr &entity);
+  void Accept(const pasta::Macro &entity);
   void Accept(const pasta::TemplateArgument &entity);
   void Accept(const pasta::CXXBaseSpecifier &entity);
   void Accept(const pasta::TemplateParameterList &entity);
@@ -54,6 +60,8 @@ class FragmentBuilder {
   void MaybeVisitNext(const pasta::Stmt &entity);
   void MaybeVisitNext(const pasta::Type &entity);
   void MaybeVisitNext(const pasta::Attr &entity);
+  void MaybeVisitNext(const pasta::Macro &entity);
+  void MaybeVisitNext(const pasta::File &entity);
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo);
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo);
@@ -78,7 +86,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
   }
 
   mx::DeclarationId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
   id.is_definition = IsDefinition(entity);
@@ -96,7 +104,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
     mx::VariantId vid = it->second.Unpack();
     if (std::holds_alternative<mx::DeclarationId>(vid)) {
       auto prev_id = std::get<mx::DeclarationId>(vid);
-      if (prev_id.fragment_id != fragment.fragment_id) {
+      if (prev_id.fragment_id != fragment.fragment_index) {
         entity_ids[entity.RawDecl()] = id;  // Overwrite and force it in.
         fragment.decls_to_serialize.emplace_back(entity);
       }
@@ -109,7 +117,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
 void FragmentBuilder::MaybeVisitNext(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
   mx::StatementId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
@@ -121,20 +129,24 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Stmt &entity) {
 void FragmentBuilder::MaybeVisitNext(const pasta::Type &entity) {
   auto kind = entity.Kind();
   mx::TypeId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.types_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (fragment.type_ids.emplace(type_key, id).second) {
+  if (type_ids.emplace(type_key, id).second) {
     fragment.types_to_serialize.emplace_back(entity);  // New type found.
   }
 }
 
+
+void FragmentBuilder::MaybeVisitNext(const pasta::Macro &) {}
+void FragmentBuilder::MaybeVisitNext(const pasta::File &) {}
+
 void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
   auto kind = entity.Kind();
   mx::AttributeId id;
-  id.fragment_id = fragment.fragment_id;
+  id.fragment_id = fragment.fragment_index;
   id.offset = static_cast<uint32_t>(fragment.attrs_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
@@ -225,6 +237,11 @@ void FragmentBuilder::MaybeVisitNext(
 #define MX_BEGIN_VISIT_PSEUDO MX_BEGIN_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 
+// NOTE(pag): Macro visitors are never reached, so trick the compiler into
+//            dead code elimination.
+#define MX_BEGIN_VISIT_MACRO(name) MX_BEGIN_VISIT_DECL(name) if (1) return;
+#define MX_END_VISIT_MACRO MX_END_VISIT_DECL
+
 #include <multiplier/Visitor.inc.h>
 
 void FragmentBuilder::Accept(const pasta::Decl &entity) {
@@ -295,20 +312,26 @@ void FragmentBuilder::Accept(const pasta::Attr &entity) {
   }
 }
 
+void FragmentBuilder::Accept(const pasta::Macro &) {}
+
 }  // namespace
 
-void PendingFragment::Build(EntityIdMap &entity_ids,
-                            const pasta::TokenRange &tokens) {
+// Build the fragment. This fills out the decls/stmts/types to serialize.
+//
+// NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
+void BuildPendingFragment(
+    PendingFragment &pf, EntityIdMap &entity_ids,
+    TypeIdMap &type_ids, const pasta::TokenRange &tokens) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;
   size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
-  FragmentBuilder builder(entity_ids, *this);
+  FragmentBuilder builder(entity_ids, type_ids, pf);
 
   // Make sure to collect everything reachable from token contexts.
-  for (auto i = begin_index; i <= end_index; ++i) {
+  for (auto i = pf.begin_index; i <= pf.end_index; ++i) {
     for (auto context = tokens[i].Context(); context;
          context = context->Parent()) {
       if (auto decl = pasta::Decl::From(*context)) {
@@ -332,39 +355,39 @@ void PendingFragment::Build(EntityIdMap &entity_ids,
   for (auto changed = true; changed; ) {
     changed = false;
 
-    size_t num_decls = decls_to_serialize.size();
-    size_t num_stmts = stmts_to_serialize.size();
-    size_t num_types = types_to_serialize.size();
-    size_t num_attrs = attrs_to_serialize.size();
-    size_t num_pseudos = pseudos_to_serialize.size();
+    size_t num_decls = pf.decls_to_serialize.size();
+    size_t num_stmts = pf.stmts_to_serialize.size();
+    size_t num_types = pf.types_to_serialize.size();
+    size_t num_attrs = pf.attrs_to_serialize.size();
+    size_t num_pseudos = pf.pseudos_to_serialize.size();
 
     for (size_t i = prev_num_decls; i < num_decls; ++i) {
       changed = true;
-      pasta::Decl entity = decls_to_serialize[i];
+      pasta::Decl entity = pf.decls_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_stmts; i < num_stmts; ++i) {
       changed = true;
-      pasta::Stmt entity = stmts_to_serialize[i];
+      pasta::Stmt entity = pf.stmts_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_types; i < num_types; ++i) {
       changed = true;
-      pasta::Type entity = types_to_serialize[i];
+      pasta::Type entity = pf.types_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_attrs; i < num_attrs; ++i) {
       changed = true;
-      pasta::Attr entity = attrs_to_serialize[i];
+      pasta::Attr entity = pf.attrs_to_serialize[i];
       builder.Accept(entity);
     }
 
     for (size_t i = prev_num_pseudos; i < num_pseudos; ++i) {
       changed = true;
-      Pseudo pseudo = pseudos_to_serialize[i];
+      Pseudo pseudo = pf.pseudos_to_serialize[i];
       if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
         builder.VisitTemplateArgument(std::get<pasta::TemplateArgument>(pseudo));
       } else if (std::holds_alternative<pasta::CXXBaseSpecifier>(pseudo)) {

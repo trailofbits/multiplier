@@ -52,12 +52,13 @@ class ParmVarDecl : public VarDecl {
   }
 
   inline static ParmVarDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ParmVarDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ParmVarDecl::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

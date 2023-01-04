@@ -300,6 +300,7 @@ class RegexQueryResult {
   friend class EntityProvider;
   friend class RemoteEntityProvider;
   friend class InvalidEntityProvider;
+  friend class RegexQuery;
   friend class RegexQueryResultIterator;
 
   std::shared_ptr<RegexQueryResultImpl> impl;

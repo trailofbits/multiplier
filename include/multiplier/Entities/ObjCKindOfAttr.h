@@ -40,12 +40,13 @@ class ObjCKindOfAttr : public TypeAttr {
   }
 
   inline static ObjCKindOfAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ObjCKindOfAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ObjCKindOfAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

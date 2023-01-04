@@ -40,12 +40,13 @@ class NoAliasAttr : public InheritableAttr {
   }
 
   inline static NoAliasAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : NoAliasAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : NoAliasAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

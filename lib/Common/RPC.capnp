@@ -64,26 +64,6 @@ struct CompileCommand @0xab30180088262c95 {
   compiler @12 :CompilerName;
 }
 
-struct MacroSubstitution @0xade5195a85fdc847 {
-  
-  # A mix of macro token IDs, file token IDs, and macro substitution IDs.
-  beforeIds @0 :List(UInt64);
-  
-  # The IDs of the replacement tokens for this substitution. This might be an
-  # invalid ID if there is no after.
-  afterIds @1 :List(UInt64);
-  
-  # `mx::MacroSubstitutionKind`.
-  kind @2 :UInt8;
-  
-  # The offsets of the begin / after-end token IDs of the macro tokens in
-  # a fragment. This can be used to form token ranges with the appropriate data.
-  firstBeforeTokenOffset @3 :UInt32;
-  afterFirstBeforeTokenOffset @4 :UInt32;
-  firstAfterTokenOffset @5 :UInt32;
-  afterLastAfterTokenOffset @6 :UInt32;
-}
-
 # Used to tell us the upper bound of something, e.g. the byte offsets of the
 # ends of lines, where `val` is the line number, and `offset` is the offset of
 # the `\n` character.
@@ -111,21 +91,18 @@ struct File @0x987f05f6a48636d5 {
   # Unique ID of this file. This corresponds to an `mx::FileId`.
   id @0 :UInt64;
   
-  # Hash of `data`.
-  hash @1 :Text;
-  
   # The data of the file.
-  data @2 :Text;
+  data @1 :Text;
   
   # Tells us about the tokens inside of `data`. There is one extra element in
   # `tokenOffsets`.
-  tokenKinds @3 :List(UInt16);
-  tokenOffsets @4 :List(UInt32);
+  tokenKinds @2 :List(UInt16);
+  tokenOffsets @3 :List(UInt32);
     
   # Byte offsets of the end of line characters. We use this to map matches in
   # files to matches in fragments, with a persistent set containing <file_id,
   # line_num, fragment_id> triples.
-  eolOffsets @5 :List(UpperBound);
+  eolOffsets @4 :List(UpperBound);
 }
 
 struct FileInfo @0xfd1022cb187f18f8 {
@@ -147,16 +124,39 @@ struct Fragment @0xe5f27760091f9a3a {
   statements @4 :List(AST.Stmt);
   types @5 :List(AST.Type);
   attributes @6 :List(AST.Attr);
-  others @7 :List(AST.Pseudo);
+  macros @7 : List(AST.Macro);
+  others @8 :List(AST.Pseudo);
   
-  # List of top-level declarations in this code chunk.
-  topLevelDeclarations @8 :List(UInt64);
+  # List of top-level declarations in this fragment.
+  topLevelDeclarations @9 :List(UInt64);
   
-  # List of token contexts. 
-  tokenContexts @9 :List(TokenContext);
+  # List of top-level macros or tokens in this code.
+  topLevelMacros @10 :List(UInt64);
+  
+  # Parsed tokens go through an extra level of indirection to get into
+  # `tokenOffsets`, `tokenKinds`, and `derivedTokenIds`.
+  #
+  # Indexed by `ParsedTokenId::offset`.
+  parsedTokenOffsetToIndex @11 :List(UInt32);
+  
+  # Inverse of the above. This is to let us get from a "final" macro token
+  # back to a parsed token. There is one for every token. A value is valid
+  # iff parsedTokenOffsetToIndex[macroTokenIndexToParsedTokenOffset[i]] == i.
+  macroTokenIndexToParsedTokenOffset @12 :List(UInt32);
+  
+  # Inverted map of macro tokens -> offset of containing macro. The macro
+  # containing the `i`th token is `macros[macroTokenIndexToMacroOffset[i]]`.
+  macroTokenIndexToMacroOffset @13 :List(UInt32);
+  
+  # List of token contexts. There is one token context per parsed token.
+  # Non-parsed tokens don't have token contexts. Whitespace doesn't have
+  # context.
+  parsedTokenContexts @14 :List(TokenContext);
   
   # List of offsets of token contexts for each of the tokens.
-  tokenContextOffsets @10 :List(UInt32);
+  #
+  # Indexed by `ParsedTokenId::offset`.
+  parsedTokenContextOffsets @15 :List(UInt32);
   
   # The actual parsed tokens, as a text buffer. Each token is separated by a
   # single space. There are no newlines, except those that might be inside of
@@ -170,32 +170,30 @@ struct Fragment @0xe5f27760091f9a3a {
   #
   # We lay out the data as follows:
   #
-  #                   A B C D E
+  #                   A E C D B
   #
-  # The tokens associated with the data are laid out in the same order.
-  tokenData @11 :Text;
+  # The parsed tokens correspond to stuff in `A E C D`, and `B` comes after.
+  tokenData @16 :Text;
   
   # Offsets of the beginning of tokens into `tokenData`. There is one extra
   # element in here than there are tokens, which represents the size of the data.
-  tokenOffsets @12 :List(UInt32);
+  tokenOffsets @17 :List(UInt32);
   
   # List of macro token kinds in this fragment.
-  tokenKinds @13 :List(UInt16);
+  tokenKinds @18 :List(UInt16);
   
   # Every macro token is associated with an ID. The id is one of:
   #
   #   - FileTokenId:         This macro token is derived from a file token.
   #   - MacroTokenId:        This macro token is a copy of another macro token.
-  #   - MacroSubstitutionId: This macro token is derived in some way from its
+  #   - MacroId: This macro token is derived in some way from its
   #                          parent substitution. E.g. stringize, concat, etc.
-  derivedTokenIds @14 :List(UInt64);
+  derivedTokenIds @19 :List(UInt64);
   
-  # List of token substitutions in this fragment.
-  substitutions @15 :List(MacroSubstitution);
+  # The single best related entity ID to the corresponding token. This helps
+  # with improving the speed of syntax highlighting.
+  relatedEntityId @20 :List(UInt64);
 
   # Source IR in text format
-  mlir @16 :Text;
-  
-  # Was there an error when building out the token tree?
-  hadSubstitutionError @17 :Bool;
+  mlir @21 :Text;
 }

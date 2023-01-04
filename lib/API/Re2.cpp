@@ -7,10 +7,12 @@
 #include "Re2.h"
 
 #include <cassert>
+#include <multiplier/Index.h>
+#include <multiplier/Types.h>
 
 #include "File.h"
 #include "Fragment.h"
-#include "multiplier/Types.h"
+#include "Token.h"
 
 #ifndef MX_DISABLE_RE2
 
@@ -22,7 +24,7 @@ RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, EntityProvider::Ptr ep_,
-    std::vector<RawEntityId> fragment_ids)
+    FragmentIdList fragment_ids)
     : query(query_),
       fragment_ids(std::move(fragment_ids)),
       ep(std::move(ep_)) {}
@@ -31,7 +33,8 @@ RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, FragmentImpl::Ptr frag_)
     : query(query_),
       ep(frag_->ep) {
-  fragment_ids.push_back(frag_->fragment_id);
+  FragmentId fid(frag_->fragment_id);
+  fragment_ids.push_back(fid);
   (void) InitForFragment(std::move(frag_));
 }
 
@@ -45,7 +48,7 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   frag_file_tokens = hl_frag.file_tokens();
 
   // Do the regex search on fragments token first.
-  query.ForEachMatch(
+  query.for_each_match(
       frag_file_tokens.data(),
       [this] (std::string_view match, unsigned begin, unsigned end) {
     matches.emplace_back(match, begin, end);
@@ -72,7 +75,8 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   return true;
 }
 
-bool RegexQueryResultImpl::InitForFragment(RawEntityId frag_id) {
+bool RegexQueryResultImpl::InitForFragment(
+    SpecificEntityId<FragmentId> frag_id) {
   return InitForFragment(ep->FragmentFor(ep, frag_id));
 }
 
@@ -297,6 +301,50 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
   return RegexQuery(match.query);
 }
 
+// Match this regular expression against a file.
+RegexQueryResult RegexQuery::match_fragments(const File &file) const {
+  auto &reader = file.impl->Reader();
+
+  std::map<unsigned, unsigned> eol_offset_to_line_num;
+  for (mx::rpc::UpperBound::Reader ubr : reader.getEolOffsets()) {
+    eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
+  }
+
+  std::vector<unsigned> line_nums;
+
+  this->for_each_match(
+      file.data(),
+      [&eol_offset_to_line_num, &line_nums]
+      (std::string_view, unsigned begin, unsigned end) -> bool {
+        unsigned prev_line = 0;
+        for (auto i = begin; i < end; ++i) {
+          auto line_it = eol_offset_to_line_num.upper_bound(i);
+          if (line_it != eol_offset_to_line_num.end()) {
+            auto line = line_it->second;
+            if (line != prev_line) {
+              prev_line = line;
+              line_nums.push_back(line);
+            }
+          }
+        }
+        return true;
+      });
+
+  if (line_nums.empty()) {
+    return {};
+  }
+
+  const EntityProvider::Ptr &ep = file.impl->ep;
+  return std::make_shared<RegexQueryResultImpl>(
+      *this, ep,
+      ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
+}
+
+// Match this regular expression against a fragment.
+RegexQueryResult RegexQuery::match_fragments(const Fragment &frag) const {
+  return std::make_shared<RegexQueryResultImpl>(*this, frag.impl);
+}
+
 }  // namespace mx
 
 #else
@@ -305,8 +353,7 @@ namespace mx {
 RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, EntityProvider::Ptr ep_,
-    std::vector<RawEntityId>)
+    const RegexQuery &query_, EntityProvider::Ptr ep_, FragmentIdList)
     : query(query_),
       ep(std::move(ep_)) {}
 
@@ -394,8 +441,16 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
   return RegexQuery(match.query);
 }
 
-}  // namespace mx
+// Match this regular expression against a file.
+RegexQueryResult RegexQuery::match_fragments(const File &) const {
+  return {};
+}
 
+RegexQueryResult RegexQuery::match_fragments(const Fragment &) const {
+  return {};
+}
+
+}  // namespace mx
 
 #endif   // MX_DISABLE_RE2
 

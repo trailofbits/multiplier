@@ -26,7 +26,7 @@ class CachingEntityProvider final : public EntityProvider {
   unsigned version_number;
 
   // Cache file list.
-  FilePathList file_list;
+  FilePathMap file_list;
   bool has_file_list{false};
 
   // Cached entities. `entities` explicitly introduces a strong, non-reclaimable
@@ -40,15 +40,11 @@ class CachingEntityProvider final : public EntityProvider {
   std::unordered_map<RawEntityId, FileImpl::WeakPtr> files;
 
   // Cached list of fragments inside of files.
-  std::unordered_map<RawEntityId, std::vector<EntityId>> file_fragments;
+  std::unordered_map<RawEntityId, FragmentIdList> file_fragments;
 
-  // Cached redeclarations/references/uses.
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
+  // Cached redeclarations.
+  std::unordered_map<RawEntityId, std::shared_ptr<RawEntityIdList>>
       redeclarations;
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
-      uses;
-  std::unordered_map<RawEntityId, std::shared_ptr<std::vector<RawEntityId>>>
-      references;
 
   void ClearCacheLocked(unsigned new_version_number);
 
@@ -66,34 +62,34 @@ class CachingEntityProvider final : public EntityProvider {
 
   void VersionNumberChanged(unsigned) final;
 
-  FilePathList ListFiles(const Ptr &) final;
+  FilePathMap ListFiles(const Ptr &) final;
 
-  std::vector<EntityId> ListFragmentsInFile(const Ptr &, RawEntityId id) final;
+  FragmentIdList ListFragmentsInFile(
+      const Ptr &, SpecificEntityId<FileId> id) final;
 
-  std::shared_ptr<const FileImpl> FileFor(const Ptr &, RawEntityId id) final;
+  std::shared_ptr<const FileImpl> FileFor(
+      const Ptr &, SpecificEntityId<FileId> id) final;
 
   // Download a fragment by its unique ID.
   std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, RawEntityId id) final;
+  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
 
-  std::shared_ptr<WeggliQueryResultImpl>
-  Query(const Ptr &, const WeggliQuery &) final;
+  // Return the list of fragments covering / overlapping some lines in a file.
+  FragmentIdList FragmentsCoveringLines(
+      const Ptr &, PackedFileId file, std::vector<unsigned> lines) final;
 
-  std::shared_ptr<RegexQueryResultImpl> Query(
-      const Ptr &, const RegexQuery &) final;
-
-  std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+  RawEntityIdList Redeclarations(
+      const Ptr &, SpecificEntityId<DeclarationId>) final;
 
   void FillUses(const Ptr &, RawEntityId eid,
-                std::vector<RawEntityId> &redecl_ids_out,
-                std::vector<RawEntityId> &fragment_ids_out) final;
+                RawEntityIdList &redecl_ids_out,
+                FragmentIdList &fragment_ids_out) final;
 
   void FillReferences(const Ptr &, RawEntityId eid,
-                      std::vector<RawEntityId> &redecl_ids_out,
-                      std::vector<RawEntityId> &fragment_ids_out) final;
+                      RawEntityIdList &redecl_ids_out,
+                      FragmentIdList &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
-                  mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
 
 };

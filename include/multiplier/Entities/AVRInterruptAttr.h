@@ -40,12 +40,13 @@ class AVRInterruptAttr : public InheritableAttr {
   }
 
   inline static AVRInterruptAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AVRInterruptAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : AVRInterruptAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

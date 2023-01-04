@@ -39,8 +39,10 @@ class Stmt {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIterator;
+  friend class Macro;
+  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
+  friend class StmtReferenceIterator;
   friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
@@ -77,7 +79,7 @@ class Stmt {
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> referenced_declaration(void) const;
-  EntityId id(void) const;
+  SpecificEntityId<StatementId> id(void) const;
   UseRange<StmtUseSelector> uses(void) const;
 
  protected:
@@ -89,12 +91,13 @@ class Stmt {
   }
 
   inline static StmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Stmt::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : Stmt::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

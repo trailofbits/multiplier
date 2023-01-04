@@ -40,12 +40,13 @@ class NoMips16Attr : public InheritableAttr {
   }
 
   inline static NoMips16AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : NoMips16Attr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : NoMips16Attr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

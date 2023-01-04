@@ -40,12 +40,13 @@ class AcquireHandleAttr : public InheritableAttr {
   }
 
   inline static AcquireHandleAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(TokenContext::of(tok));
+    return TokenContextIterator(tok.context());
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : AcquireHandleAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : AcquireHandleAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }
