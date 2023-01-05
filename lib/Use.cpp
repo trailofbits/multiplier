@@ -6,10 +6,11 @@
 
 #include "Use.h"
 
+#include <cassert>
+#include <multiplier/AST.h>
 #include <type_traits>
 
 #include "Fragment.h"
-#include <multiplier/AST.h>
 
 namespace mx {
 namespace {
