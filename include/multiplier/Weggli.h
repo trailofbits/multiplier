@@ -13,10 +13,15 @@
 #include <vector>
 #include <tuple>
 
+#include <gap/core/generator.hpp>
+
 namespace mx {
 
-class WeggliQueryImpl;
+class File;
+class Fragment;
 class Index;
+class WeggliQueryImpl;
+class WeggliQueryMatch;
 
 struct WeggliMatchData final {
   // Raw offsets of the query matches captured by Weggli.
@@ -46,13 +51,20 @@ class WeggliQuery final {
 
   ~WeggliQuery(void);
 
-  void ForEachMatch(std::string_view source,
-                    std::function<bool(WeggliMatchData)> cb) const;
+  void for_each_match(std::string_view source,
+                      std::function<bool(WeggliMatchData)> cb) const;
 
-  bool IsValid(void) const;
+  bool is_valid(void) const;
 
-  std::string_view Pattern(void) const;
-  bool IsCPlusPlus(void) const;
+  std::string_view pattern(void) const;
+
+  bool is_c_plus_plus(void) const;
+
+  // Match this Weggli query against a file.
+  gap::generator<WeggliQueryMatch> match_fragments(const File &) const;
+
+  // Match this Weggli query against a fragment.
+  gap::generator<WeggliQueryMatch> match_fragments(const Fragment &) const;
 };
 
 }  // namespace mx

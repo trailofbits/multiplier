@@ -10,6 +10,9 @@
 
 namespace mx {
 
+class FragmentImpl;
+class FileImpl;
+
 class TokenReader {
  public:
   using Ptr = std::shared_ptr<const TokenReader>;
@@ -27,6 +30,12 @@ class TokenReader {
 
   // Return the id of the token from which the Nth token is derived.
   virtual EntityId NthDerivedTokenId(unsigned token_index) const = 0;
+
+  // Return the id of the parsed token which is derived from the Nth token.
+  virtual EntityId NthParsedTokenId(unsigned token_index) const = 0;
+
+  // Return the id of the macro containing the Nth token.
+  virtual EntityId NthContainingMacroId(unsigned token_index) const = 0;
 
   // Return the id of the Nth token.
   virtual EntityId NthTokenId(unsigned token_index) const = 0;
@@ -46,6 +55,9 @@ class TokenReader {
 
   static Ptr ReaderForToken(const Ptr &self, const EntityProvider::Ptr &ep,
                             EntityId eid);
+
+  virtual const FragmentImpl *OwningFragment(void) const noexcept;
+  virtual const FileImpl *OwningFile(void) const noexcept;
 };
 
 // Used for invalid tokens.
@@ -63,11 +75,17 @@ class InvalidTokenReader final : public TokenReader {
   std::string_view NthTokenData(unsigned) const final;
 
   // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(unsigned) const;
+  EntityId NthDerivedTokenId(unsigned) const final;
+
+  // Return the id of the parsed token which is derived from the Nth token.
+  EntityId NthParsedTokenId(unsigned) const final;
+
+  // Return the id of the macro containing the Nth token.
+  EntityId NthContainingMacroId(unsigned) const final;
 
   // Return the id of the Nth token.
-  EntityId NthTokenId(unsigned token_index) const final;
-  EntityId NthFileTokenId(unsigned token_index) const final;
+  EntityId NthTokenId(unsigned) const final;
+  EntityId NthFileTokenId(unsigned) const final;
 
   // Return the token reader for another file.
   Ptr ReaderForToken(const Ptr &self, RawEntityId id) const final;

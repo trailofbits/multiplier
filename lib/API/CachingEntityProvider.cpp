@@ -36,8 +36,6 @@ void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
   file_fragments.clear();
   file_list.clear();
   redeclarations.clear();
-  uses.clear();
-  references.clear();
   has_file_list = false;
   version_number = new_version_number;
   next->VersionNumberChanged(new_version_number);
@@ -50,7 +48,7 @@ void CachingEntityProvider::VersionNumberChanged(unsigned new_version_number) {
   }
 }
 
-FilePathList CachingEntityProvider::ListFiles(const Ptr &self) {
+FilePathMap CachingEntityProvider::ListFiles(const Ptr &self) {
   std::lock_guard<std::recursive_mutex> locker(lock);
   if (!has_file_list) {
     has_file_list = true;
@@ -60,23 +58,26 @@ FilePathList CachingEntityProvider::ListFiles(const Ptr &self) {
 }
 
 // Get the current list of fragment IDs associated with a file.
-std::vector<EntityId> CachingEntityProvider::ListFragmentsInFile(
-    const Ptr &self, RawEntityId id) {
+FragmentIdList CachingEntityProvider::ListFragmentsInFile(
+    const Ptr &self, SpecificEntityId<FileId> id) {
+  RawEntityId raw_id = id.Pack();
   std::lock_guard<std::recursive_mutex> locker(lock);
-  if (auto it = file_fragments.find(id); it != file_fragments.end()) {
+  if (auto it = file_fragments.find(raw_id); it != file_fragments.end()) {
     return it->second;
   } else {
     auto fragment_ids = next->ListFragmentsInFile(self, id);
-    file_fragments.emplace(id, fragment_ids);  // Cache it.
+    file_fragments.emplace(raw_id, fragment_ids);  // Cache it.
     return fragment_ids;
   }
 }
 
-FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, RawEntityId id) {
+FileImpl::Ptr CachingEntityProvider::FileFor(
+    const Ptr &self, SpecificEntityId<FileId> id) {
   
+  RawEntityId raw_id = id.Pack();
   std::lock_guard<std::recursive_mutex> locker(lock);
   FileImpl::Ptr ptr;
-  if (auto it = files.find(id); it != files.end()) {
+  if (auto it = files.find(raw_id); it != files.end()) {
     ptr = it->second.lock();
   }
 
@@ -84,7 +85,7 @@ FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, RawEntityId id) {
   //            invalidation.
   if (!ptr) {
     ptr = next->FileFor(self, id);
-    files[id] = ptr;
+    files[raw_id] = ptr;
   }
 
   // Extend liftime of `ptr`.
@@ -94,11 +95,12 @@ FileImpl::Ptr CachingEntityProvider::FileFor(const Ptr &self, RawEntityId id) {
 }
 
 FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
-    const Ptr &self, RawEntityId id) {
+    const Ptr &self, SpecificEntityId<FragmentId> id) {
   
+  RawEntityId raw_id = id.Pack();
   std::lock_guard<std::recursive_mutex> locker(lock);
   FragmentImpl::Ptr ptr;
-  if (auto it = fragments.find(id); it != fragments.end()) {
+  if (auto it = fragments.find(raw_id); it != fragments.end()) {
     ptr = it->second.lock();
   }
 
@@ -106,7 +108,7 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
   //            invalidation.
   if (!ptr) {
     ptr = next->FragmentFor(self, id);
-    fragments[id] = ptr;
+    fragments[raw_id] = ptr;
   }
 
   // Extend the liftime of `ptr`.
@@ -115,107 +117,104 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
   return ptr;
 }
 
-gap::generator<WeggliQueryMatch> CachingEntityProvider::Query(
-    const Ptr &self, const WeggliQuery &query) {
-  return next->Query(self, query);
+// Return the list of fragments covering / overlapping some lines in a file.
+FragmentIdList CachingEntityProvider::FragmentsCoveringLines(
+    const Ptr &self, PackedFileId file, std::vector<unsigned> lines) {
+  return next->FragmentsCoveringLines(self, file, std::move(lines));
 }
 
-gap::generator<RegexQueryMatch> CachingEntityProvider::Query(
-    const Ptr &self, const RegexQuery &query) {
-  return next->Query(self, query);
-}
+RawEntityIdList CachingEntityProvider::Redeclarations(
+    const Ptr &self, SpecificEntityId<DeclarationId> eid) {
 
-std::vector<RawEntityId> CachingEntityProvider::Redeclarations(
-    const Ptr &self, RawEntityId eid) {
+  auto raw_id = eid.Pack();
 
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  if (auto it = redeclarations.find(eid); it != redeclarations.end()) {
-    return *(it->second);
+  std::shared_ptr<RawEntityIdList> redecls;
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(raw_id);
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
+    }
+  } while (false);
+
+  if (!redecls) {
+    redecls = std::make_shared<RawEntityIdList>(
+        next->Redeclarations(self, eid));
+
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    redeclarations.emplace(raw_id, redecls);
   }
 
-  auto redecl_ids_out = next->Redeclarations(self, eid);
-  auto cached_redecl_eids =
-      std::make_shared<std::vector<RawEntityId>>(redecl_ids_out);
-  for (auto eid : redecl_ids_out) {
-    redeclarations[eid] = cached_redecl_eids;
-  }
-  return redecl_ids_out;
+  return *redecls;
 }
 
 void CachingEntityProvider::FillUses(
     const Ptr &self, RawEntityId eid,
-    std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<RawEntityId> &fragment_ids_out) {
-  
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  auto redecl_it = redeclarations.find(eid);
-  if (redecl_it != redeclarations.end()) {
-    if (auto uses_it = uses.find(eid); uses_it != uses.end()) {
-      redecl_ids_out = *(redecl_it->second);
-      fragment_ids_out = *(uses_it->second);
-      return;
-    }
+    RawEntityIdList &redecl_ids_out,
+    FragmentIdList &fragment_ids_out) {
+
+  if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
+    next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
+    return;
   }
 
-  next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
-
-  // Double check and overwrite the redeclarations.
-  redecl_it = redeclarations.find(eid);
-  if (redecl_it == redeclarations.end()) {
-    auto cached_redecl_eids =
-        std::make_shared<std::vector<RawEntityId>>(redecl_ids_out);
-    for (auto eid : redecl_ids_out) {
-      redeclarations[eid] = cached_redecl_eids;
+  std::shared_ptr<RawEntityIdList> redecls;
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(eid);
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
     }
-  }
+  } while (false);
 
-  // Cache the used fragments.
-  auto cached_fragment_ids =
-      std::make_shared<std::vector<RawEntityId>>(fragment_ids_out);
-  for (auto eid : redecl_ids_out) {
-    uses[eid] = cached_fragment_ids;
+  if (!redecls) {
+    next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
+    redecls = std::make_shared<RawEntityIdList>(redecl_ids_out);
+
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    redeclarations.emplace(eid, std::move(redecls));
+
+  } else {
+    redecl_ids_out = *redecls;
+    next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
   }
 }
 
 void CachingEntityProvider::FillReferences(
     const Ptr &self, RawEntityId eid,
-    std::vector<RawEntityId> &redecl_ids_out,
-    std::vector<RawEntityId> &fragment_ids_out) {
+    RawEntityIdList &redecl_ids_out,
+    FragmentIdList &fragment_ids_out) {
 
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  auto redecl_it = redeclarations.find(eid);
-  if (redecl_it != redeclarations.end()) {
-    if (auto refs_it = references.find(eid); refs_it != uses.end()) {
-      redecl_ids_out = *(redecl_it->second);
-      fragment_ids_out = *(refs_it->second);
-      return;
-    }
+  if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+    return;
   }
 
-  next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
-
-  // Double check and overwrite the redeclarations.
-  redecl_it = redeclarations.find(eid);
-  if (redecl_it == redeclarations.end()) {
-    auto cached_redecl_eids =
-        std::make_shared<std::vector<RawEntityId>>(redecl_ids_out);
-    for (auto eid : redecl_ids_out) {
-      redeclarations[eid] = cached_redecl_eids;
+  std::shared_ptr<RawEntityIdList> redecls;
+  do {
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    auto redecl_it = redeclarations.find(eid);
+    if (redecl_it != redeclarations.end()) {
+      redecls = redecl_it->second;
     }
-  }
+  } while (false);
 
-  // Cache the referenced fragments.
-  auto cached_fragment_ids =
-      std::make_shared<std::vector<RawEntityId>>(fragment_ids_out);
-  for (auto eid : redecl_ids_out) {
-    references[eid] = cached_fragment_ids;
+  if (!redecls) {
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
+    redecls = std::make_shared<RawEntityIdList>(redecl_ids_out);
+
+    std::lock_guard<std::recursive_mutex> locker(lock);
+    redeclarations.emplace(eid, std::move(redecls));
+
+  } else {
+    redecl_ids_out = *redecls;
+    next->FillReferences(self, eid, redecl_ids_out, fragment_ids_out);
   }
 }
 
 void CachingEntityProvider::FindSymbol(
-    const Ptr &self, std::string name,
-    mx::DeclCategory category, std::vector<RawEntityId> &ids_out) {
-  return next->FindSymbol(self, std::move(name), category, ids_out);
+    const Ptr &self, std::string name, std::vector<RawEntityId> &ids_out) {
+  return next->FindSymbol(self, std::move(name), ids_out);
 }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.

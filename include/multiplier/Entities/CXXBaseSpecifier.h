@@ -21,6 +21,7 @@
 #include "../Use.h"
 
 #include "AccessSpecifier.h"
+#include "PseudoKind.h"
 #include "TagTypeKind.h"
 #include "TokenUseSelector.h"
 
@@ -37,6 +38,8 @@ class CXXBaseSpecifier {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

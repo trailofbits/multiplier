@@ -21,9 +21,8 @@ VAST_RELAX_WARNINGS
 VAST_UNRELAX_WARNINGS
 
 #include <glog/logging.h>
-
-#include <map>
 #include <pasta/AST/Decl.h>
+#include <map>
 
 #include <vast/Util/Common.hpp>
 #include <vast/Translation/Context.hpp>

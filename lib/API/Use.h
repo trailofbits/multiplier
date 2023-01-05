@@ -7,8 +7,8 @@
 #pragma once
 
 #include <multiplier/Use.h>
-#include <multiplier/Reference.h>
 
+#include <multiplier/Reference.h>
 #include <vector>
 
 #include "API.h"
@@ -16,18 +16,27 @@
 
 namespace mx {
 
-class UseIteratorImpl final {
+class BaseUseIteratorImpl {
  public:
   std::shared_ptr<EntityProvider> ep;
   std::vector<RawEntityId> search_ids;
-  std::vector<RawEntityId> fragment_ids;
+  FragmentIdList fragment_ids;
   unsigned fragment_offset{0u};
   unsigned list_offset{0u};
+
+  inline BaseUseIteratorImpl(std::shared_ptr<EntityProvider> ep_)
+      : ep(std::move(ep_)) {}
+};
+
+class UseIteratorImpl : public BaseUseIteratorImpl {
+ public:
 
   UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity);
   UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity);
+  UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
+  UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
   UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity);
 
   void FillAndUniqueFragmentIds(void);
@@ -37,6 +46,7 @@ class UseIteratorImpl final {
   bool FindNextStmt(UseBase &use);
   bool FindNextType(UseBase &use);
   bool FindNextAttr(UseBase &use);
+  bool FindNextMacro(UseBase &use);
   bool FindNextPseudo(UseBase &use);
   bool FindNext(UseBase &use);
 
@@ -47,6 +57,16 @@ class UseIteratorImpl final {
       co_yield use;
     }
   }
+};
+
+class ReferenceIteratorImpl : public BaseUseIteratorImpl {
+ public:
+  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
+  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
+  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
+
+  gap::generator<MacroReference> enumerate_macros(void);
+  gap::generator<StmtReference> enumerate_stmts(void);
 };
 
 }  // namespace mx

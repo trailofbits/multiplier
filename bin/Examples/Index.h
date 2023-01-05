@@ -9,11 +9,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <multiplier/Index.h>
-#include <multiplier/Macro.h>
 #include <string>
 #include <unordered_map>
 
-extern std::unordered_map<mx::RawEntityId, std::filesystem::path> file_paths;
+extern std::unordered_map<mx::PackedFileId, std::filesystem::path> file_paths;
 extern mx::FileLocationCache location_cache;
 
 mx::Index InitExample(bool fill_locations=false);
@@ -22,10 +21,10 @@ void HighlightToken(std::ostream &os, mx::Token token);
 
 void PrintToken(std::ostream &os, mx::Token token);
 
-bool ContainsHighlightedTokens(gap::generator<mx::MacroSubstitutionEntry> nodes,
+bool ContainsHighlightedTokens(std::vector<mx::MacroOrToken> nodes,
                                const mx::TokenRange &entity_tokens);
 
-void PrintUnparsedTokens(std::ostream &os, gap::generator<mx::MacroSubstitutionEntry> nodes,
+void PrintUnparsedTokens(std::ostream &os, std::vector<mx::MacroOrToken> nodes,
                          const mx::TokenRange &entity_tokens=mx::TokenRange(),
                          bool force_highlight=false);
 

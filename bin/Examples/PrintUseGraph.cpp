@@ -48,9 +48,17 @@ KindAndColor(mx::RawEntityId id) {
     auto eid = std::get<mx::AttributeId>(vid);
     return {mx::EnumeratorName(eid.kind), "antiquewhite3"};
 
+  } else if (std::holds_alternative<mx::MacroId>(vid)) {
+    auto eid = std::get<mx::MacroId>(vid);
+    return {mx::EnumeratorName(eid.kind), "indianred1"};
+
   } else if (std::holds_alternative<mx::DesignatorId>(vid)) {
     auto eid = std::get<mx::DesignatorId>(vid);
     return {"Designator", "chartreuse3"};
+
+  } else if (std::holds_alternative<mx::FileId>(vid)) {
+    auto eid = std::get<mx::FileId>(vid);
+    return {"File", "cornsilk3"};
   
   } else {
     return {"Other", "darkseagreen2"};
@@ -87,13 +95,15 @@ extern "C" int main(int argc, char *argv[]) {
 
       UseEdge edge(used_id, mx::EnumeratorName(sel));
       if (auto user_decl = use.as_declaration()) {
-        with_user(user_decl->id(), edge, path_len);
+        with_user(user_decl->id().Pack(), edge, path_len);
       } else if (auto user_stmt = use.as_statement()) {
-        with_user(user_stmt->id(), edge, path_len);
+        with_user(user_stmt->id().Pack(), edge, path_len);
       } else if (auto user_type = use.as_type()) {
-        with_user(user_type->id(), edge, path_len);
+        with_user(user_type->id().Pack(), edge, path_len);
       } else if (auto user_attr = use.as_attribute()) {
-        with_user(user_attr->id(), edge, path_len);
+        with_user(user_attr->id().Pack(), edge, path_len);
+      } else if (auto user_macro = use.as_macro()) {
+        with_user(user_macro->id().Pack(), edge, path_len);
       }
     }
   };
@@ -137,6 +147,16 @@ extern "C" int main(int argc, char *argv[]) {
 
       } else if (std::holds_alternative<mx::Attr>(ent)) {
         for (auto use : std::get<mx::Attr>(ent).uses()) {
+          with_use(user_id, use, path_len);
+        }
+
+      } else if (std::holds_alternative<mx::Macro>(ent)) {
+        for (auto use : std::get<mx::Macro>(ent).uses()) {
+          with_use(user_id, use, path_len);
+        }
+
+      } else if (std::holds_alternative<mx::File>(ent)) {
+        for (auto use : std::get<mx::File>(ent).uses()) {
           with_use(user_id, use, path_len);
         }
       }

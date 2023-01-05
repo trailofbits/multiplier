@@ -13,41 +13,51 @@
 
 namespace mx {
 
-// Return the token context associated with a token.
+
+std::optional<TokenContext> TokenContext::of(const Token &tok) {
+  return tok.context();
+}
+
+// Return the context node that identifies how this token relates to the AST.
 //
 // NOTE(pag): This only works with parsed tokens, and not all parsed tokens
 //            are guaranteed to have a context.
-std::optional<TokenContext> TokenContext::of(const Token &tok) {
-  if (!tok.impl) {
+std::optional<TokenContext> Token::context(void) const {
+  if (!impl) {
     return std::nullopt;
   }
 
-  auto frag = dynamic_cast<const PackedFragmentImpl *>(tok.impl.get());
+  const FragmentImpl *frag = impl->OwningFragment();
   if (!frag) {
     return std::nullopt;
   }
 
   // Only parsed tokens have token contexts.
-  if (tok.offset >= frag->num_parsed_tokens) {
+  if (offset >= frag->num_parsed_tokens) {
     return std::nullopt;
   }
 
-  FragmentReader frag_reader = frag->Fragment();
-  unsigned tagged_offset = frag_reader.getTokenContextOffsets()[tok.offset];
+  // Make sure this is indeed a parsed token.
+  if (!std::holds_alternative<ParsedTokenId>(id().Unpack())) {
+    return std::nullopt;
+  }
+
+  const FragmentReader &frag_reader = frag->Fragment();
+  unsigned tagged_offset = frag_reader.getParsedTokenContextOffsets()[offset];
   if (!(tagged_offset & 1u)) {
     assert(!tagged_offset);
     return std::nullopt;
   }
 
   unsigned offset = tagged_offset >> 1u;
-  auto contexts_reader = frag_reader.getTokenContexts();
+  auto contexts_reader = frag_reader.getParsedTokenContexts();
   if (offset >= contexts_reader.size()) {
     assert(false);
     return std::nullopt;
   }
 
   mx::rpc::TokenContext::Reader tc = contexts_reader[offset];
-  std::shared_ptr<const FragmentImpl> frag_ptr(tok.impl, frag);
+  std::shared_ptr<const FragmentImpl> frag_ptr(impl, frag);
 
   // NOTE(pag): +1 to skip `kInvalid`.
   TokenContext ret(std::move(frag_ptr));
@@ -69,9 +79,8 @@ std::optional<TokenContext> TokenContext::of(const Token &tok) {
 
 // Return the declaration associated with this context, if any.
 std::optional<Decl> TokenContext::as_declaration(void) const {
-  EntityId id(entity_id);
-  if (impl && std::holds_alternative<DeclarationId>(id.Unpack())) {
-    return impl->DeclFor(impl, id);
+  if (auto ptr = impl->DeclFor(impl, EntityId(entity_id), true)) {
+    return ptr.value();
   } else {
     return std::nullopt;
   }
@@ -79,9 +88,8 @@ std::optional<Decl> TokenContext::as_declaration(void) const {
 
 // Return the statement associated with this context, if any.
 std::optional<Stmt> TokenContext::as_statement(void) const {
-  EntityId id(entity_id);
-  if (impl && std::holds_alternative<StatementId>(id.Unpack())) {
-    return impl->StmtFor(impl, id);
+  if (auto ptr = impl->StmtFor(impl, EntityId(entity_id), true)) {
+    return ptr.value();
   } else {
     return std::nullopt;
   }
@@ -89,9 +97,8 @@ std::optional<Stmt> TokenContext::as_statement(void) const {
 
 // Return the type associated with this context, if any.
 std::optional<Type> TokenContext::as_type(void) const {
-  EntityId id(entity_id);
-  if (impl && std::holds_alternative<TypeId>(id.Unpack())) {
-    return impl->TypeFor(impl, id);
+  if (auto ptr = impl->TypeFor(impl, EntityId(entity_id), true)) {
+    return ptr.value();
   } else {
     return std::nullopt;
   }
@@ -99,9 +106,8 @@ std::optional<Type> TokenContext::as_type(void) const {
 
 // Return the attribute associated with this context, if any.
 std::optional<Attr> TokenContext::as_attribute(void) const {
-  EntityId id(entity_id);
-  if (impl && std::holds_alternative<AttributeId>(id.Unpack())) {
-    return impl->AttrFor(impl, id);
+  if (auto ptr = impl->AttrFor(impl, EntityId(entity_id), true)) {
+    return ptr.value();
   } else {
     return std::nullopt;
   }
@@ -125,7 +131,7 @@ std::optional<TokenContext> TokenContext::aliasee(void) const {
     return std::nullopt;
 
   } else {
-    auto tc = impl->Fragment().getTokenContexts()[alias_offset.value()];
+    auto tc = impl->Fragment().getParsedTokenContexts()[alias_offset.value()];
     TokenContext ret(impl);
     assert(entity_id == tc.getEntityId());
     assert(!tc.getAliasIndex());
@@ -142,7 +148,7 @@ std::optional<TokenContext> TokenContext::parent(void) const {
     return std::nullopt;
   }
 
-  auto tc = impl->Fragment().getTokenContexts()[parent_offset.value()];
+  auto tc = impl->Fragment().getParsedTokenContexts()[parent_offset.value()];
 
   // NOTE(pag): `+1` to skip `kInvalid`.
   TokenContext ret(impl);

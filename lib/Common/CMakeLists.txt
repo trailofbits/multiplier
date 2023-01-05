@@ -57,6 +57,7 @@ add_custom_target("copy_headers"
 
 set(common_headers
   "${source_include_dir}/Compress.h"
+  "${source_include_dir}/Database.h"
   "${source_include_dir}/Result.h"
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Types.h"
@@ -65,14 +66,15 @@ set(common_headers
 
 add_library("mx-common" STATIC
   ${common_headers}
-  "${source_include_dir}/IndexStorage.h"
   
   "Compress.cpp"
-  "IndexStorage.cpp"
+  "Database.cpp"
   "Re2.cpp"
   "Re2.h"
   "SQLiteStore.cpp"
-  "SymbolDatabase.cpp"
+  "SQLiteStore.h"
+  "ThreadLocal.cpp"
+  "ThreadLocal.h"
   "Types.cpp"
   "Weggli.cpp"
 
@@ -89,11 +91,11 @@ add_dependencies("mx-common"
 target_link_libraries("mx-common"
   PUBLIC
     "CapnProto::capnp-rpc"
-    SQLite::SQLite3
     gap::gap
     gap::gap-core
     std::coroutines
     gap::gap-settings
+    "mx-sqlite"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     "ZLIB::ZLIB"

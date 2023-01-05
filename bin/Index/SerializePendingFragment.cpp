@@ -7,6 +7,9 @@
 #include <capnp/common.h>
 #include <capnp/message.h>
 
+#include <multiplier/AST.capnp.h>
+#include <multiplier/RPC.capnp.h>
+
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
@@ -14,7 +17,7 @@
 namespace indexer {
 namespace {
 
-static void DispatchSerializeDecl(EntityMapper &em,
+static void DispatchSerializeDecl(const EntityMapper &em,
                                   mx::ast::Decl::Builder builder,
                                   const pasta::Decl &entity) {
   switch (entity.Kind()) {
@@ -35,7 +38,7 @@ static void DispatchSerializeDecl(EntityMapper &em,
   }
 }
 
-static void DispatchSerializeStmt(EntityMapper &em,
+static void DispatchSerializeStmt(const EntityMapper &em,
                                   mx::ast::Stmt::Builder builder,
                                   const pasta::Stmt &entity) {
   switch (entity.Kind()) {
@@ -60,7 +63,7 @@ static void DispatchSerializeStmt(EntityMapper &em,
   }
 }
 
-static void DispatchSerializeType(EntityMapper &em,
+static void DispatchSerializeType(const EntityMapper &em,
                                   mx::ast::Type::Builder builder,
                                   const pasta::Type &entity) {
 
@@ -82,7 +85,7 @@ static void DispatchSerializeType(EntityMapper &em,
   }
 }
 
-static void DispatchSerializeAttr(EntityMapper &em,
+static void DispatchSerializeAttr(const EntityMapper &em,
                                   mx::ast::Attr::Builder builder,
                                   const pasta::Attr &entity) {
 
@@ -106,41 +109,75 @@ static void DispatchSerializeAttr(EntityMapper &em,
 
 }  // namespace
 
-void PendingFragment::Serialize(EntityMapper &em,
-                                mx::rpc::Fragment::Builder &b) {
+// Dispatch to the right macro serializer.
+void DispatchSerializeMacro(const EntityMapper &em,
+                            mx::ast::Macro::Builder builder,
+                            const pasta::Macro &entity, const TokenTree *tt) {
+
+  // Second pass actually does the real serialization.
+  switch (entity.Kind()) {
+#define MX_VISIT_MACRO(type) \
+  case pasta::MacroKind::k ## type: \
+    SerializeMacro ## type ( \
+        em, builder, \
+        reinterpret_cast<const pasta::Macro ## type &>(entity), tt); \
+    break;
+
+#define MX_VISIT_DIRECTIVE(type) \
+  case pasta::MacroKind::k ## type ## Directive: \
+    Serialize ## type ## MacroDirective( \
+        em, builder, \
+        reinterpret_cast<const pasta::type ## MacroDirective &>(entity), tt); \
+    break;
+
+    PASTA_FOR_EACH_MACRO_IMPL(MX_VISIT_MACRO, PASTA_IGNORE_ABSTRACT,
+                              MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
+                              MX_VISIT_DIRECTIVE, MX_VISIT_DIRECTIVE,
+                              PASTA_IGNORE_ABSTRACT)
+#undef MX_VISIT_ATTR
+    default:
+      assert(false);
+      break;
+  }
+}
+
+// Serialize all entities into the Cap'n Proto version of the fragment.
+void SerializePendingFragment(const PendingFragment &pf,
+                              const EntityMapper &em,
+                              mx::rpc::Fragment::Builder &b) {
 
   auto i = 0u;
   auto decl_builder = b.initDeclarations(
-      static_cast<unsigned>(decls_to_serialize.size()));
-  for (const pasta::Decl &entity : decls_to_serialize) {
+      static_cast<unsigned>(pf.decls_to_serialize.size()));
+  for (const pasta::Decl &entity : pf.decls_to_serialize) {
     DispatchSerializeDecl(em, decl_builder[i++], entity);
   }
 
   i = 0u;
   auto stmt_builder = b.initStatements(
-      static_cast<unsigned>(stmts_to_serialize.size()));
-  for (const pasta::Stmt &entity : stmts_to_serialize) {
+      static_cast<unsigned>(pf.stmts_to_serialize.size()));
+  for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
     DispatchSerializeStmt(em, stmt_builder[i++], entity);
   }
 
   i = 0u;
   auto type_builder = b.initTypes(
-      static_cast<unsigned>(types_to_serialize.size()));
-  for (const pasta::Type &entity : types_to_serialize) {
+      static_cast<unsigned>(pf.types_to_serialize.size()));
+  for (const pasta::Type &entity : pf.types_to_serialize) {
     DispatchSerializeType(em, type_builder[i++], entity);
   }
 
   i = 0u;
   auto attr_builder = b.initAttributes(
-      static_cast<unsigned>(attrs_to_serialize.size()));
-  for (const pasta::Attr &entity : attrs_to_serialize) {
+      static_cast<unsigned>(pf.attrs_to_serialize.size()));
+  for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     DispatchSerializeAttr(em, attr_builder[i++], entity);
   }
 
   i = 0u;
   auto pseudo_builder = b.initOthers(
-      static_cast<unsigned>(pseudos_to_serialize.size()));
-  for (const Pseudo &pseudo : pseudos_to_serialize) {
+      static_cast<unsigned>(pf.pseudos_to_serialize.size()));
+  for (const Pseudo &pseudo : pf.pseudos_to_serialize) {
     if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
       SerializeTemplateArgument(
           em, pseudo_builder[i++], std::get<pasta::TemplateArgument>(pseudo));

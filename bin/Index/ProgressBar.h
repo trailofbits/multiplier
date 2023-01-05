@@ -68,6 +68,13 @@ class ProgressBarWork : public ProgressBarStep {
 
  public:
   template <typename T>
+  inline explicit ProgressBarWork(const std::unique_ptr<T> &bar_)
+      : ProgressBarStep(bar_.get()) {
+    if (bar) {
+      bar->AddWork(1);
+    }
+  }
+  template <typename T>
   inline explicit ProgressBarWork(const T &bar_)
       : ProgressBarStep(bar_) {
     if (bar) {

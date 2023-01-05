@@ -14,6 +14,8 @@
 namespace mx {
 namespace {
 
+static thread_local RawEntityIdList tIgnoredRedecls;
+
 #define MX_VISIT_ENUM(cls, api_name, storage, apply, \
                       pasta_name, type, nth_list) \
     template <typename Reader> \
@@ -22,7 +24,7 @@ namespace {
     }
 
 #define MX_VISIT_PSEUDO_KIND(cls, storage) \
-    inline static PseudoKind Get_PseudoKind( \
+    inline static PseudoKind Get_Pseudo_Kind( \
         const mx::ast::Pseudo::Reader &reader, cls *) { \
       return static_cast<PseudoKind>(reader.getVal ## storage()); \
     }
@@ -36,6 +38,7 @@ namespace {
 #define MX_BEGIN_VISIT_STMT(name) DECLARE_FIND_READER_USES(Stmt, name)
 #define MX_BEGIN_VISIT_TYPE(name) DECLARE_FIND_READER_USES(Type, name)
 #define MX_BEGIN_VISIT_ATTR(name) DECLARE_FIND_READER_USES(Attr, name)
+#define MX_BEGIN_VISIT_MACRO(name) DECLARE_FIND_READER_USES(Macro, name)
 #define MX_BEGIN_VISIT_PSEUDO(name) DECLARE_FIND_READER_USES(Pseudo, name)
 
 #include <multiplier/Visitor.inc.h>
@@ -60,71 +63,143 @@ namespace {
 #define MX_BEGIN_VISIT_STMT(name) DEFINE_FIND_READER_KIND_USES(Stmt, name)
 #define MX_BEGIN_VISIT_TYPE(name) DEFINE_FIND_READER_KIND_USES(Type, name)
 #define MX_BEGIN_VISIT_ATTR(name) DEFINE_FIND_READER_KIND_USES(Attr, name)
+#define MX_BEGIN_VISIT_MACRO(name) DEFINE_FIND_READER_KIND_USES(Macro, name)
 #define MX_BEGIN_VISIT_PSEUDO(name) DEFINE_FIND_READER_KIND_USES(Pseudo, name)
 #define MX_END_VISIT_DECL(name) }
 #define MX_END_VISIT_STMT MX_END_VISIT_DECL
 #define MX_END_VISIT_TYPE MX_END_VISIT_DECL
 #define MX_END_VISIT_PSEUDO MX_END_VISIT_DECL
 #define MX_END_VISIT_ATTR MX_END_VISIT_DECL
+#define MX_END_VISIT_MACRO MX_END_VISIT_DECL
 #include <multiplier/Visitor.inc.h>
+
+template <typename Reader>
+static DeclKind Get_Decl_Kind(const Reader &);
+
+template <typename Reader>
+static StmtKind Get_Stmt_Kind(const Reader &);
+
+template <typename Reader>
+static TypeKind Get_Type_Kind(const Reader &);
+
+template <typename Reader>
+static AttrKind Get_Attr_Kind(const Reader &);
+
+template <typename Reader>
+static MacroKind Get_Macro_Kind(const Reader &);
 
 }  // namespace
 
-void UseIteratorImpl::FillAndUniqueFragmentIds(void) {
-  if (fragment_ids.empty()) {
-    for (auto eid : search_ids) {
-      auto vid = EntityId(eid).Unpack();
-      if (std::holds_alternative<DeclarationId>(vid)) {
-        fragment_ids.push_back(std::get<DeclarationId>(vid).fragment_id);
-      }
-    }
+const char *EnumeratorName(UseKind kind) {
+  switch (kind) {
+    case UseKind::DECLARATION: return "DECLARATION";
+    case UseKind::STATEMENT: return "STATEMENT";
+    case UseKind::TYPE: return "TYPE";
+    case UseKind::CXX_BASE_SPECIFIER: return "CXX_BASE_SPECIFIER";
+    case UseKind::TEMPLATE_ARGUMENT: return "TEMPLATE_ARGUMENT";
+    case UseKind::TEMPLATE_PARAMETER_LIST: return "TEMPLATE_PARAMETER_LIST";
+    case UseKind::DESIGNATOR: return "DESIGNATOR";
+    case UseKind::ATTRIBUTE: return "ATTRIBUTE";
+    case UseKind::MACRO: return "MACRO";
   }
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedDeclarationId sid = entity.id();
+  DeclarationId did = sid.Unpack();
+
+  ep->FillUses(ep, sid.Pack(), search_ids, fragment_ids);
+
+  // Make sure all fragments containing each redeclaration is present in
+  // the output fragment ID list.
+  for (RawEntityId search_id : search_ids) {
+    DeclarationId id = std::get<DeclarationId>(EntityId(search_id).Unpack());
+    fragment_ids.emplace_back(FragmentId(id.fragment_id));
+  }
+
+  std::sort(search_ids.begin(), search_ids.end());
+  auto it = std::unique(search_ids.begin(), search_ids.end());
+  search_ids.erase(it, search_ids.end());
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it2, fragment_ids.end());
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedStatementId id = entity.id();
+  search_ids.push_back(entity.id().Pack());
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedTypeId id = entity.id();
+  search_ids.push_back(entity.id().Pack());
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedAttributeId id = entity.id();
+  search_ids.push_back(entity.id().Pack());
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
+}
+
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+
+  PackedMacroId id = entity.id();
+  RawEntityId raw_id = id.Pack();
+  search_ids.push_back(raw_id);
+
+  // TODO(pag): Support redeclarations of macros.
+  ep->FillUses(ep, raw_id, tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
+
+  fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 
   std::sort(fragment_ids.begin(), fragment_ids.end());
   auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it, fragment_ids.end());
 }
 
-UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
-    : ep(std::move(ep_)) {
+UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
 
-  if (MayHaveRemoteUses(entity)) {
-    ep->FillUses(ep, entity.id(), search_ids, fragment_ids);
-  }
+  RawEntityId raw_id = entity.id().Pack();
+  search_ids.push_back(raw_id);
 
-  if (search_ids.empty()) {
-    for (const mx::Decl &redecl :
-             entity.redeclarations_visible_in_translation_unit()) {
-      search_ids.push_back(redecl.id());
-      fragment_ids.push_back(redecl.fragment->fragment_id);
-    }
-  }
-
-  FillAndUniqueFragmentIds();
-}
-
-UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
-    : ep(std::move(ep_)) {
-  search_ids.push_back(entity.id());
-  fragment_ids.push_back(entity.fragment->fragment_id);
-}
-
-UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
-    : ep(std::move(ep_)) {
-  search_ids.push_back(entity.id());
-  fragment_ids.push_back(entity.fragment->fragment_id);
-}
-
-UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity)
-    : ep(std::move(ep_)) {
-  search_ids.push_back(entity.id());
-  fragment_ids.push_back(entity.fragment->fragment_id);
+  ep->FillUses(ep, raw_id, tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
 }
 
 UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
-    : ep(frag->ep) {
-  search_ids.push_back(entity.id());
-  fragment_ids.push_back(frag->fragment_id);
+    : BaseUseIteratorImpl(frag->ep) {
+
+  EntityId eid = entity.id();
+  RawEntityId raw_id = eid.Pack();
+  search_ids.push_back(raw_id);
+
+  ep->FillUses(ep, raw_id, tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
+
+  // This token might be part of a fragment.
+  VariantId vid = eid.Unpack();
+  if (std::holds_alternative<ParsedTokenId>(vid)) {
+    ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+    fragment_ids.emplace_back(FragmentId(tid.fragment_id));
+
+  } else if (std::holds_alternative<MacroTokenId>(vid)) {
+    MacroTokenId tid = std::get<MacroTokenId>(vid);
+    fragment_ids.emplace_back(FragmentId(tid.fragment_id));
+  }
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it, fragment_ids.end());
 }
 
 bool UseIteratorImpl::FindNextDecl(UseBase &use) {
@@ -245,6 +320,35 @@ bool UseIteratorImpl::FindNextAttr(UseBase &use) {
   return false;
 }
 
+bool UseIteratorImpl::FindNextMacro(UseBase& use) {
+  while (list_offset < use.fragment->num_macros) {
+    use.offset = list_offset++;
+    mx::ast::Macro::Reader reader = use.fragment->NthMacro(use.offset);
+    bool found = false;
+
+    use.selectors.reset();
+
+    for (auto eid : search_ids) {
+      switch (Get_Macro_Kind(reader)) {
+
+#define MX_BEGIN_VISIT_ABSTRACT_MACRO(name)
+#define MX_BEGIN_VISIT_MACRO(name) \
+    case name::static_kind(): \
+      FindUses_ ## name (eid, use.selectors, reader, found); \
+      break;
+
+#include <multiplier/Visitor.inc.h>
+
+      }
+    }
+
+    if (found) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 bool UseIteratorImpl::FindNextPseudo(UseBase &use) {
   while (list_offset < use.fragment->num_pseudos) {
@@ -256,7 +360,7 @@ bool UseIteratorImpl::FindNextPseudo(UseBase &use) {
     bool found = false;
 
     for (auto eid : search_ids) {
-      switch (Get_PseudoKind(reader, dummy)) {
+      switch (Get_Pseudo_Kind(reader, dummy)) {
         case PseudoKind::CXX_BASE_SPECIFIER:
           use.kind = UseKind::CXX_BASE_SPECIFIER;
           FindUses_CXXBaseSpecifier(eid, use.selectors, reader, found);
@@ -333,6 +437,15 @@ bool UseIteratorImpl::FindNext(UseBase &use) {
           return true;
         } else {
           // Skip to next list; didn't find.
+          use.kind = UseKind::MACRO;
+          list_offset = 0u;
+          continue;
+        }
+      case UseKind::MACRO:
+        if (FindNextMacro(use)) {
+          return true;
+        } else {
+          // Skip to next list; didn't find.
           use.kind = UseKind::CXX_BASE_SPECIFIER;
           list_offset = 0u;
           continue;
@@ -383,6 +496,12 @@ UseBase::UseBase(Attr entity, UseSelectorSet selectors_)
       offset(entity.offset_),
       kind(UseKind::ATTRIBUTE) {}
 
+UseBase::UseBase(Macro entity, UseSelectorSet selectors_)
+    : selectors(std::move(selectors_)),
+      fragment(std::move(entity.fragment)),
+      offset(entity.offset_),
+      kind(UseKind::MACRO) {}
+
 UseBase::UseBase(Designator entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
       fragment(std::move(entity.fragment)),
@@ -427,6 +546,12 @@ VariantUse UseBase::entity(void) const {
     case UseKind::TYPE:
       if (offset < fragment->num_types) {
         return Type(fragment, offset);
+      } else {
+        return NotAnEntity{};
+      }
+    case UseKind::MACRO:
+      if (offset < fragment->num_macros) {
+        return Macro(fragment, offset);
       } else {
         return NotAnEntity{};
       }
@@ -497,6 +622,14 @@ std::optional<Attr> UseBase::as_attribute(void) const {
   }
 }
 
+std::optional<Macro> UseBase::as_macro(void) const {
+  if (kind == UseKind::MACRO && fragment && offset < fragment->num_macros) {
+    return Macro(fragment, offset);
+  } else {
+    return std::nullopt;
+  }
+}
+
 std::optional<CXXBaseSpecifier> UseBase::as_cxx_base_specifier(void) const {
   if (kind == UseKind::CXX_BASE_SPECIFIER && fragment &&
       offset < fragment->num_pseudos) {
@@ -534,20 +667,250 @@ std::optional<Designator> UseBase::as_designator(void) const {
   }
 }
 
-Stmt Reference::statement(void) && noexcept {
+ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
+                                             const Decl &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  PackedDeclarationId sid = entity.id();
+  DeclarationId did = sid.Unpack();
+
+  ep->FillReferences(ep, sid.Pack(), search_ids, fragment_ids);
+
+  // Make sure all fragments containing each redeclaration is present in
+  // the output fragment ID list.
+  for (RawEntityId search_id : search_ids) {
+    DeclarationId id = std::get<DeclarationId>(EntityId(search_id).Unpack());
+    fragment_ids.emplace_back(FragmentId(id.fragment_id));
+  }
+
+  std::sort(search_ids.begin(), search_ids.end());
+  auto it = std::unique(search_ids.begin(), search_ids.end());
+  search_ids.erase(it, search_ids.end());
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it2, fragment_ids.end());
+}
+
+ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
+                                             const Macro &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+  SpecificEntityId<MacroId> sid = entity.id();
+  ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
+
+  // Make sure the fragments containing the macro is present in
+  // the output fragment ID list.
+  search_ids.emplace_back(sid.Pack());
+  fragment_ids.emplace_back(FragmentId(sid.Unpack().fragment_id));
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it2, fragment_ids.end());
+}
+
+ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
+                                             const File &entity)
+    : BaseUseIteratorImpl(std::move(ep_)) {
+
+  SpecificEntityId<FileId> sid = entity.id();
+  ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
+  assert(tIgnoredRedecls.empty());
+
+  search_ids.emplace_back(sid.Pack());
+
+  std::sort(fragment_ids.begin(), fragment_ids.end());
+  auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
+  fragment_ids.erase(it2, fragment_ids.end());
+
+  // NOTE(pag): Not all files will have uses, as some are the main source
+  //            files of the compiler itself.
+}
+
+gap::generator<MacroReference> ReferenceIteratorImpl::enumerate_macros(void) {
+  if (search_ids.empty() || fragment_ids.empty()) {
+    co_return;
+  }
+
+  assert(search_ids.size() == 1u);
+  RawEntityId search_id = search_ids[0];
+  unsigned fragment_offset = 0u;
+  MacroReference user;
+
+  for (;;) {
+    // Initialize to the first macro of the fragment.
+    if (!user.fragment) {
+      if (fragment_offset >= fragment_ids.size()) {
+        co_return;
+      }
+
+      auto frag_id = fragment_ids[fragment_offset++];
+      user.fragment = ep->FragmentFor(ep, frag_id);
+      if (!user.fragment) {
+        continue;
+      }
+
+      user.offset = 0u;
+
+    // Skip to the next macro.
+    } else {
+      ++user.offset;
+    }
+
+    // We've exhausted the macros in this fragment; skip to the next
+    // fragment.
+    if (user.offset >= user.fragment->num_macros) {
+      user.fragment.reset();
+      user.offset = 0u;
+      continue;
+    }
+
+    Macro macro(std::move(user.fragment), user.offset);
+
+    // Needs to match what is in `LinkExternalReferencesInFragment` in
+    // `bin/Index/LinkExternalReferencesInFragment.cpp`.
+    switch (macro.kind()) {
+      case mx::MacroKind::EXPANSION: {
+        auto &exp = reinterpret_cast<const MacroExpansion &>(macro);
+        if (auto def = exp.definition()) {
+          SpecificEntityId<MacroId> referenced_id = def->id();
+          if (referenced_id.Pack() == search_id) {
+            user.fragment = std::move(macro.fragment);  // Take it back.
+            co_yield user;  // Hit!
+          }
+        }
+        break;
+      }
+      case mx::MacroKind::INCLUDE_DIRECTIVE:
+      case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
+      case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
+      case mx::MacroKind::IMPORT_DIRECTIVE: {
+        auto &inc = reinterpret_cast<const IncludeLikeMacroDirective &>(macro);
+        if (auto file = inc.included_file()) {
+          SpecificEntityId<FileId> referenced_id = file->id();
+          if (referenced_id.Pack() == search_id) {
+            user.fragment = std::move(macro.fragment);  // Take it back.
+            co_yield user;  // Hit!
+          }
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    user.fragment = std::move(macro.fragment);  // Take it back.
+  }
+}
+
+gap::generator<StmtReference> ReferenceIteratorImpl::enumerate_stmts(void) {
+  if (search_ids.empty() || fragment_ids.empty()) {
+    co_return;
+  }
+
+  unsigned fragment_offset = 0;
+  StmtReference user;
+  for (;;) {
+    // Initialize to the first statement of the fragment.
+    if (!user.fragment) {
+      if (fragment_offset >= fragment_ids.size()) {
+        co_return;
+      }
+
+      auto frag_id = fragment_ids[fragment_offset++];
+      user.fragment = ep->FragmentFor(ep, frag_id);
+      if (!user.fragment) {
+        continue;
+      }
+
+      user.offset = 0u;
+
+    // Skip to the next statement.
+    } else {
+      ++user.offset;
+    }
+
+    // We've exhausted the statements in this fragment; skip to the next
+    // fragment.
+    if (user.offset >= user.fragment->num_stmts) {
+      user.fragment.reset();
+      user.offset = 0u;
+      continue;
+    }
+
+    Stmt stmt(std::move(user.fragment), user.offset);
+    switch (stmt.kind()) {
+      // Has to match with what is supported by `ReferencedDecl` in
+      // `bin/Index/Util.cpp`.
+      case StmtKind::DECL_REF_EXPR:
+      case StmtKind::MEMBER_EXPR:
+      case StmtKind::CXX_CONSTRUCT_EXPR:
+      case StmtKind::CXX_NEW_EXPR:
+      case StmtKind::GOTO_STMT:
+      case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+      case StmtKind::BUILTIN_BIT_CAST_EXPR:
+      case StmtKind::C_STYLE_CAST_EXPR:
+      case StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+      case StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+      case StmtKind::CXX_CONST_CAST_EXPR:
+      case StmtKind::CXX_DYNAMIC_CAST_EXPR:
+      case StmtKind::CXX_REINTERPRET_CAST_EXPR:
+      case StmtKind::CXX_STATIC_CAST_EXPR:
+      case StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+
+      // TODO(pag): Do we want implicit casts? They end up being quite "verbose"
+      //            in terms of quantities of outputs. If so, make sure to
+      //            update `ReferencedDecl`.
+      // case StmtKind::IMPLICIT_CAST_EXPR:
+
+        if (std::optional<Decl> ref_decl = stmt.referenced_declaration()) {
+          PackedDeclarationId referenced_id = ref_decl->id();
+          for (RawEntityId search_id : search_ids) {
+            if (referenced_id == search_id) {
+              user.fragment = std::move(stmt.fragment);  // Take it back.
+              co_yield user;
+            }
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    user.fragment = std::move(stmt.fragment);  // Take it back.
+  }
+}
+
+Stmt StmtReference::statement(void) && noexcept {
   return Stmt(std::move(fragment), offset);
 }
 
-Stmt Reference::statement(void) const & noexcept {
+Stmt StmtReference::statement(void) const & noexcept {
   return Stmt(fragment, offset);
 }
 
-Reference::operator Stmt(void) && noexcept {
+StmtReference::operator Stmt(void) && noexcept {
   return Stmt(std::move(fragment), offset);
 }
 
-Reference::operator Stmt(void) const & noexcept {
+StmtReference::operator Stmt(void) const & noexcept {
   return Stmt(fragment, offset);
+}
+
+Macro MacroReference::macro(void) && noexcept {
+  return Macro(std::move(fragment), offset);
+}
+
+Macro MacroReference::macro(void) const & noexcept {
+  return Macro(fragment, offset);
+}
+
+MacroReference::operator Macro(void) && noexcept {
+  return Macro(std::move(fragment), offset);
+}
+
+MacroReference::operator Macro(void) const & noexcept {
+  return Macro(fragment, offset);
 }
 
 }  // namespace mx

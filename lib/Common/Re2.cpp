@@ -54,7 +54,7 @@ RegexQuery::RegexQuery(std::string pattern)
 
 RegexQuery::~RegexQuery(void) {}
 
-void RegexQuery::ForEachMatch(
+void RegexQuery::for_each_match(
     std::string_view source,
     std::function<bool(
         std::string_view /* match */,
@@ -66,7 +66,7 @@ void RegexQuery::ForEachMatch(
 }
 
 // Returns the underlying pattern.
-std::string_view RegexQuery::Pattern(void) const {
+std::string_view RegexQuery::pattern(void) const {
   if (impl) {
     // NOTE(pag): Need to remove the wrapping `(` and `)`.
     return std::string_view(impl->pattern).substr(1u, impl->pattern.size() - 2u);
@@ -76,7 +76,7 @@ std::string_view RegexQuery::Pattern(void) const {
 }
 
 // Returns `true` if we successfully compiled this regular expression.
-bool RegexQuery::IsValid(void) const {
+bool RegexQuery::is_valid(void) const {
   return impl && impl->IsValid();
 }
 
@@ -103,7 +103,7 @@ RegexQuery::RegexQuery(std::string pattern)
 
 RegexQuery::~RegexQuery(void) {}
 
-void RegexQuery::ForEachMatch(
+void RegexQuery::for_each_match(
     std::string_view source,
     std::function<bool(
         std::string_view /* match */,
@@ -111,18 +111,15 @@ void RegexQuery::ForEachMatch(
         unsigned /* end_offset */)> cb) const {}
 
 // Returns the underlying pattern.
-std::string_view RegexQuery::Pattern(void) const {
+std::string_view RegexQuery::pattern(void) const {
     return {};
 }
 
 // Returns `true` if we successfully compiled this regular expression.
-bool RegexQuery::IsValid(void) const {
+bool RegexQuery::is_valid(void) const {
   return false;
 }
 
 }  // namespace mx
 
-
-
 #endif   // MX_DISABLE_RE2
-

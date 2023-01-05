@@ -12,8 +12,12 @@
 #include <string>
 #include <vector>
 
+#include <gap/core/generator.hpp>
+
 namespace mx {
 
+class File;
+class Fragment;
 class RegexQueryImpl;
 class RegexQueryMatch;
 
@@ -42,17 +46,23 @@ class RegexQuery final {
   // Search for matches in `source`. Each match is returned as a string
   // view, corresponding to the range `[begin_offset, end_offset)` in `source`.
   // `match` also points into `source`.
-  void ForEachMatch(
+  void for_each_match(
       std::string_view source,
       std::function<bool(std::string_view /* match */,
                          unsigned /* begin_offset */,
                          unsigned /* end_offset */)> cb) const;
 
   // Returns the underlying pattern.
-  std::string_view Pattern(void) const;
+  std::string_view pattern(void) const;
 
   // Returns `true` if we successfully compiled this regular expression.
-  bool IsValid(void) const;
+  bool is_valid(void) const;
+
+  // Match this regular expression against a file.
+  gap::generator<RegexQueryMatch> match_fragments(const File &) const;
+
+  // Match this regular expression against a fragment.
+  gap::generator<RegexQueryMatch> match_fragments(const Fragment &) const;
 };
 
 }  // namespace mx

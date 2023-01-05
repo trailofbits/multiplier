@@ -45,7 +45,7 @@ class RegexQueryResultImpl final {
   unsigned next_match_index{0};
 
   // List of fragments that might match.
-  std::vector<RawEntityId> fragment_ids;
+  FragmentIdList fragment_ids;
 
   using Ptr = std::shared_ptr<RegexQueryResultImpl>;
 
@@ -53,12 +53,12 @@ class RegexQueryResultImpl final {
 
   RegexQueryResultImpl(
       const RegexQuery &re_, EntityProvider::Ptr ep_,
-      std::vector<RawEntityId> fragment_ids);
+      FragmentIdList fragment_ids);
 
   RegexQueryResultImpl(const RegexQuery &re_, FragmentImpl::Ptr frag_);
 
   bool InitForFragment(FragmentImpl::Ptr frag_);
-  bool InitForFragment(RawEntityId frag_id);
+  bool InitForFragment(SpecificEntityId<FragmentId> frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
 

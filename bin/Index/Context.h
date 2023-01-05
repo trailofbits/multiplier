@@ -7,29 +7,21 @@
 #pragma once
 
 #include <atomic>
-#include <capnp/message.h>
 #include <cstdint>
 #include <filesystem>
-#include <kj/array.h>
-#include <map>
 #include <memory>
-#include <multiplier/PersistentMap.h>
-#include <multiplier/Types.h>
-#include <multiplier/IndexStorage.h>
-#include <mutex>
-#include <pasta/Util/File.h>
-#include <pasta/Util/FileManager.h>
+#include <multiplier/Database.h>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <iostream>
-#include <set>
-#include <deque>
 
 #include "Codegen.h"
 #include "Executor.h"
 #include "ProgressBar.h"
+#include "Util.h"
 
+namespace pasta {
+class File;
+class TokenRange;
+}  // namespace pasta
 namespace mx {
 class Executor;
 class ProgressBar;
@@ -37,58 +29,15 @@ enum class DeclKind : unsigned char;
 }  // namespace mx
 namespace indexer {
 
-enum WorkerId : unsigned;
-
-class GlobalIndexingState;
 class CodeGenerator;
-
-struct EntityIdMap final : public std::unordered_map<const void *, mx::EntityId> {};
-struct FileIdMap final : public std::unordered_map<pasta::File, mx::RawEntityId> {};
-struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {};
-using TypeKey = std::pair<const void *, uint32_t>;
-struct TypeIdMap final : public std::map<TypeKey, mx::EntityId> {};
-struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
-
-// State that lives at least as long as the server itself.
-class alignas(64) WorkerIndexingState {
- public:
-  sqlite::Connection db;
-
-  // Access to the database, shared with the API.
-  mx::IndexStorage storage;
-
-  // Worker-local next counters for IDs. There is a global version of these
-  // that is an atomic counter. There is a deliberate race condition when
-  // assigning IDs to things like fragments. There may be two or more worker
-  // threads vying to assign the same fragment different IDs, and only one can
-  // win. So, what ends up happening is that when we fail, we save off the ID
-  // that didn't get assigned, and try to use it for the next thing. In general,
-  // we want a dense ID space, as there are only so many bits allocated to
-  // differerent things inside of a packed `RawEntityId`.
-  std::optional<mx::RawEntityId> local_next_file_id;
-  std::optional<mx::RawEntityId> local_next_small_fragment_id;
-  std::optional<mx::RawEntityId> local_next_big_fragment_id;
-
-  void Flush(void);
-
-  ~WorkerIndexingState(void);
-
-  explicit WorkerIndexingState(std::filesystem::path db_path);
-
-  inline mx::IndexStorage &ClientSharedStorage(void) {
-    return storage;
-  }
-};
+class GlobalIndexingState;
+class NameMangler;
+class PendingFragment;
 
 // State that needs to live only as long as there are active indexing jobs
 // underway.
 class GlobalIndexingState {
  public:
-  std::deque<WorkerIndexingState> server_context;
-
-  inline WorkerIndexingState &PerWorkerState(WorkerId wid) {
-    return server_context[wid];
-  }
 
   // Tracks progress in parsing compile commands and turning them into compile
   // jobs.
@@ -111,39 +60,14 @@ class GlobalIndexingState {
 
   const unsigned num_workers;
 
+  // Worker pool.
   Executor executor;
-
-  // The next file ID that can be assigned. This represents an upper bound on
-  // the total number of file IDs.
-  //
-  // NOTE(pag): This is an in-memory "fast" version that is meant to hold
-  //            the next state for `IndexStorage::next_file_id`.
-  std::atomic<mx::RawEntityId> next_file_id;
-
-  // The next ID for a "small fragment." A small fragment has fewer than
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Small fragments
-  // are more common, and require fewer bits to encode token offsets inside of
-  // the packed `mx::EntityId` for tokens.
-  //
-  // NOTE(pag): This is an in-memory "fast" version that is meant to hold
-  //            the next state for `IndexStorage::next_small_fragment_id`.
-  std::atomic<mx::RawEntityId> next_small_fragment_id;
-
-  // The next ID for a "big fragment." A big fragment has at least
-  // `mx::kNumTokensInBigFragment` tokens (likely 2^16) in it. Big fragments
-  // are less common, so we reserve space for fewer of them (typically there is
-  // a maximum of 2^16 big fragments allowed). Big fragments require more bits
-  // to represent token offsets inside of the packed `mx::EntityId` for tokens,
-  // but because we reserve the low ID space for big fragment IDs, we know that
-  // we need fewer bits to represent the fragment IDs. Thus, we trade fragment
-  // bit for token offset bits.
-  //
-  // NOTE(pag): This is an in-memory "fast" version that is meant to hold
-  //            the next state for `IndexStorage::next_big_fragment_id`.
-  std::atomic<mx::RawEntityId> next_big_fragment_id;
 
   // MLIR code generator.
   CodeGenerator codegen;
+
+  // Write access to the index database.
+  mx::DatabaseWriter database;
 
   explicit GlobalIndexingState(std::filesystem::path db_path,
                                const Executor &exe_);
@@ -152,48 +76,42 @@ class GlobalIndexingState {
 
   void InitializeProgressBars(void);
 
-  // Get or create a file ID for the file at `file_path` with contents
-  // `contents_hash`.
-  std::pair<mx::RawEntityId, bool> GetOrCreateFileId(
-      WorkerId worker_id, std::filesystem::path file_path,
-      const std::string &contents_hash);
+  // Persist a file. Our representation includes stuff not in the file to enable
+  // us to improve performance of common operations, like search. That is, we
+  // could store a file as a list of tokens, where each token has its own data;
+  // however, we want to able to run regular expression searches over files, and
+  // so it's convenient to not have to reconstruct the file data from the tokens
+  // for every such query. Similarly, we often want to map from matches in files
+  // to matches in fragments, and so we create and persist a mapping of file
+  // offsets to line numbers here to help us with those translations later.
+  void PersistFile(mx::SpecificEntityId<mx::FileId> file_id,
+                   const pasta::File &file);
 
-  // Get or create a code ID for the top-level declarations that hash to
-  // `code_hash`.
-  std::pair<mx::RawEntityId, bool> GetOrCreateFragmentId(
-      WorkerId worker_id, const std::string &code_hash,
-      uint64_t num_tokens);
-
-  // Save the serialized contents of a file as a token list.
-  void PutSerializedFile(WorkerId worker_id_, mx::RawEntityId file_id,
-                         std::string);
-
-  // Save the serialized top-level entities and the parsed tokens.
-  void PutSerializedFragment(WorkerId worker_id_, mx::RawEntityId id,
-                             std::string);
-
-  // Link fragment declarations.
-  void LinkDeclarations(WorkerId worker_id_, mx::RawEntityId a,
-                        mx::RawEntityId b);
-
-  // Link the mangled name of something to its entity ID.
-  void LinkMangledName(WorkerId worker_id_, const std::string &name,
-                       mx::RawEntityId eid);
-
-  // Link an entity to the fragment that uses the entity.
-  void LinkUseInFragment(WorkerId worker_id_, mx::RawEntityId use,
-                         mx::RawEntityId user);
-
-  // Link a direct reference to an entity from another entity.
-  void LinkReferenceInFragment(WorkerId worker_id_, mx::RawEntityId use,
-                               mx::RawEntityId user);
-
-  // Save an entries of the form `(file_id, line_number, fragment_id)` over
-  // the inclusive range `[start_line, end_line]` so that we can figure out
-  // which fragments overlap which lines.
-  void PutFragmentLineCoverage(WorkerId worker_id_, mx::RawEntityId file_id,
-                               mx::RawEntityId fragment_id,
-                               unsigned start_line, unsigned end_line);
+  // Persist a fragment. A fragment is Multiplier's "unit of granularity" of
+  // deduplication and indexing. It roughly corresponds to a sequence of one-or-
+  // more syntactically overlapping "top-level declarations." For us, a top-
+  // level declaration is one that only nested inside of a namespace, a linkage
+  // specifier, a translation unit, etc. Thus, things like global variables,
+  // functions, and classes are all top-level declarations. These things tend
+  // to contain lots of other declarations/statements, and those all get lumped
+  // into and persisted a TLD's fragment.
+  //
+  // Fragments separate out their lists of persistent entities. This enables
+  // some downstream benefits. For example, all declarations are persisted in a
+  // separate list from all statements. This allows us to more easily jump into
+  // the middle of the "sub-AST" persisted in a fragment. For example, if we
+  // want to find all `VarDecl`s, we can iterate the list of declarations, check
+  // the decl kinds, and then yield only the discovered `VarDecl`s. No recursive
+  // visitor needed!
+  //
+  // Fragments also store things like the macro substitution tree, and parsed
+  // tokens associated with the covered declarations/statements. This is
+  // partially because our serialized decls/stmts/etc. reference these tokens,
+  // and partially so that we can do things like print out fragments, or chunks
+  // thereof.
+  void PersistFragment(const pasta::AST &ast, const pasta::TokenRange &tokens,
+                       NameMangler &mangler, EntityIdMap &entity_ids,
+                       PendingFragment &fragment);
 };
 
 }  // namespace indexer

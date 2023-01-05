@@ -51,7 +51,7 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   }
 
   inline static gap::generator<CXXDeductionGuideDecl> containing(const Token &tok) {
-    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
       if(auto d = from(*ctx)) {
         co_yield *d;
       }
@@ -59,8 +59,9 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : CXXDeductionGuideDecl::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : CXXDeductionGuideDecl::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

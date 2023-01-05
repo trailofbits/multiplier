@@ -8,21 +8,26 @@
 
 #include <optional>
 
+#include "Entities/Macro.h"
 #include "Entities/Stmt.h"
 
 namespace mx {
 
 class Decl;
+class File;
+class ReferenceIteratorImpl;
 
-class Reference {
+// A reference from a statement to a declaration.
+class StmtReference {
  private:
   friend class Fragment;
   friend class Decl;
+  friend class ReferenceIteratorImpl;
 
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset{0u};
 
-  Reference(void) = default;
+  StmtReference(void) = default;
 
  public:
 
@@ -30,6 +35,25 @@ class Reference {
   Stmt statement(void) const & noexcept;
   operator Stmt(void) && noexcept;
   operator Stmt(void) const & noexcept;
+};
+
+// A reference
+class MacroReference {
+ private:
+  friend class Fragment;
+  friend class File;
+  friend class ReferenceIteratorImpl;
+
+  std::shared_ptr<const FragmentImpl> fragment;
+  unsigned offset{0u};
+
+  MacroReference(void) = default;
+
+ public:
+  Macro macro(void) && noexcept;
+  Macro macro(void) const & noexcept;
+  operator Macro(void) && noexcept;
+  operator Macro(void) const & noexcept;
 };
 
 }  // namespace mx

@@ -8,9 +8,10 @@
 
 #include <cassert>
 #include <multiplier/Entities/Attr.h>
+#include <multiplier/Entities/Decl.h>
 #include <multiplier/Entities/Designator.h>
+#include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Type.h>
-#include <multiplier/Macro.h>
 
 #include "File.h"
 #include "Re2.h"
@@ -20,15 +21,7 @@ namespace mx {
 
 // Return the list of fragments in a file.
 gap::generator<Fragment> Fragment::in(const File &file) {
-  auto &ep = file.impl->ep;
-  auto fragment_ids = ep->ListFragmentsInFile(ep, file.impl->file_id);
-  auto num_fragments = fragment_ids.size();
-  for(size_t i = 0; i < num_fragments; ++i) {
-    auto frag = ep->FragmentFor(ep, fragment_ids[i]);
-    if (frag) {
-      co_yield frag;
-    }
-  }
+  return file.fragments();
 }
 
 // Return the fragment containing a query match.
@@ -62,7 +55,7 @@ Fragment Fragment::containing(const Designator &entity) {
 }
 
 std::optional<Fragment> Fragment::containing(const Token &entity) {
-  if (auto frag = dynamic_cast<const PackedFragmentImpl *>(entity.impl.get())) {
+  if (auto frag = entity.impl->OwningFragment()) {
     std::shared_ptr<const FragmentImpl> ptr(entity.impl, frag);
     return Fragment(std::move(ptr));
   } else {
@@ -70,21 +63,21 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
   }
 }
 
-Fragment Fragment::containing(const MacroSubstitution &entity) {
-  return Fragment(entity.impl);
+Fragment Fragment::containing(const Macro &entity) {
+  return Fragment(entity.fragment);
 }
 
 Fragment Fragment::containing(const UseBase &use) {
   return Fragment(use.fragment);
 }
 
-Fragment Fragment::containing(const Reference &ref) {
+Fragment Fragment::containing(const StmtReference &ref) {
   return Fragment(ref.fragment);
 }
 
 // Return the ID of this fragment.
-EntityId Fragment::id(void) const noexcept {
-  return EntityId(FragmentId{impl->fragment_id});
+SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
+  return FragmentId{impl->fragment_id};
 }
 
 // The range of file tokens in this fragment.
@@ -104,7 +97,8 @@ TokenRange Fragment::file_tokens(void) const {
     return TokenRange();
   }
 
-  auto file = impl->ep->FileFor(impl->ep, first_fid.file_id);
+  FileId fid(first_fid.file_id);
+  auto file = impl->ep->FileFor(impl->ep, fid);
   auto raw_file = file.get();
   return TokenRange(
       raw_file->TokenReader(std::move(file)),
@@ -112,40 +106,24 @@ TokenRange Fragment::file_tokens(void) const {
 }
 
 // The range of parsed tokens in this fragment.
-TokenList Fragment::parsed_tokens(void) const {
-  return TokenList(impl->TokenReader(impl), impl->num_parsed_tokens);
-}
-
-// Return the pre-processed code from this fragment.
-std::optional<MacroSubstitution> Fragment::preprocessed_code(void) const & {
-  if (impl->Fragment().getHadSubstitutionError()) {
-    return std::nullopt;
-  } else {
-    return MacroSubstitution(
-        impl, 0u, MacroSubstitutionKind::PREPROCESSED_CODE);
+TokenRange Fragment::parsed_tokens(void) const {
+  if (!impl->num_parsed_tokens) {
+    return TokenRange();
   }
-}
 
-// Return the pre-processed code from this fragment.
-std::optional<MacroSubstitution> Fragment::preprocessed_code(void) const && {
-  if (impl->Fragment().getHadSubstitutionError()) {
-    return std::nullopt;
-  } else {
-    return MacroSubstitution(
-        std::move(impl), 0u, MacroSubstitutionKind::PREPROCESSED_CODE);
-  }
+  return TokenRange(impl->ParsedTokenReader(impl), 0u, impl->num_parsed_tokens);
 }
 
 // Return the list of top-level declarations in this fragment.
 std::vector<Decl> Fragment::top_level_declarations(void) const {
   std::vector<Decl> decls;
-  TopLevelDeclListReader decl_ids = impl->Fragment().getTopLevelDeclarations();
+  EntityIdListReader decl_ids = impl->Fragment().getTopLevelDeclarations();
   decls.reserve(decl_ids.size());
-  for (auto eid_ : decl_ids) {
+  for (RawEntityId eid_ : decl_ids) {
     EntityId eid(eid_);
     VariantId vid = eid.Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
-      auto decl_id = std::get<DeclarationId>(vid);
+      DeclarationId decl_id = std::get<DeclarationId>(vid);
       if (decl_id.fragment_id == impl->fragment_id) {
         decls.emplace_back(impl, decl_id.offset);
       } else {
@@ -156,6 +134,49 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
     }
   }
   return decls;
+}
+
+// Return the list of top-level macros in this fragment.
+// This will return a mix of `Macro` or `Token` values.
+std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
+  std::vector<std::variant<Macro, Token>> macros;
+  EntityIdListReader macro_ids = impl->Fragment().getTopLevelMacros();
+  macros.reserve(macro_ids.size());
+  for (RawEntityId eid_ : macro_ids) {
+    EntityId eid(eid_);
+    VariantId vid = eid.Unpack();
+    if (std::holds_alternative<MacroId>(vid)) {
+      MacroId macro_id = std::get<MacroId>(vid);
+      if (macro_id.fragment_id == impl->fragment_id) {
+        macros.emplace_back(Macro(impl, macro_id.offset));
+      } else {
+        assert(false);
+      }
+
+    } else if (std::holds_alternative<MacroTokenId>(vid)) {
+      MacroTokenId macro_id = std::get<MacroTokenId>(vid);
+      if (macro_id.fragment_id == impl->fragment_id) {
+        macros.emplace_back(Token(impl->MacroTokenReader(impl), macro_id.offset));
+      } else {
+        assert(false);
+      }
+
+    } else if (std::holds_alternative<ParsedTokenId>(vid)) {
+      ParsedTokenId macro_id = std::get<ParsedTokenId>(vid);
+      if (macro_id.fragment_id == impl->fragment_id) {
+        macros.emplace_back(Token(impl->ParsedTokenReader(impl), macro_id.offset));
+      } else {
+        assert(false);
+      }
+
+    } else if (std::holds_alternative<FileTokenId>(vid)) {
+      assert(false);
+
+    } else {
+      assert(false);
+    }
+  }
+  return macros;
 }
 
 // Returns source IR for the fragment.

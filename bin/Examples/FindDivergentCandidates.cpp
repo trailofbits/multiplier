@@ -75,7 +75,7 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
           std::vector<mx::ArraySubscriptExpr> mem_accesses;
           std::vector<mx::Stmt> outside_uses;
 
-          for (const mx::Reference ref : decl.references()) {
+          for (const mx::StmtReference ref : decl.references()) {
             mx::Stmt ref_stmt = ref.statement();
             if (auto parent = ref_stmt.parent_statement()) { 
               if (parent->kind() == mx::StmtKind::IMPLICIT_CAST_EXPR) {
@@ -154,12 +154,12 @@ extern "C" int main(int argc, char *argv[]) {
       std::cerr << "Invalid file id " << FLAGS_file_id << std::endl;
       return EXIT_FAILURE;
     }
-    for (mx::Fragment fragment : mx::Fragment::in(*file)) {
+    for (mx::Fragment fragment : file->fragments()) {
       FindDivergentCandidates(std::move(fragment));
     }
   } else {
-    for (mx::File file : mx::File::in(index)) {
-      for (mx::Fragment fragment : mx::Fragment::in(file)) {
+    for (mx::File file : index.files()) {
+      for (mx::Fragment fragment : file.fragments()) {
         FindDivergentCandidates(std::move(fragment));
       }
     }

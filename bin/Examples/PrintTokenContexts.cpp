@@ -71,7 +71,7 @@ extern "C" int main(int argc, char *argv[]) {
   for (mx::Token tok : fragment->parsed_tokens()) {
     for (auto context = mx::TokenContext::of(tok); context;
          context = context->parent()) {
-      contexts.emplace(context->id(), context.value());
+      contexts.emplace(context->index_in_fragment(), context.value());
     }
 
     os
@@ -97,6 +97,10 @@ extern "C" int main(int argc, char *argv[]) {
       bgcolor = " bgcolor=\"cadetblue1\"";
       kind_name = mx::EnumeratorName(type->kind());
 
+    } else if (auto attr = context.as_attribute()) {
+      bgcolor = " bgcolor=\"cornflowerblue\"";
+      kind_name = mx::EnumeratorName(attr->kind());
+
     } else if (context.is_alias()) {
       bgcolor = " bgcolor=\"deepskyblue3\"";
 
@@ -105,7 +109,7 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     os
-        << "c" << context.id()
+        << "c" << context.index_in_fragment()
         << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" "
         << "border=\"1\"><TR><TD" << bgcolor << ">";
 
@@ -116,12 +120,12 @@ extern "C" int main(int argc, char *argv[]) {
 
     if (auto parent_context = context.parent()) {
       os
-          << "c" << context.id() << " -> c" << parent_context->id() << ";\n";
+          << "c" << context.index_in_fragment() << " -> c" << parent_context->index_in_fragment() << ";\n";
     }
 
     if (auto alias_context = context.aliasee()) {
       os
-          << "c" << context.id() << " -> c" << alias_context->id()
+          << "c" << context.index_in_fragment() << " -> c" << alias_context->index_in_fragment()
           << " [style=dashed];\n";
     }
   }
@@ -130,7 +134,7 @@ extern "C" int main(int argc, char *argv[]) {
   for (mx::Token tok : fragment->parsed_tokens()) {
     if (auto context = mx::TokenContext::of(tok)) {
       os
-          << "tokens:t" << (i++) << " -> c" << context->id() << ";\n";
+          << "tokens:t" << (i++) << " -> c" << context->index_in_fragment() << ";\n";
     }
   }
 

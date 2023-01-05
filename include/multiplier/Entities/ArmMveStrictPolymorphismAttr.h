@@ -43,7 +43,7 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
   }
 
   inline static gap::generator<ArmMveStrictPolymorphismAttr> containing(const Token &tok) {
-    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
       if(auto d = from(*ctx)) {
         co_yield *d;
       }
@@ -51,8 +51,9 @@ class ArmMveStrictPolymorphismAttr : public TypeAttr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : ArmMveStrictPolymorphismAttr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : ArmMveStrictPolymorphismAttr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

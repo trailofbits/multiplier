@@ -28,34 +28,34 @@ class InvalidEntityProvider final : public EntityProvider {
 
   void VersionNumberChanged(unsigned) final;
 
-  FilePathList ListFiles(const Ptr &) final;
+  FilePathMap ListFiles(const Ptr &) final;
 
-  std::vector<EntityId> ListFragmentsInFile(const Ptr &, RawEntityId id);
+  FragmentIdList ListFragmentsInFile(
+      const Ptr &, SpecificEntityId<FileId> id);
 
-  std::shared_ptr<const FileImpl> FileFor(const Ptr &, RawEntityId id) final;
+  std::shared_ptr<const FileImpl> FileFor(
+      const Ptr &, SpecificEntityId<FileId> id) final;
 
   // Download a fragment by its unique ID.
   std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, RawEntityId id) final;
+  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
 
-  gap::generator<WeggliQueryMatch>
-  Query(const Ptr &, const WeggliQuery &) final;
+  // Return the list of fragments covering / overlapping some lines in a file.
+  FragmentIdList FragmentsCoveringLines(
+      const Ptr &, PackedFileId file, std::vector<unsigned> lines) final;
 
-  gap::generator<RegexQueryMatch> Query(
-      const Ptr &, const RegexQuery &) final;
-
-  std::vector<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+  RawEntityIdList Redeclarations(
+      const Ptr &, SpecificEntityId<DeclarationId>) final;
 
   void FillUses(const Ptr &, RawEntityId eid,
-                std::vector<RawEntityId> &redecl_ids_out,
-                std::vector<RawEntityId> &fragment_ids_out) final;
+                RawEntityIdList &redecl_ids_out,
+                FragmentIdList &fragment_ids_out) final;
 
   void FillReferences(const Ptr &, RawEntityId eid,
-                      std::vector<RawEntityId> &redecl_ids_out,
-                      std::vector<RawEntityId> &fragment_ids_out) final;
+                      RawEntityIdList &redecl_ids_out,
+                      FragmentIdList &fragment_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
-                  mx::DeclCategory category,
                   std::vector<RawEntityId> &ids_out) final;
 };
 

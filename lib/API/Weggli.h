@@ -33,12 +33,12 @@ class WeggliQueryResultImpl final {
   unsigned next_weggli_match{0};
 
   // List of fragments in this file.
-  std::vector<RawEntityId> fragments;
+  FragmentIdList fragments;
 
   ~WeggliQueryResultImpl(void) noexcept;
 
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
-                        std::vector<RawEntityId> fragment_ids);
+                        FragmentIdList fragment_ids);
 
   WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImpl::Ptr frag_);
 

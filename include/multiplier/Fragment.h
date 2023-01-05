@@ -9,10 +9,11 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <unordered_map>
+#include <variant>
 #include <vector>
 
 #include "File.h"
+#include "Types.h"
 
 namespace mx {
 
@@ -24,14 +25,22 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class InvalidEntityProvider;
+class ReferenceIteratorImpl;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryMatch;
 class Stmt;
 class Token;
+class Macro;
 class Type;
 class WeggliQuery;
 class WeggliQueryMatch;
+class WeggliQueryResult;
+class WeggliQueryResultImpl;
+class WeggliQueryResultIterator;
+class WeggliQueryResultIterator;
+
+using MacroOrToken = std::variant<Macro, Token>;
 
 // A fragment of code containing one or more top-level declarations, the
 // associated declaration and statement entities, macro expansion/substitution
@@ -44,13 +53,15 @@ class Fragment {
   friend class File;
   friend class FragmentImpl;
   friend class Index;
-  friend class Reference;
+  friend class Macro;
+  friend class ReferenceIteratorImpl;
   friend class RemoteEntityProvider;
+  friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class Stmt;
   friend class Token;
-  friend class MacroSubstitution;
   friend class Type;
+  friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
 
   std::shared_ptr<const FragmentImpl> impl;
@@ -60,6 +71,7 @@ class Fragment {
 
  public:
   // Return the list of fragments in a file.
+  [[deprecated("Use File::fragments() instead.")]]
   static gap::generator<Fragment> in(const File &);
 
   // Return the fragment containing a query match.
@@ -73,25 +85,24 @@ class Fragment {
   static Fragment containing(const Attr &);
   static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
-  static Fragment containing(const MacroSubstitution &);
+  static Fragment containing(const Macro &);
   static Fragment containing(const UseBase &);
-  static Fragment containing(const Reference &);
+  static Fragment containing(const StmtReference &);
 
   // Return the entity ID of this fragment.
-  EntityId id(void) const noexcept;
+  SpecificEntityId<FragmentId> id(void) const noexcept;
 
   // The range of file tokens in this fragment.
   TokenRange file_tokens(void) const;
 
   // The range of parsed tokens in this fragment.
-  TokenList parsed_tokens(void) const;
-
-  // Return the pre-processed code from this fragment.
-  std::optional<MacroSubstitution> preprocessed_code(void) const &;
-  std::optional<MacroSubstitution> preprocessed_code(void) const &&;
+  TokenRange parsed_tokens(void) const;
 
   // Return the list of top-level declarations in this fragment.
   std::vector<Decl> top_level_declarations(void) const;
+
+  // Return the list of top-level macros or macro tokens in this code.
+  std::vector<MacroOrToken> preprocessed_code(void) const;
 
   // Returns source IR for the fragment.
   std::optional<std::string_view> source_ir(void) const noexcept;

@@ -33,6 +33,8 @@ class Attr {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
@@ -63,7 +65,7 @@ class Attr {
     return c.as_attribute();
   }
 
-  EntityId id(void) const;
+  SpecificEntityId<AttributeId> id(void) const;
   gap::generator<Use<AttrUseSelector>> uses(void) const;
 
  protected:
@@ -79,7 +81,7 @@ class Attr {
   }
 
   inline static gap::generator<Attr> containing(const Token &tok) {
-    for(auto ctx = TokenContext::of(tok); ctx.has_value(); ctx = ctx->parent()) {
+    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
       if(auto d = from(*ctx)) {
         co_yield *d;
       }
@@ -87,8 +89,9 @@ class Attr {
   }
 
   inline bool contains(const Token &tok) {
-    for(auto &parent : Attr::containing(tok)) {
-      if(parent.id() == id()) { return true; }
+    auto id_ = id();
+    for (auto &parent : Attr::containing(tok)) {
+      if (parent.id() == id_) { return true; }
     }
     return false;
   }

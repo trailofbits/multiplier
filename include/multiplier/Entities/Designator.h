@@ -21,6 +21,7 @@
 #include "../Use.h"
 
 #include "DeclUseSelector.h"
+#include "PseudoKind.h"
 
 namespace mx {
 class Designator;
@@ -34,6 +35,8 @@ class Designator {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
+  friend class Macro;
+  friend class ReferenceIteratorImpl;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;

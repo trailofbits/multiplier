@@ -18,6 +18,7 @@ class CXXBaseSpecifier;
 class Decl;
 class Designator;
 class FragmentImpl;
+class Macro;
 class Stmt;
 class TemplateArgument;
 class TemplateParameterList;
@@ -207,8 +208,25 @@ class DerivedEntityRange {
   }
 };
 
+// An edge from tokens to AST nodes containing those tokens. Only parsed tokens
+// have token contexts. Multiple contexts may share the same parents. The token
+// context tree is a sort of DAG, via mechanism called "aliases." This is to
+// handle the challenges of C's bizarre declaration syntax. For example:
+//
+//   int foo(void (*func_ptr)(...));
+//
+// This declares `func_ptr` as a function pointer-typed parameter of `foo`. The
+// token contexts for this would have `func_ptr` link to something like:
+//
+//   foo ----------------------------------------------------.
+//   ...                                                     |
+//   func_ptr -> ParmVarDecl -> FunctionType -> ParmVarDecl -+-> FunctionDecl
+//                    |                              ^
+//                    '----------- alias ------------'
 class TokenContext {
  private:
+  friend class Token;
+
   std::shared_ptr<const FragmentImpl> impl;
 
   // Offset of this token context inside of the fragment.
@@ -236,7 +254,9 @@ class TokenContext {
     return alias_offset.has_value();
   }
 
-  inline unsigned id(void) const noexcept {
+  // NOTE(pag): This is sort of an internal API, though it makes it convenient
+  //            to identify token contexts.
+  inline unsigned index_in_fragment(void) const noexcept {
     return offset;
   }
 
@@ -244,6 +264,7 @@ class TokenContext {
   //
   // NOTE(pag): This only works with parsed tokens, and not all parsed tokens
   //            are guaranteed to have a context.
+  __attribute__((deprecated("Use Token::context() instead.")))
   static std::optional<TokenContext> of(const Token &tok);
 
   // Return the declaration associated with this context, if any.

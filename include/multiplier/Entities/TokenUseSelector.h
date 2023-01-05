@@ -42,6 +42,7 @@ enum class TokenUseSelector : unsigned short {
   DEFAULT_ARGUMENT_TOKEN,
   DEFAULT_TOKEN,
   DESTROYED_TYPE_TOKEN,
+  DIRECTIVE_NAME,
   DO_TOKEN,
   DOT_TOKEN,
   ELLIPSIS_TOKEN,
@@ -63,6 +64,7 @@ enum class TokenUseSelector : unsigned short {
   GENERIC_TOKEN,
   GETTER_NAME_TOKEN,
   GOTO_TOKEN,
+  HASH,
   IDENTIFIER_TOKEN,
   IF_TOKEN,
   INSTANCE_VARIABLE_L_BRACE_TOKEN,
@@ -81,6 +83,7 @@ enum class TokenUseSelector : unsigned short {
   LEFT_BRACKET_TOKEN,
   LEFT_TOKEN,
   MEMBER_TOKEN,
+  NAME,
   NAME_TOKEN,
   NAMESPACE_KEY_TOKEN,
   NAMESPACE_TOKEN,
@@ -125,6 +128,7 @@ enum class TokenUseSelector : unsigned short {
   UD_SUFFIX_TOKEN,
   USED_TOKEN,
   USING_TOKEN,
+  VARIADIC_DOTS,
   VARIANCE_TOKEN,
   WHILE_TOKEN,
 };
@@ -134,7 +138,7 @@ inline static const char *EnumerationName(TokenUseSelector) {
 }
 
 inline static constexpr unsigned NumEnumerators(TokenUseSelector) {
-  return 115;
+  return 119;
 }
 
 const char *EnumeratorName(TokenUseSelector);

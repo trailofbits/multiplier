@@ -7,10 +7,11 @@
 #pragma once
 
 #include <memory>
+#include <multiplier/Entities/FileUseSelector.h>
+#include <multiplier/Reference.h>
 #include <string_view>
 #include <gap/core/generator.hpp>
 
-#include "Reference.h"
 #include "Token.h"
 
 namespace mx {
@@ -23,8 +24,11 @@ class FileLocationCacheImpl;
 class Fragment;
 class FragmentImpl;
 class Index;
+class MacroReference;
 class RegexQueryMatch;
 class WeggliQueryMatch;
+
+using FragmentIdList = std::vector<PackedFragmentId>;
 
 class FileLocationConfiguration {
  public:
@@ -38,6 +42,8 @@ class FileLocationConfiguration {
 };
 
 // Represents a cache of files to pre-computed line/column number locations.
+// The purpose of the cache is to allow us to configure a specific
+// interpretation of tab width, as well as tab stop behavior.
 class FileLocationCache {
  private:
   friend class Token;
@@ -71,10 +77,14 @@ class File {
   friend class FileLocationCache;
   friend class FileLocationCacheImpl;
   friend class FragmentImpl;
+  friend class IncludeLikeMacroDirective;
   friend class Index;
   friend class RemoteEntityProvider;
+  friend class RegexQuery;
+  friend class RegexQueryResultIterator;
+  friend class RegexQueryResultImpl;
   friend class Token;
-  friend class MacroSubstitution;
+  friend class WeggliQuery;
 
   Ptr impl;
 
@@ -84,28 +94,31 @@ class File {
  public:
 
   // Return the file containing a regex match.
-  static File containing(const RegexQueryMatch &match);
+  static std::optional<File> containing(const RegexQueryMatch &match);
 
   // Return the file containing a specific fragment.
-  static File containing(const WeggliQueryMatch &match);
+  static std::optional<File> containing(const WeggliQueryMatch &match);
 
   // Return the file containing a specific fragment.
-  static File containing(const Fragment &fragment);
-
-  // Return the file containing a specific token substitution.
-  static File containing(const MacroSubstitution &entity);
+  static std::optional<File> containing(const Fragment &fragment);
 
   // Return the file containing a specific designator.
-  static File containing(const Designator &entity);
+  static std::optional<File> containing(const Designator &entity);
 
   // Return the file containing the fragment containing a specific entity.
-  static File containing(const Decl &entity);
+  static std::optional<File> containing(const Decl &entity);
 
   // Return the file containing the fragment containing a specific entity.
-  static File containing(const Stmt &entity);
+  static std::optional<File> containing(const Stmt &entity);
 
   // Return the file containing the fragment containing a specific entity.
-  static File containing(const Type &type);
+  static std::optional<File> containing(const Type &type);
+
+  // Return the file containing the fragment containing a specific entity.
+  static std::optional<File> containing(const Attr &type);
+
+  // Return the file containing a specific token substitution.
+  static std::optional<File> containing(const Macro &entity);
 
   // Return the file containing a specific token.
   //
@@ -114,19 +127,29 @@ class File {
   static std::optional<File> containing(const Token &token);
 
   // Return all files in a given index.
+  [[deprecated("Use Index::files() instead.")]]
   static gap::generator<File> in(const Index &index);
 
   // Return the entity ID of this file.
-  EntityId id(void) const noexcept;
+  SpecificEntityId<FileId> id(void) const noexcept;
+
+  // Return a list of fragments in this file.
+  gap::generator<Fragment> fragments(void) const;
 
   // Return the list of fragment ids in the file
-  std::vector<EntityId> fragment_ids(void) const;
+  FragmentIdList fragment_ids(void) const;
 
   // Return the file tokens for the file.
-  TokenList tokens(void) const noexcept;
+  TokenRange tokens(void) const noexcept;
 
   // Return the contents of the file as a UTF-8 string.
   std::string_view data(void) const noexcept;
+
+  // Uses of this file.
+  gap::generator<Use<FileUseSelector>> uses(void) const;
+
+  // References of this file.
+  gap::generator<MacroReference> references(void) const;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();
