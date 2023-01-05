@@ -5,6 +5,8 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "File.h"
+
+#include <cassert>
 #include <multiplier/Entities/TokenKind.h>
 
 namespace mx {
