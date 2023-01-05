@@ -8,8 +8,6 @@
 
 #include "Fragment.h"
 #include "File.h"
-#include "Re2.h"
-#include "Weggli.h"
 
 #include <mutex>
 #include <unordered_map>

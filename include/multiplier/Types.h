@@ -407,7 +407,7 @@ struct EntityTypeImpl;
 #define MX_MAP_ENTITY_TYPE(id, t) \
     template <> \
     struct EntityTypeImpl<id> { \
-      using Type = t; \
+      using Entity = t; \
     }
 
 MX_MAP_ENTITY_TYPE(AttributeId, Attr);
@@ -425,7 +425,7 @@ MX_MAP_ENTITY_TYPE(TypeId, Type);
 #undef MX_MAP_ENTITY_TYPE
 
 template <typename T>
-using EntityType = typename EntityTypeImpl<T>::Type;
+using EntityType = typename EntityTypeImpl<T>::Entity;
 
 }  // namespace mx
 namespace std {

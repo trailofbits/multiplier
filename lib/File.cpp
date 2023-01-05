@@ -13,9 +13,9 @@
 #include <multiplier/Entities/Type.h>
 
 #include "Fragment.h"
-#include "Re2.h"
+#include "Re2Impl.h"
 #include "Use.h"
-#include "Weggli.h"
+#include "WeggliImpl.h"
 
 namespace mx {
 
