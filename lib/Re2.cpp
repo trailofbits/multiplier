@@ -5,6 +5,7 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Re2.h"
+
 #include <cassert>
 
 #ifndef MX_DISABLE_RE2

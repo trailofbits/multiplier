@@ -6,11 +6,12 @@
 
 #pragma once
 
-#include "Fragment.h"
-#include "multiplier/Types.h"
+#include <multiplier/Weggli.h>
 
 #include <map>
-#include <multiplier/Weggli.h>
+#include <multiplier/Types.h>
+
+#include "Fragment.h"
 
 namespace mx {
 

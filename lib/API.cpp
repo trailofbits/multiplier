@@ -23,11 +23,10 @@
 #include "File.h"
 #include "Fragment.h"
 #include "InvalidEntityProvider.h"
-#include "Re2.h"
+#include "Re2Impl.h"
 #include "Token.h"
 #include "Use.h"
 #include "Weggli.h"
-#include "../Common/Re2.h"
 
 namespace mx {
 

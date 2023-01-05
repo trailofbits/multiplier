@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <multiplier/Compress.h>
+
 #include <functional>
 #include <capnp/serialize.h>
 #include <capnp/serialize-packed.h>

@@ -11,7 +11,7 @@
 #include <multiplier/Index.h>
 #include <vector>
 
-#include "../Common/ThreadLocal.h"
+#include "ThreadLocal.h"
 
 namespace sqlite {
 class Statement;
