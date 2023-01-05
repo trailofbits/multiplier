@@ -6,20 +6,47 @@
 
 #pragma once
 
-#include "API.h"
+#include <filesystem>
+#include <memory>
+#include <multiplier/Index.h>
+#include <vector>
 
-#include "File.h"
-#include "Fragment.h"
-#include "Re2.h"
-#include "Token.h"
-#include "Use.h"
-#include "Weggli.h"
+#include "ThreadLocal.h"
 
+namespace sqlite {
+class Statement;
+}  // namespace sqlite
 namespace mx {
 
-class InvalidEntityProvider final : public EntityProvider {
+enum class DeclCategory : unsigned char;
+
+class File;
+class FileImpl;
+class FragmentImpl;
+class RegexQuery;
+class RegexQueryResultImpl;
+class WeggliQueryResultImpl;
+
+class SQLiteEntityProviderImpl;
+
+class SQLiteEntityProvider final : public EntityProvider {
+ private:
+  friend class SQLiteEntityProviderImpl;
+
+  using ImplPtr = std::shared_ptr<SQLiteEntityProviderImpl>;
+
+  const std::filesystem::path db_path;
+  ThreadLocal<SQLiteEntityProviderImpl> impl;
+
+  RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context);
+
+  void FillFragments(SQLiteEntityProviderImpl &context, sqlite::Statement &get_fragments,
+                     RawEntityId eid, RawEntityIdList &redecl_ids_out,
+                     FragmentIdList &fragment_ids_out);
+
  public:
-  virtual ~InvalidEntityProvider(void) noexcept;
+  virtual ~SQLiteEntityProvider(void) noexcept;
+  SQLiteEntityProvider(std::filesystem::path path);
 
   void ClearCache(void) final;
 
@@ -30,8 +57,7 @@ class InvalidEntityProvider final : public EntityProvider {
 
   FilePathMap ListFiles(const Ptr &) final;
 
-  FragmentIdList ListFragmentsInFile(
-      const Ptr &, SpecificEntityId<FileId> id);
+  FragmentIdList ListFragmentsInFile(const Ptr &, SpecificEntityId<FileId> id);
 
   std::shared_ptr<const FileImpl> FileFor(
       const Ptr &, SpecificEntityId<FileId> id) final;

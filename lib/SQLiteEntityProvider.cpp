@@ -7,15 +7,13 @@
 #include "SQLiteEntityProvider.h"
 
 #include <multiplier/Database.h>
-#include <multiplier/Re2.h>
 #include <multiplier/Types.h>
 
 #include "API.h"
 #include "Compress.h"
 #include "File.h"
 #include "Fragment.h"
-#include "Re2.h"
-#include "../Common/SQLiteStore.h"
+#include "SQLiteStore.h"
 
 namespace mx {
 namespace {

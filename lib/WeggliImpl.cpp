@@ -4,13 +4,13 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include "Weggli.h"
+#include "WeggliImpl.h"
 
 #include <cassert>
+#include <multiplier/Types.h>
 
 #include "File.h"
 #include "Fragment.h"
-#include "multiplier/Types.h"
 
 namespace mx {
 
