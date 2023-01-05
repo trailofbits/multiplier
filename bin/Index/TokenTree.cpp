@@ -12,6 +12,7 @@
 #include <map>
 #include <multiplier/Entities/MacroKind.h>
 #include <multiplier/Types.h>
+#include <mutex>
 #include <optional>
 #include <pasta/AST/AST.h>
 #include <pasta/AST/Forward.h>

@@ -3917,6 +3917,7 @@ void CodeGenerator::RunOnUseSet(
 
   lib_cpp_os
       << "  }\n"
+      << "  return \"<invalid>\";\n"
       << "}\n\n";
 
   os

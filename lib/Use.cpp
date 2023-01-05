@@ -103,6 +103,7 @@ const char *EnumeratorName(UseKind kind) {
     case UseKind::ATTRIBUTE: return "ATTRIBUTE";
     case UseKind::MACRO: return "MACRO";
   }
+  return "<invalid>";
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)

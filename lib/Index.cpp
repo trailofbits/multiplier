@@ -22,6 +22,7 @@ const char *EnumeratorName(IndexStatus status) {
     case IndexStatus::INDEXING_IN_PROGRESS: return "INDEXING_IN_PROGRESS";
     case IndexStatus::INDEXED: return "INDEXED";
   }
+  return "<invalid>";
 }
 
 Index::~Index(void) {}
