@@ -21,16 +21,16 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(sqlite)
 
-add_library(SQLite3 STATIC
+add_library("mx-sqlite" STATIC
   "${sqlite_SOURCE_DIR}/sqlite3.c"
 )
 
-target_include_directories(SQLite3
+target_include_directories("mx-sqlite"
   PUBLIC
-    "${sqlite_SOURCE_DIR}"
+    $<BUILD_INTERFACE:${sqlite_SOURCE_DIR}>
 )
 
-target_compile_definitions(SQLite3
+target_compile_definitions("mx-sqlite"
   PRIVATE
     $<$<CONFIG:Debug>:SQLITE_DEBUG=1>
     "-DSQLITE_ENABLE_FTS5"
@@ -46,15 +46,38 @@ target_compile_definitions(SQLite3
     "-DSQLITE_THREADSAFE=2"
 )
 
-set_target_properties(SQLite3
+# TODO(pag): Consider installing sqlite.h into the header
+
+set_target_properties("mx-sqlite"
   PROPERTIES
-    C_VISIBILITY_PRESET   default
-    CXX_VISIBILITY_PRESET default
+    LINKER_LANGUAGE
+      C
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    PUBLIC_HEADER
+      "${sqlite_SOURCE_DIR}/sqlite3.h"
+    C_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
 )
 
-add_library(SQLite::SQLite3 ALIAS SQLite3)
-
-set(SQLite3_VERSION "3.40.0")
-set(SQLite3_INCLUDE_DIRS "${sqlite_SOURCE_DIR}")
-set(SQLite3_LIBRARIES SQLite::SQLite3)
-set(SQLite3_FOUND TRUE)
+if(MX_ENABLE_INSTALL)
+  install(
+    TARGETS
+      "mx-sqlite"
+    EXPORT "${PROJECT_NAME}Targets"
+    RUNTIME
+      DESTINATION
+        "${CMAKE_INSTALL_BINDIR}"
+    LIBRARY
+      DESTINATION
+        "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE
+      DESTINATION
+        "${CMAKE_INSTALL_LIBDIR}"
+    PUBLIC_HEADER
+      DESTINATION
+        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}"
+  )
+endif(MX_ENABLE_INSTALL)
