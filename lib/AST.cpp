@@ -7,6 +7,7 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST.h>
+#include <cassert>
 
 #include "Fragment.h"
 

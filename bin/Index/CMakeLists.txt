@@ -71,7 +71,7 @@ target_link_libraries("${exe_name}"
   PRIVATE
     ${MX_BEGIN_FORCE_LOAD_GROUP}
     mx-api
-    "glog::glog"
+    glog::glog
     gflags::gflags
     concurrentqueue
     reproc++
