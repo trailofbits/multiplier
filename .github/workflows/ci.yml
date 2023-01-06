@@ -84,7 +84,6 @@ jobs:
       with:
           repository: 'trailofbits/pasta'
           path: '${{ github.workspace }}/src/pasta'
-          ref: 'a379517d414619892cc14b3602547270380bfdd4'
 
     - name: Build and install pasta
       run: |
