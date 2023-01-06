@@ -505,6 +505,18 @@ static void PersistParsedTokens(
   }
 }
 
+// Combine all parsed tokens into a string for diagnostic purposes.
+static std::string DiagnoseParsedTokens(
+    const std::vector<pasta::Token> &parsed_tokens) {
+  std::stringstream ss;
+  auto sep = "";
+  for (const pasta::Token &tok : parsed_tokens) {
+    ss << sep << tok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
 // Persist the token tree, which is a tree of substitutions, i.e. before/after
 // macro use/expansion, or x-macro file inclusion.
 //
@@ -545,8 +557,11 @@ static void PersistTokenTree(
       dt.set(i, DerivedTokenId(em, ft.value()));
 
     } else {
+      auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
-          << "Missing parsed/file token for token node";
+          << "Missing parsed/file token for token node in source file "
+          << ast.MainFile().Path().generic_string() << " with parsed tokens "
+          << DiagnoseParsedTokens(parsed_tokens);
     }
 
     ++i;
@@ -587,8 +602,11 @@ static void PersistTokenTree(
       pto2i.set(i, mi);
       mti2po.set(mi, i);
     } else {
+      auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
-          << "TokenTree nodes didn't cover all parsed tokens";
+          << "TokenTree nodes didn't cover all parsed tokens in source file "
+          << ast.MainFile().Path().generic_string() << " with parsed tokens "
+          << DiagnoseParsedTokens(parsed_tokens);
     }
 
     // Introduce a mapping of macro tokens back to parsed tokens.
