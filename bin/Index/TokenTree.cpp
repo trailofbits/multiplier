@@ -1327,7 +1327,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
   body = CreateSubstitution(mx::MacroKind::DEFINE_DIRECTIVE);
   body->macro = def;
 
-  for (auto &node : def.Body()) {
+  for (pasta::Macro node : def.Body()) {
     std::optional<pasta::MacroToken> tok = pasta::MacroToken::From(node);
     if (!tok) {
       continue;
@@ -1335,6 +1335,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
 
     D( std::cerr << indent << "body token: " << tok->Data() << '\n'; )
 
+    pasta::TokenKind tok_kind = tok->TokenKind();
     TokenInfo &info = tokens_alloc.emplace_back();
     info.file_tok = tok->FileLocation();
     info.parsed_tok = tok->ParsedLocation();
@@ -1342,7 +1343,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
     info.is_part_of_sub = info.file_tok.has_value();
     info.category = TokenInfo::kMissingFileToken;
 
-    switch (tok->TokenKind()) {
+    switch (tok_kind) {
       case pasta::TokenKind::kEndOfFile:
       case pasta::TokenKind::kEndOfDirective:
         continue;
