@@ -71,10 +71,10 @@ class WriterThreadState {
       const std::filesystem::path &path)
       : db(path) {}
 
-  RawEntityId GetOrCreateFileId(RawEntityId proposed_index,
+  RawEntityId GetOrCreateFileId(RawEntityId proposed_id,
                                 const std::string &hash);
 
-  RawEntityId GetOrCreateFragmentId(RawEntityId proposed_index,
+  RawEntityId GetOrCreateFragmentId(RawEntityId proposed_id,
                                     RawEntityId file_tok_id,
                                     const std::string &hash);
 };
@@ -372,7 +372,7 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
   for (size_t i = 0u; i < kNumFileShards; ++i) {
     db.Execute(
         "CREATE TABLE IF NOT EXISTS file_hash_" + std::to_string(i) + " ("
-        "  file_index INT NOT NULL,"
+        "  file_id INT NOT NULL,"
         "  hash BLOB NOT NULL,"
         "  PRIMARY KEY(hash)"
         ") WITHOUT rowid");
@@ -381,7 +381,7 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
   for (size_t i = 0u; i < kNumFragmentShards; ++i) {
     db.Execute(
         "CREATE TABLE IF NOT EXISTS fragment_hash_" + std::to_string(i) + " ("
-        "  fragment_index INT NOT NULL,"
+        "  fragment_id INT NOT NULL,"
         "  file_token_id INT NOT NULL,"
         "  hash BLOB NOT NULL,"
         "  PRIMARY KEY(file_token_id, hash)"
