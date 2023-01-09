@@ -145,7 +145,16 @@ struct MangledNameRecord {
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS mangled_name_from_entity_id
-         ON mangled_name(data))"};
+         ON mangled_name(data))",
+
+      // Mangle name data columns use space-delimited data. Having a view that
+      // can give us access to just the normal names is nifty when we're trying
+      // to diagnose issues where we have logically the same entity mangled to
+      // two different names, e.g. `static inline` functions in headers.
+      R"(CREATE VIEW IF NOT EXISTS base_mangled_name AS
+         SELECT m.entity_id AS entity_id,
+                substr(m.data||' ', 0, instr(m.data||' ',' ')) AS data
+         FROM mangled_name AS m)"};
 
   static constexpr const char *kInsertStatement =
       R"(INSERT INTO mangled_name (entity_id, data)
