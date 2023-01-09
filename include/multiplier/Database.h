@@ -315,18 +315,18 @@ class DatabaseWriter final {
   void AsyncFlush(void);
 
   // Get, or create and return, a file ID for the specific file contents hash.
-  SpecificEntityId<FileId> GetOrCreateFileIdForHash(
+  PackedFileId GetOrCreateFileIdForHash(
       std::string hash, bool &is_new);
 
   // Get, or create and return, a fragment ID for the specific fragment hash.
-  SpecificEntityId<FragmentId> GetOrCreateSmallFragmentIdForHash(
+  PackedFragmentId GetOrCreateSmallFragmentIdForHash(
       RawEntityId tok_id, std::string hash, bool &is_new);
 
   // Get, or create and return, a fragment ID for the specific fragment hash.
-  SpecificEntityId<FragmentId> GetOrCreateLargeFragmentIdForHash(
+  PackedFragmentId GetOrCreateLargeFragmentIdForHash(
       RawEntityId tok_id, std::string hash, bool &is_new);
 
-  SpecificEntityId<FragmentId> GetOrCreateFragmentIdForHash(
+  PackedFragmentId GetOrCreateFragmentIdForHash(
       RawEntityId tok_id, std::string hash, size_t num_tokens, bool &is_new) {
 
     // "Big codes" have IDs in the range [1, mx::kMaxNumBigPendingFragments)`.

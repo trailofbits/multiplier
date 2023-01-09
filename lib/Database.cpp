@@ -557,6 +557,7 @@ DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
     proposed_index = writer->available_small_fragment_index.value();
     writer->available_small_fragment_index.reset();
   }
+  assert(proposed_index >= kMaxBigFragmentId);
 
   RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
   RawEntityId found_id = writer->GetOrCreateFragmentId(
@@ -568,7 +569,9 @@ DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
 
   VariantId vid = EntityId(found_id).Unpack();
   assert(std::holds_alternative<FragmentId>(vid));
-  return std::get<FragmentId>(vid);
+  FragmentId fid = std::get<FragmentId>(vid);
+  assert(fid.fragment_id >= kMaxBigFragmentId);
+  return fid;
 }
 
 // Get, or create and return, a fragment ID for the specific fragment hash.
@@ -587,17 +590,21 @@ DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
     writer->available_big_fragment_index.reset();
   }
 
+  assert(proposed_index < kMaxBigFragmentId);
+
   RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
   RawEntityId found_id = writer->GetOrCreateFragmentId(
       proposed_id, tok_id, std::move(hash));
-  is_new = found_id == proposed_index;
+  is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_big_fragment_index.emplace(proposed_index);
   }
 
   VariantId vid = EntityId(found_id).Unpack();
   assert(std::holds_alternative<FragmentId>(vid));
-  return std::get<FragmentId>(vid);
+  FragmentId fid = std::get<FragmentId>(vid);
+  assert(fid.fragment_id < kMaxBigFragmentId);
+  return fid;
 }
 
 void DatabaseWriterImpl::InitRecords(void) {
