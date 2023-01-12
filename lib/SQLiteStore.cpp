@@ -320,8 +320,8 @@ Statement Connection::Prepare(const std::string &query) {
       impl->db, query.c_str(), static_cast<int>(query.size()),
       SQLITE_PREPARE_PERSISTENT, &stmt, const_cast<const char **>(&tail));
   if (SQLITE_OK != ret) {
-    assert(false);
-    throw Error("Failed to prepare statement");
+    std::string error_msg = sqlite3_errmsg(impl->db) == nullptr ? "" : sqlite3_errmsg(impl->db);
+    throw Error("Failed to prepare statement " + error_msg);
   }
 
   impl->stmts.push_back(stmt);

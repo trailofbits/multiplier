@@ -135,7 +135,8 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   }
 
   indexer::Executor executor{{FLAGS_num_workers}};
-  auto ic = std::make_shared<indexer::GlobalIndexingState>(FLAGS_db, executor);
+  mx::DatabaseWriter database(FLAGS_db);
+  auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 

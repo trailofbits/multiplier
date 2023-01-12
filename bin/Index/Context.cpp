@@ -24,11 +24,11 @@
 
 namespace indexer {
 
-GlobalIndexingState::GlobalIndexingState(std::filesystem::path db_path,
+GlobalIndexingState::GlobalIndexingState(mx::DatabaseWriter &database_,
                                  const Executor &exe_)
     : num_workers(exe_.NumWorkers()),
       executor(exe_),
-      database(std::move(db_path)) {}
+      database(database_) {}
 
 GlobalIndexingState::~GlobalIndexingState(void) {}
 
