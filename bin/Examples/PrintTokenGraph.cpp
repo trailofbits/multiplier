@@ -85,11 +85,15 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
     os << pred_prefix << m->id().Pack() << ":t" << dt_id.Pack()
        << " -> " << prefix << parent_id << ":t" << id << ";\n";
 
-  // No containing macro, and it's not a file token means it's a top-level
-  // macro token.
-  } else {
+  // No containing macro, but it's part of a fragment, which means it's a top-
+  // level macro token.
+  } else if (auto m = mx::Fragment::containing(dt.value())) {
     os << "ct0:t" << dt_id.Pack() << " -> " << prefix << parent_id
        << ":t" << id << ";\n";
+
+  // It must be a file token related to a different fragment.
+  } else {
+
   }
 }
 
