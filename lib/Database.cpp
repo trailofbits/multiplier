@@ -402,6 +402,7 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
 
   ExitRecords();
   ExitMetadata();
+  db.Execute("PRAGMA wal_checkpoint(FULL)");
   db.Optimize();
 }
 
