@@ -67,9 +67,9 @@ class GlobalIndexingState {
   CodeGenerator codegen;
 
   // Write access to the index database.
-  mx::DatabaseWriter database;
+  mx::DatabaseWriter &database;
 
-  explicit GlobalIndexingState(std::filesystem::path db_path,
+  explicit GlobalIndexingState(mx::DatabaseWriter &database_,
                                const Executor &exe_);
 
   ~GlobalIndexingState(void);

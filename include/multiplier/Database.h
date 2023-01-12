@@ -269,7 +269,7 @@ struct ReferenceRecord {
     m(ReferenceRecord) \
     m(SymbolNameRecord)
 
-#define MX_DATABASE_PRAGMA_SYNCHRONOUS "OFF"
+#define MX_DATABASE_PRAGMA_SYNCHRONOUS "NORMAL"
 #define MX_DATABASE_TEMP_STORE "MEMORY"
 #define MX_DATABASE_JOURNAL_MODE "WAL"
 
