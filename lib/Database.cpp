@@ -387,6 +387,7 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
         "  PRIMARY KEY(file_token_id, hash)"
         ") WITHOUT rowid");
   }
+
   return db;
 }
 
