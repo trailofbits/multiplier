@@ -54,6 +54,9 @@ class ReadMacroTokensFromFragment : public TokenReader {
   // Return the id of the macro containing the Nth token.
   EntityId NthContainingMacroId(unsigned) const override;
 
+  // Return an entity id associated with the Nth token.
+  EntityId NthRelatedEntityId(unsigned) const override;
+
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const override;
   EntityId NthFileTokenId(unsigned token_index) const override;
@@ -90,6 +93,9 @@ class ReadParsedTokensFromFragment final
 
   // Return the id of the macro containing the Nth token.
   EntityId NthContainingMacroId(unsigned) const final;
+
+  // Return an entity id associated with the Nth token.
+  EntityId NthRelatedEntityId(unsigned) const override;
 
   // Return the id of the Nth token.
   EntityId NthTokenId(unsigned token_index) const final;

@@ -73,6 +73,11 @@ EntityId ReadFileTokensFromFile::NthContainingMacroId(unsigned) const {
   return kInvalidEntityId;
 }
 
+// Return an entity id associated with the Nth token.
+EntityId ReadFileTokensFromFile::NthRelatedEntityId(unsigned) const {
+  return kInvalidEntityId;
+}
+
 // Return the id of the Nth token.
 EntityId ReadFileTokensFromFile::NthTokenId(unsigned token_index) const {
   if (token_index < file->num_tokens) {

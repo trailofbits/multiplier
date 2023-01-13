@@ -43,6 +43,63 @@
 #define MACRO_DIRECTIVE_NAME(name) #name "MacroDirective",
 #define STR_NAME(name) #name,
 
+// We want these things to exist inside of Multiplier, so we will add them
+// here.
+namespace pasta {
+
+enum class TokenCategory : unsigned char {
+  // These line up with `TokenClass`.
+  kUnknown,
+  kIdentifier,
+  kMacroName,
+  kKeyword,
+  kObjectiveCKeyword,
+  kPreProcessorKeyword,
+  kBuiltinTypeName,
+  kPunctuation,
+  kLiteral,
+  kComment,
+
+  // These line up with `DeclCategory`.
+  kLocalVariable,
+  kGlobalVariable,
+  kParameterVariable,
+  kFunction,
+  kInstanceMethod,
+  kInstanceMember,
+  kClassMethod,
+  kClassMember,
+  kThis,
+  kClass,
+  kStruct,
+  kUnion,
+  kInterface,
+  kEnum,
+  kEnumerator,
+  kNamespace,
+  kTypeAlias,
+  kTemplateParameterType,
+  kTemplateParameterValue,
+  kLabel,
+
+  // Extra.
+  kWhitespace
+};
+
+enum class TokenClass {
+  kUnknown,
+  kIdentifier,
+  kMacroName,
+  kKeyword,
+  kObjectiveCKeyword,
+  kPreProcessorKeyword,
+  kBuiltinTypeName,
+  kPunctuation,
+  kLiteral,
+  kComment
+};
+}  // namespace pasta
+
 // These are types with no corresponding enumeration for the respective `kind`
 // methods.
 static const std::unordered_set<std::string> gAbstractTypes{

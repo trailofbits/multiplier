@@ -8,6 +8,7 @@
 #include "File.h"
 #include "Fragment.h"
 #include "Use.h"
+#include <multiplier/Entities/MacroKind.h>
 #include <multiplier/Entities/TokenKind.h>
 
 #include <cassert>
@@ -115,6 +116,11 @@ EntityId InvalidTokenReader::NthParsedTokenId(unsigned) const {
 
 // Return the id of the macro containing the Nth token.
 EntityId InvalidTokenReader::NthContainingMacroId(unsigned) const {
+  return kInvalidEntityId;
+}
+
+// Return an entity id associated with the Nth token.
+EntityId InvalidTokenReader::NthRelatedEntityId(unsigned) const {
   return kInvalidEntityId;
 }
 
@@ -250,6 +256,47 @@ std::optional<Token> Token::nearest_file_token(void) const {
     }
   }
 
+  return std::nullopt;
+}
+
+// Return the entity associated with this token.
+//
+// NOTE(pag): This is only meaningful for parsed tokens and macro tokens.
+std::optional<NamedEntity> Token::related_entity(void) const {
+  const FragmentImpl *tok_frag = impl->OwningFragment();
+  if (!tok_frag) {
+    return std::nullopt;
+  }
+
+  VariantId vid = impl->NthRelatedEntityId(offset).Unpack();
+  if (std::holds_alternative<InvalidId>(vid)) {
+    return std::nullopt;
+
+  } else if (std::holds_alternative<DeclarationId>(vid)) {
+    DeclarationId id = std::get<DeclarationId>(vid);
+    FragmentId fid(id.fragment_id);
+    if (auto frag = tok_frag->ep->FragmentFor(tok_frag->ep, fid)) {
+      if (auto decl = frag->DeclFor(frag, id, false)) {
+        if (auto nd = NamedDecl::from(decl.value())) {
+          return nd.value();
+        }
+      }
+    }
+
+  } else if (std::holds_alternative<MacroId>(vid)) {
+    MacroId id = std::get<MacroId>(vid);
+    FragmentId fid(id.fragment_id);
+    if (auto frag = tok_frag->ep->FragmentFor(tok_frag->ep, fid)) {
+      if (auto macro = frag->MacroFor(frag, id, false)) {
+        if (auto dd = DefineMacroDirective::from(macro.value())) {
+          return dd.value();
+        }
+      }
+    }
+
+  }
+
+  assert(false);
   return std::nullopt;
 }
 

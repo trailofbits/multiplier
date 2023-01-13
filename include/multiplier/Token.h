@@ -17,6 +17,7 @@
 
 namespace mx {
 
+class DefineMacroDirective;
 class EntityProvider;
 class File;
 class FileLocationCache;
@@ -24,6 +25,7 @@ class Fragment;
 class FragmentImpl;
 class Index;
 class Macro;
+class NamedDecl;
 class RegexQuery;
 class RegexQueryResultIterator;
 class TokenContext;
@@ -34,6 +36,8 @@ class WeggliQuery;
 class WeggliQueryResultIterator;
 
 enum class TokenKind : unsigned short;
+
+using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
 using TokenUse = Use<TokenUseSelector>;
 
 // A single token, e.g. from a file or from a macro expansion.
@@ -102,6 +106,11 @@ class Token {
   // likely means this token exists inside of a macro expansion. If that is the
   // case, then this will return the beginning token of the macro expansion.
   std::optional<Token> nearest_file_token(void) const;
+
+  // Return the entity associated with this token.
+  //
+  // NOTE(pag): This is only meaningful for parsed tokens and macro tokens.
+  std::optional<NamedEntity> related_entity(void) const;
 
   // Return the set of all uses of this token within its fragment (if it's a
   // fragment token).

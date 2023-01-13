@@ -235,7 +235,7 @@ inline FileId::FileId(const FileTokenId &id_)
     : file_id(id_.file_id) {}
 
 // A tag type representing an invalid entity id.
-struct InvalidId {};
+using InvalidId = std::monostate;
 
 // Possible types of entity ids represented by a packed
 // `EntityId`.

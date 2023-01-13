@@ -37,6 +37,9 @@ class TokenReader {
   // Return the id of the macro containing the Nth token.
   virtual EntityId NthContainingMacroId(unsigned token_index) const = 0;
 
+  // Return an entity id associated with the Nth token.
+  virtual EntityId NthRelatedEntityId(unsigned token_index) const = 0;
+
   // Return the id of the Nth token.
   virtual EntityId NthTokenId(unsigned token_index) const = 0;
 
@@ -66,32 +69,35 @@ class InvalidTokenReader final : public TokenReader {
   virtual ~InvalidTokenReader(void) noexcept;
 
   // Return the number of tokens accessible to this reader.
-  unsigned NumTokens(void) const final;
+  unsigned NumTokens(void) const override;
 
   // Return the kind of the Nth token.
-  TokenKind NthTokenKind(unsigned) const final;
+  TokenKind NthTokenKind(unsigned) const override;
 
   // Return the data of the Nth token.
-  std::string_view NthTokenData(unsigned) const final;
+  std::string_view NthTokenData(unsigned) const override;
 
   // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(unsigned) const final;
+  EntityId NthDerivedTokenId(unsigned) const override;
 
   // Return the id of the parsed token which is derived from the Nth token.
-  EntityId NthParsedTokenId(unsigned) const final;
+  EntityId NthParsedTokenId(unsigned) const override;
 
   // Return the id of the macro containing the Nth token.
-  EntityId NthContainingMacroId(unsigned) const final;
+  EntityId NthContainingMacroId(unsigned) const override;
+
+  // Return an entity id associated with the Nth token.
+  EntityId NthRelatedEntityId(unsigned) const override;
 
   // Return the id of the Nth token.
-  EntityId NthTokenId(unsigned) const final;
-  EntityId NthFileTokenId(unsigned) const final;
+  EntityId NthTokenId(unsigned) const override;
+  EntityId NthFileTokenId(unsigned) const override;
 
   // Return the token reader for another file.
-  Ptr ReaderForToken(const Ptr &self, RawEntityId id) const final;
+  Ptr ReaderForToken(const Ptr &self, RawEntityId id) const override;
   
   // Returns `true` if `this` is logically equivalent to `that`.
-  bool Equals(const TokenReader *) const final;
+  bool Equals(const TokenReader *) const override;
 };
 
 }  // namespace mx

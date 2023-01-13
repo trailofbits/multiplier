@@ -127,6 +127,7 @@ class EntityProvider {
   friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
   friend class StmtReferenceIterator;
+  friend class Token;
   friend class TokenReader;
   friend class UseIteratorImpl;
   friend class WeggliQuery;
