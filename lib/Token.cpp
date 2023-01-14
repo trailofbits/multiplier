@@ -499,7 +499,7 @@ static TokenCategory ClassifyMacro(const Token &tok, MacroId id) {
 
 static inline TokenCategory Rebase(DeclCategory category) {
   return static_cast<TokenCategory>(
-      int(category) + int(TokenCategory::LOCAL_VARIABLE));
+      int(category) + int(TokenCategory::COMMENT));
 }
 
 static TokenCategory ClassifyDecl(const Token &tok, DeclarationId id) {
