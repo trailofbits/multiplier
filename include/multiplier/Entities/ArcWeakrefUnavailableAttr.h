@@ -76,7 +76,6 @@ class ArcWeakrefUnavailableAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ArcWeakrefUnavailableAttr) == sizeof(InheritableAttr));

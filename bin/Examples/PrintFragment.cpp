@@ -41,14 +41,18 @@ extern "C" int main(int argc, char *argv[]) {
   // or comments. There can be empty tokens, however.
   } else {
 
-    std::cout << "Parsed data from tokens:\n";
+    std::cout << "Parsed data from tokens:";
 
     for (mx::Token token : fragment->parsed_tokens()) {
-      std::cout << token.id() << '\t' << mx::EnumeratorName(token.kind()) << '\t' << token.data() << '\n';
-//      std::cout << token.data() << ' ';
+      std::cout
+          << '\n' << token.id()
+          << '\t' << token.related_entity_id()
+          << '\t' << mx::EnumeratorName(token.kind())
+          << '\t' << mx::EnumeratorName(token.category())
+          << '\t' << token.data();
     }
 
-    std::cout << "\n\nParsed data from token range:\n";
+    std::cout << "\n\n\nParsed data from token range:\n";
     std::cout << fragment->parsed_tokens().data();
 
     std::cout << "\n\nFile data from tokens:\n";

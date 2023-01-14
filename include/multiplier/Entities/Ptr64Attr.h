@@ -76,7 +76,6 @@ class Ptr64Attr : public TypeAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(Ptr64Attr) == sizeof(TypeAttr));

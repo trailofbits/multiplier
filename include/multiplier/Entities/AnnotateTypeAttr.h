@@ -77,7 +77,6 @@ class AnnotateTypeAttr : public TypeAttr {
   }
 
   std::string_view annotation(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AnnotateTypeAttr) == sizeof(TypeAttr));

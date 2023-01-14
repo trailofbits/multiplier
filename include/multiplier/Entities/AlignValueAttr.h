@@ -66,7 +66,6 @@ class AlignValueAttr : public Attr {
   }
 
   Expr alignment(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AlignValueAttr) == sizeof(Attr));

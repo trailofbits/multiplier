@@ -78,7 +78,6 @@ class OpenCLConstantAddressSpaceAttr : public TypeAttr {
   }
 
   OpenCLConstantAddressSpaceAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OpenCLConstantAddressSpaceAttr) == sizeof(TypeAttr));

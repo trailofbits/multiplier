@@ -78,7 +78,6 @@ class ConstInitAttr : public InheritableAttr {
   }
 
   ConstInitAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_constinit(void) const;
 };
 

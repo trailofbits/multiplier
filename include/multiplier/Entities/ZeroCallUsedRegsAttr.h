@@ -77,7 +77,6 @@ class ZeroCallUsedRegsAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   ZeroCallUsedRegsAttrZeroCallUsedRegsKind zero_call_used_regs(void) const;
 };
 

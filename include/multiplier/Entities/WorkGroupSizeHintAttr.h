@@ -76,7 +76,6 @@ class WorkGroupSizeHintAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(WorkGroupSizeHintAttr) == sizeof(InheritableAttr));

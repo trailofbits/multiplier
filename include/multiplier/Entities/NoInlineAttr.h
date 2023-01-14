@@ -88,7 +88,6 @@ class NoInlineAttr : public DeclOrStmtAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   bool is_clang_no_inline(void) const;
 };
 

@@ -76,7 +76,6 @@ class AVRSignalAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AVRSignalAttr) == sizeof(InheritableAttr));

@@ -78,7 +78,6 @@ class EnumExtensibilityAttr : public InheritableAttr {
   }
 
   EnumExtensibilityAttrKind extensibility(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(EnumExtensibilityAttr) == sizeof(InheritableAttr));

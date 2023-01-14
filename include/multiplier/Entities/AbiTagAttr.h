@@ -64,7 +64,6 @@ class AbiTagAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AbiTagAttr) == sizeof(Attr));

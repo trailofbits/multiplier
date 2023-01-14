@@ -308,6 +308,19 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
       LOG(ERROR)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
+
+    // Try to get preprocessor kinds, if possible.
+    //
+    // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
+    //            the raw lexer, whereas fragments do better.
+    case pasta::TokenRole::kFileToken:
+      if (auto ft = entity.FileLocation()) {
+        if (auto ret = TokenKindFromPasta(ft.value());
+            ret != mx::TokenKind::IDENTIFIER) {
+          return ret;
+        }
+      }
+      break;
   }
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
@@ -650,7 +663,8 @@ mx::RawEntityId RelatedEntityId(
     case mx::TokenKind::IDENTIFIER: break;
   }
 
-  for (auto context = token.Context(); context; context = context->Parent()) {
+  for (auto context = token.Context(); !related_decl && context;
+       context = context->Parent()) {
     switch (context->Kind()) {
       case pasta::TokenContextKind::kStmt:
         if (std::optional<pasta::Stmt> stmt =
@@ -733,6 +747,9 @@ mx::RawEntityId RelatedEntityId(
 
   if (auto parent = mtok.Parent()) {
     if (auto exp = pasta::MacroExpansion::From(parent.value())) {
+
+      // If the macro token is the name of the macro definition used, then
+      // make the related entity be the defined macro itself.
       if (auto def = exp->Definition()) {
         if (def->Name().Data() == mtok.Data()) {
           auto eid = em.EntityId(def.value());
@@ -741,12 +758,65 @@ mx::RawEntityId RelatedEntityId(
           return eid;
         }
       }
+
+      // If it's the first token in an expansion, then reference the expansion
+      // instead. Sometimes we have macro expansions but no definitions.
+      if (mtok.TokenKind() == pasta::TokenKind::kIdentifier ||
+          mtok.TokenKind() == pasta::TokenKind::kRawIdentifier) {
+
+        for (auto child : exp->Children()) {
+          if (child.RawMacro() == mtok.RawMacro()) {
+            auto eid = em.EntityId(exp.value());
+            related_ids.emplace(tok.RawToken(), eid);
+            found = true;
+            return eid;
+          }
+        }
+      }
+
+    // If it's the first token in a substitution, and if the token is an
+    // identifier name, then reference the substitution itself.
+    } else if (auto sub = pasta::MacroSubstitution::From(parent.value())) {
+      if (mtok.TokenKind() == pasta::TokenKind::kIdentifier ||
+          mtok.TokenKind() == pasta::TokenKind::kRawIdentifier) {
+
+        auto children = sub->Children();
+        if (children.Size() == 1u &&
+            children[0u].RawMacro() == mtok.RawMacro()) {
+          auto eid = em.EntityId(exp.value());
+          related_ids.emplace(tok.RawToken(), eid);
+          found = true;
+          return eid;
+        }
+      }
+
+    // It's a macro parameter.
+    } else if (auto param = pasta::MacroParameter::From(parent.value())) {
+      auto eid = em.EntityId(param.value());
+      related_ids.emplace(tok.RawToken(), eid);
+      found = true;
+      return eid;
+
+
+    // Point the defined macro name at the macro itself.
     } else if (auto def = pasta::DefineMacroDirective::From(parent.value())) {
       if (def->Name().RawMacro() == mtok.RawMacro()) {
         auto eid = em.EntityId(def.value());
         related_ids.emplace(tok.RawToken(), eid);
         found = true;
         return eid;
+      }
+    }
+
+    // Point the macro directive at the macro itself.
+    if (auto dir = pasta::MacroDirective::From(parent.value())) {
+      if (auto dir_name = dir->DirectiveName()) {
+        if (dir_name->RawMacro() == mtok.RawMacro()) {
+          auto eid = em.EntityId(dir.value());
+          related_ids.emplace(tok.RawToken(), eid);
+          found = true;
+          return eid;
+        }
       }
     }
   }

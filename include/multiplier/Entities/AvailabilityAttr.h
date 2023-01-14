@@ -78,7 +78,6 @@ class AvailabilityAttr : public InheritableAttr {
 
   std::string_view message(void) const;
   std::string_view replacement(void) const;
-  std::string_view spelling(void) const;
   bool strict(void) const;
   bool unavailable(void) const;
 };

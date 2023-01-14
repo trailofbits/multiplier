@@ -76,7 +76,6 @@ class NoProfileFunctionAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NoProfileFunctionAttr) == sizeof(InheritableAttr));

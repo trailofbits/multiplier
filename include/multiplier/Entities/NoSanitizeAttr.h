@@ -76,7 +76,6 @@ class NoSanitizeAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   bool has_coverage(void) const;
 };
 

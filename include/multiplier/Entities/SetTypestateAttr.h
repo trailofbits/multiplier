@@ -78,7 +78,6 @@ class SetTypestateAttr : public InheritableAttr {
   }
 
   SetTypestateAttrConsumedState new_state(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SetTypestateAttr) == sizeof(InheritableAttr));

@@ -78,7 +78,6 @@ class MipsLongCallAttr : public InheritableAttr {
   }
 
   MipsLongCallAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MipsLongCallAttr) == sizeof(InheritableAttr));

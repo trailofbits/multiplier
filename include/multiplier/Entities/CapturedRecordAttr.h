@@ -76,7 +76,6 @@ class CapturedRecordAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CapturedRecordAttr) == sizeof(InheritableAttr));

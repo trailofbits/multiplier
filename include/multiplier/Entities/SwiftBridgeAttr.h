@@ -76,7 +76,6 @@ class SwiftBridgeAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   std::string_view swift_type(void) const;
 };
 

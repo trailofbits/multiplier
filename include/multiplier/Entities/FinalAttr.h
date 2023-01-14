@@ -78,7 +78,6 @@ class FinalAttr : public InheritableAttr {
   }
 
   FinalAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_spelled_as_sealed(void) const;
 };
 

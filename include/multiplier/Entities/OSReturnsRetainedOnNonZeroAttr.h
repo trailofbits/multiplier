@@ -76,7 +76,6 @@ class OSReturnsRetainedOnNonZeroAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OSReturnsRetainedOnNonZeroAttr) == sizeof(InheritableAttr));

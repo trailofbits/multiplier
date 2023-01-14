@@ -76,7 +76,6 @@ class OverrideAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OverrideAttr) == sizeof(InheritableAttr));

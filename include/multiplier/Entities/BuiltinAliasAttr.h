@@ -66,7 +66,6 @@ class BuiltinAliasAttr : public Attr {
   }
 
   BuiltinAliasAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(BuiltinAliasAttr) == sizeof(Attr));

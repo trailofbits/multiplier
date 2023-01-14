@@ -77,7 +77,6 @@ class BlocksAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   BlocksAttrBlockType type(void) const;
 };
 

@@ -77,7 +77,6 @@ class HLSLShaderAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   HLSLShaderAttrShaderType type(void) const;
 };
 

@@ -77,7 +77,6 @@ class PragmaClangRodataSectionAttr : public InheritableAttr {
   }
 
   std::string_view name(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(PragmaClangRodataSectionAttr) == sizeof(InheritableAttr));

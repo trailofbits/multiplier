@@ -77,7 +77,6 @@ class MSVtorDispAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   MSVtorDispMode vtor_disp_mode(void) const;
 };
 

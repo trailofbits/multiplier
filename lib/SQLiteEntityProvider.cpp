@@ -435,8 +435,8 @@ void SQLiteEntityProvider::FillFragments(
 
       redecl_ids_out = ReadRedeclarations(context);
       assert(!redecl_ids_out.empty());
-      assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(), eid) !=
-             redecl_ids_out.end());
+      assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(),
+                       eid.Pack()) != redecl_ids_out.end());
 
     // If we already have a set then use them.
     } else {

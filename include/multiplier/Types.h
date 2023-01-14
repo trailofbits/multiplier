@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <compare>
 #include <cstdint>
 #include <functional>
@@ -320,6 +321,16 @@ class EntityId final {
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;
 
+  // Test if an entity ID is valid-looking.
+  inline operator bool(void) const noexcept {
+    if (opaque == kInvalidEntityId) {
+      return false;
+    } else {
+      assert(!std::holds_alternative<InvalidId>(Unpack()));
+      return true;
+    }
+  }
+
   inline RawEntityId Pack(void) const noexcept {
     return opaque;
   }
@@ -424,6 +435,7 @@ MX_MAP_ENTITY_TYPE(TypeId, Type);
 
 #undef MX_MAP_ENTITY_TYPE
 
+// Given an entity ID type, get us the entity type.
 template <typename T>
 using EntityType = typename EntityTypeImpl<T>::Entity;
 

@@ -79,7 +79,6 @@ class SectionAttr : public InheritableAttr {
 
   std::string_view name(void) const;
   SectionAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SectionAttr) == sizeof(InheritableAttr));

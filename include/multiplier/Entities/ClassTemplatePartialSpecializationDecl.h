@@ -30,6 +30,7 @@ class Decl;
 class NamedDecl;
 class RecordDecl;
 class TagDecl;
+class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using ClassTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplatePartialSpecializationDecl>;
@@ -144,6 +145,11 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     }
   }
 
+  Type injected_specialization_type(void) const;
+  ClassTemplatePartialSpecializationDecl instantiated_from_member(void) const;
+  ClassTemplatePartialSpecializationDecl instantiated_from_member_template(void) const;
+  TemplateParameterList template_parameters(void) const;
+  bool has_associated_constraints(void) const;
 };
 
 static_assert(sizeof(ClassTemplatePartialSpecializationDecl) == sizeof(ClassTemplateSpecializationDecl));

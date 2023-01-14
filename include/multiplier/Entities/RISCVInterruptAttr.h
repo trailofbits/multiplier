@@ -78,7 +78,6 @@ class RISCVInterruptAttr : public InheritableAttr {
   }
 
   RISCVInterruptAttrInterruptType interrupt(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(RISCVInterruptAttr) == sizeof(InheritableAttr));

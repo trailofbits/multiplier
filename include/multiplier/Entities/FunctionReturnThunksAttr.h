@@ -77,7 +77,6 @@ class FunctionReturnThunksAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   FunctionReturnThunksAttrKind thunk_type(void) const;
 };
 

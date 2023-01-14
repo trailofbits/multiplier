@@ -81,7 +81,6 @@ class OMPAllocateDeclAttr : public InheritableAttr {
   Expr alignment(void) const;
   Expr allocator(void) const;
   OMPAllocateDeclAttrAllocatorTypeTy allocator_type(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OMPAllocateDeclAttr) == sizeof(InheritableAttr));

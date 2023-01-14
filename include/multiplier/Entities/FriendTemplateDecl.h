@@ -25,6 +25,9 @@
 namespace mx {
 class Decl;
 class FriendTemplateDecl;
+class NamedDecl;
+class TemplateParameterList;
+class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using FriendTemplateDeclRange = DerivedEntityRange<DeclIterator, FriendTemplateDecl>;
 using FriendTemplateDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, FriendTemplateDecl>;
@@ -72,6 +75,10 @@ class FriendTemplateDecl : public Decl {
     }
   }
 
+  NamedDecl friend_declaration(void) const;
+  Token friend_token(void) const;
+  Type friend_type(void) const;
+  std::vector<TemplateParameterList> template_parameter_lists(void) const;
 };
 
 static_assert(sizeof(FriendTemplateDecl) == sizeof(Decl));

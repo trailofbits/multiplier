@@ -83,7 +83,6 @@ class OMPDeclareTargetDeclAttr : public InheritableAttr {
   bool indirect(void) const;
   Expr indirect_expression(void) const;
   OMPDeclareTargetDeclAttrMapTypeTy map_type(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OMPDeclareTargetDeclAttr) == sizeof(InheritableAttr));

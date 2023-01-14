@@ -100,7 +100,6 @@ class SwiftAsyncContextAttr : public ParameterABIAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SwiftAsyncContextAttr) == sizeof(ParameterABIAttr));

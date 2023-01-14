@@ -77,7 +77,6 @@ class AcquireHandleAttr : public InheritableAttr {
   }
 
   std::string_view handle_type(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AcquireHandleAttr) == sizeof(InheritableAttr));

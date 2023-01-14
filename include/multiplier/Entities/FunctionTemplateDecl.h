@@ -108,6 +108,7 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
     }
   }
 
+  bool is_abbreviated(void) const;
 };
 
 static_assert(sizeof(FunctionTemplateDecl) == sizeof(RedeclarableTemplateDecl));

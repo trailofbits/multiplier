@@ -76,7 +76,6 @@ class AArch64SVEPcsAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AArch64SVEPcsAttr) == sizeof(InheritableAttr));

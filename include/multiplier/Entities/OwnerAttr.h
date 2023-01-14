@@ -79,7 +79,6 @@ class OwnerAttr : public InheritableAttr {
 
   Type deref_type(void) const;
   Type deref_type_token(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OwnerAttr) == sizeof(InheritableAttr));

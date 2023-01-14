@@ -76,7 +76,6 @@ class OSConsumesThisAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OSConsumesThisAttr) == sizeof(InheritableAttr));

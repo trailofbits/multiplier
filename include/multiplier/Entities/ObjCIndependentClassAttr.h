@@ -76,7 +76,6 @@ class ObjCIndependentClassAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCIndependentClassAttr) == sizeof(InheritableAttr));

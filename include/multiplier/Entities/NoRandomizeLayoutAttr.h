@@ -76,7 +76,6 @@ class NoRandomizeLayoutAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NoRandomizeLayoutAttr) == sizeof(InheritableAttr));

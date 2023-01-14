@@ -64,7 +64,6 @@ class ObjCDirectAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCDirectAttr) == sizeof(Attr));

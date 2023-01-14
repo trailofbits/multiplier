@@ -76,7 +76,6 @@ class CUDAInvalidTargetAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CUDAInvalidTargetAttr) == sizeof(InheritableAttr));

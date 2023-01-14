@@ -76,7 +76,6 @@ class HLSLSV_GroupIndexAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(HLSLSV_GroupIndexAttr) == sizeof(InheritableAttr));

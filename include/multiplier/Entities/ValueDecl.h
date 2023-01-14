@@ -54,10 +54,6 @@ class ValueDecl : public NamedDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::VALUE;
-  }
-
   static ValueDeclContainingDeclRange containing(const Decl &decl);
   static ValueDeclContainingDeclRange containing(const Stmt &stmt);
 

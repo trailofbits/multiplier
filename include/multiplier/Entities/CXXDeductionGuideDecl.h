@@ -29,7 +29,7 @@ class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
-class ParmVarDecl;
+class TemplateDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using CXXDeductionGuideDeclRange = DerivedEntityRange<DeclIterator, CXXDeductionGuideDecl>;
@@ -123,9 +123,9 @@ class CXXDeductionGuideDecl : public FunctionDecl {
   }
 
   CXXConstructorDecl corresponding_constructor(void) const;
+  TemplateDecl deduced_template(void) const;
   bool is_copy_deduction_candidate(void) const;
   bool is_explicit(void) const;
-  std::vector<ParmVarDecl> parameter_declarations(void) const;
 };
 
 static_assert(sizeof(CXXDeductionGuideDecl) == sizeof(FunctionDecl));

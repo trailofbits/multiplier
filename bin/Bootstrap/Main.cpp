@@ -48,13 +48,13 @@
 namespace pasta {
 
 enum class TokenCategory : unsigned char {
-  // These line up with `TokenClass`.
   kUnknown,
   kIdentifier,
   kMacroName,
+  kMacroParameterName,
+  kMacroDirectiveName,
   kKeyword,
   kObjectiveCKeyword,
-  kPreProcessorKeyword,
   kBuiltinTypeName,
   kPunctuation,
   kLiteral,
@@ -73,6 +73,7 @@ enum class TokenCategory : unsigned char {
   kClass,
   kStruct,
   kUnion,
+  kConcept,
   kInterface,
   kEnum,
   kEnumerator,
@@ -86,18 +87,6 @@ enum class TokenCategory : unsigned char {
   kWhitespace
 };
 
-enum class TokenClass {
-  kUnknown,
-  kIdentifier,
-  kMacroName,
-  kKeyword,
-  kObjectiveCKeyword,
-  kPreProcessorKeyword,
-  kBuiltinTypeName,
-  kPunctuation,
-  kLiteral,
-  kComment
-};
 }  // namespace pasta
 
 // These are types with no corresponding enumeration for the respective `kind`
@@ -111,25 +100,10 @@ static const std::unordered_set<std::string> gAbstractTypes{
                             IGNORE, STR_NAME)
 };
 
+clang::ClassTemplateDecl * x;
+
 static const std::unordered_set<std::string> gUnserializableTypes{
-  // These aren't "real entities," as they don't result in tangible code being
-  // generated. Instead, they are templates for real entities.
-  //
-  // TODO(pag): Re-think all of these. We will likely want to be able to get at
-  //            templates and other things from the instantiated things.
-  "ClassTemplatePartialSpecializationDecl",
-  "VarTemplatePartialSpecializationDecl",
-  "ClassTemplateDecl",
-  "VarTemplateDecl",
-  "FunctionTemplateDecl",
-
-  "BuiltinTemplateDecl",
-  "RedeclarableTemplateDecl",
-  "TemplateDecl",
-  "TemplateTemplateParmDecl",
-  "FriendTemplateDecl",
-
-  // These are not contained in fragments.
+   // These are not contained in fragments.
   "NamespaceDecl",
   "TranslationUnitDecl",
   "ExternCContextDecl",
@@ -349,6 +323,11 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // the TokenTree.
   {"MacroExpansion", "IsArgumentPreExpansion"},
   {"MacroExpansion", "ArgumentPreExpansion"},
+
+  // TODO(pag): We'll eventually have to re-introduce these manually.
+  {"ClassTemplateDecl", "Specializations"},
+  {"VarTemplateDecl", "Specializations"},
+  {"FunctionTemplateDecl", "Specializations"},
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
@@ -2709,6 +2688,10 @@ MethodListPtr CodeGenerator::RunOnClass(
   auto methods = cls->record.Methods();
   assert(methods);
   for (pasta::CXXMethodDecl method : *methods) {
+    if (dont_serialize) {
+      continue;
+    }
+
     if (method.NumParameters()) {
       continue;  // Skip methods with parameters.
     }
@@ -2723,23 +2706,10 @@ MethodListPtr CodeGenerator::RunOnClass(
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
 
-    std::pair<std::string, std::string> method_key{class_name, method_name};
-    if (kMethodBlackList.count(method_key)) {
-      continue;
-    }
-
-    if (dont_serialize) {
-      continue;
-    }
-
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
 
     // We have a custom implementation of `redeclarations`.
-    if (snake_name == "redeclarations") {
-      assert(false);  // In the blacklist.
-      continue;
-
-    } else if (snake_name == "is_this_declaration_a_definition") {
+    if (snake_name == "is_this_declaration_a_definition") {
       snake_name = "is_definition";
 
     } else if (snake_name == "is_this_declaration_a_demoted_definition") {
@@ -2771,7 +2741,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     if (snake_name.ends_with("type_source_info")) {
-      snake_name = snake_name.substr(0, snake_name.size() - 12u);  // Retain `type`.
+      snake_name = snake_name.substr(0, snake_name.size() - 12u);  // Keep `type`.
     }
 
     if (snake_name.starts_with("type_info_")) {
@@ -2780,6 +2750,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     std::string api_name = SnakeCaseToAPICase(snake_name);
     if (!seen_methods->emplace(api_name).second) {
+      continue;
+    }
+
+    std::pair<std::string, std::string> method_key{class_name, method_name};
+    if (kMethodBlackList.count(method_key)) {
+      (void) seen_methods->emplace(api_name);
       continue;
     }
 
@@ -3180,7 +3156,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         serialize_inc_os
             << "  MX_VISIT_PSEUDO(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
-            << record_name << ", " << nth_entity_reader << ")\n";
+            << record_name << ", " << nth_entity_reader << ", InvalidSelector)\n";
 
         class_os
             << "  " << record_name << " " << api_name
@@ -3195,7 +3171,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
+            << "  b." << setter_name << "(es.PseudoId(e."
+            << method_name << "()));\n";
 
       } else if (gNotReferenceTypes.count(record_name)) {
         std::cerr << "unhandled record " << record_name << "\n";

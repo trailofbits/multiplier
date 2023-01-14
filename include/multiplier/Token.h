@@ -17,7 +17,10 @@
 
 namespace mx {
 
+class Attr;
+class Decl;
 class DefineMacroDirective;
+class Designator;
 class EntityProvider;
 class File;
 class FileLocationCache;
@@ -28,17 +31,21 @@ class Macro;
 class NamedDecl;
 class RegexQuery;
 class RegexQueryResultIterator;
+class Stmt;
 class TokenContext;
 class TokenRangeIterator;
 class TokenRange;
 class TokenReader;
+class Type;
 class WeggliQuery;
 class WeggliQueryResultIterator;
 
 enum class TokenKind : unsigned short;
+enum class TokenCategory : unsigned char;
 
-using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
 using TokenUse = Use<TokenUseSelector>;
+using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
+                                   Token, Designator, Fragment, File>;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
@@ -108,9 +115,13 @@ class Token {
   std::optional<Token> nearest_file_token(void) const;
 
   // Return the entity associated with this token.
-  //
-  // NOTE(pag): This is only meaningful for parsed tokens and macro tokens.
-  std::optional<NamedEntity> related_entity(void) const;
+  VariantEntity related_entity(void) const;
+
+  // Return the ID entity associated with this token.
+  EntityId related_entity_id(void) const;
+
+  // The category of this token. This takes into account any related entities.
+  TokenCategory category(void) const;
 
   // Return the set of all uses of this token within its fragment (if it's a
   // fragment token).

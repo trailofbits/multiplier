@@ -40,7 +40,6 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
       }
 
     // Tags.
-    case mx::DeclKind::TAG:
     case mx::DeclKind::RECORD:
     case mx::DeclKind::CXX_RECORD:
     case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
@@ -50,7 +49,6 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
       return true;
 
     // Redeclarable templates.
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
     case mx::DeclKind::FUNCTION_TEMPLATE:
     case mx::DeclKind::CLASS_TEMPLATE:
     case mx::DeclKind::VAR_TEMPLATE:
@@ -64,9 +62,7 @@ static bool ShouldGetSymbolName(const pasta::Decl &decl) {
 
     // Types.
     case mx::DeclKind::TYPE_ALIAS:
-    case mx::DeclKind::TYPE:
     case mx::DeclKind::TYPEDEF:
-    case mx::DeclKind::TYPEDEF_NAME:
       return true;
 
     default:

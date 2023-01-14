@@ -132,6 +132,9 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     }
   }
 
+  VarTemplatePartialSpecializationDecl instantiated_from_member(void) const;
+  TemplateParameterList template_parameters(void) const;
+  bool has_associated_constraints(void) const;
 };
 
 static_assert(sizeof(VarTemplatePartialSpecializationDecl) == sizeof(VarTemplateSpecializationDecl));

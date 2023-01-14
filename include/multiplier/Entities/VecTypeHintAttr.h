@@ -77,7 +77,6 @@ class VecTypeHintAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   Type type_hint(void) const;
   Type type_hint_token(void) const;
 };

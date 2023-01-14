@@ -54,10 +54,6 @@ class BaseUsingDecl : public NamedDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::BASE_USING;
-  }
-
   static BaseUsingDeclContainingDeclRange containing(const Decl &decl);
   static BaseUsingDeclContainingDeclRange containing(const Stmt &stmt);
 

@@ -76,7 +76,6 @@ class SPtrAttr : public TypeAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SPtrAttr) == sizeof(TypeAttr));

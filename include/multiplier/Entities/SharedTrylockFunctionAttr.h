@@ -77,7 +77,6 @@ class SharedTrylockFunctionAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   Expr success_value(void) const;
 };
 

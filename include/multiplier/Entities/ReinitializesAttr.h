@@ -76,7 +76,6 @@ class ReinitializesAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ReinitializesAttr) == sizeof(InheritableAttr));

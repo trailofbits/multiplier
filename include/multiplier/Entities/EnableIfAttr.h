@@ -79,7 +79,6 @@ class EnableIfAttr : public InheritableAttr {
 
   Expr condition(void) const;
   std::string_view message(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(EnableIfAttr) == sizeof(InheritableAttr));

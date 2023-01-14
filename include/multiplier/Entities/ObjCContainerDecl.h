@@ -55,10 +55,6 @@ class ObjCContainerDecl : public NamedDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::OBJ_C_CONTAINER;
-  }
-
   static ObjCContainerDeclContainingDeclRange containing(const Decl &decl);
   static ObjCContainerDeclContainingDeclRange containing(const Stmt &stmt);
 

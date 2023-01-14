@@ -77,7 +77,6 @@ class ReturnTypestateAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   ReturnTypestateAttrConsumedState state(void) const;
 };
 

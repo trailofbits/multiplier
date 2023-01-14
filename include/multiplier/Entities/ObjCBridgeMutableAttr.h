@@ -76,7 +76,6 @@ class ObjCBridgeMutableAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCBridgeMutableAttr) == sizeof(InheritableAttr));

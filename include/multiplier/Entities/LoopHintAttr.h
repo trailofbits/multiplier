@@ -70,7 +70,6 @@ class LoopHintAttr : public Attr {
 
   LoopHintAttrOptionType option(void) const;
   LoopHintAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   LoopHintAttrLoopHintState state(void) const;
   Expr value(void) const;
 };

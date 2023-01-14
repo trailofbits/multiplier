@@ -76,7 +76,6 @@ class IBOutletAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(IBOutletAttr) == sizeof(InheritableAttr));

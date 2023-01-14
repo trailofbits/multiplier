@@ -76,7 +76,6 @@ class IBActionAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(IBActionAttr) == sizeof(InheritableAttr));

@@ -20,7 +20,6 @@
 #include "../Use.h"
 
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 #include "RedeclarableTemplateDecl.h"
 
 namespace mx {
@@ -28,7 +27,6 @@ class Decl;
 class NamedDecl;
 class RedeclarableTemplateDecl;
 class TemplateDecl;
-class TypeAliasDecl;
 class TypeAliasTemplateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using TypeAliasTemplateDeclRange = DerivedEntityRange<DeclIterator, TypeAliasTemplateDecl>;
@@ -110,8 +108,6 @@ class TypeAliasTemplateDecl : public RedeclarableTemplateDecl {
     }
   }
 
-  std::optional<TypeAliasTemplateDecl> instantiated_from_member_template(void) const;
-  TypeAliasDecl templated_declaration(void) const;
 };
 
 static_assert(sizeof(TypeAliasTemplateDecl) == sizeof(RedeclarableTemplateDecl));

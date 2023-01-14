@@ -88,7 +88,6 @@ class NoMergeAttr : public DeclOrStmtAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NoMergeAttr) == sizeof(DeclOrStmtAttr));

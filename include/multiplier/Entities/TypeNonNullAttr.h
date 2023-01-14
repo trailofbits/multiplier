@@ -76,7 +76,6 @@ class TypeNonNullAttr : public TypeAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(TypeNonNullAttr) == sizeof(TypeAttr));

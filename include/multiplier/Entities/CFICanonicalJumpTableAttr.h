@@ -76,7 +76,6 @@ class CFICanonicalJumpTableAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CFICanonicalJumpTableAttr) == sizeof(InheritableAttr));

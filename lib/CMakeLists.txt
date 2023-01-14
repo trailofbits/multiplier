@@ -208,6 +208,14 @@ set_target_properties("mx-api"
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
+      "mx-entities"
+    EXPORT "${PROJECT_NAME}Targets"
+    PUBLIC_HEADER
+      DESTINATION
+        "${CMAKE_INSTALL_INCLUDEDIR}/${lower_project_name}/Entities"
+  )
+  install(
+    TARGETS
       "mx-api"
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME

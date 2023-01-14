@@ -30,7 +30,6 @@ class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
 class NamedDecl;
-class ParmVarDecl;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -136,7 +135,6 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_virtual(void) const;
   bool is_volatile(void) const;
   std::vector<CXXMethodDecl> overridden_methods(void) const;
-  std::vector<ParmVarDecl> parameter_declarations(void) const;
 };
 
 static_assert(sizeof(CXXMethodDecl) == sizeof(FunctionDecl));

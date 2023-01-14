@@ -84,7 +84,6 @@ class DiagnoseIfAttr : public InheritableAttr {
   DiagnoseIfAttrDiagnosticType diagnostic_type(void) const;
   std::string_view message(void) const;
   NamedDecl parent(void) const;
-  std::string_view spelling(void) const;
   bool is_error(void) const;
   bool is_warning(void) const;
 };

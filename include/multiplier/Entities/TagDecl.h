@@ -59,10 +59,6 @@ class TagDecl : public TypeDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::TAG;
-  }
-
   static TagDeclContainingDeclRange containing(const Decl &decl);
   static TagDeclContainingDeclRange containing(const Stmt &stmt);
 

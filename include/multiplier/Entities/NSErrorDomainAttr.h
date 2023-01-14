@@ -78,7 +78,6 @@ class NSErrorDomainAttr : public InheritableAttr {
   }
 
   VarDecl error_domain(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NSErrorDomainAttr) == sizeof(InheritableAttr));

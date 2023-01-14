@@ -79,7 +79,6 @@ class TryAcquireCapabilityAttr : public InheritableAttr {
   }
 
   TryAcquireCapabilityAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   Expr success_value(void) const;
   bool is_shared(void) const;
 };

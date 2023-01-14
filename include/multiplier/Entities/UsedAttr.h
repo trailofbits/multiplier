@@ -76,7 +76,6 @@ class UsedAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(UsedAttr) == sizeof(InheritableAttr));

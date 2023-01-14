@@ -53,10 +53,6 @@ class TemplateDecl : public NamedDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::TEMPLATE;
-  }
-
   static TemplateDeclContainingDeclRange containing(const Decl &decl);
   static TemplateDeclContainingDeclRange containing(const Stmt &stmt);
 
@@ -84,6 +80,9 @@ class TemplateDecl : public NamedDecl {
     }
   }
 
+  TemplateParameterList template_parameters(void) const;
+  NamedDecl templated_declaration(void) const;
+  bool has_associated_constraints(void) const;
 };
 
 static_assert(sizeof(TemplateDecl) == sizeof(NamedDecl));

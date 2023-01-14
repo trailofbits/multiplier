@@ -76,7 +76,6 @@ class C11NoReturnAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(C11NoReturnAttr) == sizeof(InheritableAttr));

@@ -81,7 +81,6 @@ class TypeTagForDatatypeAttr : public InheritableAttr {
   Type matching_c_type(void) const;
   Type matching_c_type_token(void) const;
   bool must_be_null(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(TypeTagForDatatypeAttr) == sizeof(InheritableAttr));

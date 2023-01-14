@@ -78,7 +78,6 @@ class OpenCLGenericAddressSpaceAttr : public TypeAttr {
   }
 
   OpenCLGenericAddressSpaceAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OpenCLGenericAddressSpaceAttr) == sizeof(TypeAttr));

@@ -76,7 +76,6 @@ class ArtificialAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ArtificialAttr) == sizeof(InheritableAttr));

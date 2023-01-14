@@ -19,6 +19,7 @@
 #include "../Token.h"
 #include "../Use.h"
 
+#include "DeclUseSelector.h"
 #include "Expr.h"
 #include "LambdaCaptureDefault.h"
 #include "StmtKind.h"
@@ -29,6 +30,7 @@ class CXXMethodDecl;
 class CXXRecordDecl;
 class CompoundStmt;
 class Expr;
+class FunctionTemplateDecl;
 class LambdaExpr;
 class NamedDecl;
 class Stmt;
@@ -108,6 +110,7 @@ class LambdaExpr : public Expr {
   LambdaCaptureDefault capture_default(void) const;
   Token capture_default_token(void) const;
   CompoundStmt compound_statement_body(void) const;
+  std::optional<FunctionTemplateDecl> dependent_call_operator(void) const;
   std::vector<NamedDecl> explicit_template_parameters(void) const;
   TokenRange introducer_range(void) const;
   CXXRecordDecl lambda_class(void) const;

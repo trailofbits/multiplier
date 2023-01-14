@@ -76,7 +76,6 @@ class MaxFieldAlignmentAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MaxFieldAlignmentAttr) == sizeof(InheritableAttr));

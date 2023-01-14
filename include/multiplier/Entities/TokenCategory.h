@@ -11,8 +11,18 @@
 #include <cstdint>
 
 namespace mx {
-enum class DeclCategory : unsigned char {
+enum class TokenCategory : unsigned char {
   UNKNOWN,
+  IDENTIFIER,
+  MACRO_NAME,
+  MACRO_PARAMETER_NAME,
+  MACRO_DIRECTIVE_NAME,
+  KEYWORD,
+  OBJECTIVE_C_KEYWORD,
+  BUILTIN_TYPE_NAME,
+  PUNCTUATION,
+  LITERAL,
+  COMMENT,
   LOCAL_VARIABLE,
   GLOBAL_VARIABLE,
   PARAMETER_VARIABLE,
@@ -23,27 +33,28 @@ enum class DeclCategory : unsigned char {
   CLASS_MEMBER,
   THIS,
   CLASS,
-  STRUCTURE,
+  STRUCT,
   UNION,
   CONCEPT,
   INTERFACE,
-  ENUMERATION,
+  ENUM,
   ENUMERATOR,
   NAMESPACE,
   TYPE_ALIAS,
-  TEMPLATE_TYPE_PARAMETER,
-  TEMPLATE_VALUE_PARAMETER,
+  TEMPLATE_PARAMETER_TYPE,
+  TEMPLATE_PARAMETER_VALUE,
   LABEL,
+  WHITESPACE,
 };
 
-inline static const char *EnumerationName(DeclCategory) {
-  return "DeclCategory";
+inline static const char *EnumerationName(TokenCategory) {
+  return "TokenCategory";
 }
 
-inline static constexpr unsigned NumEnumerators(DeclCategory) {
-  return 22;
+inline static constexpr unsigned NumEnumerators(TokenCategory) {
+  return 33;
 }
 
-const char *EnumeratorName(DeclCategory);
+const char *EnumeratorName(TokenCategory);
 
 } // namespace mx

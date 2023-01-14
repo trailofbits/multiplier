@@ -78,7 +78,6 @@ class UnusedAttr : public InheritableAttr {
   }
 
   UnusedAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(UnusedAttr) == sizeof(InheritableAttr));

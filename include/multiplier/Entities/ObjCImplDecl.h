@@ -57,10 +57,6 @@ class ObjCImplDecl : public ObjCContainerDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::OBJ_C_IMPL;
-  }
-
   static ObjCImplDeclContainingDeclRange containing(const Decl &decl);
   static ObjCImplDeclContainingDeclRange containing(const Stmt &stmt);
 

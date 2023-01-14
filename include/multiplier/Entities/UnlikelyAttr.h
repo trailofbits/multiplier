@@ -76,7 +76,6 @@ class UnlikelyAttr : public StmtAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(UnlikelyAttr) == sizeof(StmtAttr));

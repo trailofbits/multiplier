@@ -78,7 +78,6 @@ class AsmLabelAttr : public InheritableAttr {
 
   bool is_literal_label(void) const;
   std::string_view label(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AsmLabelAttr) == sizeof(InheritableAttr));

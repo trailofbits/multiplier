@@ -76,7 +76,6 @@ class SpeculativeLoadHardeningAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SpeculativeLoadHardeningAttr) == sizeof(InheritableAttr));

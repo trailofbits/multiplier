@@ -76,7 +76,6 @@ class TransparentUnionAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(TransparentUnionAttr) == sizeof(InheritableAttr));

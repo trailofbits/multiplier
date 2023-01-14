@@ -78,7 +78,6 @@ class ErrorAttr : public InheritableAttr {
   }
 
   ErrorAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   std::string_view user_diagnostic(void) const;
   bool is_error(void) const;
   bool is_warning(void) const;

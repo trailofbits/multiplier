@@ -76,7 +76,6 @@ class CPUSpecificAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CPUSpecificAttr) == sizeof(InheritableAttr));

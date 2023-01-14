@@ -64,7 +64,6 @@ class ObjCNonRuntimeProtocolAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCNonRuntimeProtocolAttr) == sizeof(Attr));

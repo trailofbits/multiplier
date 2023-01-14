@@ -545,6 +545,11 @@ static void PersistTokenTree(
   auto re = fb.initRelatedEntityId(num_tokens);
   auto i = 0u;
 
+  // Pre-fill the related entity IDs for the parsed tokens.
+  for (const pasta::Token &tok : parsed_tokens) {
+    (void) RelatedEntityId(em, tok, tok_related_entities);
+  }
+
   // Serialize the tokens.
   for (const TokenTreeNode &tok_node : sched.tokens) {
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));

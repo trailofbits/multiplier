@@ -90,7 +90,6 @@ class AlwaysInlineAttr : public DeclOrStmtAttr {
   }
 
   AlwaysInlineAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_clang_always_inline(void) const;
 };
 

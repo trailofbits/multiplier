@@ -64,7 +64,6 @@ class ObjCNonLazyClassAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCNonLazyClassAttr) == sizeof(Attr));

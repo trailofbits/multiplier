@@ -58,10 +58,6 @@ class TypedefNameDecl : public TypeDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::TYPEDEF_NAME;
-  }
-
   static TypedefNameDeclContainingDeclRange containing(const Decl &decl);
   static TypedefNameDeclContainingDeclRange containing(const Stmt &stmt);
 
