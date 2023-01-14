@@ -337,8 +337,13 @@ void SerializeDefineMacroDirective(const EntityMapper &es, mx::ast::Macro::Build
   (void) b;
   (void) e;
   SerializeMacroDirective(es, b, e, tt);
-  auto t9 = e.Name();
-  b.setVal9(es.EntityId(t9));
+  auto v9 = e.Name();
+  if (v9) {
+    auto id9 = es.EntityId(v9.value());
+    b.setVal9(id9);
+  } else {
+    b.setVal9(mx::kInvalidEntityId);
+  }
   if (true) {
     auto v3 = e.Body();
     auto sv3 = b.initVal3(static_cast<unsigned>(v3.size()));

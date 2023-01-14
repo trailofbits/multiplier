@@ -579,6 +579,13 @@ static std::vector<OrderedMacro> FindTLMs(const pasta::AST &ast) {
     // macro is used at least once.
     if (auto md = pasta::DefineMacroDirective::From(mn)) {
 
+      // If this macro definition doesn't have a name, then it's in a
+      // conditionally disabled region.
+      auto name = md->Name();
+      if (!name) {
+        continue;
+      }
+
       // Builtin or command-line specified macros have no location.
       //
       // NOTE(pag): The persistence for macros re-interprets macros with no
@@ -586,7 +593,7 @@ static std::vector<OrderedMacro> FindTLMs(const pasta::AST &ast) {
       //            expansions.
       //
       // TODO(pag): Find a way to give these file locations.
-      if (!md->Name().FileLocation()) {
+      if (!name->FileLocation()) {
         continue;
       }
 

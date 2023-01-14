@@ -814,7 +814,7 @@ EntityId Token::id(void) const {
 // macro token that only relates to a single parsed token, then that is
 // returned. If this is a macro token that doesn't relate to any parsed
 // tokens, or relates to more than one, then nothing is returned.
-std::optional<Token> Token::parsed_token(void) const {
+Token Token::parsed_token(void) const {
   VariantId vid = impl->NthParsedTokenId(offset).Unpack();
   if (std::holds_alternative<ParsedTokenId>(vid)) {
     return *this;
@@ -823,13 +823,13 @@ std::optional<Token> Token::parsed_token(void) const {
     return Token(frag->MacroTokenReader(frag),
                  std::get<MacroTokenId>(vid).offset);
   } else {
-    return std::nullopt;
+    return Token();
   }
 }
 
 // Return the token from which this token was derived. This can be a macro
 // token or a file token.
-std::optional<Token> Token::derived_token(void) const {
+Token Token::derived_token(void) const {
   EntityId eid = impl->NthDerivedTokenId(offset);
   VariantId vid = eid.Unpack();
 
@@ -845,19 +845,19 @@ std::optional<Token> Token::derived_token(void) const {
     offset = std::get<MacroTokenId>(vid).offset;
 
   } else {
-    return std::nullopt;
+    return Token();
   }
 
   auto reader = impl->ReaderForToken(impl, eid.Pack());
   if (!reader) {
     assert(false);  // Should always get a reader.
-    return std::nullopt;
+    return Token();
   }
 
   auto num_tokens = reader->NumTokens();
   if (offset >= num_tokens) {
     assert(false);
-    return std::nullopt;
+    return Token();
   }
 
   return Token(std::move(reader), offset);
@@ -866,17 +866,17 @@ std::optional<Token> Token::derived_token(void) const {
 // Return the version of this token from a file, if any. If this is a parsed
 // or macro token, then this will walk the derivation chain back to a file
 // token.
-std::optional<Token> Token::file_token(void) const {
+Token Token::file_token(void) const {
   EntityId eid(impl->NthFileTokenId(offset));
   VariantId vid = eid.Unpack();
   if (!std::holds_alternative<FileTokenId>(vid)) {
-    return std::nullopt;
+    return Token();
   }
 
   FileTokenId fid = std::get<FileTokenId>(vid);
   auto fr = impl->ReaderForToken(impl, eid.Pack());
   if (!fr) {
-    return std::nullopt;
+    return Token();
   }
 
   return Token(std::move(fr), fid.offset);
@@ -886,7 +886,7 @@ std::optional<Token> Token::file_token(void) const {
 // one-to-one correspondence between this token and a file token, then it
 // likely means this token exists inside of a macro expansion. If that is the
 // case, then this will return the beginning token of the macro expansion.
-std::optional<Token> Token::nearest_file_token(void) const {
+Token Token::nearest_file_token(void) const {
   for (auto i = 0u; i <= offset; ++i) {
     EntityId eid(impl->NthFileTokenId(offset - i));
     VariantId vid = eid.Unpack();
@@ -898,7 +898,7 @@ std::optional<Token> Token::nearest_file_token(void) const {
     }
   }
 
-  return std::nullopt;
+  return Token();
 }
 
 // The category of this token. This takes into account any related entities.

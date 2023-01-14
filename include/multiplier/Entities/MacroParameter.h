@@ -60,8 +60,8 @@ class MacroParameter : public Macro {
     }
   }
 
-  std::optional<Token> variadic_dots(void) const;
-  std::optional<Token> name(void) const;
+  Token variadic_dots(void) const;
+  Token name(void) const;
   unsigned index(void) const;
 };
 

@@ -143,9 +143,11 @@ void LinkEntityNamesToFragment(
   //            like this, I think.
   for (const pasta::Macro &macro : pf.top_level_macros) {
     if (auto nm = pasta::DefineMacroDirective::From(macro)) {
-      std::string_view name = nm->Name().Data();
-      database.AddAsync(mx::SymbolNameRecord{
-          em.EntityId(macro), std::string(name.data(), name.size())});
+      if (auto macro_name = nm->Name()) {
+        std::string_view name = macro_name->Data();
+        database.AddAsync(mx::SymbolNameRecord{
+            em.EntityId(macro), std::string(name.data(), name.size())});
+      }
     }
   }
 }

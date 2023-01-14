@@ -6240,7 +6240,7 @@ MX_BEGIN_VISIT_PSEUDO(CXXBaseSpecifier)
   MX_VISIT_ENUM(CXXBaseSpecifier, base_kind, 17, MX_APPLY_METHOD, BaseKind, TagTypeKind, NthPseudo)
   MX_VISIT_BOOL(CXXBaseSpecifier, is_pack_expansion, 2, MX_APPLY_METHOD, IsPackExpansion, bool, NthPseudo)
   MX_VISIT_BOOL(CXXBaseSpecifier, constructors_are_inherited, 3, MX_APPLY_METHOD, ConstructorsAreInherited, bool, NthPseudo)
-  MX_VISIT_OPTIONAL_ENTITY(CXXBaseSpecifier, ellipsis_token, 7, MX_APPLY_METHOD, EllipsisToken, Token, NthPseudo, TokenUseSelector::ELLIPSIS_TOKEN)
+  MX_VISIT_ENTITY(CXXBaseSpecifier, ellipsis_token, 7, MX_APPLY_METHOD, EllipsisToken, Token, NthPseudo, TokenUseSelector::ELLIPSIS_TOKEN)
   MX_VISIT_ENUM(CXXBaseSpecifier, semantic_access_specifier, 19, MX_APPLY_METHOD, SemanticAccessSpecifier, AccessSpecifier, NthPseudo)
   MX_VISIT_ENUM(CXXBaseSpecifier, lexical_access_specifier, 20, MX_APPLY_METHOD, LexicalAccessSpecifier, AccessSpecifier, NthPseudo)
   MX_VISIT_ENTITY(CXXBaseSpecifier, base_type, 8, MX_APPLY_METHOD, BaseType, Type, NthPseudo, TypeUseSelector::BASE_TYPE)
@@ -6364,8 +6364,8 @@ MX_END_VISIT_MACRO(MacroArgument)
 MX_BEGIN_VISIT_MACRO(MacroParameter)
   MX_ENTER_VISIT_MacroParameter
   MX_VISIT_BASE(MacroParameter, Macro)
-  MX_VISIT_OPTIONAL_ENTITY(MacroParameter, variadic_dots, 4, MX_APPLY_METHOD, VariadicDots, MacroToken, NthMacro, TokenUseSelector::VARIADIC_DOTS)
-  MX_VISIT_OPTIONAL_ENTITY(MacroParameter, name, 8, MX_APPLY_METHOD, Name, MacroToken, NthMacro, TokenUseSelector::NAME)
+  MX_VISIT_ENTITY(MacroParameter, variadic_dots, 4, MX_APPLY_METHOD, VariadicDots, MacroToken, NthMacro, TokenUseSelector::VARIADIC_DOTS)
+  MX_VISIT_ENTITY(MacroParameter, name, 8, MX_APPLY_METHOD, Name, MacroToken, NthMacro, TokenUseSelector::NAME)
   MX_VISIT_INT(MacroParameter, index, 7, MX_APPLY_METHOD, Index, unsigned, NthMacro)
   MX_EXIT_VISIT_MacroParameter
 MX_END_VISIT_MACRO(MacroParameter)
@@ -6381,7 +6381,7 @@ MX_BEGIN_VISIT_ABSTRACT_MACRO(MacroDirective)
   MX_ENTER_VISIT_MacroDirective
   MX_VISIT_BASE(MacroDirective, Macro)
   MX_VISIT_ENTITY(MacroDirective, hash, 4, MX_APPLY_METHOD, Hash, MacroToken, NthMacro, TokenUseSelector::HASH)
-  MX_VISIT_OPTIONAL_ENTITY(MacroDirective, directive_name, 8, MX_APPLY_METHOD, DirectiveName, MacroToken, NthMacro, TokenUseSelector::DIRECTIVE_NAME)
+  MX_VISIT_ENTITY(MacroDirective, directive_name, 8, MX_APPLY_METHOD, DirectiveName, MacroToken, NthMacro, TokenUseSelector::DIRECTIVE_NAME)
   MX_EXIT_VISIT_MacroDirective
 MX_END_VISIT_MACRO(MacroDirective)
 

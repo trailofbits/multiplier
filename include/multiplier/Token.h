@@ -97,22 +97,22 @@ class Token {
   // returned. If this is a macro token that doesn't relate to any parsed
   // tokens, or relates to more than one, then nothing is returned. If this
   // is a file token then nothing is returned.
-  std::optional<Token> parsed_token(void) const;
+  Token parsed_token(void) const;
 
   // Return the token from which this token was derived. This can be a macro
   // token or a file token.
-  std::optional<Token> derived_token(void) const;
+  Token derived_token(void) const;
 
   // Return the version of this token from a file, if any. If this is a parsed
   // or macro token, then this will walk the derivation chain back to a file
   // token.
-  std::optional<Token> file_token(void) const;
+  Token file_token(void) const;
 
   // Return the version of this token from a file, if any. If there isn't a
   // one-to-one correspondence between this token and a file token, then it
   // likely means this token exists inside of a macro expansion. If that is the
   // case, then this will return the beginning token of the macro expansion.
-  std::optional<Token> nearest_file_token(void) const;
+  Token nearest_file_token(void) const;
 
   // Return the entity associated with this token.
   VariantEntity related_entity(void) const;
@@ -141,7 +141,7 @@ class Token {
   inline std::optional<std::pair<unsigned, unsigned>> nearest_location(
       const FileLocationCache &cache) const {
     if (auto maybe_file_token = nearest_file_token()) {
-      return maybe_file_token->location(cache);
+      return maybe_file_token.location(cache);
     } else {
       return std::nullopt;
     }

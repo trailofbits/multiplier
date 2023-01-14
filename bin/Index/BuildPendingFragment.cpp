@@ -54,6 +54,9 @@ class FragmentBuilder {
   void Accept(const pasta::TemplateParameterList &entity);
   void Accept(const pasta::Designator &entity);
 
+  void MaybeVisitNext(std::optional<pasta::MacroToken>) {}
+  void MaybeVisitNext(std::optional<pasta::FileToken>) {}
+  void MaybeVisitNext(std::optional<pasta::Token>) {}
   void MaybeVisitNext(const pasta::Token &) {}
 
   void MaybeVisitNext(const pasta::Decl &entity);

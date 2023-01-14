@@ -751,11 +751,13 @@ mx::RawEntityId RelatedEntityId(
       // If the macro token is the name of the macro definition used, then
       // make the related entity be the defined macro itself.
       if (auto def = exp->Definition()) {
-        if (def->Name().Data() == mtok.Data()) {
-          auto eid = em.EntityId(def.value());
-          related_ids.emplace(tok.RawToken(), eid);
-          found = true;
-          return eid;
+        if (auto name = def->Name()) {
+          if (name->Data() == mtok.Data()) {
+            auto eid = em.EntityId(def.value());
+            related_ids.emplace(tok.RawToken(), eid);
+            found = true;
+            return eid;
+          }
         }
       }
 
@@ -800,11 +802,13 @@ mx::RawEntityId RelatedEntityId(
 
     // Point the defined macro name at the macro itself.
     } else if (auto def = pasta::DefineMacroDirective::From(parent.value())) {
-      if (def->Name().RawMacro() == mtok.RawMacro()) {
-        auto eid = em.EntityId(def.value());
-        related_ids.emplace(tok.RawToken(), eid);
-        found = true;
-        return eid;
+      if (auto name = def->Name()) {
+        if (name->RawMacro() == mtok.RawMacro()) {
+          auto eid = em.EntityId(def.value());
+          related_ids.emplace(tok.RawToken(), eid);
+          found = true;
+          return eid;
+        }
       }
     }
 

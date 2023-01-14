@@ -7884,11 +7884,11 @@ bool CXXBaseSpecifier::constructors_are_inherited(void) const {
   return self.getVal3();
 }
 
-std::optional<Token> CXXBaseSpecifier::ellipsis_token(void) const {
+Token CXXBaseSpecifier::ellipsis_token(void) const {
   auto self = fragment->NthPseudo(offset_);
   if (true) {
     EntityId id(self.getVal7());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -8293,19 +8293,19 @@ std::optional<MacroParameter> MacroParameter::from(const Macro &parent) {
   }
 }
 
-std::optional<Token> MacroParameter::variadic_dots(void) const {
+Token MacroParameter::variadic_dots(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal4());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
-std::optional<Token> MacroParameter::name(void) const {
+Token MacroParameter::name(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal8());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -8370,11 +8370,11 @@ Token MacroDirective::hash(void) const {
   }
 }
 
-std::optional<Token> MacroDirective::directive_name(void) const {
+Token MacroDirective::directive_name(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal8());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -8416,10 +8416,9 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const Macro &pare
 
 Token DefineMacroDirective::name(void) const {
   auto self = fragment->NthMacro(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
+  if (true) {
+    EntityId id(self.getVal9());
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 

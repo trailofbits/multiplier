@@ -1034,6 +1034,7 @@ void CodeGenerator::RunOnOptional(
   std::string cxx_underlying_name;
   bool is_enum = false;
   bool is_bool = false;
+  bool is_token = false;
   bool needs_test = true;
   if (!element_name) {
 
@@ -1091,6 +1092,7 @@ void CodeGenerator::RunOnOptional(
         *element_name == "MacroToken") {
       capn_element_name = "UInt64";  // Reference.
       cxx_element_name = "Token";
+      is_token = true;
     }
 
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
@@ -1112,21 +1114,39 @@ void CodeGenerator::RunOnOptional(
 
   auto [ip_getter_name, ip_setter_name, ip_init_name] = NamesFor(is_present_i);
 
-  os
-      << "  std::optional<" << cxx_element_name << "> "
-      << api_name << "(void) const;\n";
+  // Tokens are nullable-ish.
+  if (is_token) {
+    os
+        << "  Token " << api_name << "(void) const;\n";
 
-  lib_cpp_os
-      << "std::optional<" << cxx_element_name << "> "
-      << class_name << "::" << api_name
-      << "(void) const {\n"
-      << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+    lib_cpp_os
+        << "Token " << class_name << "::" << api_name
+        << "(void) const {\n"
+        << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+  } else {
+    os
+        << "  std::optional<" << cxx_element_name << "> "
+        << api_name << "(void) const;\n";
+
+    lib_cpp_os
+        << "std::optional<" << cxx_element_name << "> "
+        << class_name << "::" << api_name
+        << "(void) const {\n"
+        << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+  }
 
   if (needs_test) {
-    lib_cpp_os
-        << "  if (!self." << ip_getter_name << "()) {\n"
-        << "    return std::nullopt;\n"
-        << "  } else {\n";
+    if (is_token) {
+      lib_cpp_os
+          << "  if (!self." << ip_getter_name << "()) {\n"
+          << "    return Token();\n"
+          << "  } else {\n";
+    } else {
+      lib_cpp_os
+          << "  if (!self." << ip_getter_name << "()) {\n"
+          << "    return std::nullopt;\n"
+          << "  } else {\n";
+    }
   } else {
     lib_cpp_os
         << "  if (true) {\n";
@@ -1210,7 +1230,12 @@ void CodeGenerator::RunOnOptional(
   } else if (gEntityClassNames.count(element_name.value())) {
     assert(!needs_test);
     fwd_decls.insert(cxx_element_name);
-    serializer = "MX_VISIT_OPTIONAL_ENTITY";
+
+    if (is_token) {
+      serializer = "MX_VISIT_ENTITY";
+    } else {
+      serializer = "MX_VISIT_OPTIONAL_ENTITY";
+    }
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
@@ -1227,13 +1252,13 @@ void CodeGenerator::RunOnOptional(
     selector << ", ";
 
     // Tokens are more like pseudo-entities but whatever.
-    if (*element_name == "Token" || *element_name == "FileToken" ||
-        *element_name == "MacroToken") {
+    if (is_token) {
       needed_decls.insert("TokenUseSelector");
       token_use_ids[api_name].SetId(cls, i);
       selector << "TokenUseSelector";
       lib_cpp_os
-          << "    return fragment->TokenFor(fragment, id);\n";
+          << "    return fragment->TokenFor(fragment, id, "
+             "true /* can_fail */).value();\n";
 
     } else if (*element_name == "File") {
       needed_decls.insert("FileUseSelector");

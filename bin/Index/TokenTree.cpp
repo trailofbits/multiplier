@@ -1323,7 +1323,12 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
     return body;
   }
 
-  pasta::MacroToken name = def.Name();
+  auto maybe_name = def.Name();
+  if (!maybe_name) {
+    return nullptr;
+  }
+
+  pasta::MacroToken name = std::move(maybe_name.value());
   body = CreateSubstitution(mx::MacroKind::DEFINE_DIRECTIVE);
   body->macro = def;
 
@@ -1757,8 +1762,13 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   Substitution *macro_body = GetMacroBody(macro_def.value(), err);
   if (!macro_body) {
     exp->after.has_error = true;
-    err << "Unable to find macro body for macro with name '"
-        << macro_def->Name().Data() << "'";
+    if (auto macro_name = macro_def->Name()) {
+      err << "Unable to find macro body for macro with name '"
+          << macro_name->Data() << "'";
+    } else {
+      assert(false);
+      err << "Unable to find macro body for macro that was probably not defined";
+    }
     return nullptr;
   }
 
@@ -1766,8 +1776,14 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   if (pre_exp) {
     exp->before_after_bounds_are_same = true;
     if (!MergeArgPreExpansion(exp, pre_exp, err)) {
-      err << "Unable to merge pre-argument expansion with use of macro "
-          << macro_def->Name().Data();
+      if (auto macro_name = macro_def->Name()) {
+        err << "Unable to merge argument pre-expansion with use of macro "
+            << macro_name->Data() << "'";
+      } else {
+        assert(false);
+        err << "Unable to merge argument pre-expansion with use of macro "
+               "that wasn't defined?";
+      }
       return nullptr;
     }
 

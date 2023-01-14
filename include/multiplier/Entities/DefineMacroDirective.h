@@ -21,12 +21,14 @@
 
 #include "MacroDirective.h"
 #include "MacroKind.h"
+#include "TokenUseSelector.h"
 
 namespace mx {
 class DefineMacroDirective;
 class Macro;
 class MacroDirective;
 class MacroReferenceRange;
+class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using DefineMacroDirectiveRange = DerivedEntityRange<MacroIterator, DefineMacroDirective>;
 using DefineMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, DefineMacroDirective>;
