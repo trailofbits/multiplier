@@ -71,7 +71,6 @@ class LoaderUninitializedAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(LoaderUninitializedAttr) == sizeof(Attr));

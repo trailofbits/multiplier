@@ -84,7 +84,6 @@ class BTFTypeTagAttr : public TypeAttr {
   }
 
   std::string_view btf_type_tag(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(BTFTypeTagAttr) == sizeof(TypeAttr));

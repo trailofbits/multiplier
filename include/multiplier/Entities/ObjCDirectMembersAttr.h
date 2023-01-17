@@ -71,7 +71,6 @@ class ObjCDirectMembersAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCDirectMembersAttr) == sizeof(Attr));

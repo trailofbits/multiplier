@@ -83,7 +83,6 @@ class OMPCaptureNoInitAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OMPCaptureNoInitAttr) == sizeof(InheritableAttr));

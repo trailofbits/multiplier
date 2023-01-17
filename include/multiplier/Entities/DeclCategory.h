@@ -25,6 +25,7 @@ enum class DeclCategory : unsigned char {
   CLASS,
   STRUCTURE,
   UNION,
+  CONCEPT,
   INTERFACE,
   ENUMERATION,
   ENUMERATOR,
@@ -40,7 +41,7 @@ inline static const char *EnumerationName(DeclCategory) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclCategory) {
-  return 21;
+  return 22;
 }
 
 const char *EnumeratorName(DeclCategory);

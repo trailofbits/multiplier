@@ -38,6 +38,7 @@ struct FileHashMap final : public std::unordered_map<pasta::File, std::string> {
 using TypeKey = std::pair<const void *, uint32_t>;
 struct TypeIdMap final : public std::map<TypeKey, mx::SpecificEntityId<mx::TypeId>> {};
 struct PseudoOffsetMap final : public std::unordered_map<const void *, uint32_t> {};
+class EntityMapper;
 
 // Return `true` of `tok` is in the context of `decl`.
 bool TokenIsInContextOfDecl(const pasta::Token &tok, const pasta::Decl &decl);
@@ -82,5 +83,19 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Type &type);
 
 // Try to find the `Decl` referenced by a particular `stmt`.
 std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt);
+
+using RelatedEntityIds = std::unordered_map<const void *, mx::RawEntityId>;
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::Token &tok,
+    RelatedEntityIds &related_ids);
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::MacroToken &tok,
+    RelatedEntityIds &related_ids);
 
 }  // namespace indexer

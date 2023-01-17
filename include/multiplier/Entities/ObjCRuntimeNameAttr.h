@@ -72,7 +72,6 @@ class ObjCRuntimeNameAttr : public Attr {
   }
 
   std::string_view metadata_name(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCRuntimeNameAttr) == sizeof(Attr));

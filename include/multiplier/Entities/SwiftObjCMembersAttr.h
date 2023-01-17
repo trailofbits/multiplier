@@ -71,7 +71,6 @@ class SwiftObjCMembersAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SwiftObjCMembersAttr) == sizeof(Attr));

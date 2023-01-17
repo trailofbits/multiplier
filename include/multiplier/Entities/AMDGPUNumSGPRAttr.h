@@ -83,7 +83,6 @@ class AMDGPUNumSGPRAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AMDGPUNumSGPRAttr) == sizeof(InheritableAttr));

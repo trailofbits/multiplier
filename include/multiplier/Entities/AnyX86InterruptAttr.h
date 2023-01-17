@@ -83,7 +83,6 @@ class AnyX86InterruptAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AnyX86InterruptAttr) == sizeof(InheritableAttr));

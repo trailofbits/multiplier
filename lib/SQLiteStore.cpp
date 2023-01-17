@@ -24,6 +24,7 @@ static thread_local sqlite3 *tDatabase = nullptr;
 class ConnectionImpl {
  public:
   const std::filesystem::path db_path;
+  const bool read_only;
   sqlite3 *db{nullptr};
   std::vector<sqlite3_stmt *> stmts;
 
@@ -37,8 +38,9 @@ class ConnectionImpl {
 };
 
 ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
-                               bool read_only)
+                               bool read_only_)
     : db_path(db_path_),
+      read_only(read_only_),
       busy_handler([] (unsigned) -> int {
         std::this_thread::yield();
         return 1;
@@ -248,6 +250,11 @@ Connection::Connection(const std::filesystem::path &db_path,
 // Get the filename used to open the database
 std::filesystem::path Connection::GetFilename(void) const {
   return impl->db_path;
+}
+
+// Was this connection opened in read-only mode?
+bool Connection::IsReadOnly(void) const {
+  return impl->read_only;
 }
 
 void Connection::CreateFunction(

@@ -83,7 +83,6 @@ class X86ForceAlignArgPointerAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(X86ForceAlignArgPointerAttr) == sizeof(InheritableAttr));

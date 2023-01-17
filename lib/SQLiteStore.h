@@ -200,11 +200,17 @@ class Connection {
   explicit Connection(const std::filesystem::path &db_path,
                       bool read_only = false);
 
-  Connection(const Connection &) = default;
-  Connection &operator=(const Connection &) = default;
-
   Connection(Connection &&) = default;
   Connection &operator=(Connection &&) noexcept = default;
+
+  // Copying a connection makes a new connection.
+  Connection(const Connection &conn)
+      : Connection(conn.GetFilename(), conn.IsReadOnly()) {}
+
+  // Assigning moves a copy of a new connection.
+  inline Connection &operator=(const Connection &conn) {
+    return *this = Connection(conn);
+  }
 
   // Execute statements without results
   void Execute(const std::string &query);
@@ -248,6 +254,9 @@ class Connection {
 
   // Get the filename used to open the database
   std::filesystem::path GetFilename(void) const;
+
+  // Was this connection opened in read-only mode?
+  bool IsReadOnly(void) const;
 };
 
 class Transaction {

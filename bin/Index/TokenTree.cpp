@@ -1323,11 +1323,16 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
     return body;
   }
 
-  pasta::MacroToken name = def.Name();
+  auto maybe_name = def.Name();
+  if (!maybe_name) {
+    return nullptr;
+  }
+
+  pasta::MacroToken name = std::move(maybe_name.value());
   body = CreateSubstitution(mx::MacroKind::DEFINE_DIRECTIVE);
   body->macro = def;
 
-  for (auto &node : def.Body()) {
+  for (pasta::Macro node : def.Body()) {
     std::optional<pasta::MacroToken> tok = pasta::MacroToken::From(node);
     if (!tok) {
       continue;
@@ -1335,6 +1340,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
 
     D( std::cerr << indent << "body token: " << tok->Data() << '\n'; )
 
+    pasta::TokenKind tok_kind = tok->TokenKind();
     TokenInfo &info = tokens_alloc.emplace_back();
     info.file_tok = tok->FileLocation();
     info.parsed_tok = tok->ParsedLocation();
@@ -1342,7 +1348,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
     info.is_part_of_sub = info.file_tok.has_value();
     info.category = TokenInfo::kMissingFileToken;
 
-    switch (tok->TokenKind()) {
+    switch (tok_kind) {
       case pasta::TokenKind::kEndOfFile:
       case pasta::TokenKind::kEndOfDirective:
         continue;
@@ -1756,8 +1762,13 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   Substitution *macro_body = GetMacroBody(macro_def.value(), err);
   if (!macro_body) {
     exp->after.has_error = true;
-    err << "Unable to find macro body for macro with name '"
-        << macro_def->Name().Data() << "'";
+    if (auto macro_name = macro_def->Name()) {
+      err << "Unable to find macro body for macro with name '"
+          << macro_name->Data() << "'";
+    } else {
+      assert(false);
+      err << "Unable to find macro body for macro that was probably not defined";
+    }
     return nullptr;
   }
 
@@ -1765,8 +1776,14 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   if (pre_exp) {
     exp->before_after_bounds_are_same = true;
     if (!MergeArgPreExpansion(exp, pre_exp, err)) {
-      err << "Unable to merge pre-argument expansion with use of macro "
-          << macro_def->Name().Data();
+      if (auto macro_name = macro_def->Name()) {
+        err << "Unable to merge argument pre-expansion with use of macro "
+            << macro_name->Data() << "'";
+      } else {
+        assert(false);
+        err << "Unable to merge argument pre-expansion with use of macro "
+               "that wasn't defined?";
+      }
       return nullptr;
     }
 

@@ -83,7 +83,6 @@ class Mips16Attr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(Mips16Attr) == sizeof(InheritableAttr));

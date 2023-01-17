@@ -83,7 +83,6 @@ class LayoutVersionAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(LayoutVersionAttr) == sizeof(InheritableAttr));

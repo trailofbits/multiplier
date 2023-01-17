@@ -27,6 +27,7 @@
 
 namespace mx {
 class CXXRecordDecl;
+class ClassTemplateDecl;
 class ClassTemplateSpecializationDecl;
 class Decl;
 class NamedDecl;
@@ -144,6 +145,7 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   Token extern_token(void) const;
   Token point_of_instantiation(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
+  ClassTemplateDecl specialized_template(void) const;
   std::vector<TemplateArgument> template_arguments(void) const;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;

@@ -75,7 +75,6 @@ class OMPDeclareSimdDeclAttr : public Attr {
 
   OMPDeclareSimdDeclAttrBranchStateTy branch_state(void) const;
   Expr simdlen(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OMPDeclareSimdDeclAttr) == sizeof(Attr));

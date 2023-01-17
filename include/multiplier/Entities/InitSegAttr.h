@@ -72,7 +72,6 @@ class InitSegAttr : public Attr {
   }
 
   std::string_view section(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(InitSegAttr) == sizeof(Attr));

@@ -83,7 +83,6 @@ class M68kInterruptAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(M68kInterruptAttr) == sizeof(InheritableAttr));

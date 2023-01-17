@@ -669,6 +669,8 @@ VariantId EntityId::Unpack(void) const noexcept {
         }
     }
   }
+
+  return InvalidId{};
 }
 
 }  // namespace mx

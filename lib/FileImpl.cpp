@@ -5,6 +5,8 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "File.h"
+
+#include <cassert>
 #include <multiplier/Entities/TokenKind.h>
 
 namespace mx {
@@ -68,6 +70,11 @@ EntityId ReadFileTokensFromFile::NthParsedTokenId(unsigned) const {
 
 // Return the id of the macro containing the Nth token.
 EntityId ReadFileTokensFromFile::NthContainingMacroId(unsigned) const {
+  return kInvalidEntityId;
+}
+
+// Return an entity id associated with the Nth token.
+EntityId ReadFileTokensFromFile::NthRelatedEntityId(unsigned) const {
   return kInvalidEntityId;
 }
 

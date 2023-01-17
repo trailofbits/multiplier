@@ -40,6 +40,7 @@ class Expr;
 class NamedDecl;
 class ValueDecl;
 class VarDecl;
+class VarTemplateDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarDecl : public DeclaratorDecl {
  private:
@@ -125,6 +126,7 @@ class VarDecl : public DeclaratorDecl {
   }
 
   std::optional<VarDecl> acting_definition(void) const;
+  std::optional<VarTemplateDecl> described_variable_template(void) const;
   std::optional<Expr> initializer(void) const;
   VarDeclInitializationStyle initializer_style(void) const;
   std::optional<VarDecl> initializing_declaration(void) const;

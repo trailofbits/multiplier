@@ -95,7 +95,6 @@ class CarriesDependencyAttr : public InheritableParamAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CarriesDependencyAttr) == sizeof(InheritableParamAttr));

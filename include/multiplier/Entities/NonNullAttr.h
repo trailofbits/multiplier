@@ -95,7 +95,6 @@ class NonNullAttr : public InheritableParamAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NonNullAttr) == sizeof(InheritableParamAttr));

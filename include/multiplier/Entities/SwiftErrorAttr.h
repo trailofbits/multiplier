@@ -85,7 +85,6 @@ class SwiftErrorAttr : public InheritableAttr {
   }
 
   SwiftErrorAttrConventionKind convention(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SwiftErrorAttr) == sizeof(InheritableAttr));

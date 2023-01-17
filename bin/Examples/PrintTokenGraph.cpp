@@ -52,19 +52,16 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
     return;
   }
 
-  mx::EntityId dt_id = dt->id();
-  std::vector<mx::Macro> containing;
-  for(auto m : mx::Macro::containing(dt.value())) {
-    containing.push_back(m);
-  }
-  if (file_toks.index_of(dt.value())) {
+  mx::EntityId dt_id = dt.id();
+  auto macro_containing = mx::Macro::containing(dt);
+  auto m = macro_containing.begin();
+  if (file_toks.index_of(dt)) {
     os << "ft0:t" << dt_id.Pack() << " -> " << prefix << parent_id
        << ":t" << id << ";\n";
 
-  } else if (!containing.empty()) {
-    auto m = containing.front();
+  } else if (m != macro_containing.end()) {
     const char *pred_prefix = "m";
-    switch (m.kind()) {
+    switch (m->kind()) {
       case mx::MacroKind::SUBSTITUTION:
       case mx::MacroKind::EXPANSION:
       case mx::MacroKind::STRINGIFY:
@@ -76,10 +73,10 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
         break;
     }
 
-    if (auto sub = mx::MacroSubstitution::from(m)) {
+    if (auto sub = mx::MacroSubstitution::from(*m)) {
       for (const mx::MacroOrToken node : sub->replacement_children()) {
         if (std::holds_alternative<mx::Token>(node)) {
-          if (std::get<mx::Token>(node) == dt.value()) {
+          if (std::get<mx::Token>(node) == dt) {
             pred_prefix = "a";
             break;
           }
@@ -87,14 +84,18 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
       }
     }
 
-    os << pred_prefix << m.id().Pack() << ":t" << dt_id.Pack()
+    os << pred_prefix << m->id().Pack() << ":t" << dt_id.Pack()
        << " -> " << prefix << parent_id << ":t" << id << ";\n";
 
-  // No containing macro, and it's not a file token means it's a top-level
-  // macro token.
-  } else {
+  // No containing macro, but it's part of a fragment, which means it's a top-
+  // level macro token.
+  } else if (auto m = mx::Fragment::containing(dt)) {
     os << "ct0:t" << dt_id.Pack() << " -> " << prefix << parent_id
        << ":t" << id << ";\n";
+
+  // It must be a file token related to a different fragment.
+  } else {
+
   }
 }
 

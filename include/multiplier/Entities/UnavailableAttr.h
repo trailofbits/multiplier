@@ -86,7 +86,6 @@ class UnavailableAttr : public InheritableAttr {
 
   UnavailableAttrImplicitReason implicit_reason(void) const;
   std::string_view message(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(UnavailableAttr) == sizeof(InheritableAttr));

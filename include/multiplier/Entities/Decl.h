@@ -35,6 +35,7 @@ class Decl;
 class ExternalSourceSymbolAttr;
 class Stmt;
 class StmtReference;
+class TemplateDecl;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Decl {
@@ -123,6 +124,7 @@ class Decl {
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;
+  std::optional<TemplateDecl> described_template(void) const;
   std::optional<TemplateParameterList> described_template_parameters(void) const;
   std::optional<ExternalSourceSymbolAttr> external_source_symbol_attribute(void) const;
   DeclFriendObjectKind friend_object_kind(void) const;

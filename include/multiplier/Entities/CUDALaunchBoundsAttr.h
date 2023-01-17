@@ -86,7 +86,6 @@ class CUDALaunchBoundsAttr : public InheritableAttr {
 
   Expr max_threads(void) const;
   Expr min_blocks(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CUDALaunchBoundsAttr) == sizeof(InheritableAttr));

@@ -86,7 +86,6 @@ class XRayInstrumentAttr : public InheritableAttr {
 
   bool always_x_ray_instrument(void) const;
   XRayInstrumentAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool never_x_ray_instrument(void) const;
 };
 

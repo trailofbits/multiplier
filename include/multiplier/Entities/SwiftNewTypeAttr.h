@@ -87,7 +87,6 @@ class SwiftNewTypeAttr : public InheritableAttr {
 
   SwiftNewTypeAttrNewtypeKind newtype_kind(void) const;
   SwiftNewTypeAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SwiftNewTypeAttr) == sizeof(InheritableAttr));

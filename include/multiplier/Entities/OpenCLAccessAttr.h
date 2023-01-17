@@ -73,7 +73,6 @@ class OpenCLAccessAttr : public Attr {
   }
 
   OpenCLAccessAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_read_only(void) const;
   bool is_read_write(void) const;
   bool is_write_only(void) const;

@@ -83,7 +83,6 @@ class SwiftBridgedTypedefAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SwiftBridgedTypedefAttr) == sizeof(InheritableAttr));

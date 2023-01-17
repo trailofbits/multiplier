@@ -84,7 +84,6 @@ class OMPDeclareVariantAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   Expr variant_func_reference(void) const;
 };
 

@@ -43,6 +43,52 @@
 #define MACRO_DIRECTIVE_NAME(name) #name "MacroDirective",
 #define STR_NAME(name) #name,
 
+// We want these things to exist inside of Multiplier, so we will add them
+// here.
+namespace pasta {
+
+enum class TokenCategory : unsigned char {
+  kUnknown,
+  kIdentifier,
+  kMacroName,
+  kMacroParameterName,
+  kMacroDirectiveName,
+  kKeyword,
+  kObjectiveCKeyword,
+  kBuiltinTypeName,
+  kPunctuation,
+  kLiteral,
+  kComment,
+
+  // These line up with `DeclCategory`.
+  kLocalVariable,
+  kGlobalVariable,
+  kParameterVariable,
+  kFunction,
+  kInstanceMethod,
+  kInstanceMember,
+  kClassMethod,
+  kClassMember,
+  kThis,
+  kClass,
+  kStruct,
+  kUnion,
+  kConcept,
+  kInterface,
+  kEnum,
+  kEnumerator,
+  kNamespace,
+  kTypeAlias,
+  kTemplateParameterType,
+  kTemplateParameterValue,
+  kLabel,
+
+  // Extra.
+  kWhitespace
+};
+
+}  // namespace pasta
+
 // These are types with no corresponding enumeration for the respective `kind`
 // methods.
 static const std::unordered_set<std::string> gAbstractTypes{
@@ -54,25 +100,10 @@ static const std::unordered_set<std::string> gAbstractTypes{
                             IGNORE, STR_NAME)
 };
 
+clang::ClassTemplateDecl * x;
+
 static const std::unordered_set<std::string> gUnserializableTypes{
-  // These aren't "real entities," as they don't result in tangible code being
-  // generated. Instead, they are templates for real entities.
-  //
-  // TODO(pag): Re-think all of these. We will likely want to be able to get at
-  //            templates and other things from the instantiated things.
-  "ClassTemplatePartialSpecializationDecl",
-  "VarTemplatePartialSpecializationDecl",
-  "ClassTemplateDecl",
-  "VarTemplateDecl",
-  "FunctionTemplateDecl",
-
-  "BuiltinTemplateDecl",
-  "RedeclarableTemplateDecl",
-  "TemplateDecl",
-  "TemplateTemplateParmDecl",
-  "FriendTemplateDecl",
-
-  // These are not contained in fragments.
+   // These are not contained in fragments.
   "NamespaceDecl",
   "TranslationUnitDecl",
   "ExternCContextDecl",
@@ -292,6 +323,11 @@ static std::set<std::pair<std::string, std::string>> kMethodBlackList{
   // the TokenTree.
   {"MacroExpansion", "IsArgumentPreExpansion"},
   {"MacroExpansion", "ArgumentPreExpansion"},
+
+  // TODO(pag): We'll eventually have to re-introduce these manually.
+  {"ClassTemplateDecl", "Specializations"},
+  {"VarTemplateDecl", "Specializations"},
+  {"FunctionTemplateDecl", "Specializations"},
 
   // Add stuff here to avoid waiting for PASTA bootstrap, and also add it into
   // PASTA's nullptr checking stuff.
@@ -998,6 +1034,7 @@ void CodeGenerator::RunOnOptional(
   std::string cxx_underlying_name;
   bool is_enum = false;
   bool is_bool = false;
+  bool is_token = false;
   bool needs_test = true;
   if (!element_name) {
 
@@ -1055,6 +1092,7 @@ void CodeGenerator::RunOnOptional(
         *element_name == "MacroToken") {
       capn_element_name = "UInt64";  // Reference.
       cxx_element_name = "Token";
+      is_token = true;
     }
 
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
@@ -1076,21 +1114,39 @@ void CodeGenerator::RunOnOptional(
 
   auto [ip_getter_name, ip_setter_name, ip_init_name] = NamesFor(is_present_i);
 
-  os
-      << "  std::optional<" << cxx_element_name << "> "
-      << api_name << "(void) const;\n";
+  // Tokens are nullable-ish.
+  if (is_token) {
+    os
+        << "  Token " << api_name << "(void) const;\n";
 
-  lib_cpp_os
-      << "std::optional<" << cxx_element_name << "> "
-      << class_name << "::" << api_name
-      << "(void) const {\n"
-      << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+    lib_cpp_os
+        << "Token " << class_name << "::" << api_name
+        << "(void) const {\n"
+        << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+  } else {
+    os
+        << "  std::optional<" << cxx_element_name << "> "
+        << api_name << "(void) const;\n";
+
+    lib_cpp_os
+        << "std::optional<" << cxx_element_name << "> "
+        << class_name << "::" << api_name
+        << "(void) const {\n"
+        << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+  }
 
   if (needs_test) {
-    lib_cpp_os
-        << "  if (!self." << ip_getter_name << "()) {\n"
-        << "    return std::nullopt;\n"
-        << "  } else {\n";
+    if (is_token) {
+      lib_cpp_os
+          << "  if (!self." << ip_getter_name << "()) {\n"
+          << "    return Token();\n"
+          << "  } else {\n";
+    } else {
+      lib_cpp_os
+          << "  if (!self." << ip_getter_name << "()) {\n"
+          << "    return std::nullopt;\n"
+          << "  } else {\n";
+    }
   } else {
     lib_cpp_os
         << "  if (true) {\n";
@@ -1174,7 +1230,12 @@ void CodeGenerator::RunOnOptional(
   } else if (gEntityClassNames.count(element_name.value())) {
     assert(!needs_test);
     fwd_decls.insert(cxx_element_name);
-    serializer = "MX_VISIT_OPTIONAL_ENTITY";
+
+    if (is_token) {
+      serializer = "MX_VISIT_ENTITY";
+    } else {
+      serializer = "MX_VISIT_OPTIONAL_ENTITY";
+    }
 
     serialize_cpp_os
         << "  if (v" << i << ") {\n"
@@ -1191,13 +1252,13 @@ void CodeGenerator::RunOnOptional(
     selector << ", ";
 
     // Tokens are more like pseudo-entities but whatever.
-    if (*element_name == "Token" || *element_name == "FileToken" ||
-        *element_name == "MacroToken") {
+    if (is_token) {
       needed_decls.insert("TokenUseSelector");
       token_use_ids[api_name].SetId(cls, i);
       selector << "TokenUseSelector";
       lib_cpp_os
-          << "    return fragment->TokenFor(fragment, id);\n";
+          << "    return fragment->TokenFor(fragment, id, "
+             "true /* can_fail */).value();\n";
 
     } else if (*element_name == "File") {
       needed_decls.insert("FileUseSelector");
@@ -2634,6 +2695,10 @@ MethodListPtr CodeGenerator::RunOnClass(
   auto methods = cls->record.Methods();
   assert(methods);
   for (pasta::CXXMethodDecl method : *methods) {
+    if (dont_serialize) {
+      continue;
+    }
+
     if (method.NumParameters()) {
       continue;  // Skip methods with parameters.
     }
@@ -2648,23 +2713,10 @@ MethodListPtr CodeGenerator::RunOnClass(
       continue;  // E.g. `Decl::KindName()`, `operator==`.
     }
 
-    std::pair<std::string, std::string> method_key{class_name, method_name};
-    if (kMethodBlackList.count(method_key)) {
-      continue;
-    }
-
-    if (dont_serialize) {
-      continue;
-    }
-
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
 
     // We have a custom implementation of `redeclarations`.
-    if (snake_name == "redeclarations") {
-      assert(false);  // In the blacklist.
-      continue;
-
-    } else if (snake_name == "is_this_declaration_a_definition") {
+    if (snake_name == "is_this_declaration_a_definition") {
       snake_name = "is_definition";
 
     } else if (snake_name == "is_this_declaration_a_demoted_definition") {
@@ -2696,7 +2748,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     if (snake_name.ends_with("type_source_info")) {
-      snake_name = snake_name.substr(0, snake_name.size() - 12u);  // Retain `type`.
+      snake_name = snake_name.substr(0, snake_name.size() - 12u);  // Keep `type`.
     }
 
     if (snake_name.starts_with("type_info_")) {
@@ -2705,6 +2757,12 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     std::string api_name = SnakeCaseToAPICase(snake_name);
     if (!seen_methods->emplace(api_name).second) {
+      continue;
+    }
+
+    std::pair<std::string, std::string> method_key{class_name, method_name};
+    if (kMethodBlackList.count(method_key)) {
+      (void) seen_methods->emplace(api_name);
       continue;
     }
 
@@ -3105,7 +3163,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         serialize_inc_os
             << "  MX_VISIT_PSEUDO(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
-            << record_name << ", " << nth_entity_reader << ")\n";
+            << record_name << ", " << nth_entity_reader << ", InvalidSelector)\n";
 
         class_os
             << "  " << record_name << " " << api_name
@@ -3120,7 +3178,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "}\n\n";
 
         serialize_cpp_os
-            << "  sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
+            << "  b." << setter_name << "(es.PseudoId(e."
+            << method_name << "()));\n";
 
       } else if (gNotReferenceTypes.count(record_name)) {
         std::cerr << "unhandled record " << record_name << "\n";
@@ -3332,7 +3391,8 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// This source code is licensed in accordance with the terms specified in\n"
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
-      << "#include <multiplier/AST.h>\n\n"
+      << "#include <multiplier/AST.h>\n"
+      << "#include <cassert>\n"
       << "#include \"Fragment.h\"\n\n"
       << "namespace mx {\n";
 
@@ -3898,6 +3958,7 @@ void CodeGenerator::RunOnUseSet(
 
   lib_cpp_os
       << "  }\n"
+      << "  return \"<invalid>\";\n"
       << "}\n\n";
 
   os

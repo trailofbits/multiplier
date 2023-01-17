@@ -83,7 +83,6 @@ class ObjCSubclassingRestrictedAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCSubclassingRestrictedAttr) == sizeof(InheritableAttr));

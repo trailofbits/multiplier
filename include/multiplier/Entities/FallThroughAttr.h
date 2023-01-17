@@ -83,7 +83,6 @@ class FallThroughAttr : public StmtAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(FallThroughAttr) == sizeof(StmtAttr));

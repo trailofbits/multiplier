@@ -64,7 +64,7 @@ class CXXBaseSpecifier {
   TagTypeKind base_kind(void) const;
   bool is_pack_expansion(void) const;
   bool constructors_are_inherited(void) const;
-  std::optional<Token> ellipsis_token(void) const;
+  Token ellipsis_token(void) const;
   AccessSpecifier semantic_access_specifier(void) const;
   AccessSpecifier lexical_access_specifier(void) const;
   Type base_type(void) const;

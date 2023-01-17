@@ -83,7 +83,6 @@ class ScopedLockableAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ScopedLockableAttr) == sizeof(InheritableAttr));

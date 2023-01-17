@@ -85,7 +85,6 @@ class CleanupAttr : public InheritableAttr {
   }
 
   FunctionDecl function_declaration(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CleanupAttr) == sizeof(InheritableAttr));

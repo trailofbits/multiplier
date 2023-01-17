@@ -84,7 +84,6 @@ class PreferredNameAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   Type typedef_type(void) const;
   Type typedef_type_token(void) const;
 };

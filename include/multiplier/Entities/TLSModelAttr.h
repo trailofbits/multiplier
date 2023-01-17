@@ -84,7 +84,6 @@ class TLSModelAttr : public InheritableAttr {
   }
 
   std::string_view model(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(TLSModelAttr) == sizeof(InheritableAttr));

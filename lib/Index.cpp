@@ -22,6 +22,7 @@ const char *EnumeratorName(IndexStatus status) {
     case IndexStatus::INDEXING_IN_PROGRESS: return "INDEXING_IN_PROGRESS";
     case IndexStatus::INDEXED: return "INDEXED";
   }
+  return "<invalid>";
 }
 
 Index::~Index(void) {}
@@ -57,6 +58,42 @@ Index Index::containing(const Fragment &fragment) {
 
 Index Index::containing(const File &file) {
   return Index(file.impl->ep);
+}
+
+Index Index::containing(const Decl &entity) {
+  return Index(entity.fragment->ep);
+}
+
+Index Index::containing(const Stmt &entity) {
+  return Index(entity.fragment->ep);
+}
+
+Index Index::containing(const Type &entity) {
+  return Index(entity.fragment->ep);
+}
+
+Index Index::containing(const Attr &entity) {
+  return Index(entity.fragment->ep);
+}
+
+Index Index::containing(const Macro &entity) {
+  return Index(entity.fragment->ep);
+}
+
+Index Index::containing(const Designator &entity) {
+  return Index(entity.fragment->ep);
+}
+
+std::optional<Index> Index::containing(const Token &entity) {
+  if (auto frag = entity.impl->OwningFragment()) {
+    return Index(frag->ep);
+
+  } else if (auto file = entity.impl->OwningFile()) {
+    return Index(file->ep);
+
+  } else {
+    return std::nullopt;
+  }
 }
 
 // Clear any internal caches.

@@ -86,7 +86,6 @@ class CapabilityAttr : public InheritableAttr {
 
   std::string_view name(void) const;
   CapabilityAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_shared(void) const;
 };
 

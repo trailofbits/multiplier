@@ -83,7 +83,6 @@ class PtGuardedVarAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(PtGuardedVarAttr) == sizeof(InheritableAttr));

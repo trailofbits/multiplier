@@ -83,7 +83,6 @@ class HLSLNumThreadsAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(HLSLNumThreadsAttr) == sizeof(InheritableAttr));

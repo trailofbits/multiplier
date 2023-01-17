@@ -86,7 +86,6 @@ class IBOutletCollectionAttr : public InheritableAttr {
 
   Type interface(void) const;
   Type interface_token(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(IBOutletCollectionAttr) == sizeof(InheritableAttr));

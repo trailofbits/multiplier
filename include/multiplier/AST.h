@@ -553,6 +553,7 @@
 #include "Entities/IncludePathLocation.h"
 #include "Entities/TargetLanguage.h"
 #include "Entities/PseudoKind.h"
+#include "Entities/TokenCategory.h"
 #include "Entities/Designator.h"
 #include "Entities/TemplateParameterList.h"
 #include "Entities/TemplateArgument.h"

@@ -7,7 +7,6 @@
 #include "WeggliImpl.h"
 
 #include <cassert>
-#include <multiplier/Types.h>
 
 #include "File.h"
 #include "Fragment.h"

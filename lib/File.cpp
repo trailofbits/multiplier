@@ -15,9 +15,9 @@
 #include <mutex>
 
 #include "Fragment.h"
-#include "Re2.h"
+#include "Re2Impl.h"
 #include "Use.h"
-#include "Weggli.h"
+#include "WeggliImpl.h"
 
 namespace mx {
 
@@ -122,50 +122,50 @@ void FileLocationCache::clear(void) {
 std::optional<std::pair<unsigned, unsigned>> Token::location(
     const FileLocationCache &cache) const {
 
-  std::optional<Token> maybe_file_token = file_token();
+  Token maybe_file_token = file_token();
   if (!maybe_file_token) {
     return std::nullopt;
   }
 
-  const FileImpl *file_ptr = maybe_file_token->impl->OwningFile();
+  const FileImpl *file_ptr = maybe_file_token.impl->OwningFile();
   if (!file_ptr) {
     return std::nullopt;
   }
 
-  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token->impl),
+  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token.impl),
                                             file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
-  if (maybe_file_token->offset >= vec.size()) {
+  if (maybe_file_token.offset >= vec.size()) {
     return std::nullopt;
   }
 
-  return vec[maybe_file_token->offset];
+  return vec[maybe_file_token.offset];
 }
 
 // Return the line and column number for this token, if any.
 std::optional<std::pair<unsigned, unsigned>> Token::next_location(
     const FileLocationCache &cache) const {
 
-  std::optional<Token> maybe_file_token = file_token();
+  Token maybe_file_token = file_token();
   if (!maybe_file_token) {
     return std::nullopt;
   }
 
-  const FileImpl *file_ptr = maybe_file_token->impl->OwningFile();
+  const FileImpl *file_ptr = maybe_file_token.impl->OwningFile();
   if (!file_ptr) {
     return std::nullopt;
   }
 
-  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token->impl),
+  File file(std::shared_ptr<const FileImpl>(std::move(maybe_file_token.impl),
                                             file_ptr));
   const FileLocationVector &vec = cache.impl->Add(std::move(file));
 
-  if ((maybe_file_token->offset + 1u) >= vec.size()) {
+  if ((maybe_file_token.offset + 1u) >= vec.size()) {
     return std::nullopt;
   }
 
-  return vec[maybe_file_token->offset + 1u];
+  return vec[maybe_file_token.offset + 1u];
 }
 
 // Return the file containing a specific fragment.

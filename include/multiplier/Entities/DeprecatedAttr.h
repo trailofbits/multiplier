@@ -85,7 +85,6 @@ class DeprecatedAttr : public InheritableAttr {
 
   std::string_view message(void) const;
   std::string_view replacement(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(DeprecatedAttr) == sizeof(InheritableAttr));

@@ -71,16 +71,16 @@ class WriterThreadState {
       const std::filesystem::path &path)
       : db(path) {}
 
-  RawEntityId GetOrCreateFileId(RawEntityId proposed_index,
+  RawEntityId GetOrCreateFileId(RawEntityId proposed_id,
                                 const std::string &hash);
 
-  RawEntityId GetOrCreateFragmentId(RawEntityId proposed_index,
+  RawEntityId GetOrCreateFragmentId(RawEntityId proposed_id,
                                     RawEntityId file_tok_id,
                                     const std::string &hash);
 };
 
 RawEntityId WriterThreadState::GetOrCreateFileId(
-    RawEntityId proposed_index, const std::string &hash) {
+    RawEntityId proposed_id, const std::string &hash) {
 
   // Calculate which file table to index into.
   const size_t table = kHasher(hash) % kNumFileShards;
@@ -91,36 +91,37 @@ RawEntityId WriterThreadState::GetOrCreateFileId(
   if (!get) {
     auto table_name = "file_hash_" + std::to_string(table);
     get.emplace(db.Prepare(
-        "SELECT file_index FROM " + table_name + " WHERE hash = ?1")),
+        "SELECT file_id FROM " + table_name + " WHERE hash = ?1")),
 
     set.emplace(db.Prepare(
-        "INSERT INTO " + table_name + " (file_index, hash) "
+        "INSERT INTO " + table_name + " (file_id, hash) "
         "VALUES (?1, ?2) "
-        "ON CONFLICT DO UPDATE SET file_index = file_index "
-        "RETURNING file_index"));
+        "ON CONFLICT DO UPDATE SET file_id = file_id "
+        "RETURNING file_id"));
   }
 
-  RawEntityId index_out = kInvalidEntityId;
+  RawEntityId id_out = kInvalidEntityId;
 
   get->BindValues(hash);
   if (get->ExecuteStep()) {
-    get->Row().Columns(index_out);
+    get->Row().Columns(id_out);
   }
   get->Reset();
 
-  while (index_out == kInvalidEntityId) {
-    set->BindValues(proposed_index, hash);
+
+  while (id_out == kInvalidEntityId) {
+    set->BindValues(proposed_id, hash);
     if (set->ExecuteStep()) {
-      set->Row().Columns(index_out);
+      set->Row().Columns(id_out);
     }
     set->Reset();
   }
 
-  return index_out;
+  return id_out;
 }
 
 RawEntityId WriterThreadState::GetOrCreateFragmentId(
-    RawEntityId proposed_index, RawEntityId file_tok_id,
+    RawEntityId proposed_id, RawEntityId file_tok_id,
     const std::string &hash) {
 
   // Calculate which fragment table to index into.
@@ -132,32 +133,33 @@ RawEntityId WriterThreadState::GetOrCreateFragmentId(
   if (!get) {
     auto table_name = "fragment_hash_" + std::to_string(table);
     get.emplace(db.Prepare(
-        "SELECT fragment_index FROM " + table_name +
+        "SELECT fragment_id FROM " + table_name +
         " WHERE file_token_id = ?1 AND hash = ?2")),
 
     set.emplace(db.Prepare(
-        "INSERT INTO " + table_name + " (fragment_index, file_token_id, hash) "
+        "INSERT INTO " + table_name + " (fragment_id, file_token_id, hash) "
         "VALUES (?1, ?2, ?3) "
-        "ON CONFLICT DO UPDATE SET fragment_index = fragment_index "
-        "RETURNING fragment_index"));
+        "ON CONFLICT DO UPDATE SET fragment_id = fragment_id "
+        "RETURNING fragment_id"));
   }
 
-  RawEntityId index_out = kInvalidEntityId;
+  RawEntityId id_out = kInvalidEntityId;
+
   get->BindValues(file_tok_id, hash);
   if (get->ExecuteStep()) {
-    get->Row().Columns(index_out);
+    get->Row().Columns(id_out);
   }
   get->Reset();
 
-  while (index_out == kInvalidEntityId) {
-    set->BindValues(proposed_index, file_tok_id, hash);
+  while (id_out == kInvalidEntityId) {
+    set->BindValues(proposed_id, file_tok_id, hash);
     if (set->ExecuteStep()) {
-      set->Row().Columns(index_out);
+      set->Row().Columns(id_out);
     }
     set->Reset();
   }
 
-  return index_out;
+  return id_out;
 }
 
 class BulkInserterState {
@@ -370,7 +372,7 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
   for (size_t i = 0u; i < kNumFileShards; ++i) {
     db.Execute(
         "CREATE TABLE IF NOT EXISTS file_hash_" + std::to_string(i) + " ("
-        "  file_index INT NOT NULL,"
+        "  file_id INT NOT NULL,"
         "  hash BLOB NOT NULL,"
         "  PRIMARY KEY(hash)"
         ") WITHOUT rowid");
@@ -379,12 +381,13 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
   for (size_t i = 0u; i < kNumFragmentShards; ++i) {
     db.Execute(
         "CREATE TABLE IF NOT EXISTS fragment_hash_" + std::to_string(i) + " ("
-        "  fragment_index INT NOT NULL,"
+        "  fragment_id INT NOT NULL,"
         "  file_token_id INT NOT NULL,"
         "  hash BLOB NOT NULL,"
         "  PRIMARY KEY(file_token_id, hash)"
         ") WITHOUT rowid");
   }
+
   return db;
 }
 
@@ -400,6 +403,7 @@ DatabaseWriterImpl::~DatabaseWriterImpl(void) {
 
   ExitRecords();
   ExitMetadata();
+  db.Execute("PRAGMA wal_checkpoint(FULL)");
   db.Optimize();
 }
 
@@ -528,16 +532,16 @@ SpecificEntityId<FileId> DatabaseWriter::GetOrCreateFileIdForHash(
     writer->available_file_index.reset();
   }
 
-  RawEntityId found_index = writer->GetOrCreateFileId(proposed_index, hash);
-  is_new = found_index == proposed_index;
+  RawEntityId proposed_id = EntityId(FileId(proposed_index)).Pack();
+  RawEntityId found_id = writer->GetOrCreateFileId(proposed_id, hash);
+  is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_file_index.emplace(proposed_index);
   }
 
-  assert(found_index != kInvalidEntityId);
-
-  FileId ret(found_index);
-  return ret;
+  VariantId vid = EntityId(found_id).Unpack();
+  assert(std::holds_alternative<FileId>(vid));
+  return std::get<FileId>(vid);
 }
 
 // Get, or create and return, a fragment ID for the specific fragment hash.
@@ -555,17 +559,21 @@ DatabaseWriter::GetOrCreateSmallFragmentIdForHash(
     proposed_index = writer->available_small_fragment_index.value();
     writer->available_small_fragment_index.reset();
   }
+  assert(proposed_index >= kMaxBigFragmentId);
 
-  RawEntityId found_index = writer->GetOrCreateFragmentId(
-      proposed_index, tok_id, hash);
-  is_new = found_index == proposed_index;
+  RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
+  RawEntityId found_id = writer->GetOrCreateFragmentId(
+      proposed_id, tok_id, hash);
+  is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_small_fragment_index.emplace(proposed_index);
   }
 
-  assert(found_index != kInvalidEntityId);
-
-  return FragmentId(found_index);
+  VariantId vid = EntityId(found_id).Unpack();
+  assert(std::holds_alternative<FragmentId>(vid));
+  FragmentId fid = std::get<FragmentId>(vid);
+  assert(fid.fragment_id >= kMaxBigFragmentId);
+  return fid;
 }
 
 // Get, or create and return, a fragment ID for the specific fragment hash.
@@ -584,16 +592,21 @@ DatabaseWriter::GetOrCreateLargeFragmentIdForHash(
     writer->available_big_fragment_index.reset();
   }
 
-  RawEntityId found_index = writer->GetOrCreateFragmentId(
-      proposed_index, tok_id, std::move(hash));
-  is_new = found_index == proposed_index;
+  assert(proposed_index < kMaxBigFragmentId);
+
+  RawEntityId proposed_id = EntityId(FragmentId(proposed_index)).Pack();
+  RawEntityId found_id = writer->GetOrCreateFragmentId(
+      proposed_id, tok_id, std::move(hash));
+  is_new = found_id == proposed_id;
   if (!is_new) {
     writer->available_big_fragment_index.emplace(proposed_index);
   }
 
-  assert(found_index != kInvalidEntityId);
-
-  return FragmentId(found_index);
+  VariantId vid = EntityId(found_id).Unpack();
+  assert(std::holds_alternative<FragmentId>(vid));
+  FragmentId fid = std::get<FragmentId>(vid);
+  assert(fid.fragment_id < kMaxBigFragmentId);
+  return fid;
 }
 
 void DatabaseWriterImpl::InitRecords(void) {

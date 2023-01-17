@@ -84,7 +84,6 @@ class WebAssemblyImportNameAttr : public InheritableAttr {
   }
 
   std::string_view import_name(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(WebAssemblyImportNameAttr) == sizeof(InheritableAttr));

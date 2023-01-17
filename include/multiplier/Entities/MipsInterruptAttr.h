@@ -85,7 +85,6 @@ class MipsInterruptAttr : public InheritableAttr {
   }
 
   MipsInterruptAttrInterruptType interrupt(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MipsInterruptAttr) == sizeof(InheritableAttr));

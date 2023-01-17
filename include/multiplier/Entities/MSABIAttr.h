@@ -83,7 +83,6 @@ class MSABIAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MSABIAttr) == sizeof(InheritableAttr));

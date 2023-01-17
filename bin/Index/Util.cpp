@@ -18,6 +18,7 @@
 
 #include <multiplier/AST.h>
 #include <pasta/AST/AST.h>
+#include <pasta/AST/Attr.h>
 #include <pasta/AST/Decl.h>
 #include <pasta/AST/Forward.h>
 #include <pasta/AST/Printer.h>
@@ -27,6 +28,7 @@
 #include <pasta/Util/File.h>
 #include <sstream>
 
+#include "EntityMapper.h"
 #include "PASTA.h"
 
 namespace indexer {
@@ -306,6 +308,19 @@ mx::TokenKind TokenKindFromPasta(const pasta::Token &entity) {
       LOG(ERROR)
           << "Should not be serializing marker tokens";
       return mx::TokenKind::UNKNOWN;
+
+    // Try to get preprocessor kinds, if possible.
+    //
+    // NOTE(pag): File tokens show `IDENTIFIER` (due to `raw_identifier`) from
+    //            the raw lexer, whereas fragments do better.
+    case pasta::TokenRole::kFileToken:
+      if (auto ft = entity.FileLocation()) {
+        if (auto ret = TokenKindFromPasta(ft.value());
+            ret != mx::TokenKind::IDENTIFIER) {
+          return ret;
+        }
+      }
+      break;
   }
   auto kind = mx::FromPasta(entity.Kind());
   if (kind == mx::TokenKind::UNKNOWN) {
@@ -482,6 +497,377 @@ std::optional<pasta::Decl> ReferencedDecl(const pasta::Stmt &stmt) {
   }
 
   return std::nullopt;
+}
+
+namespace {
+
+static mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::MacroToken &tok, bool &found,
+    RelatedEntityIds &related_ids);
+
+static mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::Token &token, bool &found,
+    RelatedEntityIds &related_ids);
+
+static mx::RawEntityId RelatedEntityIdToDerived(
+    const EntityMapper &em, const pasta::Token &token, bool &found,
+    std::unordered_map<const void *, mx::RawEntityId> &related_ids) {
+
+  mx::RawEntityId eid = mx::kInvalidEntityId;
+
+  if (auto dtok = token.DerivedLocation()) {
+    eid = RelatedEntityId(em, dtok.value(), found, related_ids);
+    if (found) {
+      related_ids.emplace(token.RawToken(), eid);
+    }
+  }
+  return eid;
+}
+
+static std::optional<pasta::Decl> VisitStmt(const pasta::Stmt &stmt,
+                                            const pasta::Token &token) {
+  if (auto dre = pasta::DeclRefExpr::From(stmt)) {
+    if (auto named_decl = pasta::NamedDecl::From(dre->Declaration())) {
+      if (dre->ExpressionToken().RawToken() == token.RawToken()) {
+        return named_decl;
+      }
+    }
+  } else if (auto me = pasta::MemberExpr::From(stmt)) {
+    auto member_decl = me->MemberDeclaration();
+    if (me->MemberToken().RawToken() == token.RawToken()) {
+      return member_decl;
+    } else {
+      return VisitStmt(me->Base(), token);
+    }
+  } else if (auto ce = pasta::CXXConstructExpr::From(stmt)) {
+    auto constructor_decl = ce->Constructor();
+    if (ce->Token().RawToken() == token.RawToken()) {
+      return constructor_decl;
+    }
+  } else if (auto gt = pasta::GotoStmt::From(stmt)) {
+    if (gt->LabelToken().RawToken() == token.RawToken()) {
+      return gt->Label();
+    }
+  } else if (auto di = pasta::DesignatedInitExpr::From(stmt)) {
+    // TODO(pag): need support in pasta.
+
+  } else if (auto ls = pasta::LabelStmt::From(stmt)) {
+    if (ls->IdentifierToken().RawToken() == token.RawToken()) {
+      return ls->Declaration();
+    }
+
+    // Backup.
+  } else if (auto call = pasta::CallExpr::From(stmt)) {
+    if (call->ExpressionToken().RawToken() == token.RawToken()) {
+      if (auto called_decl = call->CalleeDeclaration()) {
+        return called_decl;
+      }
+    }
+  }
+
+  return std::nullopt;
+}
+
+static std::optional<pasta::Decl> VisitType(const pasta::Type &type,
+                                            const pasta::Token &token) {
+  if (auto typedef_type = pasta::TypedefType::From(type)) {
+    auto typedef_decl = typedef_type->Declaration();
+    if (typedef_decl.Name() == token.Data()) {
+      return typedef_decl;
+    }
+
+  } else if (auto tag_type = pasta::TagType::From(type)) {
+    auto tag_decl = tag_type->Declaration();
+    if (tag_decl.Name() == token.Data()) {
+      return tag_decl;
+    }
+
+  } else if (auto deduced_type = pasta::DeducedType::From(type)) {
+    return VisitType(deduced_type.value(), token);
+
+  } else if (auto unqual_type = type.UnqualifiedType();
+             unqual_type.RawType() != type.RawType()) {
+    return VisitType(unqual_type, token);
+  }
+
+  return std::nullopt;
+}
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::Token &token, bool &found,
+    RelatedEntityIds &related_ids) {
+
+  if (auto it = related_ids.find(token.RawToken()); it != related_ids.end()) {
+    found = true;
+    return it->second;
+  }
+
+  std::optional<pasta::Decl> related_decl;
+
+  switch (mx::FromPasta(token.Kind())) {
+    default:
+      goto fallback;
+
+    case mx::TokenKind::L_SQUARE:
+    case mx::TokenKind::R_SQUARE:
+    case mx::TokenKind::L_PARENTHESIS:
+    case mx::TokenKind::R_PARENTHESIS:
+    case mx::TokenKind::L_BRACE_TOKEN:
+    case mx::TokenKind::R_BRACE_TOKEN:
+    case mx::TokenKind::AMP:
+    case mx::TokenKind::AMP_AMP:
+    case mx::TokenKind::AMP_EQUAL:
+    case mx::TokenKind::STAR:
+    case mx::TokenKind::STAR_EQUAL:
+    case mx::TokenKind::PLUS:
+    case mx::TokenKind::PLUS_PLUS:
+    case mx::TokenKind::PLUS_EQUAL:
+    case mx::TokenKind::MINUS:
+    case mx::TokenKind::ARROW:
+    case mx::TokenKind::MINUS_MINUS:
+    case mx::TokenKind::MINUS_EQUAL:
+    case mx::TokenKind::TILDE:
+    case mx::TokenKind::EXCLAIM:
+    case mx::TokenKind::EXCLAIM_EQUAL:
+    case mx::TokenKind::SLASH:
+    case mx::TokenKind::SLASH_EQUAL:
+    case mx::TokenKind::PERCENT:
+    case mx::TokenKind::PERCENT_EQUAL:
+    case mx::TokenKind::LESS:
+    case mx::TokenKind::LESS_LESS:
+    case mx::TokenKind::LESS_EQUAL:
+    case mx::TokenKind::LESS_LESS_EQUAL:
+    case mx::TokenKind::SPACESHIP:
+    case mx::TokenKind::GREATER:
+    case mx::TokenKind::GREATER_GREATER:
+    case mx::TokenKind::GREATER_EQUAL:
+    case mx::TokenKind::GREATER_GREATER_EQUAL:
+    case mx::TokenKind::CARET:
+    case mx::TokenKind::CARET_EQUAL:
+    case mx::TokenKind::PIPE:
+    case mx::TokenKind::PIPE_PIPE:
+    case mx::TokenKind::PIPE_EQUAL:
+    case mx::TokenKind::EQUAL:
+    case mx::TokenKind::EQUAL_EQUAL:
+    case mx::TokenKind::COMMA:
+    case mx::TokenKind::PERIOD_STAR:
+    case mx::TokenKind::ARROW_STAR:
+    case mx::TokenKind::LESS_LESS_LESS:
+    case mx::TokenKind::GREATER_GREATER_GREATER:
+    case mx::TokenKind::CARETCARET:
+    case mx::TokenKind::KEYWORD_DELETE:
+    case mx::TokenKind::KEYWORD_NEW:
+    case mx::TokenKind::KEYWORD_OPERATOR:
+    case mx::TokenKind::IDENTIFIER: break;
+  }
+
+  for (auto context = token.Context(); !related_decl && context;
+       context = context->Parent()) {
+    switch (context->Kind()) {
+      case pasta::TokenContextKind::kStmt:
+        if (std::optional<pasta::Stmt> stmt =
+                pasta::Stmt::From(context.value())) {
+          related_decl = VisitStmt(stmt.value(), token);
+        }
+        break;
+      case pasta::TokenContextKind::kType:
+        related_decl = VisitType(
+            pasta::Type::From(context.value()).value(),
+            token);
+        break;
+      case pasta::TokenContextKind::kDecl:
+        if (std::optional<pasta::Decl> decl =
+                pasta::Decl::From(context.value())) {
+          if (auto nd = pasta::NamedDecl::From(decl.value());
+              nd && nd->Name() == token.Data()) {
+            related_decl = nd.value();
+          }
+          if (!related_decl &&
+              decl->Token().RawToken() == token.RawToken()) {
+            related_decl = std::move(decl);
+          }
+        }
+        break;
+      case pasta::TokenContextKind::kAttr:
+        if (std::optional<pasta::Attr> attr =
+                pasta::Attr::From(context.value()).value();
+            attr && attr->Token().RawToken() == token.RawToken()) {
+          return mx::kInvalidEntityId;
+        }
+        break;
+      case pasta::TokenContextKind::kDesignator:
+        if (std::optional<pasta::Designator> d =
+                pasta::Designator::From(context.value())) {
+          if (d->FieldToken().RawToken() == token.RawToken()) {
+            if (auto field = d->Field()) {
+              related_decl = field.value();
+              break;
+            }
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if (related_decl) {
+    auto eid = em.EntityId(related_decl.value());
+    related_ids.emplace(token.RawToken(), eid);
+    found = true;
+    return eid;
+  }
+
+fallback:
+  if (auto mtok = token.MacroLocation()) {
+    auto eid = RelatedEntityId(em, mtok.value(), found, related_ids);
+    if (found) {
+      related_ids.emplace(token.RawToken(), eid);
+    }
+    return eid;
+  } else {
+    return RelatedEntityIdToDerived(em, token, found, related_ids);
+  }
+}
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::MacroToken &mtok, bool &found,
+    RelatedEntityIds &related_ids) {
+
+  auto tok = mtok.ParsedLocation();
+  if (auto it = related_ids.find(tok.RawToken()); it != related_ids.end()) {
+    found = true;
+    return it->second;
+  }
+
+  if (auto parent = mtok.Parent()) {
+    if (auto exp = pasta::MacroExpansion::From(parent.value())) {
+
+      // If the macro token is the name of the macro definition used, then
+      // make the related entity be the defined macro itself.
+      if (auto def = exp->Definition()) {
+        if (auto name = def->Name()) {
+          if (name->Data() == mtok.Data()) {
+            auto eid = em.EntityId(def.value());
+            related_ids.emplace(tok.RawToken(), eid);
+            found = true;
+            return eid;
+          }
+        }
+      }
+
+      // If it's the first token in an expansion, then reference the expansion
+      // instead. Sometimes we have macro expansions but no definitions.
+      if (mtok.TokenKind() == pasta::TokenKind::kIdentifier ||
+          mtok.TokenKind() == pasta::TokenKind::kRawIdentifier) {
+
+        for (auto child : exp->Children()) {
+          if (child.RawMacro() == mtok.RawMacro()) {
+            auto eid = em.EntityId(exp.value());
+            related_ids.emplace(tok.RawToken(), eid);
+            found = true;
+            return eid;
+          }
+        }
+      }
+
+    // If it's the first token in a substitution, and if the token is an
+    // identifier name, then reference the substitution itself.
+    } else if (auto sub = pasta::MacroSubstitution::From(parent.value())) {
+      if (mtok.TokenKind() == pasta::TokenKind::kIdentifier ||
+          mtok.TokenKind() == pasta::TokenKind::kRawIdentifier) {
+
+        auto children = sub->Children();
+        if (children.Size() == 1u &&
+            children[0u].RawMacro() == mtok.RawMacro()) {
+          auto eid = em.EntityId(exp.value());
+          related_ids.emplace(tok.RawToken(), eid);
+          found = true;
+          return eid;
+        }
+      }
+
+    // It's a macro parameter.
+    } else if (auto param = pasta::MacroParameter::From(parent.value())) {
+      auto eid = em.EntityId(param.value());
+      related_ids.emplace(tok.RawToken(), eid);
+      found = true;
+      return eid;
+
+
+    // Point the defined macro name at the macro itself.
+    } else if (auto def = pasta::DefineMacroDirective::From(parent.value())) {
+      if (auto name = def->Name()) {
+        if (name->RawMacro() == mtok.RawMacro()) {
+          auto eid = em.EntityId(def.value());
+          related_ids.emplace(tok.RawToken(), eid);
+          found = true;
+          return eid;
+        }
+      }
+    }
+
+    // Point the macro directive at the macro itself.
+    if (auto dir = pasta::MacroDirective::From(parent.value())) {
+      if (auto dir_name = dir->DirectiveName()) {
+        if (dir_name->RawMacro() == mtok.RawMacro()) {
+          auto eid = em.EntityId(dir.value());
+          related_ids.emplace(tok.RawToken(), eid);
+          found = true;
+          return eid;
+        }
+      }
+    }
+  }
+
+  auto eid = RelatedEntityIdToDerived(em, tok, found, related_ids);
+  if (found) {
+    related_ids.emplace(tok.RawToken(), eid);
+  }
+  return eid;
+}
+
+}  // namespace
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::Token &tok,
+    RelatedEntityIds &related_ids) {
+  bool found = false;
+  auto eid = RelatedEntityId(em, tok, found, related_ids);
+  if (!found) {
+    return eid;
+  }
+
+  // Back-propagate.
+  if (auto dloc = tok.DerivedLocation()) {
+    auto prop_eid = eid;
+    do {
+      found = false;
+      auto eid_dloc = RelatedEntityId(em, dloc.value(), found, related_ids);
+      if (found) {
+        prop_eid = eid_dloc;
+      }
+      related_ids.emplace(dloc->RawToken(), prop_eid);
+      dloc = dloc->DerivedLocation();
+    } while (dloc);
+  }
+
+  return eid;
+}
+
+// Find the entity ID of the declaration that is most related to a particular
+// token.
+mx::RawEntityId RelatedEntityId(
+    const EntityMapper &em, const pasta::MacroToken &tok,
+    RelatedEntityIds &related_ids) {
+  return RelatedEntityId(em, tok.ParsedLocation(), related_ids);
 }
 
 }  // namespace indexer

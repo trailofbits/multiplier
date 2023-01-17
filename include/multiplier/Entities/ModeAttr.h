@@ -71,7 +71,6 @@ class ModeAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ModeAttr) == sizeof(Attr));

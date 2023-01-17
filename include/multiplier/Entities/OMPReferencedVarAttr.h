@@ -73,7 +73,6 @@ class OMPReferencedVarAttr : public Attr {
   }
 
   Expr reference(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OMPReferencedVarAttr) == sizeof(Attr));

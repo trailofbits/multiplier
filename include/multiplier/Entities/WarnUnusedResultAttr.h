@@ -87,7 +87,6 @@ class WarnUnusedResultAttr : public InheritableAttr {
   bool is_cxx11_no_discard(void) const;
   std::string_view message(void) const;
   WarnUnusedResultAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(WarnUnusedResultAttr) == sizeof(InheritableAttr));

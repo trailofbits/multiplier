@@ -63,10 +63,6 @@ class TypedefNameDecl : public TypeDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::TYPEDEF_NAME;
-  }
-
   static gap::generator<TypedefNameDecl> containing(const Decl &decl);
   static gap::generator<TypedefNameDecl> containing(const Stmt &stmt);
 

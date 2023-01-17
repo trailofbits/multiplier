@@ -85,7 +85,6 @@ class OpenCLPrivateAddressSpaceAttr : public TypeAttr {
   }
 
   OpenCLPrivateAddressSpaceAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OpenCLPrivateAddressSpaceAttr) == sizeof(TypeAttr));

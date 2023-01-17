@@ -557,6 +557,7 @@ enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
 enum class PseudoKind : unsigned char;
+enum class TokenCategory : unsigned char;
 }  // namespace pasta
 namespace mx {
 enum class DeclKind : unsigned char;
@@ -2193,6 +2194,9 @@ TargetLanguage FromPasta(pasta::TargetLanguage pasta_val);
 
 enum class PseudoKind : unsigned char;
 PseudoKind FromPasta(pasta::PseudoKind pasta_val);
+
+enum class TokenCategory : unsigned char;
+TokenCategory FromPasta(pasta::TokenCategory pasta_val);
 
 enum class DeclUseSelector : unsigned short;
 enum class StmtUseSelector : unsigned short;

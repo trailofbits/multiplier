@@ -83,7 +83,6 @@ class LeafAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(LeafAttr) == sizeof(InheritableAttr));

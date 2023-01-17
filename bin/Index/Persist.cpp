@@ -445,6 +445,7 @@ static void PersistParsedTokens(
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
     const std::vector<pasta::Token> &parsed_tokens) {
 
+  RelatedEntityIds tok_related_entities;
   std::string utf8_fragment_data;
 
   // Find the set of macros to serialize.
@@ -459,6 +460,7 @@ static void PersistParsedTokens(
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
   auto dt = fb.initDerivedTokenIds(num_tokens);
+  auto re = fb.initRelatedEntityId(num_tokens);
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
   auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
   auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
@@ -485,6 +487,7 @@ static void PersistParsedTokens(
     to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
     tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(tok)));
     dt.set(i, DerivedTokenId(em, tok));
+    re.set(i, RelatedEntityId(em, tok, tok_related_entities));
 
     AccumulateTokenData(utf8_fragment_data, tok);
     ++i;
@@ -505,6 +508,18 @@ static void PersistParsedTokens(
   }
 }
 
+// Combine all parsed tokens into a string for diagnostic purposes.
+static std::string DiagnoseParsedTokens(
+    const std::vector<pasta::Token> &parsed_tokens) {
+  std::stringstream ss;
+  auto sep = "";
+  for (const pasta::Token &tok : parsed_tokens) {
+    ss << sep << tok.Data();
+    sep = " ";
+  }
+  return ss.str();
+}
+
 // Persist the token tree, which is a tree of substitutions, i.e. before/after
 // macro use/expansion, or x-macro file inclusion.
 //
@@ -515,6 +530,7 @@ static void PersistTokenTree(
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
     TokenTreeNodeRange nodes, const std::vector<pasta::Token> &parsed_tokens) {
 
+  RelatedEntityIds tok_related_entities;
   TokenTreeSerializationSchedule sched(pf, em);
   sched.Schedule(nodes);
 
@@ -526,7 +542,13 @@ static void PersistTokenTree(
   auto tk = fb.initTokenKinds(num_tokens);
   auto to = fb.initTokenOffsets(num_tokens + 1u);
   auto dt = fb.initDerivedTokenIds(num_tokens);
+  auto re = fb.initRelatedEntityId(num_tokens);
   auto i = 0u;
+
+  // Pre-fill the related entity IDs for the parsed tokens.
+  for (const pasta::Token &tok : parsed_tokens) {
+    (void) RelatedEntityId(em, tok, tok_related_entities);
+  }
 
   // Serialize the tokens.
   for (const TokenTreeNode &tok_node : sched.tokens) {
@@ -538,15 +560,20 @@ static void PersistTokenTree(
       AccumulateTokenData(utf8_fragment_data, pt.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(pt.value())));
       dt.set(i, DerivedTokenId(em, pt.value()));
+      re.set(i, RelatedEntityId(em, pt.value(), tok_related_entities));
 
     } else if (ft) {
       AccumulateTokenData(utf8_fragment_data, ft.value());
       tk.set(i, static_cast<uint16_t>(TokenKindFromPasta(ft.value())));
       dt.set(i, DerivedTokenId(em, ft.value()));
+      re.set(i, mx::kInvalidEntityId);
 
     } else {
+      auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
-          << "Missing parsed/file token for token node";
+          << "Missing parsed/file token for token node in source file "
+          << ast.MainFile().Path().generic_string() << " with parsed tokens "
+          << DiagnoseParsedTokens(parsed_tokens);
     }
 
     ++i;
@@ -587,8 +614,12 @@ static void PersistTokenTree(
       pto2i.set(i, mi);
       mti2po.set(mi, i);
     } else {
+      auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
-          << "TokenTree nodes didn't cover all parsed tokens";
+          << "TokenTree nodes didn't cover parsed token '" << parsed_tok.Data()
+          << "' at index " << i << " in parsed token list from source file "
+          << ast.MainFile().Path().generic_string() << " with parsed tokens "
+          << DiagnoseParsedTokens(parsed_tokens);
     }
 
     // Introduce a mapping of macro tokens back to parsed tokens.

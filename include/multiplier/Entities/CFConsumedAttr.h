@@ -95,7 +95,6 @@ class CFConsumedAttr : public InheritableParamAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CFConsumedAttr) == sizeof(InheritableParamAttr));

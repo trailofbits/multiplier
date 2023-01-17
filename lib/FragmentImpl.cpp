@@ -41,6 +41,7 @@ FragmentImpl::FragmentImpl(FragmentId id_,
   assert((num_tokens + 1u) == reader.getTokenOffsets().size());
   assert(num_parsed_tokens == reader.getParsedTokenOffsetToIndex().size());
   assert(num_tokens == reader.getMacroTokenIndexToParsedTokenOffset().size());
+  assert(num_tokens == reader.getRelatedEntityId().size());
 }
 
 // Return the ID of the file containing the first token.
@@ -155,6 +156,16 @@ EntityId ReadMacroTokensFromFragment::NthContainingMacroId(unsigned ti) const {
   FragmentImpl::Ptr frag(fragment->ep, fragment);
   Macro m(std::move(frag), mo);
   return m.id().Pack();
+}
+
+// Return an entity id associated with the Nth token.
+EntityId ReadMacroTokensFromFragment::NthRelatedEntityId(unsigned ti) const {
+  if (ti >= fragment->num_tokens) {
+    assert(false);
+    return kInvalidEntityId;
+  }
+
+  return fragment->Fragment().getRelatedEntityId()[ti];
 }
 
 // Return the id of the Nth token.
@@ -374,6 +385,22 @@ EntityId ReadParsedTokensFromFragment::NthContainingMacroId(unsigned to) const {
   FragmentImpl::Ptr frag(fragment->ep, fragment);
   Macro m(std::move(frag), mo);
   return m.id().Pack();
+}
+
+// Return an entity id associated with the Nth token.
+EntityId ReadParsedTokensFromFragment::NthRelatedEntityId(unsigned to) const {
+  if (to >= fragment->num_parsed_tokens) {
+    return kInvalidEntityId;
+  }
+
+  auto &reader = fragment->Fragment();
+  auto ti = reader.getParsedTokenOffsetToIndex()[to];
+  if (ti >= fragment->num_tokens) {
+    assert(false);
+    return kInvalidEntityId;
+  }
+
+  return reader.getRelatedEntityId()[ti];
 }
 
 // Return the id of the Nth token.

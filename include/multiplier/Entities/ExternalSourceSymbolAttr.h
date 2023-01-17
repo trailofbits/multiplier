@@ -86,7 +86,6 @@ class ExternalSourceSymbolAttr : public InheritableAttr {
   std::string_view defined_in(void) const;
   bool generated_declaration(void) const;
   std::string_view language(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ExternalSourceSymbolAttr) == sizeof(InheritableAttr));

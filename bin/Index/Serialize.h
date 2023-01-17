@@ -1369,6 +1369,7 @@ enum class CompilerName : unsigned;
 enum class IncludePathLocation : unsigned;
 enum class TargetLanguage : unsigned;
 enum class PseudoKind : unsigned char;
+enum class TokenCategory : unsigned char;
 }  // namespace pasta
 namespace indexer {
 class EntityMapper;

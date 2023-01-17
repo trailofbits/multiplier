@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <compare>
 #include <cstdint>
 #include <functional>
@@ -235,7 +236,7 @@ inline FileId::FileId(const FileTokenId &id_)
     : file_id(id_.file_id) {}
 
 // A tag type representing an invalid entity id.
-struct InvalidId {};
+using InvalidId = std::monostate;
 
 // Possible types of entity ids represented by a packed
 // `EntityId`.
@@ -319,6 +320,16 @@ class EntityId final {
 
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;
+
+  // Test if an entity ID is valid-looking.
+  inline operator bool(void) const noexcept {
+    if (opaque == kInvalidEntityId) {
+      return false;
+    } else {
+      assert(!std::holds_alternative<InvalidId>(Unpack()));
+      return true;
+    }
+  }
 
   inline RawEntityId Pack(void) const noexcept {
     return opaque;
@@ -407,7 +418,7 @@ struct EntityTypeImpl;
 #define MX_MAP_ENTITY_TYPE(id, t) \
     template <> \
     struct EntityTypeImpl<id> { \
-      using Type = t; \
+      using Entity = t; \
     }
 
 MX_MAP_ENTITY_TYPE(AttributeId, Attr);
@@ -424,8 +435,9 @@ MX_MAP_ENTITY_TYPE(TypeId, Type);
 
 #undef MX_MAP_ENTITY_TYPE
 
+// Given an entity ID type, get us the entity type.
 template <typename T>
-using EntityType = typename EntityTypeImpl<T>::Type;
+using EntityType = typename EntityTypeImpl<T>::Entity;
 
 }  // namespace mx
 namespace std {

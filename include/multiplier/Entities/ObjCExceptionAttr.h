@@ -83,7 +83,6 @@ class ObjCExceptionAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCExceptionAttr) == sizeof(InheritableAttr));

@@ -83,7 +83,6 @@ class AnyX86NoCfCheckAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AnyX86NoCfCheckAttr) == sizeof(InheritableAttr));

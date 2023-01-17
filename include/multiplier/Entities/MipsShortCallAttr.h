@@ -85,7 +85,6 @@ class MipsShortCallAttr : public InheritableAttr {
   }
 
   MipsShortCallAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MipsShortCallAttr) == sizeof(InheritableAttr));

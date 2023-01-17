@@ -83,7 +83,6 @@ class EmptyBasesAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(EmptyBasesAttr) == sizeof(InheritableAttr));

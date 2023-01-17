@@ -59,10 +59,6 @@ class BaseUsingDecl : public NamedDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::BASE_USING;
-  }
-
   static gap::generator<BaseUsingDecl> containing(const Decl &decl);
   static gap::generator<BaseUsingDecl> containing(const Stmt &stmt);
 

@@ -83,7 +83,6 @@ class BPFPreserveAccessIndexAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(BPFPreserveAccessIndexAttr) == sizeof(InheritableAttr));

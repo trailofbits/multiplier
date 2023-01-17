@@ -32,6 +32,7 @@ class TemplateArgument;
 class Type;
 class ValueDecl;
 class VarDecl;
+class VarTemplateDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class VarTemplateSpecializationDecl : public VarDecl {
@@ -130,6 +131,7 @@ class VarTemplateSpecializationDecl : public VarDecl {
 
   Token extern_token(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
+  VarTemplateDecl specialized_template(void) const;
   std::vector<TemplateArgument> template_arguments(void) const;
   std::vector<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;

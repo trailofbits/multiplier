@@ -83,7 +83,6 @@ class AlignMac68kAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AlignMac68kAttr) == sizeof(InheritableAttr));

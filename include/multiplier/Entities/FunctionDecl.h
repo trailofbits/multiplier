@@ -37,6 +37,7 @@ namespace mx {
 class Decl;
 class DeclaratorDecl;
 class FunctionDecl;
+class FunctionTemplateDecl;
 class NamedDecl;
 class ParmVarDecl;
 class Stmt;
@@ -132,6 +133,7 @@ class FunctionDecl : public DeclaratorDecl {
   Type call_result_type(void) const;
   ConstexprSpecKind constexpr_kind(void) const;
   Type declared_return_type(void) const;
+  std::optional<FunctionTemplateDecl> described_function_template(void) const;
   Token ellipsis_token(void) const;
   TokenRange exception_spec_source_range(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
@@ -143,6 +145,7 @@ class FunctionDecl : public DeclaratorDecl {
   OverloadedOperatorKind overloaded_operator(void) const;
   TokenRange parameters_source_range(void) const;
   Token point_of_instantiation(void) const;
+  std::optional<FunctionTemplateDecl> primary_template(void) const;
   Type return_type(void) const;
   TokenRange return_type_source_range(void) const;
   StorageClass storage_class(void) const;

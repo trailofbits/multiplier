@@ -85,7 +85,6 @@ class ConsumableAttr : public InheritableAttr {
   }
 
   ConsumableAttrConsumedState default_state(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ConsumableAttr) == sizeof(InheritableAttr));

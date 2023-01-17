@@ -85,7 +85,6 @@ class CFGuardAttr : public InheritableAttr {
   }
 
   CFGuardAttrGuardArg guard(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CFGuardAttr) == sizeof(InheritableAttr));

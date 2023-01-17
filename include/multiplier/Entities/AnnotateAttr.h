@@ -96,7 +96,6 @@ class AnnotateAttr : public InheritableParamAttr {
   }
 
   std::string_view annotation(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AnnotateAttr) == sizeof(InheritableParamAttr));

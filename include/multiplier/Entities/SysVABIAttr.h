@@ -83,7 +83,6 @@ class SysVABIAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SysVABIAttr) == sizeof(InheritableAttr));

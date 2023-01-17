@@ -64,10 +64,6 @@ class TagDecl : public TypeDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::TAG;
-  }
-
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const Stmt &stmt);
 

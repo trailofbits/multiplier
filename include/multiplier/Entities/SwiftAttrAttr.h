@@ -84,7 +84,6 @@ class SwiftAttrAttr : public InheritableAttr {
   }
 
   std::string_view attribute(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(SwiftAttrAttr) == sizeof(InheritableAttr));

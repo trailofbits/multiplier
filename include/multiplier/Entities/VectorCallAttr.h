@@ -83,7 +83,6 @@ class VectorCallAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(VectorCallAttr) == sizeof(InheritableAttr));

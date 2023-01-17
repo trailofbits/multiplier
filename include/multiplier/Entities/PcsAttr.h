@@ -85,7 +85,6 @@ class PcsAttr : public InheritableAttr {
   }
 
   PcsAttrPCSType pcs(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(PcsAttr) == sizeof(InheritableAttr));

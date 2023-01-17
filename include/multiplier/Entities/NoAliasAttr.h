@@ -83,7 +83,6 @@ class NoAliasAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NoAliasAttr) == sizeof(InheritableAttr));

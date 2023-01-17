@@ -84,7 +84,6 @@ class TypeVisibilityAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   TypeVisibilityAttrVisibilityType visibility(void) const;
 };
 

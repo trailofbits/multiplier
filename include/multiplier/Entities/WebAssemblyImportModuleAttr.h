@@ -84,7 +84,6 @@ class WebAssemblyImportModuleAttr : public InheritableAttr {
   }
 
   std::string_view import_module(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(WebAssemblyImportModuleAttr) == sizeof(InheritableAttr));

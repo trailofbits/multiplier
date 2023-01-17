@@ -83,7 +83,6 @@ class AddressSpaceAttr : public TypeAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AddressSpaceAttr) == sizeof(TypeAttr));

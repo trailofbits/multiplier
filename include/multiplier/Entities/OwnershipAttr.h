@@ -87,7 +87,6 @@ class OwnershipAttr : public InheritableAttr {
 
   OwnershipAttrOwnershipKind own_kind(void) const;
   OwnershipAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_holds(void) const;
   bool is_returns(void) const;
   bool is_takes(void) const;

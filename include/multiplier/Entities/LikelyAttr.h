@@ -83,7 +83,6 @@ class LikelyAttr : public StmtAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(LikelyAttr) == sizeof(StmtAttr));

@@ -83,7 +83,6 @@ class MSP430InterruptAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MSP430InterruptAttr) == sizeof(InheritableAttr));

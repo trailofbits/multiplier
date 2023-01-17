@@ -6,10 +6,11 @@
 
 #include "Use.h"
 
+#include <cassert>
+#include <multiplier/AST.h>
 #include <type_traits>
 
 #include "Fragment.h"
-#include <multiplier/AST.h>
 
 namespace mx {
 namespace {
@@ -102,6 +103,7 @@ const char *EnumeratorName(UseKind kind) {
     case UseKind::ATTRIBUTE: return "ATTRIBUTE";
     case UseKind::MACRO: return "MACRO";
   }
+  return "<invalid>";
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)

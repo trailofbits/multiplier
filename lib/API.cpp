@@ -27,7 +27,7 @@
 #include "Re2Impl.h"
 #include "Token.h"
 #include "Use.h"
-#include "Weggli.h"
+#include "WeggliImpl.h"
 
 namespace mx {
 

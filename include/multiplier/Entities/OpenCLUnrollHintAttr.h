@@ -83,7 +83,6 @@ class OpenCLUnrollHintAttr : public StmtAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(OpenCLUnrollHintAttr) == sizeof(StmtAttr));

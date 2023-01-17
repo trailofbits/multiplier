@@ -60,10 +60,6 @@ class ObjCContainerDecl : public NamedDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::OBJ_C_CONTAINER;
-  }
-
   static gap::generator<ObjCContainerDecl> containing(const Decl &decl);
   static gap::generator<ObjCContainerDecl> containing(const Stmt &stmt);
 

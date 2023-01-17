@@ -13,7 +13,6 @@
 namespace mx {
 enum class DeclKind : unsigned char {
   ACCESS_SPEC,
-  BASE_USING,
   BINDING,
   BLOCK,
   BUILTIN_TEMPLATE,
@@ -30,7 +29,6 @@ enum class DeclKind : unsigned char {
   CLASS_TEMPLATE_SPECIALIZATION,
   CONCEPT,
   CONSTRUCTOR_USING_SHADOW,
-  DECLARATOR,
   DECOMPOSITION,
   EMPTY,
   ENUM_CONSTANT,
@@ -51,7 +49,6 @@ enum class DeclKind : unsigned char {
   LINKAGE_SPEC,
   MS_GUID,
   MS_PROPERTY,
-  NAMED,
   NAMESPACE_ALIAS,
   NAMESPACE,
   NON_TYPE_TEMPLATE_PARM,
@@ -65,8 +62,6 @@ enum class DeclKind : unsigned char {
   OBJ_C_CATEGORY,
   OBJ_C_CATEGORY_IMPL,
   OBJ_C_COMPATIBLE_ALIAS,
-  OBJ_C_CONTAINER,
-  OBJ_C_IMPL,
   OBJ_C_IMPLEMENTATION,
   OBJ_C_INTERFACE,
   OBJ_C_IVAR,
@@ -79,20 +74,15 @@ enum class DeclKind : unsigned char {
   PRAGMA_COMMENT,
   PRAGMA_DETECT_MISMATCH,
   RECORD,
-  REDECLARABLE_TEMPLATE,
   REQUIRES_EXPR_BODY,
   STATIC_ASSERT,
-  TAG,
-  TEMPLATE,
   TEMPLATE_PARAM_OBJECT,
   TEMPLATE_TEMPLATE_PARM,
   TEMPLATE_TYPE_PARM,
   TRANSLATION_UNIT,
   TYPE_ALIAS,
   TYPE_ALIAS_TEMPLATE,
-  TYPE,
   TYPEDEF,
-  TYPEDEF_NAME,
   UNNAMED_GLOBAL_CONSTANT,
   UNRESOLVED_USING_IF_EXISTS,
   UNRESOLVED_USING_TYPENAME,
@@ -102,7 +92,6 @@ enum class DeclKind : unsigned char {
   USING_ENUM,
   USING_PACK,
   USING_SHADOW,
-  VALUE,
   VAR,
   VAR_TEMPLATE,
   VAR_TEMPLATE_PARTIAL_SPECIALIZATION,
@@ -114,7 +103,7 @@ inline static const char *EnumerationName(DeclKind) {
 }
 
 inline static constexpr unsigned NumEnumerators(DeclKind) {
-  return 95;
+  return 84;
 }
 
 const char *EnumeratorName(DeclKind);

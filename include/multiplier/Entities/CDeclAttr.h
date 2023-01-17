@@ -83,7 +83,6 @@ class CDeclAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CDeclAttr) == sizeof(InheritableAttr));

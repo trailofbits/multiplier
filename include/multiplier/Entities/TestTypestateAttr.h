@@ -84,7 +84,6 @@ class TestTypestateAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
   TestTypestateAttrConsumedState test_state(void) const;
 };
 

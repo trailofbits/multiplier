@@ -86,6 +86,7 @@ class EntityProvider {
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RemoteEntityProvider;
+  friend class Token;
   friend class TokenReader;
   friend class UseIteratorImpl;
   friend class WeggliQuery;
@@ -223,8 +224,15 @@ class Index {
   /* implicit */ inline Index(EntityProvider::Ptr impl_)
       : impl(std::move(impl_)) {}
 
-  static Index containing(const Fragment &fragment);
-  static Index containing(const File &file);
+  static Index containing(const Fragment &entity);
+  static Index containing(const File &entity);
+  static Index containing(const Decl &entity);
+  static Index containing(const Stmt &entity);
+  static Index containing(const Type &entity);
+  static Index containing(const Attr &entity);
+  static Index containing(const Macro &entity);
+  static Index containing(const Designator &entity);
+  static std::optional<Index> containing(const Token &entity);
 
   // Return the status of the index.
   IndexStatus status(bool block=false) const;
@@ -249,7 +257,16 @@ class Index {
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;
 
-  // Return a
+  template <typename T>
+  inline std::optional<EntityType<T>> entity(T eid) const {
+    VariantEntity vent = entity(eid.Pack());
+    if (std::holds_alternative<EntityType<T>>(vent)) {
+      return std::move(std::get<EntityType<T>>(vent));
+    } else {
+      return std::nullopt;
+    }
+  }
+
   template <typename T>
   inline std::optional<EntityType<T>> entity(SpecificEntityId<T> eid) const {
     VariantEntity vent = entity(eid.Pack());

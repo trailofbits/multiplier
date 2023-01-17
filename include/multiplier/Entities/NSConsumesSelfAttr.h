@@ -83,7 +83,6 @@ class NSConsumesSelfAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NSConsumesSelfAttr) == sizeof(InheritableAttr));

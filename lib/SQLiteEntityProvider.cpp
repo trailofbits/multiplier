@@ -95,7 +95,8 @@ class SQLiteEntityProviderImpl {
         expand_entity_id_list_with_redecls(db.Prepare(
             "INSERT OR IGNORE INTO " + entity_id_list  + " (entity_id) "
             "WITH RECURSIVE transitive_redeclaration(entity_id) "
-            "AS (SELECT l.entity_id FROM " + entity_id_list + " AS l"
+            "AS NOT MATERIALIZED ("
+            "      SELECT l.entity_id FROM " + entity_id_list + " AS l"
             "    UNION"
             "      SELECT r1.redecl_id"
             "      FROM transitive_redeclaration AS tc1"
@@ -434,8 +435,8 @@ void SQLiteEntityProvider::FillFragments(
 
       redecl_ids_out = ReadRedeclarations(context);
       assert(!redecl_ids_out.empty());
-      assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(), eid) !=
-             redecl_ids_out.end());
+      assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(),
+                       eid.Pack()) != redecl_ids_out.end());
 
     // If we already have a set then use them.
     } else {

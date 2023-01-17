@@ -71,7 +71,6 @@ class ObjCClassStubAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCClassStubAttr) == sizeof(Attr));

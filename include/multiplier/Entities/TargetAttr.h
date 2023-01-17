@@ -85,7 +85,6 @@ class TargetAttr : public InheritableAttr {
 
   std::string_view architecture(void) const;
   std::string_view features_string(void) const;
-  std::string_view spelling(void) const;
   bool is_default_version(void) const;
 };
 

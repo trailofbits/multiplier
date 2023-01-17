@@ -72,7 +72,6 @@ class IFuncAttr : public Attr {
   }
 
   std::string_view resolver(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(IFuncAttr) == sizeof(Attr));

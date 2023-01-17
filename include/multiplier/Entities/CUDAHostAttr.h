@@ -83,7 +83,6 @@ class CUDAHostAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(CUDAHostAttr) == sizeof(InheritableAttr));

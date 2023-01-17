@@ -83,7 +83,6 @@ class ObjCExplicitProtocolImplAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCExplicitProtocolImplAttr) == sizeof(InheritableAttr));

@@ -83,7 +83,6 @@ class PreserveMostAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(PreserveMostAttr) == sizeof(InheritableAttr));

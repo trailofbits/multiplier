@@ -83,7 +83,6 @@ class PatchableFunctionEntryAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(PatchableFunctionEntryAttr) == sizeof(InheritableAttr));

@@ -10,7 +10,6 @@
 
 #include "File.h"
 #include "Fragment.h"
-#include "Re2.h"
 #include "Token.h"
 #include "Use.h"
 

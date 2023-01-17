@@ -88,7 +88,6 @@ class MSInheritanceAttr : public InheritableAttr {
   bool best_case(void) const;
   MSInheritanceModel inheritance_model(void) const;
   MSInheritanceAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(MSInheritanceAttr) == sizeof(InheritableAttr));

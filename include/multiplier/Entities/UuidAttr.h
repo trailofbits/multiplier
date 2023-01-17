@@ -86,7 +86,6 @@ class UuidAttr : public InheritableAttr {
 
   std::string_view guid(void) const;
   MSGuidDecl guid_declaration(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(UuidAttr) == sizeof(InheritableAttr));

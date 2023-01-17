@@ -83,7 +83,6 @@ class NSReturnsRetainedAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NSReturnsRetainedAttr) == sizeof(InheritableAttr));

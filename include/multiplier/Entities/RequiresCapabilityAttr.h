@@ -85,7 +85,6 @@ class RequiresCapabilityAttr : public InheritableAttr {
   }
 
   RequiresCapabilityAttrSpelling semantic_spelling(void) const;
-  std::string_view spelling(void) const;
   bool is_shared(void) const;
 };
 

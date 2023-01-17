@@ -71,7 +71,6 @@ class ObjCBoxableAttr : public Attr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(ObjCBoxableAttr) == sizeof(Attr));

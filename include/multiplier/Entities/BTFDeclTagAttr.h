@@ -84,7 +84,6 @@ class BTFDeclTagAttr : public InheritableAttr {
   }
 
   std::string_view btf_decl_tag(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(BTFDeclTagAttr) == sizeof(InheritableAttr));

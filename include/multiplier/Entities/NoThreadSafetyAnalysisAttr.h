@@ -83,7 +83,6 @@ class NoThreadSafetyAnalysisAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(NoThreadSafetyAnalysisAttr) == sizeof(InheritableAttr));

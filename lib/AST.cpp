@@ -7,14 +7,13 @@
 // Auto-generated file; do not modify!
 
 #include <multiplier/AST.h>
-
+#include <cassert>
 #include "Fragment.h"
 
 namespace mx {
 const char *EnumeratorName(DeclKind e) {
   switch (e) {
     case DeclKind::ACCESS_SPEC: return "ACCESS_SPEC";
-    case DeclKind::BASE_USING: return "BASE_USING";
     case DeclKind::BINDING: return "BINDING";
     case DeclKind::BLOCK: return "BLOCK";
     case DeclKind::BUILTIN_TEMPLATE: return "BUILTIN_TEMPLATE";
@@ -31,7 +30,6 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::CLASS_TEMPLATE_SPECIALIZATION: return "CLASS_TEMPLATE_SPECIALIZATION";
     case DeclKind::CONCEPT: return "CONCEPT";
     case DeclKind::CONSTRUCTOR_USING_SHADOW: return "CONSTRUCTOR_USING_SHADOW";
-    case DeclKind::DECLARATOR: return "DECLARATOR";
     case DeclKind::DECOMPOSITION: return "DECOMPOSITION";
     case DeclKind::EMPTY: return "EMPTY";
     case DeclKind::ENUM_CONSTANT: return "ENUM_CONSTANT";
@@ -52,7 +50,6 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::LINKAGE_SPEC: return "LINKAGE_SPEC";
     case DeclKind::MS_GUID: return "MS_GUID";
     case DeclKind::MS_PROPERTY: return "MS_PROPERTY";
-    case DeclKind::NAMED: return "NAMED";
     case DeclKind::NAMESPACE_ALIAS: return "NAMESPACE_ALIAS";
     case DeclKind::NAMESPACE: return "NAMESPACE";
     case DeclKind::NON_TYPE_TEMPLATE_PARM: return "NON_TYPE_TEMPLATE_PARM";
@@ -66,8 +63,6 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::OBJ_C_CATEGORY: return "OBJ_C_CATEGORY";
     case DeclKind::OBJ_C_CATEGORY_IMPL: return "OBJ_C_CATEGORY_IMPL";
     case DeclKind::OBJ_C_COMPATIBLE_ALIAS: return "OBJ_C_COMPATIBLE_ALIAS";
-    case DeclKind::OBJ_C_CONTAINER: return "OBJ_C_CONTAINER";
-    case DeclKind::OBJ_C_IMPL: return "OBJ_C_IMPL";
     case DeclKind::OBJ_C_IMPLEMENTATION: return "OBJ_C_IMPLEMENTATION";
     case DeclKind::OBJ_C_INTERFACE: return "OBJ_C_INTERFACE";
     case DeclKind::OBJ_C_IVAR: return "OBJ_C_IVAR";
@@ -80,20 +75,15 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::PRAGMA_COMMENT: return "PRAGMA_COMMENT";
     case DeclKind::PRAGMA_DETECT_MISMATCH: return "PRAGMA_DETECT_MISMATCH";
     case DeclKind::RECORD: return "RECORD";
-    case DeclKind::REDECLARABLE_TEMPLATE: return "REDECLARABLE_TEMPLATE";
     case DeclKind::REQUIRES_EXPR_BODY: return "REQUIRES_EXPR_BODY";
     case DeclKind::STATIC_ASSERT: return "STATIC_ASSERT";
-    case DeclKind::TAG: return "TAG";
-    case DeclKind::TEMPLATE: return "TEMPLATE";
     case DeclKind::TEMPLATE_PARAM_OBJECT: return "TEMPLATE_PARAM_OBJECT";
     case DeclKind::TEMPLATE_TEMPLATE_PARM: return "TEMPLATE_TEMPLATE_PARM";
     case DeclKind::TEMPLATE_TYPE_PARM: return "TEMPLATE_TYPE_PARM";
     case DeclKind::TRANSLATION_UNIT: return "TRANSLATION_UNIT";
     case DeclKind::TYPE_ALIAS: return "TYPE_ALIAS";
     case DeclKind::TYPE_ALIAS_TEMPLATE: return "TYPE_ALIAS_TEMPLATE";
-    case DeclKind::TYPE: return "TYPE";
     case DeclKind::TYPEDEF: return "TYPEDEF";
-    case DeclKind::TYPEDEF_NAME: return "TYPEDEF_NAME";
     case DeclKind::UNNAMED_GLOBAL_CONSTANT: return "UNNAMED_GLOBAL_CONSTANT";
     case DeclKind::UNRESOLVED_USING_IF_EXISTS: return "UNRESOLVED_USING_IF_EXISTS";
     case DeclKind::UNRESOLVED_USING_TYPENAME: return "UNRESOLVED_USING_TYPENAME";
@@ -103,7 +93,6 @@ const char *EnumeratorName(DeclKind e) {
     case DeclKind::USING_ENUM: return "USING_ENUM";
     case DeclKind::USING_PACK: return "USING_PACK";
     case DeclKind::USING_SHADOW: return "USING_SHADOW";
-    case DeclKind::VALUE: return "VALUE";
     case DeclKind::VAR: return "VAR";
     case DeclKind::VAR_TEMPLATE: return "VAR_TEMPLATE";
     case DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION: return "VAR_TEMPLATE_PARTIAL_SPECIALIZATION";
@@ -7491,6 +7480,7 @@ const char *EnumeratorName(DeclCategory e) {
     case DeclCategory::CLASS: return "CLASS";
     case DeclCategory::STRUCTURE: return "STRUCTURE";
     case DeclCategory::UNION: return "UNION";
+    case DeclCategory::CONCEPT: return "CONCEPT";
     case DeclCategory::INTERFACE: return "INTERFACE";
     case DeclCategory::ENUMERATION: return "ENUMERATION";
     case DeclCategory::ENUMERATOR: return "ENUMERATOR";
@@ -7591,6 +7581,45 @@ const char *EnumeratorName(PseudoKind e) {
     case PseudoKind::TEMPLATE_PARAMETER_LIST: return "TEMPLATE_PARAMETER_LIST";
     case PseudoKind::CXX_BASE_SPECIFIER: return "CXX_BASE_SPECIFIER";
     case PseudoKind::DESIGNATOR: return "DESIGNATOR";
+    default: return "<invalid>";
+  }
+}
+
+const char *EnumeratorName(TokenCategory e) {
+  switch (e) {
+    case TokenCategory::UNKNOWN: return "UNKNOWN";
+    case TokenCategory::IDENTIFIER: return "IDENTIFIER";
+    case TokenCategory::MACRO_NAME: return "MACRO_NAME";
+    case TokenCategory::MACRO_PARAMETER_NAME: return "MACRO_PARAMETER_NAME";
+    case TokenCategory::MACRO_DIRECTIVE_NAME: return "MACRO_DIRECTIVE_NAME";
+    case TokenCategory::KEYWORD: return "KEYWORD";
+    case TokenCategory::OBJECTIVE_C_KEYWORD: return "OBJECTIVE_C_KEYWORD";
+    case TokenCategory::BUILTIN_TYPE_NAME: return "BUILTIN_TYPE_NAME";
+    case TokenCategory::PUNCTUATION: return "PUNCTUATION";
+    case TokenCategory::LITERAL: return "LITERAL";
+    case TokenCategory::COMMENT: return "COMMENT";
+    case TokenCategory::LOCAL_VARIABLE: return "LOCAL_VARIABLE";
+    case TokenCategory::GLOBAL_VARIABLE: return "GLOBAL_VARIABLE";
+    case TokenCategory::PARAMETER_VARIABLE: return "PARAMETER_VARIABLE";
+    case TokenCategory::FUNCTION: return "FUNCTION";
+    case TokenCategory::INSTANCE_METHOD: return "INSTANCE_METHOD";
+    case TokenCategory::INSTANCE_MEMBER: return "INSTANCE_MEMBER";
+    case TokenCategory::CLASS_METHOD: return "CLASS_METHOD";
+    case TokenCategory::CLASS_MEMBER: return "CLASS_MEMBER";
+    case TokenCategory::THIS: return "THIS";
+    case TokenCategory::CLASS: return "CLASS";
+    case TokenCategory::STRUCT: return "STRUCT";
+    case TokenCategory::UNION: return "UNION";
+    case TokenCategory::CONCEPT: return "CONCEPT";
+    case TokenCategory::INTERFACE: return "INTERFACE";
+    case TokenCategory::ENUM: return "ENUM";
+    case TokenCategory::ENUMERATOR: return "ENUMERATOR";
+    case TokenCategory::NAMESPACE: return "NAMESPACE";
+    case TokenCategory::TYPE_ALIAS: return "TYPE_ALIAS";
+    case TokenCategory::TEMPLATE_PARAMETER_TYPE: return "TEMPLATE_PARAMETER_TYPE";
+    case TokenCategory::TEMPLATE_PARAMETER_VALUE: return "TEMPLATE_PARAMETER_VALUE";
+    case TokenCategory::LABEL: return "LABEL";
+    case TokenCategory::WHITESPACE: return "WHITESPACE";
     default: return "<invalid>";
   }
 }
@@ -7855,11 +7884,11 @@ bool CXXBaseSpecifier::constructors_are_inherited(void) const {
   return self.getVal3();
 }
 
-std::optional<Token> CXXBaseSpecifier::ellipsis_token(void) const {
+Token CXXBaseSpecifier::ellipsis_token(void) const {
   auto self = fragment->NthPseudo(offset_);
   if (true) {
     EntityId id(self.getVal7());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -8336,19 +8365,19 @@ std::optional<MacroParameter> MacroParameter::from(const Macro &parent) {
   }
 }
 
-std::optional<Token> MacroParameter::variadic_dots(void) const {
+Token MacroParameter::variadic_dots(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal4());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
-std::optional<Token> MacroParameter::name(void) const {
+Token MacroParameter::name(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal8());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -8421,11 +8450,11 @@ Token MacroDirective::hash(void) const {
   }
 }
 
-std::optional<Token> MacroDirective::directive_name(void) const {
+Token MacroDirective::directive_name(void) const {
   auto self = fragment->NthMacro(offset_);
   if (true) {
     EntityId id(self.getVal8());
-    return fragment->TokenFor(fragment, id);
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -8475,10 +8504,9 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const Macro &pare
 
 Token DefineMacroDirective::name(void) const {
   auto self = fragment->NthMacro(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
+  if (true) {
+    EntityId id(self.getVal9());
+    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
   }
 }
 
@@ -9410,12 +9438,6 @@ Expr AlignValueAttr::alignment(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-std::string_view AlignValueAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AliasAttr> AliasAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9434,12 +9456,6 @@ std::string_view AliasAttr::aliasee(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view AliasAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AbiTagAttr> AbiTagAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9450,12 +9466,6 @@ std::optional<AbiTagAttr> AbiTagAttr::from(const Attr &parent) {
       return reinterpret_cast<const AbiTagAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AbiTagAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<TypeAttr> TypeAttr::from(const TokenContext &c) {
@@ -9509,12 +9519,6 @@ std::optional<SPtrAttr> SPtrAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SPtrAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<Ptr64Attr> Ptr64Attr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9531,12 +9535,6 @@ std::optional<Ptr64Attr> Ptr64Attr::from(const Attr &parent) {
   }
 }
 
-std::string_view Ptr64Attr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<Ptr32Attr> Ptr32Attr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9551,12 +9549,6 @@ std::optional<Ptr32Attr> Ptr32Attr::from(const Attr &parent) {
       return reinterpret_cast<const Ptr32Attr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view Ptr32Attr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::from(const TokenContext &c) {
@@ -9577,13 +9569,7 @@ std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::from
 
 OpenCLPrivateAddressSpaceAttrSpelling OpenCLPrivateAddressSpaceAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OpenCLPrivateAddressSpaceAttrSpelling>(self.getVal11());
-}
-
-std::string_view OpenCLPrivateAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OpenCLPrivateAddressSpaceAttrSpelling>(self.getVal10());
 }
 
 std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::from(const TokenContext &c) {
@@ -9604,13 +9590,7 @@ std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::from(con
 
 OpenCLLocalAddressSpaceAttrSpelling OpenCLLocalAddressSpaceAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OpenCLLocalAddressSpaceAttrSpelling>(self.getVal11());
-}
-
-std::string_view OpenCLLocalAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OpenCLLocalAddressSpaceAttrSpelling>(self.getVal10());
 }
 
 std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::from(const TokenContext &c) {
@@ -9629,12 +9609,6 @@ std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr
   }
 }
 
-std::string_view OpenCLGlobalHostAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpaceAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9649,12 +9623,6 @@ std::optional<OpenCLGlobalDeviceAddressSpaceAttr> OpenCLGlobalDeviceAddressSpace
       return reinterpret_cast<const OpenCLGlobalDeviceAddressSpaceAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OpenCLGlobalDeviceAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OpenCLGlobalAddressSpaceAttr> OpenCLGlobalAddressSpaceAttr::from(const TokenContext &c) {
@@ -9675,13 +9643,7 @@ std::optional<OpenCLGlobalAddressSpaceAttr> OpenCLGlobalAddressSpaceAttr::from(c
 
 OpenCLGlobalAddressSpaceAttrSpelling OpenCLGlobalAddressSpaceAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OpenCLGlobalAddressSpaceAttrSpelling>(self.getVal11());
-}
-
-std::string_view OpenCLGlobalAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OpenCLGlobalAddressSpaceAttrSpelling>(self.getVal10());
 }
 
 std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from(const TokenContext &c) {
@@ -9702,13 +9664,7 @@ std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from
 
 OpenCLGenericAddressSpaceAttrSpelling OpenCLGenericAddressSpaceAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OpenCLGenericAddressSpaceAttrSpelling>(self.getVal11());
-}
-
-std::string_view OpenCLGenericAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OpenCLGenericAddressSpaceAttrSpelling>(self.getVal10());
 }
 
 std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::from(const TokenContext &c) {
@@ -9729,13 +9685,7 @@ std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::fr
 
 OpenCLConstantAddressSpaceAttrSpelling OpenCLConstantAddressSpaceAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OpenCLConstantAddressSpaceAttrSpelling>(self.getVal11());
-}
-
-std::string_view OpenCLConstantAddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OpenCLConstantAddressSpaceAttrSpelling>(self.getVal10());
 }
 
 std::optional<ObjCKindOfAttr> ObjCKindOfAttr::from(const TokenContext &c) {
@@ -9754,12 +9704,6 @@ std::optional<ObjCKindOfAttr> ObjCKindOfAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ObjCKindOfAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9774,12 +9718,6 @@ std::optional<ObjCInertUnsafeUnretainedAttr> ObjCInertUnsafeUnretainedAttr::from
       return reinterpret_cast<const ObjCInertUnsafeUnretainedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCInertUnsafeUnretainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCGCAttr> ObjCGCAttr::from(const TokenContext &c) {
@@ -9798,12 +9736,6 @@ std::optional<ObjCGCAttr> ObjCGCAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ObjCGCAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoDerefAttr> NoDerefAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9820,12 +9752,6 @@ std::optional<NoDerefAttr> NoDerefAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoDerefAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CmseNSCallAttr> CmseNSCallAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9840,12 +9766,6 @@ std::optional<CmseNSCallAttr> CmseNSCallAttr::from(const Attr &parent) {
       return reinterpret_cast<const CmseNSCallAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CmseNSCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<BTFTypeTagAttr> BTFTypeTagAttr::from(const TokenContext &c) {
@@ -9870,12 +9790,6 @@ std::string_view BTFTypeTagAttr::btf_type_tag(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view BTFTypeTagAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9890,12 +9804,6 @@ std::optional<ArmMveStrictPolymorphismAttr> ArmMveStrictPolymorphismAttr::from(c
       return reinterpret_cast<const ArmMveStrictPolymorphismAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ArmMveStrictPolymorphismAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AnnotateTypeAttr> AnnotateTypeAttr::from(const TokenContext &c) {
@@ -9920,12 +9828,6 @@ std::string_view AnnotateTypeAttr::annotation(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view AnnotateTypeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AddressSpaceAttr> AddressSpaceAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9940,12 +9842,6 @@ std::optional<AddressSpaceAttr> AddressSpaceAttr::from(const Attr &parent) {
       return reinterpret_cast<const AddressSpaceAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AddressSpaceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<UPtrAttr> UPtrAttr::from(const TokenContext &c) {
@@ -9964,12 +9860,6 @@ std::optional<UPtrAttr> UPtrAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view UPtrAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<TypeNullableResultAttr> TypeNullableResultAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -9984,12 +9874,6 @@ std::optional<TypeNullableResultAttr> TypeNullableResultAttr::from(const Attr &p
       return reinterpret_cast<const TypeNullableResultAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view TypeNullableResultAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<TypeNullableAttr> TypeNullableAttr::from(const TokenContext &c) {
@@ -10008,12 +9892,6 @@ std::optional<TypeNullableAttr> TypeNullableAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view TypeNullableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10028,12 +9906,6 @@ std::optional<TypeNullUnspecifiedAttr> TypeNullUnspecifiedAttr::from(const Attr 
       return reinterpret_cast<const TypeNullUnspecifiedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view TypeNullUnspecifiedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<TypeNonNullAttr> TypeNonNullAttr::from(const TokenContext &c) {
@@ -10052,12 +9924,6 @@ std::optional<TypeNonNullAttr> TypeNonNullAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view TypeNonNullAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ThreadAttr> ThreadAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10070,12 +9936,6 @@ std::optional<ThreadAttr> ThreadAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ThreadAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10086,12 +9946,6 @@ std::optional<SwiftObjCMembersAttr> SwiftObjCMembersAttr::from(const Attr &paren
       return reinterpret_cast<const SwiftObjCMembersAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SwiftObjCMembersAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<StmtAttr> StmtAttr::from(const TokenContext &c) {
@@ -10127,12 +9981,6 @@ std::optional<OpenCLUnrollHintAttr> OpenCLUnrollHintAttr::from(const Attr &paren
   }
 }
 
-std::string_view OpenCLUnrollHintAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MustTailAttr> MustTailAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10147,12 +9995,6 @@ std::optional<MustTailAttr> MustTailAttr::from(const Attr &parent) {
       return reinterpret_cast<const MustTailAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view MustTailAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<LikelyAttr> LikelyAttr::from(const TokenContext &c) {
@@ -10171,12 +10013,6 @@ std::optional<LikelyAttr> LikelyAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view LikelyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<FallThroughAttr> FallThroughAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10191,12 +10027,6 @@ std::optional<FallThroughAttr> FallThroughAttr::from(const Attr &parent) {
       return reinterpret_cast<const FallThroughAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view FallThroughAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<UnlikelyAttr> UnlikelyAttr::from(const TokenContext &c) {
@@ -10215,12 +10045,6 @@ std::optional<UnlikelyAttr> UnlikelyAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view UnlikelyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SuppressAttr> SuppressAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10237,12 +10061,6 @@ std::optional<SuppressAttr> SuppressAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SuppressAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10255,12 +10073,6 @@ std::optional<RenderScriptKernelAttr> RenderScriptKernelAttr::from(const Attr &p
   }
 }
 
-std::string_view RenderScriptKernelAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OverloadableAttr> OverloadableAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10271,12 +10083,6 @@ std::optional<OverloadableAttr> OverloadableAttr::from(const Attr &parent) {
       return reinterpret_cast<const OverloadableAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OverloadableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const TokenContext &c) {
@@ -10293,28 +10099,22 @@ std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const Attr &parent) {
 
 OpenCLAccessAttrSpelling OpenCLAccessAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OpenCLAccessAttrSpelling>(self.getVal11());
-}
-
-std::string_view OpenCLAccessAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OpenCLAccessAttrSpelling>(self.getVal10());
 }
 
 bool OpenCLAccessAttr::is_read_only(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal12();
+  return self.getVal11();
 }
 
 bool OpenCLAccessAttr::is_read_write(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 bool OpenCLAccessAttr::is_write_only(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::from(const TokenContext &c) {
@@ -10327,12 +10127,6 @@ std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::from(const Attr &p
       return reinterpret_cast<const ObjCRuntimeVisibleAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCRuntimeVisibleAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::from(const TokenContext &c) {
@@ -10353,12 +10147,6 @@ std::string_view ObjCRuntimeNameAttr::metadata_name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view ObjCRuntimeNameAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10369,12 +10157,6 @@ std::optional<ObjCNonRuntimeProtocolAttr> ObjCNonRuntimeProtocolAttr::from(const
       return reinterpret_cast<const ObjCNonRuntimeProtocolAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCNonRuntimeProtocolAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::from(const TokenContext &c) {
@@ -10389,12 +10171,6 @@ std::optional<ObjCNonLazyClassAttr> ObjCNonLazyClassAttr::from(const Attr &paren
   }
 }
 
-std::string_view ObjCNonLazyClassAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCDirectMembersAttr> ObjCDirectMembersAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10405,12 +10181,6 @@ std::optional<ObjCDirectMembersAttr> ObjCDirectMembersAttr::from(const Attr &par
       return reinterpret_cast<const ObjCDirectMembersAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCDirectMembersAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCDirectAttr> ObjCDirectAttr::from(const TokenContext &c) {
@@ -10425,12 +10195,6 @@ std::optional<ObjCDirectAttr> ObjCDirectAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ObjCDirectAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10441,12 +10205,6 @@ std::optional<ObjCDesignatedInitializerAttr> ObjCDesignatedInitializerAttr::from
       return reinterpret_cast<const ObjCDesignatedInitializerAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCDesignatedInitializerAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCClassStubAttr> ObjCClassStubAttr::from(const TokenContext &c) {
@@ -10461,12 +10219,6 @@ std::optional<ObjCClassStubAttr> ObjCClassStubAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ObjCClassStubAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCBoxableAttr> ObjCBoxableAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10477,12 +10229,6 @@ std::optional<ObjCBoxableAttr> ObjCBoxableAttr::from(const Attr &parent) {
       return reinterpret_cast<const ObjCBoxableAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCBoxableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::from(const TokenContext &c) {
@@ -10503,12 +10249,6 @@ Expr OMPReferencedVarAttr::reference(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-std::string_view OMPReferencedVarAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10523,19 +10263,13 @@ std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const Attr &p
 
 OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(self.getVal11());
+  return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(self.getVal10());
 }
 
 Expr OMPDeclareSimdDeclAttr::simdlen(void) const {
   auto self = fragment->NthAttr(offset_);
   EntityId id(self.getVal8());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
-}
-
-std::string_view OMPDeclareSimdDeclAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const TokenContext &c) {
@@ -10550,12 +10284,6 @@ std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view OMPCaptureKindAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoEscapeAttr> NoEscapeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10566,12 +10294,6 @@ std::optional<NoEscapeAttr> NoEscapeAttr::from(const Attr &parent) {
       return reinterpret_cast<const NoEscapeAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoEscapeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoBuiltinAttr> NoBuiltinAttr::from(const TokenContext &c) {
@@ -10586,12 +10308,6 @@ std::optional<NoBuiltinAttr> NoBuiltinAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoBuiltinAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ModeAttr> ModeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10602,12 +10318,6 @@ std::optional<ModeAttr> ModeAttr::from(const Attr &parent) {
       return reinterpret_cast<const ModeAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ModeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<LoopHintAttr> LoopHintAttr::from(const TokenContext &c) {
@@ -10624,23 +10334,17 @@ std::optional<LoopHintAttr> LoopHintAttr::from(const Attr &parent) {
 
 LoopHintAttrOptionType LoopHintAttr::option(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<LoopHintAttrOptionType>(self.getVal11());
+  return static_cast<LoopHintAttrOptionType>(self.getVal10());
 }
 
 LoopHintAttrSpelling LoopHintAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<LoopHintAttrSpelling>(self.getVal15());
-}
-
-std::string_view LoopHintAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<LoopHintAttrSpelling>(self.getVal14());
 }
 
 LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<LoopHintAttrLoopHintState>(self.getVal16());
+  return static_cast<LoopHintAttrLoopHintState>(self.getVal15());
 }
 
 Expr LoopHintAttr::value(void) const {
@@ -10661,12 +10365,6 @@ std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::from(const Attr 
   }
 }
 
-std::string_view LoaderUninitializedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<InitSegAttr> InitSegAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -10682,12 +10380,6 @@ std::optional<InitSegAttr> InitSegAttr::from(const Attr &parent) {
 std::string_view InitSegAttr::section(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view InitSegAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11003,7 +10695,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
 
 bool InheritableAttr::should_inherit_even_if_already_present(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal12();
+  return self.getVal11();
 }
 
 std::optional<IBOutletCollectionAttr> IBOutletCollectionAttr::from(const TokenContext &c) {
@@ -11030,14 +10722,8 @@ Type IBOutletCollectionAttr::interface(void) const {
 
 Type IBOutletCollectionAttr::interface_token(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return fragment->TypeFor(fragment, id, false).value();
-}
-
-std::string_view IBOutletCollectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<IBOutletAttr> IBOutletAttr::from(const TokenContext &c) {
@@ -11056,12 +10742,6 @@ std::optional<IBOutletAttr> IBOutletAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view IBOutletAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<IBActionAttr> IBActionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11076,12 +10756,6 @@ std::optional<IBActionAttr> IBActionAttr::from(const Attr &parent) {
       return reinterpret_cast<const IBActionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view IBActionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<HotAttr> HotAttr::from(const TokenContext &c) {
@@ -11100,12 +10774,6 @@ std::optional<HotAttr> HotAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view HotAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11122,15 +10790,9 @@ std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view HLSLShaderAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 HLSLShaderAttrShaderType HLSLShaderAttr::type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<HLSLShaderAttrShaderType>(self.getVal11());
+  return static_cast<HLSLShaderAttrShaderType>(self.getVal10());
 }
 
 std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const TokenContext &c) {
@@ -11149,12 +10811,6 @@ std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const Attr &par
   }
 }
 
-std::string_view HLSLSV_GroupIndexAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<HLSLNumThreadsAttr> HLSLNumThreadsAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11169,12 +10825,6 @@ std::optional<HLSLNumThreadsAttr> HLSLNumThreadsAttr::from(const Attr &parent) {
       return reinterpret_cast<const HLSLNumThreadsAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view HLSLNumThreadsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<HIPManagedAttr> HIPManagedAttr::from(const TokenContext &c) {
@@ -11193,12 +10843,6 @@ std::optional<HIPManagedAttr> HIPManagedAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view HIPManagedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<GuardedVarAttr> GuardedVarAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11213,12 +10857,6 @@ std::optional<GuardedVarAttr> GuardedVarAttr::from(const Attr &parent) {
       return reinterpret_cast<const GuardedVarAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view GuardedVarAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<GuardedByAttr> GuardedByAttr::from(const TokenContext &c) {
@@ -11243,12 +10881,6 @@ Expr GuardedByAttr::argument(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-std::string_view GuardedByAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<GNUInlineAttr> GNUInlineAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11263,12 +10895,6 @@ std::optional<GNUInlineAttr> GNUInlineAttr::from(const Attr &parent) {
       return reinterpret_cast<const GNUInlineAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view GNUInlineAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const TokenContext &c) {
@@ -11287,15 +10913,9 @@ std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const Att
   }
 }
 
-std::string_view FunctionReturnThunksAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 FunctionReturnThunksAttrKind FunctionReturnThunksAttr::thunk_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<FunctionReturnThunksAttrKind>(self.getVal11());
+  return static_cast<FunctionReturnThunksAttrKind>(self.getVal10());
 }
 
 std::optional<FormatAttr> FormatAttr::from(const TokenContext &c) {
@@ -11314,12 +10934,6 @@ std::optional<FormatAttr> FormatAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view FormatAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<FormatArgAttr> FormatArgAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11334,12 +10948,6 @@ std::optional<FormatArgAttr> FormatArgAttr::from(const Attr &parent) {
       return reinterpret_cast<const FormatArgAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view FormatArgAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<FlattenAttr> FlattenAttr::from(const TokenContext &c) {
@@ -11358,12 +10966,6 @@ std::optional<FlattenAttr> FlattenAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view FlattenAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<FlagEnumAttr> FlagEnumAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11378,12 +10980,6 @@ std::optional<FlagEnumAttr> FlagEnumAttr::from(const Attr &parent) {
       return reinterpret_cast<const FlagEnumAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view FlagEnumAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<FinalAttr> FinalAttr::from(const TokenContext &c) {
@@ -11404,18 +11000,12 @@ std::optional<FinalAttr> FinalAttr::from(const Attr &parent) {
 
 FinalAttrSpelling FinalAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<FinalAttrSpelling>(self.getVal11());
-}
-
-std::string_view FinalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<FinalAttrSpelling>(self.getVal10());
 }
 
 bool FinalAttr::is_spelled_as_sealed(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<FastCallAttr> FastCallAttr::from(const TokenContext &c) {
@@ -11432,12 +11022,6 @@ std::optional<FastCallAttr> FastCallAttr::from(const Attr &parent) {
       return reinterpret_cast<const FastCallAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view FastCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const TokenContext &c) {
@@ -11464,18 +11048,12 @@ std::string_view ExternalSourceSymbolAttr::defined_in(void) const {
 
 bool ExternalSourceSymbolAttr::generated_declaration(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::string_view ExternalSourceSymbolAttr::language(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view ExternalSourceSymbolAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal18();
+  capnp::Text::Reader data = self.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11493,12 +11071,6 @@ std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(c
       return reinterpret_cast<const ExclusiveTrylockFunctionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ExclusiveTrylockFunctionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 Expr ExclusiveTrylockFunctionAttr::success_value(void) const {
@@ -11523,12 +11095,6 @@ std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantia
   }
 }
 
-std::string_view ExcludeFromExplicitInstantiationAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ErrorAttr> ErrorAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11547,29 +11113,23 @@ std::optional<ErrorAttr> ErrorAttr::from(const Attr &parent) {
 
 ErrorAttrSpelling ErrorAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ErrorAttrSpelling>(self.getVal11());
+  return static_cast<ErrorAttrSpelling>(self.getVal10());
 }
 
-std::string_view ErrorAttr::spelling(void) const {
+std::string_view ErrorAttr::user_diagnostic(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view ErrorAttr::user_diagnostic(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 bool ErrorAttr::is_error(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 bool ErrorAttr::is_warning(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const TokenContext &c) {
@@ -11590,13 +11150,7 @@ std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const Attr &par
 
 EnumExtensibilityAttrKind EnumExtensibilityAttr::extensibility(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<EnumExtensibilityAttrKind>(self.getVal11());
-}
-
-std::string_view EnumExtensibilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<EnumExtensibilityAttrKind>(self.getVal10());
 }
 
 std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const TokenContext &c) {
@@ -11615,15 +11169,9 @@ std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view EnforceTCBLeafAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::string_view EnforceTCBLeafAttr::tcb_name(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
+  capnp::Text::Reader data = self.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11643,15 +11191,9 @@ std::optional<EnforceTCBAttr> EnforceTCBAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view EnforceTCBAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::string_view EnforceTCBAttr::tcb_name(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
+  capnp::Text::Reader data = self.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11683,12 +11225,6 @@ std::string_view EnableIfAttr::message(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view EnableIfAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<EmptyBasesAttr> EmptyBasesAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11703,12 +11239,6 @@ std::optional<EmptyBasesAttr> EmptyBasesAttr::from(const Attr &parent) {
       return reinterpret_cast<const EmptyBasesAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view EmptyBasesAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<DisableTailCallsAttr> DisableTailCallsAttr::from(const TokenContext &c) {
@@ -11727,12 +11257,6 @@ std::optional<DisableTailCallsAttr> DisableTailCallsAttr::from(const Attr &paren
   }
 }
 
-std::string_view DisableTailCallsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentationAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11747,12 +11271,6 @@ std::optional<DisableSanitizerInstrumentationAttr> DisableSanitizerInstrumentati
       return reinterpret_cast<const DisableSanitizerInstrumentationAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view DisableSanitizerInstrumentationAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const TokenContext &c) {
@@ -11773,7 +11291,7 @@ std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const Attr &parent) {
 
 bool DiagnoseIfAttr::argument_dependent(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 Expr DiagnoseIfAttr::condition(void) const {
@@ -11784,7 +11302,7 @@ Expr DiagnoseIfAttr::condition(void) const {
 
 DiagnoseIfAttrDiagnosticType DiagnoseIfAttr::diagnostic_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<DiagnoseIfAttrDiagnosticType>(self.getVal11());
+  return static_cast<DiagnoseIfAttrDiagnosticType>(self.getVal10());
 }
 
 std::string_view DiagnoseIfAttr::message(void) const {
@@ -11795,24 +11313,18 @@ std::string_view DiagnoseIfAttr::message(void) const {
 
 NamedDecl DiagnoseIfAttr::parent(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
-}
-
-std::string_view DiagnoseIfAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
 }
 
 bool DiagnoseIfAttr::is_error(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 bool DiagnoseIfAttr::is_warning(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal19();
+  return self.getVal18();
 }
 
 std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const TokenContext &c) {
@@ -11837,12 +11349,6 @@ FunctionDecl DiagnoseAsBuiltinAttr::function(void) const {
   return FunctionDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-std::string_view DiagnoseAsBuiltinAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<DestructorAttr> DestructorAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11857,12 +11363,6 @@ std::optional<DestructorAttr> DestructorAttr::from(const Attr &parent) {
       return reinterpret_cast<const DestructorAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view DestructorAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<DeprecatedAttr> DeprecatedAttr::from(const TokenContext &c) {
@@ -11889,13 +11389,7 @@ std::string_view DeprecatedAttr::message(void) const {
 
 std::string_view DeprecatedAttr::replacement(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view DeprecatedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal18();
+  capnp::Text::Reader data = self.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11939,18 +11433,12 @@ std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const Attr &parent) {
 
 AlwaysInlineAttrSpelling AlwaysInlineAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<AlwaysInlineAttrSpelling>(self.getVal11());
-}
-
-std::string_view AlwaysInlineAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<AlwaysInlineAttrSpelling>(self.getVal10());
 }
 
 bool AlwaysInlineAttr::is_clang_always_inline(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<NoMergeAttr> NoMergeAttr::from(const TokenContext &c) {
@@ -11973,12 +11461,6 @@ std::optional<NoMergeAttr> NoMergeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoMergeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoInlineAttr> NoInlineAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -11999,15 +11481,9 @@ std::optional<NoInlineAttr> NoInlineAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoInlineAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 bool NoInlineAttr::is_clang_no_inline(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const TokenContext &c) {
@@ -12026,12 +11502,6 @@ std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const Att
   }
 }
 
-std::string_view DLLImportStaticLocalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<DLLImportAttr> DLLImportAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12046,12 +11516,6 @@ std::optional<DLLImportAttr> DLLImportAttr::from(const Attr &parent) {
       return reinterpret_cast<const DLLImportAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view DLLImportAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::from(const TokenContext &c) {
@@ -12070,12 +11534,6 @@ std::optional<DLLExportStaticLocalAttr> DLLExportStaticLocalAttr::from(const Att
   }
 }
 
-std::string_view DLLExportStaticLocalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<DLLExportAttr> DLLExportAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12090,12 +11548,6 @@ std::optional<DLLExportAttr> DLLExportAttr::from(const Attr &parent) {
       return reinterpret_cast<const DLLExportAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view DLLExportAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ConvergentAttr> ConvergentAttr::from(const TokenContext &c) {
@@ -12114,12 +11566,6 @@ std::optional<ConvergentAttr> ConvergentAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ConvergentAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ConsumableSetOnReadAttr> ConsumableSetOnReadAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12136,12 +11582,6 @@ std::optional<ConsumableSetOnReadAttr> ConsumableSetOnReadAttr::from(const Attr 
   }
 }
 
-std::string_view ConsumableSetOnReadAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ConsumableAutoCastAttr> ConsumableAutoCastAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12156,12 +11596,6 @@ std::optional<ConsumableAutoCastAttr> ConsumableAutoCastAttr::from(const Attr &p
       return reinterpret_cast<const ConsumableAutoCastAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ConsumableAutoCastAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ConsumableAttr> ConsumableAttr::from(const TokenContext &c) {
@@ -12182,13 +11616,7 @@ std::optional<ConsumableAttr> ConsumableAttr::from(const Attr &parent) {
 
 ConsumableAttrConsumedState ConsumableAttr::default_state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ConsumableAttrConsumedState>(self.getVal11());
-}
-
-std::string_view ConsumableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ConsumableAttrConsumedState>(self.getVal10());
 }
 
 std::optional<ConstructorAttr> ConstructorAttr::from(const TokenContext &c) {
@@ -12205,12 +11633,6 @@ std::optional<ConstructorAttr> ConstructorAttr::from(const Attr &parent) {
       return reinterpret_cast<const ConstructorAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ConstructorAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ConstInitAttr> ConstInitAttr::from(const TokenContext &c) {
@@ -12231,18 +11653,12 @@ std::optional<ConstInitAttr> ConstInitAttr::from(const Attr &parent) {
 
 ConstInitAttrSpelling ConstInitAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ConstInitAttrSpelling>(self.getVal11());
-}
-
-std::string_view ConstInitAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ConstInitAttrSpelling>(self.getVal10());
 }
 
 bool ConstInitAttr::is_constinit(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<ConstAttr> ConstAttr::from(const TokenContext &c) {
@@ -12261,12 +11677,6 @@ std::optional<ConstAttr> ConstAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ConstAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CommonAttr> CommonAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12283,12 +11693,6 @@ std::optional<CommonAttr> CommonAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view CommonAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ColdAttr> ColdAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12303,12 +11707,6 @@ std::optional<ColdAttr> ColdAttr::from(const Attr &parent) {
       return reinterpret_cast<const ColdAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ColdAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CodeSegAttr> CodeSegAttr::from(const TokenContext &c) {
@@ -12333,12 +11731,6 @@ std::string_view CodeSegAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view CodeSegAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CmseNSEntryAttr> CmseNSEntryAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12353,12 +11745,6 @@ std::optional<CmseNSEntryAttr> CmseNSEntryAttr::from(const Attr &parent) {
       return reinterpret_cast<const CmseNSEntryAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CmseNSEntryAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CleanupAttr> CleanupAttr::from(const TokenContext &c) {
@@ -12383,12 +11769,6 @@ FunctionDecl CleanupAttr::function_declaration(void) const {
   return FunctionDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-std::string_view CleanupAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12403,12 +11783,6 @@ std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const Attr &parent) {
       return reinterpret_cast<const CapturedRecordAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CapturedRecordAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CapabilityAttr> CapabilityAttr::from(const TokenContext &c) {
@@ -12435,18 +11809,12 @@ std::string_view CapabilityAttr::name(void) const {
 
 CapabilityAttrSpelling CapabilityAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<CapabilityAttrSpelling>(self.getVal11());
-}
-
-std::string_view CapabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<CapabilityAttrSpelling>(self.getVal10());
 }
 
 bool CapabilityAttr::is_shared(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<CallbackAttr> CallbackAttr::from(const TokenContext &c) {
@@ -12465,12 +11833,6 @@ std::optional<CallbackAttr> CallbackAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view CallbackAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CallableWhenAttr> CallableWhenAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12485,12 +11847,6 @@ std::optional<CallableWhenAttr> CallableWhenAttr::from(const Attr &parent) {
       return reinterpret_cast<const CallableWhenAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CallableWhenAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const TokenContext &c) {
@@ -12511,13 +11867,7 @@ std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const Attr &parent) {
 
 CXX11NoReturnAttrSpelling CXX11NoReturnAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<CXX11NoReturnAttrSpelling>(self.getVal11());
-}
-
-std::string_view CXX11NoReturnAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<CXX11NoReturnAttrSpelling>(self.getVal10());
 }
 
 std::optional<CUDASharedAttr> CUDASharedAttr::from(const TokenContext &c) {
@@ -12534,12 +11884,6 @@ std::optional<CUDASharedAttr> CUDASharedAttr::from(const Attr &parent) {
       return reinterpret_cast<const CUDASharedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CUDASharedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const TokenContext &c) {
@@ -12566,14 +11910,8 @@ Expr CUDALaunchBoundsAttr::max_threads(void) const {
 
 Expr CUDALaunchBoundsAttr::min_blocks(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
-}
-
-std::string_view CUDALaunchBoundsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const TokenContext &c) {
@@ -12592,12 +11930,6 @@ std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const Attr &par
   }
 }
 
-std::string_view CUDAInvalidTargetAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CUDAHostAttr> CUDAHostAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12612,12 +11944,6 @@ std::optional<CUDAHostAttr> CUDAHostAttr::from(const Attr &parent) {
       return reinterpret_cast<const CUDAHostAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CUDAHostAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CUDAGlobalAttr> CUDAGlobalAttr::from(const TokenContext &c) {
@@ -12636,12 +11962,6 @@ std::optional<CUDAGlobalAttr> CUDAGlobalAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view CUDAGlobalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12656,12 +11976,6 @@ std::optional<CUDADeviceBuiltinTextureTypeAttr> CUDADeviceBuiltinTextureTypeAttr
       return reinterpret_cast<const CUDADeviceBuiltinTextureTypeAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CUDADeviceBuiltinTextureTypeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAttr::from(const TokenContext &c) {
@@ -12680,12 +11994,6 @@ std::optional<CUDADeviceBuiltinSurfaceTypeAttr> CUDADeviceBuiltinSurfaceTypeAttr
   }
 }
 
-std::string_view CUDADeviceBuiltinSurfaceTypeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CUDADeviceAttr> CUDADeviceAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12700,12 +12008,6 @@ std::optional<CUDADeviceAttr> CUDADeviceAttr::from(const Attr &parent) {
       return reinterpret_cast<const CUDADeviceAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CUDADeviceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CUDAConstantAttr> CUDAConstantAttr::from(const TokenContext &c) {
@@ -12724,12 +12026,6 @@ std::optional<CUDAConstantAttr> CUDAConstantAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view CUDAConstantAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CPUSpecificAttr> CPUSpecificAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12744,12 +12040,6 @@ std::optional<CPUSpecificAttr> CPUSpecificAttr::from(const Attr &parent) {
       return reinterpret_cast<const CPUSpecificAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CPUSpecificAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CPUDispatchAttr> CPUDispatchAttr::from(const TokenContext &c) {
@@ -12768,12 +12058,6 @@ std::optional<CPUDispatchAttr> CPUDispatchAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view CPUDispatchAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12788,12 +12072,6 @@ std::optional<CFUnknownTransferAttr> CFUnknownTransferAttr::from(const Attr &par
       return reinterpret_cast<const CFUnknownTransferAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CFUnknownTransferAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CFReturnsRetainedAttr> CFReturnsRetainedAttr::from(const TokenContext &c) {
@@ -12812,12 +12090,6 @@ std::optional<CFReturnsRetainedAttr> CFReturnsRetainedAttr::from(const Attr &par
   }
 }
 
-std::string_view CFReturnsRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12834,12 +12106,6 @@ std::optional<CFReturnsNotRetainedAttr> CFReturnsNotRetainedAttr::from(const Att
   }
 }
 
-std::string_view CFReturnsNotRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12854,12 +12120,6 @@ std::optional<CFICanonicalJumpTableAttr> CFICanonicalJumpTableAttr::from(const A
       return reinterpret_cast<const CFICanonicalJumpTableAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CFICanonicalJumpTableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<CFGuardAttr> CFGuardAttr::from(const TokenContext &c) {
@@ -12880,13 +12140,7 @@ std::optional<CFGuardAttr> CFGuardAttr::from(const Attr &parent) {
 
 CFGuardAttrGuardArg CFGuardAttr::guard(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<CFGuardAttrGuardArg>(self.getVal11());
-}
-
-std::string_view CFGuardAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<CFGuardAttrGuardArg>(self.getVal10());
 }
 
 std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::from(const TokenContext &c) {
@@ -12905,12 +12159,6 @@ std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::from(const Attr &par
   }
 }
 
-std::string_view CFAuditedTransferAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CDeclAttr> CDeclAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12925,12 +12173,6 @@ std::optional<CDeclAttr> CDeclAttr::from(const Attr &parent) {
       return reinterpret_cast<const CDeclAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CDeclAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const TokenContext &c) {
@@ -12949,12 +12191,6 @@ std::optional<C11NoReturnAttr> C11NoReturnAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view C11NoReturnAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<BuiltinAttr> BuiltinAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -12969,12 +12205,6 @@ std::optional<BuiltinAttr> BuiltinAttr::from(const Attr &parent) {
       return reinterpret_cast<const BuiltinAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view BuiltinAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<BlocksAttr> BlocksAttr::from(const TokenContext &c) {
@@ -12993,15 +12223,9 @@ std::optional<BlocksAttr> BlocksAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view BlocksAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 BlocksAttrBlockType BlocksAttr::type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<BlocksAttrBlockType>(self.getVal11());
+  return static_cast<BlocksAttrBlockType>(self.getVal10());
 }
 
 std::optional<BTFDeclTagAttr> BTFDeclTagAttr::from(const TokenContext &c) {
@@ -13026,12 +12250,6 @@ std::string_view BTFDeclTagAttr::btf_decl_tag(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view BTFDeclTagAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13046,12 +12264,6 @@ std::optional<BPFPreserveAccessIndexAttr> BPFPreserveAccessIndexAttr::from(const
       return reinterpret_cast<const BPFPreserveAccessIndexAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view BPFPreserveAccessIndexAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AvailabilityAttr> AvailabilityAttr::from(const TokenContext &c) {
@@ -13078,24 +12290,18 @@ std::string_view AvailabilityAttr::message(void) const {
 
 std::string_view AvailabilityAttr::replacement(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view AvailabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal18();
+  capnp::Text::Reader data = self.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool AvailabilityAttr::strict(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 bool AvailabilityAttr::unavailable(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 std::optional<AssumptionAttr> AssumptionAttr::from(const TokenContext &c) {
@@ -13117,12 +12323,6 @@ std::optional<AssumptionAttr> AssumptionAttr::from(const Attr &parent) {
 std::string_view AssumptionAttr::assumption(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view AssumptionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13151,15 +12351,9 @@ Expr AssumeAlignedAttr::alignment(void) const {
 std::optional<Expr> AssumeAlignedAttr::offset(void) const {
   auto self = fragment->NthAttr(offset_);
   if (true) {
-    EntityId id(self.getVal17());
+    EntityId id(self.getVal16());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
-}
-
-std::string_view AssumeAlignedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AssertSharedLockAttr> AssertSharedLockAttr::from(const TokenContext &c) {
@@ -13178,12 +12372,6 @@ std::optional<AssertSharedLockAttr> AssertSharedLockAttr::from(const Attr &paren
   }
 }
 
-std::string_view AssertSharedLockAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13198,12 +12386,6 @@ std::optional<AssertExclusiveLockAttr> AssertExclusiveLockAttr::from(const Attr 
       return reinterpret_cast<const AssertExclusiveLockAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AssertExclusiveLockAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const TokenContext &c) {
@@ -13224,18 +12406,12 @@ std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const Attr &paren
 
 AssertCapabilityAttrSpelling AssertCapabilityAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<AssertCapabilityAttrSpelling>(self.getVal11());
-}
-
-std::string_view AssertCapabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<AssertCapabilityAttrSpelling>(self.getVal10());
 }
 
 bool AssertCapabilityAttr::is_shared(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const TokenContext &c) {
@@ -13256,18 +12432,12 @@ std::optional<AsmLabelAttr> AsmLabelAttr::from(const Attr &parent) {
 
 bool AsmLabelAttr::is_literal_label(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::string_view AsmLabelAttr::label(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view AsmLabelAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13287,12 +12457,6 @@ std::optional<ArtificialAttr> ArtificialAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ArtificialAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13307,12 +12471,6 @@ std::optional<ArmBuiltinAliasAttr> ArmBuiltinAliasAttr::from(const Attr &parent)
       return reinterpret_cast<const ArmBuiltinAliasAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ArmBuiltinAliasAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const TokenContext &c) {
@@ -13333,18 +12491,12 @@ std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const Attr 
 
 bool ArgumentWithTypeTagAttr::is_pointer(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 ArgumentWithTypeTagAttrSpelling ArgumentWithTypeTagAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ArgumentWithTypeTagAttrSpelling>(self.getVal11());
-}
-
-std::string_view ArgumentWithTypeTagAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ArgumentWithTypeTagAttrSpelling>(self.getVal10());
 }
 
 std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const TokenContext &c) {
@@ -13363,12 +12515,6 @@ std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const A
   }
 }
 
-std::string_view ArcWeakrefUnavailableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13383,12 +12529,6 @@ std::optional<AnyX86NoCfCheckAttr> AnyX86NoCfCheckAttr::from(const Attr &parent)
       return reinterpret_cast<const AnyX86NoCfCheckAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AnyX86NoCfCheckAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAttr::from(const TokenContext &c) {
@@ -13407,12 +12547,6 @@ std::optional<AnyX86NoCallerSavedRegistersAttr> AnyX86NoCallerSavedRegistersAttr
   }
 }
 
-std::string_view AnyX86NoCallerSavedRegistersAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AnyX86InterruptAttr> AnyX86InterruptAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13427,12 +12561,6 @@ std::optional<AnyX86InterruptAttr> AnyX86InterruptAttr::from(const Attr &parent)
       return reinterpret_cast<const AnyX86InterruptAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AnyX86InterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::from(const TokenContext &c) {
@@ -13451,12 +12579,6 @@ std::optional<AnalyzerNoReturnAttr> AnalyzerNoReturnAttr::from(const Attr &paren
   }
 }
 
-std::string_view AnalyzerNoReturnAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AlwaysDestroyAttr> AlwaysDestroyAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13471,12 +12593,6 @@ std::optional<AlwaysDestroyAttr> AlwaysDestroyAttr::from(const Attr &parent) {
       return reinterpret_cast<const AlwaysDestroyAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AlwaysDestroyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AllocSizeAttr> AllocSizeAttr::from(const TokenContext &c) {
@@ -13495,12 +12611,6 @@ std::optional<AllocSizeAttr> AllocSizeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view AllocSizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AllocAlignAttr> AllocAlignAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13515,12 +12625,6 @@ std::optional<AllocAlignAttr> AllocAlignAttr::from(const Attr &parent) {
       return reinterpret_cast<const AllocAlignAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AllocAlignAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AlignedAttr> AlignedAttr::from(const TokenContext &c) {
@@ -13550,55 +12654,49 @@ std::optional<Expr> AlignedAttr::alignment_expression(void) const {
 std::optional<Type> AlignedAttr::alignment_type(void) const {
   auto self = fragment->NthAttr(offset_);
   if (true) {
-    EntityId id(self.getVal17());
+    EntityId id(self.getVal16());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 AlignedAttrSpelling AlignedAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<AlignedAttrSpelling>(self.getVal11());
-}
-
-std::string_view AlignedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<AlignedAttrSpelling>(self.getVal10());
 }
 
 bool AlignedAttr::is_alignas(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 bool AlignedAttr::is_alignment_dependent(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 bool AlignedAttr::is_alignment_error_dependent(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal19();
+  return self.getVal18();
 }
 
 bool AlignedAttr::is_alignment_expression(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal20();
+  return self.getVal19();
 }
 
 bool AlignedAttr::is_c11(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal21();
+  return self.getVal20();
 }
 
 bool AlignedAttr::is_declspec(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal22();
+  return self.getVal21();
 }
 
 bool AlignedAttr::is_gnu(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal23();
+  return self.getVal22();
 }
 
 std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const TokenContext &c) {
@@ -13617,12 +12715,6 @@ std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view AlignNaturalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13637,12 +12729,6 @@ std::optional<AlignMac68kAttr> AlignMac68kAttr::from(const Attr &parent) {
       return reinterpret_cast<const AlignMac68kAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AlignMac68kAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AcquiredBeforeAttr> AcquiredBeforeAttr::from(const TokenContext &c) {
@@ -13661,12 +12747,6 @@ std::optional<AcquiredBeforeAttr> AcquiredBeforeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view AcquiredBeforeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AcquiredAfterAttr> AcquiredAfterAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13681,12 +12761,6 @@ std::optional<AcquiredAfterAttr> AcquiredAfterAttr::from(const Attr &parent) {
       return reinterpret_cast<const AcquiredAfterAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AcquiredAfterAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AcquireHandleAttr> AcquireHandleAttr::from(const TokenContext &c) {
@@ -13711,12 +12785,6 @@ std::string_view AcquireHandleAttr::handle_type(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view AcquireHandleAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AcquireCapabilityAttr> AcquireCapabilityAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13735,18 +12803,12 @@ std::optional<AcquireCapabilityAttr> AcquireCapabilityAttr::from(const Attr &par
 
 AcquireCapabilityAttrSpelling AcquireCapabilityAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<AcquireCapabilityAttrSpelling>(self.getVal11());
-}
-
-std::string_view AcquireCapabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<AcquireCapabilityAttrSpelling>(self.getVal10());
 }
 
 bool AcquireCapabilityAttr::is_shared(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<AVRSignalAttr> AVRSignalAttr::from(const TokenContext &c) {
@@ -13765,12 +12827,6 @@ std::optional<AVRSignalAttr> AVRSignalAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view AVRSignalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AVRInterruptAttr> AVRInterruptAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13785,12 +12841,6 @@ std::optional<AVRInterruptAttr> AVRInterruptAttr::from(const Attr &parent) {
       return reinterpret_cast<const AVRInterruptAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AVRInterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const TokenContext &c) {
@@ -13811,13 +12861,7 @@ std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const Attr &parent) {
 
 ARMInterruptAttrInterruptType ARMInterruptAttr::interrupt(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ARMInterruptAttrInterruptType>(self.getVal11());
-}
-
-std::string_view ARMInterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ARMInterruptAttrInterruptType>(self.getVal10());
 }
 
 std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const TokenContext &c) {
@@ -13844,14 +12888,8 @@ Expr AMDGPUWavesPerEUAttr::max(void) const {
 
 Expr AMDGPUWavesPerEUAttr::min(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
-}
-
-std::string_view AMDGPUWavesPerEUAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const TokenContext &c) {
@@ -13870,12 +12908,6 @@ std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view AMDGPUNumVGPRAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13892,12 +12924,6 @@ std::optional<AMDGPUNumSGPRAttr> AMDGPUNumSGPRAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view AMDGPUNumSGPRAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13912,12 +12938,6 @@ std::optional<AMDGPUKernelCallAttr> AMDGPUKernelCallAttr::from(const Attr &paren
       return reinterpret_cast<const AMDGPUKernelCallAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AMDGPUKernelCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(const TokenContext &c) {
@@ -13944,14 +12964,8 @@ Expr AMDGPUFlatWorkGroupSizeAttr::max(void) const {
 
 Expr AMDGPUFlatWorkGroupSizeAttr::min(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
-}
-
-std::string_view AMDGPUFlatWorkGroupSizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const TokenContext &c) {
@@ -13970,12 +12984,6 @@ std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const Attr &paren
   }
 }
 
-std::string_view AArch64VectorPcsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<AArch64SVEPcsAttr> AArch64SVEPcsAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -13990,12 +12998,6 @@ std::optional<AArch64SVEPcsAttr> AArch64SVEPcsAttr::from(const Attr &parent) {
       return reinterpret_cast<const AArch64SVEPcsAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view AArch64SVEPcsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const TokenContext &c) {
@@ -14014,15 +13016,9 @@ std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const Attr &paren
   }
 }
 
-std::string_view ZeroCallUsedRegsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 ZeroCallUsedRegsAttrZeroCallUsedRegsKind ZeroCallUsedRegsAttr::zero_call_used_regs(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(self.getVal11());
+  return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(self.getVal10());
 }
 
 std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const TokenContext &c) {
@@ -14039,12 +13035,6 @@ std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const Attr &parent) {
       return reinterpret_cast<const XRayLogArgsAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view XRayLogArgsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const TokenContext &c) {
@@ -14065,23 +13055,17 @@ std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const Attr &parent) {
 
 bool XRayInstrumentAttr::always_x_ray_instrument(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 XRayInstrumentAttrSpelling XRayInstrumentAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<XRayInstrumentAttrSpelling>(self.getVal11());
-}
-
-std::string_view XRayInstrumentAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<XRayInstrumentAttrSpelling>(self.getVal10());
 }
 
 bool XRayInstrumentAttr::never_x_ray_instrument(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const TokenContext &c) {
@@ -14100,12 +13084,6 @@ std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(con
   }
 }
 
-std::string_view X86ForceAlignArgPointerAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14120,12 +13098,6 @@ std::optional<WorkGroupSizeHintAttr> WorkGroupSizeHintAttr::from(const Attr &par
       return reinterpret_cast<const WorkGroupSizeHintAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view WorkGroupSizeHintAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const TokenContext &c) {
@@ -14147,12 +13119,6 @@ std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const A
 std::string_view WebAssemblyImportNameAttr::import_name(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view WebAssemblyImportNameAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14178,12 +13144,6 @@ std::string_view WebAssemblyImportModuleAttr::import_module(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view WebAssemblyImportModuleAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14203,12 +13163,6 @@ std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::from(const A
 std::string_view WebAssemblyExportNameAttr::export_name(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view WebAssemblyExportNameAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14234,12 +13188,6 @@ std::string_view WeakRefAttr::aliasee(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view WeakRefAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<WeakImportAttr> WeakImportAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14256,12 +13204,6 @@ std::optional<WeakImportAttr> WeakImportAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view WeakImportAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<WeakAttr> WeakAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14276,12 +13218,6 @@ std::optional<WeakAttr> WeakAttr::from(const Attr &parent) {
       return reinterpret_cast<const WeakAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view WeakAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const TokenContext &c) {
@@ -14302,7 +13238,7 @@ std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const Attr &paren
 
 bool WarnUnusedResultAttr::is_cxx11_no_discard(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::string_view WarnUnusedResultAttr::message(void) const {
@@ -14313,13 +13249,7 @@ std::string_view WarnUnusedResultAttr::message(void) const {
 
 WarnUnusedResultAttrSpelling WarnUnusedResultAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<WarnUnusedResultAttrSpelling>(self.getVal11());
-}
-
-std::string_view WarnUnusedResultAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<WarnUnusedResultAttrSpelling>(self.getVal10());
 }
 
 std::optional<WarnUnusedAttr> WarnUnusedAttr::from(const TokenContext &c) {
@@ -14338,12 +13268,6 @@ std::optional<WarnUnusedAttr> WarnUnusedAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view WarnUnusedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<VisibilityAttr> VisibilityAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14360,15 +13284,9 @@ std::optional<VisibilityAttr> VisibilityAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view VisibilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 VisibilityAttrVisibilityType VisibilityAttr::visibility(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<VisibilityAttrVisibilityType>(self.getVal11());
+  return static_cast<VisibilityAttrVisibilityType>(self.getVal10());
 }
 
 std::optional<VectorCallAttr> VectorCallAttr::from(const TokenContext &c) {
@@ -14387,12 +13305,6 @@ std::optional<VectorCallAttr> VectorCallAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view VectorCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14409,12 +13321,6 @@ std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view VecTypeHintAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 Type VecTypeHintAttr::type_hint(void) const {
   auto self = fragment->NthAttr(offset_);
   EntityId id(self.getVal8());
@@ -14423,7 +13329,7 @@ Type VecTypeHintAttr::type_hint(void) const {
 
 Type VecTypeHintAttr::type_hint_token(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
@@ -14441,12 +13347,6 @@ std::optional<VecReturnAttr> VecReturnAttr::from(const Attr &parent) {
       return reinterpret_cast<const VecReturnAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view VecReturnAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<UuidAttr> UuidAttr::from(const TokenContext &c) {
@@ -14477,12 +13377,6 @@ MSGuidDecl UuidAttr::guid_declaration(void) const {
   return MSGuidDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-std::string_view UuidAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14499,12 +13393,6 @@ std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view UsingIfExistsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<UsedAttr> UsedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14519,12 +13407,6 @@ std::optional<UsedAttr> UsedAttr::from(const Attr &parent) {
       return reinterpret_cast<const UsedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view UsedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<UnusedAttr> UnusedAttr::from(const TokenContext &c) {
@@ -14545,13 +13427,7 @@ std::optional<UnusedAttr> UnusedAttr::from(const Attr &parent) {
 
 UnusedAttrSpelling UnusedAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<UnusedAttrSpelling>(self.getVal11());
-}
-
-std::string_view UnusedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<UnusedAttrSpelling>(self.getVal10());
 }
 
 std::optional<UninitializedAttr> UninitializedAttr::from(const TokenContext &c) {
@@ -14568,12 +13444,6 @@ std::optional<UninitializedAttr> UninitializedAttr::from(const Attr &parent) {
       return reinterpret_cast<const UninitializedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view UninitializedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<UnavailableAttr> UnavailableAttr::from(const TokenContext &c) {
@@ -14594,18 +13464,12 @@ std::optional<UnavailableAttr> UnavailableAttr::from(const Attr &parent) {
 
 UnavailableAttrImplicitReason UnavailableAttr::implicit_reason(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<UnavailableAttrImplicitReason>(self.getVal11());
+  return static_cast<UnavailableAttrImplicitReason>(self.getVal10());
 }
 
 std::string_view UnavailableAttr::message(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view UnavailableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14625,15 +13489,9 @@ std::optional<TypeVisibilityAttr> TypeVisibilityAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view TypeVisibilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 TypeVisibilityAttrVisibilityType TypeVisibilityAttr::visibility(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<TypeVisibilityAttrVisibilityType>(self.getVal11());
+  return static_cast<TypeVisibilityAttrVisibilityType>(self.getVal10());
 }
 
 std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const TokenContext &c) {
@@ -14654,7 +13512,7 @@ std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const Attr &p
 
 bool TypeTagForDatatypeAttr::layout_compatible(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type(void) const {
@@ -14665,19 +13523,13 @@ Type TypeTagForDatatypeAttr::matching_c_type(void) const {
 
 Type TypeTagForDatatypeAttr::matching_c_type_token(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool TypeTagForDatatypeAttr::must_be_null(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
-}
-
-std::string_view TypeTagForDatatypeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return self.getVal13();
 }
 
 std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const TokenContext &c) {
@@ -14698,13 +13550,7 @@ std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const Att
 
 TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<TryAcquireCapabilityAttrSpelling>(self.getVal11());
-}
-
-std::string_view TryAcquireCapabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<TryAcquireCapabilityAttrSpelling>(self.getVal10());
 }
 
 Expr TryAcquireCapabilityAttr::success_value(void) const {
@@ -14715,7 +13561,7 @@ Expr TryAcquireCapabilityAttr::success_value(void) const {
 
 bool TryAcquireCapabilityAttr::is_shared(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<TrivialABIAttr> TrivialABIAttr::from(const TokenContext &c) {
@@ -14734,12 +13580,6 @@ std::optional<TrivialABIAttr> TrivialABIAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view TrivialABIAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<TransparentUnionAttr> TransparentUnionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14754,12 +13594,6 @@ std::optional<TransparentUnionAttr> TransparentUnionAttr::from(const Attr &paren
       return reinterpret_cast<const TransparentUnionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view TransparentUnionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ThisCallAttr> ThisCallAttr::from(const TokenContext &c) {
@@ -14778,12 +13612,6 @@ std::optional<ThisCallAttr> ThisCallAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ThisCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<TestTypestateAttr> TestTypestateAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14800,15 +13628,9 @@ std::optional<TestTypestateAttr> TestTypestateAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view TestTypestateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 TestTypestateAttrConsumedState TestTypestateAttr::test_state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<TestTypestateAttrConsumedState>(self.getVal11());
+  return static_cast<TestTypestateAttrConsumedState>(self.getVal10());
 }
 
 std::optional<TargetClonesAttr> TargetClonesAttr::from(const TokenContext &c) {
@@ -14825,12 +13647,6 @@ std::optional<TargetClonesAttr> TargetClonesAttr::from(const Attr &parent) {
       return reinterpret_cast<const TargetClonesAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view TargetClonesAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<TargetAttr> TargetAttr::from(const TokenContext &c) {
@@ -14857,19 +13673,13 @@ std::string_view TargetAttr::architecture(void) const {
 
 std::string_view TargetAttr::features_string(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view TargetAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal18();
+  capnp::Text::Reader data = self.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool TargetAttr::is_default_version(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<TLSModelAttr> TLSModelAttr::from(const TokenContext &c) {
@@ -14894,12 +13704,6 @@ std::string_view TLSModelAttr::model(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view TLSModelAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SysVABIAttr> SysVABIAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14916,12 +13720,6 @@ std::optional<SysVABIAttr> SysVABIAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SysVABIAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftPrivateAttr> SwiftPrivateAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -14936,12 +13734,6 @@ std::optional<SwiftPrivateAttr> SwiftPrivateAttr::from(const Attr &parent) {
       return reinterpret_cast<const SwiftPrivateAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SwiftPrivateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const TokenContext &c) {
@@ -14962,18 +13754,12 @@ std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const Attr &parent) {
 
 SwiftNewTypeAttrNewtypeKind SwiftNewTypeAttr::newtype_kind(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<SwiftNewTypeAttrNewtypeKind>(self.getVal11());
+  return static_cast<SwiftNewTypeAttrNewtypeKind>(self.getVal10());
 }
 
 SwiftNewTypeAttrSpelling SwiftNewTypeAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<SwiftNewTypeAttrSpelling>(self.getVal15());
-}
-
-std::string_view SwiftNewTypeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<SwiftNewTypeAttrSpelling>(self.getVal14());
 }
 
 std::optional<SwiftNameAttr> SwiftNameAttr::from(const TokenContext &c) {
@@ -14998,12 +13784,6 @@ std::string_view SwiftNameAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view SwiftNameAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15022,13 +13802,7 @@ std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const Attr &parent) {
 
 SwiftErrorAttrConventionKind SwiftErrorAttr::convention(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<SwiftErrorAttrConventionKind>(self.getVal11());
-}
-
-std::string_view SwiftErrorAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<SwiftErrorAttrConventionKind>(self.getVal10());
 }
 
 std::optional<SwiftCallAttr> SwiftCallAttr::from(const TokenContext &c) {
@@ -15047,12 +13821,6 @@ std::optional<SwiftCallAttr> SwiftCallAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SwiftCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15067,12 +13835,6 @@ std::optional<SwiftBridgedTypedefAttr> SwiftBridgedTypedefAttr::from(const Attr 
       return reinterpret_cast<const SwiftBridgedTypedefAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SwiftBridgedTypedefAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<SwiftBridgeAttr> SwiftBridgeAttr::from(const TokenContext &c) {
@@ -15091,15 +13853,9 @@ std::optional<SwiftBridgeAttr> SwiftBridgeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SwiftBridgeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::string_view SwiftBridgeAttr::swift_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
+  capnp::Text::Reader data = self.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -15125,12 +13881,6 @@ std::string_view SwiftAttrAttr::attribute(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view SwiftAttrAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15153,12 +13903,6 @@ std::string_view SwiftAsyncNameAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view SwiftAsyncNameAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftAsyncErrorAttr> SwiftAsyncErrorAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15177,13 +13921,7 @@ std::optional<SwiftAsyncErrorAttr> SwiftAsyncErrorAttr::from(const Attr &parent)
 
 SwiftAsyncErrorAttrConventionKind SwiftAsyncErrorAttr::convention(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<SwiftAsyncErrorAttrConventionKind>(self.getVal11());
-}
-
-std::string_view SwiftAsyncErrorAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<SwiftAsyncErrorAttrConventionKind>(self.getVal10());
 }
 
 std::optional<SwiftAsyncCallAttr> SwiftAsyncCallAttr::from(const TokenContext &c) {
@@ -15202,12 +13940,6 @@ std::optional<SwiftAsyncCallAttr> SwiftAsyncCallAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SwiftAsyncCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15222,12 +13954,6 @@ std::optional<SwiftAsyncAttr> SwiftAsyncAttr::from(const Attr &parent) {
       return reinterpret_cast<const SwiftAsyncAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SwiftAsyncAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<StrictFPAttr> StrictFPAttr::from(const TokenContext &c) {
@@ -15246,12 +13972,6 @@ std::optional<StrictFPAttr> StrictFPAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view StrictFPAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<StdCallAttr> StdCallAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15266,12 +13986,6 @@ std::optional<StdCallAttr> StdCallAttr::from(const Attr &parent) {
       return reinterpret_cast<const StdCallAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view StdCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<StandaloneDebugAttr> StandaloneDebugAttr::from(const TokenContext &c) {
@@ -15290,12 +14004,6 @@ std::optional<StandaloneDebugAttr> StandaloneDebugAttr::from(const Attr &parent)
   }
 }
 
-std::string_view StandaloneDebugAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15312,12 +14020,6 @@ std::optional<SpeculativeLoadHardeningAttr> SpeculativeLoadHardeningAttr::from(c
   }
 }
 
-std::string_view SpeculativeLoadHardeningAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15332,12 +14034,6 @@ std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const A
       return reinterpret_cast<const SharedTrylockFunctionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SharedTrylockFunctionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 Expr SharedTrylockFunctionAttr::success_value(void) const {
@@ -15364,13 +14060,7 @@ std::optional<SetTypestateAttr> SetTypestateAttr::from(const Attr &parent) {
 
 SetTypestateAttrConsumedState SetTypestateAttr::new_state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<SetTypestateAttrConsumedState>(self.getVal11());
-}
-
-std::string_view SetTypestateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<SetTypestateAttrConsumedState>(self.getVal10());
 }
 
 std::optional<SentinelAttr> SentinelAttr::from(const TokenContext &c) {
@@ -15389,12 +14079,6 @@ std::optional<SentinelAttr> SentinelAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SentinelAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SelectAnyAttr> SelectAnyAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15409,12 +14093,6 @@ std::optional<SelectAnyAttr> SelectAnyAttr::from(const Attr &parent) {
       return reinterpret_cast<const SelectAnyAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SelectAnyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<SectionAttr> SectionAttr::from(const TokenContext &c) {
@@ -15441,13 +14119,7 @@ std::string_view SectionAttr::name(void) const {
 
 SectionAttrSpelling SectionAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<SectionAttrSpelling>(self.getVal11());
-}
-
-std::string_view SectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<SectionAttrSpelling>(self.getVal10());
 }
 
 std::optional<ScopedLockableAttr> ScopedLockableAttr::from(const TokenContext &c) {
@@ -15466,12 +14138,6 @@ std::optional<ScopedLockableAttr> ScopedLockableAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ScopedLockableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15486,12 +14152,6 @@ std::optional<SYCLSpecialClassAttr> SYCLSpecialClassAttr::from(const Attr &paren
       return reinterpret_cast<const SYCLSpecialClassAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SYCLSpecialClassAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<SYCLKernelAttr> SYCLKernelAttr::from(const TokenContext &c) {
@@ -15510,12 +14170,6 @@ std::optional<SYCLKernelAttr> SYCLKernelAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SYCLKernelAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15530,12 +14184,6 @@ std::optional<ReturnsTwiceAttr> ReturnsTwiceAttr::from(const Attr &parent) {
       return reinterpret_cast<const ReturnsTwiceAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ReturnsTwiceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ReturnsNonNullAttr> ReturnsNonNullAttr::from(const TokenContext &c) {
@@ -15554,12 +14202,6 @@ std::optional<ReturnsNonNullAttr> ReturnsNonNullAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ReturnsNonNullAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15576,15 +14218,9 @@ std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const Attr &parent)
   }
 }
 
-std::string_view ReturnTypestateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 ReturnTypestateAttrConsumedState ReturnTypestateAttr::state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ReturnTypestateAttrConsumedState>(self.getVal11());
+  return static_cast<ReturnTypestateAttrConsumedState>(self.getVal10());
 }
 
 std::optional<RetainAttr> RetainAttr::from(const TokenContext &c) {
@@ -15601,12 +14237,6 @@ std::optional<RetainAttr> RetainAttr::from(const Attr &parent) {
       return reinterpret_cast<const RetainAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view RetainAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<RestrictAttr> RestrictAttr::from(const TokenContext &c) {
@@ -15627,13 +14257,7 @@ std::optional<RestrictAttr> RestrictAttr::from(const Attr &parent) {
 
 RestrictAttrSpelling RestrictAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<RestrictAttrSpelling>(self.getVal11());
-}
-
-std::string_view RestrictAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<RestrictAttrSpelling>(self.getVal10());
 }
 
 std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const TokenContext &c) {
@@ -15654,18 +14278,12 @@ std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const Attr &p
 
 RequiresCapabilityAttrSpelling RequiresCapabilityAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<RequiresCapabilityAttrSpelling>(self.getVal11());
-}
-
-std::string_view RequiresCapabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<RequiresCapabilityAttrSpelling>(self.getVal10());
 }
 
 bool RequiresCapabilityAttr::is_shared(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::from(const TokenContext &c) {
@@ -15682,12 +14300,6 @@ std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::from(const Attr &par
       return reinterpret_cast<const ReqdWorkGroupSizeAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ReqdWorkGroupSizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const TokenContext &c) {
@@ -15708,23 +14320,17 @@ std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const Attr &par
 
 ReleaseCapabilityAttrSpelling ReleaseCapabilityAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ReleaseCapabilityAttrSpelling>(self.getVal11());
-}
-
-std::string_view ReleaseCapabilityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ReleaseCapabilityAttrSpelling>(self.getVal10());
 }
 
 bool ReleaseCapabilityAttr::is_generic(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 bool ReleaseCapabilityAttr::is_shared(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 std::optional<ReinitializesAttr> ReinitializesAttr::from(const TokenContext &c) {
@@ -15743,12 +14349,6 @@ std::optional<ReinitializesAttr> ReinitializesAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ReinitializesAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<RegCallAttr> RegCallAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15765,12 +14365,6 @@ std::optional<RegCallAttr> RegCallAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view RegCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15785,12 +14379,6 @@ std::optional<RandomizeLayoutAttr> RandomizeLayoutAttr::from(const Attr &parent)
       return reinterpret_cast<const RandomizeLayoutAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view RandomizeLayoutAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const TokenContext &c) {
@@ -15811,13 +14399,7 @@ std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const Attr &parent) {
 
 RISCVInterruptAttrInterruptType RISCVInterruptAttr::interrupt(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<RISCVInterruptAttrInterruptType>(self.getVal11());
-}
-
-std::string_view RISCVInterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<RISCVInterruptAttrInterruptType>(self.getVal10());
 }
 
 std::optional<PureAttr> PureAttr::from(const TokenContext &c) {
@@ -15836,12 +14418,6 @@ std::optional<PureAttr> PureAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view PureAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PtGuardedVarAttr> PtGuardedVarAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15856,12 +14432,6 @@ std::optional<PtGuardedVarAttr> PtGuardedVarAttr::from(const Attr &parent) {
       return reinterpret_cast<const PtGuardedVarAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view PtGuardedVarAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<PtGuardedByAttr> PtGuardedByAttr::from(const TokenContext &c) {
@@ -15886,12 +14456,6 @@ Expr PtGuardedByAttr::argument(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-std::string_view PtGuardedByAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PreserveMostAttr> PreserveMostAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15906,12 +14470,6 @@ std::optional<PreserveMostAttr> PreserveMostAttr::from(const Attr &parent) {
       return reinterpret_cast<const PreserveMostAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view PreserveMostAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<PreserveAllAttr> PreserveAllAttr::from(const TokenContext &c) {
@@ -15930,12 +14488,6 @@ std::optional<PreserveAllAttr> PreserveAllAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view PreserveAllAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PreferredNameAttr> PreferredNameAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -15952,12 +14504,6 @@ std::optional<PreferredNameAttr> PreferredNameAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view PreferredNameAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 Type PreferredNameAttr::typedef_type(void) const {
   auto self = fragment->NthAttr(offset_);
   EntityId id(self.getVal8());
@@ -15966,7 +14512,7 @@ Type PreferredNameAttr::typedef_type(void) const {
 
 Type PreferredNameAttr::typedef_type_token(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
@@ -15992,12 +14538,6 @@ std::string_view PragmaClangTextSectionAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view PragmaClangTextSectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16017,12 +14557,6 @@ std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from(c
 std::string_view PragmaClangRodataSectionAttr::name(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view PragmaClangRodataSectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -16048,12 +14582,6 @@ std::string_view PragmaClangRelroSectionAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view PragmaClangRelroSectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16076,12 +14604,6 @@ std::string_view PragmaClangDataSectionAttr::name(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view PragmaClangDataSectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16101,12 +14623,6 @@ std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const A
 std::string_view PragmaClangBSSSectionAttr::name(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view PragmaClangBSSSectionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -16134,14 +14650,8 @@ Type PointerAttr::deref_type(void) const {
 
 Type PointerAttr::deref_type_token(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return fragment->TypeFor(fragment, id, false).value();
-}
-
-std::string_view PointerAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<PcsAttr> PcsAttr::from(const TokenContext &c) {
@@ -16162,13 +14672,7 @@ std::optional<PcsAttr> PcsAttr::from(const Attr &parent) {
 
 PcsAttrPCSType PcsAttr::pcs(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<PcsAttrPCSType>(self.getVal11());
-}
-
-std::string_view PcsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<PcsAttrPCSType>(self.getVal10());
 }
 
 std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const TokenContext &c) {
@@ -16187,12 +14691,6 @@ std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const
   }
 }
 
-std::string_view PatchableFunctionEntryAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PascalAttr> PascalAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16207,12 +14705,6 @@ std::optional<PascalAttr> PascalAttr::from(const Attr &parent) {
       return reinterpret_cast<const PascalAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view PascalAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const TokenContext &c) {
@@ -16233,13 +14725,7 @@ std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const Attr &parent) {
 
 ParamTypestateAttrConsumedState ParamTypestateAttr::parameter_state(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ParamTypestateAttrConsumedState>(self.getVal11());
-}
-
-std::string_view ParamTypestateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ParamTypestateAttrConsumedState>(self.getVal10());
 }
 
 std::optional<PackedAttr> PackedAttr::from(const TokenContext &c) {
@@ -16256,12 +14742,6 @@ std::optional<PackedAttr> PackedAttr::from(const Attr &parent) {
       return reinterpret_cast<const PackedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view PackedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OwnershipAttr> OwnershipAttr::from(const TokenContext &c) {
@@ -16282,33 +14762,27 @@ std::optional<OwnershipAttr> OwnershipAttr::from(const Attr &parent) {
 
 OwnershipAttrOwnershipKind OwnershipAttr::own_kind(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OwnershipAttrOwnershipKind>(self.getVal11());
+  return static_cast<OwnershipAttrOwnershipKind>(self.getVal10());
 }
 
 OwnershipAttrSpelling OwnershipAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OwnershipAttrSpelling>(self.getVal15());
-}
-
-std::string_view OwnershipAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OwnershipAttrSpelling>(self.getVal14());
 }
 
 bool OwnershipAttr::is_holds(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 bool OwnershipAttr::is_returns(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal14();
+  return self.getVal13();
 }
 
 bool OwnershipAttr::is_takes(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal19();
+  return self.getVal18();
 }
 
 std::optional<OwnerAttr> OwnerAttr::from(const TokenContext &c) {
@@ -16335,14 +14809,8 @@ Type OwnerAttr::deref_type(void) const {
 
 Type OwnerAttr::deref_type_token(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return fragment->TypeFor(fragment, id, false).value();
-}
-
-std::string_view OwnerAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OverrideAttr> OverrideAttr::from(const TokenContext &c) {
@@ -16361,12 +14829,6 @@ std::optional<OverrideAttr> OverrideAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view OverrideAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OptimizeNoneAttr> OptimizeNoneAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16381,12 +14843,6 @@ std::optional<OptimizeNoneAttr> OptimizeNoneAttr::from(const Attr &parent) {
       return reinterpret_cast<const OptimizeNoneAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OptimizeNoneAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from(const TokenContext &c) {
@@ -16405,12 +14861,6 @@ std::optional<OpenCLKernelAttr> OpenCLKernelAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view OpenCLKernelAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16425,12 +14875,6 @@ std::optional<OpenCLIntelReqdSubGroupSizeAttr> OpenCLIntelReqdSubGroupSizeAttr::
       return reinterpret_cast<const OpenCLIntelReqdSubGroupSizeAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OpenCLIntelReqdSubGroupSizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::from(const TokenContext &c) {
@@ -16449,12 +14893,6 @@ std::optional<ObjCSubclassingRestrictedAttr> ObjCSubclassingRestrictedAttr::from
   }
 }
 
-std::string_view ObjCSubclassingRestrictedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCRootClassAttr> ObjCRootClassAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16469,12 +14907,6 @@ std::optional<ObjCRootClassAttr> ObjCRootClassAttr::from(const Attr &parent) {
       return reinterpret_cast<const ObjCRootClassAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCRootClassAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(const TokenContext &c) {
@@ -16493,12 +14925,6 @@ std::optional<ObjCReturnsInnerPointerAttr> ObjCReturnsInnerPointerAttr::from(con
   }
 }
 
-std::string_view ObjCReturnsInnerPointerAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16513,12 +14939,6 @@ std::optional<ObjCRequiresSuperAttr> ObjCRequiresSuperAttr::from(const Attr &par
       return reinterpret_cast<const ObjCRequiresSuperAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCRequiresSuperAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::from(const TokenContext &c) {
@@ -16537,12 +14957,6 @@ std::optional<ObjCRequiresPropertyDefsAttr> ObjCRequiresPropertyDefsAttr::from(c
   }
 }
 
-std::string_view ObjCRequiresPropertyDefsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16557,12 +14971,6 @@ std::optional<ObjCPreciseLifetimeAttr> ObjCPreciseLifetimeAttr::from(const Attr 
       return reinterpret_cast<const ObjCPreciseLifetimeAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCPreciseLifetimeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCOwnershipAttr> ObjCOwnershipAttr::from(const TokenContext &c) {
@@ -16581,12 +14989,6 @@ std::optional<ObjCOwnershipAttr> ObjCOwnershipAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ObjCOwnershipAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCNSObjectAttr> ObjCNSObjectAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16601,12 +15003,6 @@ std::optional<ObjCNSObjectAttr> ObjCNSObjectAttr::from(const Attr &parent) {
       return reinterpret_cast<const ObjCNSObjectAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCNSObjectAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const TokenContext &c) {
@@ -16627,13 +15023,7 @@ std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const Attr &paren
 
 ObjCMethodFamilyAttrFamilyKind ObjCMethodFamilyAttr::family(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ObjCMethodFamilyAttrFamilyKind>(self.getVal11());
-}
-
-std::string_view ObjCMethodFamilyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<ObjCMethodFamilyAttrFamilyKind>(self.getVal10());
 }
 
 std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const TokenContext &c) {
@@ -16652,12 +15042,6 @@ std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const Att
   }
 }
 
-std::string_view ObjCIndependentClassAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16672,12 +15056,6 @@ std::optional<ObjCExternallyRetainedAttr> ObjCExternallyRetainedAttr::from(const
       return reinterpret_cast<const ObjCExternallyRetainedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCExternallyRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::from(const TokenContext &c) {
@@ -16696,12 +15074,6 @@ std::optional<ObjCExplicitProtocolImplAttr> ObjCExplicitProtocolImplAttr::from(c
   }
 }
 
-std::string_view ObjCExplicitProtocolImplAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCExceptionAttr> ObjCExceptionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16716,12 +15088,6 @@ std::optional<ObjCExceptionAttr> ObjCExceptionAttr::from(const Attr &parent) {
       return reinterpret_cast<const ObjCExceptionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCExceptionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::from(const TokenContext &c) {
@@ -16740,12 +15106,6 @@ std::optional<ObjCBridgeRelatedAttr> ObjCBridgeRelatedAttr::from(const Attr &par
   }
 }
 
-std::string_view ObjCBridgeRelatedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16760,12 +15120,6 @@ std::optional<ObjCBridgeMutableAttr> ObjCBridgeMutableAttr::from(const Attr &par
       return reinterpret_cast<const ObjCBridgeMutableAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view ObjCBridgeMutableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCBridgeAttr> ObjCBridgeAttr::from(const TokenContext &c) {
@@ -16784,12 +15138,6 @@ std::optional<ObjCBridgeAttr> ObjCBridgeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view ObjCBridgeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16804,12 +15152,6 @@ std::optional<OSReturnsRetainedOnZeroAttr> OSReturnsRetainedOnZeroAttr::from(con
       return reinterpret_cast<const OSReturnsRetainedOnZeroAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OSReturnsRetainedOnZeroAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OSReturnsRetainedOnNonZeroAttr> OSReturnsRetainedOnNonZeroAttr::from(const TokenContext &c) {
@@ -16828,12 +15170,6 @@ std::optional<OSReturnsRetainedOnNonZeroAttr> OSReturnsRetainedOnNonZeroAttr::fr
   }
 }
 
-std::string_view OSReturnsRetainedOnNonZeroAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OSReturnsRetainedAttr> OSReturnsRetainedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16848,12 +15184,6 @@ std::optional<OSReturnsRetainedAttr> OSReturnsRetainedAttr::from(const Attr &par
       return reinterpret_cast<const OSReturnsRetainedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OSReturnsRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OSReturnsNotRetainedAttr> OSReturnsNotRetainedAttr::from(const TokenContext &c) {
@@ -16872,12 +15202,6 @@ std::optional<OSReturnsNotRetainedAttr> OSReturnsNotRetainedAttr::from(const Att
   }
 }
 
-std::string_view OSReturnsNotRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16892,12 +15216,6 @@ std::optional<OSConsumesThisAttr> OSConsumesThisAttr::from(const Attr &parent) {
       return reinterpret_cast<const OSConsumesThisAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OSConsumesThisAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::from(const TokenContext &c) {
@@ -16916,12 +15234,6 @@ std::optional<OMPThreadPrivateDeclAttr> OMPThreadPrivateDeclAttr::from(const Att
   }
 }
 
-std::string_view OMPThreadPrivateDeclAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -16936,12 +15248,6 @@ std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const Attr &par
       return reinterpret_cast<const OMPDeclareVariantAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OMPDeclareVariantAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 Expr OMPDeclareVariantAttr::variant_func_reference(void) const {
@@ -16968,12 +15274,12 @@ std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Att
 
 OMPDeclareTargetDeclAttrDevTypeTy OMPDeclareTargetDeclAttr::dev_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(self.getVal11());
+  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(self.getVal10());
 }
 
 bool OMPDeclareTargetDeclAttr::indirect(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
@@ -16984,13 +15290,7 @@ Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
 
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(self.getVal15());
-}
-
-std::string_view OMPDeclareTargetDeclAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(self.getVal14());
 }
 
 std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::from(const TokenContext &c) {
@@ -17007,12 +15307,6 @@ std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::from(const Attr &paren
       return reinterpret_cast<const OMPCaptureNoInitAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OMPCaptureNoInitAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const TokenContext &c) {
@@ -17039,19 +15333,13 @@ Expr OMPAllocateDeclAttr::alignment(void) const {
 
 Expr OMPAllocateDeclAttr::allocator(void) const {
   auto self = fragment->NthAttr(offset_);
-  EntityId id(self.getVal17());
+  EntityId id(self.getVal16());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 OMPAllocateDeclAttrAllocatorTypeTy OMPAllocateDeclAttr::allocator_type(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<OMPAllocateDeclAttrAllocatorTypeTy>(self.getVal11());
-}
-
-std::string_view OMPAllocateDeclAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<OMPAllocateDeclAttrAllocatorTypeTy>(self.getVal10());
 }
 
 std::optional<NotTailCalledAttr> NotTailCalledAttr::from(const TokenContext &c) {
@@ -17070,12 +15358,6 @@ std::optional<NotTailCalledAttr> NotTailCalledAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NotTailCalledAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoUniqueAddressAttr> NoUniqueAddressAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17090,12 +15372,6 @@ std::optional<NoUniqueAddressAttr> NoUniqueAddressAttr::from(const Attr &parent)
       return reinterpret_cast<const NoUniqueAddressAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoUniqueAddressAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoThrowAttr> NoThrowAttr::from(const TokenContext &c) {
@@ -17114,12 +15390,6 @@ std::optional<NoThrowAttr> NoThrowAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoThrowAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17134,12 +15404,6 @@ std::optional<NoThreadSafetyAnalysisAttr> NoThreadSafetyAnalysisAttr::from(const
       return reinterpret_cast<const NoThreadSafetyAnalysisAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoThreadSafetyAnalysisAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoStackProtectorAttr> NoStackProtectorAttr::from(const TokenContext &c) {
@@ -17158,12 +15422,6 @@ std::optional<NoStackProtectorAttr> NoStackProtectorAttr::from(const Attr &paren
   }
 }
 
-std::string_view NoStackProtectorAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoSplitStackAttr> NoSplitStackAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17178,12 +15436,6 @@ std::optional<NoSplitStackAttr> NoSplitStackAttr::from(const Attr &parent) {
       return reinterpret_cast<const NoSplitStackAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoSplitStackAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::from(const TokenContext &c) {
@@ -17202,12 +15454,6 @@ std::optional<NoSpeculativeLoadHardeningAttr> NoSpeculativeLoadHardeningAttr::fr
   }
 }
 
-std::string_view NoSpeculativeLoadHardeningAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17224,15 +15470,9 @@ std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoSanitizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 bool NoSanitizeAttr::has_coverage(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<NoReturnAttr> NoReturnAttr::from(const TokenContext &c) {
@@ -17251,12 +15491,6 @@ std::optional<NoReturnAttr> NoReturnAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoReturnAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17271,12 +15505,6 @@ std::optional<NoRandomizeLayoutAttr> NoRandomizeLayoutAttr::from(const Attr &par
       return reinterpret_cast<const NoRandomizeLayoutAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoRandomizeLayoutAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoProfileFunctionAttr> NoProfileFunctionAttr::from(const TokenContext &c) {
@@ -17295,12 +15523,6 @@ std::optional<NoProfileFunctionAttr> NoProfileFunctionAttr::from(const Attr &par
   }
 }
 
-std::string_view NoProfileFunctionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoMips16Attr> NoMips16Attr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17315,12 +15537,6 @@ std::optional<NoMips16Attr> NoMips16Attr::from(const Attr &parent) {
       return reinterpret_cast<const NoMips16Attr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoMips16Attr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoMicroMipsAttr> NoMicroMipsAttr::from(const TokenContext &c) {
@@ -17339,12 +15555,6 @@ std::optional<NoMicroMipsAttr> NoMicroMipsAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoMicroMipsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17359,12 +15569,6 @@ std::optional<NoInstrumentFunctionAttr> NoInstrumentFunctionAttr::from(const Att
       return reinterpret_cast<const NoInstrumentFunctionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoInstrumentFunctionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoDuplicateAttr> NoDuplicateAttr::from(const TokenContext &c) {
@@ -17383,12 +15587,6 @@ std::optional<NoDuplicateAttr> NoDuplicateAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoDuplicateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoDestroyAttr> NoDestroyAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17403,12 +15601,6 @@ std::optional<NoDestroyAttr> NoDestroyAttr::from(const Attr &parent) {
       return reinterpret_cast<const NoDestroyAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoDestroyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoDebugAttr> NoDebugAttr::from(const TokenContext &c) {
@@ -17427,12 +15619,6 @@ std::optional<NoDebugAttr> NoDebugAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoDebugAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NoCommonAttr> NoCommonAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17447,12 +15633,6 @@ std::optional<NoCommonAttr> NoCommonAttr::from(const Attr &parent) {
       return reinterpret_cast<const NoCommonAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NoCommonAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NoAliasAttr> NoAliasAttr::from(const TokenContext &c) {
@@ -17471,12 +15651,6 @@ std::optional<NoAliasAttr> NoAliasAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NoAliasAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NakedAttr> NakedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17491,12 +15665,6 @@ std::optional<NakedAttr> NakedAttr::from(const Attr &parent) {
       return reinterpret_cast<const NakedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NakedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NSReturnsRetainedAttr> NSReturnsRetainedAttr::from(const TokenContext &c) {
@@ -17515,12 +15683,6 @@ std::optional<NSReturnsRetainedAttr> NSReturnsRetainedAttr::from(const Attr &par
   }
 }
 
-std::string_view NSReturnsRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17537,12 +15699,6 @@ std::optional<NSReturnsNotRetainedAttr> NSReturnsNotRetainedAttr::from(const Att
   }
 }
 
-std::string_view NSReturnsNotRetainedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17557,12 +15713,6 @@ std::optional<NSReturnsAutoreleasedAttr> NSReturnsAutoreleasedAttr::from(const A
       return reinterpret_cast<const NSReturnsAutoreleasedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NSReturnsAutoreleasedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const TokenContext &c) {
@@ -17587,12 +15737,6 @@ VarDecl NSErrorDomainAttr::error_domain(void) const {
   return VarDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
-std::string_view NSErrorDomainAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17607,12 +15751,6 @@ std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from(const Attr &parent) {
       return reinterpret_cast<const NSConsumesSelfAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view NSConsumesSelfAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const TokenContext &c) {
@@ -17633,13 +15771,7 @@ std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const Attr &parent) {
 
 MipsShortCallAttrSpelling MipsShortCallAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<MipsShortCallAttrSpelling>(self.getVal11());
-}
-
-std::string_view MipsShortCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<MipsShortCallAttrSpelling>(self.getVal10());
 }
 
 std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const TokenContext &c) {
@@ -17660,13 +15792,7 @@ std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const Attr &parent) {
 
 MipsLongCallAttrSpelling MipsLongCallAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<MipsLongCallAttrSpelling>(self.getVal11());
-}
-
-std::string_view MipsLongCallAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<MipsLongCallAttrSpelling>(self.getVal10());
 }
 
 std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const TokenContext &c) {
@@ -17687,13 +15813,7 @@ std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const Attr &parent) {
 
 MipsInterruptAttrInterruptType MipsInterruptAttr::interrupt(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<MipsInterruptAttrInterruptType>(self.getVal11());
-}
-
-std::string_view MipsInterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<MipsInterruptAttrInterruptType>(self.getVal10());
 }
 
 std::optional<Mips16Attr> Mips16Attr::from(const TokenContext &c) {
@@ -17712,12 +15832,6 @@ std::optional<Mips16Attr> Mips16Attr::from(const Attr &parent) {
   }
 }
 
-std::string_view Mips16Attr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MinVectorWidthAttr> MinVectorWidthAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17732,12 +15846,6 @@ std::optional<MinVectorWidthAttr> MinVectorWidthAttr::from(const Attr &parent) {
       return reinterpret_cast<const MinVectorWidthAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view MinVectorWidthAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<MinSizeAttr> MinSizeAttr::from(const TokenContext &c) {
@@ -17756,12 +15864,6 @@ std::optional<MinSizeAttr> MinSizeAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view MinSizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MicroMipsAttr> MicroMipsAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17776,12 +15878,6 @@ std::optional<MicroMipsAttr> MicroMipsAttr::from(const Attr &parent) {
       return reinterpret_cast<const MicroMipsAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view MicroMipsAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<MayAliasAttr> MayAliasAttr::from(const TokenContext &c) {
@@ -17800,12 +15896,6 @@ std::optional<MayAliasAttr> MayAliasAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view MayAliasAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17820,12 +15910,6 @@ std::optional<MaxFieldAlignmentAttr> MaxFieldAlignmentAttr::from(const Attr &par
       return reinterpret_cast<const MaxFieldAlignmentAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view MaxFieldAlignmentAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const TokenContext &c) {
@@ -17844,15 +15928,9 @@ std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view MSVtorDispAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 MSVtorDispMode MSVtorDispAttr::vtor_disp_mode(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<MSVtorDispMode>(self.getVal11());
+  return static_cast<MSVtorDispMode>(self.getVal10());
 }
 
 std::optional<MSStructAttr> MSStructAttr::from(const TokenContext &c) {
@@ -17871,12 +15949,6 @@ std::optional<MSStructAttr> MSStructAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view MSStructAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17893,12 +15965,6 @@ std::optional<MSP430InterruptAttr> MSP430InterruptAttr::from(const Attr &parent)
   }
 }
 
-std::string_view MSP430InterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MSNoVTableAttr> MSNoVTableAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17913,12 +15979,6 @@ std::optional<MSNoVTableAttr> MSNoVTableAttr::from(const Attr &parent) {
       return reinterpret_cast<const MSNoVTableAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view MSNoVTableAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const TokenContext &c) {
@@ -17939,23 +15999,17 @@ std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const Attr &parent) {
 
 bool MSInheritanceAttr::best_case(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 MSInheritanceModel MSInheritanceAttr::inheritance_model(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<MSInheritanceModel>(self.getVal11());
+  return static_cast<MSInheritanceModel>(self.getVal10());
 }
 
 MSInheritanceAttrSpelling MSInheritanceAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<MSInheritanceAttrSpelling>(self.getVal15());
-}
-
-std::string_view MSInheritanceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<MSInheritanceAttrSpelling>(self.getVal14());
 }
 
 std::optional<MSAllocatorAttr> MSAllocatorAttr::from(const TokenContext &c) {
@@ -17974,12 +16028,6 @@ std::optional<MSAllocatorAttr> MSAllocatorAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view MSAllocatorAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<MSABIAttr> MSABIAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -17994,12 +16042,6 @@ std::optional<MSABIAttr> MSABIAttr::from(const Attr &parent) {
       return reinterpret_cast<const MSABIAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view MSABIAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from(const TokenContext &c) {
@@ -18018,12 +16060,6 @@ std::optional<MIGServerRoutineAttr> MIGServerRoutineAttr::from(const Attr &paren
   }
 }
 
-std::string_view MIGServerRoutineAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<M68kInterruptAttr> M68kInterruptAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18040,12 +16076,6 @@ std::optional<M68kInterruptAttr> M68kInterruptAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view M68kInterruptAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<LocksExcludedAttr> LocksExcludedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18060,12 +16090,6 @@ std::optional<LocksExcludedAttr> LocksExcludedAttr::from(const Attr &parent) {
       return reinterpret_cast<const LocksExcludedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view LocksExcludedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<LockReturnedAttr> LockReturnedAttr::from(const TokenContext &c) {
@@ -18090,12 +16114,6 @@ Expr LockReturnedAttr::argument(void) const {
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
-std::string_view LockReturnedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18110,12 +16128,6 @@ std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const Attr &parent) {
       return reinterpret_cast<const LifetimeBoundAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view LifetimeBoundAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<LeafAttr> LeafAttr::from(const TokenContext &c) {
@@ -18134,12 +16146,6 @@ std::optional<LeafAttr> LeafAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view LeafAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<LayoutVersionAttr> LayoutVersionAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18154,12 +16160,6 @@ std::optional<LayoutVersionAttr> LayoutVersionAttr::from(const Attr &parent) {
       return reinterpret_cast<const LayoutVersionAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view LayoutVersionAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::from(const TokenContext &c) {
@@ -18178,12 +16178,6 @@ std::optional<LTOVisibilityPublicAttr> LTOVisibilityPublicAttr::from(const Attr 
   }
 }
 
-std::string_view LTOVisibilityPublicAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<InternalLinkageAttr> InternalLinkageAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18198,12 +16192,6 @@ std::optional<InternalLinkageAttr> InternalLinkageAttr::from(const Attr &parent)
       return reinterpret_cast<const InternalLinkageAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view InternalLinkageAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from(const TokenContext &c) {
@@ -18222,12 +16210,6 @@ std::optional<IntelOclBiccAttr> IntelOclBiccAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view IntelOclBiccAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<InitPriorityAttr> InitPriorityAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18242,12 +16224,6 @@ std::optional<InitPriorityAttr> InitPriorityAttr::from(const Attr &parent) {
       return reinterpret_cast<const InitPriorityAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view InitPriorityAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<InheritableParamAttr> InheritableParamAttr::from(const TokenContext &c) {
@@ -18298,12 +16274,6 @@ std::optional<CarriesDependencyAttr> CarriesDependencyAttr::from(const Attr &par
   }
 }
 
-std::string_view CarriesDependencyAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CFConsumedAttr> CFConsumedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18322,12 +16292,6 @@ std::optional<CFConsumedAttr> CFConsumedAttr::from(const Attr &parent) {
       return reinterpret_cast<const CFConsumedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CFConsumedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<AnnotateAttr> AnnotateAttr::from(const TokenContext &c) {
@@ -18353,12 +16317,6 @@ std::optional<AnnotateAttr> AnnotateAttr::from(const Attr &parent) {
 std::string_view AnnotateAttr::annotation(void) const {
   auto self = fragment->NthAttr(offset_);
   capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::string_view AnnotateAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -18388,12 +16346,6 @@ std::string_view UseHandleAttr::handle_type(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view UseHandleAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<ReleaseHandleAttr> ReleaseHandleAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18420,12 +16372,6 @@ std::string_view ReleaseHandleAttr::handle_type(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view ReleaseHandleAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18448,18 +16394,12 @@ std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const Attr &parent) {
 
 PassObjectSizeAttrSpelling PassObjectSizeAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<PassObjectSizeAttrSpelling>(self.getVal11());
-}
-
-std::string_view PassObjectSizeAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<PassObjectSizeAttrSpelling>(self.getVal10());
 }
 
 bool PassObjectSizeAttr::is_dynamic(void) const {
   auto self = fragment->NthAttr(offset_);
-  return self.getVal13();
+  return self.getVal12();
 }
 
 std::optional<ParameterABIAttr> ParameterABIAttr::from(const TokenContext &c) {
@@ -18487,7 +16427,7 @@ std::optional<ParameterABIAttr> ParameterABIAttr::from(const Attr &parent) {
 
 ParameterABI ParameterABIAttr::abi(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<ParameterABI>(self.getVal11());
+  return static_cast<ParameterABI>(self.getVal10());
 }
 
 std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const TokenContext &c) {
@@ -18514,12 +16454,6 @@ std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const Attr 
   }
 }
 
-std::string_view SwiftIndirectResultAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftErrorResultAttr> SwiftErrorResultAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18542,12 +16476,6 @@ std::optional<SwiftErrorResultAttr> SwiftErrorResultAttr::from(const Attr &paren
       return reinterpret_cast<const SwiftErrorResultAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view SwiftErrorResultAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<SwiftContextAttr> SwiftContextAttr::from(const TokenContext &c) {
@@ -18574,12 +16502,6 @@ std::optional<SwiftContextAttr> SwiftContextAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view SwiftContextAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<SwiftAsyncContextAttr> SwiftAsyncContextAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18604,12 +16526,6 @@ std::optional<SwiftAsyncContextAttr> SwiftAsyncContextAttr::from(const Attr &par
   }
 }
 
-std::string_view SwiftAsyncContextAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<OSConsumedAttr> OSConsumedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18628,12 +16544,6 @@ std::optional<OSConsumedAttr> OSConsumedAttr::from(const Attr &parent) {
       return reinterpret_cast<const OSConsumedAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view OSConsumedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NonNullAttr> NonNullAttr::from(const TokenContext &c) {
@@ -18656,12 +16566,6 @@ std::optional<NonNullAttr> NonNullAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NonNullAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<NSConsumedAttr> NSConsumedAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18682,12 +16586,6 @@ std::optional<NSConsumedAttr> NSConsumedAttr::from(const Attr &parent) {
   }
 }
 
-std::string_view NSConsumedAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<IFuncAttr> IFuncAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18706,12 +16604,6 @@ std::string_view IFuncAttr::resolver(void) const {
   return std::string_view(data.cStr(), data.size());
 }
 
-std::string_view IFuncAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal10();
-  return std::string_view(data.cStr(), data.size());
-}
-
 std::optional<CalledOnceAttr> CalledOnceAttr::from(const TokenContext &c) {
   return from(c.as_attribute());
 }
@@ -18722,12 +16614,6 @@ std::optional<CalledOnceAttr> CalledOnceAttr::from(const Attr &parent) {
       return reinterpret_cast<const CalledOnceAttr &>(parent);
     default: return std::nullopt;
   }
-}
-
-std::string_view CalledOnceAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const TokenContext &c) {
@@ -18744,13 +16630,7 @@ std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Attr &parent) {
 
 BuiltinAliasAttrSpelling BuiltinAliasAttr::semantic_spelling(void) const {
   auto self = fragment->NthAttr(offset_);
-  return static_cast<BuiltinAliasAttrSpelling>(self.getVal11());
-}
-
-std::string_view BuiltinAliasAttr::spelling(void) const {
-  auto self = fragment->NthAttr(offset_);
-  capnp::Text::Reader data = self.getVal9();
-  return std::string_view(data.cStr(), data.size());
+  return static_cast<BuiltinAliasAttrSpelling>(self.getVal10());
 }
 
 bool Type::is_qualified(void) const {
@@ -40330,6 +38210,14 @@ CompoundStmt LambdaExpr::compound_statement_body(void) const {
   return CompoundStmt::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
+std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) const {
+  auto self = fragment->NthStmt(offset_);
+  if (true) {
+    EntityId id(self.getVal42());
+    return FunctionTemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
 std::vector<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
   auto self = fragment->NthStmt(offset_);
   auto list = self.getVal15();
@@ -40348,12 +38236,12 @@ std::vector<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
 
 TokenRange LambdaExpr::introducer_range(void) const {
   auto self = fragment->NthStmt(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal42(), self.getVal43());
+  return fragment->TokenRangeFor(fragment, self.getVal43(), self.getVal44());
 }
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {
   auto self = fragment->NthStmt(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return CXXRecordDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
@@ -40369,7 +38257,7 @@ std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) c
 std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
   auto self = fragment->NthStmt(offset_);
   if (true) {
-    EntityId id(self.getVal45());
+    EntityId id(self.getVal46());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
@@ -41914,184 +39802,192 @@ std::optional<Attr> Decl::defining_attribute(void) const {
   }
 }
 
+std::optional<TemplateDecl> Decl::described_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal7());
+    return TemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
 std::optional<TemplateParameterList> Decl::described_template_parameters(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal8()) {
+  if (!self.getVal9()) {
     return std::nullopt;
   } else {
-    return TemplateParameterList(fragment, self.getVal7());
+    return TemplateParameterList(fragment, self.getVal8());
   }
 }
 
 std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal9());
+    EntityId id(self.getVal10());
     return ExternalSourceSymbolAttr::from(fragment->AttrFor(fragment, id));
   }
 }
 
 DeclFriendObjectKind Decl::friend_object_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<DeclFriendObjectKind>(self.getVal10());
+  return static_cast<DeclFriendObjectKind>(self.getVal11());
 }
 
 DeclModuleOwnershipKind Decl::module_ownership_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<DeclModuleOwnershipKind>(self.getVal11());
+  return static_cast<DeclModuleOwnershipKind>(self.getVal12());
 }
 
 std::optional<Decl> Decl::non_closure_context(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal12());
+    EntityId id(self.getVal13());
     return fragment->DeclFor(fragment, id);
   }
 }
 
 bool Decl::has_attributes(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal13();
+  return self.getVal14();
 }
 
 bool Decl::has_owning_module(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal14();
+  return self.getVal15();
 }
 
 bool Decl::has_tag_identifier_namespace(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal15();
+  return self.getVal16();
 }
 
 bool Decl::is_defined_outside_function_or_method(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal16();
+  return self.getVal17();
 }
 
 bool Decl::is_deprecated(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal17();
+  return self.getVal18();
 }
 
 bool Decl::is_discarded_in_global_module_fragment(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal18();
+  return self.getVal19();
 }
 
 bool Decl::is_function_or_function_template(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal19();
+  return self.getVal20();
 }
 
 bool Decl::is_implicit(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal20();
+  return self.getVal21();
 }
 
 bool Decl::is_in_anonymous_namespace(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal21();
+  return self.getVal22();
 }
 
 bool Decl::is_in_export_declaration_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal22();
+  return self.getVal23();
 }
 
 bool Decl::is_in_local_scope_for_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal23();
+  return self.getVal24();
 }
 
 bool Decl::is_in_std_namespace(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal24();
+  return self.getVal25();
 }
 
 bool Decl::is_invalid_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal25();
+  return self.getVal26();
 }
 
 bool Decl::is_invisible_outside_the_owning_module(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal26();
+  return self.getVal27();
 }
 
 bool Decl::is_module_private(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal27();
+  return self.getVal28();
 }
 
 bool Decl::is_out_of_line(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal28();
+  return self.getVal29();
 }
 
 bool Decl::is_parameter_pack(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal29();
+  return self.getVal30();
 }
 
 bool Decl::is_reachable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal30();
+  return self.getVal31();
 }
 
 bool Decl::is_template_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal31();
+  return self.getVal32();
 }
 
 bool Decl::is_template_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal32();
+  return self.getVal33();
 }
 
 bool Decl::is_template_parameter_pack(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal33();
+  return self.getVal34();
 }
 
 bool Decl::is_templated(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal34();
+  return self.getVal35();
 }
 
 bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal35();
+  return self.getVal36();
 }
 
 bool Decl::is_unavailable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal36();
+  return self.getVal37();
 }
 
 bool Decl::is_unconditionally_visible(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal37();
+  return self.getVal38();
 }
 
 bool Decl::is_weak_imported(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal38();
+  return self.getVal39();
 }
 
 DeclKind Decl::kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<DeclKind>(self.getVal39());
+  return static_cast<DeclKind>(self.getVal40());
 }
 
 DeclCategory Decl::category(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<DeclCategory>(self.getVal40());
+  return static_cast<DeclCategory>(self.getVal41());
 }
 
 Token Decl::token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
     return tok.value();
   } else {
     return Token();
@@ -42100,7 +39996,7 @@ Token Decl::token(void) const {
 
 TokenRange Decl::tokens(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal42(), self.getVal43());
+  return fragment->TokenRangeFor(fragment, self.getVal43(), self.getVal44());
 }
 
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::containing(const Decl &decl) {
@@ -42147,13 +40043,13 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return CXXMethodDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 gap::generator<CapturedDecl> CapturedDecl::containing(const Decl &decl) {
@@ -42200,24 +40096,24 @@ std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
 
 ImplicitParamDecl CapturedDecl::context_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return ImplicitParamDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 bool CapturedDecl::is_nothrow(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 std::vector<ImplicitParamDecl> CapturedDecl::parameters(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<ImplicitParamDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ImplicitParamDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ImplicitParamDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -42227,7 +40123,7 @@ std::vector<ImplicitParamDecl> CapturedDecl::parameters(void) const {
 
 std::vector<Decl> CapturedDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal47();
+  auto list = self.getVal48();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -42283,35 +40179,35 @@ std::optional<BlockDecl> BlockDecl::from(const Decl &parent) {
 
 bool BlockDecl::block_missing_return_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 bool BlockDecl::can_avoid_copy_to_heap(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal48();
+  return self.getVal49();
 }
 
 bool BlockDecl::captures_cxx_this(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal49();
+  return self.getVal50();
 }
 
 bool BlockDecl::does_not_escape(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal50();
+  return self.getVal51();
 }
 
 std::optional<Decl> BlockDecl::block_mangling_context_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal44());
+    EntityId id(self.getVal45());
     return fragment->DeclFor(fragment, id);
   }
 }
 
 Token BlockDecl::caret_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -42320,48 +40216,32 @@ Token BlockDecl::caret_token(void) const {
 
 CompoundStmt BlockDecl::compound_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return CompoundStmt::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Type BlockDecl::signature_as_written(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool BlockDecl::has_captures(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal54();
+  return self.getVal55();
 }
 
 bool BlockDecl::is_conversion_from_lambda(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal55();
+  return self.getVal56();
 }
 
 bool BlockDecl::is_variadic(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal56();
+  return self.getVal57();
 }
 
 std::vector<ParmVarDecl> BlockDecl::parameters(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ParmVarDecl::from(d46.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
-}
-
-std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
   auto self = fragment->NthDecl(offset_);
   auto list = self.getVal47();
   std::vector<ParmVarDecl> vec;
@@ -42377,9 +40257,25 @@ std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
   return vec;
 }
 
+std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal48();
+  std::vector<ParmVarDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d48 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ParmVarDecl::from(d48.value())) {
+        vec.emplace_back(std::move(*e));
+      }
+    }
+  }
+  return vec;
+}
+
 std::vector<Decl> BlockDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal57();
+  auto list = self.getVal58();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -42435,7 +40331,7 @@ std::optional<AccessSpecDecl> AccessSpecDecl::from(const Decl &parent) {
 
 Token AccessSpecDecl::access_specifier_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
     return tok.value();
   } else {
     return Token();
@@ -42444,7 +40340,7 @@ Token AccessSpecDecl::access_specifier_token(void) const {
 
 Token AccessSpecDecl::colon_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -42543,13 +40439,13 @@ std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const Decl &paren
 
 std::vector<Expr> OMPThreadPrivateDecl::varlists(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Expr> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto s46 = fragment->StmtFor(fragment, id)) {
-      if (auto e = Expr::from(s46.value())) {
+    if (auto s47 = fragment->StmtFor(fragment, id)) {
+      if (auto e = Expr::from(s47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -42651,13 +40547,13 @@ std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const Decl &parent) {
 
 std::vector<Expr> OMPAllocateDecl::varlists(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Expr> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto s46 = fragment->StmtFor(fragment, id)) {
-      if (auto e = Expr::from(s46.value())) {
+    if (auto s47 = fragment->StmtFor(fragment, id)) {
+      if (auto e = Expr::from(s47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -42709,7 +40605,7 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Decl &parent)
 
 std::vector<Decl> TranslationUnitDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -42765,19 +40661,19 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
 
 Expr StaticAssertDecl::assert_expression(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 StringLiteral StaticAssertDecl::message(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return StringLiteral::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -42786,7 +40682,7 @@ Token StaticAssertDecl::r_paren_token(void) const {
 
 bool StaticAssertDecl::is_failed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::containing(const Decl &decl) {
@@ -42833,7 +40729,7 @@ std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &paren
 
 std::vector<Decl> RequiresExprBodyDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -42889,13 +40785,13 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Dec
 
 std::string_view PragmaDetectMismatchDecl::name(void) const {
   auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal58();
+  capnp::Text::Reader data = self.getVal59();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view PragmaDetectMismatchDecl::value(void) const {
   auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal59();
+  capnp::Text::Reader data = self.getVal60();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -42943,13 +40839,13 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
 
 std::string_view PragmaCommentDecl::argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal58();
+  capnp::Text::Reader data = self.getVal59();
   return std::string_view(data.cStr(), data.size());
 }
 
 PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<PragmaMSCommentKind>(self.getVal60());
+  return static_cast<PragmaMSCommentKind>(self.getVal61());
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::containing(const Decl &decl) {
@@ -42996,36 +40892,36 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &paren
 
 Expr ObjCPropertyImplDecl::getter_cxx_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::getter_method_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return ObjCMethodDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 ObjCPropertyDecl ObjCPropertyImplDecl::property_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return ObjCPropertyDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCPropertyImplDeclKind>(self.getVal60());
+  return static_cast<ObjCPropertyImplDeclKind>(self.getVal61());
 }
 
 ObjCIvarDecl ObjCPropertyImplDecl::property_instance_variable_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return ObjCIvarDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -43034,19 +40930,19 @@ Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) c
 
 Expr ObjCPropertyImplDecl::setter_cxx_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
+  EntityId id(self.getVal63());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::setter_method_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal63());
+  EntityId id(self.getVal64());
   return ObjCMethodDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 gap::generator<NamedDecl> NamedDecl::containing(const Decl &decl) {
@@ -43085,12 +40981,9 @@ std::optional<NamedDecl> NamedDecl::from(const TokenContext &c) {
 
 std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::NAMED:
     case mx::DeclKind::LABEL:
-    case mx::DeclKind::BASE_USING:
     case mx::DeclKind::USING_ENUM:
     case mx::DeclKind::USING:
-    case mx::DeclKind::VALUE:
     case mx::DeclKind::UNRESOLVED_USING_VALUE:
     case mx::DeclKind::UNNAMED_GLOBAL_CONSTANT:
     case mx::DeclKind::TEMPLATE_PARAM_OBJECT:
@@ -43098,7 +40991,6 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
     case mx::DeclKind::MS_GUID:
     case mx::DeclKind::INDIRECT_FIELD:
     case mx::DeclKind::ENUM_CONSTANT:
-    case mx::DeclKind::DECLARATOR:
     case mx::DeclKind::VAR:
     case mx::DeclKind::PARM_VAR:
     case mx::DeclKind::OMP_CAPTURED_EXPR:
@@ -43124,21 +41016,16 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
     case mx::DeclKind::USING_PACK:
     case mx::DeclKind::USING_DIRECTIVE:
     case mx::DeclKind::UNRESOLVED_USING_IF_EXISTS:
-    case mx::DeclKind::TYPE:
     case mx::DeclKind::TEMPLATE_TYPE_PARM:
-    case mx::DeclKind::TAG:
     case mx::DeclKind::RECORD:
     case mx::DeclKind::CXX_RECORD:
     case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
     case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
     case mx::DeclKind::ENUM:
     case mx::DeclKind::UNRESOLVED_USING_TYPENAME:
-    case mx::DeclKind::TYPEDEF_NAME:
     case mx::DeclKind::TYPEDEF:
     case mx::DeclKind::TYPE_ALIAS:
     case mx::DeclKind::OBJ_C_TYPE_PARAM:
-    case mx::DeclKind::TEMPLATE:
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
     case mx::DeclKind::FUNCTION_TEMPLATE:
     case mx::DeclKind::CLASS_TEMPLATE:
     case mx::DeclKind::VAR_TEMPLATE:
@@ -43148,11 +41035,9 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
     case mx::DeclKind::TEMPLATE_TEMPLATE_PARM:
     case mx::DeclKind::OBJ_C_PROPERTY:
     case mx::DeclKind::OBJ_C_METHOD:
-    case mx::DeclKind::OBJ_C_CONTAINER:
     case mx::DeclKind::OBJ_C_CATEGORY:
     case mx::DeclKind::OBJ_C_PROTOCOL:
     case mx::DeclKind::OBJ_C_INTERFACE:
-    case mx::DeclKind::OBJ_C_IMPL:
     case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
     case mx::DeclKind::OBJ_C_IMPLEMENTATION:
     case mx::DeclKind::OBJ_C_COMPATIBLE_ALIAS:
@@ -43165,79 +41050,79 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
 
 Linkage NamedDecl::formal_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<Linkage>(self.getVal60());
+  return static_cast<Linkage>(self.getVal61());
 }
 
 std::string_view NamedDecl::name(void) const {
-  auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal58();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal45()) {
-    return std::nullopt;
-  } else {
-    return static_cast<ObjCStringFormatFamily>(self.getVal64());
-  }
-}
-
-std::string_view NamedDecl::qualified_name_as_string(void) const {
   auto self = fragment->NthDecl(offset_);
   capnp::Text::Reader data = self.getVal59();
   return std::string_view(data.cStr(), data.size());
 }
 
+std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal46()) {
+    return std::nullopt;
+  } else {
+    return static_cast<ObjCStringFormatFamily>(self.getVal65());
+  }
+}
+
+std::string_view NamedDecl::qualified_name_as_string(void) const {
+  auto self = fragment->NthDecl(offset_);
+  capnp::Text::Reader data = self.getVal60();
+  return std::string_view(data.cStr(), data.size());
+}
+
 NamedDecl NamedDecl::underlying_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Visibility NamedDecl::visibility(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<Visibility>(self.getVal65());
+  return static_cast<Visibility>(self.getVal66());
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal48();
+  return self.getVal49();
 }
 
 bool NamedDecl::has_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal49();
+  return self.getVal50();
 }
 
 bool NamedDecl::has_linkage_been_computed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal50();
+  return self.getVal51();
 }
 
 bool NamedDecl::is_cxx_class_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal54();
+  return self.getVal55();
 }
 
 bool NamedDecl::is_cxx_instance_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal55();
+  return self.getVal56();
 }
 
 bool NamedDecl::is_externally_declarable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal56();
+  return self.getVal57();
 }
 
 bool NamedDecl::is_externally_visible(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal66();
+  return self.getVal67();
 }
 
 bool NamedDecl::is_linkage_valid(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal67();
+  return self.getVal68();
 }
 
 gap::generator<LabelDecl> LabelDecl::containing(const Decl &decl) {
@@ -43288,29 +41173,29 @@ std::optional<LabelDecl> LabelDecl::from(const Decl &parent) {
 
 std::string_view LabelDecl::ms_assembly_label(void) const {
   auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal68();
+  capnp::Text::Reader data = self.getVal69();
   return std::string_view(data.cStr(), data.size());
 }
 
 LabelStmt LabelDecl::statement(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return LabelStmt::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 bool LabelDecl::is_gnu_local(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool LabelDecl::is_ms_assembly_label(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool LabelDecl::is_resolved_ms_assembly_label(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const Decl &decl) {
@@ -43353,7 +41238,6 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const NamedDecl &parent) {
 
 std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::BASE_USING:
     case mx::DeclKind::USING_ENUM:
     case mx::DeclKind::USING:
       return reinterpret_cast<const BaseUsingDecl &>(parent);
@@ -43363,13 +41247,13 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
 
 std::vector<UsingShadowDecl> BaseUsingDecl::shadows(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<UsingShadowDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = UsingShadowDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = UsingShadowDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -43429,13 +41313,13 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return EnumDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -43444,7 +41328,7 @@ Token UsingEnumDecl::enum_token(void) const {
 
 Token UsingEnumDecl::using_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -43503,7 +41387,7 @@ std::optional<UsingDecl> UsingDecl::from(const Decl &parent) {
 
 Token UsingDecl::using_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -43512,12 +41396,12 @@ Token UsingDecl::using_token(void) const {
 
 bool UsingDecl::has_typename(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool UsingDecl::is_access_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 gap::generator<ValueDecl> ValueDecl::containing(const Decl &decl) {
@@ -43560,7 +41444,6 @@ std::optional<ValueDecl> ValueDecl::from(const NamedDecl &parent) {
 
 std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::VALUE:
     case mx::DeclKind::UNRESOLVED_USING_VALUE:
     case mx::DeclKind::UNNAMED_GLOBAL_CONSTANT:
     case mx::DeclKind::TEMPLATE_PARAM_OBJECT:
@@ -43568,7 +41451,6 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
     case mx::DeclKind::MS_GUID:
     case mx::DeclKind::INDIRECT_FIELD:
     case mx::DeclKind::ENUM_CONSTANT:
-    case mx::DeclKind::DECLARATOR:
     case mx::DeclKind::VAR:
     case mx::DeclKind::PARM_VAR:
     case mx::DeclKind::OMP_CAPTURED_EXPR:
@@ -43596,13 +41478,13 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
 
 Type ValueDecl::type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool ValueDecl::is_weak(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::containing(const Decl &decl) {
@@ -43657,7 +41539,7 @@ std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Dec
 
 Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -43666,7 +41548,7 @@ Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
 
 Token UnresolvedUsingValueDecl::using_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -43675,12 +41557,12 @@ Token UnresolvedUsingValueDecl::using_token(void) const {
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool UnresolvedUsingValueDecl::is_pack_expansion(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::containing(const Decl &decl) {
@@ -43835,48 +41717,48 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Decl 
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_out(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal62());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_original(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
+  EntityId id(self.getVal63());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_private(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal63());
+  EntityId id(self.getVal64());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal72());
+  EntityId id(self.getVal73());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal73());
+  return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal74());
 }
 
 std::vector<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -43990,13 +41872,13 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Decl &parent) {
 
 std::vector<NamedDecl> IndirectFieldDecl::chain(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = NamedDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = NamedDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -44007,7 +41889,7 @@ std::vector<NamedDecl> IndirectFieldDecl::chain(void) const {
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal52());
+    EntityId id(self.getVal53());
     return FieldDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -44015,7 +41897,7 @@ std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal53());
+    EntityId id(self.getVal54());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -44073,7 +41955,7 @@ std::optional<EnumConstantDecl> EnumConstantDecl::from(const Decl &parent) {
 std::optional<Expr> EnumConstantDecl::initializer_expression(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal52());
+    EntityId id(self.getVal53());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
@@ -44122,7 +42004,6 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const NamedDecl &parent) {
 
 std::optional<DeclaratorDecl> DeclaratorDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::DECLARATOR:
     case mx::DeclKind::VAR:
     case mx::DeclKind::PARM_VAR:
     case mx::DeclKind::OMP_CAPTURED_EXPR:
@@ -44148,7 +42029,7 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const Decl &parent) {
 
 Token DeclaratorDecl::first_inner_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -44157,7 +42038,7 @@ Token DeclaratorDecl::first_inner_token(void) const {
 
 Token DeclaratorDecl::first_outer_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -44167,21 +42048,12 @@ Token DeclaratorDecl::first_outer_token(void) const {
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal61());
+    EntityId id(self.getVal62());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
-}
-
-Token DeclaratorDecl::type_spec_start_token(void) const {
   auto self = fragment->NthDecl(offset_);
   if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
     return tok.value();
@@ -44190,9 +42062,18 @@ Token DeclaratorDecl::type_spec_start_token(void) const {
   }
 }
 
+Token DeclaratorDecl::type_spec_start_token(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal64())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
 std::vector<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal74();
+  auto list = self.getVal75();
   std::vector<TemplateParameterList> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -44264,28 +42145,36 @@ std::optional<VarDecl> VarDecl::from(const Decl &parent) {
 std::optional<VarDecl> VarDecl::acting_definition(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal72());
+    EntityId id(self.getVal73());
     return VarDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<VarTemplateDecl> VarDecl::described_variable_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal76());
+    return VarTemplateDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<Expr> VarDecl::initializer(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal75());
+    EntityId id(self.getVal77());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 VarDeclInitializationStyle VarDecl::initializer_style(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<VarDeclInitializationStyle>(self.getVal73());
+  return static_cast<VarDeclInitializationStyle>(self.getVal74());
 }
 
 std::optional<VarDecl> VarDecl::initializing_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal76());
+    EntityId id(self.getVal78());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -44293,19 +42182,19 @@ std::optional<VarDecl> VarDecl::initializing_declaration(void) const {
 std::optional<VarDecl> VarDecl::instantiated_from_static_data_member(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal77());
+    EntityId id(self.getVal79());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 LanguageLinkage VarDecl::language_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<LanguageLinkage>(self.getVal78());
+  return static_cast<LanguageLinkage>(self.getVal80());
 }
 
 Token VarDecl::point_of_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal79())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal81())) {
     return tok.value();
   } else {
     return Token();
@@ -44314,228 +42203,228 @@ Token VarDecl::point_of_instantiation(void) const {
 
 StorageClass VarDecl::storage_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<StorageClass>(self.getVal80());
+  return static_cast<StorageClass>(self.getVal82());
 }
 
 StorageDuration VarDecl::storage_duration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<StorageDuration>(self.getVal81());
+  return static_cast<StorageDuration>(self.getVal83());
 }
 
 VarDeclTLSKind VarDecl::tls_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<VarDeclTLSKind>(self.getVal82());
+  return static_cast<VarDeclTLSKind>(self.getVal84());
 }
 
 ThreadStorageClassSpecifier VarDecl::tsc_spec(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ThreadStorageClassSpecifier>(self.getVal83());
+  return static_cast<ThreadStorageClassSpecifier>(self.getVal85());
 }
 
 std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal84());
+    EntityId id(self.getVal86());
     return VarDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal85());
+  return static_cast<TemplateSpecializationKind>(self.getVal87());
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind_for_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal86());
+  return static_cast<TemplateSpecializationKind>(self.getVal88());
 }
 
 bool VarDecl::has_constant_initialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool VarDecl::has_dependent_alignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 bool VarDecl::has_external_storage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 std::optional<bool> VarDecl::has_flexible_array_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal89()) {
+  if (!self.getVal91()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal88());
+    return static_cast<bool>(self.getVal90());
   }
 }
 
 bool VarDecl::has_global_storage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 std::optional<bool> VarDecl::has_ice_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal92()) {
+  if (!self.getVal94()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal91());
+    return static_cast<bool>(self.getVal93());
   }
 }
 
 bool VarDecl::has_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal93();
+  return self.getVal95();
 }
 
 bool VarDecl::has_local_storage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal94();
+  return self.getVal96();
 }
 
 bool VarDecl::is_arc_pseudo_strong(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal95();
+  return self.getVal97();
 }
 
 bool VarDecl::is_cxx_for_range_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal96();
+  return self.getVal98();
 }
 
 bool VarDecl::is_constexpr(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal97();
+  return self.getVal99();
 }
 
 bool VarDecl::is_direct_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal98();
+  return self.getVal100();
 }
 
 bool VarDecl::is_escaping_byref(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal99();
+  return self.getVal101();
 }
 
 bool VarDecl::is_exception_variable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal100();
+  return self.getVal102();
 }
 
 bool VarDecl::is_extern_c(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal101();
+  return self.getVal103();
 }
 
 bool VarDecl::is_file_variable_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal102();
+  return self.getVal104();
 }
 
 bool VarDecl::is_function_or_method_variable_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal103();
+  return self.getVal105();
 }
 
 bool VarDecl::is_in_extern_c_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal104();
+  return self.getVal106();
 }
 
 bool VarDecl::is_in_extern_cxx_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal105();
+  return self.getVal107();
 }
 
 bool VarDecl::is_initializer_capture(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal106();
+  return self.getVal108();
 }
 
 bool VarDecl::is_inline(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal107();
+  return self.getVal109();
 }
 
 bool VarDecl::is_inline_specified(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal108();
+  return self.getVal110();
 }
 
 bool VarDecl::is_known_to_be_defined(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal109();
+  return self.getVal111();
 }
 
 bool VarDecl::is_local_variable_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal110();
+  return self.getVal112();
 }
 
 bool VarDecl::is_local_variable_declaration_or_parm(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal111();
+  return self.getVal113();
 }
 
 bool VarDecl::is_nrvo_variable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal112();
+  return self.getVal114();
 }
 
 bool VarDecl::is_no_destroy(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal113();
+  return self.getVal115();
 }
 
 bool VarDecl::is_non_escaping_byref(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal114();
+  return self.getVal116();
 }
 
 bool VarDecl::is_obj_c_for_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal115();
+  return self.getVal117();
 }
 
 bool VarDecl::is_previous_declaration_in_same_block_scope(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal116();
+  return self.getVal118();
 }
 
 bool VarDecl::is_static_data_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal117();
+  return self.getVal119();
 }
 
 bool VarDecl::is_static_local(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal118();
+  return self.getVal120();
 }
 
 bool VarDecl::is_demoted_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal119();
+  return self.getVal121();
 }
 
 bool VarDecl::is_usable_in_constant_expressions(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal120();
+  return self.getVal122();
 }
 
 bool VarDecl::might_be_usable_in_constant_expressions(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal121();
+  return self.getVal123();
 }
 
 QualTypeDestructionKind VarDecl::needs_destruction(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<QualTypeDestructionKind>(self.getVal122());
+  return static_cast<QualTypeDestructionKind>(self.getVal124());
 }
 
 gap::generator<ParmVarDecl> ParmVarDecl::containing(const Decl &decl) {
@@ -44599,68 +42488,68 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal123());
+    EntityId id(self.getVal125());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal124(), self.getVal125());
+  return fragment->TokenRangeFor(fragment, self.getVal126(), self.getVal127());
 }
 
 DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<DeclObjCDeclQualifier>(self.getVal126());
+  return static_cast<DeclObjCDeclQualifier>(self.getVal128());
 }
 
 Type ParmVarDecl::original_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal127());
+  EntityId id(self.getVal129());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal128());
+    EntityId id(self.getVal130());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 bool ParmVarDecl::has_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal129();
+  return self.getVal131();
 }
 
 bool ParmVarDecl::has_inherited_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal130();
+  return self.getVal132();
 }
 
 bool ParmVarDecl::has_uninstantiated_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal131();
+  return self.getVal133();
 }
 
 bool ParmVarDecl::has_unparsed_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal132();
+  return self.getVal134();
 }
 
 bool ParmVarDecl::is_destroyed_in_callee(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal133();
+  return self.getVal135();
 }
 
 bool ParmVarDecl::is_knr_promoted(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal134();
+  return self.getVal136();
 }
 
 bool ParmVarDecl::is_obj_c_method_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal135();
+  return self.getVal137();
 }
 
 gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const Decl &decl) {
@@ -44781,7 +42670,7 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const Decl &parent) {
 
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal126());
+  return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal128());
 }
 
 gap::generator<DecompositionDecl> DecompositionDecl::containing(const Decl &decl) {
@@ -44844,13 +42733,13 @@ std::optional<DecompositionDecl> DecompositionDecl::from(const Decl &parent) {
 
 std::vector<BindingDecl> DecompositionDecl::bindings(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<BindingDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = BindingDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = BindingDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -44919,7 +42808,7 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 
 Token VarTemplateSpecializationDecl::extern_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal123())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal125())) {
     return tok.value();
   } else {
     return Token();
@@ -44928,12 +42817,18 @@ Token VarTemplateSpecializationDecl::extern_token(void) const {
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal126());
+  return static_cast<TemplateSpecializationKind>(self.getVal128());
+}
+
+VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal126());
+  return VarTemplateDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal136();
+  auto list = self.getVal138();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -44944,7 +42839,7 @@ vec.emplace_back(fragment, v);
 
 std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal137();
+  auto list = self.getVal139();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -44955,7 +42850,7 @@ vec.emplace_back(fragment, v);
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal124())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal127())) {
     return tok.value();
   } else {
     return Token();
@@ -44964,23 +42859,23 @@ Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
 
 Type VarTemplateSpecializationDecl::type_as_written(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal125());
+  EntityId id(self.getVal129());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal129();
+  return self.getVal131();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal130();
+  return self.getVal132();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal131();
+  return self.getVal133();
 }
 
 gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::containing(const Decl &decl) {
@@ -45045,6 +42940,22 @@ std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializa
   }
 }
 
+VarTemplatePartialSpecializationDecl VarTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal130());
+  return VarTemplatePartialSpecializationDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+TemplateParameterList VarTemplatePartialSpecializationDecl::template_parameters(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return TemplateParameterList(fragment, self.getVal140());
+}
+
+bool VarTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal134();
+}
+
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(const Decl &decl) {
   for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
     if(auto d = from(*ancestor)) {
@@ -45101,20 +43012,20 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Decl 
 
 bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal72());
+    EntityId id(self.getVal73());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 Token NonTypeTemplateParmDecl::default_argument_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal75())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
     return tok.value();
   } else {
     return Token();
@@ -45123,50 +43034,50 @@ Token NonTypeTemplateParmDecl::default_argument_token(void) const {
 
 std::optional<unsigned> NonTypeTemplateParmDecl::num_expansion_types(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal71()) {
+  if (!self.getVal72()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal138());
+    return static_cast<unsigned>(self.getVal140());
   }
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal76());
+    EntityId id(self.getVal77());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 bool NonTypeTemplateParmDecl::has_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal89();
+  return self.getVal91();
 }
 
 bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 std::vector<Type> NonTypeTemplateParmDecl::expansion_types(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Type> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t46 = fragment->TypeFor(fragment, id)) {
-      vec.emplace_back(std::move(t46.value()));
+    if (auto t47 = fragment->TypeFor(fragment, id)) {
+      vec.emplace_back(std::move(t47.value()));
     }
   }
   return vec;
@@ -45228,12 +43139,12 @@ std::optional<MSPropertyDecl> MSPropertyDecl::from(const Decl &parent) {
 
 bool MSPropertyDecl::has_getter(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool MSPropertyDecl::has_setter(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 gap::generator<FunctionDecl> FunctionDecl::containing(const Decl &decl) {
@@ -45297,43 +43208,51 @@ std::optional<FunctionDecl> FunctionDecl::from(const Decl &parent) {
 
 bool FunctionDecl::uses_fp_intrin(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 std::optional<bool> FunctionDecl::does_declaration_force_externally_visible_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal87()) {
+  if (!self.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal71());
+    return static_cast<bool>(self.getVal72());
   }
 }
 
 bool FunctionDecl::does_this_declaration_have_a_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 Type FunctionDecl::call_result_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal72());
+  EntityId id(self.getVal73());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 ConstexprSpecKind FunctionDecl::constexpr_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ConstexprSpecKind>(self.getVal73());
+  return static_cast<ConstexprSpecKind>(self.getVal74());
 }
 
 Type FunctionDecl::declared_return_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal75());
+  EntityId id(self.getVal76());
   return fragment->TypeFor(fragment, id, false).value();
+}
+
+std::optional<FunctionTemplateDecl> FunctionDecl::described_function_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal77());
+    return FunctionTemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
 }
 
 Token FunctionDecl::ellipsis_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal78())) {
     return tok.value();
   } else {
     return Token();
@@ -45342,18 +43261,18 @@ Token FunctionDecl::ellipsis_token(void) const {
 
 TokenRange FunctionDecl::exception_spec_source_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal77(), self.getVal79());
+  return fragment->TokenRangeFor(fragment, self.getVal79(), self.getVal81());
 }
 
 ExceptionSpecificationType FunctionDecl::exception_spec_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ExceptionSpecificationType>(self.getVal78());
+  return static_cast<ExceptionSpecificationType>(self.getVal80());
 }
 
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal84());
+    EntityId id(self.getVal86());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -45361,354 +43280,362 @@ std::optional<FunctionDecl> FunctionDecl::instantiated_from_declaration(void) co
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_member_function(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal123());
+    EntityId id(self.getVal125());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 LanguageLinkage FunctionDecl::language_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<LanguageLinkage>(self.getVal80());
+  return static_cast<LanguageLinkage>(self.getVal82());
 }
 
 MultiVersionKind FunctionDecl::multi_version_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<MultiVersionKind>(self.getVal81());
+  return static_cast<MultiVersionKind>(self.getVal83());
 }
 
 std::optional<unsigned> FunctionDecl::odr_hash(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal89()) {
+  if (!self.getVal91()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal138());
+    return static_cast<unsigned>(self.getVal140());
   }
 }
 
 OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<OverloadedOperatorKind>(self.getVal82());
+  return static_cast<OverloadedOperatorKind>(self.getVal84());
 }
 
 TokenRange FunctionDecl::parameters_source_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal124(), self.getVal125());
+  return fragment->TokenRangeFor(fragment, self.getVal126(), self.getVal127());
 }
 
 Token FunctionDecl::point_of_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal127())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal129())) {
     return tok.value();
   } else {
     return Token();
   }
 }
 
+std::optional<FunctionTemplateDecl> FunctionDecl::primary_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal130());
+    return FunctionTemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
 Type FunctionDecl::return_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal128());
+  EntityId id(self.getVal141());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 TokenRange FunctionDecl::return_type_source_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal139(), self.getVal140());
+  return fragment->TokenRangeFor(fragment, self.getVal142(), self.getVal143());
 }
 
 StorageClass FunctionDecl::storage_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<StorageClass>(self.getVal83());
+  return static_cast<StorageClass>(self.getVal85());
 }
 
 std::optional<FunctionDecl> FunctionDecl::template_instantiation_pattern(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal141());
+    EntityId id(self.getVal144());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal85());
+  return static_cast<TemplateSpecializationKind>(self.getVal87());
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind_for_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal86());
+  return static_cast<TemplateSpecializationKind>(self.getVal88());
 }
 
 FunctionDeclTemplatedKind FunctionDecl::templated_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<FunctionDeclTemplatedKind>(self.getVal122());
+  return static_cast<FunctionDeclTemplatedKind>(self.getVal124());
 }
 
 bool FunctionDecl::has_implicit_return_zero(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 bool FunctionDecl::has_inherited_prototype(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal91();
+  return self.getVal93();
 }
 
 bool FunctionDecl::has_one_parameter_or_default_arguments(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal92();
+  return self.getVal94();
 }
 
 bool FunctionDecl::has_prototype(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal93();
+  return self.getVal95();
 }
 
 bool FunctionDecl::has_skipped_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal94();
+  return self.getVal96();
 }
 
 bool FunctionDecl::has_trivial_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal95();
+  return self.getVal97();
 }
 
 bool FunctionDecl::has_written_prototype(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal96();
+  return self.getVal98();
 }
 
 bool FunctionDecl::instantiation_is_pending(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal97();
+  return self.getVal99();
 }
 
 bool FunctionDecl::is_cpu_dispatch_multi_version(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal98();
+  return self.getVal100();
 }
 
 bool FunctionDecl::is_cpu_specific_multi_version(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal99();
+  return self.getVal101();
 }
 
 bool FunctionDecl::is_consteval(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal100();
+  return self.getVal102();
 }
 
 bool FunctionDecl::is_constexpr(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal101();
+  return self.getVal103();
 }
 
 bool FunctionDecl::is_constexpr_specified(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal102();
+  return self.getVal104();
 }
 
 bool FunctionDecl::is_defaulted(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal103();
+  return self.getVal105();
 }
 
 bool FunctionDecl::is_deleted(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal104();
+  return self.getVal106();
 }
 
 bool FunctionDecl::is_deleted_as_written(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal105();
+  return self.getVal107();
 }
 
 bool FunctionDecl::is_destroying_operator_delete(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal106();
+  return self.getVal108();
 }
 
 bool FunctionDecl::is_explicitly_defaulted(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal107();
+  return self.getVal109();
 }
 
 bool FunctionDecl::is_extern_c(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal108();
+  return self.getVal110();
 }
 
 bool FunctionDecl::is_function_template_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal109();
+  return self.getVal111();
 }
 
 bool FunctionDecl::is_global(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal110();
+  return self.getVal112();
 }
 
 bool FunctionDecl::is_implicitly_instantiable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal111();
+  return self.getVal113();
 }
 
 bool FunctionDecl::is_in_extern_c_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal112();
+  return self.getVal114();
 }
 
 bool FunctionDecl::is_in_extern_cxx_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal113();
+  return self.getVal115();
 }
 
 bool FunctionDecl::is_ineligible_or_not_selected(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal114();
+  return self.getVal116();
 }
 
 bool FunctionDecl::is_inline_builtin_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal115();
+  return self.getVal117();
 }
 
 std::optional<bool> FunctionDecl::is_inline_definition_externally_visible(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal117()) {
+  if (!self.getVal119()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal116());
+    return static_cast<bool>(self.getVal118());
   }
 }
 
 bool FunctionDecl::is_inline_specified(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal118();
+  return self.getVal120();
 }
 
 bool FunctionDecl::is_inlined(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal119();
+  return self.getVal121();
 }
 
 bool FunctionDecl::is_late_template_parsed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal120();
+  return self.getVal122();
 }
 
 std::optional<bool> FunctionDecl::is_ms_extern_inline(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal129()) {
+  if (!self.getVal131()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal121());
+    return static_cast<bool>(self.getVal123());
   }
 }
 
 bool FunctionDecl::is_msvcrt_entry_point(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal130();
+  return self.getVal132();
 }
 
 bool FunctionDecl::is_main(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal131();
+  return self.getVal133();
 }
 
 bool FunctionDecl::is_multi_version(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal132();
+  return self.getVal134();
 }
 
 bool FunctionDecl::is_no_return(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal133();
+  return self.getVal135();
 }
 
 bool FunctionDecl::is_overloaded_operator(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal134();
+  return self.getVal136();
 }
 
 bool FunctionDecl::is_pure(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal135();
+  return self.getVal137();
 }
 
 bool FunctionDecl::is_replaceable_global_allocation_function(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal142();
+  return self.getVal145();
 }
 
 std::optional<bool> FunctionDecl::is_reserved_global_placement_operator(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal144()) {
+  if (!self.getVal147()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal143());
+    return static_cast<bool>(self.getVal146());
   }
 }
 
 bool FunctionDecl::is_static(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal145();
+  return self.getVal148();
 }
 
 bool FunctionDecl::is_target_clones_multi_version(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal146();
+  return self.getVal149();
 }
 
 bool FunctionDecl::is_target_multi_version(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal147();
+  return self.getVal150();
 }
 
 bool FunctionDecl::is_template_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal148();
+  return self.getVal151();
 }
 
 bool FunctionDecl::is_this_declaration_instantiated_from_a_friend_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal149();
+  return self.getVal152();
 }
 
 bool FunctionDecl::is_trivial(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal150();
+  return self.getVal153();
 }
 
 bool FunctionDecl::is_trivial_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal151();
+  return self.getVal154();
 }
 
 bool FunctionDecl::is_user_provided(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal152();
+  return self.getVal155();
 }
 
 bool FunctionDecl::is_variadic(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal153();
+  return self.getVal156();
 }
 
 bool FunctionDecl::is_virtual_as_written(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal154();
+  return self.getVal157();
 }
 
 std::vector<ParmVarDecl> FunctionDecl::parameters(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ParmVarDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ParmVarDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -45718,25 +43645,25 @@ std::vector<ParmVarDecl> FunctionDecl::parameters(void) const {
 
 bool FunctionDecl::uses_seh_try(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal155();
+  return self.getVal158();
 }
 
 bool FunctionDecl::will_have_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal156();
+  return self.getVal159();
 }
 
 std::optional<Stmt> FunctionDecl::body(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal157());
+    EntityId id(self.getVal160());
     return fragment->StmtFor(fragment, id);
   }
 }
 
 std::vector<Decl> FunctionDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal47();
+  auto list = self.getVal48();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -45811,13 +43738,13 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const Decl &parent) {
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<RefQualifierKind>(self.getVal126());
+  return static_cast<RefQualifierKind>(self.getVal128());
 }
 
 std::optional<Type> CXXMethodDecl::this_object_type(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal158());
+    EntityId id(self.getVal161());
     return fragment->TypeFor(fragment, id);
   }
 }
@@ -45825,76 +43752,60 @@ std::optional<Type> CXXMethodDecl::this_object_type(void) const {
 std::optional<Type> CXXMethodDecl::this_type(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal159());
+    EntityId id(self.getVal162());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 bool CXXMethodDecl::has_inline_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal160();
+  return self.getVal163();
 }
 
 bool CXXMethodDecl::is_const(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal161();
+  return self.getVal164();
 }
 
 bool CXXMethodDecl::is_copy_assignment_operator(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal162();
+  return self.getVal165();
 }
 
 bool CXXMethodDecl::is_instance(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal163();
+  return self.getVal166();
 }
 
 bool CXXMethodDecl::is_lambda_static_invoker(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal164();
+  return self.getVal167();
 }
 
 bool CXXMethodDecl::is_move_assignment_operator(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal165();
+  return self.getVal168();
 }
 
 bool CXXMethodDecl::is_virtual(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal166();
+  return self.getVal169();
 }
 
 bool CXXMethodDecl::is_volatile(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal167();
+  return self.getVal170();
 }
 
 std::vector<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal57();
+  auto list = self.getVal58();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d57 = fragment->DeclFor(fragment, id)) {
-      if (auto e = CXXMethodDecl::from(d57.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
-}
-
-std::vector<ParmVarDecl> CXXMethodDecl::parameter_declarations(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal168();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d168 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ParmVarDecl::from(d168.value())) {
+    if (auto d58 = fragment->DeclFor(fragment, id)) {
+      if (auto e = CXXMethodDecl::from(d58.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -45967,7 +43878,7 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Decl &parent) {
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal169());
+    EntityId id(self.getVal171());
     return FunctionDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -45975,7 +43886,7 @@ std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal170());
+    EntityId id(self.getVal172());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
@@ -46044,18 +43955,18 @@ std::optional<CXXConversionDecl> CXXConversionDecl::from(const Decl &parent) {
 
 Type CXXConversionDecl::conversion_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal169());
+  EntityId id(self.getVal171());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool CXXConversionDecl::is_explicit(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal171();
+  return self.getVal173();
 }
 
 bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal172();
+  return self.getVal174();
 }
 
 gap::generator<CXXConstructorDecl> CXXConstructorDecl::containing(const Decl &decl) {
@@ -46123,34 +44034,34 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const Decl &parent) {
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal169());
+    EntityId id(self.getVal171());
     return CXXConstructorDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal171();
+  return self.getVal173();
 }
 
 bool CXXConstructorDecl::is_delegating_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal172();
+  return self.getVal174();
 }
 
 bool CXXConstructorDecl::is_explicit(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal173();
+  return self.getVal175();
 }
 
 bool CXXConstructorDecl::is_inheriting_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal174();
+  return self.getVal176();
 }
 
 bool CXXConstructorDecl::is_specialization_copying_object(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal175();
+  return self.getVal177();
 }
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const Decl &decl) {
@@ -46213,34 +44124,24 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &par
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal158());
+  EntityId id(self.getVal161());
   return CXXConstructorDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal162());
+  return TemplateDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal160();
+  return self.getVal163();
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal161();
-}
-
-std::vector<ParmVarDecl> CXXDeductionGuideDecl::parameter_declarations(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal57();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d57 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ParmVarDecl::from(d57.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
+  return self.getVal164();
 }
 
 gap::generator<FieldDecl> FieldDecl::containing(const Decl &decl) {
@@ -46302,7 +44203,7 @@ std::optional<FieldDecl> FieldDecl::from(const Decl &parent) {
 std::optional<Expr> FieldDecl::bit_width(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal72());
+    EntityId id(self.getVal73());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
@@ -46310,62 +44211,62 @@ std::optional<Expr> FieldDecl::bit_width(void) const {
 std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal75());
+    EntityId id(self.getVal76());
     return VariableArrayType::from(fragment->TypeFor(fragment, id));
   }
 }
 
 InClassInitStyle FieldDecl::in_class_initializer_style(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<InClassInitStyle>(self.getVal73());
+  return static_cast<InClassInitStyle>(self.getVal74());
 }
 
 std::optional<Expr> FieldDecl::in_class_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal76());
+    EntityId id(self.getVal77());
     return Expr::from(fragment->StmtFor(fragment, id));
   }
 }
 
 bool FieldDecl::has_captured_vla_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool FieldDecl::has_in_class_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 bool FieldDecl::is_anonymous_struct_or_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 bool FieldDecl::is_bit_field(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 bool FieldDecl::is_mutable(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal89();
+  return self.getVal91();
 }
 
 bool FieldDecl::is_unnamed_bitfield(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 bool FieldDecl::is_zero_length_bit_field(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal91();
+  return self.getVal93();
 }
 
 bool FieldDecl::is_zero_size(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal92();
+  return self.getVal94();
 }
 
 gap::generator<ObjCIvarDecl> ObjCIvarDecl::containing(const Decl &decl) {
@@ -46428,17 +44329,17 @@ std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const Decl &parent) {
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCIvarDeclAccessControl>(self.getVal78());
+  return static_cast<ObjCIvarDeclAccessControl>(self.getVal80());
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCIvarDeclAccessControl>(self.getVal80());
+  return static_cast<ObjCIvarDeclAccessControl>(self.getVal82());
 }
 
 ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal77());
+  EntityId id(self.getVal78());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
@@ -46450,7 +44351,7 @@ ObjCIvarDecl ObjCIvarDecl::next_instance_variable(void) const {
 
 bool ObjCIvarDecl::synthesize(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal93();
+  return self.getVal95();
 }
 
 gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::containing(const Decl &decl) {
@@ -46563,19 +44464,19 @@ std::optional<BindingDecl> BindingDecl::from(const Decl &parent) {
 
 Expr BindingDecl::binding(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return ValueDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 VarDecl BindingDecl::holding_variable(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal62());
   return VarDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
@@ -46685,13 +44586,13 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Decl &paren
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 std::vector<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -46752,21 +44653,21 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const Decl &parent) {
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return BaseUsingDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal52());
+    EntityId id(self.getVal53());
     return UsingShadowDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
@@ -46822,33 +44723,33 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const
 
 bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::constructed_base_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal62());
   return CXXRecordDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal62());
+    EntityId id(self.getVal63());
     return ConstructorUsingShadowDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::nominated_base_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal63());
+  EntityId id(self.getVal64());
   return CXXRecordDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal72());
+    EntityId id(self.getVal73());
     return ConstructorUsingShadowDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -46901,13 +44802,13 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const Decl &parent) {
 
 std::vector<NamedDecl> UsingPackDecl::expansions(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = NamedDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = NamedDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -46917,7 +44818,7 @@ std::vector<NamedDecl> UsingPackDecl::expansions(void) const {
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
@@ -46969,7 +44870,7 @@ std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Decl &parent) {
 
 Token UsingDirectiveDecl::identifier_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -46978,7 +44879,7 @@ Token UsingDirectiveDecl::identifier_token(void) const {
 
 Token UsingDirectiveDecl::namespace_key_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -46987,13 +44888,13 @@ Token UsingDirectiveDecl::namespace_key_token(void) const {
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -47086,16 +44987,13 @@ std::optional<TypeDecl> TypeDecl::from(const NamedDecl &parent) {
 
 std::optional<TypeDecl> TypeDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::TYPE:
     case mx::DeclKind::TEMPLATE_TYPE_PARM:
-    case mx::DeclKind::TAG:
     case mx::DeclKind::RECORD:
     case mx::DeclKind::CXX_RECORD:
     case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
     case mx::DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION:
     case mx::DeclKind::ENUM:
     case mx::DeclKind::UNRESOLVED_USING_TYPENAME:
-    case mx::DeclKind::TYPEDEF_NAME:
     case mx::DeclKind::TYPEDEF:
     case mx::DeclKind::TYPE_ALIAS:
     case mx::DeclKind::OBJ_C_TYPE_PARAM:
@@ -47107,7 +45005,7 @@ std::optional<TypeDecl> TypeDecl::from(const Decl &parent) {
 std::optional<Type> TypeDecl::type_for_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal51());
+    EntityId id(self.getVal52());
     return fragment->TypeFor(fragment, id);
   }
 }
@@ -47164,18 +45062,10 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Decl &paren
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (true) {
-    EntityId id(self.getVal52());
-    return fragment->TypeFor(fragment, id);
-  }
-}
-
-std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
     EntityId id(self.getVal53());
@@ -47183,9 +45073,17 @@ std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
   }
 }
 
+std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal54());
+    return fragment->TypeFor(fragment, id);
+  }
+}
+
 Token TemplateTypeParmDecl::default_argument_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -47194,27 +45092,27 @@ Token TemplateTypeParmDecl::default_argument_token(void) const {
 
 bool TemplateTypeParmDecl::has_default_argument(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool TemplateTypeParmDecl::has_type_constraint(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal89();
+  return self.getVal91();
 }
 
 gap::generator<TagDecl> TagDecl::containing(const Decl &decl) {
@@ -47261,7 +45159,6 @@ std::optional<TagDecl> TagDecl::from(const NamedDecl &parent) {
 
 std::optional<TagDecl> TagDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::TAG:
     case mx::DeclKind::RECORD:
     case mx::DeclKind::CXX_RECORD:
     case mx::DeclKind::CLASS_TEMPLATE_SPECIALIZATION:
@@ -47274,19 +45171,10 @@ std::optional<TagDecl> TagDecl::from(const Decl &parent) {
 
 TokenRange TagDecl::brace_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal52(), self.getVal53());
+  return fragment->TokenRangeFor(fragment, self.getVal53(), self.getVal54());
 }
 
 Token TagDecl::first_inner_token(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
-}
-
-Token TagDecl::first_outer_token(void) const {
   auto self = fragment->NthDecl(offset_);
   if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
@@ -47295,92 +45183,101 @@ Token TagDecl::first_outer_token(void) const {
   }
 }
 
+Token TagDecl::first_outer_token(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
 TagTypeKind TagDecl::tag_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TagTypeKind>(self.getVal73());
+  return static_cast<TagTypeKind>(self.getVal74());
 }
 
 std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal63());
+    EntityId id(self.getVal64());
     return TypedefNameDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 bool TagDecl::has_name_for_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool TagDecl::is_being_defined(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool TagDecl::is_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 bool TagDecl::is_complete_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 bool TagDecl::is_complete_definition_required(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 bool TagDecl::is_dependent_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal89();
+  return self.getVal91();
 }
 
 bool TagDecl::is_embedded_in_declarator(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 bool TagDecl::is_enum(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal91();
+  return self.getVal93();
 }
 
 bool TagDecl::is_free_standing(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal92();
+  return self.getVal94();
 }
 
 bool TagDecl::is_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal93();
+  return self.getVal95();
 }
 
 bool TagDecl::is_struct(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal94();
+  return self.getVal96();
 }
 
 bool TagDecl::is_demoted_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal95();
+  return self.getVal97();
 }
 
 bool TagDecl::is_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal96();
+  return self.getVal98();
 }
 
 bool TagDecl::may_have_out_of_date_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal97();
+  return self.getVal99();
 }
 
 std::vector<TemplateParameterList> TagDecl::template_parameter_lists(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal74();
+  auto list = self.getVal75();
   std::vector<TemplateParameterList> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -47391,7 +45288,7 @@ vec.emplace_back(fragment, v);
 
 std::vector<Decl> TagDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -47462,18 +45359,18 @@ std::optional<RecordDecl> RecordDecl::from(const Decl &parent) {
 
 bool RecordDecl::can_pass_in_registers(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal98();
+  return self.getVal100();
 }
 
 std::vector<FieldDecl> RecordDecl::fields(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal47();
+  auto list = self.getVal48();
   std::vector<FieldDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = fragment->DeclFor(fragment, id)) {
-      if (auto e = FieldDecl::from(d47.value())) {
+    if (auto d48 = fragment->DeclFor(fragment, id)) {
+      if (auto e = FieldDecl::from(d48.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -47483,102 +45380,102 @@ std::vector<FieldDecl> RecordDecl::fields(void) const {
 
 RecordDeclArgPassingKind RecordDecl::argument_passing_restrictions(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<RecordDeclArgPassingKind>(self.getVal78());
+  return static_cast<RecordDeclArgPassingKind>(self.getVal80());
 }
 
 bool RecordDecl::has_flexible_array_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal99();
+  return self.getVal101();
 }
 
 bool RecordDecl::has_loaded_fields_from_external_storage(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal100();
+  return self.getVal102();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_copy_c_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal101();
+  return self.getVal103();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal102();
+  return self.getVal104();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_destruct_c_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal103();
+  return self.getVal105();
 }
 
 bool RecordDecl::has_object_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal104();
+  return self.getVal106();
 }
 
 bool RecordDecl::has_volatile_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal105();
+  return self.getVal107();
 }
 
 bool RecordDecl::is_anonymous_struct_or_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal106();
+  return self.getVal108();
 }
 
 bool RecordDecl::is_captured_record(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal107();
+  return self.getVal109();
 }
 
 bool RecordDecl::is_injected_class_name(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal108();
+  return self.getVal110();
 }
 
 bool RecordDecl::is_lambda(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal109();
+  return self.getVal111();
 }
 
 bool RecordDecl::is_ms_struct(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal110();
+  return self.getVal112();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_copy(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal111();
+  return self.getVal113();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_default_initialize(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal112();
+  return self.getVal114();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_destroy(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal113();
+  return self.getVal115();
 }
 
 bool RecordDecl::is_or_contains_union(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal114();
+  return self.getVal116();
 }
 
 bool RecordDecl::is_parameter_destroyed_in_callee(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal115();
+  return self.getVal117();
 }
 
 bool RecordDecl::is_randomized(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal116();
+  return self.getVal118();
 }
 
 bool RecordDecl::may_insert_extra_padding(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal117();
+  return self.getVal119();
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Decl &decl) {
@@ -47643,19 +45540,19 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
 
 std::optional<bool> CXXRecordDecl::allow_const_default_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal119()) {
+  if (!self.getVal121()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal118());
+    return static_cast<bool>(self.getVal120());
   }
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::bases(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal120()) {
+  if (!self.getVal122()) {
     return std::nullopt;
   }
-  auto list = self.getVal136();
+  auto list = self.getVal138();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -47666,22 +45563,22 @@ vec.emplace_back(fragment, v);
 
 std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal121()) {
+  if (!self.getVal123()) {
     return std::nullopt;
   } else {
-    return static_cast<MSInheritanceModel>(self.getVal80());
+    return static_cast<MSInheritanceModel>(self.getVal82());
   }
 }
 
 std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal57();
+  auto list = self.getVal58();
   std::vector<CXXConstructorDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d57 = fragment->DeclFor(fragment, id)) {
-      if (auto e = CXXConstructorDecl::from(d57.value())) {
+    if (auto d58 = fragment->DeclFor(fragment, id)) {
+      if (auto e = CXXConstructorDecl::from(d58.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -47691,16 +45588,16 @@ std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
 
 std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal129()) {
+  if (!self.getVal131()) {
     return std::nullopt;
   }
-  auto list = self.getVal168();
+  auto list = self.getVal178();
   std::vector<FriendDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d168 = fragment->DeclFor(fragment, id)) {
-      if (auto e = FriendDecl::from(d168.value())) {
+    if (auto d178 = fragment->DeclFor(fragment, id)) {
+      if (auto e = FriendDecl::from(d178.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -47708,27 +45605,43 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
   return vec;
 }
 
+std::optional<FunctionTemplateDecl> CXXRecordDecl::dependent_lambda_call_operator(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal73());
+    return FunctionTemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+std::optional<ClassTemplateDecl> CXXRecordDecl::described_class_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal76());
+    return ClassTemplateDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
 std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal72());
+    EntityId id(self.getVal77());
     return CXXDestructorDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal130()) {
+  if (!self.getVal132()) {
     return std::nullopt;
   } else {
-    return TemplateParameterList(fragment, self.getVal138());
+    return TemplateParameterList(fragment, self.getVal140());
   }
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal75());
+    EntityId id(self.getVal78());
     return CXXRecordDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -47736,40 +45649,40 @@ std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void)
 std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal76());
+    EntityId id(self.getVal79());
     return CXXMethodDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal131()) {
+  if (!self.getVal133()) {
     return std::nullopt;
   } else {
-    return static_cast<LambdaCaptureDefault>(self.getVal81());
+    return static_cast<LambdaCaptureDefault>(self.getVal83());
   }
 }
 
 std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal77());
+    EntityId id(self.getVal81());
     return fragment->DeclFor(fragment, id);
   }
 }
 
 std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_parameters(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal132()) {
+  if (!self.getVal134()) {
     return std::nullopt;
   }
-  auto list = self.getVal176();
+  auto list = self.getVal179();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d176 = fragment->DeclFor(fragment, id)) {
-      if (auto e = NamedDecl::from(d176.value())) {
+    if (auto d179 = fragment->DeclFor(fragment, id)) {
+      if (auto e = NamedDecl::from(d179.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -47779,184 +45692,175 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
 
 std::optional<unsigned> CXXRecordDecl::lambda_mangling_number(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal133()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(self.getVal177());
-  }
-}
-
-std::optional<Type> CXXRecordDecl::lambda_type(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (true) {
-    EntityId id(self.getVal79());
-    return fragment->TypeFor(fragment, id);
-  }
-}
-
-std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal134()) {
-    return std::nullopt;
-  } else {
-    return static_cast<MSInheritanceModel>(self.getVal82());
-  }
-}
-
-MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return static_cast<MSVtorDispMode>(self.getVal83());
-}
-
-std::optional<unsigned> CXXRecordDecl::num_bases(void) const {
-  auto self = fragment->NthDecl(offset_);
   if (!self.getVal135()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(self.getVal178());
-  }
-}
-
-std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal142()) {
-    return std::nullopt;
-  } else {
-    return static_cast<unsigned>(self.getVal179());
-  }
-}
-
-std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal143()) {
     return std::nullopt;
   } else {
     return static_cast<unsigned>(self.getVal180());
   }
 }
 
+std::optional<Type> CXXRecordDecl::lambda_type(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal86());
+    return fragment->TypeFor(fragment, id);
+  }
+}
+
+std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal136()) {
+    return std::nullopt;
+  } else {
+    return static_cast<MSInheritanceModel>(self.getVal84());
+  }
+}
+
+MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return static_cast<MSVtorDispMode>(self.getVal85());
+}
+
+std::optional<unsigned> CXXRecordDecl::num_bases(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal137()) {
+    return std::nullopt;
+  } else {
+    return static_cast<unsigned>(self.getVal181());
+  }
+}
+
+std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal145()) {
+    return std::nullopt;
+  } else {
+    return static_cast<unsigned>(self.getVal182());
+  }
+}
+
+std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal146()) {
+    return std::nullopt;
+  } else {
+    return static_cast<unsigned>(self.getVal183());
+  }
+}
+
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal84());
+    EntityId id(self.getVal125());
     return CXXRecordDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal85());
+  return static_cast<TemplateSpecializationKind>(self.getVal87());
 }
 
 std::optional<bool> CXXRecordDecl::has_any_dependent_bases(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal145()) {
+  if (!self.getVal148()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal144());
+    return static_cast<bool>(self.getVal147());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal147()) {
+  if (!self.getVal150()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal146());
+    return static_cast<bool>(self.getVal149());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal149()) {
+  if (!self.getVal152()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal148());
+    return static_cast<bool>(self.getVal151());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal151()) {
+  if (!self.getVal154()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal150());
+    return static_cast<bool>(self.getVal153());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal153()) {
+  if (!self.getVal156()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal152());
+    return static_cast<bool>(self.getVal155());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal155()) {
+  if (!self.getVal158()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal154());
+    return static_cast<bool>(self.getVal157());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal160()) {
+  if (!self.getVal163()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal156());
+    return static_cast<bool>(self.getVal159());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal162()) {
+  if (!self.getVal165()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal161());
+    return static_cast<bool>(self.getVal164());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal164()) {
+  if (!self.getVal167()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal163());
+    return static_cast<bool>(self.getVal166());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_friends(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal166()) {
+  if (!self.getVal169()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal165());
+    return static_cast<bool>(self.getVal168());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_in_class_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal171()) {
+  if (!self.getVal173()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal167());
+    return static_cast<bool>(self.getVal170());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal173()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(self.getVal172());
-  }
-}
-
-std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
   if (!self.getVal175()) {
     return std::nullopt;
@@ -47965,453 +45869,448 @@ std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
   }
 }
 
-std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
+std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal182()) {
+  if (!self.getVal177()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal181());
+    return static_cast<bool>(self.getVal176());
+  }
+}
+
+std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal185()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(self.getVal184());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal184()) {
+  if (!self.getVal187()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal183());
+    return static_cast<bool>(self.getVal186());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal186()) {
+  if (!self.getVal189()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal185());
+    return static_cast<bool>(self.getVal188());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal188()) {
+  if (!self.getVal191()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal187());
+    return static_cast<bool>(self.getVal190());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal190()) {
+  if (!self.getVal193()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal189());
+    return static_cast<bool>(self.getVal192());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal192()) {
+  if (!self.getVal195()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal191());
+    return static_cast<bool>(self.getVal194());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal194()) {
+  if (!self.getVal197()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal193());
+    return static_cast<bool>(self.getVal196());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal196()) {
+  if (!self.getVal199()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal195());
+    return static_cast<bool>(self.getVal198());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal198()) {
+  if (!self.getVal201()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal197());
+    return static_cast<bool>(self.getVal200());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal200()) {
+  if (!self.getVal203()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal199());
+    return static_cast<bool>(self.getVal202());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal202()) {
+  if (!self.getVal205()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal201());
+    return static_cast<bool>(self.getVal204());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal204()) {
+  if (!self.getVal207()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal203());
+    return static_cast<bool>(self.getVal206());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal206()) {
+  if (!self.getVal209()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal205());
+    return static_cast<bool>(self.getVal208());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal208()) {
+  if (!self.getVal211()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal207());
+    return static_cast<bool>(self.getVal210());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal210()) {
+  if (!self.getVal213()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal209());
+    return static_cast<bool>(self.getVal212());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal212()) {
+  if (!self.getVal215()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal211());
+    return static_cast<bool>(self.getVal214());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal214()) {
+  if (!self.getVal217()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal213());
+    return static_cast<bool>(self.getVal216());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal216()) {
+  if (!self.getVal219()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal215());
+    return static_cast<bool>(self.getVal218());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal218()) {
+  if (!self.getVal221()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal217());
+    return static_cast<bool>(self.getVal220());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal220()) {
+  if (!self.getVal223()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal219());
+    return static_cast<bool>(self.getVal222());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal222()) {
+  if (!self.getVal225()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal221());
+    return static_cast<bool>(self.getVal224());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal224()) {
+  if (!self.getVal227()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal223());
+    return static_cast<bool>(self.getVal226());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal226()) {
+  if (!self.getVal229()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal225());
+    return static_cast<bool>(self.getVal228());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal228()) {
+  if (!self.getVal231()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal227());
+    return static_cast<bool>(self.getVal230());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal230()) {
+  if (!self.getVal233()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal229());
+    return static_cast<bool>(self.getVal232());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal232()) {
+  if (!self.getVal235()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal231());
+    return static_cast<bool>(self.getVal234());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal234()) {
+  if (!self.getVal237()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal233());
+    return static_cast<bool>(self.getVal236());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal236()) {
+  if (!self.getVal239()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal235());
+    return static_cast<bool>(self.getVal238());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal238()) {
+  if (!self.getVal241()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal237());
+    return static_cast<bool>(self.getVal240());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal240()) {
+  if (!self.getVal243()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal239());
+    return static_cast<bool>(self.getVal242());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal242()) {
+  if (!self.getVal245()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal241());
+    return static_cast<bool>(self.getVal244());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal244()) {
+  if (!self.getVal247()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal243());
+    return static_cast<bool>(self.getVal246());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal246()) {
+  if (!self.getVal249()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal245());
+    return static_cast<bool>(self.getVal248());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal248()) {
+  if (!self.getVal251()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal247());
+    return static_cast<bool>(self.getVal250());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal250()) {
+  if (!self.getVal253()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal249());
+    return static_cast<bool>(self.getVal252());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal252()) {
+  if (!self.getVal255()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal251());
+    return static_cast<bool>(self.getVal254());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal254()) {
+  if (!self.getVal257()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal253());
+    return static_cast<bool>(self.getVal256());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal256()) {
+  if (!self.getVal259()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal255());
+    return static_cast<bool>(self.getVal258());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal258()) {
+  if (!self.getVal261()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal257());
+    return static_cast<bool>(self.getVal260());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal260()) {
+  if (!self.getVal263()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal259());
+    return static_cast<bool>(self.getVal262());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal262()) {
+  if (!self.getVal265()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal261());
+    return static_cast<bool>(self.getVal264());
   }
 }
 
 std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal264()) {
+  if (!self.getVal267()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal263());
+    return static_cast<bool>(self.getVal266());
   }
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal266()) {
+  if (!self.getVal269()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal265());
+    return static_cast<bool>(self.getVal268());
   }
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal268()) {
+  if (!self.getVal271()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal267());
+    return static_cast<bool>(self.getVal270());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_abstract(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal270()) {
+  if (!self.getVal273()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal269());
+    return static_cast<bool>(self.getVal272());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal272()) {
+  if (!self.getVal275()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal271());
+    return static_cast<bool>(self.getVal274());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal274()) {
+  if (!self.getVal277()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal273());
+    return static_cast<bool>(self.getVal276());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_c_like(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal276()) {
+  if (!self.getVal279()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal275());
+    return static_cast<bool>(self.getVal278());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal278()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(self.getVal277());
-  }
-}
-
-bool CXXRecordDecl::is_dependent_lambda(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal279();
-}
-
-std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
   auto self = fragment->NthDecl(offset_);
   if (!self.getVal281()) {
     return std::nullopt;
@@ -48420,30 +46319,30 @@ std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
   }
 }
 
-std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
+bool CXXRecordDecl::is_dependent_lambda(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal283()) {
+  return self.getVal282();
+}
+
+std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal284()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal282());
+    return static_cast<bool>(self.getVal283());
+  }
+}
+
+std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal286()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(self.getVal285());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_empty(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (!self.getVal285()) {
-    return std::nullopt;
-  } else {
-    return static_cast<bool>(self.getVal284());
-  }
-}
-
-bool CXXRecordDecl::is_generic_lambda(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal286();
-}
-
-std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
   auto self = fragment->NthDecl(offset_);
   if (!self.getVal288()) {
     return std::nullopt;
@@ -48452,29 +46351,21 @@ std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
   }
 }
 
-std::optional<bool> CXXRecordDecl::is_literal(void) const {
+bool CXXRecordDecl::is_generic_lambda(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal290()) {
+  return self.getVal289();
+}
+
+std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal291()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal289());
+    return static_cast<bool>(self.getVal290());
   }
 }
 
-std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (true) {
-    EntityId id(self.getVal123());
-    return FunctionDecl::from(fragment->DeclFor(fragment, id));
-  }
-}
-
-bool CXXRecordDecl::is_never_dependent_lambda(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal291();
-}
-
-std::optional<bool> CXXRecordDecl::is_pod(void) const {
+std::optional<bool> CXXRecordDecl::is_literal(void) const {
   auto self = fragment->NthDecl(offset_);
   if (!self.getVal293()) {
     return std::nullopt;
@@ -48483,99 +46374,121 @@ std::optional<bool> CXXRecordDecl::is_pod(void) const {
   }
 }
 
-std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
+std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal295()) {
+  if (true) {
+    EntityId id(self.getVal126());
+    return FunctionDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+bool CXXRecordDecl::is_never_dependent_lambda(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal294();
+}
+
+std::optional<bool> CXXRecordDecl::is_pod(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal296()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal294());
+    return static_cast<bool>(self.getVal295());
+  }
+}
+
+std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (!self.getVal298()) {
+    return std::nullopt;
+  } else {
+    return static_cast<bool>(self.getVal297());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal297()) {
+  if (!self.getVal300()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal296());
+    return static_cast<bool>(self.getVal299());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_structural(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal299()) {
+  if (!self.getVal302()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal298());
+    return static_cast<bool>(self.getVal301());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_trivial(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal301()) {
+  if (!self.getVal304()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal300());
+    return static_cast<bool>(self.getVal303());
   }
 }
 
 std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal303()) {
+  if (!self.getVal306()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal302());
+    return static_cast<bool>(self.getVal305());
   }
 }
 
 std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal305()) {
+  if (!self.getVal308()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal304());
+    return static_cast<bool>(self.getVal307());
   }
 }
 
 std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal307()) {
+  if (!self.getVal310()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal306());
+    return static_cast<bool>(self.getVal309());
   }
 }
 
 std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal309()) {
+  if (!self.getVal312()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal308());
+    return static_cast<bool>(self.getVal311());
   }
 }
 
 std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal311()) {
+  if (!self.getVal314()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal310());
+    return static_cast<bool>(self.getVal313());
   }
 }
 
 std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal313()) {
+  if (!self.getVal316()) {
     return std::nullopt;
   }
-  auto list = self.getVal312();
+  auto list = self.getVal315();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d312 = fragment->DeclFor(fragment, id)) {
-      if (auto e = CXXMethodDecl::from(d312.value())) {
+    if (auto d315 = fragment->DeclFor(fragment, id)) {
+      if (auto e = CXXMethodDecl::from(d315.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -48585,118 +46498,118 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal315()) {
+  if (!self.getVal318()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal314());
+    return static_cast<bool>(self.getVal317());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal317()) {
+  if (!self.getVal320()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal316());
+    return static_cast<bool>(self.getVal319());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal319()) {
+  if (!self.getVal322()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal318());
+    return static_cast<bool>(self.getVal321());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal321()) {
+  if (!self.getVal324()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal320());
+    return static_cast<bool>(self.getVal323());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal323()) {
+  if (!self.getVal326()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal322());
+    return static_cast<bool>(self.getVal325());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal325()) {
+  if (!self.getVal328()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal324());
+    return static_cast<bool>(self.getVal327());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal327()) {
+  if (!self.getVal330()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal326());
+    return static_cast<bool>(self.getVal329());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal329()) {
+  if (!self.getVal332()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal328());
+    return static_cast<bool>(self.getVal331());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal331()) {
+  if (!self.getVal334()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal330());
+    return static_cast<bool>(self.getVal333());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal333()) {
+  if (!self.getVal336()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal332());
+    return static_cast<bool>(self.getVal335());
   }
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal335()) {
+  if (!self.getVal338()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal334());
+    return static_cast<bool>(self.getVal337());
   }
 }
 
 std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal337()) {
+  if (!self.getVal340()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal336());
+    return static_cast<bool>(self.getVal339());
   }
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal338()) {
+  if (!self.getVal341()) {
     return std::nullopt;
   }
-  auto list = self.getVal137();
+  auto list = self.getVal139();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -48770,7 +46683,7 @@ std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::
 
 Token ClassTemplateSpecializationDecl::extern_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal124())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal127())) {
     return tok.value();
   } else {
     return Token();
@@ -48779,7 +46692,7 @@ Token ClassTemplateSpecializationDecl::extern_token(void) const {
 
 Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal125())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal129())) {
     return tok.value();
   } else {
     return Token();
@@ -48788,12 +46701,18 @@ Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const {
 
 TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal86());
+  return static_cast<TemplateSpecializationKind>(self.getVal88());
+}
+
+ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal130());
+  return ClassTemplateDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal339();
+  auto list = self.getVal342();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -48804,7 +46723,7 @@ vec.emplace_back(fragment, v);
 
 std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal340();
+  auto list = self.getVal343();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -48815,7 +46734,7 @@ vec.emplace_back(fragment, v);
 
 Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal127())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal141())) {
     return tok.value();
   } else {
     return Token();
@@ -48825,24 +46744,24 @@ Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
 std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal128());
+    EntityId id(self.getVal142());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal341();
+  return self.getVal344();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal342();
+  return self.getVal345();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal343();
+  return self.getVal346();
 }
 
 gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Decl &decl) {
@@ -48911,6 +46830,34 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
   }
 }
 
+Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal143());
+  return fragment->TypeFor(fragment, id, false).value();
+}
+
+ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal144());
+  return ClassTemplatePartialSpecializationDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal160());
+  return ClassTemplatePartialSpecializationDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return TemplateParameterList(fragment, self.getVal347());
+}
+
+bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal348();
+}
+
 gap::generator<EnumDecl> EnumDecl::containing(const Decl &decl) {
   for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
     if(auto d = from(*ancestor)) {
@@ -48967,13 +46914,13 @@ std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
 
 std::vector<EnumConstantDecl> EnumDecl::enumerators(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal47();
+  auto list = self.getVal48();
   std::vector<EnumConstantDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = fragment->DeclFor(fragment, id)) {
-      if (auto e = EnumConstantDecl::from(d47.value())) {
+    if (auto d48 = fragment->DeclFor(fragment, id)) {
+      if (auto e = EnumConstantDecl::from(d48.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -48984,7 +46931,7 @@ std::vector<EnumConstantDecl> EnumDecl::enumerators(void) const {
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal72());
+    EntityId id(self.getVal73());
     return EnumDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -48992,22 +46939,22 @@ std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
 std::optional<Type> EnumDecl::integer_type(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal75());
+    EntityId id(self.getVal76());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal76(), self.getVal77());
+  return fragment->TokenRangeFor(fragment, self.getVal77(), self.getVal78());
 }
 
 std::optional<unsigned> EnumDecl::odr_hash(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (!self.getVal98()) {
+  if (!self.getVal100()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal138());
+    return static_cast<unsigned>(self.getVal140());
   }
 }
 
@@ -49022,49 +46969,49 @@ std::optional<Type> EnumDecl::promotion_type(void) const {
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal84());
+    EntityId id(self.getVal81());
     return EnumDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<TemplateSpecializationKind>(self.getVal78());
+  return static_cast<TemplateSpecializationKind>(self.getVal80());
 }
 
 bool EnumDecl::is_closed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal99();
+  return self.getVal101();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal100();
+  return self.getVal102();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal101();
+  return self.getVal103();
 }
 
 bool EnumDecl::is_complete(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal102();
+  return self.getVal104();
 }
 
 bool EnumDecl::is_fixed(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal103();
+  return self.getVal105();
 }
 
 bool EnumDecl::is_scoped(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal104();
+  return self.getVal106();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal105();
+  return self.getVal107();
 }
 
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::containing(const Decl &decl) {
@@ -49119,7 +47066,7 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 
 Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -49128,7 +47075,7 @@ Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
 
 Token UnresolvedUsingTypenameDecl::typename_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -49137,7 +47084,7 @@ Token UnresolvedUsingTypenameDecl::typename_token(void) const {
 
 Token UnresolvedUsingTypenameDecl::using_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -49146,7 +47093,7 @@ Token UnresolvedUsingTypenameDecl::using_token(void) const {
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const Decl &decl) {
@@ -49193,7 +47140,6 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const NamedDecl &parent) {
 
 std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::TYPEDEF_NAME:
     case mx::DeclKind::TYPEDEF:
     case mx::DeclKind::TYPE_ALIAS:
     case mx::DeclKind::OBJ_C_TYPE_PARAM:
@@ -49205,25 +47151,25 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal52());
+    EntityId id(self.getVal53());
     return TagDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Type TypedefNameDecl::underlying_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool TypedefNameDecl::is_moded(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool TypedefNameDecl::is_transparent_tag(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 gap::generator<TypedefDecl> TypedefDecl::containing(const Decl &decl) {
@@ -49337,7 +47283,7 @@ std::optional<TypeAliasDecl> TypeAliasDecl::from(const Decl &parent) {
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal61());
+    EntityId id(self.getVal62());
     return TypeAliasTemplateDecl::from(fragment->DeclFor(fragment, id));
   }
 }
@@ -49398,7 +47344,7 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Decl &parent) {
 
 Token ObjCTypeParamDecl::colon_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -49407,12 +47353,12 @@ Token ObjCTypeParamDecl::colon_token(void) const {
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCTypeParamVariance>(self.getVal73());
+  return static_cast<ObjCTypeParamVariance>(self.getVal74());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
     return tok.value();
   } else {
     return Token();
@@ -49421,7 +47367,7 @@ Token ObjCTypeParamDecl::variance_token(void) const {
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 gap::generator<TemplateDecl> TemplateDecl::containing(const Decl &decl) {
@@ -49464,8 +47410,6 @@ std::optional<TemplateDecl> TemplateDecl::from(const NamedDecl &parent) {
 
 std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::TEMPLATE:
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
     case mx::DeclKind::FUNCTION_TEMPLATE:
     case mx::DeclKind::CLASS_TEMPLATE:
     case mx::DeclKind::VAR_TEMPLATE:
@@ -49476,6 +47420,22 @@ std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
       return reinterpret_cast<const TemplateDecl &>(parent);
     default: return std::nullopt;
   }
+}
+
+TemplateParameterList TemplateDecl::template_parameters(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return TemplateParameterList(fragment, self.getVal140());
+}
+
+NamedDecl TemplateDecl::templated_declaration(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal52());
+  return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+bool TemplateDecl::has_associated_constraints(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal70();
 }
 
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(const Decl &decl) {
@@ -49522,7 +47482,6 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Nam
 
 std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::REDECLARABLE_TEMPLATE:
     case mx::DeclKind::FUNCTION_TEMPLATE:
     case mx::DeclKind::CLASS_TEMPLATE:
     case mx::DeclKind::VAR_TEMPLATE:
@@ -49530,6 +47489,17 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Dec
       return reinterpret_cast<const RedeclarableTemplateDecl &>(parent);
     default: return std::nullopt;
   }
+}
+
+RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal53());
+  return RedeclarableTemplateDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+bool RedeclarableTemplateDecl::is_member_specialization(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal71();
 }
 
 gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::containing(const Decl &decl) {
@@ -49584,6 +47554,11 @@ std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Decl &paren
       return reinterpret_cast<const FunctionTemplateDecl &>(parent);
     default: return std::nullopt;
   }
+}
+
+bool FunctionTemplateDecl::is_abbreviated(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal72();
 }
 
 gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const Decl &decl) {
@@ -49748,20 +47723,6 @@ std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::from(const Decl &par
   }
 }
 
-std::optional<TypeAliasTemplateDecl> TypeAliasTemplateDecl::instantiated_from_member_template(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (true) {
-    EntityId id(self.getVal51());
-    return TypeAliasTemplateDecl::from(fragment->DeclFor(fragment, id));
-  }
-}
-
-TypeAliasDecl TypeAliasTemplateDecl::templated_declaration(void) const {
-  auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
-  return TypeAliasDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
-}
-
 gap::generator<ConceptDecl> ConceptDecl::containing(const Decl &decl) {
   for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
     if(auto d = from(*ancestor)) {
@@ -49814,13 +47775,13 @@ std::optional<ConceptDecl> ConceptDecl::from(const Decl &parent) {
 
 Expr ConceptDecl::constraint_expression(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal53());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 bool ConceptDecl::is_type_concept(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal71();
 }
 
 gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::containing(const Decl &decl) {
@@ -49923,6 +47884,35 @@ std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Dec
   }
 }
 
+bool TemplateTemplateParmDecl::default_argument_was_inherited(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal71();
+}
+
+Token TemplateTemplateParmDecl::default_argument_token(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
+bool TemplateTemplateParmDecl::has_default_argument(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal72();
+}
+
+bool TemplateTemplateParmDecl::is_expanded_parameter_pack(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal89();
+}
+
+bool TemplateTemplateParmDecl::is_pack_expansion(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal90();
+}
+
 gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::containing(const Decl &decl) {
   for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
     if(auto d = from(*ancestor)) {
@@ -49971,7 +47961,7 @@ std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const Decl &parent) {
 
 Token ObjCPropertyDecl::at_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -49980,13 +47970,13 @@ Token ObjCPropertyDecl::at_token(void) const {
 
 ObjCMethodDecl ObjCPropertyDecl::getter_method_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return ObjCMethodDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCPropertyDecl::getter_name_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -49995,7 +47985,7 @@ Token ObjCPropertyDecl::getter_name_token(void) const {
 
 Token ObjCPropertyDecl::l_paren_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -50004,34 +47994,34 @@ Token ObjCPropertyDecl::l_paren_token(void) const {
 
 ObjCPropertyDeclPropertyControl ObjCPropertyDecl::property_implementation(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCPropertyDeclPropertyControl>(self.getVal73());
+  return static_cast<ObjCPropertyDeclPropertyControl>(self.getVal74());
 }
 
 ObjCIvarDecl ObjCPropertyDecl::property_instance_variable_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
+  EntityId id(self.getVal63());
   return ObjCIvarDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCPropertyQueryKind>(self.getVal78());
+  return static_cast<ObjCPropertyQueryKind>(self.getVal80());
 }
 
 ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCPropertyDeclSetterKind>(self.getVal80());
+  return static_cast<ObjCPropertyDeclSetterKind>(self.getVal82());
 }
 
 ObjCMethodDecl ObjCPropertyDecl::setter_method_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal63());
+  EntityId id(self.getVal64());
   return ObjCMethodDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCPropertyDecl::setter_name_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal72())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal73())) {
     return tok.value();
   } else {
     return Token();
@@ -50040,43 +48030,43 @@ Token ObjCPropertyDecl::setter_name_token(void) const {
 
 Type ObjCPropertyDecl::type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal75());
+  EntityId id(self.getVal76());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 bool ObjCPropertyDecl::is_atomic(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool ObjCPropertyDecl::is_class_property(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool ObjCPropertyDecl::is_direct_property(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 bool ObjCPropertyDecl::is_instance_property(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 bool ObjCPropertyDecl::is_optional(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 bool ObjCPropertyDecl::is_read_only(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal89();
+  return self.getVal91();
 }
 
 bool ObjCPropertyDecl::is_retaining(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 gap::generator<ObjCMethodDecl> ObjCMethodDecl::containing(const Decl &decl) {
@@ -50127,30 +48117,30 @@ std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Decl &parent) {
 
 bool ObjCMethodDecl::defined_in_ns_object(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 ObjCPropertyDecl ObjCMethodDecl::find_property_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return ObjCPropertyDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 ObjCInterfaceDecl ObjCMethodDecl::class_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 ImplicitParamDecl ObjCMethodDecl::command_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal53());
+  EntityId id(self.getVal54());
   return ImplicitParamDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCMethodDecl::declarator_end_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -50159,33 +48149,33 @@ Token ObjCMethodDecl::declarator_end_token(void) const {
 
 ObjCMethodDeclImplementationControl ObjCMethodDecl::implementation_control(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCMethodDeclImplementationControl>(self.getVal73());
+  return static_cast<ObjCMethodDeclImplementationControl>(self.getVal74());
 }
 
 ObjCMethodFamily ObjCMethodDecl::method_family(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<ObjCMethodFamily>(self.getVal78());
+  return static_cast<ObjCMethodFamily>(self.getVal80());
 }
 
 DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<DeclObjCDeclQualifier>(self.getVal80());
+  return static_cast<DeclObjCDeclQualifier>(self.getVal82());
 }
 
 Type ObjCMethodDecl::return_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
+  EntityId id(self.getVal63());
   return fragment->TypeFor(fragment, id, false).value();
 }
 
 TokenRange ObjCMethodDecl::return_type_source_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal63(), self.getVal72());
+  return fragment->TokenRangeFor(fragment, self.getVal64(), self.getVal73());
 }
 
 Token ObjCMethodDecl::selector_start_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal75())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
     return tok.value();
   } else {
     return Token();
@@ -50194,99 +48184,99 @@ Token ObjCMethodDecl::selector_start_token(void) const {
 
 ImplicitParamDecl ObjCMethodDecl::self_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal76());
+  EntityId id(self.getVal77());
   return ImplicitParamDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 bool ObjCMethodDecl::has_parameter_destroyed_in_callee(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 bool ObjCMethodDecl::has_redeclaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
+  return self.getVal72();
 }
 
 bool ObjCMethodDecl::has_related_result_type(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
+  return self.getVal89();
 }
 
 bool ObjCMethodDecl::has_skipped_body(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
+  return self.getVal90();
 }
 
 bool ObjCMethodDecl::is_class_method(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal89();
+  return self.getVal91();
 }
 
 bool ObjCMethodDecl::is_defined(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal90();
+  return self.getVal92();
 }
 
 bool ObjCMethodDecl::is_designated_initializer_for_the_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal91();
+  return self.getVal93();
 }
 
 bool ObjCMethodDecl::is_direct_method(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal92();
+  return self.getVal94();
 }
 
 bool ObjCMethodDecl::is_instance_method(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal93();
+  return self.getVal95();
 }
 
 bool ObjCMethodDecl::is_optional(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal94();
+  return self.getVal96();
 }
 
 bool ObjCMethodDecl::is_overriding(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal95();
+  return self.getVal97();
 }
 
 bool ObjCMethodDecl::is_property_accessor(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal96();
+  return self.getVal98();
 }
 
 bool ObjCMethodDecl::is_redeclaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal97();
+  return self.getVal99();
 }
 
 bool ObjCMethodDecl::is_synthesized_accessor_stub(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal98();
+  return self.getVal100();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_designated_initializer(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal99();
+  return self.getVal101();
 }
 
 bool ObjCMethodDecl::is_variadic(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal100();
+  return self.getVal102();
 }
 
 std::vector<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<ParmVarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ParmVarDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ParmVarDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50296,13 +48286,13 @@ std::vector<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
 
 std::vector<Token> ObjCMethodDecl::selector_tokens(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal47();
+  auto list = self.getVal48();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t47 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t47.value()));
+    if (auto t48 = fragment->TokenFor(fragment, id)) {
+      vec.emplace_back(std::move(t48.value()));
     }
   }
   return vec;
@@ -50310,7 +48300,7 @@ std::vector<Token> ObjCMethodDecl::selector_tokens(void) const {
 
 std::vector<Decl> ObjCMethodDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal57();
+  auto list = self.getVal58();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -50362,11 +48352,9 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const NamedDecl &parent
 
 std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::OBJ_C_CONTAINER:
     case mx::DeclKind::OBJ_C_CATEGORY:
     case mx::DeclKind::OBJ_C_PROTOCOL:
     case mx::DeclKind::OBJ_C_INTERFACE:
-    case mx::DeclKind::OBJ_C_IMPL:
     case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
     case mx::DeclKind::OBJ_C_IMPLEMENTATION:
       return reinterpret_cast<const ObjCContainerDecl &>(parent);
@@ -50376,13 +48364,13 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Decl &parent) {
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d46 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCMethodDecl::from(d46.value())) {
+    if (auto d47 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCMethodDecl::from(d47.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50392,13 +48380,13 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal47();
+  auto list = self.getVal48();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCPropertyDecl::from(d47.value())) {
+    if (auto d48 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCPropertyDecl::from(d48.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50408,12 +48396,12 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
 
 TokenRange ObjCContainerDecl::at_end_range(void) const {
   auto self = fragment->NthDecl(offset_);
-  return fragment->TokenRangeFor(fragment, self.getVal51(), self.getVal52());
+  return fragment->TokenRangeFor(fragment, self.getVal52(), self.getVal53());
 }
 
 Token ObjCContainerDecl::at_start_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -50422,13 +48410,13 @@ Token ObjCContainerDecl::at_start_token(void) const {
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal57();
+  auto list = self.getVal58();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d57 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCMethodDecl::from(d57.value())) {
+    if (auto d58 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCMethodDecl::from(d58.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50438,13 +48426,13 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal168();
+  auto list = self.getVal178();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d168 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCPropertyDecl::from(d168.value())) {
+    if (auto d178 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCPropertyDecl::from(d178.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50454,13 +48442,13 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const
 
 std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal176();
+  auto list = self.getVal179();
   std::vector<ObjCMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d176 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCMethodDecl::from(d176.value())) {
+    if (auto d179 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCMethodDecl::from(d179.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50470,13 +48458,13 @@ std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
 
 std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal312();
+  auto list = self.getVal315();
   std::vector<ObjCPropertyDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d312 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCPropertyDecl::from(d312.value())) {
+    if (auto d315 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCPropertyDecl::from(d315.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50486,7 +48474,7 @@ std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
 
 std::vector<Decl> ObjCContainerDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal344();
+  auto list = self.getVal349();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -50550,12 +48538,12 @@ std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const Decl &parent) {
 
 bool ObjCCategoryDecl::is_class_extension(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 Token ObjCCategoryDecl::category_name_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -50564,19 +48552,19 @@ Token ObjCCategoryDecl::category_name_token(void) const {
 
 ObjCInterfaceDecl ObjCCategoryDecl::class_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
+  EntityId id(self.getVal63());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 ObjCCategoryImplDecl ObjCCategoryDecl::implementation(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal63());
+  EntityId id(self.getVal64());
   return ObjCCategoryImplDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal72())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal73())) {
     return tok.value();
   } else {
     return Token();
@@ -50585,7 +48573,7 @@ Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const {
 
 Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal75())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
     return tok.value();
   } else {
     return Token();
@@ -50594,19 +48582,19 @@ Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const {
 
 ObjCCategoryDecl ObjCCategoryDecl::next_class_category(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal76());
+  EntityId id(self.getVal77());
   return ObjCCategoryDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal345();
+  auto list = self.getVal350();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d345 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCIvarDecl::from(d345.value())) {
+    if (auto d350 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCIvarDecl::from(d350.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50616,13 +48604,13 @@ std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
 
 std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal346();
+  auto list = self.getVal351();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t346 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t346.value()));
+    if (auto t351 = fragment->TokenFor(fragment, id)) {
+      vec.emplace_back(std::move(t351.value()));
     }
   }
   return vec;
@@ -50630,13 +48618,13 @@ std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const {
 
 std::vector<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal347();
+  auto list = self.getVal352();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d347 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCProtocolDecl::from(d347.value())) {
+    if (auto d352 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCProtocolDecl::from(d352.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50696,29 +48684,29 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Decl &parent) {
 
 std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const {
   auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal68();
+  capnp::Text::Reader data = self.getVal69();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool ObjCProtocolDecl::has_definition(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool ObjCProtocolDecl::is_non_runtime_protocol(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal345();
+  auto list = self.getVal350();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t345 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t345.value()));
+    if (auto t350 = fragment->TokenFor(fragment, id)) {
+      vec.emplace_back(std::move(t350.value()));
     }
   }
   return vec;
@@ -50726,13 +48714,13 @@ std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const {
 
 std::vector<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal346();
+  auto list = self.getVal351();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d346 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCProtocolDecl::from(d346.value())) {
+    if (auto d351 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCProtocolDecl::from(d351.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50792,167 +48780,6 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Decl &parent) {
 
 std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal345();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d345 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCProtocolDecl::from(d345.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
-}
-
-bool ObjCInterfaceDecl::declares_or_inherits_designated_initializers(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
-}
-
-Token ObjCInterfaceDecl::end_of_definition_token(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
-}
-
-ObjCImplementationDecl ObjCInterfaceDecl::implementation(void) const {
-  auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
-  return ObjCImplementationDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
-}
-
-std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const {
-  auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal68();
-  return std::string_view(data.cStr(), data.size());
-}
-
-std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::super_class(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (true) {
-    EntityId id(self.getVal63());
-    return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id));
-  }
-}
-
-Token ObjCInterfaceDecl::super_class_token(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal72())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
-}
-
-std::optional<Type> ObjCInterfaceDecl::super_class_type(void) const {
-  auto self = fragment->NthDecl(offset_);
-  if (true) {
-    EntityId id(self.getVal75());
-    return fragment->TypeFor(fragment, id);
-  }
-}
-
-Type ObjCInterfaceDecl::type_for_declaration(void) const {
-  auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal76());
-  return fragment->TypeFor(fragment, id, false).value();
-}
-
-bool ObjCInterfaceDecl::has_definition(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
-}
-
-bool ObjCInterfaceDecl::has_designated_initializers(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal71();
-}
-
-bool ObjCInterfaceDecl::is_arc_weakref_unavailable(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal87();
-}
-
-bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const {
-  auto self = fragment->NthDecl(offset_);
-  return self.getVal88();
-}
-
-ObjCInterfaceDecl ObjCInterfaceDecl::is_obj_c_requires_property_definitions(void) const {
-  auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal77());
-  return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
-}
-
-std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal346();
-  std::vector<ObjCIvarDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d346 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCIvarDecl::from(d346.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
-}
-
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal347();
-  std::vector<ObjCCategoryDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d347 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCCategoryDecl::from(d347.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
-}
-
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal348();
-  std::vector<ObjCCategoryDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto d348 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCCategoryDecl::from(d348.value())) {
-        vec.emplace_back(std::move(*e));
-      }
-    }
-  }
-  return vec;
-}
-
-std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
-  auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal349();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    if (auto t349 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t349.value()));
-    }
-  }
-  return vec;
-}
-
-std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
-  auto self = fragment->NthDecl(offset_);
   auto list = self.getVal350();
   std::vector<ObjCProtocolDecl> vec;
   vec.reserve(list.size());
@@ -50967,15 +48794,176 @@ std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
   return vec;
 }
 
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
+bool ObjCInterfaceDecl::declares_or_inherits_designated_initializers(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal70();
+}
+
+Token ObjCInterfaceDecl::end_of_definition_token(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
+ObjCImplementationDecl ObjCInterfaceDecl::implementation(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal63());
+  return ObjCImplementationDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const {
+  auto self = fragment->NthDecl(offset_);
+  capnp::Text::Reader data = self.getVal69();
+  return std::string_view(data.cStr(), data.size());
+}
+
+std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::super_class(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal64());
+    return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id));
+  }
+}
+
+Token ObjCInterfaceDecl::super_class_token(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal73())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
+std::optional<Type> ObjCInterfaceDecl::super_class_type(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (true) {
+    EntityId id(self.getVal76());
+    return fragment->TypeFor(fragment, id);
+  }
+}
+
+Type ObjCInterfaceDecl::type_for_declaration(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal77());
+  return fragment->TypeFor(fragment, id, false).value();
+}
+
+bool ObjCInterfaceDecl::has_definition(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal71();
+}
+
+bool ObjCInterfaceDecl::has_designated_initializers(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal72();
+}
+
+bool ObjCInterfaceDecl::is_arc_weakref_unavailable(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal89();
+}
+
+bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const {
+  auto self = fragment->NthDecl(offset_);
+  return self.getVal90();
+}
+
+ObjCInterfaceDecl ObjCInterfaceDecl::is_obj_c_requires_property_definitions(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal78());
+  return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
   auto self = fragment->NthDecl(offset_);
   auto list = self.getVal351();
-  std::vector<ObjCCategoryDecl> vec;
+  std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
     if (auto d351 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCCategoryDecl::from(d351.value())) {
+      if (auto e = ObjCIvarDecl::from(d351.value())) {
+        vec.emplace_back(std::move(*e));
+      }
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal352();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d352 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCCategoryDecl::from(d352.value())) {
+        vec.emplace_back(std::move(*e));
+      }
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal353();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d353 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCCategoryDecl::from(d353.value())) {
+        vec.emplace_back(std::move(*e));
+      }
+    }
+  }
+  return vec;
+}
+
+std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal354();
+  std::vector<Token> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto t354 = fragment->TokenFor(fragment, id)) {
+      vec.emplace_back(std::move(t354.value()));
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal355();
+  std::vector<ObjCProtocolDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d355 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCProtocolDecl::from(d355.value())) {
+        vec.emplace_back(std::move(*e));
+      }
+    }
+  }
+  return vec;
+}
+
+std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal356();
+  std::vector<ObjCCategoryDecl> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d356 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCCategoryDecl::from(d356.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -50985,13 +48973,13 @@ std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const 
 
 std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal352();
+  auto list = self.getVal357();
   std::vector<ObjCCategoryDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d352 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCCategoryDecl::from(d352.value())) {
+    if (auto d357 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCCategoryDecl::from(d357.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -51043,7 +49031,6 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const NamedDecl &parent) {
 
 std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
   switch (parent.kind()) {
-    case mx::DeclKind::OBJ_C_IMPL:
     case mx::DeclKind::OBJ_C_CATEGORY_IMPL:
     case mx::DeclKind::OBJ_C_IMPLEMENTATION:
       return reinterpret_cast<const ObjCImplDecl &>(parent);
@@ -51053,19 +49040,19 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
 
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal61());
+  EntityId id(self.getVal62());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 std::vector<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal345();
+  auto list = self.getVal350();
   std::vector<ObjCPropertyImplDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d345 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCPropertyImplDecl::from(d345.value())) {
+    if (auto d350 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCPropertyImplDecl::from(d350.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -51129,13 +49116,13 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &paren
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal62());
+  EntityId id(self.getVal63());
   return ObjCCategoryDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal64())) {
     return tok.value();
   } else {
     return Token();
@@ -51198,7 +49185,7 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Decl &p
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
     return tok.value();
   } else {
     return Token();
@@ -51207,7 +49194,7 @@ Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
 
 Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal64())) {
     return tok.value();
   } else {
     return Token();
@@ -51216,19 +49203,19 @@ Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const {
   auto self = fragment->NthDecl(offset_);
-  capnp::Text::Reader data = self.getVal68();
+  capnp::Text::Reader data = self.getVal69();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal72());
+  EntityId id(self.getVal73());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal75())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
     return tok.value();
   } else {
     return Token();
@@ -51237,23 +49224,23 @@ Token ObjCImplementationDecl::super_class_token(void) const {
 
 bool ObjCImplementationDecl::has_destructors(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal69();
+  return self.getVal70();
 }
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal70();
+  return self.getVal71();
 }
 
 std::vector<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal346();
+  auto list = self.getVal351();
   std::vector<ObjCIvarDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d346 = fragment->DeclFor(fragment, id)) {
-      if (auto e = ObjCIvarDecl::from(d346.value())) {
+    if (auto d351 = fragment->DeclFor(fragment, id)) {
+      if (auto e = ObjCIvarDecl::from(d351.value())) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -51309,7 +49296,7 @@ std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Decl 
 
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return ObjCInterfaceDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
@@ -51361,7 +49348,7 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const Decl &parent) {
 
 std::vector<Decl> NamespaceDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -51421,7 +49408,7 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const Decl &parent) {
 
 Token NamespaceAliasDecl::alias_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -51430,13 +49417,13 @@ Token NamespaceAliasDecl::alias_token(void) const {
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal52());
+  EntityId id(self.getVal53());
   return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 Token NamespaceAliasDecl::namespace_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
     return tok.value();
   } else {
     return Token();
@@ -51445,7 +49432,7 @@ Token NamespaceAliasDecl::namespace_token(void) const {
 
 Token NamespaceAliasDecl::target_name_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal61())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
     return tok.value();
   } else {
     return Token();
@@ -51496,7 +49483,7 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Decl &parent) {
 
 std::vector<Decl> LinkageSpecDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -51552,13 +49539,13 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 
 std::vector<Stmt> LifetimeExtendedTemporaryDecl::children(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Stmt> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto s46 = fragment->StmtFor(fragment, id)) {
-      vec.emplace_back(std::move(s46.value()));
+    if (auto s47 = fragment->StmtFor(fragment, id)) {
+      vec.emplace_back(std::move(s47.value()));
     }
   }
   return vec;
@@ -51566,18 +49553,18 @@ std::vector<Stmt> LifetimeExtendedTemporaryDecl::children(void) const {
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal44());
+  EntityId id(self.getVal45());
   return ValueDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
   auto self = fragment->NthDecl(offset_);
-  return static_cast<StorageDuration>(self.getVal60());
+  return static_cast<StorageDuration>(self.getVal61());
 }
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return Expr::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
@@ -51625,13 +49612,13 @@ std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
 
 std::vector<Token> ImportDecl::identifier_tokens(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Token> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto t46 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t46.value()));
+    if (auto t47 = fragment->TokenFor(fragment, id)) {
+      vec.emplace_back(std::move(t47.value()));
     }
   }
   return vec;
@@ -51679,6 +49666,38 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
   }
 }
 
+NamedDecl FriendTemplateDecl::friend_declaration(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal45());
+  return NamedDecl::from(fragment->DeclFor(fragment, id, false).value()).value();
+}
+
+Token FriendTemplateDecl::friend_token(void) const {
+  auto self = fragment->NthDecl(offset_);
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+    return tok.value();
+  } else {
+    return Token();
+  }
+}
+
+Type FriendTemplateDecl::friend_type(void) const {
+  auto self = fragment->NthDecl(offset_);
+  EntityId id(self.getVal53());
+  return fragment->TypeFor(fragment, id, false).value();
+}
+
+std::vector<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const {
+  auto self = fragment->NthDecl(offset_);
+  auto list = self.getVal75();
+  std::vector<TemplateParameterList> vec;
+  vec.reserve(list.size());
+  for (auto v : list) {
+vec.emplace_back(fragment, v);
+  }
+  return vec;
+}
+
 gap::generator<FriendDecl> FriendDecl::containing(const Decl &decl) {
   for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {
     if(auto d = from(*ancestor)) {
@@ -51724,14 +49743,14 @@ std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
 std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal44());
+    EntityId id(self.getVal45());
     return NamedDecl::from(fragment->DeclFor(fragment, id));
   }
 }
 
 Token FriendDecl::friend_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -51741,19 +49760,19 @@ Token FriendDecl::friend_token(void) const {
 std::optional<Type> FriendDecl::friend_type(void) const {
   auto self = fragment->NthDecl(offset_);
   if (true) {
-    EntityId id(self.getVal52());
+    EntityId id(self.getVal53());
     return fragment->TypeFor(fragment, id);
   }
 }
 
 bool FriendDecl::is_unsupported_friend(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 std::vector<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal74();
+  auto list = self.getVal75();
   std::vector<TemplateParameterList> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -51806,7 +49825,7 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
 
 Token FileScopeAsmDecl::assembly_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
     return tok.value();
   } else {
     return Token();
@@ -51815,13 +49834,13 @@ Token FileScopeAsmDecl::assembly_token(void) const {
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
   auto self = fragment->NthDecl(offset_);
-  EntityId id(self.getVal51());
+  EntityId id(self.getVal52());
   return StringLiteral::from(fragment->StmtFor(fragment, id, false).value()).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
     return tok.value();
   } else {
     return Token();
@@ -51872,7 +49891,7 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const Decl &parent) {
 
 std::vector<Decl> ExternCContextDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -51928,7 +49947,7 @@ std::optional<ExportDecl> ExportDecl::from(const Decl &parent) {
 
 Token ExportDecl::export_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
     return tok.value();
   } else {
     return Token();
@@ -51937,7 +49956,7 @@ Token ExportDecl::export_token(void) const {
 
 Token ExportDecl::r_brace_token(void) const {
   auto self = fragment->NthDecl(offset_);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal51())) {
+  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
     return tok.value();
   } else {
     return Token();
@@ -51946,12 +49965,12 @@ Token ExportDecl::r_brace_token(void) const {
 
 bool ExportDecl::has_braces(void) const {
   auto self = fragment->NthDecl(offset_);
-  return self.getVal45();
+  return self.getVal46();
 }
 
 std::vector<Decl> ExportDecl::declarations_in_context(void) const {
   auto self = fragment->NthDecl(offset_);
-  auto list = self.getVal46();
+  auto list = self.getVal47();
   std::vector<Decl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
@@ -52041,7 +50060,14 @@ const char *EnumeratorName(DeclUseSelector sel) {
     case DeclUseSelector::CORRESPONDING_CONSTRUCTOR: return "CORRESPONDING_CONSTRUCTOR";
     case DeclUseSelector::DECLARATION: return "DECLARATION";
     case DeclUseSelector::DECOMPOSED_DECLARATION: return "DECOMPOSED_DECLARATION";
+    case DeclUseSelector::DEDUCED_TEMPLATE: return "DEDUCED_TEMPLATE";
+    case DeclUseSelector::DEPENDENT_CALL_OPERATOR: return "DEPENDENT_CALL_OPERATOR";
+    case DeclUseSelector::DEPENDENT_LAMBDA_CALL_OPERATOR: return "DEPENDENT_LAMBDA_CALL_OPERATOR";
     case DeclUseSelector::DESCRIBED_ALIAS_TEMPLATE: return "DESCRIBED_ALIAS_TEMPLATE";
+    case DeclUseSelector::DESCRIBED_CLASS_TEMPLATE: return "DESCRIBED_CLASS_TEMPLATE";
+    case DeclUseSelector::DESCRIBED_FUNCTION_TEMPLATE: return "DESCRIBED_FUNCTION_TEMPLATE";
+    case DeclUseSelector::DESCRIBED_TEMPLATE: return "DESCRIBED_TEMPLATE";
+    case DeclUseSelector::DESCRIBED_VARIABLE_TEMPLATE: return "DESCRIBED_VARIABLE_TEMPLATE";
     case DeclUseSelector::DESTRUCTOR: return "DESTRUCTOR";
     case DeclUseSelector::DICTIONARY_WITH_OBJECTS_METHOD: return "DICTIONARY_WITH_OBJECTS_METHOD";
     case DeclUseSelector::DIRECT_CALLEE: return "DIRECT_CALLEE";
@@ -52068,6 +50094,7 @@ const char *EnumeratorName(DeclUseSelector sel) {
     case DeclUseSelector::INITIALIZED_FIELD_IN_UNION: return "INITIALIZED_FIELD_IN_UNION";
     case DeclUseSelector::INITIALIZING_DECLARATION: return "INITIALIZING_DECLARATION";
     case DeclUseSelector::INSTANTIATED_FROM_DECLARATION: return "INSTANTIATED_FROM_DECLARATION";
+    case DeclUseSelector::INSTANTIATED_FROM_MEMBER: return "INSTANTIATED_FROM_MEMBER";
     case DeclUseSelector::INSTANTIATED_FROM_MEMBER_CLASS: return "INSTANTIATED_FROM_MEMBER_CLASS";
     case DeclUseSelector::INSTANTIATED_FROM_MEMBER_ENUM: return "INSTANTIATED_FROM_MEMBER_ENUM";
     case DeclUseSelector::INSTANTIATED_FROM_MEMBER_FUNCTION: return "INSTANTIATED_FROM_MEMBER_FUNCTION";
@@ -52105,6 +50132,7 @@ const char *EnumeratorName(DeclUseSelector sel) {
     case DeclUseSelector::PARAMETER_PACK: return "PARAMETER_PACK";
     case DeclUseSelector::PARENT: return "PARENT";
     case DeclUseSelector::POINTEE_CXX_RECORD_DECLARATION: return "POINTEE_CXX_RECORD_DECLARATION";
+    case DeclUseSelector::PRIMARY_TEMPLATE: return "PRIMARY_TEMPLATE";
     case DeclUseSelector::PROMISE_DECLARATION: return "PROMISE_DECLARATION";
     case DeclUseSelector::PROPERTY_DECLARATION: return "PROPERTY_DECLARATION";
     case DeclUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION: return "PROPERTY_INSTANCE_VARIABLE_DECLARATION";
@@ -52118,6 +50146,7 @@ const char *EnumeratorName(DeclUseSelector sel) {
     case DeclUseSelector::SINGLE_DECLARATION: return "SINGLE_DECLARATION";
     case DeclUseSelector::SOURCE_BIT_FIELD: return "SOURCE_BIT_FIELD";
     case DeclUseSelector::SPECIALIZATION: return "SPECIALIZATION";
+    case DeclUseSelector::SPECIALIZED_TEMPLATE: return "SPECIALIZED_TEMPLATE";
     case DeclUseSelector::SUPER_CLASS: return "SUPER_CLASS";
     case DeclUseSelector::TARGET_CONSTRUCTOR: return "TARGET_CONSTRUCTOR";
     case DeclUseSelector::TARGET_DECLARATION: return "TARGET_DECLARATION";
@@ -52129,6 +50158,7 @@ const char *EnumeratorName(DeclUseSelector sel) {
     case DeclUseSelector::UNDERLYING_DECLARATION: return "UNDERLYING_DECLARATION";
     case DeclUseSelector::VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
   }
+  return "<invalid>";
 }
 
 const char *EnumeratorName(StmtUseSelector sel) {
@@ -52344,6 +50374,7 @@ const char *EnumeratorName(StmtUseSelector sel) {
     case StmtUseSelector::WEAK: return "WEAK";
     case StmtUseSelector::X: return "X";
   }
+  return "<invalid>";
 }
 
 const char *EnumeratorName(TypeUseSelector sel) {
@@ -52457,6 +50488,7 @@ const char *EnumeratorName(TypeUseSelector sel) {
     case TypeUseSelector::WRAPPED_TYPE: return "WRAPPED_TYPE";
     case TypeUseSelector::WRITTEN_TYPE: return "WRITTEN_TYPE";
   }
+  return "<invalid>";
 }
 
 const char *EnumeratorName(TokenUseSelector sel) {
@@ -52581,12 +50613,14 @@ const char *EnumeratorName(TokenUseSelector sel) {
     case TokenUseSelector::VARIANCE_TOKEN: return "VARIANCE_TOKEN";
     case TokenUseSelector::WHILE_TOKEN: return "WHILE_TOKEN";
   }
+  return "<invalid>";
 }
 
 const char *EnumeratorName(FileUseSelector sel) {
   switch (sel) {
     case FileUseSelector::INCLUDED_FILE: return "INCLUDED_FILE";
   }
+  return "<invalid>";
 }
 
 const char *EnumeratorName(AttrUseSelector sel) {
@@ -52596,6 +50630,7 @@ const char *EnumeratorName(AttrUseSelector sel) {
     case AttrUseSelector::EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE: return "EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE";
     case AttrUseSelector::UNUSED_RESULT_ATTRIBUTE: return "UNUSED_RESULT_ATTRIBUTE";
   }
+  return "<invalid>";
 }
 
 const char *EnumeratorName(MacroUseSelector sel) {
@@ -52603,6 +50638,7 @@ const char *EnumeratorName(MacroUseSelector sel) {
     case MacroUseSelector::DEFINITION: return "DEFINITION";
     case MacroUseSelector::PARENT: return "PARENT";
   }
+  return "<invalid>";
 }
 
 #endif

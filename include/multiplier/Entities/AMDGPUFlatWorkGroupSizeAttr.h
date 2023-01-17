@@ -86,7 +86,6 @@ class AMDGPUFlatWorkGroupSizeAttr : public InheritableAttr {
 
   Expr max(void) const;
   Expr min(void) const;
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(AMDGPUFlatWorkGroupSizeAttr) == sizeof(InheritableAttr));

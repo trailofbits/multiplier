@@ -83,7 +83,6 @@ class LTOVisibilityPublicAttr : public InheritableAttr {
     }
   }
 
-  std::string_view spelling(void) const;
 };
 
 static_assert(sizeof(LTOVisibilityPublicAttr) == sizeof(InheritableAttr));

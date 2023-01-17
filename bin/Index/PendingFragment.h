@@ -61,12 +61,12 @@ class FileLocationOfFragment {
 // represents a single logical thing.
 class PendingFragment {
  public:
-  inline PendingFragment(mx::SpecificEntityId<mx::FragmentId> fragment_id_)
+  inline PendingFragment(mx::PackedFragmentId fragment_id_)
       : fragment_id(fragment_id_),
         fragment_index(fragment_id.Unpack().fragment_id) {}
 
   // Unique ID of the fragment containing the top-level declarations `decls`.
-  mx::SpecificEntityId<mx::FragmentId> fragment_id;
+  mx::PackedFragmentId fragment_id;
   mx::RawEntityId fragment_index;
 
   // Inclusive range of indices into the parsed tokens.

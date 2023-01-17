@@ -60,10 +60,6 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::REDECLARABLE_TEMPLATE;
-  }
-
   static gap::generator<RedeclarableTemplateDecl> containing(const Decl &decl);
   static gap::generator<RedeclarableTemplateDecl> containing(const Stmt &stmt);
 
@@ -101,6 +97,8 @@ class RedeclarableTemplateDecl : public TemplateDecl {
     }
   }
 
+  RedeclarableTemplateDecl instantiated_from_member_template(void) const;
+  bool is_member_specialization(void) const;
 };
 
 static_assert(sizeof(RedeclarableTemplateDecl) == sizeof(TemplateDecl));

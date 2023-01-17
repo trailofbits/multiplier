@@ -63,10 +63,6 @@ class DeclaratorDecl : public ValueDecl {
     return false;
   }
 
-  inline static constexpr DeclKind static_kind(void) {
-    return DeclKind::DECLARATOR;
-  }
-
   static gap::generator<DeclaratorDecl> containing(const Decl &decl);
   static gap::generator<DeclaratorDecl> containing(const Stmt &stmt);
 
