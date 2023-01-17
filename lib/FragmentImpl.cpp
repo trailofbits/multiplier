@@ -507,6 +507,8 @@ std::string_view FragmentImpl::Data(void) const {
 // Return the token associated with a specific entity ID.
 std::optional<Token> FragmentImpl::TokenFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  (void) can_fail;
+
   VariantId vid = eid.Unpack();
 
   // It's a fragment token.
@@ -662,6 +664,8 @@ TokenRange FragmentImpl::TokenRangeFor(
 // Return the declaration associated with a specific entity ID.
 std::optional<Decl> FragmentImpl::DeclFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  (void) can_fail;
+
   VariantId vid = eid.Unpack();
 
   if (!std::holds_alternative<DeclarationId>(vid)) {
@@ -700,6 +704,8 @@ std::optional<Decl> FragmentImpl::DeclFor(
 // Return the statement associated with a specific entity ID.
 std::optional<Stmt> FragmentImpl::StmtFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  (void) can_fail;
+
   VariantId vid = eid.Unpack();
 
   if (!std::holds_alternative<StatementId>(vid)) {
@@ -739,6 +745,8 @@ std::optional<Stmt> FragmentImpl::StmtFor(
 // Return the type associated with a specific entity ID.
 std::optional<Type> FragmentImpl::TypeFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  (void) can_fail;
+
   VariantId vid = eid.Unpack();
 
   if (!std::holds_alternative<TypeId>(vid)) {
@@ -779,6 +787,8 @@ std::optional<Type> FragmentImpl::TypeFor(
 // Return the attribute associated with a specific entity ID.
 std::optional<Macro> FragmentImpl::MacroFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  (void) can_fail;
+
   VariantId vid = eid.Unpack();
 
   if (!std::holds_alternative<MacroId>(vid)) {
@@ -819,6 +829,8 @@ std::optional<Macro> FragmentImpl::MacroFor(
 // Return the type associated with a specific entity ID.
 std::optional<Attr> FragmentImpl::AttrFor(
     const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+  (void) can_fail;
+
   VariantId vid = eid.Unpack();
 
   if (!std::holds_alternative<AttributeId>(vid)) {

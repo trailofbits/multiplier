@@ -132,6 +132,7 @@ std::optional<TokenContext> TokenContext::aliasee(void) const {
 
   } else {
     auto tc = impl->Fragment().getParsedTokenContexts()[alias_offset.value()];
+    (void) tc;
     TokenContext ret(impl);
     assert(entity_id == tc.getEntityId());
     assert(!tc.getAliasIndex());
