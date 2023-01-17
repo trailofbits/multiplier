@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class Attr;
 class CUDASharedAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CUDASharedAttrRange = DerivedEntityRange<AttrIterator, CUDASharedAttr>;
-using CUDASharedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, CUDASharedAttr>;
 class CUDASharedAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static CUDASharedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CUDASharedAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static CUDASharedAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<CUDASharedAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

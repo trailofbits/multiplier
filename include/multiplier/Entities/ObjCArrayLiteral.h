@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class ObjCMethodDecl;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCArrayLiteralRange = DerivedEntityRange<StmtIterator, ObjCArrayLiteral>;
-using ObjCArrayLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCArrayLiteral>;
-using ObjCArrayLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCArrayLiteral>;
-
 class ObjCArrayLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -40,12 +37,20 @@ class ObjCArrayLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCArrayLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCArrayLiteral> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCArrayLiteralContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCArrayLiteral> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -60,8 +65,8 @@ class ObjCArrayLiteral : public Expr {
     return StmtKind::OBJ_C_ARRAY_LITERAL;
   }
 
-  static ObjCArrayLiteralContainingStmtRange containing(const Decl &decl);
-  static ObjCArrayLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCArrayLiteral> containing(const Decl &decl);
+  static gap::generator<ObjCArrayLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

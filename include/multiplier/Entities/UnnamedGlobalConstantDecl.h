@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class NamedDecl;
 class UnnamedGlobalConstantDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UnnamedGlobalConstantDeclRange = DerivedEntityRange<DeclIterator, UnnamedGlobalConstantDecl>;
-using UnnamedGlobalConstantDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, UnnamedGlobalConstantDecl>;
-using UnnamedGlobalConstantDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, UnnamedGlobalConstantDecl>;
-
 class UnnamedGlobalConstantDecl : public ValueDecl {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static UnnamedGlobalConstantDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UnnamedGlobalConstantDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static UnnamedGlobalConstantDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<UnnamedGlobalConstantDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class UnnamedGlobalConstantDecl : public ValueDecl {
     return DeclKind::UNNAMED_GLOBAL_CONSTANT;
   }
 
-  static UnnamedGlobalConstantDeclContainingDeclRange containing(const Decl &decl);
-  static UnnamedGlobalConstantDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<UnnamedGlobalConstantDecl> containing(const Decl &decl);
+  static gap::generator<UnnamedGlobalConstantDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

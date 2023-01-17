@@ -644,7 +644,6 @@ static TokenCategory ClassifyDecl(const Token &tok, DeclarationId id) {
       break;
   }
 
-done:
   return ClassifyToken(tok);
 }
 
@@ -732,52 +731,52 @@ TokenReader::Ptr TokenReader::ReaderForToken(
 InvalidTokenReader::~InvalidTokenReader(void) noexcept {}
 
 // Return the number of tokens accessible to this reader.
-unsigned InvalidTokenReader::NumTokens(void) const {
+EntityOffset InvalidTokenReader::NumTokens(void) const {
   return 0u;
 }
 
 // Return the kind of the Nth token.
-TokenKind InvalidTokenReader::NthTokenKind(unsigned) const {
+TokenKind InvalidTokenReader::NthTokenKind(EntityOffset) const {
   return TokenKind::UNKNOWN;
 }
 
 // Return the data of the Nth token.
-std::string_view InvalidTokenReader::NthTokenData(unsigned) const {
+std::string_view InvalidTokenReader::NthTokenData(EntityOffset) const {
   return {};
 }
 
 // Return the id of the token from which the Nth token is derived.
-EntityId InvalidTokenReader::NthDerivedTokenId(unsigned) const {
+EntityId InvalidTokenReader::NthDerivedTokenId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
 // Return the id of the parsed token which is derived from the Nth token.
-EntityId InvalidTokenReader::NthParsedTokenId(unsigned) const {
+EntityId InvalidTokenReader::NthParsedTokenId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
 // Return the id of the macro containing the Nth token.
-EntityId InvalidTokenReader::NthContainingMacroId(unsigned) const {
+EntityId InvalidTokenReader::NthContainingMacroId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
 // Return an entity id associated with the Nth token.
-EntityId InvalidTokenReader::NthRelatedEntityId(unsigned) const {
+EntityId InvalidTokenReader::NthRelatedEntityId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
 // Return the id of the Nth token.
-EntityId InvalidTokenReader::NthTokenId(unsigned) const {
+EntityId InvalidTokenReader::NthTokenId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
-EntityId InvalidTokenReader::NthFileTokenId(unsigned) const {
+EntityId InvalidTokenReader::NthFileTokenId(EntityOffset) const {
   return kInvalidEntityId;
 }
 
 // Return the token reader for another file.
 TokenReader::Ptr InvalidTokenReader::ReaderForToken(
-    const Ptr &self, RawEntityId id) const {
+    const Ptr &, RawEntityId ) const {
   return {};
 }
 
@@ -833,16 +832,16 @@ Token Token::derived_token(void) const {
   EntityId eid = impl->NthDerivedTokenId(offset);
   VariantId vid = eid.Unpack();
 
-  unsigned offset = 0u;
+  EntityOffset derived_offset = 0u;
 
   if (std::holds_alternative<FileTokenId>(vid)) {
-    offset = std::get<FileTokenId>(vid).offset;
+    derived_offset = std::get<FileTokenId>(vid).offset;
 
   } else if (std::holds_alternative<ParsedTokenId>(vid)) {
-    offset = std::get<ParsedTokenId>(vid).offset;
+    derived_offset = std::get<ParsedTokenId>(vid).offset;
 
   } else if (std::holds_alternative<MacroTokenId>(vid)) {
-    offset = std::get<MacroTokenId>(vid).offset;
+    derived_offset = std::get<MacroTokenId>(vid).offset;
 
   } else {
     return Token();
@@ -855,12 +854,12 @@ Token Token::derived_token(void) const {
   }
 
   auto num_tokens = reader->NumTokens();
-  if (offset >= num_tokens) {
+  if (derived_offset >= num_tokens) {
     assert(false);
     return Token();
   }
 
-  return Token(std::move(reader), offset);
+  return Token(std::move(reader), derived_offset);
 }
 
 // Return the version of this token from a file, if any. If this is a parsed
@@ -927,12 +926,12 @@ VariantEntity Token::related_entity(void) const {
 
 // Return the set of all uses of this token within its fragment (if it's a
 // fragment token).
-UseRange<TokenUseSelector> Token::uses(void) const {
+gap::generator<Use<TokenUseSelector>> Token::uses(void) const {
   if (auto frag = Fragment::containing(*this)) {
-    FragmentImpl::Ptr frag_ptr = std::move(frag->impl);
-    return std::make_shared<UseIteratorImpl>(std::move(frag_ptr), *this);
-  } else {
-    return {};
+    UseIteratorImpl use_iter(std::move(frag->impl), *this);
+    for (auto use : use_iter.enumerate<TokenUseSelector>()) {
+      co_yield use;
+    }
   }
 }
 
@@ -948,13 +947,13 @@ TokenRange::TokenRange(const Token &tok)
 
 // Return the token at index `index`.
 Token TokenRange::operator[](size_t relative_index) const {
-  auto effective_index = (index + relative_index);
+  size_t effective_index = (index + relative_index);
   if (effective_index >= num_tokens) {
     throw std::out_of_range(
         "Index " + std::to_string(relative_index) +
         " is out of range on mx::TokenRange");
   } else {
-    return Token(impl, effective_index);
+    return Token(impl, static_cast<EntityOffset>(effective_index));
   }
 }
 
@@ -976,12 +975,12 @@ TokenRange TokenRange::slice(size_t start_index,
   if (end_index <= start_index || start_index >= num_tokens ||
       end_index > num_tokens || (index + start_index) >= num_tokens ||
       (index + end_index) > num_tokens ||
-      static_cast<unsigned>(index + start_index) != (index + start_index) ||
-      static_cast<unsigned>(index + end_index) != (index + end_index)) {
+      static_cast<EntityOffset>(index + start_index) != (index + start_index) ||
+      static_cast<EntityOffset>(index + end_index) != (index + end_index)) {
     return TokenRange();
   } else {
-    return TokenRange(impl, static_cast<unsigned>(index + start_index),
-                      static_cast<unsigned>(index + end_index));
+    return TokenRange(impl, static_cast<EntityOffset>(index + start_index),
+                      static_cast<EntityOffset>(index + end_index));
   }
 }
 

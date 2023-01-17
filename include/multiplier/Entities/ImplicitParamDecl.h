@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -31,10 +32,6 @@ class NamedDecl;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImplicitParamDeclRange = DerivedEntityRange<DeclIterator, ImplicitParamDecl>;
-using ImplicitParamDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImplicitParamDecl>;
-using ImplicitParamDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ImplicitParamDecl>;
-
 class ImplicitParamDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -44,12 +41,20 @@ class ImplicitParamDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ImplicitParamDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ImplicitParamDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ImplicitParamDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ImplicitParamDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -64,8 +69,8 @@ class ImplicitParamDecl : public VarDecl {
     return DeclKind::IMPLICIT_PARAM;
   }
 
-  static ImplicitParamDeclContainingDeclRange containing(const Decl &decl);
-  static ImplicitParamDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ImplicitParamDecl> containing(const Decl &decl);
+  static gap::generator<ImplicitParamDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

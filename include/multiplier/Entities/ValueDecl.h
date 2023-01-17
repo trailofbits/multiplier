@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,22 +29,26 @@ class NamedDecl;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ValueDeclRange = DerivedEntityRange<DeclIterator, ValueDecl>;
-using ValueDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ValueDecl>;
-using ValueDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ValueDecl>;
-
 class ValueDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ValueDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ValueDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ValueDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ValueDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -54,8 +59,8 @@ class ValueDecl : public NamedDecl {
     return false;
   }
 
-  static ValueDeclContainingDeclRange containing(const Decl &decl);
-  static ValueDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ValueDecl> containing(const Decl &decl);
+  static gap::generator<ValueDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

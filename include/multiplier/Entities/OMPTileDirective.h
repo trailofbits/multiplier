@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class OMPLoopTransformationDirective;
 class OMPTileDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTileDirectiveRange = DerivedEntityRange<StmtIterator, OMPTileDirective>;
-using OMPTileDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTileDirective>;
-using OMPTileDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTileDirective>;
-
 class OMPTileDirective : public OMPLoopTransformationDirective {
  private:
   friend class FragmentImpl;
@@ -41,12 +38,20 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPTileDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPTileDirective> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPTileDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPTileDirective> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class OMPTileDirective : public OMPLoopTransformationDirective {
     return StmtKind::OMP_TILE_DIRECTIVE;
   }
 
-  static OMPTileDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTileDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTileDirective> containing(const Decl &decl);
+  static gap::generator<OMPTileDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

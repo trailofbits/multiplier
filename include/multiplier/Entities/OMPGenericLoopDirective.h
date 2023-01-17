@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class OMPLoopBasedDirective;
 class OMPLoopDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPGenericLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPGenericLoopDirective>;
-using OMPGenericLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPGenericLoopDirective>;
-using OMPGenericLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPGenericLoopDirective>;
-
 class OMPGenericLoopDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -41,12 +38,20 @@ class OMPGenericLoopDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPGenericLoopDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPGenericLoopDirective> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPGenericLoopDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPGenericLoopDirective> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class OMPGenericLoopDirective : public OMPLoopDirective {
     return StmtKind::OMP_GENERIC_LOOP_DIRECTIVE;
   }
 
-  static OMPGenericLoopDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPGenericLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPGenericLoopDirective> containing(const Decl &decl);
+  static gap::generator<OMPGenericLoopDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,22 +28,26 @@ class Decl;
 class NamedDecl;
 class NamespaceDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NamespaceDeclRange = DerivedEntityRange<DeclIterator, NamespaceDecl>;
-using NamespaceDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, NamespaceDecl>;
-using NamespaceDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, NamespaceDecl>;
-
 class NamespaceDecl : public NamedDecl {
  private:
   friend class FragmentImpl;
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static NamespaceDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NamespaceDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static NamespaceDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<NamespaceDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -57,8 +62,8 @@ class NamespaceDecl : public NamedDecl {
     return DeclKind::NAMESPACE;
   }
 
-  static NamespaceDeclContainingDeclRange containing(const Decl &decl);
-  static NamespaceDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<NamespaceDecl> containing(const Decl &decl);
+  static gap::generator<NamespaceDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,22 +30,26 @@ class Expr;
 class Stmt;
 class SwitchCase;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CaseStmtRange = DerivedEntityRange<StmtIterator, CaseStmt>;
-using CaseStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CaseStmt>;
-using CaseStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CaseStmt>;
-
 class CaseStmt : public SwitchCase {
  private:
   friend class FragmentImpl;
   friend class SwitchCase;
   friend class Stmt;
  public:
-  inline static CaseStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CaseStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static CaseStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<CaseStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class CaseStmt : public SwitchCase {
     return StmtKind::CASE_STMT;
   }
 
-  static CaseStmtContainingStmtRange containing(const Decl &decl);
-  static CaseStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CaseStmt> containing(const Decl &decl);
+  static gap::generator<CaseStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

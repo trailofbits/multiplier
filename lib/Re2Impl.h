@@ -62,6 +62,8 @@ class RegexQueryResultImpl final {
   bool InitForFragment(SpecificEntityId<FragmentId> frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);
+
+  gap::generator<RegexQueryMatch> enumerate(void);
 };
 
 }  // namespace mx

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -25,30 +26,20 @@
 namespace mx {
 class Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AttrRange = DerivedEntityRange<AttrIterator, Attr>;
-using AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, Attr>;
 class Attr {
  protected:
-  friend class AttrIterator;
   friend class Decl;
-  friend class DeclIterator;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
-  friend class StmtReferenceIterator;
-  friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
-  friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -75,18 +66,26 @@ class Attr {
   }
 
   SpecificEntityId<AttributeId> id(void) const;
-  UseRange<AttrUseSelector> uses(void) const;
+  gap::generator<Use<AttrUseSelector>> uses(void) const;
 
  protected:
-  static AttrIterator in_internal(const Fragment &fragment);
+  static gap::generator<Attr> in_internal(const Fragment &fragment);
 
  public:
-  inline static AttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Attr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<Attr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

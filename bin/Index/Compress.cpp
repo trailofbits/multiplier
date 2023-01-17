@@ -15,8 +15,7 @@
 namespace indexer {
 
 // Compress a message.
-std::string CompressedMessage(
-    const char *what, capnp::MessageBuilder &message) {
+std::string CompressedMessage(capnp::MessageBuilder &message) {
   size_t old_size = message.sizeInWords() * sizeof(capnp::word);
   kj::VectorOutputStream os(old_size);
   capnp::writePackedMessage(os, message);
@@ -38,7 +37,7 @@ std::string CompressedMessage(
 
   } else {
     LOG(ERROR)
-        << "Unable to compress " << what << ": "
+        << "Unable to compress: "
         << maybe_compressed.TakeError().message();
   use_uncompressed:
     output.reserve(packed_size + 1u);
@@ -50,7 +49,7 @@ std::string CompressedMessage(
 }
 
 void WithUncompressedMessageImpl(
-    const char *what, std::string data,
+    std::string data,
     std::function<void(capnp::PackedMessageReader &)> cb) {
   CHECK(!data.empty());
   auto begin = reinterpret_cast<const char *>(data.c_str());
@@ -60,7 +59,7 @@ void WithUncompressedMessageImpl(
   if (tag) {  // Compressed and packed.
     auto maybe_uncompressed = mx::TryUncompress(untagged_data);
     CHECK(maybe_uncompressed.Succeeded())
-        << "Unable to uncompress " << what << ": "
+        << "Unable to uncompress: "
         << maybe_uncompressed.TakeError().message();
 
     data = maybe_uncompressed.TakeValue();

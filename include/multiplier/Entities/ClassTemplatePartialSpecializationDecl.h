@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -33,10 +34,6 @@ class TagDecl;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ClassTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplatePartialSpecializationDecl>;
-using ClassTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassTemplatePartialSpecializationDecl>;
-using ClassTemplatePartialSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ClassTemplatePartialSpecializationDecl>;
-
 class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializationDecl {
  private:
   friend class FragmentImpl;
@@ -48,12 +45,20 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ClassTemplatePartialSpecializationDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ClassTemplatePartialSpecializationDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ClassTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -68,8 +73,8 @@ class ClassTemplatePartialSpecializationDecl : public ClassTemplateSpecializatio
     return DeclKind::CLASS_TEMPLATE_PARTIAL_SPECIALIZATION;
   }
 
-  static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
-  static ClassTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Decl &decl);
+  static gap::generator<ClassTemplatePartialSpecializationDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

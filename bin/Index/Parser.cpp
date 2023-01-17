@@ -51,7 +51,7 @@ static std::vector<std::string> SplitCompileCommands(std::string_view cmd_str) {
   ss << cmd_str;
   for (std::string line; std::getline(ss, line, '\0');) {
     auto found = line.find_first_of("{");
-    if(found != std::string::npos) {
+    if (found != std::string::npos) {
       cmd_vec.push_back(line);
     }
   }

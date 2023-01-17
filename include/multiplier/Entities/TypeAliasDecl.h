@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -31,10 +32,6 @@ class TypeAliasTemplateDecl;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeAliasDeclRange = DerivedEntityRange<DeclIterator, TypeAliasDecl>;
-using TypeAliasDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeAliasDecl>;
-using TypeAliasDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TypeAliasDecl>;
-
 class TypeAliasDecl : public TypedefNameDecl {
  private:
   friend class FragmentImpl;
@@ -43,12 +40,20 @@ class TypeAliasDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static TypeAliasDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypeAliasDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static TypeAliasDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<TypeAliasDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -63,8 +68,8 @@ class TypeAliasDecl : public TypedefNameDecl {
     return DeclKind::TYPE_ALIAS;
   }
 
-  static TypeAliasDeclContainingDeclRange containing(const Decl &decl);
-  static TypeAliasDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<TypeAliasDecl> containing(const Decl &decl);
+  static gap::generator<TypeAliasDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

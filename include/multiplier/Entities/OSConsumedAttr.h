@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,8 +29,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class OSConsumedAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OSConsumedAttrRange = DerivedEntityRange<AttrIterator, OSConsumedAttr>;
-using OSConsumedAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OSConsumedAttr>;
 class OSConsumedAttr : public InheritableParamAttr {
  private:
   friend class FragmentImpl;
@@ -37,12 +36,20 @@ class OSConsumedAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OSConsumedAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OSConsumedAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OSConsumedAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OSConsumedAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

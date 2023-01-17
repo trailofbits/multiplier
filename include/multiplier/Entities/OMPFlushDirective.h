@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,22 +28,26 @@ class OMPExecutableDirective;
 class OMPFlushDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPFlushDirectiveRange = DerivedEntityRange<StmtIterator, OMPFlushDirective>;
-using OMPFlushDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPFlushDirective>;
-using OMPFlushDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPFlushDirective>;
-
 class OMPFlushDirective : public OMPExecutableDirective {
  private:
   friend class FragmentImpl;
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPFlushDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPFlushDirective> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPFlushDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPFlushDirective> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -57,8 +62,8 @@ class OMPFlushDirective : public OMPExecutableDirective {
     return StmtKind::OMP_FLUSH_DIRECTIVE;
   }
 
-  static OMPFlushDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPFlushDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPFlushDirective> containing(const Decl &decl);
+  static gap::generator<OMPFlushDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

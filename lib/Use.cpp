@@ -47,7 +47,11 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 #define DEFINE_FIND_READER_KIND_USES(reader_kind, name) \
     void FindUses_ ## name ( \
         mx::RawEntityId eid, UseSelectorSet &selectors, \
-        const mx::ast::reader_kind::Reader &reader, bool &found) {
+        const mx::ast::reader_kind::Reader &reader, bool &found) { \
+        (void) eid; \
+        (void) selectors; \
+        (void) reader; \
+        (void) found;
 
 #define MX_VISIT_BASE(name, base_name) \
     FindUses_ ## base_name(eid, selectors, reader, found);
@@ -109,7 +113,6 @@ const char *EnumeratorName(UseKind kind) {
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
-  DeclarationId did = sid.Unpack();
 
   ep->FillUses(ep, sid.Pack(), search_ids, fragment_ids);
 
@@ -204,13 +207,13 @@ UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
   fragment_ids.erase(it, fragment_ids.end());
 }
 
-bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
-  while (self.list_offset < self.use.fragment->num_decls) {
-    self.use.offset = self.list_offset++;
-    mx::ast::Decl::Reader reader = self.use.fragment->NthDecl(self.use.offset);
+bool UseIteratorImpl::FindNextDecl(UseBase &use) {
+  while (list_offset < use.fragment->num_decls) {
+    use.offset = list_offset++;
+    mx::ast::Decl::Reader reader = use.fragment->NthDecl(use.offset);
     bool found = false;
 
-    self.use.selectors.reset();
+    use.selectors.reset();
 
     for (auto eid : search_ids) {
       switch (Get_Decl_Kind(reader)) {
@@ -218,7 +221,7 @@ bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
 #define MX_BEGIN_VISIT_ABSTRACT_DECL(name)
 #define MX_BEGIN_VISIT_DECL(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      FindUses_ ## name (eid, use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -234,13 +237,13 @@ bool UseIteratorImpl::FindNextDecl(UseIteratorBase &self) {
   return false;
 }
 
-bool UseIteratorImpl::FindNextStmt(UseIteratorBase &self) {
-  while (self.list_offset < self.use.fragment->num_stmts) {
-    self.use.offset = self.list_offset++;
-    mx::ast::Stmt::Reader reader = self.use.fragment->NthStmt(self.use.offset);
+bool UseIteratorImpl::FindNextStmt(UseBase &use) {
+  while (list_offset < use.fragment->num_stmts) {
+    use.offset = list_offset++;
+    mx::ast::Stmt::Reader reader = use.fragment->NthStmt(use.offset);
     bool found = false;
 
-    self.use.selectors.reset();
+    use.selectors.reset();
 
     for (auto eid : search_ids) {
       switch (Get_Stmt_Kind(reader)) {
@@ -248,7 +251,7 @@ bool UseIteratorImpl::FindNextStmt(UseIteratorBase &self) {
 #define MX_BEGIN_VISIT_ABSTRACT_STMT(name)
 #define MX_BEGIN_VISIT_STMT(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      FindUses_ ## name (eid, use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -262,13 +265,13 @@ bool UseIteratorImpl::FindNextStmt(UseIteratorBase &self) {
   return false;
 }
 
-bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
-  while (self.list_offset < self.use.fragment->num_types) {
-    self.use.offset = self.list_offset++;
-    mx::ast::Type::Reader reader = self.use.fragment->NthType(self.use.offset);
+bool UseIteratorImpl::FindNextType(UseBase &use) {
+  while (list_offset < use.fragment->num_types) {
+    use.offset = list_offset++;
+    mx::ast::Type::Reader reader = use.fragment->NthType(use.offset);
     bool found = false;
 
-    self.use.selectors.reset();
+    use.selectors.reset();
 
     for (auto eid : search_ids) {
       switch (Get_Type_Kind(reader)) {
@@ -276,7 +279,7 @@ bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
 #define MX_BEGIN_VISIT_ABSTRACT_TYPE(name)
 #define MX_BEGIN_VISIT_TYPE(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      FindUses_ ## name (eid, use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -292,13 +295,13 @@ bool UseIteratorImpl::FindNextType(UseIteratorBase &self) {
   return false;
 }
 
-bool UseIteratorImpl::FindNextAttr(UseIteratorBase &self) {
-  while (self.list_offset < self.use.fragment->num_attrs) {
-    self.use.offset = self.list_offset++;
-    mx::ast::Attr::Reader reader = self.use.fragment->NthAttr(self.use.offset);
+bool UseIteratorImpl::FindNextAttr(UseBase &use) {
+  while (list_offset < use.fragment->num_attrs) {
+    use.offset = list_offset++;
+    mx::ast::Attr::Reader reader = use.fragment->NthAttr(use.offset);
     bool found = false;
 
-    self.use.selectors.reset();
+    use.selectors.reset();
 
     for (auto eid : search_ids) {
       switch (Get_Attr_Kind(reader)) {
@@ -306,7 +309,7 @@ bool UseIteratorImpl::FindNextAttr(UseIteratorBase &self) {
 #define MX_BEGIN_VISIT_ABSTRACT_ATTR(name)
 #define MX_BEGIN_VISIT_ATTR(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      FindUses_ ## name (eid, use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -322,13 +325,13 @@ bool UseIteratorImpl::FindNextAttr(UseIteratorBase &self) {
   return false;
 }
 
-bool UseIteratorImpl::FindNextMacro(UseIteratorBase &self) {
-  while (self.list_offset < self.use.fragment->num_macros) {
-    self.use.offset = self.list_offset++;
-    mx::ast::Macro::Reader reader = self.use.fragment->NthMacro(self.use.offset);
+bool UseIteratorImpl::FindNextMacro(UseBase& use) {
+  while (list_offset < use.fragment->num_macros) {
+    use.offset = list_offset++;
+    mx::ast::Macro::Reader reader = use.fragment->NthMacro(use.offset);
     bool found = false;
 
-    self.use.selectors.reset();
+    use.selectors.reset();
 
     for (auto eid : search_ids) {
       switch (Get_Macro_Kind(reader)) {
@@ -336,7 +339,7 @@ bool UseIteratorImpl::FindNextMacro(UseIteratorBase &self) {
 #define MX_BEGIN_VISIT_ABSTRACT_MACRO(name)
 #define MX_BEGIN_VISIT_MACRO(name) \
     case name::static_kind(): \
-      FindUses_ ## name (eid, self.use.selectors, reader, found); \
+      FindUses_ ## name (eid, use.selectors, reader, found); \
       break;
 
 #include <multiplier/Visitor.inc.h>
@@ -352,32 +355,32 @@ bool UseIteratorImpl::FindNextMacro(UseIteratorBase &self) {
   return false;
 }
 
-bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
-  while (self.list_offset < self.use.fragment->num_pseudos) {
+bool UseIteratorImpl::FindNextPseudo(UseBase &use) {
+  while (list_offset < use.fragment->num_pseudos) {
     TemplateArgument *dummy = nullptr;
-    self.use.offset = self.list_offset++;
-    self.use.selectors.reset();
+    use.offset = list_offset++;
+    use.selectors.reset();
     mx::ast::Pseudo::Reader reader =
-        self.use.fragment->NthPseudo(self.use.offset);
+        use.fragment->NthPseudo(use.offset);
     bool found = false;
 
     for (auto eid : search_ids) {
       switch (Get_Pseudo_Kind(reader, dummy)) {
         case PseudoKind::CXX_BASE_SPECIFIER:
-          self.use.kind = UseKind::CXX_BASE_SPECIFIER;
-          FindUses_CXXBaseSpecifier(eid, self.use.selectors, reader, found);
+          use.kind = UseKind::CXX_BASE_SPECIFIER;
+          FindUses_CXXBaseSpecifier(eid, use.selectors, reader, found);
           break;
         case PseudoKind::TEMPLATE_ARGUMENT:
-          self.use.kind = UseKind::TEMPLATE_ARGUMENT;
-          FindUses_TemplateArgument(eid, self.use.selectors, reader, found);
+          use.kind = UseKind::TEMPLATE_ARGUMENT;
+          FindUses_TemplateArgument(eid, use.selectors, reader, found);
           break;
         case PseudoKind::TEMPLATE_PARAMETER_LIST:
-          self.use.kind = UseKind::TEMPLATE_PARAMETER_LIST;
-          FindUses_TemplateParameterList(eid, self.use.selectors, reader, found);
+          use.kind = UseKind::TEMPLATE_PARAMETER_LIST;
+          FindUses_TemplateParameterList(eid, use.selectors, reader, found);
           break;
         case PseudoKind::DESIGNATOR:
-          self.use.kind = UseKind::DESIGNATOR;
-          FindUses_Designator(eid, self.use.selectors, reader, found);
+          use.kind = UseKind::DESIGNATOR;
+          FindUses_Designator(eid, use.selectors, reader, found);
           break;
       }
     }
@@ -390,92 +393,86 @@ bool UseIteratorImpl::FindNextPseudo(UseIteratorBase &self) {
   return false;
 }
 
-bool UseIteratorImpl::FindNext(UseIteratorBase &self) {
+bool UseIteratorImpl::FindNext(UseBase &use) {
   for (;;) {
-    if (!self.use.fragment) {
-      if (self.fragment_offset >= fragment_ids.size()) {
+    if (!use.fragment) {
+      if (fragment_offset >= fragment_ids.size()) {
         return false;
 
       } else {
-        self.use.fragment = ep->FragmentFor(
-            ep, fragment_ids[self.fragment_offset++]);
-        if (!self.use.fragment) {
+        use.fragment = ep->FragmentFor(
+            ep, fragment_ids[fragment_offset++]);
+        if (!use.fragment) {
           continue;  // Skip to next; didn't find for some reason.
         }
       }
     }
 
-    switch (self.use.kind) {
+    switch (use.kind) {
       case UseKind::DECLARATION:
-        if (FindNextDecl(self)) {
+        if (FindNextDecl(use)) {
           return true;
 
         } else {
           // Skip to next list; didn't find.
-          self.use.kind = UseKind::STATEMENT;
-          self.list_offset = 0u;
+          use.kind = UseKind::STATEMENT;
+          list_offset = 0u;
           continue;
         }
       case UseKind::STATEMENT:
-        if (FindNextStmt(self)) {
+        if (FindNextStmt(use)) {
           return true;
         } else {
           // Skip to next list; didn't find.
-          self.use.kind = UseKind::TYPE;
-          self.list_offset = 0u;
+          use.kind = UseKind::TYPE;
+          list_offset = 0u;
           continue;
         }
       case UseKind::TYPE:
-        if (FindNextType(self)) {
+        if (FindNextType(use)) {
           return true;
         } else {
           // Skip to next list; didn't find.
-          self.use.kind = UseKind::ATTRIBUTE;
-          self.list_offset = 0u;
+          use.kind = UseKind::ATTRIBUTE;
+          list_offset = 0u;
           continue;
         }
       case UseKind::ATTRIBUTE:
-        if (FindNextAttr(self)) {
+        if (FindNextAttr(use)) {
           return true;
         } else {
           // Skip to next list; didn't find.
-          self.use.kind = UseKind::MACRO;
-          self.list_offset = 0u;
+          use.kind = UseKind::MACRO;
+          list_offset = 0u;
           continue;
         }
       case UseKind::MACRO:
-        if (FindNextMacro(self)) {
+        if (FindNextMacro(use)) {
           return true;
         } else {
           // Skip to next list; didn't find.
-          self.use.kind = UseKind::CXX_BASE_SPECIFIER;
-          self.list_offset = 0u;
+          use.kind = UseKind::CXX_BASE_SPECIFIER;
+          list_offset = 0u;
           continue;
         }
       case UseKind::CXX_BASE_SPECIFIER:
       case UseKind::TEMPLATE_ARGUMENT:
       case UseKind::TEMPLATE_PARAMETER_LIST:
       case UseKind::DESIGNATOR:
-        if (FindNextPseudo(self)) {
+        if (FindNextPseudo(use)) {
           return true;
 
         } else {
           // Skip to next fragment; didn't find.
-          self.use.fragment.reset();
-          self.list_offset = 0u;
-          self.use.kind = UseKind::DECLARATION;
+          use.fragment.reset();
+          list_offset = 0u;
+          use.kind = UseKind::DECLARATION;
           continue;
         }
     }
   }
 
   return false;
-}
-
-void UseIteratorBase::Advance(void) {
-  if (!impl->FindNext(*this)) {
-    impl.reset();
-  }
 }
 
 UseBase::~UseBase(void) {}
@@ -529,7 +526,8 @@ UseBase::UseBase(TemplateArgument entity, UseSelectorSet selectors_)
       kind(UseKind::TEMPLATE_ARGUMENT) {}
 
 UseBase::UseBase(TemplateParameterList entity, UseSelectorSet selectors_)
-    : fragment(std::move(entity.fragment)),
+    : selectors(std::move(selectors_)),
+      fragment(std::move(entity.fragment)),
       offset(entity.offset_),
       kind(UseKind::TEMPLATE_PARAMETER_LIST) {}
 
@@ -679,7 +677,6 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
-  DeclarationId did = sid.Unpack();
 
   ep->FillReferences(ep, sid.Pack(), search_ids, fragment_ids);
 
@@ -734,24 +731,99 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   //            files of the compiler itself.
 }
 
-StmtReferenceIterator::~StmtReferenceIterator(void) {}
-
-void StmtReferenceIterator::Advance(void) {
-  if (!impl || impl->search_ids.empty() || impl->fragment_ids.empty()) {
-    impl.reset();
-    return;
+gap::generator<MacroReference> ReferenceIteratorImpl::enumerate_macros(void) {
+  if (search_ids.empty() || fragment_ids.empty()) {
+    co_return;
   }
 
+  assert(search_ids.size() == 1u);
+  RawEntityId search_id = search_ids[0];
+  unsigned fragment_offset = 0u;
+  MacroReference user;
+
+  for (;;) {
+    // Initialize to the first macro of the fragment.
+    if (!user.fragment) {
+      if (fragment_offset >= fragment_ids.size()) {
+        co_return;
+      }
+
+      auto frag_id = fragment_ids[fragment_offset++];
+      user.fragment = ep->FragmentFor(ep, frag_id);
+      if (!user.fragment) {
+        continue;
+      }
+
+      user.offset = 0u;
+
+    // Skip to the next macro.
+    } else {
+      ++user.offset;
+    }
+
+    // We've exhausted the macros in this fragment; skip to the next
+    // fragment.
+    if (user.offset >= user.fragment->num_macros) {
+      user.fragment.reset();
+      user.offset = 0u;
+      continue;
+    }
+
+    Macro macro(std::move(user.fragment), user.offset);
+
+    // Needs to match what is in `LinkExternalReferencesInFragment` in
+    // `bin/Index/LinkExternalReferencesInFragment.cpp`.
+    switch (macro.kind()) {
+      case mx::MacroKind::EXPANSION: {
+        auto &exp = reinterpret_cast<const MacroExpansion &>(macro);
+        if (auto def = exp.definition()) {
+          SpecificEntityId<MacroId> referenced_id = def->id();
+          if (referenced_id.Pack() == search_id) {
+            user.fragment = std::move(macro.fragment);  // Take it back.
+            co_yield user;  // Hit!
+          }
+        }
+        break;
+      }
+      case mx::MacroKind::INCLUDE_DIRECTIVE:
+      case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
+      case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
+      case mx::MacroKind::IMPORT_DIRECTIVE: {
+        auto &inc = reinterpret_cast<const IncludeLikeMacroDirective &>(macro);
+        if (auto file = inc.included_file()) {
+          SpecificEntityId<FileId> referenced_id = file->id();
+          if (referenced_id.Pack() == search_id) {
+            user.fragment = std::move(macro.fragment);  // Take it back.
+            co_yield user;  // Hit!
+          }
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    user.fragment = std::move(macro.fragment);  // Take it back.
+  }
+}
+
+gap::generator<StmtReference> ReferenceIteratorImpl::enumerate_stmts(void) {
+  if (search_ids.empty() || fragment_ids.empty()) {
+    co_return;
+  }
+
+  unsigned fragment_offset = 0;
+  StmtReference user;
   for (;;) {
     // Initialize to the first statement of the fragment.
     if (!user.fragment) {
-      if (fragment_offset >= impl->fragment_ids.size()) {
-        impl.reset();  // Done.
-        return;
+      if (fragment_offset >= fragment_ids.size()) {
+        co_return;
       }
 
-      auto frag_id = impl->fragment_ids[fragment_offset++];
-      user.fragment = impl->ep->FragmentFor(impl->ep, frag_id);
+      auto frag_id = fragment_ids[fragment_offset++];
+      user.fragment = ep->FragmentFor(ep, frag_id);
       if (!user.fragment) {
         continue;
       }
@@ -798,10 +870,10 @@ void StmtReferenceIterator::Advance(void) {
 
         if (std::optional<Decl> ref_decl = stmt.referenced_declaration()) {
           PackedDeclarationId referenced_id = ref_decl->id();
-          for (RawEntityId search_id : impl->search_ids) {
+          for (RawEntityId search_id : search_ids) {
             if (referenced_id == search_id) {
               user.fragment = std::move(stmt.fragment);  // Take it back.
-              return;  // Hit!
+              co_yield user;
             }
           }
         }
@@ -828,85 +900,6 @@ StmtReference::operator Stmt(void) && noexcept {
 
 StmtReference::operator Stmt(void) const & noexcept {
   return Stmt(fragment, offset);
-}
-
-MacroReferenceIterator::~MacroReferenceIterator(void) {}
-
-void MacroReferenceIterator::Advance(void) {
-  if (!impl || impl->search_ids.empty() || impl->fragment_ids.empty()) {
-    impl.reset();
-    return;
-  }
-
-  assert(impl->search_ids.size() == 1u);
-  RawEntityId search_id = impl->search_ids[0];
-
-  for (;;) {
-    // Initialize to the first macro of the fragment.
-    if (!user.fragment) {
-      if (fragment_offset >= impl->fragment_ids.size()) {
-        impl.reset();  // Done.
-        return;
-      }
-
-      auto frag_id = impl->fragment_ids[fragment_offset++];
-      user.fragment = impl->ep->FragmentFor(impl->ep, frag_id);
-      if (!user.fragment) {
-        continue;
-      }
-
-      user.offset = 0u;
-
-    // Skip to the next macro.
-    } else {
-      ++user.offset;
-    }
-
-    // We've exhausted the macros in this fragment; skip to the next
-    // fragment.
-    if (user.offset >= user.fragment->num_macros) {
-      user.fragment.reset();
-      user.offset = 0u;
-      continue;
-    }
-
-    Macro macro(std::move(user.fragment), user.offset);
-
-    // Needs to match what is in `LinkExternalReferencesInFragment` in
-    // `bin/Index/LinkExternalReferencesInFragment.cpp`.
-    switch (macro.kind()) {
-      case mx::MacroKind::EXPANSION: {
-        auto &exp = reinterpret_cast<const MacroExpansion &>(macro);
-        if (auto def = exp.definition()) {
-          SpecificEntityId<MacroId> referenced_id = def->id();
-          if (referenced_id.Pack() == search_id) {
-            user.fragment = std::move(macro.fragment);  // Take it back.
-            return;  // Hit!
-          }
-        }
-        break;
-      }
-      case mx::MacroKind::INCLUDE_DIRECTIVE:
-      case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
-      case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
-      case mx::MacroKind::IMPORT_DIRECTIVE: {
-        auto &inc = reinterpret_cast<const IncludeLikeMacroDirective &>(macro);
-        if (auto file = inc.included_file()) {
-          SpecificEntityId<FileId> referenced_id = file->id();
-          if (referenced_id.Pack() == search_id) {
-            user.fragment = std::move(macro.fragment);  // Take it back.
-            return;  // Hit!
-          }
-        }
-        break;
-      }
-
-      default:
-        break;
-    }
-
-    user.fragment = std::move(macro.fragment);  // Take it back.
-  }
 }
 
 Macro MacroReference::macro(void) && noexcept {

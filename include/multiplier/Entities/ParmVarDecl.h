@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -34,10 +35,6 @@ class Type;
 class ValueDecl;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ParmVarDeclRange = DerivedEntityRange<DeclIterator, ParmVarDecl>;
-using ParmVarDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ParmVarDecl>;
-using ParmVarDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ParmVarDecl>;
-
 class ParmVarDecl : public VarDecl {
  private:
   friend class FragmentImpl;
@@ -47,12 +44,20 @@ class ParmVarDecl : public VarDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ParmVarDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ParmVarDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ParmVarDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ParmVarDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -67,8 +72,8 @@ class ParmVarDecl : public VarDecl {
     return DeclKind::PARM_VAR;
   }
 
-  static ParmVarDeclContainingDeclRange containing(const Decl &decl);
-  static ParmVarDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ParmVarDecl> containing(const Decl &decl);
+  static gap::generator<ParmVarDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -31,10 +32,6 @@ class VarDecl;
 class VarTemplatePartialSpecializationDecl;
 class VarTemplateSpecializationDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VarTemplatePartialSpecializationDeclRange = DerivedEntityRange<DeclIterator, VarTemplatePartialSpecializationDecl>;
-using VarTemplatePartialSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, VarTemplatePartialSpecializationDecl>;
-using VarTemplatePartialSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, VarTemplatePartialSpecializationDecl>;
-
 class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDecl {
  private:
   friend class FragmentImpl;
@@ -45,12 +42,20 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static VarTemplatePartialSpecializationDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VarTemplatePartialSpecializationDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static VarTemplatePartialSpecializationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -65,8 +70,8 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
     return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
   }
 
-  static VarTemplatePartialSpecializationDeclContainingDeclRange containing(const Decl &decl);
-  static VarTemplatePartialSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Decl &decl);
+  static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

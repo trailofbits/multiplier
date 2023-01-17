@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,22 +28,26 @@ class Decl;
 class OMPDeclarativeDirectiveDecl;
 class OMPRequiresDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPRequiresDeclRange = DerivedEntityRange<DeclIterator, OMPRequiresDecl>;
-using OMPRequiresDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPRequiresDecl>;
-using OMPRequiresDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, OMPRequiresDecl>;
-
 class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
  private:
   friend class FragmentImpl;
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
-  inline static OMPRequiresDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPRequiresDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPRequiresDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPRequiresDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -57,8 +62,8 @@ class OMPRequiresDecl : public OMPDeclarativeDirectiveDecl {
     return DeclKind::OMP_REQUIRES;
   }
 
-  static OMPRequiresDeclContainingDeclRange containing(const Decl &decl);
-  static OMPRequiresDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<OMPRequiresDecl> containing(const Decl &decl);
+  static gap::generator<OMPRequiresDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

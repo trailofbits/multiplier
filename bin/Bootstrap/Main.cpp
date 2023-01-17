@@ -1786,6 +1786,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     << "#include <memory>\n"
     << "#include <optional>\n"
     << "#include <vector>\n\n"
+    << "#include <gap/core/generator.hpp>\n"
     << "#include \"../Iterator.h\"\n"
     << "#include \"../Types.h\"\n"
     << "#include \"../Token.h\"\n"
@@ -1819,16 +1820,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   if (is_decl) {
     needed_decls.insert("DeclKind");
-    class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<DeclIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n"
-        << "using " << class_name
-        << "ContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, "
-        << class_name << ">;\n\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -1855,16 +1846,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   } else if (is_stmt) {
     needed_decls.insert("StmtKind");
-    class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<StmtIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n"
-        << "using " << class_name
-        << "ContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, "
-        << class_name << ">;\n\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -1887,13 +1868,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   
   } else if (is_type) {
     needed_decls.insert("TypeKind");
-    class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<TypeIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -1920,13 +1894,6 @@ MethodListPtr CodeGenerator::RunOnClass(
   // Attributes. Treated like entities because they have a class hierarchy.
   } else if (is_attr) {
     needed_decls.insert("AttrKind");
-    class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<AttrIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
-        << "ContainingTokenRange = DerivedEntityRange<TokenContextIterator, "
-        << class_name << ">;\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -1957,14 +1924,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (class_name == "Macro") {
       class_os << "using MacroOrToken = std::variant<Macro, Token>;\n";
     }
-
-    class_os
-        << "using " << class_name
-        << "Range = DerivedEntityRange<MacroIterator, " << class_name
-        << ">;\n"
-        << "using " << class_name
-        << "ContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, "
-        << class_name << ">;\n\n";
 
     serialize_cpp_os
         << "void Serialize" << class_name
@@ -2133,25 +2092,18 @@ MethodListPtr CodeGenerator::RunOnClass(
         << " {\n"
         << " protected:\n"
         << FriendOf(class_os, class_name, "Attr")
-        << FriendOf(class_os, class_name, "AttrIterator")
         << FriendOf(class_os, class_name, "Decl")
-        << FriendOf(class_os, class_name, "DeclIterator")
         << FriendOf(class_os, class_name, "File")
         << FriendOf(class_os, class_name, "Fragment")
         << FriendOf(class_os, class_name, "FragmentImpl")
         << FriendOf(class_os, class_name, "Index")
         << FriendOf(class_os, class_name, "Macro")
-        << FriendOf(class_os, class_name, "MacroReferenceIterator")
         << FriendOf(class_os, class_name, "ReferenceIteratorImpl")
         << FriendOf(class_os, class_name, "Stmt")
-        << FriendOf(class_os, class_name, "StmtReferenceIterator")
-        << FriendOf(class_os, class_name, "StmtIterator")
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
-        << FriendOf(class_os, class_name, "TypeIterator")
         << FriendOf(class_os, class_name, "UseBase")
         << FriendOf(class_os, class_name, "UseIteratorImpl")
-        << "  template <typename> friend class UseIterator;\n\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset_;\n\n"
         << " public:\n"
@@ -2165,9 +2117,9 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "        offset_(offset__) {}\n\n";
 
     if (class_name == "Decl") {
-      forward_decls.insert("StmtReferenceRange");
       needed_decls.insert("DeclUseSelector");
       forward_decls.insert("Stmt");
+      forward_decls.insert("StmtReference");
       class_os
           << "  inline static std::optional<Decl> from(const Decl &self) {\n"
           << "    return self;\n"
@@ -2184,10 +2136,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  std::vector<Decl> redeclarations(void) const;\n"
           << "  SpecificEntityId<DeclarationId> id(void) const;\n"
-          << "  UseRange<DeclUseSelector> uses(void) const;\n"
-          << "  StmtReferenceRange references(void) const;\n\n"
+          << "  gap::generator<Use<DeclUseSelector>> uses(void) const;\n"
+          << "  gap::generator<StmtReference> references(void) const;\n\n"
           << " protected:\n"
-          << "  static DeclIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       seen_methods->emplace("definition");  // Manual.
@@ -2224,9 +2176,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << "  SpecificEntityId<StatementId> id(void) const;\n"
-          << "  UseRange<StmtUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<StmtUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static StmtIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Stmt> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
       // `Stmt::referenced_declaration`.
@@ -2270,9 +2222,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_type();\n"
           << "  }\n\n"
           << "  SpecificEntityId<TypeId> id(void) const;\n"
-          << "  UseRange<TypeUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<TypeUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static TypeIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Type> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
     
     } else if (class_name == "Attr") {
@@ -2288,9 +2240,9 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return c.as_attribute();\n"
           << "  }\n\n"
           << "  SpecificEntityId<AttributeId> id(void) const;\n"
-          << "  UseRange<AttrUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<AttrUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static AttrIterator in_internal(const Fragment &fragment);\n\n"
+          << "  static gap::generator<Attr> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
     } else if (class_name == "Macro") {
@@ -2303,10 +2255,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "    return self;\n"
           << "  }\n\n"
           << "  SpecificEntityId<MacroId> id(void) const;\n"
-          << "  UseRange<MacroUseSelector> uses(void) const;\n\n"
+          << "  gap::generator<Use<MacroUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
-          << "  static MacroIterator in_internal(const Fragment &fragment);\n"
-          << "  static ParentMacroIteratorImpl<Macro> containing_internal(const Token &token);\n\n"
+          << "  static gap::generator<Macro> in_internal(const Fragment &fragment);\n"
+          << "  static gap::generator<Macro> containing_internal(const Token &token);\n\n"
           << " public:\n";
 
       // Serialization of these tokens is manually performed in
@@ -2327,13 +2279,21 @@ MethodListPtr CodeGenerator::RunOnClass(
   if (is_decl || is_stmt || is_type || is_attr) {
 
     class_os
-        << "  inline static " << class_name
-        << "Range in(const Fragment &frag) {\n"
-        << "    return in_internal(frag);\n"
+        << "  inline static gap::generator<"
+        << class_name << "> in(const Fragment &frag) {\n"
+        << "    for (auto e : in_internal(frag)) {\n"
+        << "      if (auto d = from(e)) {\n"
+        << "        co_yield *d;\n"
+        << "      }\n"
+        << "    }\n"
         << "  }\n\n"
-        << "  inline static " << class_name
-        << "ContainingTokenRange containing(const Token &tok) {\n"
-        << "    return TokenContextIterator(tok.context());\n"
+        << "  inline static gap::generator<" << class_name
+        << "> containing(const Token &tok) {\n"
+        << "    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {\n"
+        << "      if (auto d = from(*ctx)) {\n"
+        << "        co_yield *d;\n"
+        << "      }\n"
+        << "    }\n"
         << "  }\n\n"
         << "  inline bool contains(const Token &tok) {\n"
         << "    auto id_ = id();\n"
@@ -2345,9 +2305,13 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   } else if (is_macro) {
     class_os
-        << "  inline static " << class_name
-        << "Range in(const Fragment &frag) {\n"
-        << "    return in_internal(frag);\n"
+        << "  inline static gap::generator<" << class_name
+        << "> in(const Fragment &frag) {\n"
+        << "    for (auto m : in_internal(frag)) {\n"
+        << "      if (auto d = from(m)) {\n"
+        << "        co_yield *d;\n"
+        << "      }\n"
+        << "    }\n"
         << "  }\n\n";
   }
 
@@ -2364,33 +2328,39 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
-        << "  static " << class_name
-        << "ContainingDeclRange containing(const Decl &decl);\n"
-        << "  static " << class_name
-        << "ContainingDeclRange containing(const Stmt &stmt);\n\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Decl &decl);\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Stmt &stmt);\n\n"
         << "  bool contains(const Decl &decl);\n"
         << "  bool contains(const Stmt &stmt);\n\n";
 
     lib_cpp_os
-        << class_name << "ContainingDeclRange " << class_name
+        << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Decl &decl) {\n"
-        << "  return ParentDeclIteratorImpl<Decl>(decl.parent_declaration());\n"
+        << "  for (auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
+        << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
         << "}\n\n"
-        << class_name << "ContainingDeclRange " << class_name
+        << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Stmt &stmt) {\n"
-        << "  return ParentDeclIteratorImpl<Decl>(stmt.parent_declaration());\n"
+        << "  for (auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
+        << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
-        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id_) { return true; }\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
-        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id_) { return true; }\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2407,33 +2377,39 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
-        << "  static " << class_name
-        << "ContainingStmtRange containing(const Decl &decl);\n"
-        << "  static " << class_name
-        << "ContainingStmtRange containing(const Stmt &stmt);\n\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Decl &decl);\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Stmt &stmt);\n\n"
         << "  bool contains(const Decl &decl);\n"
         << "  bool contains(const Stmt &stmt);\n\n";
 
     lib_cpp_os
-        << class_name << "ContainingStmtRange " << class_name
+        << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Decl &decl) {\n"
-        << "  return ParentStmtIteratorImpl<Stmt>(decl.parent_statement());\n"
+        << "  for (auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
+        << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
         << "}\n\n"
-        << class_name << "ContainingStmtRange " << class_name
+        << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Stmt &stmt) {\n"
-        << "  return ParentStmtIteratorImpl<Stmt>(stmt.parent_statement());\n"
+        << "  for (auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
+        << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
-        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if (parent.id() == id_) { return true; }\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
-        << "  auto id_ = id();\n"
         << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if (parent.id() == id_) { return true; }\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2449,7 +2425,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << SnakeCaseToEnumCase(snake_name) << ";\n"
           << "  }\n\n";
     }
-
+  
   } else if (is_attr) {
     if (is_concrete) {
       auto snake_name = CapitalCaseToSnakeCase(class_name);
@@ -2457,7 +2433,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       class_os
           << "  inline static constexpr AttrKind static_kind(void) {\n"
-          << "    return AttrKind::"
+          << "    return AttrKind::" 
           << SnakeCaseToEnumCase(snake_name) << ";\n"
           << "  }\n\n";
     }
@@ -2485,14 +2461,21 @@ MethodListPtr CodeGenerator::RunOnClass(
     }
 
     class_os
-        << "  static " << class_name
-        << "ContainingMacroRange containing(const Macro &macro);\n"
-        << "  bool contains(const Macro &macro);\n\n";
+        << "  static gap::generator<" << class_name
+        << "> containing(const Macro &macro);\n"
+        << "  bool contains(const Macro &macro);\n\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Token &token);\n"
+        << "  bool contains(const Token &token);\n\n";
 
     lib_cpp_os
-        << class_name << "ContainingMacroRange " << class_name
+        << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Macro &macro) {\n"
-        << "  return ParentMacroIteratorImpl<Macro>(macro.parent());\n"
+        << "  for (auto impl = macro.parent(); impl; impl = impl->parent()) {\n"
+        << "    if (auto d = from(*impl)) {\n"
+        << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Macro &macro) {\n"
         << "  auto id_ = id();\n"
@@ -2508,22 +2491,21 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
-        << class_name << "ContainingMacroRange " << class_name
+        << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Token &token) {\n"
-        << "  return Macro::containing_internal(token);\n"
+        << "  for (auto m : Macro::containing_internal(token)) {\n"
+        << "    if (auto d = from(m)) {\n"
+        << "      co_yield *d;\n"
+        << "    }\n"
+        << "  }\n"
         << "}\n\n";
-
-    class_os
-        << "  static " << class_name
-        << "ContainingMacroRange containing(const Token &token);\n"
-        << "  bool contains(const Token &token);\n\n";
 
     // Add in our custom uses iterator. We have a custom definition of this
     // in the API.
     if (class_name == "DefineMacroDirective") {
-      forward_decls.insert("MacroReferenceRange");
+      forward_decls.insert("MacroReference");
       class_os
-          << "  MacroReferenceRange references(void) const;\n\n";
+          << "  gap::generator<MacroReference> references(void) const;\n\n";
     }
   }
 
@@ -3354,11 +3336,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   class_os << "};\n\n";
 
-  for(auto needed : needed_decls) {
+  for (auto needed : needed_decls) {
     os << "#include \"" << needed << ".h\"\n";
   }
   os << "\nnamespace mx {\n";
-  for(auto fwd : forward_decls) {
+  for (auto fwd : forward_decls) {
     os << "class " << fwd << ";\n";
   }
   os

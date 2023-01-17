@@ -15,6 +15,7 @@
 #include <multiplier/Entities/VarDecl.h>
 #include <multiplier/Entities/TokenKind.h>
 #include <multiplier/Compress.h>
+#include <multiplier/AST.h>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
@@ -31,46 +32,6 @@
 namespace mx {
 
 EntityProvider::~EntityProvider(void) noexcept {}
-
-Decl DeclIterator::operator*(void) && noexcept {
-  return Decl(std::move(impl), index);
-}
-
-Decl DeclIterator::operator*(void) const & noexcept {
-  return Decl(impl, index);
-}
-
-Stmt StmtIterator::operator*(void) && noexcept {
-  return Stmt(std::move(impl), index);
-}
-
-Stmt StmtIterator::operator*(void) const & noexcept {
-  return Stmt(impl, index);
-}
-
-Type TypeIterator::operator*(void) && noexcept {
-  return Type(std::move(impl), index);
-}
-
-Type TypeIterator::operator*(void) const & noexcept {
-  return Type(impl, index);
-}
-
-Attr AttrIterator::operator*(void) && noexcept {
-  return Attr(std::move(impl), index);
-}
-
-Attr AttrIterator::operator*(void) const & noexcept {
-  return Attr(impl, index);
-}
-
-Macro MacroIterator::operator*(void) && noexcept {
-  return Macro(std::move(impl), index);
-}
-
-Macro MacroIterator::operator*(void) const & noexcept {
-  return Macro(impl, index);
-}
 
 SpecificEntityId<DeclarationId> Decl::id(void) const {
   DeclarationId eid;
@@ -101,16 +62,24 @@ std::vector<Decl> Decl::redeclarations(void) const {
   return redecls;
 }
 
-UseRange<DeclUseSelector> Decl::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  for (auto use : impl.enumerate<DeclUseSelector>()) {
+    co_yield use;
+  }
 }
 
-StmtReferenceRange Decl::references(void) const {
-  return std::make_shared<ReferenceIteratorImpl>(fragment->ep, *this);
+gap::generator<StmtReference> Decl::references(void) const {
+  ReferenceIteratorImpl it(fragment->ep, *this);
+  for (auto ref : it.enumerate_stmts()) {
+    co_yield ref;
+  }
 }
 
-DeclIterator Decl::in_internal(const Fragment &fragment) {
-  return DeclIterator(fragment.impl, 0u, fragment.impl->num_decls);
+gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
+  for (EntityOffset i = 0; i < fragment.impl->num_decls; ++i) {
+    co_yield Decl(fragment.impl, i);
+  }
 }
 
 SpecificEntityId<StatementId> Stmt::id(void) const {
@@ -121,12 +90,17 @@ SpecificEntityId<StatementId> Stmt::id(void) const {
   return eid;
 }
 
-StmtIterator Stmt::in_internal(const Fragment &fragment) {
-  return StmtIterator(fragment.impl, 0u, fragment.impl->num_stmts);
+gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
+  for (EntityOffset i = 0; i < fragment.impl->num_stmts; ++i) {
+    co_yield Stmt(fragment.impl, i);
+  }
 }
 
-UseRange<StmtUseSelector> Stmt::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<StmtUseSelector>> Stmt::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  for (auto use : impl.enumerate<StmtUseSelector>()) {
+    co_yield use;
+  }
 }
 
 SpecificEntityId<TypeId> Type::id(void) const {
@@ -137,12 +111,17 @@ SpecificEntityId<TypeId> Type::id(void) const {
   return eid;
 }
 
-TypeIterator Type::in_internal(const Fragment &fragment) {
-  return TypeIterator(fragment.impl, 0u, fragment.impl->num_types);
+gap::generator<Type> Type::in_internal(const Fragment &fragment) {
+  for (EntityOffset i = 0; i < fragment.impl->num_types; ++i) {
+    co_yield Type(fragment.impl, i);
+  }
 }
 
-UseRange<TypeUseSelector> Type::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<TypeUseSelector>> Type::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  for (auto use : impl.enumerate<TypeUseSelector>()) {
+    co_yield use;
+  }
 }
 
 SpecificEntityId<AttributeId> Attr::id(void) const {
@@ -153,12 +132,17 @@ SpecificEntityId<AttributeId> Attr::id(void) const {
   return eid;
 }
 
-AttrIterator Attr::in_internal(const Fragment &fragment) {
-  return AttrIterator(fragment.impl, 0u, fragment.impl->num_attrs);
+gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
+  for (EntityOffset i = 0; i < fragment.impl->num_attrs; ++i) {
+    co_yield Attr(fragment.impl, i);
+  }
 }
 
-UseRange<AttrUseSelector> Attr::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<AttrUseSelector>> Attr::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  for (auto use : impl.enumerate<AttrUseSelector>()) {
+    co_yield use;
+  }
 }
 
 SpecificEntityId<MacroId> Macro::id(void) const {
@@ -169,11 +153,13 @@ SpecificEntityId<MacroId> Macro::id(void) const {
   return eid;
 }
 
-MacroIterator Macro::in_internal(const Fragment &fragment) {
-  return MacroIterator(fragment.impl, 0u, fragment.impl->num_macros);
+gap::generator<Macro> Macro::in_internal(const Fragment &fragment) {
+  for (EntityOffset i = 0; i < fragment.impl->num_macros; ++i) {
+    co_yield Macro(fragment.impl, i);
+  }
 }
 
-ParentMacroIteratorImpl<Macro> Macro::containing_internal(const Token &token) {
+gap::generator<Macro> Macro::containing_internal(const Token &token) {
   std::optional<Macro> macro;
   if (auto frag = token.impl->OwningFragment()) {
     auto vid = EntityId(token.impl->NthContainingMacroId(token.offset)).Unpack();
@@ -184,17 +170,25 @@ ParentMacroIteratorImpl<Macro> Macro::containing_internal(const Token &token) {
       }
     }
   }
-  return ParentMacroIteratorImpl<Macro>(std::move(macro));
+
+  for (; macro; macro = macro->parent()) {
+    co_yield *macro;
+  }
 }
 
-UseRange<MacroUseSelector> Macro::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(fragment->ep, *this);
+gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
+  UseIteratorImpl impl(fragment->ep, *this);
+  for (auto use : impl.enumerate<MacroUseSelector>()) {
+    co_yield use;
+  }
 }
 
 
-MacroReferenceRange DefineMacroDirective::references(void) const {
-  return std::make_shared<ReferenceIteratorImpl>(fragment->ep, *this);
+gap::generator<MacroReference> DefineMacroDirective::references(void) const {
+  ReferenceIteratorImpl it(fragment->ep, *this);
+  for (auto ref : it.enumerate_macros()) {
+    co_yield ref;
+  }
 }
-
 
 }  // namespace mx

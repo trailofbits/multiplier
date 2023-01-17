@@ -114,7 +114,7 @@ class WorkerThreadPool : public WorkerThreadPoolBase {
   virtual void Step(unsigned worker_id, std::unique_ptr<T> work) = 0;
 
   // Invoked on each remaining work item after the pool has been stopped.
-  virtual void Drain(std::unique_ptr<T> work) {}
+  virtual void Drain(std::unique_ptr<T>) {}
 
  private:
   WorkerThreadPool(void) = delete;

@@ -37,29 +37,29 @@ class ReadMacroTokensFromFragment : public TokenReader {
       : fragment(fragment_) {}
 
   // Return the number of tokens in the fragment.
-  unsigned NumTokens(void) const override;
+  EntityOffset NumTokens(void) const override;
 
   // Return the kind of the Nth token.
-  TokenKind NthTokenKind(unsigned index) const override;
+  TokenKind NthTokenKind(EntityOffset index) const override;
 
   // Return the data of the Nth token.
-  std::string_view NthTokenData(unsigned index) const override;
+  std::string_view NthTokenData(EntityOffset index) const override;
 
   // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(unsigned token_index) const override;
+  EntityId NthDerivedTokenId(EntityOffset token_index) const override;
 
   // Return the id of the parsed token which is derived from the Nth token.
-  EntityId NthParsedTokenId(unsigned) const override;
+  EntityId NthParsedTokenId(EntityOffset) const override;
 
   // Return the id of the macro containing the Nth token.
-  EntityId NthContainingMacroId(unsigned) const override;
+  EntityId NthContainingMacroId(EntityOffset) const override;
 
   // Return an entity id associated with the Nth token.
-  EntityId NthRelatedEntityId(unsigned) const override;
+  EntityId NthRelatedEntityId(EntityOffset) const override;
 
   // Return the id of the Nth token.
-  EntityId NthTokenId(unsigned token_index) const override;
-  EntityId NthFileTokenId(unsigned token_index) const override;
+  EntityId NthTokenId(EntityOffset token_index) const override;
+  EntityId NthFileTokenId(EntityOffset token_index) const override;
 
   // Return the token reader for another file.
   TokenReader::Ptr ReaderForToken(const TokenReader::Ptr &self,
@@ -77,29 +77,29 @@ class ReadParsedTokensFromFragment final
   using ReadMacroTokensFromFragment::ReadMacroTokensFromFragment;
 
   // Return the number of tokens in the fragment.
-  unsigned NumTokens(void) const final;
+  EntityOffset NumTokens(void) const final;
 
   // Return the kind of the Nth token.
-  TokenKind NthTokenKind(unsigned index) const final;
+  TokenKind NthTokenKind(EntityOffset index) const final;
 
   // Return the data of the Nth token.
-  std::string_view NthTokenData(unsigned index) const final;
+  std::string_view NthTokenData(EntityOffset index) const final;
 
   // Return the id of the token from which the Nth token is derived.
-  EntityId NthDerivedTokenId(unsigned token_index) const final;
+  EntityId NthDerivedTokenId(EntityOffset token_index) const final;
 
   // Return the id of the parsed token which is derived from the Nth token.
-  EntityId NthParsedTokenId(unsigned token_index) const final;
+  EntityId NthParsedTokenId(EntityOffset token_index) const final;
 
   // Return the id of the macro containing the Nth token.
-  EntityId NthContainingMacroId(unsigned) const final;
+  EntityId NthContainingMacroId(EntityOffset) const final;
 
   // Return an entity id associated with the Nth token.
-  EntityId NthRelatedEntityId(unsigned) const override;
+  EntityId NthRelatedEntityId(EntityOffset) const override;
 
   // Return the id of the Nth token.
-  EntityId NthTokenId(unsigned token_index) const final;
-  EntityId NthFileTokenId(unsigned token_index) const final;
+  EntityId NthTokenId(EntityOffset token_index) const final;
+  EntityId NthFileTokenId(EntityOffset token_index) const final;
 
   // Returns `true` if `this` is logically equivalent to `that`.
   bool Equals(const class TokenReader *that) const final;
@@ -137,14 +137,14 @@ class FragmentImpl final {
  public:
 
   // For bounds checking.
-  const unsigned num_decls;
-  const unsigned num_stmts;
-  const unsigned num_types;
-  const unsigned num_attrs;
-  const unsigned num_macros;
-  const unsigned num_pseudos;
-  const unsigned num_parsed_tokens;
-  const unsigned num_tokens;
+  const EntityOffset num_decls;
+  const EntityOffset num_stmts;
+  const EntityOffset num_types;
+  const EntityOffset num_attrs;
+  const EntityOffset num_macros;
+  const EntityOffset num_pseudos;
+  const EntityOffset num_parsed_tokens;
+  const EntityOffset num_tokens;
 
   ~FragmentImpl(void) noexcept;
 

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,21 +30,25 @@ class Stmt;
 class Type;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXCatchStmtRange = DerivedEntityRange<StmtIterator, CXXCatchStmt>;
-using CXXCatchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXCatchStmt>;
-using CXXCatchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXCatchStmt>;
-
 class CXXCatchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static CXXCatchStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXCatchStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static CXXCatchStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<CXXCatchStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -58,8 +63,8 @@ class CXXCatchStmt : public Stmt {
     return StmtKind::CXX_CATCH_STMT;
   }
 
-  static CXXCatchStmtContainingStmtRange containing(const Decl &decl);
-  static CXXCatchStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXCatchStmt> containing(const Decl &decl);
+  static gap::generator<CXXCatchStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

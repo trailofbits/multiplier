@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class Attr;
 class C11NoReturnAttr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using C11NoReturnAttrRange = DerivedEntityRange<AttrIterator, C11NoReturnAttr>;
-using C11NoReturnAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, C11NoReturnAttr>;
 class C11NoReturnAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static C11NoReturnAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<C11NoReturnAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static C11NoReturnAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<C11NoReturnAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

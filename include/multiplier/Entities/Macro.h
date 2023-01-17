@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -26,31 +27,20 @@ namespace mx {
 class Macro;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
-using MacroRange = DerivedEntityRange<MacroIterator, Macro>;
-using MacroContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, Macro>;
-
 class Macro {
  protected:
   friend class Attr;
-  friend class AttrIterator;
   friend class Decl;
-  friend class DeclIterator;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
-  friend class StmtReferenceIterator;
-  friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
-  friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -73,21 +63,25 @@ class Macro {
   }
 
   SpecificEntityId<MacroId> id(void) const;
-  UseRange<MacroUseSelector> uses(void) const;
+  gap::generator<Use<MacroUseSelector>> uses(void) const;
 
  protected:
-  static MacroIterator in_internal(const Fragment &fragment);
-  static ParentMacroIteratorImpl<Macro> containing_internal(const Token &token);
+  static gap::generator<Macro> in_internal(const Fragment &fragment);
+  static gap::generator<Macro> containing_internal(const Token &token);
 
  public:
-  inline static MacroRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Macro> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
-  static MacroContainingMacroRange containing(const Macro &macro);
+  static gap::generator<Macro> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static MacroContainingMacroRange containing(const Token &token);
+  static gap::generator<Macro> containing(const Token &token);
   bool contains(const Token &token);
 
   MacroKind kind(void) const;

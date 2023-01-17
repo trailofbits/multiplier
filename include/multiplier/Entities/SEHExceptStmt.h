@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,21 +29,25 @@ class Expr;
 class SEHExceptStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHExceptStmtRange = DerivedEntityRange<StmtIterator, SEHExceptStmt>;
-using SEHExceptStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHExceptStmt>;
-using SEHExceptStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHExceptStmt>;
-
 class SEHExceptStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SEHExceptStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SEHExceptStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static SEHExceptStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<SEHExceptStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -57,8 +62,8 @@ class SEHExceptStmt : public Stmt {
     return StmtKind::SEH_EXCEPT_STMT;
   }
 
-  static SEHExceptStmtContainingStmtRange containing(const Decl &decl);
-  static SEHExceptStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SEHExceptStmt> containing(const Decl &decl);
+  static gap::generator<SEHExceptStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

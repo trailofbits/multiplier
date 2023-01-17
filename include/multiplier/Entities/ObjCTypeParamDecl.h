@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,10 +31,6 @@ class ObjCTypeParamDecl;
 class TypeDecl;
 class TypedefNameDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCTypeParamDeclRange = DerivedEntityRange<DeclIterator, ObjCTypeParamDecl>;
-using ObjCTypeParamDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCTypeParamDecl>;
-using ObjCTypeParamDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCTypeParamDecl>;
-
 class ObjCTypeParamDecl : public TypedefNameDecl {
  private:
   friend class FragmentImpl;
@@ -42,12 +39,20 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCTypeParamDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCTypeParamDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCTypeParamDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCTypeParamDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -62,8 +67,8 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
     return DeclKind::OBJ_C_TYPE_PARAM;
   }
 
-  static ObjCTypeParamDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCTypeParamDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCTypeParamDecl> containing(const Decl &decl);
+  static gap::generator<ObjCTypeParamDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

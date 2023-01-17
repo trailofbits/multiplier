@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -26,21 +27,25 @@ namespace mx {
 class Decl;
 class PragmaDetectMismatchDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaDetectMismatchDeclRange = DerivedEntityRange<DeclIterator, PragmaDetectMismatchDecl>;
-using PragmaDetectMismatchDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, PragmaDetectMismatchDecl>;
-using PragmaDetectMismatchDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, PragmaDetectMismatchDecl>;
-
 class PragmaDetectMismatchDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static PragmaDetectMismatchDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaDetectMismatchDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static PragmaDetectMismatchDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<PragmaDetectMismatchDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -55,8 +60,8 @@ class PragmaDetectMismatchDecl : public Decl {
     return DeclKind::PRAGMA_DETECT_MISMATCH;
   }
 
-  static PragmaDetectMismatchDeclContainingDeclRange containing(const Decl &decl);
-  static PragmaDetectMismatchDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<PragmaDetectMismatchDecl> containing(const Decl &decl);
+  static gap::generator<PragmaDetectMismatchDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

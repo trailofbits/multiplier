@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class OMPLoopDirective;
 class OMPTargetParallelGenericLoopDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPTargetParallelGenericLoopDirectiveRange = DerivedEntityRange<StmtIterator, OMPTargetParallelGenericLoopDirective>;
-using OMPTargetParallelGenericLoopDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPTargetParallelGenericLoopDirective>;
-using OMPTargetParallelGenericLoopDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPTargetParallelGenericLoopDirective>;
-
 class OMPTargetParallelGenericLoopDirective : public OMPLoopDirective {
  private:
   friend class FragmentImpl;
@@ -41,12 +38,20 @@ class OMPTargetParallelGenericLoopDirective : public OMPLoopDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPTargetParallelGenericLoopDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPTargetParallelGenericLoopDirective> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPTargetParallelGenericLoopDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPTargetParallelGenericLoopDirective> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class OMPTargetParallelGenericLoopDirective : public OMPLoopDirective {
     return StmtKind::OMP_TARGET_PARALLEL_GENERIC_LOOP_DIRECTIVE;
   }
 
-  static OMPTargetParallelGenericLoopDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPTargetParallelGenericLoopDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPTargetParallelGenericLoopDirective> containing(const Decl &decl);
+  static gap::generator<OMPTargetParallelGenericLoopDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class Attr;
 class InheritableAttr;
 class OpenCLKernelAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OpenCLKernelAttrRange = DerivedEntityRange<AttrIterator, OpenCLKernelAttr>;
-using OpenCLKernelAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, OpenCLKernelAttr>;
 class OpenCLKernelAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static OpenCLKernelAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OpenCLKernelAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OpenCLKernelAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OpenCLKernelAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

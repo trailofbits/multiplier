@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -26,26 +27,27 @@ namespace mx {
 class Macro;
 class MacroArgument;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MacroArgumentRange = DerivedEntityRange<MacroIterator, MacroArgument>;
-using MacroArgumentContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, MacroArgument>;
-
 class MacroArgument : public Macro {
  private:
   friend class FragmentImpl;
   friend class Macro;
  public:
-  inline static MacroArgumentRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MacroArgument> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::ARGUMENT;
   }
 
-  static MacroArgumentContainingMacroRange containing(const Macro &macro);
+  static gap::generator<MacroArgument> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static MacroArgumentContainingMacroRange containing(const Token &token);
+  static gap::generator<MacroArgument> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<MacroArgument> from(const Macro &parent);

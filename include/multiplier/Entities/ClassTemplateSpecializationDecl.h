@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -36,10 +37,6 @@ class TemplateArgument;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ClassTemplateSpecializationDeclRange = DerivedEntityRange<DeclIterator, ClassTemplateSpecializationDecl>;
-using ClassTemplateSpecializationDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ClassTemplateSpecializationDecl>;
-using ClassTemplateSpecializationDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ClassTemplateSpecializationDecl>;
-
 class ClassTemplateSpecializationDecl : public CXXRecordDecl {
  private:
   friend class FragmentImpl;
@@ -50,12 +47,20 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ClassTemplateSpecializationDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ClassTemplateSpecializationDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ClassTemplateSpecializationDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ClassTemplateSpecializationDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -70,8 +75,8 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
     return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
   }
 
-  static ClassTemplateSpecializationDeclContainingDeclRange containing(const Decl &decl);
-  static ClassTemplateSpecializationDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ClassTemplateSpecializationDecl> containing(const Decl &decl);
+  static gap::generator<ClassTemplateSpecializationDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

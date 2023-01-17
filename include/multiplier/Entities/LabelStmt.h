@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,22 +29,26 @@ class LabelStmt;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LabelStmtRange = DerivedEntityRange<StmtIterator, LabelStmt>;
-using LabelStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, LabelStmt>;
-using LabelStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, LabelStmt>;
-
 class LabelStmt : public ValueStmt {
  private:
   friend class FragmentImpl;
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static LabelStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LabelStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static LabelStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<LabelStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -58,8 +63,8 @@ class LabelStmt : public ValueStmt {
     return StmtKind::LABEL_STMT;
   }
 
-  static LabelStmtContainingStmtRange containing(const Decl &decl);
-  static LabelStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<LabelStmt> containing(const Decl &decl);
+  static gap::generator<LabelStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

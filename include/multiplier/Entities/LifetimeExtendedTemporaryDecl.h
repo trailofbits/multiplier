@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,21 +31,25 @@ class LifetimeExtendedTemporaryDecl;
 class Stmt;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LifetimeExtendedTemporaryDeclRange = DerivedEntityRange<DeclIterator, LifetimeExtendedTemporaryDecl>;
-using LifetimeExtendedTemporaryDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, LifetimeExtendedTemporaryDecl>;
-using LifetimeExtendedTemporaryDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, LifetimeExtendedTemporaryDecl>;
-
 class LifetimeExtendedTemporaryDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static LifetimeExtendedTemporaryDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LifetimeExtendedTemporaryDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static LifetimeExtendedTemporaryDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class LifetimeExtendedTemporaryDecl : public Decl {
     return DeclKind::LIFETIME_EXTENDED_TEMPORARY;
   }
 
-  static LifetimeExtendedTemporaryDeclContainingDeclRange containing(const Decl &decl);
-  static LifetimeExtendedTemporaryDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Decl &decl);
+  static gap::generator<LifetimeExtendedTemporaryDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

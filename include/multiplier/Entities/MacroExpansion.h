@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,27 +31,28 @@ class MacroArgument;
 class MacroExpansion;
 class MacroSubstitution;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MacroExpansionRange = DerivedEntityRange<MacroIterator, MacroExpansion>;
-using MacroExpansionContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, MacroExpansion>;
-
 class MacroExpansion : public MacroSubstitution {
  private:
   friend class FragmentImpl;
   friend class MacroSubstitution;
   friend class Macro;
  public:
-  inline static MacroExpansionRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MacroExpansion> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::EXPANSION;
   }
 
-  static MacroExpansionContainingMacroRange containing(const Macro &macro);
+  static gap::generator<MacroExpansion> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static MacroExpansionContainingMacroRange containing(const Token &token);
+  static gap::generator<MacroExpansion> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<MacroExpansion> from(const MacroSubstitution &parent);

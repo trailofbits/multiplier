@@ -20,19 +20,15 @@ class PackedMessageReader;
 namespace mx {
 
 // Compress a message.
-std::string CompressedMessage(
-    const char *what, capnp::MessageBuilder &message);
+std::string CompressedMessage(capnp::MessageBuilder &message);
 
-void WithUncompressedMessageImpl(
-    const char *what, std::string data,
+void WithUncompressedMessageImpl(std::string data,
     std::function<void(capnp::PackedMessageReader &)> cb);
 
 // Call `cb` with a `T::Reader` as an argument.
 template <typename T, typename C>
-void WithUncompressedMessage(
-    const char *what, std::string data, C cb) {
+void WithUncompressedMessage(std::string data, C cb) {
   WithUncompressedMessageImpl(
-      what,
       std::move(data),
       [cb = std::move(cb)] (capnp::PackedMessageReader &reader) {
         cb(reader.getRoot<T>());

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class Attr;
 class InheritableAttr;
 class NoMips16Attr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoMips16AttrRange = DerivedEntityRange<AttrIterator, NoMips16Attr>;
-using NoMips16AttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoMips16Attr>;
 class NoMips16Attr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoMips16AttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoMips16Attr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static NoMips16AttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<NoMips16Attr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

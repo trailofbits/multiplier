@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,20 +29,26 @@ class InheritableAttr;
 class Type;
 class VecTypeHintAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VecTypeHintAttrRange = DerivedEntityRange<AttrIterator, VecTypeHintAttr>;
-using VecTypeHintAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, VecTypeHintAttr>;
 class VecTypeHintAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static VecTypeHintAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VecTypeHintAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static VecTypeHintAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<VecTypeHintAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

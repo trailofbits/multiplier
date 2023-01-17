@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class NoInitExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoInitExprRange = DerivedEntityRange<StmtIterator, NoInitExpr>;
-using NoInitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoInitExpr>;
-using NoInitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, NoInitExpr>;
-
 class NoInitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class NoInitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static NoInitExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoInitExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static NoInitExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<NoInitExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class NoInitExpr : public Expr {
     return StmtKind::NO_INIT_EXPR;
   }
 
-  static NoInitExprContainingStmtRange containing(const Decl &decl);
-  static NoInitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<NoInitExpr> containing(const Decl &decl);
+  static gap::generator<NoInitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

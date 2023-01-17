@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class Stmt;
 class StringLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using StringLiteralRange = DerivedEntityRange<StmtIterator, StringLiteral>;
-using StringLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, StringLiteral>;
-using StringLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, StringLiteral>;
-
 class StringLiteral : public Expr {
  private:
   friend class FragmentImpl;
@@ -40,12 +37,20 @@ class StringLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static StringLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<StringLiteral> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static StringLiteralContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<StringLiteral> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -60,8 +65,8 @@ class StringLiteral : public Expr {
     return StmtKind::STRING_LITERAL;
   }
 
-  static StringLiteralContainingStmtRange containing(const Decl &decl);
-  static StringLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<StringLiteral> containing(const Decl &decl);
+  static gap::generator<StringLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

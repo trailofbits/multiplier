@@ -23,7 +23,7 @@ struct SeenEntityTracker {
   SeenEntityList &seen;
   const size_t size;
   const mx::RawEntityId eid;
-  const size_t count;
+  const ssize_t count;
 
  public:
   template <typename E>
@@ -31,16 +31,17 @@ struct SeenEntityTracker {
       : seen(seen_),
         size(seen.size()),
         eid(entity.id().Pack()),
-        count(std::count(seen.begin(), seen.end(), entity.id())) {
+        count(std::count(seen.begin(), seen.end(),
+                         entity.id().Pack())) {
     seen.push_back(eid);        
   }
 
   operator bool (void) const noexcept {
-    return count <= 1u;
+    return count <= 1;
   }
 
   bool IsCycle(void) {
-    return count == 1u;
+    return count == 1;
   }
 
   ~SeenEntityTracker(void) {
@@ -91,10 +92,13 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
 
   std::cout << '\n';
 
+
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
   if (enter_entity.IsCycle()) {
     return;
-  } else if (auto decl = mx::Decl::containing(entity)) {
-    PrintCallHierarchy(decl.value(), depth + 1u);
+  } else if (decl != decls.end()) {
+    PrintCallHierarchy(*decl, depth + 1u);
   } else {
     for (const mx::StmtReference &ref : entity.references()) {
       PrintCallHierarchy(ref, depth + 1u);
@@ -107,9 +111,10 @@ void PrintCallHierarchy(mx::Stmt entity, unsigned depth) {
   if (!enter_entity) {
     return;
   }
-
-  if (auto decl = mx::Decl::containing(entity)) {
-    PrintCallHierarchy(decl.value(), depth);
+  auto decls = mx::Decl::containing(entity);
+  auto decl = decls.begin();
+  if (decl != decls.end()) {
+    PrintCallHierarchy(*decl, depth);
   }
 }
 
@@ -136,11 +141,15 @@ extern "C" int main(int argc, char *argv[]) {
 
   } else if (std::holds_alternative<mx::Token>(maybe_entity)) {
     mx::Token token = std::get<mx::Token>(maybe_entity);
-    if (auto stmt = mx::Stmt::containing(token)) {
-      PrintCallHierarchy(stmt.value(), 0u);
+    auto stmts = mx::Stmt::containing(token);
+    auto decls = mx::Decl::containing(token);
+    auto stmt = stmts.begin();
+    auto decl = decls.begin();
+    if (stmt != stmts.end()) {
+      PrintCallHierarchy(*stmt, 0u);
 
-    } else if (auto decl = mx::Decl::containing(token)) {
-      PrintCallHierarchy(decl.value(), 0u);
+    } else if (decl != decls.end()) {
+      PrintCallHierarchy(*decl, 0u);
     }
 
   // TODO(pag): Macros?

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class Attr;
 class MustTailAttr;
 class StmtAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MustTailAttrRange = DerivedEntityRange<AttrIterator, MustTailAttr>;
-using MustTailAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, MustTailAttr>;
 class MustTailAttr : public StmtAttr {
  private:
   friend class FragmentImpl;
   friend class StmtAttr;
   friend class Attr;
  public:
-  inline static MustTailAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MustTailAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static MustTailAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<MustTailAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

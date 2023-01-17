@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,10 +31,6 @@ class Type;
 class TypeTraitExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeTraitExprRange = DerivedEntityRange<StmtIterator, TypeTraitExpr>;
-using TypeTraitExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, TypeTraitExpr>;
-using TypeTraitExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, TypeTraitExpr>;
-
 class TypeTraitExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -41,12 +38,20 @@ class TypeTraitExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static TypeTraitExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TypeTraitExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static TypeTraitExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<TypeTraitExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class TypeTraitExpr : public Expr {
     return StmtKind::TYPE_TRAIT_EXPR;
   }
 
-  static TypeTraitExprContainingStmtRange containing(const Decl &decl);
-  static TypeTraitExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<TypeTraitExpr> containing(const Decl &decl);
+  static gap::generator<TypeTraitExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

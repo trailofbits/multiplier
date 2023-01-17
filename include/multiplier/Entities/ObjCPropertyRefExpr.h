@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -32,10 +33,6 @@ class Stmt;
 class Type;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCPropertyRefExprRange = DerivedEntityRange<StmtIterator, ObjCPropertyRefExpr>;
-using ObjCPropertyRefExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCPropertyRefExpr>;
-using ObjCPropertyRefExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCPropertyRefExpr>;
-
 class ObjCPropertyRefExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -43,12 +40,20 @@ class ObjCPropertyRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCPropertyRefExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCPropertyRefExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCPropertyRefExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCPropertyRefExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -63,8 +68,8 @@ class ObjCPropertyRefExpr : public Expr {
     return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
   }
 
-  static ObjCPropertyRefExprContainingStmtRange containing(const Decl &decl);
-  static ObjCPropertyRefExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCPropertyRefExpr> containing(const Decl &decl);
+  static gap::generator<ObjCPropertyRefExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

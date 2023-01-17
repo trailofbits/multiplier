@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class Attr;
 class InheritableAttr;
 class NoRandomizeLayoutAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using NoRandomizeLayoutAttrRange = DerivedEntityRange<AttrIterator, NoRandomizeLayoutAttr>;
-using NoRandomizeLayoutAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, NoRandomizeLayoutAttr>;
 class NoRandomizeLayoutAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static NoRandomizeLayoutAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<NoRandomizeLayoutAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static NoRandomizeLayoutAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<NoRandomizeLayoutAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

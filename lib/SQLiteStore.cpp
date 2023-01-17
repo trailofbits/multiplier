@@ -74,12 +74,12 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
       db,
       +[](void *self_, int num_locks) -> int {
         auto self = reinterpret_cast<ConnectionImpl *>(self_);
-        std::function<int(unsigned)> busy_handler;
+        std::function<int(unsigned)> copy_of_busy_handler;
         do {
           std::shared_lock<std::shared_mutex> locker(self->busy_handler_lock);
-          busy_handler = self->busy_handler;
+          copy_of_busy_handler = self->busy_handler;
         } while (false);
-        return busy_handler(
+        return copy_of_busy_handler(
             (0 < num_locks) ? static_cast<unsigned>(num_locks) : 0u);
       },
       this);
@@ -120,7 +120,7 @@ Error::Error(const std::string &msg, sqlite3 *db)
                     std::string(sqlite3_errmsg(db))) {}
 
 uint32_t QueryResult::NumColumns(void) {
-  return sqlite3_column_count(impl.get());
+  return static_cast<uint32_t>(sqlite3_column_count(impl.get()));
 }
 
 int64_t QueryResult::getInt64(int32_t idx) {
@@ -132,7 +132,7 @@ std::string QueryResult::getText(int32_t idx) {
   auto ptr = reinterpret_cast<const char *>(
       sqlite3_column_blob(prepared_stmt, idx));
   auto len = sqlite3_column_bytes(prepared_stmt, idx);
-  return std::string(ptr, len);
+  return std::string(ptr, static_cast<size_t>(len));
 }
 
 std::string_view QueryResult::getBlob(int32_t idx) {
@@ -140,7 +140,7 @@ std::string_view QueryResult::getBlob(int32_t idx) {
   auto ptr = reinterpret_cast<const char *>(
       sqlite3_column_blob(prepared_stmt, idx));
   auto len = sqlite3_column_bytes(prepared_stmt, idx);
-  return std::string_view(ptr, len);
+  return std::string_view(ptr, static_cast<size_t>(len));
 }
 
 size_t Statement::NumParams(void) const noexcept {
@@ -205,43 +205,55 @@ int Statement::TryExecuteStep(void) {
 }
 
 void Statement::bind(const size_t i, const int32_t &value) {
-  sqlite3_bind_int(impl.get(), i + 1, value);
+  sqlite3_bind_int(impl.get(), static_cast<int>(i + 1), value);
 }
 
 void Statement::bind(const size_t i, const uint32_t &value) {
-  sqlite3_bind_int(impl.get(), i + 1, value);
+  sqlite3_bind_int(impl.get(), static_cast<int>(i + 1),
+                   static_cast<int32_t>(value));
 }
 
 void Statement::bind(const size_t i, const int64_t &value) {
-  sqlite3_bind_int64(impl.get(), i + 1, value);
+  sqlite3_bind_int64(impl.get(), static_cast<int>(i + 1), value);
 }
 
 void Statement::bind(const size_t i, const uint64_t &value) {
-  sqlite3_bind_int64(impl.get(), i + 1, value);
+  sqlite3_bind_int64(impl.get(), static_cast<int>(i + 1),
+                     static_cast<int64_t>(value));
 }
 
 void Statement::bind(const size_t i, const double &value) {
-  sqlite3_bind_double(impl.get(), i + 1, value);
+  sqlite3_bind_double(impl.get(), static_cast<int>(i + 1), value);
 }
 
-void Statement::bind(const size_t i, const std::nullptr_t &value) {
-  sqlite3_bind_null(impl.get(), i + 1);
+void Statement::bind(const size_t i, const std::nullptr_t &) {
+  sqlite3_bind_null(impl.get(), static_cast<int>(i + 1));
 }
+
+void Statement::bind(const size_t i, const std::nullopt_t &) {
+  sqlite3_bind_null(impl.get(), static_cast<int>(i + 1));
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 
 void Statement::bind(const size_t i, const char *&value) {
-  sqlite3_bind_text(impl.get(), i + 1,
-                    value, strlen(value), SQLITE_TRANSIENT);
+  sqlite3_bind_text64(impl.get(), static_cast<int>(i + 1),
+                      value, strlen(value), SQLITE_TRANSIENT,
+                      SQLITE_UTF8);
 }
 
 void Statement::bind(const size_t i, const std::string &value) {
-  sqlite3_bind_blob64(impl.get(), i + 1,
+  sqlite3_bind_blob64(impl.get(), static_cast<int>(i + 1),
                       value.data(), value.size(), SQLITE_TRANSIENT);
 }
 
 void Statement::bind(const size_t i, const std::string_view &value) {
-  sqlite3_bind_blob64(impl.get(), i + 1,
+  sqlite3_bind_blob64(impl.get(), static_cast<int>(i + 1),
                       value.data(), value.size(), SQLITE_TRANSIENT);
 }
+
+#pragma GCC diagnostic pop
 
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
@@ -258,7 +270,7 @@ bool Connection::IsReadOnly(void) const {
 }
 
 void Connection::CreateFunction(
-    std::string func_name, unsigned n_args, unsigned flags,
+    std::string func_name, unsigned n_args, int flags,
     void (*x_func)(sqlite3_context *, int, sqlite3_value **),
     void (*x_step)(sqlite3_context *, int, sqlite3_value **),
     void (*x_final)(sqlite3_context *),
@@ -267,7 +279,7 @@ void Connection::CreateFunction(
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
-      impl->db, func_name.c_str(), n_args, rflags,
+      impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
       nullptr, x_func, x_step, x_final, x_destroy);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
@@ -275,12 +287,12 @@ void Connection::CreateFunction(
 }
 
 void Connection::DeleteFunction(
-    std::string func_name, unsigned n_args, unsigned flags) {
+    std::string func_name, unsigned n_args, int flags) {
   assert(tDatabase == impl->db);
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
-      impl->db, func_name.c_str(), n_args, rflags,
+      impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
       nullptr, nullptr, nullptr, nullptr, nullptr);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
@@ -296,7 +308,7 @@ void Connection::SetBusyHandler(std::function<int(unsigned)> func) {
 void Connection::SetBusyTimeout(std::chrono::milliseconds ms) {
   std::lock_guard<std::shared_mutex> locker(impl->busy_handler_lock);
   impl->busy_handler = [=] (unsigned) {
-    std::this_thread::sleep_for(ms);
+    std::this_thread::sleep_for (ms);
     return 1;  // Continue busy looping if necessary.
   };
 }
@@ -320,8 +332,7 @@ Statement Connection::Prepare(const std::string &query) {
       impl->db, query.c_str(), static_cast<int>(query.size()),
       SQLITE_PREPARE_PERSISTENT, &stmt, const_cast<const char **>(&tail));
   if (SQLITE_OK != ret) {
-    std::string error_msg = sqlite3_errmsg(impl->db) == nullptr ? "" : sqlite3_errmsg(impl->db);
-    throw Error("Failed to prepare statement " + error_msg);
+    throw Error("Failed to prepare statement", impl->db);
   }
 
   impl->stmts.push_back(stmt);

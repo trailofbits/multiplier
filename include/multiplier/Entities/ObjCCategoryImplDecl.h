@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,10 +31,6 @@ class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
 class ObjCImplDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCCategoryImplDeclRange = DerivedEntityRange<DeclIterator, ObjCCategoryImplDecl>;
-using ObjCCategoryImplDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCCategoryImplDecl>;
-using ObjCCategoryImplDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCCategoryImplDecl>;
-
 class ObjCCategoryImplDecl : public ObjCImplDecl {
  private:
   friend class FragmentImpl;
@@ -42,12 +39,20 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCCategoryImplDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCCategoryImplDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCCategoryImplDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCCategoryImplDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -62,8 +67,8 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
     return DeclKind::OBJ_C_CATEGORY_IMPL;
   }
 
-  static ObjCCategoryImplDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCCategoryImplDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCCategoryImplDecl> containing(const Decl &decl);
+  static gap::generator<ObjCCategoryImplDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

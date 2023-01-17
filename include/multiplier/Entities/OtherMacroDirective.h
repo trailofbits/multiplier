@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,27 +28,28 @@ class Macro;
 class MacroDirective;
 class OtherMacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OtherMacroDirectiveRange = DerivedEntityRange<MacroIterator, OtherMacroDirective>;
-using OtherMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, OtherMacroDirective>;
-
 class OtherMacroDirective : public MacroDirective {
  private:
   friend class FragmentImpl;
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static OtherMacroDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OtherMacroDirective> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::OTHER_DIRECTIVE;
   }
 
-  static OtherMacroDirectiveContainingMacroRange containing(const Macro &macro);
+  static gap::generator<OtherMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static OtherMacroDirectiveContainingMacroRange containing(const Token &token);
+  static gap::generator<OtherMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<OtherMacroDirective> from(const MacroDirective &parent);

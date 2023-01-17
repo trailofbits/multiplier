@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,27 +28,28 @@ class Macro;
 class MacroDirective;
 class PragmaMacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using PragmaMacroDirectiveRange = DerivedEntityRange<MacroIterator, PragmaMacroDirective>;
-using PragmaMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, PragmaMacroDirective>;
-
 class PragmaMacroDirective : public MacroDirective {
  private:
   friend class FragmentImpl;
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static PragmaMacroDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<PragmaMacroDirective> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::PRAGMA_DIRECTIVE;
   }
 
-  static PragmaMacroDirectiveContainingMacroRange containing(const Macro &macro);
+  static gap::generator<PragmaMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static PragmaMacroDirectiveContainingMacroRange containing(const Token &token);
+  static gap::generator<PragmaMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<PragmaMacroDirective> from(const MacroDirective &parent);

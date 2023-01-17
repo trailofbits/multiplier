@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class Stmt;
 class ValueStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using FunctionParmPackExprRange = DerivedEntityRange<StmtIterator, FunctionParmPackExpr>;
-using FunctionParmPackExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, FunctionParmPackExpr>;
-using FunctionParmPackExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, FunctionParmPackExpr>;
-
 class FunctionParmPackExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -40,12 +37,20 @@ class FunctionParmPackExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static FunctionParmPackExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<FunctionParmPackExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static FunctionParmPackExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<FunctionParmPackExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -60,8 +65,8 @@ class FunctionParmPackExpr : public Expr {
     return StmtKind::FUNCTION_PARM_PACK_EXPR;
   }
 
-  static FunctionParmPackExprContainingStmtRange containing(const Decl &decl);
-  static FunctionParmPackExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<FunctionParmPackExpr> containing(const Decl &decl);
+  static gap::generator<FunctionParmPackExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

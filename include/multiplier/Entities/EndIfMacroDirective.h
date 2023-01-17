@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,9 +29,6 @@ class EndIfMacroDirective;
 class Macro;
 class MacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EndIfMacroDirectiveRange = DerivedEntityRange<MacroIterator, EndIfMacroDirective>;
-using EndIfMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, EndIfMacroDirective>;
-
 class EndIfMacroDirective : public ConditionalMacroDirective {
  private:
   friend class FragmentImpl;
@@ -38,18 +36,22 @@ class EndIfMacroDirective : public ConditionalMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static EndIfMacroDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<EndIfMacroDirective> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::END_IF_DIRECTIVE;
   }
 
-  static EndIfMacroDirectiveContainingMacroRange containing(const Macro &macro);
+  static gap::generator<EndIfMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static EndIfMacroDirectiveContainingMacroRange containing(const Token &token);
+  static gap::generator<EndIfMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<EndIfMacroDirective> from(const ConditionalMacroDirective &parent);

@@ -271,8 +271,6 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
     return {};
   }
 
-  // TODO(pag): This is a yolo-ducated of a guess.
-  capnp::MessageSize size{((data.size() + 7u / 8u)), 0u};
   capnp::Data::Reader contents_reader(
       reinterpret_cast<const capnp::byte *>(data.data()),
       data.size());
@@ -303,8 +301,6 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
     return {};
   }
 
-  // TODO(pag): This is a yolo-ducated of a guess.
-  capnp::MessageSize size{((data.size() + 7u / 8u)), 0u};
   capnp::Data::Reader contents_reader(
       reinterpret_cast<const capnp::byte *>(data.data()),
       data.size());
@@ -317,7 +313,7 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
 
 // Return the list of fragments covering / overlapping some lines in a file.
 FragmentIdList SQLiteEntityProvider::FragmentsCoveringLines(
-    const Ptr &self, PackedFileId file_id, std::vector<unsigned> lines) {
+    const Ptr &, PackedFileId file_id, std::vector<unsigned> lines) {
 
   RawEntityId raw_file_id = file_id.Pack();
 
@@ -410,9 +406,8 @@ void SQLiteEntityProvider::FillFragments(
     SQLiteEntityProviderImpl &context, sqlite::Statement &get_fragments,
     RawEntityId raw_id, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
-  sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
-  sqlite::Statement &get_entity_ids = context.get_entity_ids;
 
+  sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
   sqlite::AbortingTransaction temporary_changes_only(context.db);
 
   // Clear our old entity id list.
@@ -426,7 +421,6 @@ void SQLiteEntityProvider::FillFragments(
 
   // We need to find uses of declarations.
   if (std::holds_alternative<DeclarationId>(vid)) {
-    DeclarationId id = std::get<DeclarationId>(vid);
 
     // If we don't have a set of redeclarations, then calculate them.
     if (redecl_ids_out.empty()) {
@@ -455,10 +449,10 @@ void SQLiteEntityProvider::FillFragments(
 
   // Get the using fragments.
   while (get_fragments.ExecuteStep()) {
-    RawEntityId raw_id = kInvalidEntityId;
+    raw_id = kInvalidEntityId;
     get_fragments.Row().Columns(raw_id);
 
-    VariantId vid = EntityId(raw_id).Unpack();
+    vid = EntityId(raw_id).Unpack();
     if (std::holds_alternative<FragmentId>(vid)) {
       fragment_ids_out.emplace_back(std::get<FragmentId>(vid));
     } else {
@@ -475,7 +469,7 @@ void SQLiteEntityProvider::FillFragments(
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
 void SQLiteEntityProvider::FillUses(
-    const Ptr &self, RawEntityId eid, RawEntityIdList &redecl_ids_out,
+    const Ptr &, RawEntityId eid, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   ImplPtr context = impl.Lock();
   FillFragments(*context, context->get_uses, eid, redecl_ids_out,
@@ -488,7 +482,7 @@ void SQLiteEntityProvider::FillUses(
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
 void SQLiteEntityProvider::FillReferences(
-    const Ptr &self, RawEntityId eid, RawEntityIdList &redecl_ids_out,
+    const Ptr &, RawEntityId eid, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
   ImplPtr context = impl.Lock();

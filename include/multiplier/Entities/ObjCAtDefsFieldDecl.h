@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,10 +31,6 @@ class NamedDecl;
 class ObjCAtDefsFieldDecl;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCAtDefsFieldDeclRange = DerivedEntityRange<DeclIterator, ObjCAtDefsFieldDecl>;
-using ObjCAtDefsFieldDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCAtDefsFieldDecl>;
-using ObjCAtDefsFieldDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCAtDefsFieldDecl>;
-
 class ObjCAtDefsFieldDecl : public FieldDecl {
  private:
   friend class FragmentImpl;
@@ -43,12 +40,20 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCAtDefsFieldDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCAtDefsFieldDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCAtDefsFieldDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCAtDefsFieldDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -63,8 +68,8 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
     return DeclKind::OBJ_C_AT_DEFS_FIELD;
   }
 
-  static ObjCAtDefsFieldDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCAtDefsFieldDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCAtDefsFieldDecl> containing(const Decl &decl);
+  static gap::generator<ObjCAtDefsFieldDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

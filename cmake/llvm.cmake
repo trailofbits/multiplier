@@ -45,7 +45,7 @@ function(find_and_install_llvm_dependencies)
     get_filename_component(file_name "${file_i}" NAME)
     if (NOT TARGET ${file_name})
       install_library(${file_name} ${file_i})
-    endif()
+    endif ()
   endforeach(file_i)
 
 endfunction()

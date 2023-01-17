@@ -19,18 +19,8 @@
 
 namespace mx {
 
-// Advance to the next valid fragment.
-void FileFragmentListIterator::Advance(void) {
-  for (; index < num_fragments; ++index) {
-    frag = impl->ep->FragmentFor(impl->ep, impl->fragment_ids[index]);
-    if (frag) {
-      return;
-    }
-  }
-}
-
 // Return the list of fragments in a file.
-FragmentList Fragment::in(const File &file) {
+gap::generator<Fragment> Fragment::in(const File &file) {
   return file.fragments();
 }
 
@@ -199,14 +189,19 @@ std::optional<std::string_view> Fragment::source_ir(void) const noexcept {
 }
 
 // Run a Weggli search over this fragment.
-WeggliQueryResult Fragment::query(const WeggliQuery &query) const {
-  return WeggliQueryResult(
-      std::make_shared<WeggliQueryResultImpl>(query, impl));
+gap::generator<WeggliQueryMatch> Fragment::query(const WeggliQuery &query) const {
+  WeggliQueryResultImpl res(query, impl);
+  for (auto match : res.enumerate()) {
+    co_yield match;
+  }
 }
 
 // Run a regular expression search over this fragment.
-RegexQueryResult Fragment::query(const RegexQuery &query) const {
-  return RegexQueryResult(std::make_shared<RegexQueryResultImpl>(query, impl));
+gap::generator<RegexQueryMatch> Fragment::query(const RegexQuery &query) const {
+  RegexQueryResultImpl res(query, impl);
+  for (auto match : res.enumerate()) {
+    co_yield match;
+  }
 }
 
 }  // namespace mx

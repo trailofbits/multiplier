@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,19 +31,25 @@ class ObjCObjectType;
 class ObjCProtocolDecl;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCObjectPointerTypeRange = DerivedEntityRange<TypeIterator, ObjCObjectPointerType>;
-using ObjCObjectPointerTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCObjectPointerType>;
 class ObjCObjectPointerType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static ObjCObjectPointerTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCObjectPointerType> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCObjectPointerTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCObjectPointerType> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

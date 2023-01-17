@@ -31,16 +31,6 @@ class FileLocationCacheImpl {
   const FileLocationVector &Add(File file);
 };
 
-class FileListImpl {
- public:
-  const EntityProvider::Ptr ep;
-
-  // NOTE(pag): These are `EntityId`-packed file ids.
-  FileIdList file_ids;
-
-  explicit FileListImpl(EntityProvider::Ptr ep_);
-};
-
 class ReadFileTokensFromFile final : public TokenReader {
  public:
   const FileImpl * const file;

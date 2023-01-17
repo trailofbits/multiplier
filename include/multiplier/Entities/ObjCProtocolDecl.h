@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class ObjCContainerDecl;
 class ObjCProtocolDecl;
 class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCProtocolDeclRange = DerivedEntityRange<DeclIterator, ObjCProtocolDecl>;
-using ObjCProtocolDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCProtocolDecl>;
-using ObjCProtocolDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, ObjCProtocolDecl>;
-
 class ObjCProtocolDecl : public ObjCContainerDecl {
  private:
   friend class FragmentImpl;
@@ -40,12 +37,20 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static ObjCProtocolDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCProtocolDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCProtocolDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCProtocolDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -60,8 +65,8 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
     return DeclKind::OBJ_C_PROTOCOL;
   }
 
-  static ObjCProtocolDeclContainingDeclRange containing(const Decl &decl);
-  static ObjCProtocolDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<ObjCProtocolDecl> containing(const Decl &decl);
+  static gap::generator<ObjCProtocolDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

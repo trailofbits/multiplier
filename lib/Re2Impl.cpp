@@ -22,10 +22,10 @@ RegexQueryResultImpl::~RegexQueryResultImpl(void) noexcept {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, EntityProvider::Ptr ep_,
-    FragmentIdList fragment_ids)
+    FragmentIdList fragment_ids_)
     : query(query_),
-      fragment_ids(std::move(fragment_ids)),
-      ep(std::move(ep_)) {}
+      ep(std::move(ep_)),
+      fragment_ids(std::move(fragment_ids_)) {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
     const RegexQuery &query_, FragmentImpl::Ptr frag_)
@@ -112,28 +112,6 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
       match, frag, query);
 }
 
-void RegexQueryResultIterator::Advance(void) {
-  result.reset();
-
-  while (index < num_matches) {
-
-    // We don't yet have any matches for `index`, so go compute them.
-    if (!impl->frag) {
-      if (!impl->InitForFragment(impl->fragment_ids[index])) {
-        ++index;
-        continue;
-      }
-    }
-
-    impl->GetNextMatchInFragment().swap(result);
-    if (result) {
-      return;
-    }
-
-    ++index;
-  }
-}
-
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
 RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
@@ -160,7 +138,6 @@ RegexQueryMatch::RegexQueryMatch(TokenRange range_ /* file token range */,
     // `1` is to skip over the `(` and `)` that our Re2 wrapper applies.
     for (auto i = 2; i <= num_captures; ++i) {
       auto part = parts[static_cast<unsigned>(i)];
-      auto x = matched_ranges.size();
       if (!part.data()) {
         matched_ranges.emplace_back();
       } else {
@@ -291,16 +268,34 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return ret;
 }
 
-RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
-    : impl(std::move(impl_)),
-      num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::enumerate(void) {
+  size_t index = 0;
+  size_t num_matches = fragment_ids.size();
+
+  while (index < num_matches) {
+    // We don't yet have any matches for `index`, so go compute them.
+    if (!frag) {
+      if (!InitForFragment(fragment_ids[index])) {
+        ++index;
+        continue;
+      }
+    }
+
+    GetNextMatchInFragment();
+    if (auto result = GetNextMatchInFragment()) {
+      co_yield *result;
+    }
+
+    ++index;
+  }
+}
 
 RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
   return RegexQuery(match.query);
 }
 
 // Match this regular expression against a file.
-RegexQueryResult RegexQuery::match_fragments(const File &file) const {
+gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &file) const {
   auto &reader = file.impl->Reader();
 
   std::map<unsigned, unsigned> eol_offset_to_line_num;
@@ -329,18 +324,24 @@ RegexQueryResult RegexQuery::match_fragments(const File &file) const {
       });
 
   if (line_nums.empty()) {
-    return {};
+    co_return;
   }
 
   const EntityProvider::Ptr &ep = file.impl->ep;
-  return std::make_shared<RegexQueryResultImpl>(
+  RegexQueryResultImpl result_impl(
       *this, ep,
       ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
+  for (auto match : result_impl.enumerate()) {
+    co_yield match;
+  }
 }
 
 // Match this regular expression against a fragment.
-RegexQueryResult RegexQuery::match_fragments(const Fragment &frag) const {
-  return std::make_shared<RegexQueryResultImpl>(*this, frag.impl);
+gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const Fragment &frag) const {
+  RegexQueryResultImpl result_impl(*this, frag.impl);
+  for (auto match : result_impl.enumerate()) {
+    co_yield match;
+  }
 }
 
 }  // namespace mx
@@ -373,7 +374,9 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
     return std::nullopt;
 }
 
-void RegexQueryResultIterator::Advance(void) {}
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::enumerate(void) {
+  co_return;
+}
 
 RegexQueryMatch::~RegexQueryMatch(void) {}
 
@@ -431,21 +434,17 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return {};
 }
 
-RegexQueryResult::RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_)
-    : impl(std::move(impl_)),
-      num_fragments(impl ? impl->fragment_ids.size() : 0u) {}
-
 RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
   return RegexQuery(match.query);
 }
 
 // Match this regular expression against a file.
-RegexQueryResult RegexQuery::match_fragments(const File &) const {
-  return {};
+gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &) const {
+  co_return;
 }
 
-RegexQueryResult RegexQuery::match_fragments(const Fragment &) const {
-  return {};
+gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const Fragment &) const {
+  co_return;
 }
 
 }  // namespace mx

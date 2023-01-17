@@ -72,7 +72,6 @@ class UseBase {
   friend class FragmentImpl;
   friend class Macro;
   friend class Stmt;
-  friend class UseIteratorBase;
   friend class UseIteratorImpl;
 
  protected:
@@ -145,108 +144,6 @@ class Use : public UseBase {
 
   inline static mx::EnumerationRange<Selector> all_selectors(void) noexcept {
     return mx::EnumerationRange<Selector>();
-  }
-};
-
-class UseIteratorImpl;
-
-class UseIteratorBase {
- protected:
-  friend class UseIteratorImpl;
-
-  std::shared_ptr<UseIteratorImpl> impl;
-  UseBase use;
-  unsigned fragment_offset{0u};
-  unsigned list_offset{0u};
-
-  UseIteratorBase(void) = default;
-
-  inline UseIteratorBase(std::shared_ptr<UseIteratorImpl> impl_)
-      : impl(std::move(impl_)) {
-    Advance();
-  }
-
-  void Advance(void);
-};
-
-template <typename Selector>
-class UseIterator : public UseIteratorBase {
- public:
-  using UseT = Use<Selector>;
-  using Self = UseIterator<Selector>;
-
-  static_assert(sizeof(UseT) == sizeof(UseBase));
-
-  bool operator==(const Self &) = delete;
-  bool operator!=(const Self &) = delete;
-
-  UseIterator(void) = default;
-  inline UseIterator(std::shared_ptr<UseIteratorImpl> impl_)
-      : UseIteratorBase(std::move(impl_)) {}
-
-  inline bool operator!=(IteratorEnd) const {
-    return !!impl;
-  }
-
-  inline bool operator==(IteratorEnd) const {
-    return !impl;
-  }
-
-  inline operator bool(void) const {
-    return !!impl;
-  }
-
-  // Return the current token pointed to by the iterator.
-  inline UseT operator*(void) && noexcept {
-    return std::move(*std::launder(reinterpret_cast<UseT *>(&use)));
-  }
-
-  // Return the current token pointed to by the iterator.
-  inline const UseT &operator*(void) const & noexcept {
-    return *std::launder(reinterpret_cast<const UseT *>(&use));
-  }
-
-  inline const UseT *operator->(void) const & noexcept {
-    return std::launder(reinterpret_cast<const UseT *>(&use));
-  }
-
-  // Pre-increment.
-  inline Self &operator++(void) & noexcept{
-    Advance();
-    return *this;
-  }
-};
-
-// Range of uses.
-template <typename Selector>
-class UseRange {
- private:
-  friend class Attr;
-  friend class Decl;
-  friend class File;
-  friend class Macro;
-  friend class Stmt;
-  friend class Type;
-  friend class Token;
-
-  std::shared_ptr<UseIteratorImpl> impl;
-
-  inline /* implicit */ UseRange(std::shared_ptr<UseIteratorImpl> impl_)
-      : impl(std::move(impl_)) {}
-
- public:
-  UseRange(void) = default;
-
-  inline UseIterator<Selector> begin(void) && noexcept {
-    return UseIterator<Selector>(std::move(impl));
-  }
-
-  inline UseIterator<Selector> begin(void) const & noexcept {
-    return UseIterator<Selector>(impl);
-  }
-
-  inline IteratorEnd end(void) const noexcept {
-    return {};
   }
 };
 

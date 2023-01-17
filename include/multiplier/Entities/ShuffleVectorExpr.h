@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class ShuffleVectorExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ShuffleVectorExprRange = DerivedEntityRange<StmtIterator, ShuffleVectorExpr>;
-using ShuffleVectorExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ShuffleVectorExpr>;
-using ShuffleVectorExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ShuffleVectorExpr>;
-
 class ShuffleVectorExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class ShuffleVectorExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ShuffleVectorExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ShuffleVectorExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ShuffleVectorExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ShuffleVectorExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class ShuffleVectorExpr : public Expr {
     return StmtKind::SHUFFLE_VECTOR_EXPR;
   }
 
-  static ShuffleVectorExprContainingStmtRange containing(const Decl &decl);
-  static ShuffleVectorExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ShuffleVectorExpr> containing(const Decl &decl);
+  static gap::generator<ShuffleVectorExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,9 +29,6 @@ class IncludeMacrosMacroDirective;
 class Macro;
 class MacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IncludeMacrosMacroDirectiveRange = DerivedEntityRange<MacroIterator, IncludeMacrosMacroDirective>;
-using IncludeMacrosMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, IncludeMacrosMacroDirective>;
-
 class IncludeMacrosMacroDirective : public IncludeLikeMacroDirective {
  private:
   friend class FragmentImpl;
@@ -38,18 +36,22 @@ class IncludeMacrosMacroDirective : public IncludeLikeMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static IncludeMacrosMacroDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IncludeMacrosMacroDirective> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::INCLUDE_MACROS_DIRECTIVE;
   }
 
-  static IncludeMacrosMacroDirectiveContainingMacroRange containing(const Macro &macro);
+  static gap::generator<IncludeMacrosMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static IncludeMacrosMacroDirectiveContainingMacroRange containing(const Token &token);
+  static gap::generator<IncludeMacrosMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<IncludeMacrosMacroDirective> from(const IncludeLikeMacroDirective &parent);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,9 +29,6 @@ class IfNotDefinedMacroDirective;
 class Macro;
 class MacroDirective;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IfNotDefinedMacroDirectiveRange = DerivedEntityRange<MacroIterator, IfNotDefinedMacroDirective>;
-using IfNotDefinedMacroDirectiveContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, IfNotDefinedMacroDirective>;
-
 class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
  private:
   friend class FragmentImpl;
@@ -38,18 +36,22 @@ class IfNotDefinedMacroDirective : public ConditionalMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static IfNotDefinedMacroDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IfNotDefinedMacroDirective> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::IF_NOT_DEFINED_DIRECTIVE;
   }
 
-  static IfNotDefinedMacroDirectiveContainingMacroRange containing(const Macro &macro);
+  static gap::generator<IfNotDefinedMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static IfNotDefinedMacroDirectiveContainingMacroRange containing(const Token &token);
+  static gap::generator<IfNotDefinedMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<IfNotDefinedMacroDirective> from(const ConditionalMacroDirective &parent);

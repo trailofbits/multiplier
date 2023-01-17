@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class OMPLoopBasedDirective;
 class OMPLoopTransformationDirective;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPLoopTransformationDirectiveRange = DerivedEntityRange<StmtIterator, OMPLoopTransformationDirective>;
-using OMPLoopTransformationDirectiveContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPLoopTransformationDirective>;
-using OMPLoopTransformationDirectiveContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPLoopTransformationDirective>;
-
 class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static OMPLoopTransformationDirectiveRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPLoopTransformationDirective> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPLoopTransformationDirectiveContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPLoopTransformationDirective> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -55,8 +60,8 @@ class OMPLoopTransformationDirective : public OMPLoopBasedDirective {
     return false;
   }
 
-  static OMPLoopTransformationDirectiveContainingStmtRange containing(const Decl &decl);
-  static OMPLoopTransformationDirectiveContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPLoopTransformationDirective> containing(const Decl &decl);
+  static gap::generator<OMPLoopTransformationDirective> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

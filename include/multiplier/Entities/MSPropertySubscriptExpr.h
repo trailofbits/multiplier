@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class MSPropertySubscriptExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MSPropertySubscriptExprRange = DerivedEntityRange<StmtIterator, MSPropertySubscriptExpr>;
-using MSPropertySubscriptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, MSPropertySubscriptExpr>;
-using MSPropertySubscriptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, MSPropertySubscriptExpr>;
-
 class MSPropertySubscriptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class MSPropertySubscriptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static MSPropertySubscriptExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MSPropertySubscriptExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static MSPropertySubscriptExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<MSPropertySubscriptExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class MSPropertySubscriptExpr : public Expr {
     return StmtKind::MS_PROPERTY_SUBSCRIPT_EXPR;
   }
 
-  static MSPropertySubscriptExprContainingStmtRange containing(const Decl &decl);
-  static MSPropertySubscriptExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<MSPropertySubscriptExpr> containing(const Decl &decl);
+  static gap::generator<MSPropertySubscriptExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

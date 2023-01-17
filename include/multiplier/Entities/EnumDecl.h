@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -34,10 +35,6 @@ class TagDecl;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using EnumDeclRange = DerivedEntityRange<DeclIterator, EnumDecl>;
-using EnumDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, EnumDecl>;
-using EnumDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, EnumDecl>;
-
 class EnumDecl : public TagDecl {
  private:
   friend class FragmentImpl;
@@ -46,12 +43,20 @@ class EnumDecl : public TagDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static EnumDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<EnumDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static EnumDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<EnumDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -66,8 +71,8 @@ class EnumDecl : public TagDecl {
     return DeclKind::ENUM;
   }
 
-  static EnumDeclContainingDeclRange containing(const Decl &decl);
-  static EnumDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<EnumDecl> containing(const Decl &decl);
+  static gap::generator<EnumDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

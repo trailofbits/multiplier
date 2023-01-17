@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,8 +30,6 @@ class InheritableParamAttr;
 class ParameterABIAttr;
 class SwiftAsyncContextAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwiftAsyncContextAttrRange = DerivedEntityRange<AttrIterator, SwiftAsyncContextAttr>;
-using SwiftAsyncContextAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwiftAsyncContextAttr>;
 class SwiftAsyncContextAttr : public ParameterABIAttr {
  private:
   friend class FragmentImpl;
@@ -39,12 +38,20 @@ class SwiftAsyncContextAttr : public ParameterABIAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static SwiftAsyncContextAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwiftAsyncContextAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static SwiftAsyncContextAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<SwiftAsyncContextAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

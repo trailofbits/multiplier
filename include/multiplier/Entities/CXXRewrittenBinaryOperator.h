@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXRewrittenBinaryOperatorRange = DerivedEntityRange<StmtIterator, CXXRewrittenBinaryOperator>;
-using CXXRewrittenBinaryOperatorContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXRewrittenBinaryOperator>;
-using CXXRewrittenBinaryOperatorContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXRewrittenBinaryOperator>;
-
 class CXXRewrittenBinaryOperator : public Expr {
  private:
   friend class FragmentImpl;
@@ -40,12 +37,20 @@ class CXXRewrittenBinaryOperator : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CXXRewrittenBinaryOperatorRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXRewrittenBinaryOperator> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static CXXRewrittenBinaryOperatorContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<CXXRewrittenBinaryOperator> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -60,8 +65,8 @@ class CXXRewrittenBinaryOperator : public Expr {
     return StmtKind::CXX_REWRITTEN_BINARY_OPERATOR;
   }
 
-  static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Decl &decl);
-  static CXXRewrittenBinaryOperatorContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const Decl &decl);
+  static gap::generator<CXXRewrittenBinaryOperator> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

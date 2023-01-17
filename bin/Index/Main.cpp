@@ -140,11 +140,11 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   auto fs = pasta::FileSystem::CreateNative();
   pasta::FileManager fm(fs);
 
-  if(FLAGS_show_progress) {
+  if (FLAGS_show_progress) {
     ic->InitializeProgressBars();
   }
 
-  if(!FLAGS_generate_sourceir) {
+  if (!FLAGS_generate_sourceir) {
     ic->codegen.Disable();
   }
 

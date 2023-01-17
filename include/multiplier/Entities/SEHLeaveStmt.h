@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -26,21 +27,25 @@ namespace mx {
 class SEHLeaveStmt;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SEHLeaveStmtRange = DerivedEntityRange<StmtIterator, SEHLeaveStmt>;
-using SEHLeaveStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SEHLeaveStmt>;
-using SEHLeaveStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SEHLeaveStmt>;
-
 class SEHLeaveStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SEHLeaveStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SEHLeaveStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static SEHLeaveStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<SEHLeaveStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -55,8 +60,8 @@ class SEHLeaveStmt : public Stmt {
     return StmtKind::SEH_LEAVE_STMT;
   }
 
-  static SEHLeaveStmtContainingStmtRange containing(const Decl &decl);
-  static SEHLeaveStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SEHLeaveStmt> containing(const Decl &decl);
+  static gap::generator<SEHLeaveStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

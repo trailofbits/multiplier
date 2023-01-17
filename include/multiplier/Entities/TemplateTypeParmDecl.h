@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,10 +31,6 @@ class TemplateTypeParmDecl;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TemplateTypeParmDeclRange = DerivedEntityRange<DeclIterator, TemplateTypeParmDecl>;
-using TemplateTypeParmDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateTypeParmDecl>;
-using TemplateTypeParmDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TemplateTypeParmDecl>;
-
 class TemplateTypeParmDecl : public TypeDecl {
  private:
   friend class FragmentImpl;
@@ -41,12 +38,20 @@ class TemplateTypeParmDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static TemplateTypeParmDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TemplateTypeParmDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static TemplateTypeParmDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<TemplateTypeParmDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class TemplateTypeParmDecl : public TypeDecl {
     return DeclKind::TEMPLATE_TYPE_PARM;
   }
 
-  static TemplateTypeParmDeclContainingDeclRange containing(const Decl &decl);
-  static TemplateTypeParmDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<TemplateTypeParmDecl> containing(const Decl &decl);
+  static gap::generator<TemplateTypeParmDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

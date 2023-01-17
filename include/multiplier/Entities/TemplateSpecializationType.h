@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,19 +29,25 @@ class TemplateArgument;
 class TemplateSpecializationType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TemplateSpecializationTypeRange = DerivedEntityRange<TypeIterator, TemplateSpecializationType>;
-using TemplateSpecializationTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, TemplateSpecializationType>;
 class TemplateSpecializationType : public Type {
  private:
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static TemplateSpecializationTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TemplateSpecializationType> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static TemplateSpecializationTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<TemplateSpecializationType> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,21 +28,25 @@ class DoStmt;
 class Expr;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DoStmtRange = DerivedEntityRange<StmtIterator, DoStmt>;
-using DoStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, DoStmt>;
-using DoStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, DoStmt>;
-
 class DoStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static DoStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<DoStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static DoStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<DoStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -56,8 +61,8 @@ class DoStmt : public Stmt {
     return StmtKind::DO_STMT;
   }
 
-  static DoStmtContainingStmtRange containing(const Decl &decl);
-  static DoStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<DoStmt> containing(const Decl &decl);
+  static gap::generator<DoStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

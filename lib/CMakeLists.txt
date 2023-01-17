@@ -104,7 +104,6 @@ add_library("mx-api" STATIC
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
   "Database.cpp"
-  "FileList.cpp"
   "File.cpp"
   "FileImpl.cpp"
   "File.h"
@@ -149,6 +148,10 @@ target_link_libraries("mx-api"
   PUBLIC
     "CapnProto::capnp-rpc"
     "mx-sqlite"
+    gap::gap
+    gap::gap-core
+    std::coroutines
+    gap::gap-settings
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
     "ZLIB::ZLIB"

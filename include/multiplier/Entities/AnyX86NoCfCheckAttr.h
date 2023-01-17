@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class AnyX86NoCfCheckAttr;
 class Attr;
 class InheritableAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AnyX86NoCfCheckAttrRange = DerivedEntityRange<AttrIterator, AnyX86NoCfCheckAttr>;
-using AnyX86NoCfCheckAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, AnyX86NoCfCheckAttr>;
 class AnyX86NoCfCheckAttr : public InheritableAttr {
  private:
   friend class FragmentImpl;
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static AnyX86NoCfCheckAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AnyX86NoCfCheckAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static AnyX86NoCfCheckAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<AnyX86NoCfCheckAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

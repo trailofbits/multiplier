@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,26 +31,18 @@ class TemplateParameterList;
 class TemplateParameterList {
  protected:
   friend class Attr;
-  friend class AttrIterator;
   friend class Decl;
-  friend class DeclIterator;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
-  friend class StmtReferenceIterator;
-  friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
-  friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class OMPArraySectionExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using OMPArraySectionExprRange = DerivedEntityRange<StmtIterator, OMPArraySectionExpr>;
-using OMPArraySectionExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, OMPArraySectionExpr>;
-using OMPArraySectionExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, OMPArraySectionExpr>;
-
 class OMPArraySectionExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class OMPArraySectionExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static OMPArraySectionExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<OMPArraySectionExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static OMPArraySectionExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<OMPArraySectionExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class OMPArraySectionExpr : public Expr {
     return StmtKind::OMP_ARRAY_SECTION_EXPR;
   }
 
-  static OMPArraySectionExprContainingStmtRange containing(const Decl &decl);
-  static OMPArraySectionExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<OMPArraySectionExpr> containing(const Decl &decl);
+  static gap::generator<OMPArraySectionExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

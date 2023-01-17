@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -37,10 +38,6 @@ class Stmt;
 class TemplateParameterList;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using LambdaExprRange = DerivedEntityRange<StmtIterator, LambdaExpr>;
-using LambdaExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, LambdaExpr>;
-using LambdaExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, LambdaExpr>;
-
 class LambdaExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -48,12 +45,20 @@ class LambdaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static LambdaExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<LambdaExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static LambdaExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<LambdaExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -68,8 +73,8 @@ class LambdaExpr : public Expr {
     return StmtKind::LAMBDA_EXPR;
   }
 
-  static LambdaExprContainingStmtRange containing(const Decl &decl);
-  static LambdaExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<LambdaExpr> containing(const Decl &decl);
+  static gap::generator<LambdaExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

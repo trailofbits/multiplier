@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class Expr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using CXXNoexceptExprRange = DerivedEntityRange<StmtIterator, CXXNoexceptExpr>;
-using CXXNoexceptExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, CXXNoexceptExpr>;
-using CXXNoexceptExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, CXXNoexceptExpr>;
-
 class CXXNoexceptExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class CXXNoexceptExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static CXXNoexceptExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<CXXNoexceptExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static CXXNoexceptExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<CXXNoexceptExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class CXXNoexceptExpr : public Expr {
     return StmtKind::CXX_NOEXCEPT_EXPR;
   }
 
-  static CXXNoexceptExprContainingStmtRange containing(const Decl &decl);
-  static CXXNoexceptExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<CXXNoexceptExpr> containing(const Decl &decl);
+  static gap::generator<CXXNoexceptExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

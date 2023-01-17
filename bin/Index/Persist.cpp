@@ -206,7 +206,7 @@ void GlobalIndexingState::PersistFile(
 
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, CompressedMessage("file", message)});
+      mx::SerializedFileRecord{file_id, CompressedMessage(message)});
 }
 
 namespace {
@@ -319,7 +319,7 @@ struct TokenTreeSerializationSchedule {
   // Schedule the expansions so that all "afters" are properly nested. We want
   // this so that `fragment.parsed_tokens().data()` reflects the final result
   // of macro expansion.
-  void Schedule(const void *parent, mx::RawEntityId parent_id,
+  void Schedule(const void * /* parent */, mx::RawEntityId parent_id,
                 const TokenTreeNodeRange &nodes) {
 
     for (TokenTreeNode node : nodes) {
@@ -497,13 +497,13 @@ static void PersistParsedTokens(
   fb.setTokenData(utf8_fragment_data);
 
   auto ms = fb.initMacros(num_macros);
-  for (auto i = 0u; i < num_macros; ++i) {
+  for (i = 0u; i < num_macros; ++i) {
     mx::ast::Macro::Builder mb = ms[i];
     DispatchSerializeMacro(em, mb, macros_to_serialize[i], nullptr);
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
-  for (auto i = 0u; i < pf.num_top_level_macros; ++i) {
+  for (i = 0u; i < pf.num_top_level_macros; ++i) {
     tlms.set(i, em.EntityId(pf.top_level_macros[i]));
   }
 }
@@ -623,9 +623,9 @@ static void PersistTokenTree(
     }
 
     // Introduce a mapping of macro tokens back to parsed tokens.
-    for (auto dt = parsed_tok.DerivedLocation(); dt;
-         dt = dt->DerivedLocation()) {
-      mx::VariantId vid = mx::EntityId(em.EntityId(dt.value())).Unpack();
+    for (auto dloc = parsed_tok.DerivedLocation(); dloc;
+         dloc = dloc->DerivedLocation()) {
+      mx::VariantId vid = mx::EntityId(em.EntityId(dloc.value())).Unpack();
       if (!std::holds_alternative<mx::MacroTokenId>(vid)) {
         CHECK(!std::holds_alternative<mx::ParsedTokenId>(vid));
         continue;
@@ -1004,7 +1004,7 @@ void GlobalIndexingState::PersistFragment(
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
   database.AddAsync(
       mx::SerializedFragmentRecord{
-          pf.fragment_id, CompressedMessage("fragment", message)});
+          pf.fragment_id, CompressedMessage(message)});
 
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalUsesInFragment(database, pf, fb);

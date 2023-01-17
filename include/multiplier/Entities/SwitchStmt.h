@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -32,21 +33,25 @@ class SwitchCase;
 class SwitchStmt;
 class VarDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using SwitchStmtRange = DerivedEntityRange<StmtIterator, SwitchStmt>;
-using SwitchStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, SwitchStmt>;
-using SwitchStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, SwitchStmt>;
-
 class SwitchStmt : public Stmt {
  private:
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static SwitchStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<SwitchStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static SwitchStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<SwitchStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class SwitchStmt : public Stmt {
     return StmtKind::SWITCH_STMT;
   }
 
-  static SwitchStmtContainingStmtRange containing(const Decl &decl);
-  static SwitchStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<SwitchStmt> containing(const Decl &decl);
+  static gap::generator<SwitchStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

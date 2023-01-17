@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class ImplicitCastExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ImplicitCastExprRange = DerivedEntityRange<StmtIterator, ImplicitCastExpr>;
-using ImplicitCastExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ImplicitCastExpr>;
-using ImplicitCastExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ImplicitCastExpr>;
-
 class ImplicitCastExpr : public CastExpr {
  private:
   friend class FragmentImpl;
@@ -41,12 +38,20 @@ class ImplicitCastExpr : public CastExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ImplicitCastExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ImplicitCastExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ImplicitCastExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ImplicitCastExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -61,8 +66,8 @@ class ImplicitCastExpr : public CastExpr {
     return StmtKind::IMPLICIT_CAST_EXPR;
   }
 
-  static ImplicitCastExprContainingStmtRange containing(const Decl &decl);
-  static ImplicitCastExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ImplicitCastExpr> containing(const Decl &decl);
+  static gap::generator<ImplicitCastExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

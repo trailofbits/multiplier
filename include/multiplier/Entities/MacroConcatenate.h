@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,27 +28,28 @@ class Macro;
 class MacroConcatenate;
 class MacroSubstitution;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using MacroConcatenateRange = DerivedEntityRange<MacroIterator, MacroConcatenate>;
-using MacroConcatenateContainingMacroRange = DerivedEntityRange<ParentMacroIteratorImpl<Macro>, MacroConcatenate>;
-
 class MacroConcatenate : public MacroSubstitution {
  private:
   friend class FragmentImpl;
   friend class MacroSubstitution;
   friend class Macro;
  public:
-  inline static MacroConcatenateRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<MacroConcatenate> in(const Fragment &frag) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::CONCATENATE;
   }
 
-  static MacroConcatenateContainingMacroRange containing(const Macro &macro);
+  static gap::generator<MacroConcatenate> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
-  static MacroConcatenateContainingMacroRange containing(const Token &token);
+  static gap::generator<MacroConcatenate> containing(const Token &token);
   bool contains(const Token &token);
 
   static std::optional<MacroConcatenate> from(const MacroSubstitution &parent);

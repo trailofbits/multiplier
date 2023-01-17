@@ -53,11 +53,13 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
   }
 
   mx::EntityId dt_id = dt.id();
+  auto macro_containing = mx::Macro::containing(dt);
+  auto m = macro_containing.begin();
   if (file_toks.index_of(dt)) {
     os << "ft0:t" << dt_id.Pack() << " -> " << prefix << parent_id
        << ":t" << id << ";\n";
 
-  } else if (auto m = mx::Macro::containing(dt)) {
+  } else if (m != macro_containing.end()) {
     const char *pred_prefix = "m";
     switch (m->kind()) {
       case mx::MacroKind::SUBSTITUTION:
@@ -71,8 +73,8 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
         break;
     }
 
-    if (auto sub = mx::MacroSubstitution::from(m.value())) {
-      for (const mx::MacroOrToken node : sub->replacement_children()) {
+    if (auto sub = mx::MacroSubstitution::from(*m)) {
+      for (mx::MacroOrToken node : sub->replacement_children()) {
         if (std::holds_alternative<mx::Token>(node)) {
           if (std::get<mx::Token>(node) == dt) {
             pred_prefix = "a";
@@ -87,7 +89,7 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
 
   // No containing macro, but it's part of a fragment, which means it's a top-
   // level macro token.
-  } else if (auto m = mx::Fragment::containing(dt)) {
+  } else if (mx::Fragment::containing(dt)) {
     os << "ct0:t" << dt_id.Pack() << " -> " << prefix << parent_id
        << ":t" << id << ";\n";
 

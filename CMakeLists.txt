@@ -65,6 +65,7 @@ find_package(glog CONFIG REQUIRED)
 find_package(Z3 CONFIG REQUIRED)
 find_package(LLVM CONFIG REQUIRED)
 find_package(Clang CONFIG REQUIRED)
+find_package(gap CONFIG REQUIRED)
 
 find_package(reproc++ REQUIRED)
 find_package(pasta CONFIG REQUIRED)

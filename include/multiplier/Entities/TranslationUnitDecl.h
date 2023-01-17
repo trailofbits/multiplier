@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -26,21 +27,25 @@ namespace mx {
 class Decl;
 class TranslationUnitDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TranslationUnitDeclRange = DerivedEntityRange<DeclIterator, TranslationUnitDecl>;
-using TranslationUnitDeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, TranslationUnitDecl>;
-using TranslationUnitDeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, TranslationUnitDecl>;
-
 class TranslationUnitDecl : public Decl {
  private:
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static TranslationUnitDeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<TranslationUnitDecl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static TranslationUnitDeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<TranslationUnitDecl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -55,8 +60,8 @@ class TranslationUnitDecl : public Decl {
     return DeclKind::TRANSLATION_UNIT;
   }
 
-  static TranslationUnitDeclContainingDeclRange containing(const Decl &decl);
-  static TranslationUnitDeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<TranslationUnitDecl> containing(const Decl &decl);
+  static gap::generator<TranslationUnitDecl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

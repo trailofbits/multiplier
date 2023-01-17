@@ -29,11 +29,7 @@ namespace mx {
 class CachingEntityProvider;
 class EntityProvider;
 class File;
-class FragmentList;
-class FileFragmentListIterator;
 class FileImpl;
-class FileList;
-class FileListImpl;
 class Fragment;
 class FragmentImpl;
 class IncludeLikeMacroDirective;
@@ -43,16 +39,10 @@ class ReadMacroTokensFromFragment;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
-class RegexQueryResultIterator;
 class RegexQueryMatch;
-class RegexQueryResultImpl;
-class RegexQueryResult;
 class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
-class WeggliQueryResultIterator;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
 
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
@@ -61,10 +51,6 @@ using FileUse = Use<FileUseSelector>;
 using TokenUse = Use<TokenUseSelector>;
 using MacroUse = Use<MacroUseSelector>;
 
-using ParentDeclIterator = ParentDeclIteratorImpl<Decl>;
-using ParentStmtIterator = ParentStmtIteratorImpl<Stmt>;
-using ParentMacroIterator = ParentMacroIteratorImpl<Macro>;
-
 using FilePathMap = std::map<std::filesystem::path, PackedFileId>;
 using FragmentIdList = std::vector<PackedFragmentId>;
 using DeclarationIdList = std::vector<PackedDeclarationId>;
@@ -72,27 +58,6 @@ using RawEntityIdList = std::vector<RawEntityId>;
 
 using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
 using NamedEntityList = std::vector<NamedEntity>;
-
-template <typename T>
-inline ParentDeclIteratorImpl<T> &
-ParentDeclIteratorImpl<T>::operator++(void) & {
-  impl = impl->parent_declaration();
-  return *this;
-}
-
-template <typename T>
-inline ParentStmtIteratorImpl<T> &
-ParentStmtIteratorImpl<T>::operator++(void) & {
-  impl = impl->parent_statement();
-  return *this;
-}
-
-template <typename T>
-inline ParentMacroIteratorImpl<T> &
-ParentMacroIteratorImpl<T>::operator++(void) & {
-  impl = impl->parent();
-  return *this;
-}
 
 // Provides the APIs with entities.
 class EntityProvider {
@@ -111,28 +76,21 @@ class EntityProvider {
   friend class Decl;
   friend class File;
   friend class FileImpl;
-  friend class FileListIterator;
-  friend class FileFragmentListIterator;
-  friend class FileListImpl;
   friend class Fragment;
   friend class FragmentImpl;
   friend class IncludeLikeMacroDirective;
   friend class Index;
   friend class Macro;
-  friend class MacroReferenceIterator;
   friend class ReadMacroTokensFromFragment;
   friend class ReferenceIteratorImpl;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
-  friend class RegexQueryResultIterator;
   friend class RemoteEntityProvider;
-  friend class StmtReferenceIterator;
   friend class Token;
   friend class TokenReader;
   friend class UseIteratorImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
-  friend class WeggliQueryResultIterator;
 
  protected:
 
@@ -323,7 +281,7 @@ class Index {
   VariantEntity entity(EntityId eid) const;
 
   // Return all files in the index.
-  FileList files(void) const;
+  gap::generator<File> files(void) const;
 
   // Return an entity given its ID.
   template <typename T>

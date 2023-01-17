@@ -105,8 +105,24 @@ FilePathMap Index::file_paths(void) const {
   return impl->ListFiles(impl);
 }
 
-FileList Index::files(void) const {
-  return FileList(std::make_shared<FileListImpl>(impl));
+gap::generator<File> Index::files(void) const {
+  std::vector<SpecificEntityId<FileId>> file_ids;
+  auto file_paths = impl->ListFiles(impl);
+  file_ids.reserve(file_paths.size());
+  for (const auto &[path, file_id] : file_paths) {
+    file_ids.emplace_back(file_id);
+  }
+
+  std::sort(file_ids.begin(), file_ids.end());
+  auto it = std::unique(file_ids.begin(), file_ids.end());
+  file_ids.erase(it, file_ids.end());
+
+  for (auto file_id : file_ids) {
+    auto file = impl->FileFor(impl, file_id);
+    if (file) {
+      co_yield file;
+    }
+  }
 }
 
 std::optional<File> Index::file(FileId id) const {

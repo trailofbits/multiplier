@@ -17,33 +17,23 @@ namespace mx {
 
 class EntityProvider;
 class File;
-class FragmentList;
-class FileFragmentListIterator;
 class FileImpl;
-class FileListImpl;
 class Fragment;
 class FragmentImpl;
 class Index;
 class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
-class RegexQueryResultIterator;
 class RegexQueryMatch;
-class RegexQueryResultImpl;
-class RegexQueryResult;
 class InvalidEntityProvider;
 class WeggliQuery;
 class WeggliQueryMatch;
-class WeggliQueryResultIterator;
-class WeggliQueryResult;
-class WeggliQueryResultImpl;
 
 // The range of tokens of a match.
 class WeggliQueryMatch : public TokenRange {
  private:
   friend class File;
   friend class Fragment;
-  friend class WeggliQueryResult;
   friend class WeggliQueryResultImpl;
 
   // Fragment with the match
@@ -96,97 +86,12 @@ class WeggliQueryMatch : public TokenRange {
   }
 };
 
-class WeggliQueryResultIterator {
- private:
-  friend class WeggliQueryResult;
-
-  std::shared_ptr<WeggliQueryResultImpl> impl;
-
-  unsigned index;
-  unsigned num_fragments;
-  std::optional<WeggliQueryMatch> result;
-
-  // Try to advance to the next result. There can be multiple results per
-  // fragment.
-  void Advance(void);
-
-  inline WeggliQueryResultIterator(
-      std::shared_ptr<WeggliQueryResultImpl> impl_,
-      unsigned index_, unsigned num_fragments_)
-      : impl(std::move(impl_)),
-        index(index_),
-        num_fragments(num_fragments_) {
-    Advance();
-  }
-
- public:
-  inline WeggliQueryMatch operator*(void) && noexcept {
-    return std::move(result.value());
-  }
-
-  inline const WeggliQueryMatch &operator*(void) const & noexcept {
-    return result.value();
-  }
-
-  inline const WeggliQueryMatch *operator->(void) const & noexcept {
-    return std::addressof(result.value());
-  }
-
-  inline bool operator==(IteratorEnd) const noexcept {
-    return index >= num_fragments;
-  }
-
-  inline bool operator!=(IteratorEnd) const noexcept {
-    return index < num_fragments;
-  }
-
-  // Pre-increment.
-  inline WeggliQueryResultIterator &operator++(void) noexcept {
-    Advance();
-    return *this;
-  }
-};
-
-// NOTE(pag): The iterators from this are *NOT* restartable.
-class WeggliQueryResult {
- private:
-
-  using Ptr = std::shared_ptr<const WeggliQueryResult>;
-
-  friend class EntityProvider;
-  friend class RemoteEntityProvider;
-  friend class InvalidEntityProvider;
-  friend class WeggliQueryResultIterator;
-
-  std::shared_ptr<WeggliQueryResultImpl> impl;
-  unsigned num_fragments{0u};
-
- public:
-  WeggliQueryResult(void) = default;
-  WeggliQueryResult(std::shared_ptr<WeggliQueryResultImpl> impl_);
-
-  // Return an iterator pointing at the first token in this list.
-  inline WeggliQueryResultIterator begin(void) && noexcept {
-    return WeggliQueryResultIterator(std::move(impl), 0, num_fragments);
-  }
-
-  // Return an iterator pointing at the first token in this list.
-  inline WeggliQueryResultIterator begin(void) const & noexcept {
-    return WeggliQueryResultIterator(impl, 0, num_fragments);
-  }
-
-  inline IteratorEnd end(void) const noexcept {
-    return {};
-  }
-};
-
 // The range of tokens that matches a regular expression.
 class RegexQueryMatch : public TokenRange {
  private:
   friend class File;
   friend class Fragment;
   friend class RegexQuery;
-  friend class RegexQueryResult;
   friend class RegexQueryResultImpl;
 
   // The actual range of matched data. This is possibly a sub-sequence of
@@ -237,93 +142,6 @@ class RegexQueryMatch : public TokenRange {
 
   // Return the number of capture groups.
   size_t num_captures(void) const;
-};
-
-class RegexQueryResultIterator {
- private:
-  friend class RegexQueryResult;
-
-  std::shared_ptr<RegexQueryResultImpl> impl;
-
-  unsigned index;
-  unsigned num_matches;
-
-  std::optional<RegexQueryMatch> result;
-
-  // Try to advance to the next result. There can be multiple results per
-  // fragment.
-  void Advance(void);
-
-  inline RegexQueryResultIterator(
-      std::shared_ptr<RegexQueryResultImpl> impl_,
-      unsigned index_, unsigned num_matches_)
-      : impl(std::move(impl_)),
-        index(index_),
-        num_matches(num_matches_) {
-    Advance();
-  }
-
- public:
-  inline RegexQueryMatch operator*(void) && noexcept {
-    return std::move(result.value());
-  }
-
-  inline const RegexQueryMatch &operator*(void) const & noexcept {
-    return result.value();
-  }
-
-  inline const RegexQueryMatch *operator->(void) const & noexcept {
-    return std::addressof(result.value());
-  }
-
-  inline bool operator==(IteratorEnd) const noexcept {
-    return index >= num_matches;
-  }
-
-  inline bool operator!=(IteratorEnd) const noexcept {
-    return index < num_matches;
-  }
-
-  // Pre-increment.
-  inline RegexQueryResultIterator &operator++(void) noexcept {
-    Advance();
-    return *this;
-  }
-};
-
-// NOTE(pag): The iterators from this are *NOT* restartable.
-class RegexQueryResult {
- private:
-
-  using Ptr = std::shared_ptr<const RegexQueryResult>;
-
-  friend class EntityProvider;
-  friend class RemoteEntityProvider;
-  friend class InvalidEntityProvider;
-  friend class RegexQuery;
-  friend class RegexQueryResultIterator;
-
-  std::shared_ptr<RegexQueryResultImpl> impl;
-  unsigned num_fragments{0u};
-
- public:
-  RegexQueryResult(void) = default;
-
-  RegexQueryResult(std::shared_ptr<RegexQueryResultImpl> impl_);
-
-  // Return an iterator pointing at the first token in this list.
-  inline RegexQueryResultIterator begin(void) && noexcept {
-    return RegexQueryResultIterator(std::move(impl), 0, num_fragments);
-  }
-
-  // Return an iterator pointing at the first token in this list.
-  inline RegexQueryResultIterator begin(void) const & noexcept {
-    return RegexQueryResultIterator(impl, 0, num_fragments);
-  }
-
-  inline IteratorEnd end(void) const noexcept {
-    return {};
-  }
 };
 
 }  // namespace mx

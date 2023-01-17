@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -33,36 +34,24 @@ class Attr;
 class Decl;
 class ExternalSourceSymbolAttr;
 class Stmt;
-class StmtReferenceRange;
+class StmtReference;
 class TemplateDecl;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using DeclRange = DerivedEntityRange<DeclIterator, Decl>;
-using DeclContainingTokenRange = DerivedEntityRange<TokenContextIterator, Decl>;
-using DeclContainingDeclRange = DerivedEntityRange<ParentDeclIteratorImpl<Decl>, Decl>;
-
 class Decl {
  protected:
   friend class Attr;
-  friend class AttrIterator;
-  friend class DeclIterator;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
-  friend class StmtReferenceIterator;
-  friend class StmtIterator;
   friend class TokenContext;
   friend class Type;
-  friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -94,19 +83,27 @@ class Decl {
   bool is_definition(void) const;
   std::vector<Decl> redeclarations(void) const;
   SpecificEntityId<DeclarationId> id(void) const;
-  UseRange<DeclUseSelector> uses(void) const;
-  StmtReferenceRange references(void) const;
+  gap::generator<Use<DeclUseSelector>> uses(void) const;
+  gap::generator<StmtReference> references(void) const;
 
  protected:
-  static DeclIterator in_internal(const Fragment &fragment);
+  static gap::generator<Decl> in_internal(const Fragment &fragment);
 
  public:
-  inline static DeclRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Decl> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static DeclContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<Decl> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -117,8 +114,8 @@ class Decl {
     return false;
   }
 
-  static DeclContainingDeclRange containing(const Decl &decl);
-  static DeclContainingDeclRange containing(const Stmt &stmt);
+  static gap::generator<Decl> containing(const Decl &decl);
+  static gap::generator<Decl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

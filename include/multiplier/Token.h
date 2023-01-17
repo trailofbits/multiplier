@@ -11,6 +11,7 @@
 #include <string_view>
 #include <utility>
 #include <variant>
+#include <gap/core/generator.hpp>
 
 #include "Types.h"
 #include "Use.h"
@@ -125,7 +126,7 @@ class Token {
 
   // Return the set of all uses of this token within its fragment (if it's a
   // fragment token).
-  UseRange<TokenUseSelector> uses(void) const;
+  gap::generator<Use<TokenUseSelector>> uses(void) const;
 
   // Return the line and column number for this token, if any.
   std::optional<std::pair<unsigned, unsigned>> location(
@@ -217,14 +218,14 @@ class TokenRange {
   friend class RegexQuery;
   friend class RegexQueryResultIterator;
   friend class WeggliQuery;
-  friend class WeggliQueryResultIterator;
+  friend class WeggliQueryResultImpl;
 
   std::shared_ptr<const TokenReader> impl;
-  unsigned index;
-  unsigned num_tokens;
+  EntityOffset index;
+  EntityOffset num_tokens;
 
   inline TokenRange(std::shared_ptr<const TokenReader> impl_,
-                    unsigned index_, unsigned num_tokens_)
+                    EntityOffset index_, EntityOffset num_tokens_)
       : impl(std::move(impl_)),
         index(index_),
         num_tokens(num_tokens_) {}

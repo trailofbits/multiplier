@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -27,20 +28,26 @@ class ArrayType;
 class IncompleteArrayType;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using IncompleteArrayTypeRange = DerivedEntityRange<TypeIterator, IncompleteArrayType>;
-using IncompleteArrayTypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, IncompleteArrayType>;
 class IncompleteArrayType : public ArrayType {
  private:
   friend class FragmentImpl;
   friend class ArrayType;
   friend class Type;
  public:
-  inline static IncompleteArrayTypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<IncompleteArrayType> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static IncompleteArrayTypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<IncompleteArrayType> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -30,10 +31,6 @@ class Stmt;
 class UserDefinedLiteral;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using UserDefinedLiteralRange = DerivedEntityRange<StmtIterator, UserDefinedLiteral>;
-using UserDefinedLiteralContainingTokenRange = DerivedEntityRange<TokenContextIterator, UserDefinedLiteral>;
-using UserDefinedLiteralContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, UserDefinedLiteral>;
-
 class UserDefinedLiteral : public CallExpr {
  private:
   friend class FragmentImpl;
@@ -42,12 +39,20 @@ class UserDefinedLiteral : public CallExpr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static UserDefinedLiteralRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<UserDefinedLiteral> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static UserDefinedLiteralContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<UserDefinedLiteral> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -62,8 +67,8 @@ class UserDefinedLiteral : public CallExpr {
     return StmtKind::USER_DEFINED_LITERAL;
   }
 
-  static UserDefinedLiteralContainingStmtRange containing(const Decl &decl);
-  static UserDefinedLiteralContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<UserDefinedLiteral> containing(const Decl &decl);
+  static gap::generator<UserDefinedLiteral> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,8 +29,6 @@ class InheritableAttr;
 class InheritableParamAttr;
 class ReleaseHandleAttr;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ReleaseHandleAttrRange = DerivedEntityRange<AttrIterator, ReleaseHandleAttr>;
-using ReleaseHandleAttrContainingTokenRange = DerivedEntityRange<TokenContextIterator, ReleaseHandleAttr>;
 class ReleaseHandleAttr : public InheritableParamAttr {
  private:
   friend class FragmentImpl;
@@ -37,12 +36,20 @@ class ReleaseHandleAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static ReleaseHandleAttrRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ReleaseHandleAttr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ReleaseHandleAttrContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ReleaseHandleAttr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

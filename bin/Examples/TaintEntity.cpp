@@ -239,6 +239,7 @@ static bool TaintTrackBinOp(const mx::Stmt &op, mx::BinaryOperatorKind opcode,
                             const mx::Stmt &lhs, const mx::Stmt &rhs,
                             const mx::Stmt &taint_source,
                             const UsePath &prev, SeenEntityMap &seen) {
+  (void) rhs;
 
   switch (opcode) {
     // Focus on assignment and accumulation operations, e.g.
@@ -327,6 +328,10 @@ static bool TaintLibraryReturnValue(const mx::CallExpr &call,
                                     const mx::Stmt &tainted_arg,
                                     unsigned param_index,
                                     const UsePath &prev, SeenEntityMap &seen) {
+  (void) called_func;
+  (void) param;
+  (void) tainted_arg;
+  (void) param_index;
   TaintTrackExpr(call, prev, seen);
   return true;
 }
@@ -494,8 +499,12 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
 static void TaintTrackReturn(const mx::Stmt &ret, const UsePath &prev,
                              SeenEntityMap &seen) {
   const UsePath entry{&prev, ret.id().Pack()};
-  if (auto func = mx::FunctionDecl::containing(ret)) {
-    TaintTrackFunc(*func, entry, seen);
+  std::vector<mx::FunctionDecl> containing;
+  for (auto func : mx::FunctionDecl::containing(ret)) {
+    containing.push_back(func);
+  }
+  if (!containing.empty()) {
+    TaintTrackFunc(containing.front(), entry, seen);
   }
 }
 
@@ -629,8 +638,10 @@ void TaintTrackFunc(const mx::FunctionDecl &taint_source,
     if (!AlreadySeen(entry, seen)) {
       for (mx::StmtReference ref : taint_source.references()) {
         mx::Stmt stmt_taint_source = ref.statement();
-        if (auto call = mx::CallExpr::containing(stmt_taint_source)) {
-          TaintTrackCallRet(call.value(), stmt_taint_source, taint_source,
+        auto calls = mx::CallExpr::containing(stmt_taint_source);
+        auto call = calls.begin();
+        if (call != calls.end()) {
+          TaintTrackCallRet(*call, stmt_taint_source, taint_source,
                             entry, seen);
         }
       }
@@ -689,7 +700,6 @@ KindAndColor(mx::RawEntityId id) {
     return {mx::EnumeratorName(eid.kind), "antiquewhite3"};
 
   } else if (std::holds_alternative<mx::DesignatorId>(vid)) {
-    auto eid = std::get<mx::DesignatorId>(vid);
     return {"Designator", "chartreuse3"};
 
   } else {
@@ -764,22 +774,24 @@ extern "C" int main(int argc, char *argv[]) {
         << " [label=<<TABLE border=\"1\" cellpadding=\"1\" cellspacing=\"0\" bgcolor=\""
         << color << "\"><TR><TD>";
 
-    mx::VariantEntity entity = index.entity(id);
-    if (std::holds_alternative<mx::Decl>(entity)) {
+    mx::VariantEntity seen_entity = index.entity(id);
+    if (std::holds_alternative<mx::Decl>(seen_entity)) {
       std::cout << id;
-      if (auto vd = mx::VarDecl::from(std::get<mx::Decl>(entity))) {
+      mx::Decl decl = std::get<mx::Decl>(seen_entity);
+      if (auto vd = mx::VarDecl::from(decl)) {
         std::cout << "</TD></TR><TR><TD>";
         for (mx::Token tok : vd->tokens().file_tokens()) {
           TokData(tok, std::cout);
           std::cout << ' ';
         }
-      } else if (auto nd = mx::NamedDecl::from(std::get<mx::Decl>(entity))) {
+      } else if (auto nd = mx::NamedDecl::from(decl)) {
         std::cout << "</TD></TR><TR><TD>";
         TokData(nd->token(), std::cout);
       }
 
-    } else if (std::holds_alternative<mx::Stmt>(entity)) {
-      for (mx::Token tok : std::get<mx::Stmt>(entity).tokens().file_tokens()) {
+    } else if (std::holds_alternative<mx::Stmt>(seen_entity)) {
+      mx::Stmt stmt = std::get<mx::Stmt>(seen_entity);
+      for (mx::Token tok : stmt.tokens().file_tokens()) {
         TokData(tok, std::cout);
         std::cout << ' ';
       }

@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -29,10 +30,6 @@ class Type;
 class VAArgExpr;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using VAArgExprRange = DerivedEntityRange<StmtIterator, VAArgExpr>;
-using VAArgExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, VAArgExpr>;
-using VAArgExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, VAArgExpr>;
-
 class VAArgExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -40,12 +37,20 @@ class VAArgExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static VAArgExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<VAArgExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static VAArgExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<VAArgExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -60,8 +65,8 @@ class VAArgExpr : public Expr {
     return StmtKind::VA_ARG_EXPR;
   }
 
-  static VAArgExprContainingStmtRange containing(const Decl &decl);
-  static VAArgExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<VAArgExpr> containing(const Decl &decl);
+  static gap::generator<VAArgExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

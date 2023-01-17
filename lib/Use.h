@@ -21,6 +21,8 @@ class BaseUseIteratorImpl {
   std::shared_ptr<EntityProvider> ep;
   std::vector<RawEntityId> search_ids;
   FragmentIdList fragment_ids;
+  unsigned fragment_offset{0u};
+  unsigned list_offset{0u};
 
   inline BaseUseIteratorImpl(std::shared_ptr<EntityProvider> ep_)
       : ep(std::move(ep_)) {}
@@ -37,14 +39,24 @@ class UseIteratorImpl : public BaseUseIteratorImpl {
   UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
   UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity);
 
+  void FillAndUniqueFragmentIds(void);
+
   // Methods for finding the next user.
-  bool FindNextDecl(UseIteratorBase &self);
-  bool FindNextStmt(UseIteratorBase &self);
-  bool FindNextType(UseIteratorBase &self);
-  bool FindNextAttr(UseIteratorBase &self);
-  bool FindNextMacro(UseIteratorBase &self);
-  bool FindNextPseudo(UseIteratorBase &self);
-  bool FindNext(UseIteratorBase &self);
+  bool FindNextDecl(UseBase &use);
+  bool FindNextStmt(UseBase &use);
+  bool FindNextType(UseBase &use);
+  bool FindNextAttr(UseBase &use);
+  bool FindNextMacro(UseBase &use);
+  bool FindNextPseudo(UseBase &use);
+  bool FindNext(UseBase &use);
+
+  template<typename Selector>
+  gap::generator<Use<Selector>> enumerate(void) {
+    Use<Selector> use;
+    while(FindNext(use)) {
+      co_yield use;
+    }
+  }
 };
 
 class ReferenceIteratorImpl : public BaseUseIteratorImpl {
@@ -52,6 +64,9 @@ class ReferenceIteratorImpl : public BaseUseIteratorImpl {
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
+
+  gap::generator<MacroReference> enumerate_macros(void);
+  gap::generator<StmtReference> enumerate_stmts(void);
 };
 
 }  // namespace mx

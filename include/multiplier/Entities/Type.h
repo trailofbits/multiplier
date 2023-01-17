@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -44,30 +45,20 @@ class RecordType;
 class TagDecl;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using TypeRange = DerivedEntityRange<TypeIterator, Type>;
-using TypeContainingTokenRange = DerivedEntityRange<TokenContextIterator, Type>;
 class Type {
  protected:
   friend class Attr;
-  friend class AttrIterator;
   friend class Decl;
-  friend class DeclIterator;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class MacroReferenceIterator;
   friend class ReferenceIteratorImpl;
   friend class Stmt;
-  friend class StmtReferenceIterator;
-  friend class StmtIterator;
   friend class TokenContext;
-  friend class TypeIterator;
   friend class UseBase;
   friend class UseIteratorImpl;
-  template <typename> friend class UseIterator;
-
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -94,18 +85,26 @@ class Type {
   }
 
   SpecificEntityId<TypeId> id(void) const;
-  UseRange<TypeUseSelector> uses(void) const;
+  gap::generator<Use<TypeUseSelector>> uses(void) const;
 
  protected:
-  static TypeIterator in_internal(const Fragment &fragment);
+  static gap::generator<Type> in_internal(const Fragment &fragment);
 
  public:
-  inline static TypeRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<Type> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static TypeContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<Type> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {

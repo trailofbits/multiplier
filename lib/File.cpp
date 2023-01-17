@@ -11,6 +11,8 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
+#include <multiplier/AST.h>
+#include <mutex>
 
 #include "Fragment.h"
 #include "Re2Impl.h"
@@ -264,7 +266,7 @@ std::optional<File> File::containing(const WeggliQueryMatch &match) {
 }
 
 // Return all files in a given index.
-FileList File::in(const Index &index) {
+gap::generator<File> File::in(const Index &index) {
   return index.files();
 }
 
@@ -273,13 +275,16 @@ SpecificEntityId<FileId> File::id(void) const noexcept {
   return FileId{impl->file_id};
 }
 
-FragmentList File::fragments(void) const {
+gap::generator<Fragment> File::fragments(void) const {
   FileId fid(impl->file_id);
   auto &ep = impl->ep;
-  auto list = std::make_shared<FragmentListImpl>(
-      ep, ep->ListFragmentsInFile(ep, fid));
-  auto num_fragments = list->fragment_ids.size();
-  return FragmentList(std::move(list), static_cast<unsigned>(num_fragments));
+  auto ids = ep->ListFragmentsInFile(ep, fid);
+  for (auto id : ids) {
+    auto frag = ep->FragmentFor(ep, id);
+    if (frag) {
+      co_yield frag;
+    }
+  }
 }
 
 FragmentIdList File::fragment_ids(void) const {
@@ -297,13 +302,19 @@ std::string_view File::data(void) const noexcept {
   return impl->Data();
 }
 
-UseRange<FileUseSelector> File::uses(void) const {
-  return std::make_shared<UseIteratorImpl>(impl->ep, *this);
+gap::generator<Use<FileUseSelector>> File::uses(void) const {
+  UseIteratorImpl it(impl->ep, *this);
+  for (auto use : it.enumerate<FileUseSelector>()) {
+    co_yield use;
+  }
 }
 
 // References of this file.
-MacroReferenceRange File::references(void) const {
-  return std::make_shared<ReferenceIteratorImpl>(impl->ep, *this);
+gap::generator<MacroReference> File::references(void) const {
+  ReferenceIteratorImpl it(impl->ep, *this);
+  for (auto ref : it.enumerate_macros()) {
+    co_yield ref;
+  }
 }
 
 }  // namespace mx

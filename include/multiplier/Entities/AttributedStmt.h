@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,22 +29,26 @@ class AttributedStmt;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using AttributedStmtRange = DerivedEntityRange<StmtIterator, AttributedStmt>;
-using AttributedStmtContainingTokenRange = DerivedEntityRange<TokenContextIterator, AttributedStmt>;
-using AttributedStmtContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, AttributedStmt>;
-
 class AttributedStmt : public ValueStmt {
  private:
   friend class FragmentImpl;
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static AttributedStmtRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<AttributedStmt> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static AttributedStmtContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<AttributedStmt> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -58,8 +63,8 @@ class AttributedStmt : public ValueStmt {
     return StmtKind::ATTRIBUTED_STMT;
   }
 
-  static AttributedStmtContainingStmtRange containing(const Decl &decl);
-  static AttributedStmtContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<AttributedStmt> containing(const Decl &decl);
+  static gap::generator<AttributedStmt> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

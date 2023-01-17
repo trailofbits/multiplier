@@ -14,6 +14,7 @@
 #include <optional>
 #include <vector>
 
+#include <gap/core/generator.hpp>
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
@@ -28,10 +29,6 @@ class ObjCIsaExpr;
 class Stmt;
 class ValueStmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
-using ObjCIsaExprRange = DerivedEntityRange<StmtIterator, ObjCIsaExpr>;
-using ObjCIsaExprContainingTokenRange = DerivedEntityRange<TokenContextIterator, ObjCIsaExpr>;
-using ObjCIsaExprContainingStmtRange = DerivedEntityRange<ParentStmtIteratorImpl<Stmt>, ObjCIsaExpr>;
-
 class ObjCIsaExpr : public Expr {
  private:
   friend class FragmentImpl;
@@ -39,12 +36,20 @@ class ObjCIsaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static ObjCIsaExprRange in(const Fragment &frag) {
-    return in_internal(frag);
+  inline static gap::generator<ObjCIsaExpr> in(const Fragment &frag) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
+        co_yield *d;
+      }
+    }
   }
 
-  inline static ObjCIsaExprContainingTokenRange containing(const Token &tok) {
-    return TokenContextIterator(tok.context());
+  inline static gap::generator<ObjCIsaExpr> containing(const Token &tok) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
+        co_yield *d;
+      }
+    }
   }
 
   inline bool contains(const Token &tok) {
@@ -59,8 +64,8 @@ class ObjCIsaExpr : public Expr {
     return StmtKind::OBJ_C_ISA_EXPR;
   }
 
-  static ObjCIsaExprContainingStmtRange containing(const Decl &decl);
-  static ObjCIsaExprContainingStmtRange containing(const Stmt &stmt);
+  static gap::generator<ObjCIsaExpr> containing(const Decl &decl);
+  static gap::generator<ObjCIsaExpr> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);

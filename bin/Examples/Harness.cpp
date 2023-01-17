@@ -405,10 +405,10 @@ extern "C" int main(int argc, char *argv[]) {
   for (mx::PackedFragmentId frag_id : frags) {
     DAG &d = dag[frag_id];
     std::cerr << "f" << d.frag_id << " [label=<<TABLE><TR><TD>";
-    for (mx::Decl d : index.fragment(frag_id)->top_level_declarations()) {
-      if (auto nd = mx::NamedDecl::from(d)) {
+    for (mx::Decl decl : index.fragment(frag_id)->top_level_declarations()) {
+      if (auto nd = mx::NamedDecl::from(decl)) {
         std::cerr << nd->name();
-        if (d.is_definition()) {
+        if (decl.is_definition()) {
           std::cerr << " (def)";
         }
         break;

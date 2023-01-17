@@ -12,20 +12,20 @@
 #include <string>
 #include <vector>
 
+#include <gap/core/generator.hpp>
+
 namespace mx {
 
 class File;
 class Fragment;
 class RegexQueryImpl;
 class RegexQueryMatch;
-class RegexQueryResult;
 
 // A regular expression.
 class RegexQuery final {
  private:
   friend class Index;
   friend class RegexQueryMatch;
-  friend class RegexQueryResult;
 
   std::shared_ptr<RegexQueryImpl> impl;
 
@@ -59,10 +59,10 @@ class RegexQuery final {
   bool is_valid(void) const;
 
   // Match this regular expression against a file.
-  RegexQueryResult match_fragments(const File &) const;
+  gap::generator<RegexQueryMatch> match_fragments(const File &) const;
 
   // Match this regular expression against a fragment.
-  RegexQueryResult match_fragments(const Fragment &) const;
+  gap::generator<RegexQueryMatch> match_fragments(const Fragment &) const;
 };
 
 }  // namespace mx
