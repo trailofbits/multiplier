@@ -6,10 +6,10 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(PLATFORM_LINUX true)
 
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   set(PLATFORM_MACOS true)
   IF(NOT DEFINED ENV{SDKROOT})
     execute_process(COMMAND xcrun --sdk macosx --show-sdk-path
@@ -20,4 +20,4 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
 else()
   message(FATAL_ERROR "Unsupported platform")
-endif()
+endif ()

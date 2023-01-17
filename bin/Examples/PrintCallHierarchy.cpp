@@ -23,7 +23,7 @@ struct SeenEntityTracker {
   SeenEntityList &seen;
   const size_t size;
   const mx::RawEntityId eid;
-  const size_t count;
+  const ssize_t count;
 
  public:
   template <typename E>
@@ -31,16 +31,17 @@ struct SeenEntityTracker {
       : seen(seen_),
         size(seen.size()),
         eid(entity.id().Pack()),
-        count(std::count(seen.begin(), seen.end(), entity.id())) {
+        count(std::count(seen.begin(), seen.end(),
+                         entity.id().Pack())) {
     seen.push_back(eid);        
   }
 
   operator bool (void) const noexcept {
-    return count <= 1u;
+    return count <= 1;
   }
 
   bool IsCycle(void) {
-    return count == 1u;
+    return count == 1;
   }
 
   ~SeenEntityTracker(void) {

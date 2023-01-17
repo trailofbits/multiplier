@@ -15,7 +15,10 @@
 #include <vector>
 #include <csignal>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <blockingconcurrentqueue.h>
+#pragma GCC diagnostic pop
 
 #include "Signal.h"
 
@@ -221,8 +224,8 @@ WorkerThreadPoolBase::WorkerThreadPoolBase(unsigned num_workers_)
 
   std::weak_ptr<WorkerThreadPoolBaseImpl> weak(d);
   auto stop_work = [weak = std::move(weak)] (int) {
-    if (auto d = weak.lock()) {
-      d->OnSignalToStopInternal();
+    if (auto self = weak.lock()) {
+      self->OnSignalToStopInternal();
     }
   };
 

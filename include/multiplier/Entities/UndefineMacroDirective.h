@@ -35,8 +35,8 @@ class UndefineMacroDirective : public MacroDirective {
   friend class Macro;
  public:
   inline static gap::generator<UndefineMacroDirective> in(const Fragment &frag) {
-    for(auto m : in_internal(frag)) {
-      if(auto d = from(m)) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
         co_yield *d;
       }
     }

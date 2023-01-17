@@ -49,20 +49,20 @@ std::optional<TokenContext> Token::context(void) const {
     return std::nullopt;
   }
 
-  unsigned offset = tagged_offset >> 1u;
+  unsigned untagged_offset = tagged_offset >> 1u;
   auto contexts_reader = frag_reader.getParsedTokenContexts();
-  if (offset >= contexts_reader.size()) {
+  if (untagged_offset >= contexts_reader.size()) {
     assert(false);
     return std::nullopt;
   }
 
-  mx::rpc::TokenContext::Reader tc = contexts_reader[offset];
+  mx::rpc::TokenContext::Reader tc = contexts_reader[untagged_offset];
   std::shared_ptr<const FragmentImpl> frag_ptr(impl, frag);
 
   // NOTE(pag): +1 to skip `kInvalid`.
   TokenContext ret(std::move(frag_ptr));
   ret.entity_id = tc.getEntityId();
-  ret.offset = offset;
+  ret.offset = untagged_offset;
 
   assert(ret.entity_id != kInvalidEntityId);
 

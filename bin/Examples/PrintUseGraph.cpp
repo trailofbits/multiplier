@@ -53,11 +53,9 @@ KindAndColor(mx::RawEntityId id) {
     return {mx::EnumeratorName(eid.kind), "indianred1"};
 
   } else if (std::holds_alternative<mx::DesignatorId>(vid)) {
-    auto eid = std::get<mx::DesignatorId>(vid);
     return {"Designator", "chartreuse3"};
 
   } else if (std::holds_alternative<mx::FileId>(vid)) {
-    auto eid = std::get<mx::FileId>(vid);
     return {"File", "cornsilk3"};
   
   } else {

@@ -1085,7 +1085,7 @@ IndexCompileJobAction::IndexCompileJobAction(
       job(std::move(job_)) {}
 
 // Build and index the AST.
-void IndexCompileJobAction::Run(Executor, WorkerId worker_id) {
+void IndexCompileJobAction::Run(Executor, WorkerId) {
 
   std::optional<pasta::AST> maybe_ast = CompileJobToAST(context, job);
   if (!maybe_ast) {

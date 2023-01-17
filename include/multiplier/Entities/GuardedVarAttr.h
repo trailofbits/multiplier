@@ -35,16 +35,16 @@ class GuardedVarAttr : public InheritableAttr {
   friend class Attr;
  public:
   inline static gap::generator<GuardedVarAttr> in(const Fragment &frag) {
-    for(auto e : in_internal(frag)) {
-      if(auto d = from(e)) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
         co_yield *d;
       }
     }
   }
 
   inline static gap::generator<GuardedVarAttr> containing(const Token &tok) {
-    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if(auto d = from(*ctx)) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
         co_yield *d;
       }
     }

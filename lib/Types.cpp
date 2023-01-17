@@ -482,7 +482,7 @@ VariantId EntityId::Unpack(void) const noexcept {
           id.kind = static_cast<DeclKind>(sub_kind - kActualNumDeclKinds);
           id.is_definition = true;
         }
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -491,7 +491,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         StatementId id;
         id.fragment_id = packed.big_entity.code_id;
         id.kind = static_cast<StmtKind>(sub_kind);
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -500,7 +500,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         TypeId id;
         id.fragment_id = packed.big_entity.code_id;
         id.kind = static_cast<TypeKind>(sub_kind);
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -509,7 +509,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         AttributeId id;
         id.fragment_id = packed.big_entity.code_id;
         id.kind = static_cast<AttrKind>(sub_kind);
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -518,7 +518,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         ParsedTokenId id;
         id.fragment_id = packed.big_entity.code_id;
         id.kind = static_cast<TokenKind>(sub_kind);
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -527,7 +527,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         MacroTokenId id;
         id.fragment_id = packed.big_entity.code_id;
         id.kind = static_cast<TokenKind>(sub_kind);
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -536,7 +536,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         MacroId id;
         id.fragment_id = packed.big_entity.code_id;
         id.kind = static_cast<MacroKind>(sub_kind);
-        id.offset = packed.big_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
         return id;
       }
 
@@ -546,7 +546,7 @@ VariantId EntityId::Unpack(void) const noexcept {
           case IdentifiedPseudo::kDesignator: {
             DesignatorId id;
             id.fragment_id = packed.big_entity.code_id;
-            id.offset = packed.big_entity.offset;
+            id.offset = static_cast<EntityOffset>(packed.big_entity.offset);
             return id;
           }
         } 
@@ -569,7 +569,7 @@ VariantId EntityId::Unpack(void) const noexcept {
           id.kind = static_cast<DeclKind>(sub_kind - kActualNumDeclKinds);
           id.is_definition = true;
         }
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -578,7 +578,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         StatementId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
         id.kind = static_cast<StmtKind>(sub_kind);
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -587,7 +587,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         TypeId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
         id.kind = static_cast<TypeKind>(sub_kind);
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -596,7 +596,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         AttributeId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
         id.kind = static_cast<AttrKind>(sub_kind);
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -605,7 +605,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         ParsedTokenId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
         id.kind = static_cast<TokenKind>(sub_kind);
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -614,7 +614,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         MacroTokenId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
         id.kind = static_cast<TokenKind>(sub_kind);
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -623,7 +623,7 @@ VariantId EntityId::Unpack(void) const noexcept {
         MacroId id;
         id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
         id.kind = static_cast<MacroKind>(sub_kind);
-        id.offset = packed.small_entity.offset;
+        id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
         return id;
       }
 
@@ -633,7 +633,7 @@ VariantId EntityId::Unpack(void) const noexcept {
           case IdentifiedPseudo::kDesignator: {
             DesignatorId id;
             id.fragment_id = packed.small_entity.code_id + kMaxBigFragmentId;
-            id.offset = packed.small_entity.offset;
+            id.offset = static_cast<EntityOffset>(packed.small_entity.offset);
             return id;
           }
         } 
@@ -663,7 +663,7 @@ VariantId EntityId::Unpack(void) const noexcept {
             FileTokenId id;
             id.file_id = packed.file_token.file_id;
             id.kind = static_cast<TokenKind>(packed.file_token.token_kind);
-            id.offset = packed.file_token.offset;
+            id.offset = static_cast<EntityOffset>(packed.file_token.offset);
             return id;
           }
         }

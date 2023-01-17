@@ -250,7 +250,7 @@ EntityProvider::Ptr EntityProvider::in_memory_cache(
           } while (false);
 
           using namespace std::chrono_literals;
-          std::this_thread::sleep_for(1s * timeout_s);
+          std::this_thread::sleep_for (1s * timeout_s);
         }
       },
       ret,

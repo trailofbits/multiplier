@@ -64,20 +64,20 @@ std::vector<Decl> Decl::redeclarations(void) const {
 
 gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for(auto use : impl.enumerate<DeclUseSelector>()) {
+  for (auto use : impl.enumerate<DeclUseSelector>()) {
     co_yield use;
   }
 }
 
 gap::generator<StmtReference> Decl::references(void) const {
   ReferenceIteratorImpl it(fragment->ep, *this);
-  for(auto ref : it.enumerate_stmts()) {
+  for (auto ref : it.enumerate_stmts()) {
     co_yield ref;
   }
 }
 
 gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
-  for(size_t i = 0; i < fragment.impl->num_decls; ++i) {
+  for (EntityOffset i = 0; i < fragment.impl->num_decls; ++i) {
     co_yield Decl(fragment.impl, i);
   }
 }
@@ -91,14 +91,14 @@ SpecificEntityId<StatementId> Stmt::id(void) const {
 }
 
 gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
-  for(size_t i = 0; i < fragment.impl->num_stmts; ++i) {
+  for (EntityOffset i = 0; i < fragment.impl->num_stmts; ++i) {
     co_yield Stmt(fragment.impl, i);
   }
 }
 
 gap::generator<Use<StmtUseSelector>> Stmt::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for(auto use : impl.enumerate<StmtUseSelector>()) {
+  for (auto use : impl.enumerate<StmtUseSelector>()) {
     co_yield use;
   }
 }
@@ -112,14 +112,14 @@ SpecificEntityId<TypeId> Type::id(void) const {
 }
 
 gap::generator<Type> Type::in_internal(const Fragment &fragment) {
-  for(size_t i = 0; i < fragment.impl->num_types; ++i) {
+  for (EntityOffset i = 0; i < fragment.impl->num_types; ++i) {
     co_yield Type(fragment.impl, i);
   }
 }
 
 gap::generator<Use<TypeUseSelector>> Type::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for(auto use : impl.enumerate<TypeUseSelector>()) {
+  for (auto use : impl.enumerate<TypeUseSelector>()) {
     co_yield use;
   }
 }
@@ -133,14 +133,14 @@ SpecificEntityId<AttributeId> Attr::id(void) const {
 }
 
 gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
-  for(size_t i = 0; i < fragment.impl->num_attrs; ++i) {
+  for (EntityOffset i = 0; i < fragment.impl->num_attrs; ++i) {
     co_yield Attr(fragment.impl, i);
   }
 }
 
 gap::generator<Use<AttrUseSelector>> Attr::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for(auto use : impl.enumerate<AttrUseSelector>()) {
+  for (auto use : impl.enumerate<AttrUseSelector>()) {
     co_yield use;
   }
 }
@@ -154,7 +154,7 @@ SpecificEntityId<MacroId> Macro::id(void) const {
 }
 
 gap::generator<Macro> Macro::in_internal(const Fragment &fragment) {
-  for(size_t i = 0; i < fragment.impl->num_macros; ++i) {
+  for (EntityOffset i = 0; i < fragment.impl->num_macros; ++i) {
     co_yield Macro(fragment.impl, i);
   }
 }
@@ -171,14 +171,14 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
     }
   }
 
-  for(; macro; macro = macro->parent()) {
+  for (; macro; macro = macro->parent()) {
     co_yield *macro;
   }
 }
 
 gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for(auto use : impl.enumerate<MacroUseSelector>()) {
+  for (auto use : impl.enumerate<MacroUseSelector>()) {
     co_yield use;
   }
 }
@@ -186,10 +186,9 @@ gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
 
 gap::generator<MacroReference> DefineMacroDirective::references(void) const {
   ReferenceIteratorImpl it(fragment->ep, *this);
-  for(auto ref : it.enumerate_macros()) {
+  for (auto ref : it.enumerate_macros()) {
     co_yield ref;
   }
 }
-
 
 }  // namespace mx

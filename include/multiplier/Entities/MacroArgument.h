@@ -33,8 +33,8 @@ class MacroArgument : public Macro {
   friend class Macro;
  public:
   inline static gap::generator<MacroArgument> in(const Fragment &frag) {
-    for(auto m : in_internal(frag)) {
-      if(auto d = from(m)) {
+    for (auto m : in_internal(frag)) {
+      if (auto d = from(m)) {
         co_yield *d;
       }
     }

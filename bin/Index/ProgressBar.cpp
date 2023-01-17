@@ -16,7 +16,11 @@
 #include <thread>
 #include <vector>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <blockingconcurrentqueue.h>
+#pragma GCC diagnostic pop
+
 #include <llvm/Support/raw_ostream.h>
 
 namespace indexer {
@@ -142,7 +146,7 @@ ProgressBar::Impl::Impl(const char *label_, std::chrono::seconds report_freq_)
             uint32_t max = 0;
             while (1) {
               has_work_sem.wait();
-              for (; ; std::this_thread::sleep_for(report_frequency)) {
+              for (; ; std::this_thread::sleep_for (report_frequency)) {
                 if (done.load()) {
                   FreeLine(line_index);
                   return;

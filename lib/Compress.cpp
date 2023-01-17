@@ -76,8 +76,7 @@ TryUncompress(std::string_view compressed_input, size_t output_size) {
 
 
 // Compress a message.
-std::string CompressedMessage(
-    const char *what, capnp::MessageBuilder &message) {
+std::string CompressedMessage(capnp::MessageBuilder &message) {
   size_t old_size = message.sizeInWords() * sizeof(capnp::word);
   kj::VectorOutputStream os(old_size);
   capnp::writePackedMessage(os, message);
@@ -106,8 +105,7 @@ std::string CompressedMessage(
   return output;
 }
 
-void WithUncompressedMessageImpl(
-    const char *what, std::string data,
+void WithUncompressedMessageImpl(std::string data,
     std::function<void(capnp::PackedMessageReader &)> cb) {
   auto begin = reinterpret_cast<const char *>(data.c_str());
   auto tag = data.back();
@@ -115,7 +113,7 @@ void WithUncompressedMessageImpl(
   std::string_view untagged_data(begin, data.size());
   if (tag) {  // Compressed and packed.
     auto maybe_uncompressed = mx::TryUncompress(untagged_data);
-    if(!maybe_uncompressed.Succeeded()) {
+    if (!maybe_uncompressed.Succeeded()) {
       return;
     }
     data = maybe_uncompressed.TakeValue();

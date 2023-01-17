@@ -53,7 +53,7 @@ RawEntityIdList InvalidEntityProvider::Redeclarations(
 }
 
 void InvalidEntityProvider::FillUses(
-    const Ptr &, RawEntityId eid,
+    const Ptr &, RawEntityId,
     RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   redecl_ids_out.clear();
@@ -61,7 +61,7 @@ void InvalidEntityProvider::FillUses(
 }
 
 void InvalidEntityProvider::FillReferences(
-    const Ptr &, RawEntityId eid,
+    const Ptr &, RawEntityId,
     RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
   redecl_ids_out.clear();
@@ -69,7 +69,7 @@ void InvalidEntityProvider::FillReferences(
 }
 
 void InvalidEntityProvider::FindSymbol(
-    const Ptr &, std::string name, std::vector<RawEntityId> &ids_out) {
+    const Ptr &, std::string, std::vector<RawEntityId> &ids_out) {
   ids_out.clear();
 }
 

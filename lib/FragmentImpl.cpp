@@ -72,12 +72,12 @@ TokenReader::Ptr FragmentImpl::MacroTokenReader(
 }
 
 // Return the number of tokens in the fragment.
-unsigned ReadMacroTokensFromFragment::NumTokens(void) const {
+EntityOffset ReadMacroTokensFromFragment::NumTokens(void) const {
   return fragment->num_tokens;
 }
 
 // Return the kind of the Nth token.
-TokenKind ReadMacroTokensFromFragment::NthTokenKind(unsigned ti) const {
+TokenKind ReadMacroTokensFromFragment::NthTokenKind(EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return TokenKind::UNKNOWN;
@@ -86,7 +86,8 @@ TokenKind ReadMacroTokensFromFragment::NthTokenKind(unsigned ti) const {
 }
 
 // Return the data of the Nth token.
-std::string_view ReadMacroTokensFromFragment::NthTokenData(unsigned ti) const {
+std::string_view ReadMacroTokensFromFragment::NthTokenData(
+    EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return {};
@@ -100,7 +101,7 @@ std::string_view ReadMacroTokensFromFragment::NthTokenData(unsigned ti) const {
 }
 
 // Return the id of the token from which the Nth token is derived.
-EntityId ReadMacroTokensFromFragment::NthDerivedTokenId(unsigned ti) const {
+EntityId ReadMacroTokensFromFragment::NthDerivedTokenId(EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -109,7 +110,7 @@ EntityId ReadMacroTokensFromFragment::NthDerivedTokenId(unsigned ti) const {
 }
 
 // Return the id of the parsed token which is derived from the Nth token.
-EntityId ReadMacroTokensFromFragment::NthParsedTokenId(unsigned ti) const {
+EntityId ReadMacroTokensFromFragment::NthParsedTokenId(EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -135,7 +136,8 @@ EntityId ReadMacroTokensFromFragment::NthParsedTokenId(unsigned ti) const {
 }
 
 // Return the id of the macro containing the Nth token.
-EntityId ReadMacroTokensFromFragment::NthContainingMacroId(unsigned ti) const {
+EntityId ReadMacroTokensFromFragment::NthContainingMacroId(
+    EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -159,7 +161,8 @@ EntityId ReadMacroTokensFromFragment::NthContainingMacroId(unsigned ti) const {
 }
 
 // Return an entity id associated with the Nth token.
-EntityId ReadMacroTokensFromFragment::NthRelatedEntityId(unsigned ti) const {
+EntityId ReadMacroTokensFromFragment::NthRelatedEntityId(
+    EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -169,7 +172,7 @@ EntityId ReadMacroTokensFromFragment::NthRelatedEntityId(unsigned ti) const {
 }
 
 // Return the id of the Nth token.
-EntityId ReadMacroTokensFromFragment::NthTokenId(unsigned ti) const {
+EntityId ReadMacroTokensFromFragment::NthTokenId(EntityOffset ti) const {
   if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -182,7 +185,7 @@ EntityId ReadMacroTokensFromFragment::NthTokenId(unsigned ti) const {
   return id;
 }
 
-EntityId ReadMacroTokensFromFragment::NthFileTokenId(unsigned ti) const {
+EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
   const auto &reader = fragment->Fragment();
   auto dt = reader.getDerivedTokenIds();
   while (ti < fragment->num_tokens) {
@@ -277,12 +280,12 @@ ReadMacroTokensFromFragment::OwningFragment(void) const noexcept {
 }
 
 // Return the number of tokens in the fragment.
-unsigned ReadParsedTokensFromFragment::NumTokens(void) const {
+EntityOffset ReadParsedTokensFromFragment::NumTokens(void) const {
   return fragment->num_parsed_tokens;
 }
 
 // Return the kind of the Nth token.
-TokenKind ReadParsedTokensFromFragment::NthTokenKind(unsigned to) const {
+TokenKind ReadParsedTokensFromFragment::NthTokenKind(EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
     return TokenKind::UNKNOWN;
@@ -299,7 +302,8 @@ TokenKind ReadParsedTokensFromFragment::NthTokenKind(unsigned to) const {
 }
 
 // Return the data of the Nth token.
-std::string_view ReadParsedTokensFromFragment::NthTokenData(unsigned to) const {
+std::string_view ReadParsedTokensFromFragment::NthTokenData(
+    EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
     return {};
@@ -318,7 +322,8 @@ std::string_view ReadParsedTokensFromFragment::NthTokenData(unsigned to) const {
 // basically a self-reference, insofar as all parsed tokens map to a macro
 // token. It's the macro tokens who actually have some kind of link to a
 // derived token.
-EntityId ReadParsedTokensFromFragment::NthDerivedTokenId(unsigned to) const {
+EntityId ReadParsedTokensFromFragment::NthDerivedTokenId(
+    EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -339,7 +344,7 @@ EntityId ReadParsedTokensFromFragment::NthDerivedTokenId(unsigned to) const {
 }
 
 // Return the id of the parsed token which is derived from the Nth token.
-EntityId ReadParsedTokensFromFragment::NthParsedTokenId(unsigned to) const {
+EntityId ReadParsedTokensFromFragment::NthParsedTokenId(EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     return kInvalidEntityId;
   }
@@ -359,7 +364,8 @@ EntityId ReadParsedTokensFromFragment::NthParsedTokenId(unsigned to) const {
 }
 
 // Return the id of the macro containing the Nth token.
-EntityId ReadParsedTokensFromFragment::NthContainingMacroId(unsigned to) const {
+EntityId ReadParsedTokensFromFragment::NthContainingMacroId(
+    EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     return kInvalidEntityId;
   }
@@ -388,7 +394,8 @@ EntityId ReadParsedTokensFromFragment::NthContainingMacroId(unsigned to) const {
 }
 
 // Return an entity id associated with the Nth token.
-EntityId ReadParsedTokensFromFragment::NthRelatedEntityId(unsigned to) const {
+EntityId ReadParsedTokensFromFragment::NthRelatedEntityId(
+    EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     return kInvalidEntityId;
   }
@@ -404,7 +411,7 @@ EntityId ReadParsedTokensFromFragment::NthRelatedEntityId(unsigned to) const {
 }
 
 // Return the id of the Nth token.
-EntityId ReadParsedTokensFromFragment::NthTokenId(unsigned to) const {
+EntityId ReadParsedTokensFromFragment::NthTokenId(EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
     return kInvalidEntityId;
@@ -424,7 +431,7 @@ EntityId ReadParsedTokensFromFragment::NthTokenId(unsigned to) const {
   return id;
 }
 
-EntityId ReadParsedTokensFromFragment::NthFileTokenId(unsigned to) const {
+EntityId ReadParsedTokensFromFragment::NthFileTokenId(EntityOffset to) const {
   if (to >= fragment->num_parsed_tokens) {
     assert(false);
     return {};
@@ -456,27 +463,27 @@ bool ReadParsedTokensFromFragment::Equals(const class TokenReader *that_) const 
 }
 
 // Return a specific type of entity.
-DeclReader FragmentImpl::NthDecl(unsigned offset) const {
+DeclReader FragmentImpl::NthDecl(EntityOffset offset) const {
   return reader.getDeclarations()[offset];
 }
 
-StmtReader FragmentImpl::NthStmt(unsigned offset) const {
+StmtReader FragmentImpl::NthStmt(EntityOffset offset) const {
   return reader.getStatements()[offset];
 }
 
-TypeReader FragmentImpl::NthType(unsigned offset) const {
+TypeReader FragmentImpl::NthType(EntityOffset offset) const {
   return reader.getTypes()[offset];
 }
 
-AttrReader FragmentImpl::NthAttr(unsigned offset) const {
+AttrReader FragmentImpl::NthAttr(EntityOffset offset) const {
   return reader.getAttributes()[offset];
 }
 
-MacroReader FragmentImpl::NthMacro(unsigned offset) const {
+MacroReader FragmentImpl::NthMacro(EntityOffset offset) const {
   return reader.getMacros()[offset];
 }
 
-PseudoReader FragmentImpl::NthPseudo(unsigned offset) const {
+PseudoReader FragmentImpl::NthPseudo(EntityOffset offset) const {
   return reader.getOthers()[offset];
 }
 

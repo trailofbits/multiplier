@@ -63,6 +63,8 @@ struct ParsedTokenId;
 struct MacroId;
 struct DesignatorId;
 
+using EntityOffset = uint32_t;
+
 // Identifies a serialized fragment.
 struct FragmentId {
   RawEntityId fragment_id;
@@ -102,7 +104,7 @@ struct DeclarationId {
 
   // Offset of where this declaration is stored inside of
   // `rpc::Fragment::declarations`.
-  uint32_t offset;
+  EntityOffset offset;
 
   // Is this declaration a definition?
   bool is_definition;
@@ -118,7 +120,7 @@ struct StatementId {
 
   // Offset of where this statement is stored inside of
   // `rpc::Fragment::statements`.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const StatementId &) const noexcept = default;
 };
@@ -131,7 +133,7 @@ struct TypeId {
 
   // Offset of where this statement is stored inside of
   // `rpc::Fragment::types`.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const TypeId &) const noexcept = default;
 };
@@ -144,7 +146,7 @@ struct AttributeId {
 
   // Offset of where this attribute is stored inside of
   // `rpc::Fragment::attrs`.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const AttributeId &) const noexcept = default;
 };
@@ -156,7 +158,7 @@ struct ParsedTokenId {
 
   // Offset of where this token is stored inside of a serialized
   // `rpc::Fragment::tokenKinds` (and other token related lists).
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const ParsedTokenId &) const noexcept = default;
 };
@@ -169,7 +171,7 @@ struct FileTokenId {
 
   // Offset of this where this token is stored inside of a serialized
   // `rpc::File::tokens` list.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const FileTokenId &) const noexcept = default;
 };
@@ -182,7 +184,7 @@ struct MacroTokenId {
 
   // Offset of this where this token is stored inside of a serialized
   // `rpc::File::tokens` list.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const MacroTokenId &) const noexcept = default;
 };
@@ -196,7 +198,7 @@ struct MacroId {
 
   // Offset of where this token substitution is stored inside of a
   // serialized `rpc::Fragment::tokenSubstitutions`.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const MacroId &) const noexcept = default;
 };
@@ -206,7 +208,7 @@ struct DesignatorId {
   RawEntityId fragment_id;
 
   // Offset of the designator inside of the fragment.
-  uint32_t offset;
+  EntityOffset offset;
 
   auto operator<=>(const DesignatorId &) const noexcept = default;
 };
@@ -365,11 +367,6 @@ class SpecificEntityId final {
 
   inline SpecificEntityId<T> &operator=(const T &id) {
     opaque = EntityId(id).Pack();
-    return *this;
-  }
-
-  inline SpecificEntityId<T> &operator=(const SpecificEntityId<T> &that) {
-    opaque = that.opaque;
     return *this;
   }
 

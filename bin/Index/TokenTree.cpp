@@ -1325,6 +1325,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
 
   auto maybe_name = def.Name();
   if (!maybe_name) {
+    err << "Macro has no name";
     return nullptr;
   }
 
@@ -1759,8 +1760,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   }
 
   // Try to find the real body.
-  Substitution *macro_body = GetMacroBody(macro_def.value(), err);
-  if (!macro_body) {
+  Substitution *macro_body_sub = GetMacroBody(macro_def.value(), err);
+  if (!macro_body_sub) {
     exp->after.has_error = true;
     if (auto macro_name = macro_def->Name()) {
       err << "Unable to find macro body for macro with name '"
@@ -1790,8 +1791,8 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     assert(!PreExpansionOf(exp));
   }
 
-  exp->after.prev = macro_body->before.prev;
-  exp->after.next = macro_body->before.next;
+  exp->after.prev = macro_body_sub->before.prev;
+  exp->after.next = macro_body_sub->before.next;
 
   return sub;
 }
@@ -1817,9 +1818,9 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   }
 
   // Mark all as trusted.
-  for (Substitution::Node &node : dir->before) {
-    if (std::holds_alternative<TokenInfo *>(node)) {
-      std::get<TokenInfo *>(node)->is_part_of_sub = true;
+  for (Substitution::Node &before_node : dir->before) {
+    if (std::holds_alternative<TokenInfo *>(before_node)) {
+      std::get<TokenInfo *>(before_node)->is_part_of_sub = true;
     }
   }
 

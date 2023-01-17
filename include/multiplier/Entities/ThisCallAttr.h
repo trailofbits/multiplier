@@ -35,16 +35,16 @@ class ThisCallAttr : public InheritableAttr {
   friend class Attr;
  public:
   inline static gap::generator<ThisCallAttr> in(const Fragment &frag) {
-    for(auto e : in_internal(frag)) {
-      if(auto d = from(e)) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
         co_yield *d;
       }
     }
   }
 
   inline static gap::generator<ThisCallAttr> containing(const Token &tok) {
-    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if(auto d = from(*ctx)) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
         co_yield *d;
       }
     }

@@ -2281,16 +2281,16 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  inline static gap::generator<"
         << class_name << "> in(const Fragment &frag) {\n"
-        << "    for(auto e : in_internal(frag)) {\n"
-        << "      if(auto d = from(e)) {\n"
+        << "    for (auto e : in_internal(frag)) {\n"
+        << "      if (auto d = from(e)) {\n"
         << "        co_yield *d;\n"
         << "      }\n"
         << "    }\n"
         << "  }\n\n"
         << "  inline static gap::generator<" << class_name
         << "> containing(const Token &tok) {\n"
-        << "    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {\n"
-        << "      if(auto d = from(*ctx)) {\n"
+        << "    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {\n"
+        << "      if (auto d = from(*ctx)) {\n"
         << "        co_yield *d;\n"
         << "      }\n"
         << "    }\n"
@@ -2307,8 +2307,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  inline static gap::generator<" << class_name
         << "> in(const Fragment &frag) {\n"
-        << "    for(auto m : in_internal(frag)) {\n"
-        << "      if(auto d = from(m)) {\n"
+        << "    for (auto m : in_internal(frag)) {\n"
+        << "      if (auto d = from(m)) {\n"
         << "        co_yield *d;\n"
         << "      }\n"
         << "    }\n"
@@ -2338,29 +2338,29 @@ MethodListPtr CodeGenerator::RunOnClass(
     lib_cpp_os
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Decl &decl) {\n"
-        << "  for(auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
-        << "    if(auto d = from(*ancestor)) {\n"
+        << "  for (auto ancestor = decl.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Stmt &stmt) {\n"
-        << "  for(auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
-        << "    if(auto d = from(*ancestor)) {\n"
+        << "  for (auto ancestor = stmt.parent_declaration(); ancestor.has_value(); ancestor = ancestor->parent_declaration()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
-        << "  for(auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if(parent.id() == id()) { return true; }\n"
+        << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
-        << "  for(auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if(parent.id() == id()) { return true; }\n"
+        << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2387,29 +2387,29 @@ MethodListPtr CodeGenerator::RunOnClass(
     lib_cpp_os
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Decl &decl) {\n"
-        << "  for(auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
-        << "    if(auto d = from(*ancestor)) {\n"
+        << "  for (auto ancestor = decl.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Stmt &stmt) {\n"
-        << "  for(auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
-        << "    if(auto d = from(*ancestor)) {\n"
+        << "  for (auto ancestor = stmt.parent_statement(); ancestor.has_value(); ancestor = ancestor->parent_statement()) {\n"
+        << "    if (auto d = from(*ancestor)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Decl &decl) {\n"
-        << "  for(auto &parent : " << class_name << "::containing(decl)) {\n"
-        << "    if(parent.id() == id()) { return true; }\n"
+        << "  for (auto &parent : " << class_name << "::containing(decl)) {\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n"
         << "bool " << class_name << "::contains(const Stmt &stmt) {\n"
-        << "  for(auto &parent : " << class_name << "::containing(stmt)) {\n"
-        << "    if(parent.id() == id()) { return true; }\n"
+        << "  for (auto &parent : " << class_name << "::containing(stmt)) {\n"
+        << "    if (parent.id() == id()) { return true; }\n"
         << "  }\n"
         << "  return false;\n"
         << "}\n\n";
@@ -2471,8 +2471,8 @@ MethodListPtr CodeGenerator::RunOnClass(
     lib_cpp_os
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Macro &macro) {\n"
-        << "  for(auto impl = macro.parent(); impl; impl = impl->parent()) {\n"
-        << "    if(auto d = from(*impl)) {\n"
+        << "  for (auto impl = macro.parent(); impl; impl = impl->parent()) {\n"
+        << "    if (auto d = from(*impl)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
@@ -2493,8 +2493,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n"
         << "gap::generator<" << class_name << "> " << class_name
         << "::containing(const Token &token) {\n"
-        << "  for(auto m : Macro::containing_internal(token)) {\n"
-        << "    if(auto d = from(m)) {\n"
+        << "  for (auto m : Macro::containing_internal(token)) {\n"
+        << "    if (auto d = from(m)) {\n"
         << "      co_yield *d;\n"
         << "    }\n"
         << "  }\n"
@@ -3336,11 +3336,11 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   class_os << "};\n\n";
 
-  for(auto needed : needed_decls) {
+  for (auto needed : needed_decls) {
     os << "#include \"" << needed << ".h\"\n";
   }
   os << "\nnamespace mx {\n";
-  for(auto fwd : forward_decls) {
+  for (auto fwd : forward_decls) {
     os << "class " << fwd << ";\n";
   }
   os

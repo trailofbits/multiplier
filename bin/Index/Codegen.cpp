@@ -67,6 +67,11 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
     const std::vector<pasta::Decl> &decls,
     unsigned num_decls) {
 
+  (void) fragment_id;
+  (void) em;
+  (void) decls;
+  (void) num_decls;
+
   std::string ret;
 
 #ifdef MX_ENABLE_SOURCEIR

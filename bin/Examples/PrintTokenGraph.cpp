@@ -74,7 +74,7 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
     }
 
     if (auto sub = mx::MacroSubstitution::from(*m)) {
-      for (const mx::MacroOrToken node : sub->replacement_children()) {
+      for (mx::MacroOrToken node : sub->replacement_children()) {
         if (std::holds_alternative<mx::Token>(node)) {
           if (std::get<mx::Token>(node) == dt) {
             pred_prefix = "a";
@@ -89,7 +89,7 @@ static void PrintToken(std::ostream &os, const mx::TokenRange &file_toks,
 
   // No containing macro, but it's part of a fragment, which means it's a top-
   // level macro token.
-  } else if (auto m = mx::Fragment::containing(dt)) {
+  } else if (mx::Fragment::containing(dt)) {
     os << "ct0:t" << dt_id.Pack() << " -> " << prefix << parent_id
        << ":t" << id << ";\n";
 

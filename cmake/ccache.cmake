@@ -6,9 +6,9 @@
 # the LICENSE file found in the root directory of this source tree.
 #
 
-if(PLATFORM_LINUX OR PLATFORM_MACOS)
+if (PLATFORM_LINUX OR PLATFORM_MACOS)
   find_program(ccache_executable "ccache")
-  if(NOT ccache_executable STREQUAL "ccache_executable-NOFOUND")
+  if (NOT ccache_executable STREQUAL "ccache_executable-NOFOUND")
     message(STATUS "Multiplier: Enabling ccache support (${ccache_executable})")
 
     set(CMAKE_CXX_COMPILER_LAUNCHER "${ccache_executable}" CACHE FILEPATH "ccache")
@@ -16,5 +16,5 @@ if(PLATFORM_LINUX OR PLATFORM_MACOS)
 
   else()
     message(STATUS "Multiplier: No ccache executable found")
-  endif()
-endif()
+  endif ()
+endif ()

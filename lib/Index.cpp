@@ -117,9 +117,9 @@ gap::generator<File> Index::files(void) const {
   auto it = std::unique(file_ids.begin(), file_ids.end());
   file_ids.erase(it, file_ids.end());
 
-  for(auto file_id : file_ids) {
+  for (auto file_id : file_ids) {
     auto file = impl->FileFor(impl, file_id);
-    if(file) {
+    if (file) {
       co_yield file;
     }
   }

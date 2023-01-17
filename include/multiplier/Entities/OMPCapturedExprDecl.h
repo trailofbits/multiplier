@@ -41,16 +41,16 @@ class OMPCapturedExprDecl : public VarDecl {
   friend class Decl;
  public:
   inline static gap::generator<OMPCapturedExprDecl> in(const Fragment &frag) {
-    for(auto e : in_internal(frag)) {
-      if(auto d = from(e)) {
+    for (auto e : in_internal(frag)) {
+      if (auto d = from(e)) {
         co_yield *d;
       }
     }
   }
 
   inline static gap::generator<OMPCapturedExprDecl> containing(const Token &tok) {
-    for(auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if(auto d = from(*ctx)) {
+    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
+      if (auto d = from(*ctx)) {
         co_yield *d;
       }
     }

@@ -221,11 +221,11 @@ class TokenRange {
   friend class WeggliQueryResultImpl;
 
   std::shared_ptr<const TokenReader> impl;
-  unsigned index;
-  unsigned num_tokens;
+  EntityOffset index;
+  EntityOffset num_tokens;
 
   inline TokenRange(std::shared_ptr<const TokenReader> impl_,
-                    unsigned index_, unsigned num_tokens_)
+                    EntityOffset index_, EntityOffset num_tokens_)
       : impl(std::move(impl_)),
         index(index_),
         num_tokens(num_tokens_) {}

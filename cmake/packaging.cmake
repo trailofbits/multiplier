@@ -27,8 +27,8 @@ set(CPACK_RPM_PACKAGE_GROUP "default")
 set(CPACK_RPM_PACKAGE_LICENSE "Proprietary")
 
 # ZIP settings
-if("${CPACK_GENERATOR}" STREQUAL "ZIP")
+if ("${CPACK_GENERATOR}" STREQUAL "ZIP")
   set(CPACK_SET_DESTDIR ON)
-endif()
+endif ()
 
 include("CPack")

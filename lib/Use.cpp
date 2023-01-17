@@ -47,7 +47,11 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 #define DEFINE_FIND_READER_KIND_USES(reader_kind, name) \
     void FindUses_ ## name ( \
         mx::RawEntityId eid, UseSelectorSet &selectors, \
-        const mx::ast::reader_kind::Reader &reader, bool &found) {
+        const mx::ast::reader_kind::Reader &reader, bool &found) { \
+        (void) eid; \
+        (void) selectors; \
+        (void) reader; \
+        (void) found;
 
 #define MX_VISIT_BASE(name, base_name) \
     FindUses_ ## base_name(eid, selectors, reader, found);
@@ -109,7 +113,6 @@ const char *EnumeratorName(UseKind kind) {
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
-  DeclarationId did = sid.Unpack();
 
   ep->FillUses(ep, sid.Pack(), search_ids, fragment_ids);
 
@@ -523,7 +526,8 @@ UseBase::UseBase(TemplateArgument entity, UseSelectorSet selectors_)
       kind(UseKind::TEMPLATE_ARGUMENT) {}
 
 UseBase::UseBase(TemplateParameterList entity, UseSelectorSet selectors_)
-    : fragment(std::move(entity.fragment)),
+    : selectors(std::move(selectors_)),
+      fragment(std::move(entity.fragment)),
       offset(entity.offset_),
       kind(UseKind::TEMPLATE_PARAMETER_LIST) {}
 
@@ -673,7 +677,6 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
     : BaseUseIteratorImpl(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
-  DeclarationId did = sid.Unpack();
 
   ep->FillReferences(ep, sid.Pack(), search_ids, fragment_ids);
 

@@ -67,19 +67,19 @@ bool WeggliQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
 gap::generator<WeggliQueryMatch>
 WeggliQueryResultImpl::enumerate(void) {
   unsigned index = 0u;
-  unsigned num_fragments = fragments.size();
+  size_t num_fragments = fragments.size();
   while (index < num_fragments) {
 
     // Reset the caches of data in the fragment, and the mapping of offsets
     // to token ids.
     if (!frag) {
-      auto frag = ep->FragmentFor(ep, fragments[index]);
-      if (!frag) {
+      auto frag_ptr = ep->FragmentFor(ep, fragments[index]);
+      if (!frag_ptr) {
         ++index;
         continue;
       }
 
-      if (!InitForFragment(std::move(frag))) {
+      if (!InitForFragment(std::move(frag_ptr))) {
         ++index;
         continue;
       }
@@ -267,7 +267,7 @@ gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const File &file) 
   WeggliQueryResultImpl it(
       *this, ep,
       ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
-  for(auto match : it.enumerate()) {
+  for (auto match : it.enumerate()) {
     co_yield match;
   }
 }
@@ -275,7 +275,7 @@ gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const File &file) 
 // Match this Weggli query against a fragment.
 gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const Fragment &frag) const {
   WeggliQueryResultImpl it(*this, frag.impl);
-  for(auto match : it.enumerate()) {
+  for (auto match : it.enumerate()) {
     co_yield match;
   }
 }

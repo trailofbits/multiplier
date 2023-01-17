@@ -146,7 +146,8 @@ class Statement {
 
   void bind(const size_t i, const double &value);
 
-  void bind(const size_t i, const std::nullptr_t &value);
+  void bind(const size_t i, const std::nullptr_t &);
+  void bind(const size_t i, const std::nullopt_t &);
 
   void bind(const size_t i, const char *&value);
 
@@ -243,14 +244,14 @@ class Connection {
   void SetBusyTimeout(std::chrono::milliseconds ms);
 
   // Attach custom function to your sqlite database
-  void CreateFunction(std::string func_name, unsigned n_args, unsigned flags,
+  void CreateFunction(std::string func_name, unsigned n_args, int flags,
                       void (*x_func)(sqlite3_context *, int, sqlite3_value **),
                       void (*x_step)(sqlite3_context *, int, sqlite3_value **),
                       void (*x_final)(sqlite3_context *),
                       void (*x_destroy)(void *));
 
   // Delete custom function from the sqlite database
-  void DeleteFunction(std::string func_name, unsigned n_args, unsigned flags);
+  void DeleteFunction(std::string func_name, unsigned n_args, int flags);
 
   // Get the filename used to open the database
   std::filesystem::path GetFilename(void) const;
