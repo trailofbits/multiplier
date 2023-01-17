@@ -174,19 +174,19 @@ jobs:
       run: |
         chmod +x install/bin/*
         $INSTALL_DIR/bin/mx-index \
-          --db lua-5.4.4.mx \
+          --db /tmp/lua-5.4.4.mx \
           --target '${{ github.workspace }}/src/lua-5.4.4/compile_commands.json'
 
     - name: List functions
       run: |
         $INSTALL_DIR/bin/mx-list-functions \
-          --db lua-5.4.4.mx
+          --db /tmp/lua-5.4.4.mx
 
     - name: Upload Lua index
       uses: actions/upload-artifact@v3
       with:
         name: lua-5.4.4
-        path: lua-5.4.4.mx
+        path: /tmp/lua-5.4.4.mx
 
   index-pcre2:
     runs-on: ubuntu-22.04
@@ -229,19 +229,19 @@ jobs:
       run: |
         chmod +x install/bin/*
         $INSTALL_DIR/bin/mx-index \
-          --db pcre2-10.42.mx \
+          --db /tmp/pcre2-10.42.mx \
           --target '${{ github.workspace }}/build/pcre2-10.42/compile_commands.json'
 
     - name: List functions
       run: |
         $INSTALL_DIR/bin/mx-list-functions \
-          --db pcre2-10.42.mx
+          --db /tmp/pcre2-10.42.mx
 
     - name: Upload PCRE2 index
       uses: actions/upload-artifact@v3
       with:
         name: pcre2-10.42
-        path: pcre2-10.42.mx
+        path: /tmp/pcre2-10.42.mx
 
   index-sqlite:
     runs-on: ubuntu-22.04
@@ -285,16 +285,16 @@ jobs:
       run: |
         chmod +x install/bin/*
         $INSTALL_DIR/bin/mx-index \
-          --db sqlite-autoconf-3400000.mx \
+          --db /tmp/sqlite-autoconf-3400000.mx \
           --target '${{ github.workspace }}/build/sqlite-autoconf-3400000/compile_commands.json'
 
     - name: List functions
       run: |
         $INSTALL_DIR/bin/mx-list-functions \
-          --db sqlite-autoconf-3400000.mx
+          --db /tmp/sqlite-autoconf-3400000.mx
 
     - name: Upload SQLite index
       uses: actions/upload-artifact@v3
       with:
         name: sqlite-autoconf-3400000
-        path: sqlite-autoconf-3400000.mx
+        path: /tmp/sqlite-autoconf-3400000.mx
