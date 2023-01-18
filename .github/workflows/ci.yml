@@ -314,7 +314,8 @@ jobs:
         sudo apt-get install -y \
              gpg wget curl zip unzip tar git pkg-config \
              ninja-build clang-tidy cppcheck ccache build-essential \
-             doctest-dev clang-15 bear
+             doctest-dev clang-15 bear libtool autoconf flex bison \
+             libncurses-dev libssl-dev libelf-dev
         mkdir src
         mkdir build
 
