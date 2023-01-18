@@ -88,10 +88,10 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            std::shared_ptr<GlobalIndexingState> ctx)
+                            std::shared_ptr<GlobalIndexingState> ctx_)
       : fm(fm_),
         command(command_),
-        ctx(ctx) {}
+        ctx(std::move(ctx_)) {}
 
   void Run(Executor exe, WorkerId) final;
 };
@@ -278,14 +278,21 @@ struct Importer::PrivateData {
   pasta::FileManager &fm;
   std::shared_ptr<GlobalIndexingState> ctx;
 
-  inline PrivateData(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<GlobalIndexingState> ctx)
-      : cwd(std::move(cwd_)), fm(fm), ctx(ctx) {}
+  inline PrivateData(std::filesystem::path cwd_,
+                     pasta::FileManager &fm_,
+                     std::shared_ptr<GlobalIndexingState> ctx_)
+      : cwd(std::move(cwd_)),
+        fm(fm_),
+        ctx(std::move(ctx_)) {}
 };
 
 Importer::~Importer(void) {}
 
-Importer::Importer(std::filesystem::path cwd_, pasta::FileManager &fm, std::shared_ptr<GlobalIndexingState> ctx)
-    : d(std::make_unique<Importer::PrivateData>(std::move(cwd_), fm, ctx)) {}
+Importer::Importer(std::filesystem::path cwd_,
+                   pasta::FileManager &fm,
+                   std::shared_ptr<GlobalIndexingState> ctx)
+    : d(std::make_unique<Importer::PrivateData>(
+            std::move(cwd_), fm, std::move(ctx))) {}
 
 bool Importer::ImportBlightCompileCommand(llvm::json::Object &o) {
 

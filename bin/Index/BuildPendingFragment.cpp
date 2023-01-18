@@ -10,6 +10,9 @@
 #include "PASTA.h"
 #include "Util.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ingored "-Wunused-function"
+
 namespace indexer {
 namespace {
 
@@ -23,7 +26,7 @@ namespace {
 // "owned" by one decl, or one-or-more types. All types referenced by decls/
 // stmts/types/pseudos in a fragment are also stored in the fragment, even if it
 // ends up being redundant across fragments.
-class FragmentBuilder {
+class FragmentBuilder final {
  public:
   EntityIdMap &entity_ids;
   TypeIdMap &type_ids;
@@ -315,6 +318,8 @@ void FragmentBuilder::Accept(const pasta::Attr &entity) {
   }
 }
 
+// NOTE(pag): We visit macros in `Persist.cpp`, as it has to also correlate
+//            macro nodes with `TokenTree` nodes.
 void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 }  // namespace
@@ -413,3 +418,5 @@ void BuildPendingFragment(
 }
 
 }  // namespace indexer
+
+#pragma GCC diagnostic pop

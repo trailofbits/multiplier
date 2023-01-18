@@ -27,6 +27,9 @@
 #include "Util.h"
 namespace indexer {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 void SerializeDesignator(const EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::Designator &e) {
   b.setVal0(static_cast<uint8_t>(pasta::PseudoKind::kDesignator));
   b.setVal1(e.IsFieldDesignator());
@@ -10910,4 +10913,5 @@ void SerializeEmptyDecl(const EntityMapper &es, mx::ast::Decl::Builder b, const 
   SerializeDecl(es, b, e);
 }
 
+#pragma GCC diagnostic pop
 }  // namespace indexer

@@ -169,6 +169,16 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     ClearEnvironmentVars(envp);
   }
 
+  // Sometimes bugs don't reproduce in debuggers, e.g. due to the environment
+  // variables or something else being different. This gives us the possibility
+  // to late-attach a debugger before anything interesting happens.
+  if (FLAGS_attach) {
+    std::cout << "Process ID: " << getpid() << "\nPress enter: \n";
+    std::cout.flush();
+    char x;
+    read(0, &x, 1);
+  }
+
   indexer::EnvVariableMap env = ParseEnvVariablesFromFile(FLAGS_env);
   for (const auto &[key, val] : env) {
     if (key == "=") {
@@ -190,16 +200,6 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   }
 
   importer.Import(executor);
-
-  // Sometimes bugs don't reproduce in debuggers, e.g. due to the environment
-  // variables or something else being different. This gives us the possibility
-  // to late-attach a debugger before anything interesting happens.
-  if (FLAGS_attach) {
-    std::cout << "Process ID: " << getpid() << "\nPress enter: \n";
-    std::cout.flush();
-    char x;
-    read(0, &x, 1);
-  }
 
   executor.Start();
   executor.Wait();

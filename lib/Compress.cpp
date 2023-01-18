@@ -15,6 +15,9 @@
 
 namespace mx {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 Result<std::string, std::error_code> TryCompress(std::string_view input) {
   std::string compressed_output;
   auto source_len = static_cast<uLong>(input.size());
@@ -126,5 +129,7 @@ void WithUncompressedMessageImpl(std::string data,
   capnp::PackedMessageReader packed_reader(stream, options);
   cb(packed_reader);
 }
+
+#pragma GCC diagnostic pop
 
 }  // namespace mx
