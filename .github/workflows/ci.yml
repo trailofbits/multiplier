@@ -298,3 +298,58 @@ jobs:
       with:
         name: sqlite-autoconf-3400000
         path: /tmp/sqlite-autoconf-3400000.mx
+
+  index-linux:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    needs: [build]
+    steps:
+    - name: Install dependencies
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
+        echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" | sudo tee -a /etc/apt/sources.list
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y \
+             gpg wget curl zip unzip tar git pkg-config \
+             ninja-build clang-tidy cppcheck ccache build-essential \
+             doctest-dev clang-15 bear
+        mkdir src
+        mkdir build
+
+    - name: Download cxx-common
+      run: |
+        curl --silent --location '${{ env.CXX_COMMON_URL }}' | tar xJ
+
+    - name: Download multiplier
+      uses: actions/download-artifact@v3
+      with:
+        name: multiplier
+        path: install
+
+    - name: Download, configure and build Linux
+      run: |
+        curl --silent --location \
+          https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.6.tar.xz | tar xJ -C '${{ github.workspace }}/src'
+        cd '${{ github.workspace }}/src/linux-6.1.6'
+        make CC="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang" defconfig
+        bear -- make CC="$VCPKG_ROOT/installed/x64-linux-rel/tools/llvm/clang"
+
+    - name: Index Linux
+      run: |
+        chmod +x install/bin/*
+        $INSTALL_DIR/bin/mx-index \
+          --db /tmp/linux-6.1.6.mx \
+          --target '${{ github.workspace }}/src/linux-6.1.6/compile_commands.json'
+
+    - name: List functions
+      run: |
+        $INSTALL_DIR/bin/mx-list-functions \
+          --db /tmp/linux-6.1.6.mx
+
+    - name: Upload Linux index
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-6.1.6
+        path: /tmp/linux-6.1.6.mx
