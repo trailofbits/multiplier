@@ -180,6 +180,12 @@ else()
       "MX_DISABLE_WEGGLI")
 endif()
 
+target_compile_options("mx-api"
+  PRIVATE
+    "-Wno-unknown-warning-option"
+    "-Wno-pragmas"
+)
+
 target_include_directories("mx-api"
   PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

@@ -64,14 +64,14 @@ std::vector<Decl> Decl::redeclarations(void) const {
 
 gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.enumerate<DeclUseSelector>()) {
+  for (auto use : impl.Enumerate<DeclUseSelector>()) {
     co_yield use;
   }
 }
 
 gap::generator<StmtReference> Decl::references(void) const {
   ReferenceIteratorImpl it(fragment->ep, *this);
-  for (auto ref : it.enumerate_stmts()) {
+  for (auto ref : it.EnumerateStatements()) {
     co_yield ref;
   }
 }
@@ -98,7 +98,7 @@ gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
 
 gap::generator<Use<StmtUseSelector>> Stmt::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.enumerate<StmtUseSelector>()) {
+  for (auto use : impl.Enumerate<StmtUseSelector>()) {
     co_yield use;
   }
 }
@@ -119,7 +119,7 @@ gap::generator<Type> Type::in_internal(const Fragment &fragment) {
 
 gap::generator<Use<TypeUseSelector>> Type::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.enumerate<TypeUseSelector>()) {
+  for (auto use : impl.Enumerate<TypeUseSelector>()) {
     co_yield use;
   }
 }
@@ -140,7 +140,7 @@ gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
 
 gap::generator<Use<AttrUseSelector>> Attr::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.enumerate<AttrUseSelector>()) {
+  for (auto use : impl.Enumerate<AttrUseSelector>()) {
     co_yield use;
   }
 }
@@ -162,7 +162,7 @@ gap::generator<Macro> Macro::in_internal(const Fragment &fragment) {
 gap::generator<Macro> Macro::containing_internal(const Token &token) {
   std::optional<Macro> macro;
   if (auto frag = token.impl->OwningFragment()) {
-    auto vid = EntityId(token.impl->NthContainingMacroId(token.offset)).Unpack();
+    auto vid = token.impl->NthContainingMacroId(token.offset).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
       MacroId mid = std::get<MacroId>(vid);
       if (mid.fragment_id == frag->fragment_id) {
@@ -178,7 +178,7 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
 
 gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
   UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.enumerate<MacroUseSelector>()) {
+  for (auto use : impl.Enumerate<MacroUseSelector>()) {
     co_yield use;
   }
 }
@@ -186,7 +186,7 @@ gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
 
 gap::generator<MacroReference> DefineMacroDirective::references(void) const {
   ReferenceIteratorImpl it(fragment->ep, *this);
-  for (auto ref : it.enumerate_macros()) {
+  for (auto ref : it.EnumerateMacros()) {
     co_yield ref;
   }
 }

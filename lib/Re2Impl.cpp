@@ -64,7 +64,7 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   unsigned offset = 0u;
   unsigned index = 0u;
   for (const Token &tok : frag_file_tokens) {
-    offset += tok.data().size();
+    offset += static_cast<unsigned>(tok.data().size());
     offset_to_index.emplace(offset, index++);
   }
 
@@ -231,12 +231,11 @@ std::optional<std::string_view> RegexQueryMatch::captured_data(
 }
 
 // Return the captured tokens for a given indexed capture group.
-std::optional<TokenRange> RegexQueryMatch::captured_tokens(
-    size_t index) const {
-  std::optional<std::string_view> maybe_data = captured_data(index);
+std::optional<TokenRange> RegexQueryMatch::captured_tokens(size_t ti) const {
+  std::optional<std::string_view> maybe_data = captured_data(ti);
   if (!maybe_data) {
     return std::nullopt;
-  } else if (index) {
+  } else if (ti) {
     return TranslateCapture(*maybe_data);
   } else {
     return *this;
@@ -268,7 +267,7 @@ std::vector<std::string> RegexQueryMatch::captured_variables(void) const {
   return ret;
 }
 
-gap::generator<RegexQueryMatch> RegexQueryResultImpl::enumerate(void) {
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) {
   size_t index = 0;
   size_t num_matches = fragment_ids.size();
 
@@ -331,7 +330,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &file) co
   RegexQueryResultImpl result_impl(
       *this, ep,
       ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
-  for (auto match : result_impl.enumerate()) {
+  for (auto match : result_impl.Enumerate()) {
     co_yield match;
   }
 }
@@ -339,7 +338,7 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &file) co
 // Match this regular expression against a fragment.
 gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const Fragment &frag) const {
   RegexQueryResultImpl result_impl(*this, frag.impl);
-  for (auto match : result_impl.enumerate()) {
+  for (auto match : result_impl.Enumerate()) {
     co_yield match;
   }
 }
@@ -374,7 +373,7 @@ RegexQueryResultImpl::GetNextMatchInFragment(void) {
     return std::nullopt;
 }
 
-gap::generator<RegexQueryMatch> RegexQueryResultImpl::enumerate(void) {
+gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) {
   co_return;
 }
 

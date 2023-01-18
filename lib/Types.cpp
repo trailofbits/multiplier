@@ -122,6 +122,9 @@ static_assert(sizeof(PackedEntityId) == sizeof(uint64_t));
 
 }  // namespace
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+
 EntityId::EntityId(DeclarationId id) {
   if (id.fragment_id) {
     PackedEntityId packed = {};
@@ -456,6 +459,8 @@ EntityId::EntityId(FileTokenId id) {
 #endif
   }
 }
+
+#pragma GCC diagnostic pop
 
 // Unpack this entity ID into a concrete type.
 VariantId EntityId::Unpack(void) const noexcept {

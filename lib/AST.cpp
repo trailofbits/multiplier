@@ -7625,6 +7625,8 @@ const char *EnumeratorName(TokenCategory e) {
 }
 
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 bool Designator::is_field_designator(void) const {
   auto self = fragment->NthPseudo(offset_);
   return self.getVal1();
@@ -50641,5 +50643,6 @@ const char *EnumeratorName(MacroUseSelector sel) {
   return "<invalid>";
 }
 
+#pragma GCC diagnostic pop
 #endif
 }  // namespace mx

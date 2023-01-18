@@ -3752,7 +3752,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   lib_cpp_os
-      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
+      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
+      << "#pragma GCC diagnostic push\n"
+      << "#pragma GCC diagnostic ignored \"-Wuseless-cast\"\n";
   
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
@@ -3908,6 +3910,7 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   RunOnUseSet(macro_use_ids, "MacroUseSelector");
 
   lib_cpp_os
+      << "#pragma GCC diagnostic pop\n"
       << "#endif\n";
 
   lib_pasta_h_os << "}  // namespace mx\n";
