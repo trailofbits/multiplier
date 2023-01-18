@@ -157,26 +157,24 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     path = "/dev/stdin";
   }
 
-  auto maybe_buff = llvm::MemoryBuffer::getFileOrSTDIN(FLAGS_target, -1, false);
-  if (!maybe_buff) {
-    std::cerr
-        << "Unable to open file " << FLAGS_target << ":"
-        << maybe_buff.getError().message();
-    return EXIT_FAILURE;
-  }
-
-  if (!FLAGS_env.empty()) {
-    ClearEnvironmentVars(envp);
-  }
-
   // Sometimes bugs don't reproduce in debuggers, e.g. due to the environment
   // variables or something else being different. This gives us the possibility
   // to late-attach a debugger before anything interesting happens.
+  //
+  // NOTE(pag): This is helpful on macOS where LLDB sets the `SDKROOT` and
+  //            `CPATH` environment variables.
   if (FLAGS_attach) {
     std::cout << "Process ID: " << getpid() << "\nPress enter: \n";
     std::cout.flush();
     char x;
     read(0, &x, 1);
+  }
+
+  // Optionally take environent variables to pass down to the compile
+  // commands. These environment variables are stored in a file, with one
+  // line per variable, and the name and value separated by an `=`.
+  if (!FLAGS_env.empty()) {
+    ClearEnvironmentVars(envp);
   }
 
   indexer::EnvVariableMap env = ParseEnvVariablesFromFile(FLAGS_env);
@@ -190,17 +188,33 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     }
   }
 
+  auto maybe_buff = llvm::MemoryBuffer::getFileOrSTDIN(FLAGS_target, -1, false);
+  if (!maybe_buff) {
+    std::cerr
+        << "Unable to open file " << FLAGS_target << ":"
+        << maybe_buff.getError().message();
+    return EXIT_FAILURE;
+  }
+
   llvm::LLVMContext context;
   indexer::Importer importer(path.parent_path(), fm, ic);
-  indexer::Parser parser(context, importer);
-  if (!parser.Parse(*maybe_buff.get(), env)) {
+
+  // Parse the target, be it a compile commands JSON database or a binary
+  // with embedded commands.
+  if (!indexer::Parser(context, importer).Parse(*maybe_buff.get(), env)) {
     std::cerr
           << "An error occurred when trying to import " << FLAGS_target;
     return EXIT_FAILURE;
   }
 
+  // This goes an does a lot of sub-process execution, re-running all of the
+  // commands, albeit slightly modified, so that we can get the compiler to
+  // tell us about include search paths, etc. The result of this is that
+  // indexing actions are enqueued into the `executor`.
   importer.Import(executor);
 
+  // Start the executor, so that we can start processing the indexing actions.
+  // Wait for all actions to complete.
   executor.Start();
   executor.Wait();
 

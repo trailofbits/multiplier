@@ -6,21 +6,22 @@
 
 #include <filesystem>
 #include <memory>
+#include <string>
 #include <unordered_map>
-
-#include <pasta/Compile/Command.h>
-
-#include "Context.h"
-#include "Executor.h"
 
 namespace llvm {
 namespace json {
 class Object;
 }  // namespace json
 }  // namespace llvm
+namespace pasta {
+class FileManager;
+}
 namespace indexer {
 
+class GlobalIndexingState;
 class EnvVariableMap : public std::unordered_map<std::string, std::string> {};
+class Executor;
 
 class Importer {
  private:
@@ -32,12 +33,14 @@ class Importer {
 
  public:
   ~Importer(void);
+
   explicit Importer(std::filesystem::path cwd_,
-    pasta::FileManager &fm,
-    std::shared_ptr<GlobalIndexingState> context);
+                    const pasta::FileManager &fm,
+                    std::shared_ptr<GlobalIndexingState> context);
 
   bool ImportBlightCompileCommand(llvm::json::Object &o);
-  bool ImportCMakeCompileCommand(llvm::json::Object &o, const EnvVariableMap &envp);
+  bool ImportCMakeCompileCommand(llvm::json::Object &o,
+                                 const EnvVariableMap &envp);
 
   void Import(Executor &executor);
 };

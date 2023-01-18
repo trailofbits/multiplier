@@ -34,6 +34,8 @@
 #include <pasta/Util/Result.h>
 
 #include "Action.h"
+#include "Context.h"
+#include "Executor.h"
 #include "IndexCompileJob.h"
 #include "PASTA.h"
 #include "Subprocess.h"
@@ -42,15 +44,6 @@
 
 namespace indexer {
 namespace {
-
-static inline void
-FixEnvVariables(EnvVariableMap &envp, std::string &path) {
-  for (const auto &[key, _]: envp) {
-    if (key == "PWD" || key == "CWD") {
-      envp[key] = path;
-    }
-  }
-}
 
 struct Command {
  public:
@@ -67,6 +60,101 @@ struct Command {
   Command(const std::vector<std::string> &args)
       : vec(args) {}
 };
+
+struct PathCache {
+  std::shared_ptr<pasta::FileSystem> fs;
+  std::unordered_map<std::string,
+                     std::unordered_map<std::string, std::string>> cache;
+
+  explicit PathCache(const pasta::FileManager &fm)
+      : fs(fm.FileSystem()) {}
+
+  std::string *PathOf(std::string exe, const std::string &path,
+                      const std::string &cwd) {
+    std::unordered_map<std::string, std::string> &path_cache = cache[path];
+    auto old_size = path_cache.size();
+    std::string &entry = path_cache[exe];
+
+    if (!entry.empty()) {
+      return &entry;
+
+    } else if (old_size == path_cache.size()) {
+      return nullptr;
+    }
+
+    // Try to get the absolute path of the binary if this looks like a file.
+    if (exe.starts_with('/') || exe.starts_with('\\') ||
+        exe.starts_with('.')) {
+      pasta::Result<pasta::Stat, std::error_code> res = fs->Stat(exe, cwd);
+      if (res.Succeeded()) {
+        entry = res.TakeValue().real_path.generic_string();
+        return &entry;
+      } else {
+        (void) res.TakeError();
+      }
+    }
+
+    std::stringstream path_ss;
+    path_ss << path;
+
+    char sep = ':';
+    if (path.find(';') != std::string::npos) {
+      sep = ';';
+    }
+
+    // Look for the binary in the `PATH` variable.
+    for (std::string dir; std::getline(path_ss, dir, sep); dir.clear()) {
+      std::filesystem::path exe_path(dir);
+      exe_path /= exe;
+      pasta::Result<pasta::Stat, std::error_code> res = fs->Stat(exe_path, cwd);
+      if (res.Succeeded()) {
+        entry = res.TakeValue().real_path.generic_string();
+        return &entry;
+      } else {
+        (void) res.TakeError();
+      }
+    }
+
+    return nullptr;
+  }
+};
+
+static void FixEnvVariables(Command &command, const std::string &cwd,
+                            PathCache &cache) {
+  EnvVariableMap &envp = command.env;
+  std::vector<std::string> to_remove;
+  std::string path;
+
+  for (auto &[key, val] : envp) {
+    if (key == "PATH") {
+      path = val;
+
+    } else if (key.starts_with("BLIGHT_")) {
+      to_remove.push_back(key);
+    }
+  }
+
+  // Try to get the path of the target executable, and if we succeed, then
+  // use it, otherwise drop `_`.
+  std::string exe_name_var("_");
+  if (auto exe = cache.PathOf(command.vec[0], path, cwd)) {
+    envp[exe_name_var] = *exe;
+  } else {
+    envp.erase(exe_name_var);
+  }
+
+  // Remove Blight-specific environment variables.
+  for (const std::string &k : to_remove) {
+    envp.erase(k);
+  }
+
+  // Maybe speed up the compiler we're invoking?
+  envp["LC_ALL"] = "C";
+  envp["LC_COLLATE"] = "C";
+  envp["LANG"] = "C";
+  envp["CWD"] = cwd;
+  envp["PWD"] = cwd;
+}
 
 class BuildCommandAction final : public Action {
  private:
@@ -101,20 +189,35 @@ class BuildCommandAction final : public Action {
 mx::Result<std::pair<std::string, std::string>, std::error_code>
 BuildCommandAction::InitCompilerFromCommand(void) {
   std::vector<std::string> new_args;
+  bool skip = false;
   for (const char *arg : command.vec) {
+    if (skip) {
+      skip = false;
+      continue;
+    }
+
     if (strstr(arg, "-Wno") == arg) {
       // Keep the argument.
+
     } else if (strstr(arg, "-W") == arg || strstr(arg, "-pendantic") == arg) {
       continue;  // Skip the argument.
+
+    // Output file.
+    } else if (!strcmp(arg, "-o")) {
+      skip = true;
+      new_args.emplace_back(arg);
+      new_args.emplace_back("/dev/null");
     }
+
     new_args.emplace_back(arg);
   }
 
   new_args.emplace_back("-w");  // Disable all warnings (GCC).
   new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
-  new_args.emplace_back("-P");
+  new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
-  new_args.emplace_back("-dD");
+//  new_args.emplace_back("-dD");  // Print macro definitions in -E mode.
+  new_args.emplace_back("-E");  // Only run the preprocessor.
 
   // Include a non-existent file. This guarantees a fatal error in all cases,
   // which prevents any compilation jobs from proceeding.
@@ -123,7 +226,9 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 
   std::string output_sysroot;
   auto ret = Subprocess::Execute(
-      new_args, &(command.env), nullptr, nullptr, &output_sysroot);
+      new_args, &(command.env), nullptr /* stdin */, nullptr /* stdout */,
+      &output_sysroot);
+
   if (!ret.Succeeded() && output_sysroot.empty()) {
     return ret.TakeError();
   }
@@ -275,11 +380,11 @@ struct Importer::PrivateData {
   std::unordered_map<std::string, std::vector<Command>> commands;
 
   std::filesystem::path cwd;
-  pasta::FileManager &fm;
+  pasta::FileManager fm;
   std::shared_ptr<GlobalIndexingState> ctx;
 
   inline PrivateData(std::filesystem::path cwd_,
-                     pasta::FileManager &fm_,
+                     const pasta::FileManager &fm_,
                      std::shared_ptr<GlobalIndexingState> ctx_)
       : cwd(std::move(cwd_)),
         fm(fm_),
@@ -289,7 +394,7 @@ struct Importer::PrivateData {
 Importer::~Importer(void) {}
 
 Importer::Importer(std::filesystem::path cwd_,
-                   pasta::FileManager &fm,
+                   const pasta::FileManager &fm,
                    std::shared_ptr<GlobalIndexingState> ctx)
     : d(std::make_unique<Importer::PrivateData>(
             std::move(cwd_), fm, std::move(ctx))) {}
@@ -361,17 +466,19 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
 
   auto &commands = d->commands[cwd_str];
 
+  PathCache cache(d->fm);
+
   // E.g. from CMake, Blight.
   if (auto commands_str = o.getString("command")) {
-    auto args_str = commands_str->str();
-    auto &command = commands.emplace_back(args_str);
+    std::string args_str = commands_str->str();
+    Command &command = commands.emplace_back(args_str);
     if (command.vec.Size()) {
       DLOG(INFO) << "Parsed command: " << command.vec.Join();
 
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
       command.env = envp;
-      FixEnvVariables(command.env, cwd_str);
+      FixEnvVariables(command, cwd_str, cache);
 
       // Guess at the language.
       if (commands_str->contains_insensitive("++") ||
@@ -424,7 +531,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
       command.env = envp;
-      FixEnvVariables(command.env, cwd_str);
+      FixEnvVariables(command, cwd_str, cache);
       command.lang = lang;
       return true;
 
