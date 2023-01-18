@@ -257,7 +257,7 @@ void Statement::bind(const size_t i, const std::string_view &value) {
 
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
-    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {};
+    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {}
 
 // Get the filename used to open the database
 std::filesystem::path Connection::GetFilename(void) const {
