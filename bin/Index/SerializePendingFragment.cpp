@@ -15,6 +15,8 @@
 #include "PendingFragment.h"
 #include "Serialize.h"
 
+#include <deque>
+
 namespace indexer {
 namespace {
 

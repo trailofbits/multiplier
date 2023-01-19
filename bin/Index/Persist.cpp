@@ -21,6 +21,7 @@
 #include <sstream>
 #include <utility>
 #include <unordered_set>
+#include <deque>
 
 #include "Codegen.h"
 #include "Compress.h"

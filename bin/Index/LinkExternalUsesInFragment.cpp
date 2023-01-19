@@ -14,6 +14,7 @@
 #include <pasta/AST/Macro.h>
 #include <type_traits>
 #include <unordered_set>
+#include <deque>
 
 #include "NameMangler.h"
 #include "PendingFragment.h"
