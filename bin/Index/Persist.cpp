@@ -24,7 +24,6 @@
 #include <deque>
 
 #include "Codegen.h"
-#include "Compress.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
@@ -219,7 +218,7 @@ void GlobalIndexingState::PersistFile(
 
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, CompressedMessage(message)});
+      mx::SerializedFileRecord{file_id, GetPackedData(message)});
 }
 
 namespace {
@@ -1031,7 +1030,7 @@ void GlobalIndexingState::PersistFragment(
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
   database.AddAsync(
       mx::SerializedFragmentRecord{
-          pf.fragment_id, CompressedMessage(message)});
+          pf.fragment_id, GetPackedData(message)});
 
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalUsesInFragment(database, pf, fb, decls,

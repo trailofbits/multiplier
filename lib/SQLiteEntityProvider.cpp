@@ -10,7 +10,6 @@
 #include <multiplier/Types.h>
 
 #include "API.h"
-#include "Compress.h"
 #include "File.h"
 #include "Fragment.h"
 #include "SQLiteStore.h"
@@ -86,9 +85,9 @@ class SQLiteEntityProviderImpl {
         line_number_list("line_number_list_" + std::to_string(worker_index)),
         db(Connect(path, entity_id_list, line_number_list)),
         get_file_by_id(db.Prepare(
-            "SELECT data FROM file WHERE file_id = ?1")),
+            "SELECT zstd_decompress(data) FROM file WHERE file_id = ?1")),
         get_frag_by_id(db.Prepare(
-            "SELECT data FROM fragment WHERE fragment_id = ?1")),
+            "SELECT zstd_decompress(data) FROM fragment WHERE fragment_id = ?1")),
         get_version_number(db.Prepare(
             "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
         get_file_paths(db.Prepare(
@@ -96,9 +95,9 @@ class SQLiteEntityProviderImpl {
         get_file_fragments(db.Prepare(
             "SELECT DISTINCT(fragment_id) FROM fragment_line WHERE file_id = ?1")),
         get_file_data(db.Prepare(
-            "SELECT data FROM file WHERE file_id = ?1")),
+            "SELECT zstd_decompress(data) FROM file WHERE file_id = ?1")),
         get_fragment_data(db.Prepare(
-            "SELECT data FROM fragment WHERE fragment_id = ?1")),
+            "SELECT zstd_decompress(data) FROM fragment WHERE fragment_id = ?1")),
         clear_entity_id_list(db.Prepare(
             "DELETE FROM " + entity_id_list)),
         add_entity_id_to_list(db.Prepare(
@@ -154,30 +153,30 @@ class SQLiteEntityProviderImpl {
             "AND fln.last_line_number >= lnl.line_number")),
             
         get_decls(db.Prepare(
-          "SELECT contents FROM Decl WHERE fragment_id = ?1 ORDER BY offset ASC")),
+          "SELECT zstd_decompress(contents) FROM Decl WHERE fragment_id = ?1 ORDER BY offset ASC")),
         get_types(db.Prepare(
-          "SELECT contents FROM Type WHERE fragment_id = ?1 ORDER BY offset ASC")),
+          "SELECT zstd_decompress(contents) FROM Type WHERE fragment_id = ?1 ORDER BY offset ASC")),
         get_stmts(db.Prepare(
-          "SELECT contents FROM Stmt WHERE fragment_id = ?1 ORDER BY offset ASC")),
+          "SELECT zstd_decompress(contents) FROM Stmt WHERE fragment_id = ?1 ORDER BY offset ASC")),
         get_attrs(db.Prepare(
-          "SELECT contents FROM Attr WHERE fragment_id = ?1 ORDER BY offset ASC")),
+          "SELECT zstd_decompress(contents) FROM Attr WHERE fragment_id = ?1 ORDER BY offset ASC")),
         get_macros(db.Prepare(
-          "SELECT contents FROM Macro WHERE fragment_id = ?1 ORDER BY offset ASC")),
+          "SELECT zstd_decompress(contents) FROM Macro WHERE fragment_id = ?1 ORDER BY offset ASC")),
         get_pseudos(db.Prepare(
-          "SELECT contents FROM Pseudo WHERE fragment_id = ?1 ORDER BY offset ASC")),
+          "SELECT zstd_decompress(contents) FROM Pseudo WHERE fragment_id = ?1 ORDER BY offset ASC")),
 
         get_decl(db.Prepare(
-          "SELECT contents FROM Decl WHERE fragment_id = ?1 AND offset = ?2")),
+          "SELECT zstd_decompress(contents) FROM Decl WHERE fragment_id = ?1 AND offset = ?2")),
         get_type(db.Prepare(
-          "SELECT contents FROM Type WHERE fragment_id = ?1 AND offset = ?2")),
+          "SELECT zstd_decompress(contents) FROM Type WHERE fragment_id = ?1 AND offset = ?2")),
         get_stmt(db.Prepare(
-          "SELECT contents FROM Stmt WHERE fragment_id = ?1 AND offset = ?2")),
+          "SELECT zstd_decompress(contents) FROM Stmt WHERE fragment_id = ?1 AND offset = ?2")),
         get_attr(db.Prepare(
-          "SELECT contents FROM Attr WHERE fragment_id = ?1 AND offset = ?2")),
+          "SELECT zstd_decompress(contents) FROM Attr WHERE fragment_id = ?1 AND offset = ?2")),
         get_macro(db.Prepare(
-          "SELECT contents FROM Macro WHERE fragment_id = ?1 AND offset = ?2")),
+          "SELECT zstd_decompress(contents) FROM Macro WHERE fragment_id = ?1 AND offset = ?2")),
         get_pseudo(db.Prepare(
-          "SELECT contents FROM Pseudo WHERE fragment_id = ?1 AND offset = ?2")) {}
+          "SELECT zstd_decompress(contents) FROM Pseudo WHERE fragment_id = ?1 AND offset = ?2")) {}
 };
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)

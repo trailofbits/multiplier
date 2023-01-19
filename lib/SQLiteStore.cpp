@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "API.h"
+#include "SQLiteCompression.h"
 
 namespace sqlite {
 
@@ -325,6 +326,36 @@ Connection::Connection(const std::filesystem::path &db_path,
 
       CreateFunction("Pseudo_kind", 1, SQLITE_DETERMINISTIC,
         EntityKindFunc<mx::ast::Pseudo>, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC,
+        ZstdCompress, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC,
+        ZstdCompressDict, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_compress", 3, SQLITE_DETERMINISTIC,
+        ZstdCompressDictCtx, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC,
+        ZstdDecompress, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC,
+        ZstdDecompressDict, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_decompress", 3, SQLITE_DETERMINISTIC,
+        ZstdDecompressDictCtx, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_create_cdict", 1, 0,
+        ZstdCreateCDict, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_create_ddict", 1, 0,
+        ZstdCreateDDict, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_create_cctx", 0, 0,
+        ZstdCreateCCtx, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_create_dctx", 0, 0,
+        ZstdCreateDCtx, nullptr, nullptr, nullptr);
     };
 
 // Get the filename used to open the database

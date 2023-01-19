@@ -14,7 +14,6 @@
 #include <multiplier/Entities/Type.h>
 #include <multiplier/Entities/VarDecl.h>
 #include <multiplier/Entities/TokenKind.h>
-#include <multiplier/Compress.h>
 #include <multiplier/AST.h>
 #include <sstream>
 #include <stdexcept>

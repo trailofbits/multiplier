@@ -51,7 +51,7 @@ struct SerializedFileRecord {
   static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, ?2)";
+      "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, zstd_compress(?2))";
 
   SpecificEntityId<FileId> file_id;
   std::string data;
@@ -97,7 +97,7 @@ struct SerializedFragmentRecord {
 
   static constexpr const char *kInsertStatement =
       R"(INSERT OR IGNORE INTO fragment (fragment_id, data)
-         VALUES (?1, ?2))";
+         VALUES (?1, zstd_compress(?2)))";
 
   SpecificEntityId<FragmentId> fragment_id;
   std::string data;
@@ -266,13 +266,13 @@ struct ReferenceRecord {
             fragment_id INT NOT NULL, \
             offset INT NOT NULL, \
             contents BLOB NOT NULL, \
-            kind INT GENERATED ALWAYS AS (" #name "_kind(contents)) STORED, \
+            kind INT GENERATED ALWAYS AS (" #name "_kind(zstd_decompress(contents))) STORED, \
             PRIMARY KEY(fragment_id, offset) \
           ) WITHOUT rowid"}; \
     static constexpr const char *kExitStatements[] = \
       {"CREATE INDEX IF NOT EXISTS " #name "_kind_index ON " #name "(kind)"}; \
     static constexpr const char *kInsertStatement = \
-      "INSERT INTO " #name " (fragment_id, offset, contents) VALUES (?1, ?2, ?3)"; \
+      "INSERT INTO " #name " (fragment_id, offset, contents) VALUES (?1, ?2, zstd_compress(?3))"; \
     mx::SpecificEntityId<FragmentId> fragment_id; \
     unsigned offset; \
     std::string content; \
