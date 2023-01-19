@@ -271,63 +271,60 @@ void Statement::bind(const size_t i, const std::string_view &value) {
 
 #pragma GCC diagnostic pop
 
+static int GetKind(const mx::ast::Decl::Reader &reader) {
+  return Get_Decl_Kind(reader);
+}
+
+static int GetKind(const mx::ast::Stmt::Reader &reader) {
+  return Get_Stmt_Kind(reader);
+}
+
+static int GetKind(const mx::ast::Type::Reader &reader) {
+  return Get_Type_Kind(reader);
+}
+
+static int GetKind(const mx::ast::Attr::Reader &reader) {
+  return Get_Attr_Kind(reader);
+}
+
+static int GetKind(const mx::ast::Macro::Reader &reader) {
+  return Get_Macro_Kind(reader);
+}
+
+static int GetKind(const mx::ast::Pseudo::Reader &reader) {
+  mx::TemplateArgument *dummy;
+  return Get_Pseudo_Kind(reader, dummy);
+}
+
+template<typename T>
+static void EntityKindFunc(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+  auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+  auto blob_size = sqlite3_value_bytes(argv[0]);
+  std::string blob(blob_ptr, blob_size);
+  mx::PackedReaderState package(blob);
+  sqlite3_result_int(ctx, GetKind(package.Reader<T>()));
+}
+
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
     : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
       CreateFunction("Decl_kind", 1, SQLITE_DETERMINISTIC,
-        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
-          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
-          auto blob_size = sqlite3_value_bytes(argv[0]);
-          std::string blob(blob_ptr, blob_size);
-          mx::PackedReaderState package(blob);
-          sqlite3_result_int(ctx, Get_Decl_Kind(package.Reader<mx::ast::Decl>()));
-        }, nullptr, nullptr, nullptr);
+        EntityKindFunc<mx::ast::Decl>, nullptr, nullptr, nullptr);
 
       CreateFunction("Stmt_kind", 1, SQLITE_DETERMINISTIC,
-        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
-          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
-          auto blob_size = sqlite3_value_bytes(argv[0]);
-          std::string blob(blob_ptr, blob_size);
-          mx::PackedReaderState package(blob);
-          sqlite3_result_int(ctx, Get_Stmt_Kind(package.Reader<mx::ast::Stmt>()));
-        }, nullptr, nullptr, nullptr);
+        EntityKindFunc<mx::ast::Stmt>, nullptr, nullptr, nullptr);
 
       CreateFunction("Type_kind", 1, SQLITE_DETERMINISTIC,
-        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
-          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
-          auto blob_size = sqlite3_value_bytes(argv[0]);
-          std::string blob(blob_ptr, blob_size);
-          mx::PackedReaderState package(blob);
-          sqlite3_result_int(ctx, Get_Type_Kind(package.Reader<mx::ast::Type>()));
-        }, nullptr, nullptr, nullptr);
+        EntityKindFunc<mx::ast::Type>, nullptr, nullptr, nullptr);
 
       CreateFunction("Attr_kind", 1, SQLITE_DETERMINISTIC,
-        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
-          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
-          auto blob_size = sqlite3_value_bytes(argv[0]);
-          std::string blob(blob_ptr, blob_size);
-          mx::PackedReaderState package(blob);
-          sqlite3_result_int(ctx, Get_Attr_Kind(package.Reader<mx::ast::Attr>()));
-        }, nullptr, nullptr, nullptr);
+        EntityKindFunc<mx::ast::Attr>, nullptr, nullptr, nullptr);
 
       CreateFunction("Macro_kind", 1, SQLITE_DETERMINISTIC,
-        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
-          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
-          auto blob_size = sqlite3_value_bytes(argv[0]);
-          std::string blob(blob_ptr, blob_size);
-          mx::PackedReaderState package(blob);
-          sqlite3_result_int(ctx, Get_Macro_Kind(package.Reader<mx::ast::Macro>()));
-        }, nullptr, nullptr, nullptr);
+        EntityKindFunc<mx::ast::Macro>, nullptr, nullptr, nullptr);
 
       CreateFunction("Pseudo_kind", 1, SQLITE_DETERMINISTIC,
-        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
-          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
-          auto blob_size = sqlite3_value_bytes(argv[0]);
-          std::string blob(blob_ptr, blob_size);
-          mx::PackedReaderState package(blob);
-          mx::TemplateArgument* dummy;
-          sqlite3_result_int(ctx, Get_Pseudo_Kind(package.Reader<mx::ast::Pseudo>(), dummy));
-        }, nullptr, nullptr, nullptr);
+        EntityKindFunc<mx::ast::Pseudo>, nullptr, nullptr, nullptr);
     };
 
 // Get the filename used to open the database
