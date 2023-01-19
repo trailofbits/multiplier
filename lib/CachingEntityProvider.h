@@ -90,6 +90,41 @@ class CachingEntityProvider final : public EntityProvider {
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
 
+  gap::generator<ReaderPtr> DeclsFor(const Ptr &,
+                                PackedFragmentId id) final;
+
+  gap::generator<ReaderPtr> TypesFor(const Ptr &,
+                                PackedFragmentId id) final;
+
+  gap::generator<ReaderPtr> StmtsFor(const Ptr &,
+                                PackedFragmentId id) final;
+
+  gap::generator<ReaderPtr> AttrsFor(const Ptr &,
+                                PackedFragmentId id) final;
+
+  gap::generator<ReaderPtr> MacrosFor(const Ptr &,
+                                  PackedFragmentId id) final;
+
+  gap::generator<ReaderPtr> PseudosFor(const Ptr &,
+                                  PackedFragmentId id) final;
+
+  std::optional<ReaderPtr> DeclFor(const Ptr &,
+                               PackedFragmentId id, unsigned offset) final;
+
+  std::optional<ReaderPtr> TypeFor(const Ptr &,
+                              PackedFragmentId id, unsigned offset) final;
+
+  std::optional<ReaderPtr> StmtFor(const Ptr &,
+                              PackedFragmentId id, unsigned offset) final;
+
+  std::optional<ReaderPtr> AttrFor(const Ptr &,
+                              PackedFragmentId id, unsigned offset) final;
+
+  std::optional<ReaderPtr> MacroFor(const Ptr &,
+                                PackedFragmentId id, unsigned offset) final;
+
+  std::optional<ReaderPtr> PseudoFor(const Ptr &,
+                                PackedFragmentId id, unsigned offset) final;
 };
 
 }  // namespace mx

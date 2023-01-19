@@ -507,6 +507,22 @@ bool BulkInserterState::InsertAsync(
   return false;
 }
 
+#define MX_INSERT_ASYNC_ENTITY(name) \
+  bool BulkInserterState::InsertAsync(name ## EntityRecord record, sqlite::Statement &insert) { \
+    if(!record.content.empty()) { \
+      insert.BindValues(record.fragment_id.Pack(), record.offset, record.content); \
+      return true; \
+    } \
+    return false; \
+  }
+
+MX_INSERT_ASYNC_ENTITY(Decl)
+MX_INSERT_ASYNC_ENTITY(Type)
+MX_INSERT_ASYNC_ENTITY(Stmt)
+MX_INSERT_ASYNC_ENTITY(Attr)
+MX_INSERT_ASYNC_ENTITY(Macro)
+MX_INSERT_ASYNC_ENTITY(Pseudo)
+
 DatabaseWriter::DatabaseWriter(
     std::filesystem::path db_path)
     : impl(std::make_shared<DatabaseWriterImpl>(db_path)) {}

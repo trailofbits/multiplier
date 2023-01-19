@@ -10,6 +10,7 @@
 #include <multiplier/AST.h>
 #include <type_traits>
 
+#include "API.h"
 #include "Fragment.h"
 
 namespace mx {
@@ -208,9 +209,9 @@ UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
 }
 
 bool UseIteratorImpl::FindNextDecl(UseBase &use) {
-  while (list_offset < use.fragment->num_decls) {
+  while (auto decl_reader = use.fragment->NthDecl(list_offset)) {
     use.offset = list_offset++;
-    mx::ast::Decl::Reader reader = use.fragment->NthDecl(use.offset);
+    mx::ast::Decl::Reader reader = (*decl_reader)->Reader<mx::ast::Decl>();
     bool found = false;
 
     use.selectors.reset();
@@ -238,9 +239,9 @@ bool UseIteratorImpl::FindNextDecl(UseBase &use) {
 }
 
 bool UseIteratorImpl::FindNextStmt(UseBase &use) {
-  while (list_offset < use.fragment->num_stmts) {
+  while (auto stmt_reader = use.fragment->NthStmt(list_offset)) {
     use.offset = list_offset++;
-    mx::ast::Stmt::Reader reader = use.fragment->NthStmt(use.offset);
+    mx::ast::Stmt::Reader reader = (*stmt_reader)->Reader<mx::ast::Stmt>();
     bool found = false;
 
     use.selectors.reset();
@@ -266,9 +267,9 @@ bool UseIteratorImpl::FindNextStmt(UseBase &use) {
 }
 
 bool UseIteratorImpl::FindNextType(UseBase &use) {
-  while (list_offset < use.fragment->num_types) {
+  while (auto type_reader = use.fragment->NthType(list_offset)) {
     use.offset = list_offset++;
-    mx::ast::Type::Reader reader = use.fragment->NthType(use.offset);
+    mx::ast::Type::Reader reader = (*type_reader)->Reader<mx::ast::Type>();
     bool found = false;
 
     use.selectors.reset();
@@ -296,9 +297,9 @@ bool UseIteratorImpl::FindNextType(UseBase &use) {
 }
 
 bool UseIteratorImpl::FindNextAttr(UseBase &use) {
-  while (list_offset < use.fragment->num_attrs) {
+  while (auto decl_reader = use.fragment->NthAttr(list_offset)) {
     use.offset = list_offset++;
-    mx::ast::Attr::Reader reader = use.fragment->NthAttr(use.offset);
+    mx::ast::Attr::Reader reader = (*decl_reader)->Reader<mx::ast::Attr>();
     bool found = false;
 
     use.selectors.reset();
@@ -326,9 +327,9 @@ bool UseIteratorImpl::FindNextAttr(UseBase &use) {
 }
 
 bool UseIteratorImpl::FindNextMacro(UseBase& use) {
-  while (list_offset < use.fragment->num_macros) {
+  while (auto macro_reader = use.fragment->NthMacro(list_offset)) {
     use.offset = list_offset++;
-    mx::ast::Macro::Reader reader = use.fragment->NthMacro(use.offset);
+    mx::ast::Macro::Reader reader = (*macro_reader)->Reader<mx::ast::Macro>();
     bool found = false;
 
     use.selectors.reset();
@@ -356,12 +357,12 @@ bool UseIteratorImpl::FindNextMacro(UseBase& use) {
 }
 
 bool UseIteratorImpl::FindNextPseudo(UseBase &use) {
-  while (list_offset < use.fragment->num_pseudos) {
+  while (auto pseudo_reader = use.fragment->NthPseudo(list_offset)) {
     TemplateArgument *dummy = nullptr;
     use.offset = list_offset++;
     use.selectors.reset();
     mx::ast::Pseudo::Reader reader =
-        use.fragment->NthPseudo(use.offset);
+        (*pseudo_reader)->Reader<mx::ast::Pseudo>();
     bool found = false;
 
     for (auto eid : search_ids) {
@@ -536,58 +537,60 @@ VariantUse UseBase::entity(void) const {
     return NotAnEntity{};
   }
 
+  FragmentId fid(fragment->fragment_id);
+
   switch (kind) {
     case UseKind::DECLARATION:
-      if (offset < fragment->num_decls) {
-        return Decl(fragment, offset);
+      if (auto decl_reader = fragment->NthDecl(offset)) {
+        return Decl(std::move(*decl_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::STATEMENT:
-      if (offset < fragment->num_stmts) {
-        return Stmt(fragment, offset);
+      if (auto stmt_reader = fragment->NthStmt(offset)) {
+        return Stmt(std::move(*stmt_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::TYPE:
-      if (offset < fragment->num_types) {
-        return Type(fragment, offset);
+      if (auto type_reader = fragment->NthType(offset)) {
+        return Type(std::move(*type_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::MACRO:
-      if (offset < fragment->num_macros) {
-        return Macro(fragment, offset);
+      if (auto macro_reader = fragment->NthMacro(offset)) {
+        return Macro(std::move(*macro_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::CXX_BASE_SPECIFIER:
-      if (offset < fragment->num_pseudos) {
-        return CXXBaseSpecifier(fragment, offset);
+      if (auto pseudo_reader = fragment->NthPseudo(offset)) {
+        return CXXBaseSpecifier(std::move(*pseudo_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::TEMPLATE_ARGUMENT:
-      if (offset < fragment->num_pseudos) {
-        return TemplateArgument(fragment, offset);
+      if (auto pseudo_reader = fragment->NthPseudo(offset)) {
+        return TemplateArgument(std::move(*pseudo_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::TEMPLATE_PARAMETER_LIST:
-      if (offset < fragment->num_pseudos) {
-        return TemplateParameterList(fragment, offset);
+      if (auto pseudo_reader = fragment->NthPseudo(offset)) {
+        return TemplateParameterList(std::move(*pseudo_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::DESIGNATOR:
-      if (offset < fragment->num_pseudos) {
-        return Designator(fragment, offset);
+      if (auto pseudo_reader = fragment->NthPseudo(offset)) {
+        return Designator(std::move(*pseudo_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
     case UseKind::ATTRIBUTE:
-      if (offset < fragment->num_attrs) {
-        return Attr(fragment, offset);
+      if (auto attr_reader = fragment->NthAttr(offset)) {
+        return Attr(std::move(*attr_reader), fragment, offset);
       } else {
         return NotAnEntity{};
       }
@@ -597,58 +600,65 @@ VariantUse UseBase::entity(void) const {
 }
 
 std::optional<Decl> UseBase::as_declaration(void) const {
-  if (kind == UseKind::DECLARATION && fragment && offset < fragment->num_decls) {
-    return Decl(fragment, offset);
+  auto decl_reader = fragment->NthDecl(offset);
+  if (kind == UseKind::DECLARATION && fragment && decl_reader.has_value()) {
+    return Decl(std::move(*decl_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<Stmt> UseBase::as_statement(void) const {
-  if (kind == UseKind::STATEMENT && fragment && offset < fragment->num_stmts) {
-    return Stmt(fragment, offset);
+  auto stmt_reader = fragment->NthStmt(offset);
+  if (kind == UseKind::STATEMENT && fragment && stmt_reader.has_value()) {
+    return Stmt(std::move(*stmt_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<Type> UseBase::as_type(void) const {
-  if (kind == UseKind::TYPE && fragment && offset < fragment->num_types) {
-    return Type(fragment, offset);
+  auto type_reader = fragment->NthType(offset);
+  if (kind == UseKind::TYPE && fragment && type_reader.has_value()) {
+    return Type(std::move(*type_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<Attr> UseBase::as_attribute(void) const {
-  if (kind == UseKind::ATTRIBUTE && fragment && offset < fragment->num_attrs) {
-    return Attr(fragment, offset);
+  auto attr_reader = fragment->NthAttr(offset);
+  if (kind == UseKind::ATTRIBUTE && fragment && attr_reader.has_value()) {
+    return Attr(std::move(*attr_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<Macro> UseBase::as_macro(void) const {
-  if (kind == UseKind::MACRO && fragment && offset < fragment->num_macros) {
-    return Macro(fragment, offset);
+  auto macro_reader = fragment->NthMacro(offset);
+  if (kind == UseKind::MACRO && fragment && macro_reader.has_value()) {
+    return Macro(std::move(*macro_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<CXXBaseSpecifier> UseBase::as_cxx_base_specifier(void) const {
+  auto pseudo_reader = fragment->NthPseudo(offset);
   if (kind == UseKind::CXX_BASE_SPECIFIER && fragment &&
-      offset < fragment->num_pseudos) {
-    return CXXBaseSpecifier(fragment, offset);
+      pseudo_reader.has_value()) {
+    return CXXBaseSpecifier(std::move(*pseudo_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<TemplateArgument> UseBase::as_template_argument(void) const {
+  auto pseudo_reader = fragment->NthPseudo(offset);
   if (kind == UseKind::TEMPLATE_ARGUMENT && fragment &&
-      offset < fragment->num_pseudos) {
-    return TemplateArgument(fragment, offset);
+      pseudo_reader.has_value()) {
+    return TemplateArgument(std::move(*pseudo_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
@@ -656,18 +666,20 @@ std::optional<TemplateArgument> UseBase::as_template_argument(void) const {
 
 std::optional<TemplateParameterList>
 UseBase::as_template_parameter_list(void) const {
+  auto pseudo_reader = fragment->NthPseudo(offset);
   if (kind == UseKind::TEMPLATE_PARAMETER_LIST && fragment &&
-      offset < fragment->num_pseudos) {
-    return TemplateParameterList(fragment, offset);
+      pseudo_reader.has_value()) {
+    return TemplateParameterList(std::move(*pseudo_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
 }
 
 std::optional<Designator> UseBase::as_designator(void) const {
+  auto pseudo_reader = fragment->NthPseudo(offset);
   if (kind == UseKind::DESIGNATOR && fragment &&
-      offset < fragment->num_pseudos) {
-    return Designator(fragment, offset);
+      pseudo_reader.has_value()) {
+    return Designator(std::move(*pseudo_reader), fragment, offset);
   } else {
     return std::nullopt;
   }
@@ -763,13 +775,14 @@ gap::generator<MacroReference> ReferenceIteratorImpl::enumerate_macros(void) {
 
     // We've exhausted the macros in this fragment; skip to the next
     // fragment.
-    if (user.offset >= user.fragment->num_macros) {
+    auto macro_reader = user.fragment->NthMacro(user.offset);
+    if (!macro_reader.has_value()) {
       user.fragment.reset();
       user.offset = 0u;
       continue;
     }
 
-    Macro macro(std::move(user.fragment), user.offset);
+    Macro macro(std::move(*macro_reader), std::move(user.fragment), user.offset);
 
     // Needs to match what is in `LinkExternalReferencesInFragment` in
     // `bin/Index/LinkExternalReferencesInFragment.cpp`.
@@ -837,13 +850,14 @@ gap::generator<StmtReference> ReferenceIteratorImpl::enumerate_stmts(void) {
 
     // We've exhausted the statements in this fragment; skip to the next
     // fragment.
-    if (user.offset >= user.fragment->num_stmts) {
+    auto stmt_reader = user.fragment->NthStmt(user.offset);
+    if (!stmt_reader.has_value()) {
       user.fragment.reset();
       user.offset = 0u;
       continue;
     }
 
-    Stmt stmt(std::move(user.fragment), user.offset);
+    Stmt stmt(std::move(*stmt_reader), std::move(user.fragment), user.offset);
     switch (stmt.kind()) {
       // Has to match with what is supported by `ReferencedDecl` in
       // `bin/Index/Util.cpp`.
@@ -887,35 +901,43 @@ gap::generator<StmtReference> ReferenceIteratorImpl::enumerate_stmts(void) {
 }
 
 Stmt StmtReference::statement(void) && noexcept {
-  return Stmt(std::move(fragment), offset);
+  auto reader = fragment->NthStmt(offset);
+  return Stmt(std::move(*reader), std::move(fragment), offset);
 }
 
 Stmt StmtReference::statement(void) const & noexcept {
-  return Stmt(fragment, offset);
+  auto reader = fragment->NthStmt(offset);
+  return Stmt(std::move(*reader), fragment, offset);
 }
 
 StmtReference::operator Stmt(void) && noexcept {
-  return Stmt(std::move(fragment), offset);
+  auto reader = fragment->NthStmt(offset);
+  return Stmt(std::move(*reader), std::move(fragment), offset);
 }
 
 StmtReference::operator Stmt(void) const & noexcept {
-  return Stmt(fragment, offset);
+  auto reader = fragment->NthStmt(offset);
+  return Stmt(std::move(*reader), fragment, offset);
 }
 
 Macro MacroReference::macro(void) && noexcept {
-  return Macro(std::move(fragment), offset);
+  auto reader = fragment->NthMacro(offset);
+  return Macro(std::move(*reader), std::move(fragment), offset);
 }
 
 Macro MacroReference::macro(void) const & noexcept {
-  return Macro(fragment, offset);
+  auto reader = fragment->NthMacro(offset);
+  return Macro(std::move(*reader), fragment, offset);
 }
 
 MacroReference::operator Macro(void) && noexcept {
-  return Macro(std::move(fragment), offset);
+  auto reader = fragment->NthMacro(offset);
+  return Macro(std::move(*reader), std::move(fragment), offset);
 }
 
 MacroReference::operator Macro(void) const & noexcept {
-  return Macro(fragment, offset);
+  auto reader = fragment->NthMacro(offset);
+  return Macro(std::move(*reader), fragment, offset);
 }
 
 }  // namespace mx

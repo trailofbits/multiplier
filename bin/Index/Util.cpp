@@ -27,6 +27,10 @@
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
 #include <sstream>
+#include <capnp/common.h>
+#include <capnp/message.h>
+#include <capnp/serialize-packed.h>
+#include <kj/io.h>
 
 #include "EntityMapper.h"
 #include "PASTA.h"
@@ -868,6 +872,14 @@ mx::RawEntityId RelatedEntityId(
     const EntityMapper &em, const pasta::MacroToken &tok,
     RelatedEntityIds &related_ids) {
   return RelatedEntityId(em, tok.ParsedLocation(), related_ids);
+}
+
+std::string GetPackedData(capnp::MessageBuilder& builder) {
+  kj::VectorOutputStream os(builder.sizeInWords());
+  capnp::writePackedMessage(os, builder);
+  kj::ArrayPtr<kj::byte> packed_data = os.getArray();
+  auto packed_size = packed_data.size();
+  return {packed_data.asChars().begin(), packed_size};
 }
 
 }  // namespace indexer

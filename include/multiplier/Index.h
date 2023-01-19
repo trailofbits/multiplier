@@ -44,6 +44,9 @@ class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
 
+struct PackedReaderState;
+using ReaderPtr = std::shared_ptr<PackedReaderState>;
+
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
 using TypeUse = Use<TypeUseSelector>;
@@ -81,13 +84,18 @@ class EntityProvider {
   friend class IncludeLikeMacroDirective;
   friend class Index;
   friend class Macro;
+  friend class MacroReference;
   friend class ReadMacroTokensFromFragment;
+  friend class ReadParsedTokensFromFragment;
   friend class ReferenceIteratorImpl;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RemoteEntityProvider;
+  friend class StmtReference;
   friend class Token;
   friend class TokenReader;
+  friend class TokenContext;
+  friend class UseBase;
   friend class UseIteratorImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
@@ -152,6 +160,42 @@ class EntityProvider {
   //            raw fragment id.
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual gap::generator<ReaderPtr>
+  DeclsFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual gap::generator<ReaderPtr>
+  TypesFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual gap::generator<ReaderPtr>
+  StmtsFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual gap::generator<ReaderPtr>
+  AttrsFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual gap::generator<ReaderPtr>
+  MacrosFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual gap::generator<ReaderPtr>
+  PseudosFor(const Ptr &, PackedFragmentId id) = 0;
+
+  virtual std::optional<ReaderPtr>
+  DeclFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
+
+  virtual std::optional<ReaderPtr>
+  TypeFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
+
+  virtual std::optional<ReaderPtr>
+  StmtFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
+
+  virtual std::optional<ReaderPtr>
+  AttrFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
+
+  virtual std::optional<ReaderPtr>
+  MacroFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
+
+  virtual std::optional<ReaderPtr>
+  PseudoFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
 
   // Return the list of fragments covering / overlapping some lines in a file.
   virtual FragmentIdList FragmentsCoveringLines(

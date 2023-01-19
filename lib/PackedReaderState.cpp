@@ -43,4 +43,12 @@ PackedReaderState::PackedReaderState(capnp::Data::Reader data) {
   packed_reader.emplace(stream.value(), options);
 }
 
+PackedReaderState::PackedReaderState(const std::string& data) : storage(data) {
+  capnp::ReaderOptions options;
+  options.traversalLimitInWords = ~0ull;
+  stream.emplace(kj::arrayPtr(
+      reinterpret_cast<const kj::byte *>(&(storage[0])), storage.size()));
+  packed_reader.emplace(stream.value(), options);
+}
+
 }  // namespace mx

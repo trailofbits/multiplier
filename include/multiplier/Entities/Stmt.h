@@ -24,6 +24,7 @@
 #include "StmtKind.h"
 
 namespace mx {
+class PackedReaderState;
 class Stmt;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
@@ -40,6 +41,7 @@ class Stmt {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
+  std::shared_ptr<PackedReaderState> package;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -49,8 +51,9 @@ class Stmt {
   Stmt &operator=(Stmt &&) noexcept = default;
   Stmt &operator=(const Stmt &) = default;
 
-  inline Stmt(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
+  inline Stmt(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : package(std::move(package_)),
+        fragment(std::move(fragment_)),
         offset_(offset__) {}
 
   inline static std::optional<Stmt> from(const Stmt &self) {

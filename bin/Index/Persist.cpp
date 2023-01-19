@@ -70,7 +70,13 @@ extern void LinkEntitiesAcrossFragments(
 // fragment ID in the data store.
 extern void LinkExternalUsesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    mx::rpc::Fragment::Builder &b);
+    mx::rpc::Fragment::Builder &b,
+    std::deque<EntityBuilder<mx::ast::Decl>> &decls,
+    std::deque<EntityBuilder<mx::ast::Stmt>> &stmts,
+    std::deque<EntityBuilder<mx::ast::Type>> &types,
+    std::deque<EntityBuilder<mx::ast::Attr>> &attrs,
+    std::deque<EntityBuilder<mx::ast::Macro>> &macros,
+    std::deque<EntityBuilder<mx::ast::Pseudo>> &pseudos);
 
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
@@ -79,9 +85,15 @@ extern void LinkExternalReferencesInFragment(
     EntityMapper &em);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
-extern void SerializePendingFragment(const PendingFragment &pf,
+extern void SerializePendingFragment(mx::DatabaseWriter &database,
+                                     const PendingFragment &pf,
                                      const EntityMapper &em,
-                                     mx::rpc::Fragment::Builder &b);
+                                     mx::rpc::Fragment::Builder &b,
+                                     std::deque<EntityBuilder<mx::ast::Decl>> &decls,
+                                     std::deque<EntityBuilder<mx::ast::Stmt>> &stmts,
+                                     std::deque<EntityBuilder<mx::ast::Type>> &types,
+                                     std::deque<EntityBuilder<mx::ast::Attr>> &attrs,
+                                     std::deque<EntityBuilder<mx::ast::Pseudo>> &pseudos);
 
 // Save the symbolic names of all declarations into the database.
 extern void LinkEntityNamesToFragment(
@@ -442,8 +454,10 @@ void VisitMacros(
 //
 // NOTE(pag): This is a *backup* approach when building a token tree fails.
 static void PersistParsedTokens(
+    mx::DatabaseWriter &database,
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    const std::vector<pasta::Token> &parsed_tokens) {
+    const std::vector<pasta::Token> &parsed_tokens,
+    std::deque<EntityBuilder<mx::ast::Macro>> &macros) {
 
   RelatedEntityIds tok_related_entities;
   std::string utf8_fragment_data;
@@ -496,10 +510,12 @@ static void PersistParsedTokens(
   to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
   fb.setTokenData(utf8_fragment_data);
 
-  auto ms = fb.initMacros(num_macros);
   for (i = 0u; i < num_macros; ++i) {
-    mx::ast::Macro::Builder mb = ms[i];
-    DispatchSerializeMacro(em, mb, macros_to_serialize[i], nullptr);
+    auto &storage = macros.emplace_back();
+    DispatchSerializeMacro(em, storage.builder, macros_to_serialize[i], nullptr);
+    database.AddAsync(
+        mx::MacroEntityRecord{
+          pf.fragment_id, i, GetPackedData(storage.message)});
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
@@ -527,8 +543,10 @@ static std::string DiagnoseParsedTokens(
 // are macro tokens. The top-level substitution points to the macro code in
 // before IDs, and the
 static void PersistTokenTree(
+    mx::DatabaseWriter &database,
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
-    TokenTreeNodeRange nodes, const std::vector<pasta::Token> &parsed_tokens) {
+    TokenTreeNodeRange nodes, const std::vector<pasta::Token> &parsed_tokens,
+    std::deque<EntityBuilder<mx::ast::Macro>> &macros) {
 
   RelatedEntityIds tok_related_entities;
   TokenTreeSerializationSchedule sched(pf, em);
@@ -651,7 +669,6 @@ static void PersistTokenTree(
   }
 
   // Serialize the token trees / macros.
-  auto ms = fb.initMacros(num_macros);
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
     const void *raw_tt = tt->RawNode();
 
@@ -659,9 +676,12 @@ static void PersistTokenTree(
         mx::EntityId(em.EntityId(raw_tt)).Unpack());
 
     CHECK_LT(id.offset, num_macros);
-    mx::ast::Macro::Builder mb = ms[id.offset];
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
-      DispatchSerializeMacro(em, mb, macro.value(), &(tt.value()));
+      auto &storage = macros.emplace_back();
+      DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
+      database.AddAsync(
+          mx::MacroEntityRecord{
+              mx::FragmentId(id.fragment_id), id.offset, GetPackedData(storage.message)});
     }
   }
 
@@ -941,8 +961,14 @@ void GlobalIndexingState::PersistFragment(
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf, em);
 
+  std::deque<EntityBuilder<mx::ast::Decl>> decls;
+  std::deque<EntityBuilder<mx::ast::Stmt>> stmts;
+  std::deque<EntityBuilder<mx::ast::Type>> types;
+  std::deque<EntityBuilder<mx::ast::Attr>> attrs;
+  std::deque<EntityBuilder<mx::ast::Macro>> macros;
+  std::deque<EntityBuilder<mx::ast::Pseudo>> pseudos;
   // Serialize all discovered entities.
-  SerializePendingFragment(pf, em, fb);
+  SerializePendingFragment(database, pf, em, fb, decls, stmts, types, attrs, pseudos);
 
   std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
       tokens, begin_index, end_index);
@@ -977,7 +1003,7 @@ void GlobalIndexingState::PersistFragment(
       tokens, begin_index, end_index, tok_tree_err);
 
   if (maybe_tt) {
-    PersistTokenTree(pf, em, fb, std::move(maybe_tt.value()), parsed_tokens);
+    PersistTokenTree(database, pf, em, fb, std::move(maybe_tt.value()), parsed_tokens, macros);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -998,7 +1024,7 @@ void GlobalIndexingState::PersistFragment(
           << ast.MainFile().Path().generic_string();
     }
 
-    PersistParsedTokens(pf, em, fb, parsed_tokens);
+    PersistParsedTokens(database, pf, em, fb, parsed_tokens, macros);
   }
 
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
@@ -1007,7 +1033,8 @@ void GlobalIndexingState::PersistFragment(
           pf.fragment_id, CompressedMessage(message)});
 
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
-  LinkExternalUsesInFragment(database, pf, fb);
+  LinkExternalUsesInFragment(database, pf, fb, decls,
+    stmts, types, attrs, macros, pseudos);
   LinkExternalReferencesInFragment(database, pf, em);
   LinkEntityNamesToFragment(database, pf, em);
 }

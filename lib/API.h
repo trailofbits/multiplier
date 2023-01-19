@@ -48,6 +48,7 @@ struct PackedReaderState {
 
  public:
   explicit PackedReaderState(capnp::Data::Reader data);
+  explicit PackedReaderState(const std::string& data);
 
   template <typename T>
   auto Reader(void) -> typename T::Reader {

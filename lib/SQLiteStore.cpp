@@ -13,7 +13,23 @@
 #include <sqlite3.h>
 #include <vector>
 
+#include "API.h"
+
 namespace sqlite {
+
+#define MX_VISIT_ENUM(cls, api_name, storage, apply, \
+                      pasta_name, type, nth_list) \
+    template <typename Reader> \
+    inline static unsigned Get_ ## cls ## _ ## pasta_name(const Reader &reader) { \
+      return reader.getVal ## storage(); \
+    }
+
+#define MX_VISIT_PSEUDO_KIND(cls, storage) \
+    inline static unsigned Get_Pseudo_Kind( \
+        const mx::ast::Pseudo::Reader &reader, mx::cls *) { \
+      return reader.getVal ## storage(); \
+    }
+#include <multiplier/Visitor.inc.h>
 
 #ifndef NDEBUG
 // Nifty to double check that only one connection is being used/created
@@ -257,7 +273,62 @@ void Statement::bind(const size_t i, const std::string_view &value) {
 
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
-    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {};
+    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
+      CreateFunction("Decl_kind", 1, SQLITE_DETERMINISTIC,
+        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
+          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+          auto blob_size = sqlite3_value_bytes(argv[0]);
+          std::string blob(blob_ptr, blob_size);
+          mx::PackedReaderState package(blob);
+          sqlite3_result_int(ctx, Get_Decl_Kind(package.Reader<mx::ast::Decl>()));
+        }, nullptr, nullptr, nullptr);
+
+      CreateFunction("Stmt_kind", 1, SQLITE_DETERMINISTIC,
+        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
+          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+          auto blob_size = sqlite3_value_bytes(argv[0]);
+          std::string blob(blob_ptr, blob_size);
+          mx::PackedReaderState package(blob);
+          sqlite3_result_int(ctx, Get_Stmt_Kind(package.Reader<mx::ast::Stmt>()));
+        }, nullptr, nullptr, nullptr);
+
+      CreateFunction("Type_kind", 1, SQLITE_DETERMINISTIC,
+        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
+          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+          auto blob_size = sqlite3_value_bytes(argv[0]);
+          std::string blob(blob_ptr, blob_size);
+          mx::PackedReaderState package(blob);
+          sqlite3_result_int(ctx, Get_Type_Kind(package.Reader<mx::ast::Type>()));
+        }, nullptr, nullptr, nullptr);
+
+      CreateFunction("Attr_kind", 1, SQLITE_DETERMINISTIC,
+        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
+          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+          auto blob_size = sqlite3_value_bytes(argv[0]);
+          std::string blob(blob_ptr, blob_size);
+          mx::PackedReaderState package(blob);
+          sqlite3_result_int(ctx, Get_Attr_Kind(package.Reader<mx::ast::Attr>()));
+        }, nullptr, nullptr, nullptr);
+
+      CreateFunction("Macro_kind", 1, SQLITE_DETERMINISTIC,
+        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
+          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+          auto blob_size = sqlite3_value_bytes(argv[0]);
+          std::string blob(blob_ptr, blob_size);
+          mx::PackedReaderState package(blob);
+          sqlite3_result_int(ctx, Get_Macro_Kind(package.Reader<mx::ast::Macro>()));
+        }, nullptr, nullptr, nullptr);
+
+      CreateFunction("Pseudo_kind", 1, SQLITE_DETERMINISTIC,
+        [](sqlite3_context *ctx, int argc, sqlite3_value **argv) -> void {
+          auto blob_ptr = static_cast<const char*>(sqlite3_value_blob(argv[0]));
+          auto blob_size = sqlite3_value_bytes(argv[0]);
+          std::string blob(blob_ptr, blob_size);
+          mx::PackedReaderState package(blob);
+          mx::TemplateArgument* dummy;
+          sqlite3_result_int(ctx, Get_Pseudo_Kind(package.Reader<mx::ast::Pseudo>(), dummy));
+        }, nullptr, nullptr, nullptr);
+    };
 
 // Get the filename used to open the database
 std::filesystem::path Connection::GetFilename(void) const {

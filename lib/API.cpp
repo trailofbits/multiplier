@@ -77,8 +77,9 @@ gap::generator<StmtReference> Decl::references(void) const {
 }
 
 gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_decls; ++i) {
-    co_yield Decl(fragment.impl, i);
+  unsigned i = 0;
+  for (auto reader : fragment.impl->Decls()) {
+    co_yield Decl(std::move(reader), fragment.impl, i++);
   }
 }
 
@@ -91,8 +92,9 @@ SpecificEntityId<StatementId> Stmt::id(void) const {
 }
 
 gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_stmts; ++i) {
-    co_yield Stmt(fragment.impl, i);
+  unsigned i = 0;
+  for (auto reader : fragment.impl->Stmts()) {
+    co_yield Stmt(std::move(reader), fragment.impl, i++);
   }
 }
 
@@ -112,8 +114,9 @@ SpecificEntityId<TypeId> Type::id(void) const {
 }
 
 gap::generator<Type> Type::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_types; ++i) {
-    co_yield Type(fragment.impl, i);
+  unsigned i = 0;
+  for (auto reader : fragment.impl->Types()) {
+    co_yield Type(std::move(reader), fragment.impl, i++);
   }
 }
 
@@ -133,8 +136,9 @@ SpecificEntityId<AttributeId> Attr::id(void) const {
 }
 
 gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_attrs; ++i) {
-    co_yield Attr(fragment.impl, i);
+  unsigned i = 0;
+  for (auto reader : fragment.impl->Attrs()) {
+    co_yield Attr(std::move(reader), fragment.impl, i++);
   }
 }
 
@@ -154,8 +158,9 @@ SpecificEntityId<MacroId> Macro::id(void) const {
 }
 
 gap::generator<Macro> Macro::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_macros; ++i) {
-    co_yield Macro(fragment.impl, i);
+  unsigned i = 0;
+  for (auto reader : fragment.impl->Macros()) {
+    co_yield Macro(std::move(reader), fragment.impl, i++);
   }
 }
 
@@ -165,8 +170,9 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
     auto vid = EntityId(token.impl->NthContainingMacroId(token.offset)).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
       MacroId mid = std::get<MacroId>(vid);
-      if (mid.fragment_id == frag->fragment_id) {
-        macro.emplace(FragmentImpl::Ptr(token.impl, frag), mid.offset);
+      auto reader = frag->NthMacro(mid.offset);
+      if (mid.fragment_id == frag->fragment_id && reader.has_value()) {
+        macro.emplace(std::move(*reader), FragmentImpl::Ptr(token.impl, frag), mid.offset);
       }
     }
   }

@@ -26,6 +26,7 @@
 namespace mx {
 class Expr;
 class NamedDecl;
+class PackedReaderState;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
@@ -43,6 +44,7 @@ class TemplateParameterList {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
+  std::shared_ptr<PackedReaderState> package;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -52,8 +54,9 @@ class TemplateParameterList {
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
 
-  inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
+  inline TemplateParameterList(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : package(std::move(package_)),
+        fragment(std::move(fragment_)),
         offset_(offset__) {}
 
   unsigned num_parameters(void) const;

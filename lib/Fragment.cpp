@@ -124,8 +124,9 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
     VariantId vid = eid.Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
       DeclarationId decl_id = std::get<DeclarationId>(vid);
-      if (decl_id.fragment_id == impl->fragment_id) {
-        decls.emplace_back(impl, decl_id.offset);
+      auto decl_reader = impl->NthDecl(decl_id.offset);
+      if (decl_id.fragment_id == impl->fragment_id && decl_reader.has_value()) {
+        decls.emplace_back(std::move(*decl_reader), impl, decl_id.offset);
       } else {
         assert(false);
       }
@@ -147,8 +148,9 @@ std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
     VariantId vid = eid.Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
       MacroId macro_id = std::get<MacroId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id) {
-        macros.emplace_back(Macro(impl, macro_id.offset));
+      auto macro_reader = impl->NthMacro(macro_id.offset);
+      if (macro_id.fragment_id == impl->fragment_id && macro_reader.has_value()) {
+        macros.emplace_back(Macro(std::move(*macro_reader), impl, macro_id.offset));
       } else {
         assert(false);
       }

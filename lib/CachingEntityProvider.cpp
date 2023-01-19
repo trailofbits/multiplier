@@ -217,6 +217,31 @@ void CachingEntityProvider::FindSymbol(
   return next->FindSymbol(self, std::move(name), ids_out);
 }
 
+gap::generator<ReaderPtr> CachingEntityProvider::DeclsFor(
+  const Ptr &self, PackedFragmentId id) { return next->DeclsFor(self, id); }
+gap::generator<ReaderPtr> CachingEntityProvider::TypesFor(
+  const Ptr &self, PackedFragmentId id) { return next->TypesFor(self, id); }
+gap::generator<ReaderPtr> CachingEntityProvider::StmtsFor(
+  const Ptr &self, PackedFragmentId id) { return next->StmtsFor(self, id); }
+gap::generator<ReaderPtr> CachingEntityProvider::AttrsFor(
+  const Ptr &self, PackedFragmentId id) { return next->AttrsFor(self, id); }
+gap::generator<ReaderPtr> CachingEntityProvider::MacrosFor(
+  const Ptr &self, PackedFragmentId id) { return next->MacrosFor(self, id); }
+gap::generator<ReaderPtr> CachingEntityProvider::PseudosFor(
+  const Ptr &self, PackedFragmentId id) { return next->PseudosFor(self, id); }
+std::optional<ReaderPtr> CachingEntityProvider::DeclFor(
+  const Ptr &self, PackedFragmentId id, unsigned offset) { return next->DeclFor(self, id, offset); }
+std::optional<ReaderPtr> CachingEntityProvider::TypeFor(
+  const Ptr &self, PackedFragmentId id, unsigned offset) { return next->TypeFor(self, id, offset); }
+std::optional<ReaderPtr> CachingEntityProvider::StmtFor(
+  const Ptr &self, PackedFragmentId id, unsigned offset) { return next->StmtFor(self, id, offset); }
+std::optional<ReaderPtr> CachingEntityProvider::AttrFor(
+  const Ptr &self, PackedFragmentId id, unsigned offset) { return next->AttrFor(self, id, offset); }
+std::optional<ReaderPtr> CachingEntityProvider::MacroFor(
+  const Ptr &self, PackedFragmentId id, unsigned offset) { return next->MacroFor(self, id, offset); }
+std::optional<ReaderPtr> CachingEntityProvider::PseudoFor(
+  const Ptr &self, PackedFragmentId id, unsigned offset) { return next->PseudoFor(self, id, offset); }
+
 // Returns an entity provider that gets entities from a UNIX domain socket.
 EntityProvider::Ptr EntityProvider::in_memory_cache(
     Ptr next, unsigned timeout_s_) {

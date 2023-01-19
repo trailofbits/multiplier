@@ -118,8 +118,9 @@ std::optional<Designator> TokenContext::as_designator(void) const {
   VariantId vid = EntityId(entity_id).Unpack();
   if (impl && std::holds_alternative<DesignatorId>(vid)) {
     DesignatorId did = std::get<DesignatorId>(vid);
-    if (did.offset < impl->num_pseudos) {
-      return Designator(impl, did.offset);
+    auto reader = impl->NthPseudo(did.offset);
+    if (reader.has_value()) {
+      return Designator(std::move(*reader), impl, did.offset);
     }
   }
   return std::nullopt;
