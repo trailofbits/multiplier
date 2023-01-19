@@ -167,7 +167,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     std::cout << "Process ID: " << getpid() << "\nPress enter: \n";
     std::cout.flush();
     char x;
-    read(0, &x, 1);
+    (void) read(0, &x, 1);
   }
 
   // Optionally take environent variables to pass down to the compile
