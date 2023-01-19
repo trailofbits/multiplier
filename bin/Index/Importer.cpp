@@ -199,14 +199,26 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     if (strstr(arg, "-Wno") == arg) {
       // Keep the argument.
 
-    } else if (strstr(arg, "-W") == arg || strstr(arg, "-pendantic") == arg) {
+    } else if (strstr(arg, "-W") == arg || strstr(arg, "-pedantic") == arg ||
+               strstr(arg, "-fsanitize") == arg) {
       continue;  // Skip the argument.
+
+    } else if (strstr(arg, "-mllvm") == arg ||
+               strstr(arg, "-Xclang") == arg) {
+      skip = true;
+      continue;  // Skip the argument and the next argument.
+
+    // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` then
+    // drop it.
+    } else if (strstr(arg, "-file=")) {
+      continue;
 
     // Output file.
     } else if (!strcmp(arg, "-o")) {
       skip = true;
       new_args.emplace_back(arg);
       new_args.emplace_back("/dev/null");
+      continue;
     }
 
     new_args.emplace_back(arg);
@@ -223,6 +235,18 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   // which prevents any compilation jobs from proceeding.
   new_args.emplace_back("-include");
   new_args.emplace_back("/trail/of/bits");
+
+//  for (auto &[k, v] : command.env) {
+//    std::cerr << k << '=' << v << " \\\n";
+//  }
+//  auto sep = "";
+//  for (auto a : new_args) {
+//    std::cerr << sep << a;
+//    sep = " ";
+//  }
+//
+//  std::cerr << "\n\n";
+//  std::cerr.flush();
 
   std::string output_sysroot;
   auto ret = Subprocess::Execute(
