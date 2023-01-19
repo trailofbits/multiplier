@@ -15,12 +15,6 @@
 
 namespace sqlite {
 
-#ifndef NDEBUG
-// Nifty to double check that only one connection is being used/created
-// per-thread.
-static thread_local sqlite3 *tDatabase = nullptr;
-#endif
-
 class ConnectionImpl {
  public:
   const std::filesystem::path db_path;
@@ -55,11 +49,6 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
       (ro_flag | SQLITE_OPEN_NOMUTEX |
        SQLITE_OPEN_PRIVATECACHE | SQLITE_OPEN_WAL),
       nullptr);
-
-#ifndef NDEBUG
-  assert(!tDatabase);
-  tDatabase = db;
-#endif
 
   if (ret != SQLITE_OK) {
     throw Error("Failed to open database", db);
@@ -149,7 +138,6 @@ size_t Statement::NumParams(void) const noexcept {
 }
 
 void Statement::ClearBoundValues(void) {
-  assert(tDatabase == sqlite3_db_handle(impl.get()));
   sqlite3_clear_bindings(impl.get());
 }
 
@@ -200,7 +188,6 @@ QueryResult Statement::Row(void) {
 }
 
 int Statement::TryExecuteStep(void) {
-  assert(tDatabase == sqlite3_db_handle(impl.get()));
   return sqlite3_step(impl.get());
 }
 
@@ -275,7 +262,6 @@ void Connection::CreateFunction(
     void (*x_step)(sqlite3_context *, int, sqlite3_value **),
     void (*x_final)(sqlite3_context *),
     void (*x_destroy)(void *)) {
-  assert(tDatabase == impl->db);
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
@@ -288,7 +274,6 @@ void Connection::CreateFunction(
 
 void Connection::DeleteFunction(
     std::string func_name, unsigned n_args, int flags) {
-  assert(tDatabase == impl->db);
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
@@ -314,8 +299,6 @@ void Connection::SetBusyTimeout(std::chrono::milliseconds ms) {
 }
 
 void Connection::Execute(const std::string &query) {
-  assert(tDatabase == impl->db);
-
   char *error_msg = nullptr;
   int ret = sqlite3_exec(impl->db, query.c_str(), nullptr, nullptr, &error_msg);
   if (SQLITE_OK != ret) {
@@ -324,8 +307,6 @@ void Connection::Execute(const std::string &query) {
 }
 
 Statement Connection::Prepare(const std::string &query) {
-  assert(tDatabase == impl->db);
-
   sqlite3_stmt *stmt = nullptr;
   char *tail = nullptr;
   auto ret = sqlite3_prepare_v3(
