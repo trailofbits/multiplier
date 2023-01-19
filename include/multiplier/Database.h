@@ -266,7 +266,7 @@ struct ReferenceRecord {
             fragment_id INT NOT NULL, \
             offset INT NOT NULL, \
             contents BLOB NOT NULL, \
-            kind TEXT GENERATED ALWAYS AS (" #name "_kind(contents)) STORED, \
+            kind INT GENERATED ALWAYS AS (" #name "_kind(contents)) STORED, \
             PRIMARY KEY(fragment_id, offset) \
           ) WITHOUT rowid"}; \
     static constexpr const char *kExitStatements[] = \
