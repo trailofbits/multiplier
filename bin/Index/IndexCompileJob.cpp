@@ -496,6 +496,10 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
     if (ta->DescribedAliasTemplate()) {
       tsk = pasta::TemplateSpecializationKind::kImplicitInstantiation;  // Fake.
     }
+  } else if (auto td = pasta::TagDecl::From(decl)) {
+    if (td->Name().empty()) {
+      return false;
+    }
   }
 
   if (tsk == pasta::TemplateSpecializationKind::kExplicitSpecialization) {

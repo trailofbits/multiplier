@@ -16,19 +16,14 @@
 
 namespace mx {
 
-class BaseUseIteratorImpl {
- public:
-  std::shared_ptr<EntityProvider> ep;
+class UseIteratorImpl final {
+ private:
+  EntityProvider::Ptr ep;
   std::vector<RawEntityId> search_ids;
   FragmentIdList fragment_ids;
   unsigned fragment_offset{0u};
   unsigned list_offset{0u};
 
-  inline BaseUseIteratorImpl(std::shared_ptr<EntityProvider> ep_)
-      : ep(std::move(ep_)) {}
-};
-
-class UseIteratorImpl : public BaseUseIteratorImpl {
  public:
 
   UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
@@ -51,22 +46,27 @@ class UseIteratorImpl : public BaseUseIteratorImpl {
   bool FindNext(UseBase &use);
 
   template<typename Selector>
-  gap::generator<Use<Selector>> enumerate(void) {
+  gap::generator<Use<Selector>> Enumerate(void) {
     Use<Selector> use;
-    while(FindNext(use)) {
+    while (FindNext(use)) {
       co_yield use;
     }
   }
 };
 
-class ReferenceIteratorImpl : public BaseUseIteratorImpl {
+class ReferenceIteratorImpl final {
+ private:
+  std::shared_ptr<EntityProvider> ep;
+  std::vector<RawEntityId> search_ids;
+  FragmentIdList fragment_ids;
+
  public:
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
   ReferenceIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
 
-  gap::generator<MacroReference> enumerate_macros(void);
-  gap::generator<StmtReference> enumerate_stmts(void);
+  gap::generator<MacroReference> EnumerateMacros(void);
+  gap::generator<StmtReference> EnumerateStatements(void);
 };
 
 }  // namespace mx

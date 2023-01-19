@@ -929,7 +929,7 @@ VariantEntity Token::related_entity(void) const {
 gap::generator<Use<TokenUseSelector>> Token::uses(void) const {
   if (auto frag = Fragment::containing(*this)) {
     UseIteratorImpl use_iter(std::move(frag->impl), *this);
-    for (auto use : use_iter.enumerate<TokenUseSelector>()) {
+    for (auto use : use_iter.Enumerate<TokenUseSelector>()) {
       co_yield use;
     }
   }
@@ -990,7 +990,7 @@ std::optional<unsigned> TokenRange::index_of(const Token &that) const noexcept {
     return std::nullopt;
   }
 
-  VariantId vid = EntityId(that.id()).Unpack();
+  VariantId vid = that.id().Unpack();
   if (std::holds_alternative<ParsedTokenId>(vid)) {
     auto id = std::get<ParsedTokenId>(vid);
     if (id.offset < index) {
@@ -1074,9 +1074,9 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
   }
 
   // Hope for an exact match with the last token in the range.
-  if (auto last_fid = impl->NthFileTokenId(num_tokens - 1u);
+  if (EntityId last_fid = impl->NthFileTokenId(num_tokens - 1u);
       last_fid != EntityId{}) {
-    VariantId vid = EntityId(last_fid).Unpack();
+    VariantId vid = last_fid.Unpack();
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);
       if (fid.file_id == file_id) {
@@ -1093,7 +1093,7 @@ TokenRange TokenRange::file_tokens(void) const noexcept {
   // offset plus one.
   auto offset_shift = 0u;
   for (auto i = 0u; i <= num_tokens; ++i) {
-    VariantId vid = EntityId(impl->NthFileTokenId(num_tokens - i)).Unpack();
+    VariantId vid = impl->NthFileTokenId(num_tokens - i).Unpack();
     if (std::holds_alternative<FileTokenId>(vid)) {
       FileTokenId fid = std::get<FileTokenId>(vid);
       if (fid.file_id == file_id) {

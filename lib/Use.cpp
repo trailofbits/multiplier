@@ -112,7 +112,7 @@ const char *EnumeratorName(UseKind kind) {
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
 
   ep->FillUses(ep, sid.Pack(), search_ids, fragment_ids);
@@ -134,28 +134,28 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity)
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Stmt &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
   PackedStatementId id = entity.id();
   search_ids.push_back(entity.id().Pack());
   fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Type &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
   PackedTypeId id = entity.id();
   search_ids.push_back(entity.id().Pack());
   fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Attr &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
   PackedAttributeId id = entity.id();
   search_ids.push_back(entity.id().Pack());
   fragment_ids.emplace_back(FragmentId(id.Unpack().fragment_id));
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
 
   PackedMacroId id = entity.id();
   RawEntityId raw_id = id.Pack();
@@ -173,7 +173,7 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity)
 }
 
 UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
 
   RawEntityId raw_id = entity.id().Pack();
   search_ids.push_back(raw_id);
@@ -183,7 +183,7 @@ UseIteratorImpl::UseIteratorImpl(EntityProvider::Ptr ep_, const File &entity)
 }
 
 UseIteratorImpl::UseIteratorImpl(FragmentImpl::Ptr frag, const Token &entity)
-    : BaseUseIteratorImpl(frag->ep) {
+    : ep(frag->ep) {
 
   EntityId eid = entity.id();
   RawEntityId raw_id = eid.Pack();
@@ -687,7 +687,7 @@ std::optional<Designator> UseBase::as_designator(void) const {
 
 ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Decl &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
   PackedDeclarationId sid = entity.id();
 
   ep->FillReferences(ep, sid.Pack(), search_ids, fragment_ids);
@@ -710,7 +710,7 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
 
 ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const Macro &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
   SpecificEntityId<MacroId> sid = entity.id();
   ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
   assert(tIgnoredRedecls.empty());
@@ -727,7 +727,7 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
 
 ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
                                              const File &entity)
-    : BaseUseIteratorImpl(std::move(ep_)) {
+    : ep(std::move(ep_)) {
 
   SpecificEntityId<FileId> sid = entity.id();
   ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
@@ -743,7 +743,7 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   //            files of the compiler itself.
 }
 
-gap::generator<MacroReference> ReferenceIteratorImpl::enumerate_macros(void) {
+gap::generator<MacroReference> ReferenceIteratorImpl::EnumerateMacros(void) {
   if (search_ids.empty() || fragment_ids.empty()) {
     co_return;
   }
@@ -821,7 +821,7 @@ gap::generator<MacroReference> ReferenceIteratorImpl::enumerate_macros(void) {
   }
 }
 
-gap::generator<StmtReference> ReferenceIteratorImpl::enumerate_stmts(void) {
+gap::generator<StmtReference> ReferenceIteratorImpl::EnumerateStatements(void) {
   if (search_ids.empty() || fragment_ids.empty()) {
     co_return;
   }

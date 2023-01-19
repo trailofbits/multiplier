@@ -79,6 +79,12 @@ target_link_libraries("${exe_name}"
     ${MX_END_FORCE_LOAD_GROUP}
 )
 
+target_compile_options("${exe_name}"
+  PRIVATE
+    "-Wno-unknown-warning-option"
+    "-Wno-pragmas"
+)
+
 if(MX_ENABLE_VAST)
   target_compile_definitions("${exe_name}"
     PRIVATE

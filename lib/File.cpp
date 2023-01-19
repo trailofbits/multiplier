@@ -304,7 +304,7 @@ std::string_view File::data(void) const noexcept {
 
 gap::generator<Use<FileUseSelector>> File::uses(void) const {
   UseIteratorImpl it(impl->ep, *this);
-  for (auto use : it.enumerate<FileUseSelector>()) {
+  for (auto use : it.Enumerate<FileUseSelector>()) {
     co_yield use;
   }
 }
@@ -312,7 +312,7 @@ gap::generator<Use<FileUseSelector>> File::uses(void) const {
 // References of this file.
 gap::generator<MacroReference> File::references(void) const {
   ReferenceIteratorImpl it(impl->ep, *this);
-  for (auto ref : it.enumerate_macros()) {
+  for (auto ref : it.EnumerateMacros()) {
     co_yield ref;
   }
 }

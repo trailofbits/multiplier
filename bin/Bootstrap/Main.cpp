@@ -3638,7 +3638,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include \"Pseudo.h\"\n"
       << "#include \"TokenTree.h\"\n"
       << "#include \"Util.h\"\n"
-      << "namespace indexer {\n\n";
+      << "namespace indexer {\n\n"
+      << "#pragma GCC diagnostic push\n"
+      << "#pragma GCC diagnostic ignored \"-Wuseless-cast\"\n\n";
 
   include_h_os
       << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
@@ -3767,7 +3769,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   }
 
   lib_cpp_os
-      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n";
+      << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
+      << "#pragma GCC diagnostic push\n"
+      << "#pragma GCC diagnostic ignored \"-Wuseless-cast\"\n";
   
   while (!work_list.empty()) {
     auto [cls, parent_methods] = work_list.back();
@@ -3923,13 +3927,16 @@ void CodeGenerator::RunOnClassHierarchies(void) {
   RunOnUseSet(macro_use_ids, "MacroUseSelector");
 
   lib_cpp_os
+      << "#pragma GCC diagnostic pop\n"
       << "#endif\n";
 
   lib_pasta_h_os << "}  // namespace mx\n";
   lib_pasta_cpp_os << "}  // namespace mx\n";
   lib_cpp_os << "}  // namespace mx\n";
   serialize_h_os << "}  // namespace indexer\n";
-  serialize_cpp_os << "}  // namespace indexer\n";
+  serialize_cpp_os
+      << "#pragma GCC diagnostic pop\n"
+      << "}  // namespace indexer\n";
 }
 
 void CodeGenerator::RunOnUseSet(

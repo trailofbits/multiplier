@@ -447,7 +447,7 @@ extern "C" int main(int argc, char *argv[]) {
         file_toks = file->tokens();
       }
       mx::FileTokenId lti = std::get<mx::FileTokenId>(
-          mx::EntityId(last_frag_file_tok.id()).Unpack());
+          last_frag_file_tok.id().Unpack());
 
       if (lti.offset + 1u < file_toks.size()) {
         mx::Token pt = file_toks[lti.offset + 1u];
