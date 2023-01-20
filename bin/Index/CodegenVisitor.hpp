@@ -95,7 +95,7 @@ struct FallBackDeclVisitor
           llvm::SmallVector< vast::Value > elements;
           auto assert_expr  = decl->getAssertExpr();
           elements.push_back(visit(assert_expr)->getResult(0));
-          return make< vast::hl::UnsupportedDeclOp >(loc, "StaticAssert", elements);
+          return make< vast::hl::UnsupportedDeclOp >(loc, decl->getDeclKindName(), elements);
       }
 
       vast::Operation* VisitLinkageSpecDecl(const clang::LinkageSpecDecl *decl) {
@@ -145,133 +145,103 @@ struct FallBackStmtVisitor
         return this->template create< Op >(std::forward< Args >(args)...);
       }
 
-      vast::Operation* VisitPredefinedExpr(const clang::PredefinedExpr *expr) {
+      // NOTE: We only visit first child of the expression to avoid issue with
+      // adding multiple blocks to mlir region. Updated/Add new Dialect that
+      // should enable us to walk through all the child and add unsupported expr
+      // node for them
+      vast::Operation* VisitChildExpr(const clang::Expr *expr, std::string node) {
         auto loc  = meta_location(expr);
-        auto [region, type] = make_value_yield_region(*(expr->child_begin()));
-        return make< vast::hl::UnsupportedExprOp >(loc, "PredefinedExpr", type, std::move(region));
+        if (expr->child_begin() != expr->child_end()) {
+          auto first_child = *(expr->child_begin());
+          auto [region, _] = make_value_yield_region(first_child);
+
+          // Assign return type as expression type
+          return make< vast::hl::UnsupportedExprOp >(loc, node, visit(expr->getType()), std::move(region));
+        }
+        return make< vast::hl::UnsupportedExprOp >(loc, node, visit(expr->getType()), nullptr);
+      }
+
+      vast::Operation* VisitPredefinedExpr(const clang::PredefinedExpr *expr) {
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitCompoundLiteralExpr(const clang::CompoundLiteralExpr *expr) {
-        auto loc = meta_location(expr);
-        auto [region, type] = make_value_yield_region(*(expr->child_begin()));
-        return make< vast::hl::UnsupportedExprOp >(loc, "CompoundLiteralExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitCXXConstructExpr(const clang::CXXConstructExpr *expr) {
-        auto loc  = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "CXXConstructExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitRecoveryExpr(const clang::RecoveryExpr *expr) {
-        auto loc  = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "RecoveryExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitBinaryOperator(const clang::BinaryOperator *stmt) {
         auto loc = meta_location(stmt);
-        auto [region, type] = make_value_yield_region(stmt->getRHS());
-        return make< vast::hl::UnsupportedExprOp >(loc,  "BinaryOperator", type, std::move(region));
+        auto [region, _] = make_value_yield_region(stmt->getRHS());
+        return make< vast::hl::UnsupportedExprOp >(loc,  stmt->getStmtClassName(), visit(stmt->getType()), std::move(region));
       }
 
       vast::Operation* VisitConditionalOperator(const clang::ConditionalOperator *stmt) {
         auto loc = meta_location(stmt);
         auto [region, type] = make_value_yield_region(stmt->getCond());
-        return make <vast::hl::UnsupportedExprOp> (loc,  "ConditionalOperator", type, std::move(region));
+        return make <vast::hl::UnsupportedExprOp> (loc, stmt->getStmtClassName(), type, std::move(region));
       }
 
       vast::Operation* VisitCXXDependentScopeMemberExpr(const clang::CXXDependentScopeMemberExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "CXXDependentScopeMemberExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitUnresolvedLookupExpr(const clang::UnresolvedLookupExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "UnresolvedLookupExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitVAArgExpr(const clang::VAArgExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "VAArgExpr", type,  std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitStmtExpr(const clang::StmtExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "StmtExpr", type,  std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitDeclRefExpr(const clang::DeclRefExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "DeclRefExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitTypeTraitExpr(const clang::TypeTraitExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "TypeTraitExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitObjCAvailabilityCheckExpr(const clang::ObjCAvailabilityCheckExpr *expr){
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "ObjCAvailabilityCheckExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitOffsetOfExpr(const clang::OffsetOfExpr *expr){
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "OffsetOfExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitGCCAsmStmt(const clang::GCCAsmStmt *expr){
         auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "GCCAsmStmt", type, std::move(region));
+        auto label = expr->getLabelExpr(0);
+        auto [region, type] = make_value_yield_region(label);
+        return make< vast::hl::UnsupportedExprOp >(loc, expr->getStmtClassName(), type, std::move(region));
       }
 
       vast::Operation* VisitImplicitValueInitExpr(const clang::ImplicitValueInitExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "ImplicitValueInitExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitAtomicExpr(const clang::AtomicExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "AtomicExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitGenericSelectionExpr(const clang::GenericSelectionExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "GenericSelectionExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitChooseExpr(const clang::ChooseExpr *expr) {
-        auto loc = meta_location(expr);
-        auto first_child = *(expr->child_begin());
-        auto [region, type] = make_value_yield_region(first_child);
-        return make< vast::hl::UnsupportedExprOp >(loc, "ChooseExpr", type, std::move(region));
+        return VisitChildExpr(expr, expr->getStmtClassName());
       }
 };
 

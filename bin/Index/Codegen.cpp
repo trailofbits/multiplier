@@ -111,9 +111,6 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
     return ret;
   }
 
-  //clang::Decl *first_decl = const_cast<clang::Decl *>(decls[0].RawDecl());
-  //clang::ASTContext &ast_context = first_decl->getASTContext();
-
   auto flags = mlir::OpPrintingFlags();
   flags.enableDebugInfo(true);
 
@@ -130,10 +127,8 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
   }
 
   auto mod = codegen.freeze();
-  // NOTE: Remove it before final PR
   llvm::raw_string_ostream os(ret);
   mod->print(os, flags);
-  std::cerr << os.str();
 #endif
 
   return ret;

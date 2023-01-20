@@ -93,28 +93,7 @@ if(MX_ENABLE_VAST)
   target_link_libraries("${exe_name}"
     PRIVATE
       ${MX_BEGIN_FORCE_LOAD_GROUP}
-      vast::vast
-      vast::MLIRMeta
-      MLIRDialect
-      MLIRMLProgramDialect
-      MLIROpenMPDialect
-      MLIRTosaDialect
-
-      MLIRBufferizationTransformOps
-      MLIRSparseTensorTransforms
-      MLIROpenACCDialect
-      MLIRLLVMIRTransforms
-      MLIRROCDLDialect
-      MLIRAsyncDialect
-      MLIRSCFTransformOps
-      MLIREmitCDialect
-      MLIRNVGPUDialect
-      MLIRShapeDialect
-      MLIRAMDGPUDialect
-      MLIRShapeOpsTransforms
-      MLIRLinalgTransformOps
-      MLIRSPIRVDialect
-      MLIRTensorInferTypeOpInterfaceImpl
+      mx-mlir
       ${MX_END_FORCE_LOAD_GROUP}
   )
 endif()
