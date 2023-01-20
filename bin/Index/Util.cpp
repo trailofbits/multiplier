@@ -876,10 +876,9 @@ mx::RawEntityId RelatedEntityId(
 
 std::string GetPackedData(capnp::MessageBuilder& builder) {
   kj::VectorOutputStream os(builder.sizeInWords());
-  capnp::writePackedMessage(os, builder);
-  kj::ArrayPtr<kj::byte> packed_data = os.getArray();
-  auto packed_size = packed_data.size();
-  return {packed_data.asChars().begin(), packed_size};
+  capnp::writeMessage(os, builder);
+  auto packed_data = os.getArray().asChars();
+  return {packed_data.begin(), packed_data.end()};
 }
 
 }  // namespace indexer

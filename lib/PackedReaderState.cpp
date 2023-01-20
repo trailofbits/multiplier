@@ -16,19 +16,6 @@
 
 namespace mx {
 
-PackedReaderState::PackedReaderState(capnp::Data::Reader data) {
-  auto begin = reinterpret_cast<const char *>(data.begin());
-  std::string_view untagged_data(begin, data.size() - 1u);
-
-  storage.insert(storage.end(), untagged_data.begin(), untagged_data.end());
-
-  capnp::ReaderOptions options;
-  options.traversalLimitInWords = ~0ull;
-  stream.emplace(kj::arrayPtr(
-      reinterpret_cast<const kj::byte *>(&(storage[0])), storage.size()));
-  packed_reader.emplace(stream.value(), options);
-}
-
 PackedReaderState::PackedReaderState(const std::string& data) : storage(data) {
   capnp::ReaderOptions options;
   options.traversalLimitInWords = ~0ull;

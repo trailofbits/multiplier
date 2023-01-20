@@ -20,10 +20,10 @@ FragmentImpl::~FragmentImpl(void) noexcept {}
 
 FragmentImpl::FragmentImpl(FragmentId id_,
                            EntityProvider::Ptr ep_,
-                           const capnp::Data::Reader &reader_)
+                           const std::string &data)
     : fragment_id(id_.fragment_id),
       ep(std::move(ep_)),
-      package(reader_),
+      package(data),
       reader(package.Reader<rpc::Fragment>()),
       parsed_token_reader(this),
       macro_token_reader(this),

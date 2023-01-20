@@ -42,12 +42,11 @@ struct PackedReaderState {
  private:
   std::string storage;
   std::optional<kj::ArrayInputStream> stream;
-  std::optional<capnp::PackedMessageReader> packed_reader;
+  std::optional<capnp::InputStreamMessageReader> packed_reader;
 
   PackedReaderState(void) = delete;
 
  public:
-  explicit PackedReaderState(capnp::Data::Reader data);
   explicit PackedReaderState(const std::string& data);
 
   template <typename T>

@@ -15,10 +15,10 @@ FileImpl::~FileImpl(void) noexcept {}
 
 FileImpl::FileImpl(
     FileId id_, EntityProvider::Ptr ep_,
-    const capnp::Data::Reader &reader_)
+    const std::string &data)
     : file_id(id_.file_id),
       ep(std::move(ep_)),
-      package(reader_),
+      package(data),
       reader(package.Reader<rpc::File>()),
       file_token_reader(this),
       num_tokens(reader.getTokenKinds().size()) {

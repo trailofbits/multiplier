@@ -310,12 +310,8 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
     return {};
   }
 
-  capnp::Data::Reader contents_reader(
-      reinterpret_cast<const capnp::byte *>(data.data()),
-      data.size());
-
   auto ret = std::make_shared<FileImpl>(
-      file_id.Unpack(), self, contents_reader);
+      file_id.Unpack(), self, data);
   auto ret_ptr = ret.get();
   return FileImpl::Ptr(std::move(ret), ret_ptr);
 }
@@ -340,12 +336,8 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
     return {};
   }
 
-  capnp::Data::Reader contents_reader(
-      reinterpret_cast<const capnp::byte *>(data.data()),
-      data.size());
-
   auto ret = std::make_shared<FragmentImpl>(
-      fragment_id.Unpack(), self, contents_reader);
+      fragment_id.Unpack(), self, data);
   auto ret_ptr = ret.get();
   return FragmentImpl::Ptr(std::move(ret), ret_ptr);
 }

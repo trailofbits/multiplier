@@ -143,7 +143,7 @@ class FragmentImpl final {
   ~FragmentImpl(void) noexcept;
 
   explicit FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                        const capnp::Data::Reader &reader_);
+                        const std::string &data);
 
   // Return the ID of the file containing the first token.
   //
