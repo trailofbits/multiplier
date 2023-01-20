@@ -69,8 +69,6 @@ static constexpr const char *kDDictId = "ZSTD_DDict";
 static constexpr const char *kCCtxId = "ZSTD_CCtx";
 static constexpr const char *kDCtxId = "ZSTD_DCtx";
 
-using dtor_t = void(void*);
-
 void ZstdCreateCDict(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
     auto blob_data = sqlite3_value_blob(argv[0]);
     auto blob_size = sqlite3_value_bytes(argv[0]);
@@ -81,7 +79,7 @@ void ZstdCreateCDict(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
         return;
     }
     sqlite3_result_pointer(ctx, dict, kCDictId,
-        reinterpret_cast<dtor_t *>(ZSTD_freeCDict));
+        [](void *dict) { ZSTD_freeCDict(static_cast<ZSTD_CDict *>(dict)); });
 }
 
 void ZstdCreateDDict(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
@@ -94,7 +92,7 @@ void ZstdCreateDDict(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
         return;
     }
     sqlite3_result_pointer(ctx, dict, kDDictId,
-        reinterpret_cast<dtor_t *>(ZSTD_freeDDict));
+        [](void *dict) { ZSTD_freeDDict(static_cast<ZSTD_DDict *>(dict)); });
 }
 
 void ZstdCompressDict(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
@@ -148,7 +146,7 @@ void ZstdCreateCCtx(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
         return;
     }
     sqlite3_result_pointer(sql_ctx, cctx, kCCtxId,
-        reinterpret_cast<dtor_t *>(ZSTD_freeCCtx));
+        [](void *ctx) { ZSTD_freeCCtx(static_cast<ZSTD_CCtx *>(ctx)); });
 }
 
 void ZstdCreateDCtx(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
@@ -158,7 +156,7 @@ void ZstdCreateDCtx(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
         return;
     }
     sqlite3_result_pointer(sql_ctx, dctx, kDCtxId,
-        reinterpret_cast<dtor_t *>(ZSTD_freeDCtx));
+        [](void *ctx) { ZSTD_freeDCtx(static_cast<ZSTD_DCtx *>(ctx)); });
 }
 
 void ZstdCompressDictCtx(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
