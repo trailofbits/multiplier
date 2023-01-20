@@ -167,8 +167,7 @@ class BuildCommandAction final : public Action {
   mx::Result<std::pair<std::string, std::string>, std::error_code>
   InitCompilerFromCommand(void);
 
-  void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc,
-                       Executor &exe);
+  void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
   static bool CanRunCompileJob(const pasta::CompileJob &job);
 
@@ -181,7 +180,7 @@ class BuildCommandAction final : public Action {
         command(command_),
         ctx(std::move(ctx_)) {}
 
-  void Run(Executor exe, WorkerId) final;
+  void Run(Executor, WorkerId) final;
 };
 
 // If we are using something like CMake commands, then pull in the relevant
@@ -302,7 +301,8 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
   const auto &args = job.Arguments();
   for (auto it = args.begin(); it != args.end(); ++it) {
-    if (strcmp(*it, "-x")) {
+    const char *arg = *it;
+    if (strcmp(arg, "-x")) {
       continue;
     }
     
@@ -314,9 +314,10 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
     
     // Next argument after opt_x flag will be lang value; Compare
     // it with the supported language i.e. C.
-    if (strcmp(*it, "c")) {
+    arg = *it;
+    if (strcmp(arg, "c")) {
       LOG(ERROR) << "Skipping compile job due to unsupported language "
-                 << (*it) << ": " << args.Join();
+                 << arg << ": " << args.Join();
       return false;
     }
     
@@ -331,8 +332,7 @@ bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
 }
 
 void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
-                                         pasta::Compiler cc,
-                                         Executor &exe) {
+                                         pasta::Compiler cc) {
   auto maybe_jobs = cc.CreateJobsForCommand(cmd);
   if (!maybe_jobs.Succeeded()) {
     LOG(ERROR)
@@ -343,17 +343,30 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
   // The build command action adds these jobs to the indexing executor, which
   // is different than `exe`, because `exe` operates (and waits), for things
   // to finish with the current working directory changed.
+  unsigned num_jobs = 0u;
   for (pasta::CompileJob job : maybe_jobs.TakeValue()) {
+    ++num_jobs;
+
     if (!CanRunCompileJob(job)) {
+      DLOG(WARNING)
+          << "Skipping job: " << job.Arguments().Join();
       continue;
     }
+
+    DLOG(INFO)
+        << "Creating indexing action for main source file "
+        << job.SourceFile().Path().generic_string();
+
     ctx->executor.EmplaceAction<IndexCompileJobAction>(ctx, fm, job);
   }
-  (void)exe;
+
+  LOG_IF(ERROR, !num_jobs)
+      << "Didn't create any compiler jobs for command "
+      << cmd.Arguments().Join();
 }
 
 // Build the compilers for the commands, then build the commands.
-void BuildCommandAction::Run(Executor exe, WorkerId) {
+void BuildCommandAction::Run(Executor, WorkerId) {
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
@@ -380,20 +393,24 @@ void BuildCommandAction::Run(Executor exe, WorkerId) {
                               command.name, command.lang, cc_version_sysroot,
                               cc_version_no_sysroot);
 
-  if (!maybe_cc.Succeeded()) {
-    auto error = maybe_cc.TakeError();
-    maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
-    if (maybe_cc.Succeeded()) {
-      RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue(),
-                      exe);
-    } else {
-      LOG(ERROR)
-          << "Unable to create compiler: " << error;
-    }
-  } else {
-    RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue(),
-                    exe);
+  if (maybe_cc.Succeeded()) {
+    RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue());
+    return;
   }
+
+  LOG(ERROR)
+      << "Unable to create command-specific compiler: " << maybe_cc.TakeError()
+      << "; falling back to host compiler for command " << command.vec.Join();
+
+  maybe_cc = pasta::Compiler::CreateHostCompiler(fm, command.lang);
+  if (maybe_cc.Succeeded()) {
+    RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue());
+    return;
+  }
+
+  LOG(ERROR)
+      << "Unable to create host compiler " << maybe_cc.TakeError()
+      << " for command " << command.vec.Join();
 }
 
 }  // namespace
@@ -575,8 +592,9 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(Executor &exe) {
-  Executor per_path_exe;
+void Importer::Import(const ExecutorOptions &options) {
+  Executor per_path_exe(options);
+
   for (auto &[cwd, commands] : d->commands) {
 
     // Make sure that even concurrent calls to `Import` never concurrently
@@ -600,9 +618,7 @@ void Importer::Import(Executor &exe) {
 
     per_path_exe.Start();
     per_path_exe.Wait();
-
   }
-  (void)exe;
 }
 
 }  // namespace indexer

@@ -366,7 +366,14 @@ void DatabaseWriterImpl::BulkInserter(void) {
 
 namespace {
 
-sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
+// XREF(pag): Issue #251: we see issues when we try to prepare statements in
+//            other threads. The initial mitigation was to always put the
+//            database for indexing in `/tmp`, which is memory-backed.
+//
+// NOTE(frabert): Solution idea was to close the connection that created the
+//                database first. We achieve that via the destruction of
+//                `db` here, and returning the path to re-open to the caller.
+std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
   sqlite::Connection db(db_path_);
   for (const char *stmt : DatabaseWriter::kInitStatements) {
     db.Execute(std::string(stmt));
@@ -390,7 +397,9 @@ sqlite::Connection CreateDatabase(const std::filesystem::path &db_path_) {
         ") WITHOUT rowid");
   }
 
-  return db;
+  db.Execute("PRAGMA wal_checkpoint(FULL)");
+
+  return db_path_;
 }
 
 }  // namespace

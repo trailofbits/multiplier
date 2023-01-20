@@ -1,0 +1,127 @@
+[
+{
+"file": "APIAvailable.c",
+"command": "clang APIAvailable.c",
+"directory": ""
+},
+{
+"file": "EmptyFunctionMacroWithParams.c",
+"command": "clang EmptyFunctionMacroWithParams.c",
+"directory": ""
+},
+{
+"file": "C99VarArgsTokenPaste.c",
+"command": "clang C99VarArgsTokenPaste.c",
+"directory": ""
+},
+{
+"file": "ConditionalPragmaMark.c",
+"command": "clang ConditionalPragmaMark.c",
+"directory": ""
+},
+{
+"file": "ConditionalWarningMessage.c",
+"command": "clang ConditionalWarningMessage.c",
+"directory": ""
+},
+{
+"file": "DeferredPragmaCancellation.c",
+"command": "clang DeferredPragmaCancellation.c",
+"directory": ""
+},
+{
+"file": "DeferredSequence.c",
+"command": "clang DeferredSequence.c",
+"directory": ""
+},
+{
+"file": "DeferredTower.c",
+"command": "clang DeferredTower.c",
+"directory": ""
+},
+{
+"file": "DeferredExpansionFromConcatenation.c",
+"command": "clang DeferredExpansionFromConcatenation.c",
+"directory": ""
+},
+{
+"file": "Defined.c",
+"command": "clang Defined.c",
+"directory": ""
+},
+{
+"file": "EmptyDirective.c",
+"command": "clang EmptyDirective.c",
+"directory": ""
+},
+{
+"file": "EmptyMacro.c",
+"command": "clang EmptyMacro.c",
+"directory": ""
+},
+{
+"file": "EmptyFunctionMacro.c",
+"command": "clang EmptyFunctionMacro.c",
+"directory": ""
+},
+{
+"file": "GNUVarArgsTokenPaste.c",
+"command": "clang GNUVarArgsTokenPaste.c",
+"directory": ""
+},
+{
+"file": "HasFeature.c",
+"command": "clang HasFeature.c",
+"directory": ""
+},
+{
+"file": "MacroCallAcrossLines.c",
+"command": "clang MacroCallAcrossLines.c",
+"directory": ""
+},
+{
+"file": "MultiLineString.c",
+"command": "clang MultiLineString.c",
+"directory": ""
+},
+{
+"file": "NestedConditions.c",
+"command": "clang NestedConditions.c",
+"directory": ""
+},
+{
+"file": "NestedMacroConditions.c",
+"command": "clang NestedMacroConditions.c",
+"directory": ""
+},
+{
+"file": "ParameterSubstitutions.c",
+"command": "clang ParameterSubstitutions.c",
+"directory": ""
+},
+{
+"file": "PragmaCancellation.c",
+"command": "clang PragmaCancellation.c",
+"directory": ""
+},
+{
+"file": "TrailingConditionalVariadicMacro.c",
+"command": "clang TrailingConditionalVariadicMacro.c",
+"directory": ""
+},
+{
+"file": "TrailingMacroExpansionFromPaste.c",
+"command": "clang TrailingMacroExpansionFromPaste.c",
+"directory": ""
+},
+{
+"file": "VariadicCommaConcatenateIdiom.c",
+"command": "clang VariadicCommaConcatenateIdiom.c",
+"directory": ""
+},
+{
+"file": "VariadicPreExpansionOfComma.c",
+"command": "clang VariadicPreExpansionOfComma.c",
+"directory": ""
+}
+]

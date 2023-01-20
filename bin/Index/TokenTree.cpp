@@ -149,6 +149,8 @@ class Substitution {
 
 class TokenTreeImpl {
  public:
+  bool has_error{false};
+
   std::map<std::pair<const void *, size_t>, TokenInfo *> nth_file_token;
   std::unordered_map<const TokenInfo *, TokenInfo *> before_tokens;
   std::unordered_map<const TokenInfo *, TokenInfo *> after_tokens;
@@ -751,7 +753,7 @@ void Substitution::PrintDOT(std::ostream &os, bool first) const {
     for (const Substitution::Node &ent : nodes) {
       if (std::holds_alternative<Substitution *>(ent)) {
         Substitution *s = std::get<Substitution *>(ent);
-        assert(s->parent == self);
+        assert(s->parent == self || s->before.has_error || s->after.has_error);
         s->PrintDOT(os, false);
         auto other = reinterpret_cast<const void *>(s);
         os << prefix << self << ":s" << other << " -> s" << other << ";\n";
@@ -1598,8 +1600,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   // conditional directives.
   if (curr->macro_tok->RawMacro() != node.RawMacro()) {
     nodes.has_error = true;
-    Die(this);
-    return sub;
+    has_error = true;
   }
 
   // Skip to the next token for the caller.
@@ -2399,6 +2400,11 @@ TokenTree::Create(const pasta::TokenRange &range, uint64_t begin_index,
 
     Substitution *sub = impl->BuildSubstitutions(err);
     if (!sub) {
+      return std::nullopt;
+    }
+
+    if (impl->has_error) {
+      Die(impl.get());
       return std::nullopt;
     }
 
