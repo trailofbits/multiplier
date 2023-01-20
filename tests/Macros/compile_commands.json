@@ -40,8 +40,8 @@
 "directory": ""
 },
 {
-"file": "DefferedExpansionFromConcatenation.c",
-"command": "clang DefferedExpansionFromConcatenation.c",
+"file": "DeferredExpansionFromConcatenation.c",
+"command": "clang DeferredExpansionFromConcatenation.c",
 "directory": ""
 },
 {
@@ -102,6 +102,16 @@
 {
 "file": "PragmaCancellation.c",
 "command": "clang PragmaCancellation.c",
+"directory": ""
+},
+{
+"file": "TrailingConditionalVariadicMacro.c",
+"command": "clang TrailingConditionalVariadicMacro.c",
+"directory": ""
+},
+{
+"file": "TrailingMacroExpansionFromPaste.c",
+"command": "clang TrailingMacroExpansionFromPaste.c",
 "directory": ""
 },
 {

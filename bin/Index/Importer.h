@@ -21,7 +21,7 @@ namespace indexer {
 
 class GlobalIndexingState;
 class EnvVariableMap : public std::unordered_map<std::string, std::string> {};
-class Executor;
+struct ExecutorOptions;
 
 class Importer {
  private:
@@ -42,7 +42,7 @@ class Importer {
   bool ImportCMakeCompileCommand(llvm::json::Object &o,
                                  const EnvVariableMap &envp);
 
-  void Import(Executor &executor);
+  void Import(const ExecutorOptions &options);
 };
 
 }  // namespace indexer

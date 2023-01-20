@@ -134,7 +134,8 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     return EXIT_FAILURE;
   }
 
-  indexer::Executor executor{{FLAGS_num_workers}};
+  indexer::ExecutorOptions executor_options = {FLAGS_num_workers};
+  indexer::Executor executor(executor_options);
   mx::DatabaseWriter database(FLAGS_db);
   auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);
   auto fs = pasta::FileSystem::CreateNative();
@@ -211,7 +212,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   // commands, albeit slightly modified, so that we can get the compiler to
   // tell us about include search paths, etc. The result of this is that
   // indexing actions are enqueued into the `executor`.
-  importer.Import(executor);
+  importer.Import(executor_options);
 
   // Start the executor, so that we can start processing the indexing actions.
   // Wait for all actions to complete.

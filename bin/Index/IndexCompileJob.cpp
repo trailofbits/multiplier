@@ -982,6 +982,10 @@ static std::vector<PendingFragment> CreatePendingFragments(
   std::vector<PendingFragment> pending_fragments;
   pending_fragments.reserve(decl_group_ranges.size());
 
+  DLOG(INFO)
+      << "Main source file " << ast.MainFile().Path().generic_string()
+      << " has " << decl_group_ranges.size() << " possible fragments";
+
   pasta::TokenRange tok_range = ast.Tokens();
 
   // Visit decl range groups in reverse order, so that we're more likely to
@@ -1007,6 +1011,10 @@ static void PersistParsedFragments(
 
   pasta::TokenRange tok_range = ast.Tokens();
   NameMangler mangler(ast);
+
+  DLOG(INFO)
+      << "Main source file " << ast.MainFile().Path().generic_string()
+      << " has " << pending_fragments.size() << " unique fragments";
 
   for (PendingFragment &pf : pending_fragments) {
     ProgressBarWork fragment_progress_tracker(context.serialization_progress);
@@ -1098,6 +1106,11 @@ void IndexCompileJobAction::Run(Executor, WorkerId) {
 
   EntityIdMap entity_ids;
   pasta::AST ast = std::move(maybe_ast.value());
+
+  DLOG(INFO)
+      << "Built AST for main source file "
+      << ast.MainFile().Path().generic_string();
+
   PersistParsedFiles(*context, ast, entity_ids);
   PersistParsedFragments(
       *context, ast, entity_ids,
