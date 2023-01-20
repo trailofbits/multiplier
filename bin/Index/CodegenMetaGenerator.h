@@ -27,7 +27,7 @@ namespace indexer {
 class MetaGenerator {
  public:
   MetaGenerator(const pasta::AST &ast, mlir::MLIRContext *mctx,  const EntityMapper &em)
-  : ast(ast), mctx(mctx), em(em) {}
+  : ast(ast), em(em), mctx(mctx) {}
 
   vast::hl::DefaultMeta get(const clang::Decl *decl) const {
     return {Location(decl)};
