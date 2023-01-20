@@ -266,7 +266,7 @@ struct ReferenceRecord {
             fragment_id INT NOT NULL, \
             offset INT NOT NULL, \
             contents BLOB NOT NULL, \
-            kind INT GENERATED ALWAYS AS (" #name "_kind(zstd_decompress(contents))) STORED, \
+            kind INT GENERATED ALWAYS AS (" #name "_kind(zstd_decompress(contents))) VIRTUAL, \
             PRIMARY KEY(fragment_id, offset) \
           ) WITHOUT rowid"}; \
     static constexpr const char *kExitStatements[] = \
