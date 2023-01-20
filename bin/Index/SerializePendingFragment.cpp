@@ -14,6 +14,7 @@
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
+#include "PASTA.h"
 
 #include <deque>
 
@@ -159,36 +160,53 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
   for (const pasta::Decl &entity : pf.decls_to_serialize) {
     auto &storage = decls.emplace_back();
     DispatchSerializeDecl(em, storage.builder, entity);
+    mx::DeclarationId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
+    id.is_definition = IsDefinition(entity);
     database.AddAsync(
         mx::DeclEntityRecord{
-          pf.fragment_id, i++, GetPackedData(storage.message)});
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
   for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
     auto &storage = stmts.emplace_back();
     DispatchSerializeStmt(em, storage.builder, entity);
+    mx::StatementId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
         mx::StmtEntityRecord{
-          pf.fragment_id, i++, GetPackedData(storage.message)});
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
   for (const pasta::Type &entity : pf.types_to_serialize) {
     auto &storage = types.emplace_back();
     DispatchSerializeType(em, storage.builder, entity);
+    mx::TypeId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
         mx::TypeEntityRecord{
-          pf.fragment_id, i++, GetPackedData(storage.message)});
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
     auto &storage = attrs.emplace_back();
     DispatchSerializeAttr(em, storage.builder, entity);
+    mx::AttributeId id;
+    id.fragment_id = pf.fragment_id.Unpack().fragment_id;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
         mx::AttrEntityRecord{
-          pf.fragment_id, i++, GetPackedData(storage.message)});
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
@@ -211,9 +229,12 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     } else {
       assert(false);
     }
+    mx::DesignatorId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
     database.AddAsync(
         mx::PseudoEntityRecord{
-          pf.fragment_id, i++, GetPackedData(storage.message)});
+          id, GetPackedData(storage.message)});
   }
 }
 

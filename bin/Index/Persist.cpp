@@ -513,9 +513,13 @@ static void PersistParsedTokens(
   for (i = 0u; i < num_macros; ++i) {
     auto &storage = macros.emplace_back();
     DispatchSerializeMacro(em, storage.builder, macros_to_serialize[i], nullptr);
+    mx::MacroId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i;
+    id.kind = mx::FromPasta(macros_to_serialize[i].Kind());
     database.AddAsync(
         mx::MacroEntityRecord{
-          pf.fragment_id, i, GetPackedData(storage.message)});
+          id, GetPackedData(storage.message)});
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
@@ -681,7 +685,7 @@ static void PersistTokenTree(
       DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
       database.AddAsync(
           mx::MacroEntityRecord{
-              mx::FragmentId(id.fragment_id), id.offset, GetPackedData(storage.message)});
+              id, GetPackedData(storage.message)});
     }
   }
 

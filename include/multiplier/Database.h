@@ -263,18 +263,19 @@ struct ReferenceRecord {
     static constexpr const char *kTableName = #name; \
     static constexpr const char *kInitStatements[] = \
       {"CREATE TABLE IF NOT EXISTS " #name "( \
-            fragment_id INT NOT NULL, \
-            offset INT NOT NULL, \
+            id INT PRIMARY KEY, \
             contents BLOB NOT NULL, \
-            kind INT GENERATED ALWAYS AS (" #name "_kind(zstd_decompress(contents))) VIRTUAL, \
-            PRIMARY KEY(fragment_id, offset) \
-          ) WITHOUT rowid"}; \
+            fragment_id INT GENERATED ALWAYS AS (" #name "_fragment(id)) VIRTUAL, \
+            offset INT GENERATED ALWAYS AS (" #name "_offset(id)) VIRTUAL, \
+            kind INT GENERATED ALWAYS AS (" #name "_kind(id)) VIRTUAL \
+          )"}; \
     static constexpr const char *kExitStatements[] = \
-      {"CREATE INDEX IF NOT EXISTS " #name "_kind_index ON " #name "(kind)"}; \
+      {"CREATE INDEX IF NOT EXISTS " #name "_kind_index ON " #name "(kind)", \
+       "CREATE INDEX IF NOT EXISTS " #name "_fragment_index ON " #name "(fragment_id)", \
+       "CREATE INDEX IF NOT EXISTS " #name "_offset_index ON " #name "(fragment_id, offset ASC)"}; \
     static constexpr const char *kInsertStatement = \
-      "INSERT INTO " #name " (fragment_id, offset, contents) VALUES (?1, ?2, zstd_compress(?3))"; \
-    mx::SpecificEntityId<FragmentId> fragment_id; \
-    unsigned offset; \
+      "INSERT INTO " #name " (id, contents) VALUES (?1, zstd_compress(?2))"; \
+    mx::EntityId id; \
     std::string content; \
   };
 
