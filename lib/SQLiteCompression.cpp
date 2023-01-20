@@ -9,6 +9,7 @@
 #include <sqlite3.h>
 #include <zstd.h>
 #include <vector>
+#include <memory>
 
 namespace std {
     template<>
