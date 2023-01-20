@@ -265,6 +265,7 @@ if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "mx-api"
+      "mx-mlir"
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION

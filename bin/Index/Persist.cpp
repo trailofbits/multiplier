@@ -960,8 +960,8 @@ void GlobalIndexingState::PersistFragment(
 
   // Generate source IR before saving the fragments to the persistent
   // storage.
-  fb.setMlir(codegen.GenerateSourceIRFromTLDs(ast,
-      fragment_id.Pack(), em, pf.top_level_decls,
+  fb.setMlir(codegen.GenerateSourceIRFromTLDs(
+      ast, fragment_id.Pack(), em, pf.top_level_decls,
       pf.num_top_level_declarations));
 
   auto tlds = fb.initTopLevelDeclarations(pf.num_top_level_declarations);
