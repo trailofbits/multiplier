@@ -2496,6 +2496,31 @@ bool TokenTreeNodeIterator::operator!=(TokenTreeNodeIteratorEnd) const {
   return node.offset < node.impl->size();
 }
 
+// Dump.
+void TokenTreeNodeRange::Dump(std::ostream &os) const {
+  Substitution *root = nullptr;
+  for (const SubstitutionNode &node : *(begin_.node.impl)) {
+    if (!std::holds_alternative<Substitution *>(node)) {
+      continue;
+    }
+
+    auto sub = std::get<Substitution *>(node);
+    while (sub->parent) {
+      root = sub->parent;
+      sub = root;
+    }
+
+    if (!root) {
+      continue;
+    }
+
+    std::unique_lock<std::mutex> locker(gPrintDOTLock);
+    root->PrintDOT(os);
+    os.flush();
+    return;
+  }
+}
+
 unsigned TokenTreeNodeRange::Size(void) const noexcept {
   return static_cast<unsigned>(begin_.node.impl->size());
 }

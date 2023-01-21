@@ -95,6 +95,9 @@ class TokenTreeNodeRange {
 
  public:
 
+  // Dump.
+  void Dump(std::ostream &os) const;
+
   inline TokenTreeNodeIterator begin(void) const & noexcept {
     return begin_;
   }

@@ -11,6 +11,7 @@
 #include <capnp/message.h>
 #include <fstream>
 #include <glog/logging.h>
+#include <iostream>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
@@ -570,6 +571,9 @@ static void PersistTokenTree(
 
     } else {
       auto ast = pasta::AST::From(parsed_tokens.front());
+
+      nodes.Dump(std::cerr);
+
       LOG(FATAL)
           << "Missing parsed/file token for token node in source file "
           << ast.MainFile().Path().generic_string() << " with parsed tokens "
@@ -617,7 +621,8 @@ static void PersistTokenTree(
       auto ast = pasta::AST::From(parsed_tokens.front());
       LOG(FATAL)
           << "TokenTree nodes didn't cover parsed token '" << parsed_tok.Data()
-          << "' at index " << i << " in parsed token list from source file "
+          << "' at index " << i << " (PTI " << parsed_tok.Index()
+          << ") in parsed token list from source file "
           << ast.MainFile().Path().generic_string() << " with parsed tokens "
           << DiagnoseParsedTokens(parsed_tokens);
     }
