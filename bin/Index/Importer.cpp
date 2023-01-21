@@ -119,8 +119,8 @@ struct PathCache {
   }
 };
 
-static void FixEnvVariables(Command &command, const std::string &cwd,
-                            PathCache &cache) {
+static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
+                                   PathCache &cache) {
   EnvVariableMap &envp = command.env;
   std::vector<std::string> to_remove;
   std::string path;
@@ -139,6 +139,16 @@ static void FixEnvVariables(Command &command, const std::string &cwd,
   std::string exe_name_var("_");
   if (auto exe = cache.PathOf(command.vec[0], path, cwd)) {
     envp[exe_name_var] = *exe;
+
+    // Overwrite the first argument in the vector with the fully realized
+    // path of the compiler.
+    std::vector<std::string> new_vec;
+    for (const char *arg : command.vec.Arguments()) {
+      new_vec.emplace_back(arg);
+    }
+    new_vec[0] = *exe;
+    command.vec.Reset(new_vec);
+
   } else {
     envp.erase(exe_name_var);
   }
@@ -180,7 +190,7 @@ class BuildCommandAction final : public Action {
         command(command_),
         ctx(std::move(ctx_)) {}
 
-  void Run(Executor, WorkerId) final;
+  void Run(unsigned) final;
 };
 
 // If we are using something like CMake commands, then pull in the relevant
@@ -366,7 +376,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 }
 
 // Build the compilers for the commands, then build the commands.
-void BuildCommandAction::Run(Executor, WorkerId) {
+void BuildCommandAction::Run(unsigned) {
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(
@@ -514,12 +524,14 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
     std::string args_str = commands_str->str();
     Command &command = commands.emplace_back(args_str);
     if (command.vec.Size()) {
-      DLOG(INFO) << "Parsed command: " << command.vec.Join();
-
       command.compiler_hash = std::move(args_str);
       command.working_dir = cwd_str;
       command.env = envp;
-      FixEnvVariables(command, cwd_str, cache);
+      FixEnvVariablesAndPath(command, cwd_str, cache);
+
+      // Log after so that we can show the absolute path to the compiler if
+      // it was updated by `FixEnvVariablesAndPath`.
+      DLOG(INFO) << "Parsed command: " << command.vec.Join();
 
       // Guess at the language.
       if (commands_str->contains_insensitive("++") ||
@@ -572,7 +584,7 @@ bool Importer::ImportCMakeCompileCommand(llvm::json::Object &o,
       command.compiler_hash = ss.str();
       command.working_dir = cwd_str;
       command.env = envp;
-      FixEnvVariables(command, cwd_str, cache);
+      FixEnvVariablesAndPath(command, cwd_str, cache);
       command.lang = lang;
       return true;
 

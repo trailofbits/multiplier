@@ -10,4 +10,9 @@ namespace indexer {
 
 Action::~Action(void) {}
 
+// Return the priority of this action.
+unsigned Action::Priority(void) const {
+  return 0u;
+}
+
 }  // namespace indexer

@@ -134,7 +134,13 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     return EXIT_FAILURE;
   }
 
-  indexer::ExecutorOptions executor_options = {FLAGS_num_workers};
+  indexer::ExecutorOptions executor_options;
+
+  // Number of workers to run. This should be the total number of threads,
+  // less one, so that the database writer thread can do its job without
+  // blocking.
+  executor_options.num_workers = FLAGS_num_workers;
+
   indexer::Executor executor(executor_options);
   mx::DatabaseWriter database(FLAGS_db);
   auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);

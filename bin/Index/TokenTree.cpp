@@ -894,6 +894,12 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
     info.macro_tok = tok.MacroLocation();
     info.parsed_tok = tok;
 
+    if (info.file_tok) {
+      nth_file_token.emplace(
+          std::make_pair(info.file_tok->RawFile(), info.file_tok->Index()),
+          &info);
+    }
+
     switch (tok.Role()) {
       default:
       case pasta::TokenRole::kInvalid:
@@ -972,12 +978,6 @@ TokenInfo *TokenTreeImpl::BuildInitialTokenList(pasta::TokenRange range,
         info.category = TokenInfo::kMarkerToken;
         break;
       }
-    }
-
-    if (info.file_tok) {
-      nth_file_token.emplace(
-          std::make_pair(info.file_tok->RawFile(), info.file_tok->Index()),
-          &info);
     }
   }
 

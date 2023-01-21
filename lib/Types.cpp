@@ -88,7 +88,7 @@ union PackedEntityId {
 
     uint64_t offset:kBigFragmentIdNumBits;
 
-    // 36 bits for fragment id, i.e. 68 billion ids.
+    // 35 bits for fragment id, i.e. 34 billion IDs.
     uint64_t code_id:(62u - (kSubKindNumBits + kBigFragmentIdNumBits));
     uint64_t is_big:1u;
     uint64_t is_fragment_entity:1u;

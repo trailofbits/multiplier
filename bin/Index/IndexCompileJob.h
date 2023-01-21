@@ -23,7 +23,6 @@ class TokenRange;
 }  // namespace pasta
 namespace indexer {
 
-
 class IndexCompileJobAction final : public Action {
  private:
   const std::shared_ptr<GlobalIndexingState> context;
@@ -38,7 +37,7 @@ class IndexCompileJobAction final : public Action {
                         pasta::CompileJob job_);
 
   // Build and index the AST.
-  void Run(Executor exe, WorkerId worker_id) final;
+  void Run(unsigned) final;
 };
 
 }  // namespace indexer
