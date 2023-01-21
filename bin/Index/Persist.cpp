@@ -617,6 +617,11 @@ static void PersistTokenTree(
       mti2po.set(mi, i);
     } else {
       auto ast = pasta::AST::From(parsed_tokens.front());
+      if (!pf.decls_to_serialize.empty()) {
+        LOG(ERROR)
+            << "Token trees didn't cover token in decl: "
+            << DeclToString(pf.decls_to_serialize[0]);
+      }
       nodes.Dump(std::cerr);
       LOG(FATAL)
           << "TokenTree nodes didn't cover parsed token '" << parsed_tok.Data()

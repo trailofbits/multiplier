@@ -104,24 +104,14 @@ bool IsParsedToken(const pasta::Token &tok) {
 // Print a declaration; useful for error reporting.
 std::string DeclToString(const pasta::Decl &decl) {
   std::stringstream ss;
-  auto sep = "";
-  for (auto ptok : pasta::PrintedTokenRange::Create(decl)) {
-    ss << sep << ptok.Data();
-    sep = " ";
-  }
-  return ss.str();
-}
-
-std::string DeclToString(const pasta::AST &ast, const pasta::Decl &decl) {
-  std::stringstream ss;
-  clang::ASTContext &context = ast.UnderlyingAST();
-  clang::PrintingPolicy Policy = context.getPrintingPolicy();
-  Policy.TerseOutput = true;
-  auto sep = "";
-  for (auto ptok : pasta::PrintedTokenRange::Create(
-      context, Policy, const_cast<clang::Decl*>(decl.RawDecl()))) {
-    ss << sep << ptok.Data();
-    sep = " ";
+  for (pasta::PrintedToken ptok : pasta::PrintedTokenRange::Create(decl)) {
+    for (auto i = 0u, max_i = ptok.NumLeadingNewLines(); i < max_i; ++i) {
+      ss << '\n';
+    }
+    for (auto i = 0u, max_i = ptok.NumleadingSpaces(); i < max_i; ++i) {
+      ss << ' ';
+    }
+    ss << ptok.Data();
   }
   return ss.str();
 }
