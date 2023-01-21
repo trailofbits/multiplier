@@ -618,9 +618,9 @@ static void PersistTokenTree(
     } else {
       auto ast = pasta::AST::From(parsed_tokens.front());
       if (!pf.decls_to_serialize.empty()) {
-        LOG(ERROR)
-            << "Token trees didn't cover token in decl: "
-            << DeclToString(pf.decls_to_serialize[0]);
+        auto err = PrefixedLocation(pf.decls_to_serialize[0],
+                                    "Token tree didn't cover code near ");
+        LOG_IF(ERROR, !err.empty()) << err;
       }
       nodes.Dump(std::cerr);
       LOG(FATAL)
