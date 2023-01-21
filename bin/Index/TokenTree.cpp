@@ -2504,20 +2504,21 @@ void TokenTreeNodeRange::Dump(std::ostream &os) const {
       continue;
     }
 
-    auto sub = std::get<Substitution *>(node);
-    while (sub->parent) {
-      root = sub->parent;
-      sub = root;
+    Substitution *sub = std::get<Substitution *>(node);
+    while (sub) {
+      root = sub;
+      sub = sub->parent;
     }
 
-    if (!root) {
-      continue;
+    if (root) {
+      break;
     }
+  }
 
+  if (root) {
     std::unique_lock<std::mutex> locker(gPrintDOTLock);
     root->PrintDOT(os);
     os.flush();
-    return;
   }
 }
 
