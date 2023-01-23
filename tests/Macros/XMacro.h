@@ -1,0 +1,2 @@
+XMACRO(A)
+XMACRO(B)

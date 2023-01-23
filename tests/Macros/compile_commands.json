@@ -123,5 +123,10 @@
 "file": "VariadicPreExpansionOfComma.c",
 "command": "clang VariadicPreExpansionOfComma.c",
 "directory": ""
+},
+{
+"file": "XMacro.c",
+"command": "clang XMacro.c",
+"directory": ""
 }
 ]
