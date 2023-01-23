@@ -248,7 +248,7 @@ class Connection {
                       void (*x_func)(sqlite3_context *, int, sqlite3_value **),
                       void (*x_step)(sqlite3_context *, int, sqlite3_value **),
                       void (*x_final)(sqlite3_context *),
-                      void (*x_destroy)(void *));
+                      void (*x_destroy)(void *), void* pApp = nullptr);
 
   // Delete custom function from the sqlite database
   void DeleteFunction(std::string func_name, unsigned n_args, int flags);

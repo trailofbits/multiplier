@@ -14,12 +14,6 @@ void ZstdDecompress(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 void ZstdCreateCDict(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 void ZstdCreateDDict(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 
-void ZstdCreateCCtx(sqlite3_context *ctx, int argc, sqlite3_value **argv);
-void ZstdCreateDCtx(sqlite3_context *ctx, int argc, sqlite3_value **argv);
-
 void ZstdCompressDict(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 void ZstdDecompressDict(sqlite3_context *ctx, int argc, sqlite3_value **argv);
-
-void ZstdCompressDictCtx(sqlite3_context *ctx, int argc, sqlite3_value **argv);
-void ZstdDecompressDictCtx(sqlite3_context *ctx, int argc, sqlite3_value **argv);
 }

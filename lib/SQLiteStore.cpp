@@ -12,9 +12,26 @@
 #include <shared_mutex>
 #include <sqlite3.h>
 #include <vector>
+#include <zstd.h>
 
 #include "API.h"
 #include "SQLiteCompression.h"
+
+namespace std {
+  template<>
+  struct default_delete<ZSTD_CCtx> {
+    void operator()(ZSTD_CCtx* cctx) {
+      ZSTD_freeCCtx(cctx);
+    }
+  };
+
+  template<>
+  struct default_delete<ZSTD_DCtx> {
+    void operator()(ZSTD_DCtx* cctx) {
+      ZSTD_freeDCtx(cctx);
+    }
+  };
+}
 
 namespace sqlite {
 
@@ -41,6 +58,9 @@ class ConnectionImpl {
   std::shared_mutex busy_handler_lock;
   std::function<int(unsigned)> busy_handler;
 
+  std::unique_ptr<ZSTD_CCtx> compression_ctx;
+  std::unique_ptr<ZSTD_DCtx> decompression_ctx;
+
   ConnectionImpl(const std::filesystem::path &db_path_,
                  bool read_only);
 
@@ -54,7 +74,9 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
       busy_handler([] (unsigned) -> int {
         std::this_thread::yield();
         return 1;
-      }) {
+      }),
+      compression_ctx(ZSTD_createCCtx()),
+      decompression_ctx(ZSTD_createDCtx()) {
 
   int ro_flag = read_only
       ? SQLITE_OPEN_READONLY
@@ -362,34 +384,22 @@ Connection::Connection(const std::filesystem::path &db_path,
         EntityOffset<mx::DesignatorId>, nullptr, nullptr, nullptr);
 
       CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC,
-        ZstdCompress, nullptr, nullptr, nullptr);
+        ZstdCompress, nullptr, nullptr, nullptr, impl->compression_ctx.get());
 
       CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC,
-        ZstdCompressDict, nullptr, nullptr, nullptr);
-
-      CreateFunction("zstd_compress", 3, SQLITE_DETERMINISTIC,
-        ZstdCompressDictCtx, nullptr, nullptr, nullptr);
+        ZstdCompressDict, nullptr, nullptr, nullptr, impl->compression_ctx.get());
 
       CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC,
-        ZstdDecompress, nullptr, nullptr, nullptr);
+        ZstdDecompress, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
 
       CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC,
-        ZstdDecompressDict, nullptr, nullptr, nullptr);
-
-      CreateFunction("zstd_decompress", 3, SQLITE_DETERMINISTIC,
-        ZstdDecompressDictCtx, nullptr, nullptr, nullptr);
+        ZstdDecompressDict, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
 
       CreateFunction("zstd_create_cdict", 1, 0,
-        ZstdCreateCDict, nullptr, nullptr, nullptr);
+        ZstdCreateCDict, nullptr, nullptr, nullptr, impl->compression_ctx.get());
 
       CreateFunction("zstd_create_ddict", 1, 0,
-        ZstdCreateDDict, nullptr, nullptr, nullptr);
-
-      CreateFunction("zstd_create_cctx", 0, 0,
-        ZstdCreateCCtx, nullptr, nullptr, nullptr);
-
-      CreateFunction("zstd_create_dctx", 0, 0,
-        ZstdCreateDCtx, nullptr, nullptr, nullptr);
+        ZstdCreateDDict, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
     };
 
 // Get the filename used to open the database
@@ -407,12 +417,12 @@ void Connection::CreateFunction(
     void (*x_func)(sqlite3_context *, int, sqlite3_value **),
     void (*x_step)(sqlite3_context *, int, sqlite3_value **),
     void (*x_final)(sqlite3_context *),
-    void (*x_destroy)(void *)) {
+    void (*x_destroy)(void *), void *pApp) {
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
       impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
-      nullptr, x_func, x_step, x_final, x_destroy);
+      pApp, x_func, x_step, x_final, x_destroy);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
   }
