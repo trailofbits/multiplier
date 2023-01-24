@@ -10,6 +10,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <pthread.h>
 #include <thread>
 #include <map>
 
@@ -62,12 +63,12 @@ class ExecutorImpl final : public std::enable_shared_from_this<ExecutorImpl> {
   std::atomic<State> state;
   std::mutex wait_lock;
 
-  std::vector<std::thread> workers;
+  std::vector<pthread_t> workers;
 
   std::mutex lock;
   std::condition_variable state_change;
 
-  void Run(unsigned worker_id);
+  void Run(void);
 
  private:
   ExecutorImpl(void) = delete;
@@ -76,10 +77,9 @@ class ExecutorImpl final : public std::enable_shared_from_this<ExecutorImpl> {
 ExecutorImpl::~ExecutorImpl(void) {
   state.store(State::kWaiting);
   state_change.notify_all();
-  for (std::thread &worker : workers) {
-    if (worker.joinable()) {
-      worker.join();
-    }
+  for (pthread_t &worker : workers) {
+    void *data = nullptr;
+    pthread_join(worker, &data);
   }
 }
 
@@ -92,7 +92,7 @@ ExecutorImpl::ExecutorImpl(const ExecutorOptions &options_)
   workers.reserve(num_workers);
 }
 
-void ExecutorImpl::Run(unsigned worker_id) {
+void ExecutorImpl::Run(void) {
   std::vector<std::unique_ptr<Action>> actions_to_run;
   actions_to_run.reserve(64u);
 
@@ -156,7 +156,7 @@ void ExecutorImpl::Run(unsigned worker_id) {
     // priority lists, so there's no reasonable way to return them out to the
     // caller on a call to `Stop`.
     for (std::unique_ptr<Action> &action : actions_to_run) {
-      action->Run(worker_id);
+      action->Run();
       action.reset();
       num_pending_actions.fetch_sub(1u);
     }
@@ -244,10 +244,29 @@ void Executor::Start(void) {
 
   d->state.store(State::kRunning);
   d->workers.clear();
+  d->workers.resize(d->num_workers);
   for (auto i = 0u; i < d->num_workers; ++i) {
-    d->workers.emplace_back([=] (void) {
-      d->Run(i);
-    });
+
+    // NOTE(pag): In debug builds, the stack can get quite big, especially
+    //            in Clang's parser, so we use pthreads and an attribute to set
+    //            large stacks.
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, (1ull << 20) * 32ull);
+
+    pthread_t &thread = d->workers[i];
+    pthread_create(
+        &thread,
+        &attr,
+        +[] (void *d_) -> void * {
+          std::shared_ptr<ExecutorImpl> self =
+              reinterpret_cast<ExecutorImpl *>(d_)->shared_from_this();
+          self->Run();
+          return nullptr;
+        },
+        d.get());
+
+    pthread_attr_destroy(&attr);
   }
 }
 
@@ -260,7 +279,7 @@ void Executor::Start(void) {
 //            queues to be flushed.
 void Executor::Stop(std::vector<std::unique_ptr<Action>> &remaining_actions) {
 
-  std::vector<std::thread> workers;
+  std::vector<pthread_t> workers;
   std::map<unsigned, std::unique_ptr<Action>> prioritized_actions;
 
   do {
@@ -306,10 +325,9 @@ void Executor::Stop(std::vector<std::unique_ptr<Action>> &remaining_actions) {
   }
 
   // Join the stolen workers.
-  for (std::thread &worker : workers) {
-    if (worker.joinable()) {
-      worker.join();
-    }
+  for (pthread_t &worker : workers) {
+    void *data = nullptr;
+    pthread_join(worker, &data);
   }
 }
 
@@ -321,7 +339,7 @@ void Executor::Stop(std::vector<std::unique_ptr<Action>> &remaining_actions) {
 void Executor::Wait(void) {
   std::unique_lock<std::mutex> wait_locker(d->wait_lock);
 
-  std::vector<std::thread> workers;
+  std::vector<pthread_t> workers;
 
   do {
     std::unique_lock<std::mutex> locker(d->lock);
@@ -372,10 +390,9 @@ void Executor::Wait(void) {
   d->state_change.notify_all();
 
   // Join the worker threads.
-  for (std::thread &worker : workers) {
-    if (worker.joinable()) {
-      worker.join();
-    }
+  for (pthread_t &worker : workers) {
+    void *data = nullptr;
+    pthread_join(worker, &data);
   }
 
   std::unique_lock<std::mutex> locker(d->lock);

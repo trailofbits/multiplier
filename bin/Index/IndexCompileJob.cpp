@@ -19,6 +19,7 @@
 #include <pasta/AST/Printer.h>
 #include <pasta/Util/ArgumentVector.h>
 #include <pasta/Util/File.h>
+#include <set>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
@@ -516,8 +517,10 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
 }
 
 static void AddDeclRangeToEntityList(
-    const pasta::TokenRange &tok_range, std::string_view main_file_path,
-    std::vector<EntityRange> &entity_ranges, pasta::Decl decl) {
+    const pasta::TokenRange &tokens, std::string_view main_file_path,
+    const std::map<uint64_t, pasta::IncludeLikeMacroDirective> &eof_to_include,
+    const std::map<uint64_t, uint64_t> &eof_indices, pasta::Decl decl,
+    std::vector<EntityRange> &entity_ranges) {
 
   if (decl.Kind() == pasta::DeclKind::kEmpty) {
     return;
@@ -550,8 +553,59 @@ static void AddDeclRangeToEntityList(
       << PrefixedLocation(decl, " at or near ")
       << " on main job file " << main_file_path;
 
-  auto [begin_index, end_index] = FindDeclRange(tok_range, decl, tok,
-                                                  main_file_path);
+  auto [begin_index, end_index] = FindDeclRange(tokens, decl, tok,
+                                                main_file_path);
+
+  // If we find an EOF marker nested inside the range (hence the exclusive
+  // bounds on this loop, rather than inclusive), then extend the decl range
+  // to also include the include directive itself. We observe issues in the
+  // Linux kernel with unbalanced begin/end file markers.
+  //
+  // XREF(pag): Issue 258#issuecomment-1401170794
+  std::optional<pasta::IncludeLikeMacroDirective> smallest_include;
+retry:
+  for (uint64_t i = begin_index + 1u; i < end_index; ++i) {
+    switch (tokens[i].Role()) {
+
+      // If we find an enclosed begin-of-file marker, then expand to the
+      // end-of-file marker.
+      case pasta::TokenRole::kBeginOfFileMarker:
+        if (auto it = eof_indices.find(i); it != eof_indices.end()) {
+          if (it->second > end_index) {
+            smallest_include.reset();
+            std::tie(begin_index, end_index) =
+                ExpandRange(tokens, begin_index, it->second);
+            goto retry;
+          }
+        }
+        break;
+
+      // If we find an enclosed end-of-file marker, then expand to the
+      // `#include` directive preceding the begin-of-file marker.
+      case pasta::TokenRole::kEndOfFileMarker:
+        if (!smallest_include) {
+          if (auto it = eof_to_include.find(i); it != eof_to_include.end()) {
+            smallest_include.emplace(it->second);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  // Expand the range to include the `#include`.
+  if (smallest_include) {
+    pasta::MacroToken hash_tok = smallest_include->Hash();
+    uint64_t inc_index = hash_tok.ParsedLocation().Index();
+    std::tie(begin_index, end_index) =
+        ExpandRange(
+            tokens, std::min<uint64_t>(begin_index, inc_index), end_index);
+
+    LOG(WARNING)
+        << "Expanding fragment to higher-level include directive "
+        << main_file_path << ": " << DeclToString(decl);
+  }
 
   // There should always be at least two tokens in any top-level decl.
   LOG_IF(ERROR, begin_index == end_index)
@@ -572,9 +626,14 @@ static pasta::Macro RootMacroFrom(pasta::Macro node) {
 
 // Go find the macro definitions, and for each definition, find the uses, then
 // find the "root" of that use.
-static std::vector<OrderedMacro> FindTLMs(const pasta::AST &ast) {
+static std::vector<OrderedMacro> FindTLMs(
+    const pasta::AST &ast, const pasta::TokenRange &tokens,
+    const std::map<uint64_t, uint64_t> &bof_to_eof,
+    std::map<uint64_t, pasta::IncludeLikeMacroDirective> &eof_to_include) {
+
   std::vector<OrderedMacro> tlms;
   std::vector<pasta::DefineMacroDirective> defs;
+  const uint64_t num_tokens = tokens.Size();
 
   auto order = 0u;
   for (pasta::Macro mn : ast.Macros()) {
@@ -611,6 +670,24 @@ static std::vector<OrderedMacro> FindTLMs(const pasta::AST &ast) {
     } else if (auto dir = pasta::MacroDirective::From(mn)) {
       if (!dir->Hash().FileLocation()) {
         continue;
+      }
+
+      // If it's an include-like directive, then we want to be able to associate
+      // begin- and end-of-file markers with this directive. Here we'll find
+      // the relevant begin-of-file markers.
+      if (auto ild = pasta::IncludeLikeMacroDirective::From(mn)) {
+        if (auto et = ild->EndToken()) {
+          uint64_t i = et->ParsedLocation().Index() + 1u;
+          for (auto max_i = std::min(num_tokens, i + 8u); i < max_i; ++i) {
+            if (tokens[i].Role() != pasta::TokenRole::kBeginOfFileMarker) {
+              continue;
+            }
+            if (auto it = bof_to_eof.find(i); it != bof_to_eof.end()) {
+              eof_to_include.emplace(it->second, ild.value());
+              break;
+            }
+          }
+        }
       }
 
       tlms.emplace_back(std::move(mn), order++);
@@ -711,18 +788,47 @@ static void AddMacroRangeToEntityList(
 static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
                                              std::string_view main_file_path) {
 
-  pasta::TokenRange tok_range = ast.Tokens();
+  pasta::TokenRange tokens = ast.Tokens();
   std::vector<EntityRange> entity_ranges;
   entity_ranges.reserve(8192u);
 
-  for (OrderedDecl ordered_entry : FindTLDs(ast)) {
-    AddDeclRangeToEntityList(tok_range, main_file_path, entity_ranges,
-                             std::move(ordered_entry.first));
+  std::map<uint64_t, pasta::IncludeLikeMacroDirective> eof_index_to_include;
+  std::map<uint64_t, uint64_t> bof_to_eof;
+
+  // Find end-of-file indices. Sometimes we need to expand declaration ranges
+  // out to include an end of file if they include the beginning of the file.
+  // This helps keep later `TokenTree` stuff balanced, and relates to Issue
+  // #258.
+  std::vector<uint64_t> open_indexes;
+  for (const pasta::Token &tok : tokens) {
+    switch (tok.Role()) {
+      case pasta::TokenRole::kBeginOfFileMarker:
+        open_indexes.push_back(tok.Index());
+        break;
+      case pasta::TokenRole::kEndOfFileMarker:
+        bof_to_eof.emplace(open_indexes.back(), tok.Index());
+        open_indexes.pop_back();
+        break;
+      case pasta::TokenRole::kFileToken:
+        if (open_indexes.empty()) {
+          open_indexes.push_back(tok.Index());
+        }
+        break;
+      default:
+        break;
+    }
   }
 
-  for (OrderedMacro ordered_entry : FindTLMs(ast)) {
-    AddMacroRangeToEntityList(tok_range, main_file_path, entity_ranges,
+  for (OrderedMacro ordered_entry : FindTLMs(ast, tokens, bof_to_eof,
+                                             eof_index_to_include)) {
+    AddMacroRangeToEntityList(tokens, main_file_path, entity_ranges,
                               std::move(ordered_entry.first));
+  }
+
+  for (OrderedDecl ordered_entry : FindTLDs(ast)) {
+    AddDeclRangeToEntityList(tokens, main_file_path, eof_index_to_include,
+                             bof_to_eof, std::move(ordered_entry.first),
+                             entity_ranges);
   }
 
   // It's possible that we have two-or-more things that appear to be top-level
@@ -963,9 +1069,11 @@ static void CreatePendingFragment(
   // methods descend vs. cross the tree (into other fragments).
   LabelEntitiesInFragment(pf, entity_ids, tok_range);
 
-  if (is_new_fragment_id) {
-    pending_fragments.emplace_back(std::move(pf));
+  if (!is_new_fragment_id) {
+    return;
   }
+
+  pending_fragments.emplace_back(std::move(pf));
 }
 
 // Create fragments in reverse order that we see them in the AST. The hope
@@ -1097,7 +1205,7 @@ IndexCompileJobAction::IndexCompileJobAction(
       job(std::move(job_)) {}
 
 // Build and index the AST.
-void IndexCompileJobAction::Run(unsigned) {
+void IndexCompileJobAction::Run(void) {
 
   std::optional<pasta::AST> maybe_ast = CompileJobToAST(context, job);
   if (!maybe_ast) {

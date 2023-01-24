@@ -546,7 +546,7 @@ static std::optional<pasta::Decl> VisitStmt(const pasta::Stmt &stmt,
       return ls->Declaration();
     }
 
-    // Backup.
+  // Backup.
   } else if (auto call = pasta::CallExpr::From(stmt)) {
     if (call->ExpressionToken().RawToken() == token.RawToken()) {
       if (auto called_decl = call->CalleeDeclaration()) {

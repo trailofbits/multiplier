@@ -255,7 +255,10 @@ class TokenTreeImpl {
       Substitution::NodeList &nodes, std::ostream &err);
 
   Substitution *BuildSubstitutions(TokenInfo *&prev, TokenInfo *&curr,
-                                   std::ostream &err);
+                                   Substitution *sub, std::ostream &err);
+
+  Substitution *BuildSubstitutionsIter(TokenInfo *&prev, TokenInfo *&curr,
+                                       std::ostream &err);
 
   Substitution *BuildSubstitutions(std::ostream &err);
 
@@ -268,25 +271,30 @@ class TokenTreeImpl {
   void AddOrClearInsaneBounds(Substitution *sub);
 };
 
+[[gnu::noinline]]
+static std::ostream &Error(void) {
+  return std::cerr;
+}
+
 static void Die(const TokenTreeImpl *impl) {
   std::unique_lock<std::mutex> locker(gPrintDOTLock);
-  std::cerr.flush();
+  Error().flush();
   auto &sub = impl->substitutions_alloc.front();
-  std::cerr << "--------------------------------------------------------\n";
-  std::cerr << "--------------------------------------------------------\n";
+  Error() << "--------------------------------------------------------\n";
+  Error() << "--------------------------------------------------------\n";
   for (const TokenInfo &tok : impl->tokens_alloc) {
     if (tok.parsed_tok) {
       const pasta::Token &ast_tok = tok.parsed_tok.value();
       pasta::AST ast = pasta::AST::From(ast_tok);
-      std::cerr << ast.MainFile().Path().generic_string() << "\n\n";
+      Error() << ast.MainFile().Path().generic_string() << "\n\n";
       break;
     }
   }
   sub.Print(std::cerr);
-  std::cerr << "\n\n";
+  Error() << "\n\n";
   sub.PrintDOT(std::cerr);
-  std::cerr << "\n\n";
-  std::cerr.flush();
+  Error() << "\n\n";
+  Error().flush();
   TT_ASSERT(false);
 }
 
@@ -1583,12 +1591,14 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
       break;
 
     } else {
+      assert(false);
       err << "Found an unusual token";
       return nullptr;
     }
   }
 
   if (!curr || !curr->macro_tok) {
+    assert(false);
     err << "Failed to find the next macro token";
     return nullptr;
   }
@@ -1599,6 +1609,7 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
   // directives in the use with pre-expansion form that doesn't have the
   // conditional directives.
   if (curr->macro_tok->RawMacro() != node.RawMacro()) {
+    assert(false);
     nodes.has_error = true;
     has_error = true;
   }
@@ -1915,11 +1926,15 @@ Substitution *TokenTreeImpl::BuildMacroSubstitutions(
     return nullptr;
   }
 
+  Substitution *sub_exp = sub;
   sub = BuildMacroSubstitutions(
       prev, curr, sub, sub->before, RootNodeFrom(use->macro_tok.value()), err);
   if (!sub) {
     return nullptr;
   }
+
+  assert(sub == sub_exp);
+  (void) sub_exp;
 
   if (!curr || curr->category != TokenInfo::kMarkerToken) {
     sub->before.has_error = true;
@@ -1954,10 +1969,15 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
 
   // Recursively call the top-level builder starting with the first token
   // in the included file.
-  Substitution *file_sub = BuildSubstitutions(prev, curr, err);
+
+  Substitution *file_sub = CreateSubstitution(mx::MacroKind::OTHER_DIRECTIVE);
+  Substitution *file_sub_exp = BuildSubstitutions(prev, curr, file_sub, err);
   if (!file_sub) {
     return nullptr;
   }
+
+  assert(file_sub == file_sub_exp);
+  (void) file_sub_exp;
 
   // Go add this file substitution to the previous inclusion directive.
   if (sub->before.empty() ||
@@ -1986,11 +2006,17 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
   // Make sure that we're at the end of a file.
   if (!curr || curr->category != TokenInfo::kMarkerToken) {
     err << "Expected a marker token at the end of file";
+    if (curr) {
+      err << " (PTI " << curr->parsed_tok->Index() << ')';
+    } else if (prev) {
+      err << " (prev PTI " << prev->parsed_tok->Index() << ')';
+    }
     return nullptr;
   }
 
   if (curr->parsed_tok->Role() != pasta::TokenRole::kEndOfFileMarker) {
-    err << "Expected a file ending marker token at the end of a file";
+    err << "Expected a file ending marker token at the end of a file (PTI "
+        << curr->parsed_tok->Index() << ')';
     return nullptr;
   }
 
@@ -2006,10 +2032,61 @@ Substitution *TokenTreeImpl::BuildFileSubstitutions(
   return sub;
 }
 
-Substitution *TokenTreeImpl::BuildSubstitutions(
+// Iteratively build out substitutions. We might cross file boundaries here.
+//
+// This happens in the Linux kernel with `drbd_genl_cmd_to_str` that has
+// an attribute in one file but the rest of the function in another file. This
+// entity is produced by macro expansion of
+//
+//        CONCAT_(GENL_MAGIC_FAMILY, _genl_cmd_to_str)
+//
+// in the x-macro file `include/linux/genl_magic_func.h`, where the attribute
+// is the last thing in a macro expansion of `GENL_struct` in the same file.
+//
+// What happens is that we end up having unbalanced begin/end file marker
+// tokens.
+//
+// XREF(pag):
+// https://github.com/trailofbits/multiplier/issues/258#issuecomment-1401170794
+Substitution *TokenTreeImpl::BuildSubstitutionsIter(
     TokenInfo *&prev, TokenInfo *&curr, std::ostream &err) {
 
   Substitution *sub = CreateSubstitution(mx::MacroKind::OTHER_DIRECTIVE);
+  for (;;) {
+    Substitution *sub_exp = BuildSubstitutions(prev, curr, sub, err);
+    if (!sub_exp) {
+      return nullptr;
+    }
+
+    assert(sub_exp == sub);
+    if (!curr) {
+      return sub;
+    }
+
+    // An end of file that doesn't have any matching begin of file; accumulate
+    // into the top-level. In theory we should accumulate an `#include` above
+    // `sub`, and do a kind of recursive ascent constuction of the tree. In
+    // practice, we don't expect to hit this situation, and we try to mitigate
+    // the issue of unbalanced BOF/EOF tokens in `IndexCompileJob.cpp` by
+    // identifying when decls include `EOF` markers, and then expanding their
+    // ranges to contain the associated `#include` directive.
+    if (curr->parsed_tok->Role() == pasta::TokenRole::kEndOfFileMarker) {
+      prev = curr;
+      curr = curr->next;
+      continue;
+    }
+
+    err << "Unexpected top-level token could not be contained by token tree";
+    return nullptr;
+  }
+
+  return sub;
+}
+
+Substitution *TokenTreeImpl::BuildSubstitutions(
+    TokenInfo *&prev, TokenInfo *&curr, Substitution *sub, std::ostream &err) {
+
+  Substitution * const sub_exp = sub;
   while (curr) {
     switch (curr->category) {
       // Basic case: just add the token in.
@@ -2040,6 +2117,9 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
             if (!sub) {
               return nullptr;
             }
+
+            assert(sub_exp == sub);
+            (void) sub_exp;
             continue;
 
           // Return to our caller, don't adjust the bounds. This is the end of
@@ -2053,6 +2133,10 @@ Substitution *TokenTreeImpl::BuildSubstitutions(
             if (!sub) {
               return nullptr;
             }
+
+            assert(sub_exp == sub);
+            (void) sub_exp;
+
             continue;
 
           default:
@@ -2359,7 +2443,7 @@ Substitution *TokenTreeImpl::BuildSubstitutions(std::ostream &err) {
   TokenInfo *prev = nullptr;
   TokenInfo * const first = &(tokens_alloc.front());
   TokenInfo *curr = first;  // NOTE(pag): Updated by reference.
-  auto sub = BuildSubstitutions(prev, curr, err);
+  auto sub = BuildSubstitutionsIter(prev, curr, err);
   if (!sub) {
     return nullptr;
   }

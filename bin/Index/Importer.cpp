@@ -190,7 +190,7 @@ class BuildCommandAction final : public Action {
         command(command_),
         ctx(std::move(ctx_)) {}
 
-  void Run(unsigned) final;
+  void Run(void) final;
 };
 
 // If we are using something like CMake commands, then pull in the relevant
@@ -376,7 +376,7 @@ void BuildCommandAction::RunWithCompiler(pasta::CompileCommand cmd,
 }
 
 // Build the compilers for the commands, then build the commands.
-void BuildCommandAction::Run(unsigned) {
+void BuildCommandAction::Run(void) {
 
   pasta::Result<pasta::CompileCommand, std::string_view> maybe_cmd =
       pasta::CompileCommand::CreateFromArguments(

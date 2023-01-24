@@ -571,7 +571,6 @@ static void PersistTokenTree(
 
     } else {
       auto ast = pasta::AST::From(parsed_tokens.front());
-      nodes.Dump(std::cerr);
       LOG(FATAL)
           << "Missing parsed/file token for token node in source file "
           << ast.MainFile().Path().generic_string() << " with parsed tokens "
@@ -622,7 +621,7 @@ static void PersistTokenTree(
                                     "Token tree didn't cover code near ");
         LOG_IF(ERROR, !err.empty()) << err;
       }
-      nodes.Dump(std::cerr);
+
       LOG(FATAL)
           << "TokenTree nodes didn't cover parsed token '" << parsed_tok.Data()
           << "' at index " << i << " (PTI " << parsed_tok.Index()

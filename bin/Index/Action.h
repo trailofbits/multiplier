@@ -20,7 +20,7 @@ class Action {
   // Run this action in the worker `worker_id`. The action itself may need to
   // add more work to the executor, and so it's given a reference to the
   // executor for this reason.
-  virtual void Run(unsigned worker_id) = 0;
+  virtual void Run(void) = 0;
 
   // Return the priority of this action. A higher value means higher priority.
   // Default value is `0`.

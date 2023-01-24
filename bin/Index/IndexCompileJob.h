@@ -37,7 +37,7 @@ class IndexCompileJobAction final : public Action {
                         pasta::CompileJob job_);
 
   // Build and index the AST.
-  void Run(unsigned) final;
+  void Run(void) final;
 };
 
 }  // namespace indexer
