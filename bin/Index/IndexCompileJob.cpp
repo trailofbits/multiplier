@@ -566,8 +566,6 @@ static void AddDeclRangeToEntityList(
   //            where possible.
   //
   // XREF(pag): Issue 258#issuecomment-1401170794
-  std::optional<pasta::IncludeLikeMacroDirective> smallest_include;
-retry:
   for (uint64_t i = begin_index + 1u; i < end_index; ++i) {
     switch (tokens[i].Role()) {
 
@@ -578,7 +576,6 @@ retry:
         if (auto it = eof_indices.find(i);
             it != eof_indices.end() && it->second > end_index) {
           end_index = it->second;
-          goto retry;
         }
         break;
 
@@ -586,13 +583,10 @@ retry:
       // `#include` directive preceding the begin-of-file marker. This will
       // jump `begin_index` to the begin-of-macro marker.
       case pasta::TokenRole::kEndOfFileMarker:
-        if (!smallest_include) {
-          pasta::MacroToken hash_tok = smallest_include->Hash();
-          if (auto it = eof_to_include.find(i);
-              it != eof_to_include.end() && it->second < begin_index) {
-            begin_index = it->second;
-            goto retry;
-          }
+        if (auto it = eof_to_include.find(i);
+            it != eof_to_include.end() && it->second < begin_index) {
+          begin_index = it->second;
+          i = begin_index + 1u;
         }
         break;
       default:
