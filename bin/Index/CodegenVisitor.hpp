@@ -135,6 +135,7 @@ struct FallBackStmtVisitor
 
       using Builder::make_stmt_region;
       using Builder::make_region_builder;
+      using Builder::make_cond_builder;
       using Builder::make_value_yield_region;
       using Builder::set_insertion_point_to_start;
       using Builder::set_insertion_point_to_end;
@@ -156,13 +157,24 @@ struct FallBackStmtVisitor
           auto [region, _] = make_value_yield_region(first_child);
 
           // Assign return type as expression type
-          return make< vast::hl::UnsupportedExprOp >(loc, node, visit(expr->getType()), std::move(region));
+          return make<vast::hl::UnsupportedExprOp>(loc, node, visit(expr->getType()), std::move(region));
         }
-        return make< vast::hl::UnsupportedExprOp >(loc, node, visit(expr->getType()), nullptr);
+        return make<vast::hl::UnsupportedExprOp>(loc, node, visit(expr->getType()), nullptr);
+      }
+
+      vast::Operation* VisitOperands(const clang::Expr *expr, std::string node) {
+        auto loc  = meta_location(expr);
+        auto rtype =  visit(expr->getType());
+
+        llvm::SmallVector<vast::Value> elements;
+        for (auto it = expr->child_begin(); it != expr->child_end(); ++it) {
+          elements.push_back(visit(*it)->getResult(0));
+        }
+        return  make<vast::hl::UnsupportedOp>(loc, rtype, node, elements);
       }
 
       vast::Operation* VisitPredefinedExpr(const clang::PredefinedExpr *expr) {
-        return VisitChildExpr(expr, expr->getStmtClassName());
+        return  VisitOperands(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitCompoundLiteralExpr(const clang::CompoundLiteralExpr *expr) {
@@ -179,14 +191,24 @@ struct FallBackStmtVisitor
 
       vast::Operation* VisitBinaryOperator(const clang::BinaryOperator *stmt) {
         auto loc = meta_location(stmt);
-        auto [region, _] = make_value_yield_region(stmt->getRHS());
-        return make< vast::hl::UnsupportedExprOp >(loc,  stmt->getStmtClassName(), visit(stmt->getType()), std::move(region));
+        auto rtype =  visit(stmt->getType());
+
+        llvm::SmallVector<vast::Value> elements;
+        elements.push_back(visit(stmt->getLHS())->getResult(0));
+        elements.push_back(visit(stmt->getRHS())->getResult(0));
+        return  make<vast::hl::UnsupportedOp>(loc, rtype, stmt->getStmtClassName(), elements);
       }
 
       vast::Operation* VisitConditionalOperator(const clang::ConditionalOperator *stmt) {
         auto loc = meta_location(stmt);
-        auto [region, type] = make_value_yield_region(stmt->getCond());
-        return make <vast::hl::UnsupportedExprOp> (loc, stmt->getStmtClassName(), type, std::move(region));
+        auto rtype =  visit(stmt->getType());
+
+        llvm::SmallVector<vast::Value> elements;
+        elements.push_back(visit(stmt->getCond())->getResult(0));
+        elements.push_back(visit(stmt->getLHS())->getResult(0));
+        elements.push_back(visit(stmt->getRHS())->getResult(0));
+        return  make<vast::hl::UnsupportedOp>(loc, rtype, stmt->getStmtClassName(),  elements);
+
       }
 
       vast::Operation* VisitCXXDependentScopeMemberExpr(const clang::CXXDependentScopeMemberExpr *expr) {
@@ -225,15 +247,15 @@ struct FallBackStmtVisitor
         auto loc = meta_location(expr);
         auto label = expr->getLabelExpr(0);
         auto [region, type] = make_value_yield_region(label);
-        return make< vast::hl::UnsupportedExprOp >(loc, expr->getStmtClassName(), type, std::move(region));
+        return make<vast::hl::UnsupportedExprOp>(loc, expr->getStmtClassName(), type, std::move(region));
       }
 
       vast::Operation* VisitImplicitValueInitExpr(const clang::ImplicitValueInitExpr *expr) {
-        return VisitChildExpr(expr, expr->getStmtClassName());
+        return VisitOperands(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitAtomicExpr(const clang::AtomicExpr *expr) {
-        return VisitChildExpr(expr, expr->getStmtClassName());
+        return VisitOperands(expr, expr->getStmtClassName());
       }
 
       vast::Operation* VisitGenericSelectionExpr(const clang::GenericSelectionExpr *expr) {
@@ -242,6 +264,30 @@ struct FallBackStmtVisitor
 
       vast::Operation* VisitChooseExpr(const clang::ChooseExpr *expr) {
         return VisitChildExpr(expr, expr->getStmtClassName());
+      }
+
+      vast::Operation* VisitUnaryOperator(const clang::UnaryOperator *expr) {
+        auto loc = meta_location(expr);
+        auto rtype =  visit(expr->getType());
+
+        llvm::SmallVector<vast::Value> elements;
+        elements.push_back(visit(expr->getSubExpr())->getResult(0));
+        return make<vast::hl::UnsupportedOp>(loc, rtype, expr->getStmtClassName(), elements);
+      }
+
+      vast::Operation* VisitIndirectGotoStmt(const clang::IndirectGotoStmt *expr) {
+        auto loc = meta_location(expr);
+        auto target = expr->getTarget();
+        auto [region, type] = make_value_yield_region(target);
+        return make<vast::hl::UnsupportedExprOp>(loc, expr->getStmtClassName(), type, std::move(region));
+      }
+
+      // Note: vast handles FunctionDeclRefExpr node. However in some cases it may return null if
+      //       FunctionDecl is not available in the top-level declarations. It will fallback to
+      //       the visitor and throw an exception.
+      vast::Operation* VisitFunctionDeclRefExpr(const clang::DeclRefExpr *expr) {
+        THROW("Missing function decl : {0}", expr->getNameInfo().getAsString());
+        return nullptr;
       }
 };
 
