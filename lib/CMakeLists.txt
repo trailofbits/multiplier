@@ -214,6 +214,45 @@ set_target_properties("mx-api"
       cxx_std_20
 )
 
+add_library("mx-mlir" INTERFACE)
+set_target_properties("mx-mlir"
+  PROPERTIES
+    LINKER_LANGUAGE
+      CXX
+    VISIBILITY_INLINES_HIDDEN
+      YES
+    CXX_VISIBILITY_PRESET
+      hidden
+    POSITION_INDEPENDENT_CODE
+      YES
+)
+
+target_link_libraries("mx-mlir"
+  INTERFACE
+    vast::vast
+    vast::MLIRMeta
+    MLIRDialect
+    MLIRMLProgramDialect
+    MLIROpenMPDialect
+    MLIRTosaDialect
+
+    MLIRBufferizationTransformOps
+    MLIRSparseTensorTransforms
+    MLIROpenACCDialect
+    MLIRLLVMIRTransforms
+    MLIRROCDLDialect
+    MLIRAsyncDialect
+    MLIRSCFTransformOps
+    MLIREmitCDialect
+    MLIRNVGPUDialect
+    MLIRShapeDialect
+    MLIRAMDGPUDialect
+    MLIRShapeOpsTransforms
+    MLIRLinalgTransformOps
+    MLIRSPIRVDialect
+    MLIRTensorInferTypeOpInterfaceImpl
+)
+
 if(MX_ENABLE_INSTALL)
   install(
     TARGETS
@@ -226,6 +265,7 @@ if(MX_ENABLE_INSTALL)
   install(
     TARGETS
       "mx-api"
+      "mx-mlir"
     EXPORT "${PROJECT_NAME}Targets"
     RUNTIME
       DESTINATION
