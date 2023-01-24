@@ -100,6 +100,7 @@ std::string CodeGenerator::GenerateSourceIRFromTLDs(
     const std::vector<pasta::Decl> &decls,
     unsigned num_decls) {
 
+  (void) ast;
   (void) fragment_id;
   (void) em;
   (void) decls;
