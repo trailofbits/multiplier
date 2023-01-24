@@ -518,7 +518,7 @@ static bool ShouldFindDeclInTokenContexts(const pasta::Decl &decl) {
 
 static void AddDeclRangeToEntityList(
     const pasta::TokenRange &tokens, std::string_view main_file_path,
-    const std::map<uint64_t, pasta::IncludeLikeMacroDirective> &eof_to_include,
+    const std::map<uint64_t, uint64_t> &eof_to_include,
     const std::map<uint64_t, uint64_t> &eof_indices, pasta::Decl decl,
     std::vector<EntityRange> &entity_ranges) {
 
@@ -561,6 +561,10 @@ static void AddDeclRangeToEntityList(
   // to also include the include directive itself. We observe issues in the
   // Linux kernel with unbalanced begin/end file markers.
   //
+  // NOTE(pag): It's not safe to use `ExpandRange` as that will try to
+  //            contract the range to *exclude* begin- and end-of-file markers
+  //            where possible.
+  //
   // XREF(pag): Issue 258#issuecomment-1401170794
   std::optional<pasta::IncludeLikeMacroDirective> smallest_include;
 retry:
@@ -568,43 +572,32 @@ retry:
     switch (tokens[i].Role()) {
 
       // If we find an enclosed begin-of-file marker, then expand to the
-      // end-of-file marker.
+      // end-of-file marker. This will jump `end_index` to the end-of-file
+      // marker.
       case pasta::TokenRole::kBeginOfFileMarker:
-        if (auto it = eof_indices.find(i); it != eof_indices.end()) {
-          if (it->second > end_index) {
-            smallest_include.reset();
-            std::tie(begin_index, end_index) =
-                ExpandRange(tokens, begin_index, it->second);
-            goto retry;
-          }
+        if (auto it = eof_indices.find(i);
+            it != eof_indices.end() && it->second > end_index) {
+          end_index = it->second;
+          goto retry;
         }
         break;
 
       // If we find an enclosed end-of-file marker, then expand to the
-      // `#include` directive preceding the begin-of-file marker.
+      // `#include` directive preceding the begin-of-file marker. This will
+      // jump `begin_index` to the begin-of-macro marker.
       case pasta::TokenRole::kEndOfFileMarker:
         if (!smallest_include) {
-          if (auto it = eof_to_include.find(i); it != eof_to_include.end()) {
-            smallest_include.emplace(it->second);
+          pasta::MacroToken hash_tok = smallest_include->Hash();
+          if (auto it = eof_to_include.find(i);
+              it != eof_to_include.end() && it->second < begin_index) {
+            begin_index = it->second;
+            goto retry;
           }
         }
         break;
       default:
         break;
     }
-  }
-
-  // Expand the range to include the `#include`.
-  if (smallest_include) {
-    pasta::MacroToken hash_tok = smallest_include->Hash();
-    uint64_t inc_index = hash_tok.ParsedLocation().Index();
-    std::tie(begin_index, end_index) =
-        ExpandRange(
-            tokens, std::min<uint64_t>(begin_index, inc_index), end_index);
-
-    LOG(WARNING)
-        << "Expanding fragment to higher-level include directive "
-        << main_file_path << ": " << DeclToString(decl);
   }
 
   // There should always be at least two tokens in any top-level decl.
@@ -629,7 +622,7 @@ static pasta::Macro RootMacroFrom(pasta::Macro node) {
 static std::vector<OrderedMacro> FindTLMs(
     const pasta::AST &ast, const pasta::TokenRange &tokens,
     const std::map<uint64_t, uint64_t> &bof_to_eof,
-    std::map<uint64_t, pasta::IncludeLikeMacroDirective> &eof_to_include) {
+    std::map<uint64_t, uint64_t> &eof_to_include) {
 
   std::vector<OrderedMacro> tlms;
   std::vector<pasta::DefineMacroDirective> defs;
@@ -672,25 +665,49 @@ static std::vector<OrderedMacro> FindTLMs(
         continue;
       }
 
+      tlms.emplace_back(mn, order++);
+
       // If it's an include-like directive, then we want to be able to associate
       // begin- and end-of-file markers with this directive. Here we'll find
       // the relevant begin-of-file markers.
-      if (auto ild = pasta::IncludeLikeMacroDirective::From(mn)) {
-        if (auto et = ild->EndToken()) {
-          uint64_t i = et->ParsedLocation().Index() + 1u;
-          for (auto max_i = std::min(num_tokens, i + 8u); i < max_i; ++i) {
-            if (tokens[i].Role() != pasta::TokenRole::kBeginOfFileMarker) {
-              continue;
-            }
-            if (auto it = bof_to_eof.find(i); it != bof_to_eof.end()) {
-              eof_to_include.emplace(it->second, ild.value());
-              break;
-            }
-          }
+      auto ild = pasta::IncludeLikeMacroDirective::From(mn);
+      if (!ild) {
+        continue;
+      }
+
+      // Find the end token of the `#include`.
+      auto ild_et = ild->EndToken();
+      if (!ild_et) {
+        continue;
+      }
+
+      // Scan backward looking for the beginning of macro marker.
+      uint64_t i = ild_et->ParsedLocation().Index();
+      uint64_t j = i;
+      for (; j; --j) {
+        if (tokens[j].Role() == pasta::TokenRole::kBeginOfMacroExpansionMarker) {
+          break;
         }
       }
 
-      tlms.emplace_back(std::move(mn), order++);
+      assert(0u < j);
+
+      // Scan forward beyond the end token of the `#include` by a fudge factor
+      // and try to find a beginning of file marker.
+      for (auto max_i = std::min(num_tokens, i + 8u); i < max_i; ++i) {
+        if (tokens[i].Role() != pasta::TokenRole::kBeginOfFileMarker) {
+          continue;
+        }
+
+        auto it = bof_to_eof.find(i);
+        if (it == bof_to_eof.end()) {
+          continue;
+        }
+
+        // Map the EOF marker to the BOM marker token for the `#include`.
+        eof_to_include.emplace(it->second, j);
+        break;
+      }
     }
   }
 
@@ -792,7 +809,7 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   std::vector<EntityRange> entity_ranges;
   entity_ranges.reserve(8192u);
 
-  std::map<uint64_t, pasta::IncludeLikeMacroDirective> eof_index_to_include;
+  std::map<uint64_t, uint64_t> eof_index_to_include;
   std::map<uint64_t, uint64_t> bof_to_eof;
 
   // Find end-of-file indices. Sometimes we need to expand declaration ranges
