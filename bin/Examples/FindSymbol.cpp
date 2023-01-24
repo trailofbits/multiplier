@@ -15,6 +15,7 @@
 DECLARE_bool(help);
 DECLARE_string(db);
 DEFINE_string(name, "", "Search for the symbol with name");
+DEFINE_bool(exact, false, "Should we match exactly the specified name?");
 
 extern "C" int main(int argc, char *argv[]) {
   std::stringstream ss;
@@ -38,12 +39,18 @@ extern "C" int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  mx::Index index(mx::EntityProvider::from_database(FLAGS_db));
+  mx::Index index(mx::EntityProvider::in_memory_cache(
+      mx::EntityProvider::from_database(FLAGS_db)));
 
   for (const mx::NamedEntity &ent : index.query_entities(FLAGS_name)) {
     if (std::holds_alternative<mx::NamedDecl>(ent)) {
       mx::NamedDecl decl = std::get<mx::NamedDecl>(ent);
+      if (FLAGS_exact && decl.name() != FLAGS_name) {
+        continue;
+      }
+
       mx::Fragment frag = mx::Fragment::containing(decl);
+
       std::optional<mx::File> file = mx::File::containing(frag);
       std::cout
           << (file ? file->id().Pack() : mx::kInvalidEntityId) << '\t'
@@ -53,6 +60,10 @@ extern "C" int main(int argc, char *argv[]) {
 
     } else if (std::holds_alternative<mx::DefineMacroDirective>(ent)) {
       mx::DefineMacroDirective macro = std::get<mx::DefineMacroDirective>(ent);
+      if (FLAGS_exact && macro.name().data() != FLAGS_name) {
+        continue;
+      }
+
       mx::Fragment frag = mx::Fragment::containing(macro);
       std::optional<mx::File> file = mx::File::containing(frag);
       std::cout
