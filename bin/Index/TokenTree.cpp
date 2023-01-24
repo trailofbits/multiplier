@@ -1379,7 +1379,7 @@ Substitution *TokenTreeImpl::GetMacroBody(pasta::DefineMacroDirective def,
   AddOrClearInsaneBounds(body);
 
   D( indent.resize(indent.size()  - 2u); )
-
+  (void)err;
   return body;
 }
 
