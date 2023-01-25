@@ -33,7 +33,9 @@ DECLARE_bool(help);
 
 // Number of threads to use in the executors. These are mostly used for indexing
 // jobs.
-DEFINE_int32(num_workers, -1, "Number of worker threads to use for parallel jobs");
+DEFINE_int32(num_indexer_workers, -1, "Number of worker threads to use for parallel indexing jobs");
+
+DEFINE_int32(num_command_workers, -1, "Number of worker threads to use for parallel command interpretation jobs");
 
 // Should we show progress bars when indexing?
 DEFINE_bool(show_progress, false, "Show indexing progress bars");
@@ -134,14 +136,20 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
     return EXIT_FAILURE;
   }
 
-  indexer::ExecutorOptions executor_options;
+  indexer::ExecutorOptions command_exe_options;
+  indexer::ExecutorOptions indexer_exe_options;
 
   // Number of workers to run. This should be the total number of threads,
   // less one, so that the database writer thread can do its job without
   // blocking.
-  executor_options.num_workers = FLAGS_num_workers;
+  //
+  // We use separate numbers here because the workers for commands go and
+  // execute the original compiler as a subprocess, and -- on big machines with
+  // many cores -- that can lead to file descriptor exhaustion issues.
+  command_exe_options.num_workers = FLAGS_num_command_workers;
+  indexer_exe_options.num_workers = FLAGS_num_indexer_workers;
 
-  indexer::Executor executor(executor_options);
+  indexer::Executor executor(indexer_exe_options);
   mx::DatabaseWriter database(FLAGS_db);
   auto ic = std::make_shared<indexer::GlobalIndexingState>(database, executor);
   auto fs = pasta::FileSystem::CreateNative();
@@ -218,7 +226,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   // commands, albeit slightly modified, so that we can get the compiler to
   // tell us about include search paths, etc. The result of this is that
   // indexing actions are enqueued into the `executor`.
-  importer.Import(executor_options);
+  importer.Import(command_exe_options);
 
   // Start the executor, so that we can start processing the indexing actions.
   // Wait for all actions to complete.
