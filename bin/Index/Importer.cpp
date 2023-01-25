@@ -7,6 +7,7 @@
 #include "Importer.h"
 
 #include <cstring>
+#include <fcntl.h>
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -38,8 +39,6 @@
 #include "IndexCompileJob.h"
 #include "PASTA.h"
 #include "Subprocess.h"
-
-#include <fcntl.h>
 
 namespace indexer {
 namespace {
@@ -103,6 +102,10 @@ struct PathCache {
 
     // Look for the binary in the `PATH` variable.
     for (std::string dir; std::getline(path_ss, dir, sep); dir.clear()) {
+      if (dir.empty()) {
+        continue;
+      }
+
       std::filesystem::path exe_path(dir);
       exe_path /= exe;
       pasta::Result<pasta::Stat, std::error_code> res = fs->Stat(exe_path, cwd);
@@ -170,15 +173,27 @@ struct CompilerPathInfo {
   std::string no_sysroot;
 };
 
+class CompilerPathInfoCache {
+ private:
+  const bool enable_cache;
+
+  std::unordered_map<std::string, CompilerPathInfo> cached_info;
+  std::mutex cached_info_lock;
+
+ public:
+  inline CompilerPathInfoCache(bool enable_cache_)
+      : enable_cache(enable_cache_) {}
+
+  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
+      const Command &command);
+};
+
 class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
   std::shared_ptr<GlobalIndexingState> ctx;
-
-  // If we are using something like CMake commands, then pull in the relevant
-  // information by trying to execute the compiler directly.
-  std::variant<CompilerPathInfo, std::string> InitCompilerFromCommand(void);
+  CompilerPathInfoCache &cache;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
@@ -188,10 +203,12 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            std::shared_ptr<GlobalIndexingState> ctx_)
+                            std::shared_ptr<GlobalIndexingState> ctx_,
+                            CompilerPathInfoCache &cache_)
       : fm(fm_),
         command(command_),
-        ctx(std::move(ctx_)) {}
+        ctx(std::move(ctx_)),
+        cache(cache_) {}
 
   void Run(void) final;
 };
@@ -199,7 +216,25 @@ class BuildCommandAction final : public Action {
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
 std::variant<CompilerPathInfo, std::string>
-BuildCommandAction::InitCompilerFromCommand(void) {
+CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
+
+  std::unique_lock<std::mutex> locker;
+
+  // In caching mode, we check to see if, for the given compiler path, if we've
+  // already got compiler info. If so then great, if not then we need to run
+  // a command. We'll use the info generated from the first successful command.
+  //
+  // NOTE(pag): This is technically sketchy, but for some tests, in uniform
+  //            codebases, this can significantly speed up the import step for
+  //            compile commands.
+  if (enable_cache) {
+    std::unique_lock<std::mutex>(cached_info_lock).swap(locker);
+    if (auto info_it = cached_info.find(command.vec[0]);
+        info_it != cached_info.end()) {
+      return info_it->second;  // Cache hit.
+    }
+  }
+
   std::vector<std::string> new_args;
   bool skip = false;
   for (const char *arg : command.vec) {
@@ -248,18 +283,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   new_args.emplace_back("-include");
   new_args.emplace_back("/trail/of/bits");
 
-//  for (auto &[k, v] : command.env) {
-//    std::cerr << k << '=' << v << " \\\n";
-//  }
-//  auto sep = "";
-//  for (auto a : new_args) {
-//    std::cerr << sep << a;
-//    sep = " ";
-//  }
-//
-//  std::cerr << "\n\n";
-//  std::cerr.flush();
-
   CompilerPathInfo output;
   auto ret = Subprocess::Execute(
       new_args, &(command.env), nullptr /* stdin */, nullptr /* stdout */,
@@ -268,11 +291,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   if (std::holds_alternative<std::error_code>(ret) && output.sysroot.empty()) {
     return std::get<std::error_code>(ret).message();
   }
-
-//  if (output_sysroot.find("udf.c") != std::string::npos) {
-//    auto fd = open("/tmp/udf_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-//    write(fd, output_sysroot.data(), output_sysroot.size());
-//  }
 
   if (auto it = output.sysroot.find("End of search list.");
       it == std::string::npos) {
@@ -298,11 +316,6 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     return std::get<std::error_code>(ret).message();
   }
 
-//  if (output_no_sysroot.find("udf.c") != std::string::npos) {
-//    auto fd = open("/tmp/udf_no_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-//    write(fd, output_no_sysroot.data(), output_no_sysroot.size());
-//  }
-
   if (auto it = output.no_sysroot.find("End of search list.");
       it == std::string::npos) {
     if (std::holds_alternative<std::error_code>(ret)) {
@@ -310,6 +323,10 @@ BuildCommandAction::InitCompilerFromCommand(void) {
     } else {
       return "Unknown error: " + output.sysroot;
     }
+  }
+
+  if (enable_cache) {
+    cached_info.emplace(command.vec[0], output);
   }
 
   return output;
@@ -394,7 +411,7 @@ void BuildCommandAction::Run(void) {
     return;
   }
 
-  auto maybe_cc_info = InitCompilerFromCommand();
+  auto maybe_cc_info = cache.GetCompilerInfo(command);
   if (!std::holds_alternative<CompilerPathInfo>(maybe_cc_info)) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
@@ -611,10 +628,11 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(const ExecutorOptions &options) {
+void Importer::Import(const ExecutorOptions &options, bool fast_import) {
   Executor per_path_exe(options);
 
   for (auto &[cwd, commands] : d->commands) {
+    CompilerPathInfoCache cc_info_cache(fast_import);
 
     // Make sure that even concurrent calls to `Import` never concurrently
     // change the current working directory.
@@ -632,7 +650,8 @@ void Importer::Import(const ExecutorOptions &options) {
     }
 
     for (const Command &cmd : commands) {
-      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
+                                                     cc_info_cache);
     }
 
     per_path_exe.Start();
