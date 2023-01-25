@@ -9,10 +9,14 @@
 
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
+#include <multiplier/Database.h>
 
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
+#include "PASTA.h"
+
+#include <deque>
 
 namespace indexer {
 namespace {
@@ -142,60 +146,95 @@ void DispatchSerializeMacro(const EntityMapper &em,
 }
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
-void SerializePendingFragment(const PendingFragment &pf,
+void SerializePendingFragment(mx::DatabaseWriter &database,
+                              const PendingFragment &pf,
                               const EntityMapper &em,
-                              mx::rpc::Fragment::Builder &b) {
+                              mx::rpc::Fragment::Builder &b,
+                              std::deque<EntityBuilder<mx::ast::Decl>> &decls,
+                              std::deque<EntityBuilder<mx::ast::Stmt>> &stmts,
+                              std::deque<EntityBuilder<mx::ast::Type>> &types,
+                              std::deque<EntityBuilder<mx::ast::Attr>> &attrs,
+                              std::deque<EntityBuilder<mx::ast::Pseudo>> &pseudos) {
 
   auto i = 0u;
-  auto decl_builder = b.initDeclarations(
-      static_cast<unsigned>(pf.decls_to_serialize.size()));
   for (const pasta::Decl &entity : pf.decls_to_serialize) {
-    DispatchSerializeDecl(em, decl_builder[i++], entity);
+    auto &storage = decls.emplace_back();
+    DispatchSerializeDecl(em, storage.builder, entity);
+    mx::DeclarationId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
+    id.is_definition = IsDefinition(entity);
+    database.AddAsync(
+        mx::DeclEntityRecord{
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
-  auto stmt_builder = b.initStatements(
-      static_cast<unsigned>(pf.stmts_to_serialize.size()));
   for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
-    DispatchSerializeStmt(em, stmt_builder[i++], entity);
+    auto &storage = stmts.emplace_back();
+    DispatchSerializeStmt(em, storage.builder, entity);
+    mx::StatementId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
+    database.AddAsync(
+        mx::StmtEntityRecord{
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
-  auto type_builder = b.initTypes(
-      static_cast<unsigned>(pf.types_to_serialize.size()));
   for (const pasta::Type &entity : pf.types_to_serialize) {
-    DispatchSerializeType(em, type_builder[i++], entity);
+    auto &storage = types.emplace_back();
+    DispatchSerializeType(em, storage.builder, entity);
+    mx::TypeId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
+    database.AddAsync(
+        mx::TypeEntityRecord{
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
-  auto attr_builder = b.initAttributes(
-      static_cast<unsigned>(pf.attrs_to_serialize.size()));
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
-    DispatchSerializeAttr(em, attr_builder[i++], entity);
+    auto &storage = attrs.emplace_back();
+    DispatchSerializeAttr(em, storage.builder, entity);
+    mx::AttributeId id;
+    id.fragment_id = pf.fragment_id.Unpack().fragment_id;
+    id.offset = i++;
+    id.kind = mx::FromPasta(entity.Kind());
+    database.AddAsync(
+        mx::AttrEntityRecord{
+          id, GetPackedData(storage.message)});
   }
 
   i = 0u;
-  auto pseudo_builder = b.initOthers(
-      static_cast<unsigned>(pf.pseudos_to_serialize.size()));
   for (const Pseudo &pseudo : pf.pseudos_to_serialize) {
+    auto &storage = pseudos.emplace_back();
     if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
       SerializeTemplateArgument(
-          em, pseudo_builder[i++], std::get<pasta::TemplateArgument>(pseudo));
+          em, storage.builder, std::get<pasta::TemplateArgument>(pseudo));
     } else if (std::holds_alternative<pasta::CXXBaseSpecifier>(pseudo)) {
       SerializeCXXBaseSpecifier(
-          em, pseudo_builder[i++], std::get<pasta::CXXBaseSpecifier>(pseudo));
+          em, storage.builder, std::get<pasta::CXXBaseSpecifier>(pseudo));
     } else if (std::holds_alternative<pasta::TemplateParameterList>(pseudo)) {
       SerializeTemplateParameterList(
-          em, pseudo_builder[i++],
+          em, storage.builder,
           std::get<pasta::TemplateParameterList>(pseudo));
     } else if (std::holds_alternative<pasta::Designator>(pseudo)) {
       SerializeDesignator(
-          em, pseudo_builder[i++],
+          em, storage.builder,
           std::get<pasta::Designator>(pseudo));
     } else {
       assert(false);
-      ++i;
     }
+    mx::DesignatorId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i++;
+    database.AddAsync(
+        mx::PseudoEntityRecord{
+          id, GetPackedData(storage.message)});
   }
 }
 

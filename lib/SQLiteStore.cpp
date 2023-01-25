@@ -12,8 +12,41 @@
 #include <shared_mutex>
 #include <sqlite3.h>
 #include <vector>
+#include <zstd.h>
+
+#include "API.h"
+#include "SQLiteCompression.h"
+
+namespace std {
+  template<>
+  struct default_delete<ZSTD_CCtx> {
+    void operator()(ZSTD_CCtx* cctx) {
+      ZSTD_freeCCtx(cctx);
+    }
+  };
+
+  template<>
+  struct default_delete<ZSTD_DCtx> {
+    void operator()(ZSTD_DCtx* cctx) {
+      ZSTD_freeDCtx(cctx);
+    }
+  };
+}
 
 namespace sqlite {
+
+#define MX_VISIT_PSEUDO_KIND(cls, storage) \
+    inline static unsigned Get_Pseudo_Kind( \
+        const mx::ast::Pseudo::Reader &reader, mx::cls *) { \
+      return reader.getVal ## storage(); \
+    }
+#include <multiplier/Visitor.inc.h>
+
+#ifndef NDEBUG
+// Nifty to double check that only one connection is being used/created
+// per-thread.
+static thread_local sqlite3 *tDatabase = nullptr;
+#endif
 
 class ConnectionImpl {
  public:
@@ -24,6 +57,9 @@ class ConnectionImpl {
 
   std::shared_mutex busy_handler_lock;
   std::function<int(unsigned)> busy_handler;
+
+  std::unique_ptr<ZSTD_CCtx> compression_ctx;
+  std::unique_ptr<ZSTD_DCtx> decompression_ctx;
 
   ConnectionImpl(const std::filesystem::path &db_path_,
                  bool read_only);
@@ -38,7 +74,9 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
       busy_handler([] (unsigned) -> int {
         std::this_thread::yield();
         return 1;
-      }) {
+      }),
+      compression_ctx(ZSTD_createCCtx()),
+      decompression_ctx(ZSTD_createDCtx()) {
 
   int ro_flag = read_only
       ? SQLITE_OPEN_READONLY
@@ -242,9 +280,127 @@ void Statement::bind(const size_t i, const std::string_view &value) {
 
 #pragma GCC diagnostic pop
 
+template<typename T>
+static void EntityFragmentId(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+  mx::EntityId id(sqlite3_value_int64(argv[0]));
+  auto unpacked = id.Unpack();
+  if(!std::holds_alternative<T>(unpacked)) {
+    sqlite3_result_error(ctx, "The id does not correspond to the specified type", -1);
+    return;
+  }
+
+  auto entity_id = std::get<T>(unpacked);
+  mx::SpecificEntityId<mx::FragmentId> packed(entity_id);
+  sqlite3_result_int64(ctx, packed.Pack());
+}
+
+template<typename T>
+static void EntityOffset(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+  mx::EntityId id(sqlite3_value_int64(argv[0]));
+  auto unpacked = id.Unpack();
+  if(!std::holds_alternative<T>(unpacked)) {
+    sqlite3_result_error(ctx, "The id does not correspond to the specified type", -1);
+    return;
+  }
+
+  auto entity_id = std::get<T>(unpacked);
+  sqlite3_result_int64(ctx, entity_id.offset);
+}
+
+template<typename T>
+static void EntityKind(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+  mx::EntityId id(sqlite3_value_int64(argv[0]));
+  auto unpacked = id.Unpack();
+  if(!std::holds_alternative<T>(unpacked)) {
+    sqlite3_result_error(ctx, "The id does not correspond to the specified type", -1);
+    return;
+  }
+
+  auto entity_id = std::get<T>(unpacked);
+  sqlite3_result_int64(ctx, static_cast<unsigned>(entity_id.kind));
+}
+
+template<>
+void EntityKind<mx::ast::Pseudo>(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
+  // TODO(frabert): This needs to change once we store pseudos other than Designators
+  sqlite3_result_int(ctx, static_cast<int>(mx::PseudoKind::DESIGNATOR));
+}
+
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
-    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {}
+    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
+      CreateFunction("Decl_kind", 1, SQLITE_DETERMINISTIC,
+        EntityKind<mx::DeclarationId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Stmt_kind", 1, SQLITE_DETERMINISTIC,
+        EntityKind<mx::StatementId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Type_kind", 1, SQLITE_DETERMINISTIC,
+        EntityKind<mx::TypeId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Attr_kind", 1, SQLITE_DETERMINISTIC,
+        EntityKind<mx::AttributeId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Macro_kind", 1, SQLITE_DETERMINISTIC,
+        EntityKind<mx::MacroId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Pseudo_kind", 1, SQLITE_DETERMINISTIC,
+        EntityKind<mx::ast::Pseudo>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Decl_fragment", 1, SQLITE_DETERMINISTIC,
+        EntityFragmentId<mx::DeclarationId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Stmt_fragment", 1, SQLITE_DETERMINISTIC,
+        EntityFragmentId<mx::StatementId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Type_fragment", 1, SQLITE_DETERMINISTIC,
+        EntityFragmentId<mx::TypeId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Attr_fragment", 1, SQLITE_DETERMINISTIC,
+        EntityFragmentId<mx::AttributeId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Macro_fragment", 1, SQLITE_DETERMINISTIC,
+        EntityFragmentId<mx::MacroId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Pseudo_fragment", 1, SQLITE_DETERMINISTIC,
+        EntityFragmentId<mx::DesignatorId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Decl_offset", 1, SQLITE_DETERMINISTIC,
+        EntityOffset<mx::DeclarationId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Stmt_offset", 1, SQLITE_DETERMINISTIC,
+        EntityOffset<mx::StatementId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Type_offset", 1, SQLITE_DETERMINISTIC,
+        EntityOffset<mx::TypeId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Attr_offset", 1, SQLITE_DETERMINISTIC,
+        EntityOffset<mx::AttributeId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Macro_offset", 1, SQLITE_DETERMINISTIC,
+        EntityOffset<mx::MacroId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("Pseudo_offset", 1, SQLITE_DETERMINISTIC,
+        EntityOffset<mx::DesignatorId>, nullptr, nullptr, nullptr);
+
+      CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC,
+        ZstdCompress, nullptr, nullptr, nullptr, impl->compression_ctx.get());
+
+      CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC,
+        ZstdCompressDict, nullptr, nullptr, nullptr, impl->compression_ctx.get());
+
+      CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC,
+        ZstdDecompress, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
+
+      CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC,
+        ZstdDecompressDict, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
+
+      CreateFunction("zstd_create_cdict", 1, 0,
+        ZstdCreateCDict, nullptr, nullptr, nullptr, impl->compression_ctx.get());
+
+      CreateFunction("zstd_create_ddict", 1, 0,
+        ZstdCreateDDict, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
+    };
 
 // Get the filename used to open the database
 std::filesystem::path Connection::GetFilename(void) const {
@@ -261,12 +417,12 @@ void Connection::CreateFunction(
     void (*x_func)(sqlite3_context *, int, sqlite3_value **),
     void (*x_step)(sqlite3_context *, int, sqlite3_value **),
     void (*x_final)(sqlite3_context *),
-    void (*x_destroy)(void *)) {
+    void (*x_destroy)(void *), void *pApp) {
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
       impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
-      nullptr, x_func, x_step, x_final, x_destroy);
+      pApp, x_func, x_step, x_final, x_destroy);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
   }

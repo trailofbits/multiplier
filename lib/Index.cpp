@@ -220,14 +220,19 @@ VariantEntity Index::entity(EntityId eid) const {
     DeclarationId id = std::get<DeclarationId>(vid);
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_decls) {
-      Decl decl(std::move(frag_ptr), id.offset);
-      if (decl.id() == eid) {
-        return decl;
-      } else {
-        assert(false);
-      }
+    auto frag_ptr = impl->FragmentFor(impl, fid);
+    if(!frag_ptr) {
+      return NotAnEntity();
+    }
+    auto reader = frag_ptr->NthDecl(id.offset);
+    if(!reader.has_value()) {
+      return NotAnEntity();
+    }
+    Decl decl(std::move(*reader), std::move(frag_ptr), id.offset);
+    if (decl.id() == eid) {
+      return decl;
+    } else {
+      assert(false);
     }
 
   // It's a reference to a statement.
@@ -235,14 +240,19 @@ VariantEntity Index::entity(EntityId eid) const {
     StatementId id = std::get<StatementId>(vid);
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_stmts) {
-      Stmt stmt(std::move(frag_ptr), id.offset);
-      if (stmt.id() == eid) {
-        return stmt;
-      } else {
-        assert(false);
-      }
+    auto frag_ptr = impl->FragmentFor(impl, fid);
+    if(!frag_ptr) {
+      return NotAnEntity();
+    }
+    auto reader = frag_ptr->NthStmt(id.offset);
+    if(!reader.has_value()) {
+      return NotAnEntity();
+    }
+    Stmt stmt(std::move(*reader), std::move(frag_ptr), id.offset);
+    if (stmt.id() == eid) {
+      return stmt;
+    } else {
+      assert(false);
     }
 
   // It's a reference to a type.
@@ -250,14 +260,19 @@ VariantEntity Index::entity(EntityId eid) const {
     TypeId id = std::get<TypeId>(vid);
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_types) {
-      Type type(std::move(frag_ptr), id.offset);
-      if (type.id() == eid) {
-        return type;
-      } else {
-        assert(false);
-      }
+    auto frag_ptr = impl->FragmentFor(impl, fid);
+    if(!frag_ptr) {
+      return NotAnEntity();
+    }
+    auto reader = frag_ptr->NthType(id.offset);
+    if(!reader.has_value()) {
+      return NotAnEntity();
+    }
+    Type type(std::move(*reader), std::move(frag_ptr), id.offset);
+    if (type.id() == eid) {
+      return type;
+    } else {
+      assert(false);
     }
 
   // It's a reference to an attribute.
@@ -265,14 +280,19 @@ VariantEntity Index::entity(EntityId eid) const {
     AttributeId id = std::get<AttributeId>(vid);
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_attrs) {
-      Attr attr(std::move(frag_ptr), id.offset);
-      if (attr.id() == eid) {
-        return attr;
-      } else {
-        assert(false);
-      }
+    auto frag_ptr = impl->FragmentFor(impl, fid);
+    if(!frag_ptr) {
+      return NotAnEntity();
+    }
+    auto reader = frag_ptr->NthAttr(id.offset);
+    if(!reader.has_value()) {
+      return NotAnEntity();
+    }
+    Attr attr(std::move(*reader), std::move(frag_ptr), id.offset);
+    if (attr.id() == eid) {
+      return attr;
+    } else {
+      assert(false);
     }
 
   // It's a reference to a parsed token resident in a fragment.
@@ -311,14 +331,19 @@ VariantEntity Index::entity(EntityId eid) const {
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
 
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_macros) {
-      Macro macro(frag_ptr, id.offset);
-      if (macro.id() == eid) {
-        return macro;
-      } else {
-        assert(false);
-      }
+    auto frag_ptr = impl->FragmentFor(impl, fid);
+    if(!frag_ptr) {
+      return NotAnEntity();
+    }
+    auto reader = frag_ptr->NthMacro(id.offset);
+    if(!reader.has_value()) {
+      return NotAnEntity();
+    }
+    Macro macro(std::move(*reader), std::move(frag_ptr), id.offset);
+    if (macro.id() == eid) {
+      return macro;
+    } else {
+      assert(false);
     }
 
   // It's a reference to a file token.
@@ -338,10 +363,15 @@ VariantEntity Index::entity(EntityId eid) const {
   } else if (std::holds_alternative<DesignatorId>(vid)) {
     DesignatorId id = std::get<DesignatorId>(vid);
     FragmentId fid(id.fragment_id);
-    if (FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-        frag_ptr && id.offset < frag_ptr->num_pseudos) {
-      return Designator(std::move(frag_ptr), id.offset);
+    auto frag_ptr = impl->FragmentFor(impl, fid);
+    if(!frag_ptr) {
+      return NotAnEntity();
     }
+    auto reader = frag_ptr->NthPseudo(id.offset);
+    if(!reader.has_value()) {
+      return NotAnEntity();
+    }
+    return Designator(std::move(*reader), std::move(frag_ptr), id.offset);
  
   } else if (std::holds_alternative<FragmentId>(vid)) {
     FragmentId id = std::get<FragmentId>(vid);

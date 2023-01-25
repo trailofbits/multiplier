@@ -107,7 +107,7 @@ class FileImpl final {
   ~FileImpl(void) noexcept;
 
   explicit FileImpl(FileId id_, EntityProvider::Ptr ep_,
-                    const capnp::Data::Reader &reader_);
+                    const std::string &data);
 
   // Return a reader for the tokens in the file.
   inline std::shared_ptr<const class TokenReader> TokenReader(

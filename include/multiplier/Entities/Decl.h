@@ -33,6 +33,7 @@ namespace mx {
 class Attr;
 class Decl;
 class ExternalSourceSymbolAttr;
+class PackedReaderState;
 class Stmt;
 class StmtReference;
 class TemplateDecl;
@@ -52,6 +53,7 @@ class Decl {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
+  std::shared_ptr<PackedReaderState> package;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -61,8 +63,9 @@ class Decl {
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
 
-  inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
+  inline Decl(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : package(std::move(package_)),
+        fragment(std::move(fragment_)),
         offset_(offset__) {}
 
   inline static std::optional<Decl> from(const Decl &self) {

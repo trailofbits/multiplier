@@ -25,6 +25,7 @@
 
 namespace mx {
 class Macro;
+class PackedReaderState;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -41,6 +42,7 @@ class Macro {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
+  std::shared_ptr<PackedReaderState> package;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -50,8 +52,9 @@ class Macro {
   Macro &operator=(Macro &&) noexcept = default;
   Macro &operator=(const Macro &) = default;
 
-  inline Macro(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
+  inline Macro(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : package(std::move(package_)),
+        fragment(std::move(fragment_)),
         offset_(offset__) {}
 
   inline static std::optional<Macro> from(const Macro &self) {

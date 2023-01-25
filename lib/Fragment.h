@@ -137,19 +137,13 @@ class FragmentImpl final {
  public:
 
   // For bounds checking.
-  const EntityOffset num_decls;
-  const EntityOffset num_stmts;
-  const EntityOffset num_types;
-  const EntityOffset num_attrs;
-  const EntityOffset num_macros;
-  const EntityOffset num_pseudos;
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
 
   ~FragmentImpl(void) noexcept;
 
   explicit FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                        const capnp::Data::Reader &reader_);
+                        const std::string &data);
 
   // Return the ID of the file containing the first token.
   //
@@ -172,12 +166,19 @@ class FragmentImpl final {
   }
 
   // Return a specific type of entity.
-  DeclReader NthDecl(unsigned offset) const;
-  StmtReader NthStmt(unsigned offset) const;
-  TypeReader NthType(unsigned offset) const;
-  AttrReader NthAttr(unsigned offset) const;
-  MacroReader NthMacro(unsigned offset) const;
-  PseudoReader NthPseudo(unsigned offset) const;
+  std::optional<ReaderPtr> NthDecl(unsigned offset) const;
+  std::optional<ReaderPtr> NthStmt(unsigned offset) const;
+  std::optional<ReaderPtr> NthType(unsigned offset) const;
+  std::optional<ReaderPtr> NthAttr(unsigned offset) const;
+  std::optional<ReaderPtr> NthMacro(unsigned offset) const;
+  std::optional<ReaderPtr> NthPseudo(unsigned offset) const;
+
+  gap::generator<ReaderPtr> Decls() const;
+  gap::generator<ReaderPtr> Stmts() const;
+  gap::generator<ReaderPtr> Types() const;
+  gap::generator<ReaderPtr> Attrs() const;
+  gap::generator<ReaderPtr> Macros() const;
+  gap::generator<ReaderPtr> Pseudos() const;
 
   std::string_view SourceIR(void) const;
 

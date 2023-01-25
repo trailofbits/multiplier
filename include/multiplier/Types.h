@@ -65,25 +65,6 @@ struct DesignatorId;
 
 using EntityOffset = uint32_t;
 
-// Identifies a serialized fragment.
-struct FragmentId {
-  RawEntityId fragment_id;
-
-  auto operator<=>(const FragmentId &) const noexcept = default;
-
-  inline explicit FragmentId(RawEntityId fragment_id_)
-      : fragment_id(fragment_id_) {}
-
-  inline /* implicit */ FragmentId(const DeclarationId &);
-  inline /* implicit */ FragmentId(const StatementId &);
-  inline /* implicit */ FragmentId(const TypeId &);
-  inline /* implicit */ FragmentId(const AttributeId &);
-  inline /* implicit */ FragmentId(const ParsedTokenId &);
-  inline /* implicit */ FragmentId(const MacroTokenId &);
-  inline /* implicit */ FragmentId(const MacroId &);
-  inline /* implicit */ FragmentId(const DesignatorId &);
-};
-
 // Identifies a serialized file.
 struct FileId {
   RawEntityId file_id;
@@ -213,26 +194,32 @@ struct DesignatorId {
   auto operator<=>(const DesignatorId &) const noexcept = default;
 };
 
-inline FragmentId::FragmentId(const DeclarationId &id_)
-    : fragment_id(id_.fragment_id) {}
+// Identifies a serialized fragment.
+struct FragmentId {
+  RawEntityId fragment_id;
 
-inline FragmentId::FragmentId(const StatementId &id_)
-    : fragment_id(id_.fragment_id) {}
+  auto operator<=>(const FragmentId &) const noexcept = default;
 
-inline FragmentId::FragmentId(const TypeId &id_)
-    : fragment_id(id_.fragment_id) {}
+  inline explicit FragmentId(RawEntityId fragment_id_)
+      : fragment_id(fragment_id_) {}
 
-inline FragmentId::FragmentId(const ParsedTokenId &id_)
+  inline /* implicit */ FragmentId(const DeclarationId &id_)
     : fragment_id(id_.fragment_id) {}
-
-inline FragmentId::FragmentId(const MacroTokenId &id_)
+  inline /* implicit */ FragmentId(const StatementId &id_)
     : fragment_id(id_.fragment_id) {}
-
-inline FragmentId::FragmentId(const MacroId &id_)
+  inline /* implicit */ FragmentId(const TypeId &id_)
     : fragment_id(id_.fragment_id) {}
-
-inline FragmentId::FragmentId(const DesignatorId &id_)
+  inline /* implicit */ FragmentId(const AttributeId &id_)
     : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const ParsedTokenId &id_)
+    : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const MacroTokenId &id_)
+    : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const MacroId &id_)
+    : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const DesignatorId &id_)
+    : fragment_id(id_.fragment_id) {}
+};
 
 inline FileId::FileId(const FileTokenId &id_)
     : file_id(id_.file_id) {}

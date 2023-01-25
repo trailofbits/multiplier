@@ -731,7 +731,8 @@ class CodeGenerator {
       const std::optional<pasta::RecordDecl> &record,
       const std::string &class_name, const std::string &api_name,
       const std::string &method_name, const char *nth_entity_reader,
-      std::set<std::string> &fwd_decls, std::set<std::string> &needed_decls);
+      std::set<std::string> &fwd_decls, std::set<std::string> &needed_decls,
+      const std::string& base_name);
 
   void RunOnVector(
       std::ostream &os, SpecificEntityStorage &storage,
@@ -739,7 +740,7 @@ class CodeGenerator {
       const std::string &class_name, const std::string &api_name,
       const std::string &method_name, const char *nth_entity_reader,
       bool optional, std::set<std::string> &fwd_decls,
-      std::set<std::string> &needed_decls);
+      std::set<std::string> &needed_decls, const std::string& base_name);
 
  public:
   CodeGenerator(char *argv[]);
@@ -1025,7 +1026,7 @@ void CodeGenerator::RunOnOptional(
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name,
     const char *nth_entity_reader, std::set<std::string>& fwd_decls,
-    std::set<std::string>& needed_decls) {
+    std::set<std::string>& needed_decls, const std::string& base_name) {
 
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
@@ -1065,7 +1066,7 @@ void CodeGenerator::RunOnOptional(
   } else if (*element_name == "vector") {
     if (auto sub_record = GetTemplateParameterRecord(record)) {
       RunOnVector(os, storage, sub_record, class_name, api_name, method_name,
-                  nth_entity_reader, true, fwd_decls, needed_decls);
+                  nth_entity_reader, true, fwd_decls, needed_decls, base_name);
       return;
     }
 
@@ -1122,7 +1123,7 @@ void CodeGenerator::RunOnOptional(
     lib_cpp_os
         << "Token " << class_name << "::" << api_name
         << "(void) const {\n"
-        << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+        << "  auto self = package->Reader<ast::" << base_name << ">();\n";
   } else {
     os
         << "  std::optional<" << cxx_element_name << "> "
@@ -1132,7 +1133,7 @@ void CodeGenerator::RunOnOptional(
         << "std::optional<" << cxx_element_name << "> "
         << class_name << "::" << api_name
         << "(void) const {\n"
-        << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+        << "  auto self = package->Reader<ast::" << base_name << ">();\n";
   }
 
   if (needs_test) {
@@ -1256,6 +1257,7 @@ void CodeGenerator::RunOnOptional(
       needed_decls.insert("TokenUseSelector");
       token_use_ids[api_name].SetId(cls, i);
       selector << "TokenUseSelector";
+      element_name = "Token";
       lib_cpp_os
           << "    return fragment->TokenFor(fragment, id, "
              "true /* can_fail */).value();\n";
@@ -1369,8 +1371,9 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    return " << element_name.value() << "(fragment, self."
-        << getter_name << "());\n";
+        << "    auto offset = self." << getter_name << "();\n"
+        << "    auto reader = fragment->NthPseudo(offset);\n"
+        << "    return " << element_name.value() << "(std::move(*reader), fragment, offset);\n";
 
   // Enums, bools, ints, etc.
   } else {
@@ -1417,7 +1420,7 @@ void CodeGenerator::RunOnVector(
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name, const char *nth_entity_reader,
     bool optional, std::set<std::string> &fwd_decls,
-    std::set<std::string> &needed_decls) {
+    std::set<std::string> &needed_decls, const std::string& base_name) {
 
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
@@ -1494,7 +1497,7 @@ void CodeGenerator::RunOnVector(
   lib_cpp_os
       << class_name << "::" << api_name
       << "(void) const {\n"
-      << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n";
+      << "  auto self = package->Reader<ast::" << base_name << ">();\n";
 
   if (optional) {
     lib_cpp_os
@@ -1689,7 +1692,8 @@ void CodeGenerator::RunOnVector(
         << "      sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
 
     lib_cpp_os
-        << "vec.emplace_back(fragment, v);\n";
+        << "  auto reader = fragment->NthPseudo(v);\n"
+        << "  vec.emplace_back(std::move(*reader), fragment, v);\n";
   }
 
   lib_cpp_os
@@ -1817,6 +1821,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   serialize_inc_os
       << "\n#endif\n\n";
+
+  std::string base_name;
+  if (is_decl) { base_name = "Decl"; }
+  else if (is_type) { base_name = "Type"; }
+  else if (is_stmt) { base_name = "Stmt"; }
+  else if (is_attr) { base_name = "Attr"; }
+  else if (is_macro) { base_name = "Macro"; }
+  else { base_name = "Pseudo"; }
 
   if (is_decl) {
     needed_decls.insert("DeclKind");
@@ -2060,7 +2072,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "bool Decl::is_definition(void) const {\n"
             << "  auto self = fragment->NthDecl(offset_);\n"
-            << "  return self." << def_getter_name << "();\n"
+            << "  return (*self)->Reader<ast::Decl>()." << def_getter_name << "();\n"
             << "}\n\n";
 
         serialize_cpp_os
@@ -2069,7 +2081,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       lib_cpp_os
           << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
-          << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+          << "  auto self = package->Reader<ast::" << base_name << ">();\n"
           << "  if (auto id = self." << cd_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
           << "    return fragment->DeclFor(fragment, id);\n"
@@ -2078,7 +2090,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n"
           << "}\n\n"
           << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
-          << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+          << "  auto self = package->Reader<ast::" << base_name << ">();\n"
           << "  if (auto id = self." << cs_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
           << "    return fragment->StmtFor(fragment, id);\n"
@@ -2104,6 +2116,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "Type")
         << FriendOf(class_os, class_name, "UseBase")
         << FriendOf(class_os, class_name, "UseIteratorImpl")
+        << "  std::shared_ptr<PackedReaderState> package;\n"
         << "  std::shared_ptr<const FragmentImpl> fragment;\n"
         << "  unsigned offset_;\n\n"
         << " public:\n"
@@ -2112,9 +2125,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  " << class_name << " &operator=(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << " &operator=(const " << class_name << " &) = default;\n\n"
         << "  inline " << class_name
-        << "(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)\n"
-        << "      : fragment(std::move(fragment_)),\n"
+        << "(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)\n"
+        << "      : package(std::move(package_)),\n"
+        << "        fragment(std::move(fragment_)),\n"
         << "        offset_(offset__) {}\n\n";
+    forward_decls.insert("PackedReaderState");
 
     if (class_name == "Decl") {
       needed_decls.insert("DeclUseSelector");
@@ -2193,7 +2208,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << "std::optional<Decl> Stmt::referenced_declaration(void) const {\n"
           << "  auto self = fragment->NthStmt(offset_);\n"
-          << "  if (auto id = self." << ref_getter_name << "(); id != kInvalidEntityId) {\n"
+          << "  if (auto id = (*self)->Reader<mx::ast::Decl>()." << ref_getter_name << "(); id != kInvalidEntityId) {\n"
           << "    return fragment->DeclFor(fragment, id);\n"
           << "  } else {\n"
           << "    return std::nullopt;\n"
@@ -2779,6 +2794,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       // both as references.
       if (record_name == "Token" || record_name == "FileToken" ||
           record_name == "MacroToken") {
+        record_name = "Token";
 
         const auto i = storage.AddMethod("UInt64");  // Reference.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
@@ -2798,7 +2814,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "Token " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  if (auto tok = fragment->TokenFor(fragment, self."
             << getter_name << "())) {\n"
             << "    return tok.value();\n"
@@ -2829,7 +2845,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "TokenRange " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  return fragment->TokenRangeFor(fragment, self."
             << begin_getter_name << "(), self." << end_getter_name << "());\n"
             << "}\n\n";
@@ -2863,7 +2879,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "std::vector<" << cxx_element_name << "> "
             << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  auto index = Index(fragment->ep);\n"
             << "  auto list = self." << getter_name << "();\n"
             << "  std::vector<" << cxx_element_name << "> vec;\n"
@@ -2934,7 +2950,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "File " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  auto file = fragment->ep->FileFor(fragment->ep, self."
             << getter_name << "());\n"
             << "  return File(std::move(file));\n"
@@ -2961,7 +2977,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
             << "  return std::string_view(data.cStr(), data.size());\n"
@@ -2990,7 +3006,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
             << "  return std::string_view(data.cStr(), data.size());\n"
@@ -3023,7 +3039,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::filesystem::path " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  capnp::Text::Reader data = self." << getter_name
             << "();\n"
             << "  return data.cStr();\n"
@@ -3041,13 +3057,13 @@ MethodListPtr CodeGenerator::RunOnClass(
       } else if (record_name == "optional") {
         RunOnOptional(class_os, cls, storage, record, class_name, api_name,
                       method_name, nth_entity_reader, forward_decls,
-                      needed_decls);
+                      needed_decls, base_name);
 
       // List of things; figure out what.
       } else if (record_name == "vector") {
         RunOnVector(class_os, storage, record, class_name, api_name,
                     method_name, nth_entity_reader, false, forward_decls,
-                    needed_decls);
+                    needed_decls, base_name);
 
       // E.g. something that returns a `Decl`, `Stmt`, etc.
       } else if (gEntityClassNames.count(record_name)) {
@@ -3070,7 +3086,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << record_name << " " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  EntityId id(self." << getter_name
             << "());\n";
 
@@ -3172,9 +3188,10 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << record_name << " " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
-            << "  return " << record_name << "(fragment, self." << getter_name
-            << "());\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
+            << "  auto offset = self." << getter_name << "();\n"
+            << "  auto reader = fragment->NthPseudo(offset);\n"
+            << "  return " << record_name << "(std::move(*reader), fragment, offset);\n"
             << "}\n\n";
 
         serialize_cpp_os
@@ -3209,7 +3226,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << enum_name << " " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+            << "  auto self = package->Reader<ast::" << base_name << ">();\n"
             << "  return static_cast<" << enum_name << ">(self." << getter_name
             << "());\n"
             << "}\n\n";
@@ -3274,7 +3291,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << cxx_int_type << " " << class_name << "::" << api_name
           << "(void) const {\n"
-          << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+          << "  auto self = package->Reader<ast::" << base_name << ">();\n"
           << "  return self." << getter_name << "();\n"
           << "}\n\n";
 
@@ -3308,7 +3325,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "std::vector<Decl> "
           << class_name << "::" << api_name
           << "(void) const {\n"
-          << "  auto self = fragment->" << nth_entity_reader << "(offset_);\n"
+          << "  auto self = package->Reader<ast::" << base_name << ">();\n"
           << "  auto list = self." << getter_name << "();\n"
           << "  std::vector<Decl> vec;\n"
           << "  vec.reserve(list.size());\n"

@@ -51,7 +51,7 @@ struct SerializedFileRecord {
   static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, ?2)";
+      "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, zstd_compress(?2))";
 
   SpecificEntityId<FileId> file_id;
   std::string data;
@@ -97,7 +97,7 @@ struct SerializedFragmentRecord {
 
   static constexpr const char *kInsertStatement =
       R"(INSERT OR IGNORE INTO fragment (fragment_id, data)
-         VALUES (?1, ?2))";
+         VALUES (?1, zstd_compress(?2)))";
 
   SpecificEntityId<FragmentId> fragment_id;
   std::string data;
@@ -258,6 +258,34 @@ struct ReferenceRecord {
   RawEntityId entity_id;
 };
 
+#define MX_ENTITY_TABLE(name) \
+  struct name ## EntityRecord { \
+    static constexpr const char *kTableName = #name; \
+    static constexpr const char *kInitStatements[] = \
+      {"CREATE TABLE IF NOT EXISTS " #name "( \
+            id INT PRIMARY KEY, \
+            contents BLOB NOT NULL, \
+            fragment_id INT GENERATED ALWAYS AS (" #name "_fragment(id)) VIRTUAL, \
+            offset INT GENERATED ALWAYS AS (" #name "_offset(id)) VIRTUAL, \
+            kind INT GENERATED ALWAYS AS (" #name "_kind(id)) VIRTUAL \
+          )"}; \
+    static constexpr const char *kExitStatements[] = \
+      {"CREATE INDEX IF NOT EXISTS " #name "_kind_index ON " #name "(kind)", \
+       "CREATE INDEX IF NOT EXISTS " #name "_fragment_index ON " #name "(fragment_id)", \
+       "CREATE INDEX IF NOT EXISTS " #name "_offset_index ON " #name "(fragment_id, offset ASC)"}; \
+    static constexpr const char *kInsertStatement = \
+      "INSERT INTO " #name " (id, contents) VALUES (?1, zstd_compress(?2))"; \
+    mx::EntityId id; \
+    std::string content; \
+  };
+
+MX_ENTITY_TABLE(Decl)
+MX_ENTITY_TABLE(Type)
+MX_ENTITY_TABLE(Stmt)
+MX_ENTITY_TABLE(Attr)
+MX_ENTITY_TABLE(Macro)
+MX_ENTITY_TABLE(Pseudo)
+
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
     m(SerializedFileRecord) \
@@ -267,7 +295,13 @@ struct ReferenceRecord {
     m(MangledNameRecord) \
     m(UseRecord) \
     m(ReferenceRecord) \
-    m(SymbolNameRecord)
+    m(SymbolNameRecord) \
+    m(DeclEntityRecord) \
+    m(TypeEntityRecord) \
+    m(StmtEntityRecord) \
+    m(AttrEntityRecord) \
+    m(MacroEntityRecord) \
+    m(PseudoEntityRecord)
 
 #define MX_DATABASE_PRAGMA_SYNCHRONOUS "NORMAL"
 #define MX_DATABASE_TEMP_STORE "MEMORY"

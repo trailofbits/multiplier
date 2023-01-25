@@ -14,6 +14,8 @@
 #include <string_view>
 #include <unordered_map>
 #include <variant>
+#include <capnp/c++.capnp.h>
+#include <capnp/message.h>
 
 namespace pasta {
 class AST;
@@ -95,5 +97,15 @@ mx::RawEntityId RelatedEntityId(
 mx::RawEntityId RelatedEntityId(
     const EntityMapper &em, const pasta::MacroToken &tok,
     RelatedEntityIds &related_ids);
+
+template<typename T>
+struct EntityBuilder {
+  capnp::MallocMessageBuilder message;
+  typename T::Builder builder;
+
+  EntityBuilder() : builder(message.initRoot<T>()) {}
+};
+
+std::string GetPackedData(capnp::MessageBuilder& builder);
 
 }  // namespace indexer

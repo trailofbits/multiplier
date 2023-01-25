@@ -26,6 +26,7 @@
 #include "TypeUseSelector.h"
 
 namespace mx {
+class PackedReaderState;
 class TemplateArgument;
 class Type;
 class ValueDecl;
@@ -45,6 +46,7 @@ class TemplateArgument {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
+  std::shared_ptr<PackedReaderState> package;
   std::shared_ptr<const FragmentImpl> fragment;
   unsigned offset_;
 
@@ -54,8 +56,9 @@ class TemplateArgument {
   TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
   TemplateArgument &operator=(const TemplateArgument &) = default;
 
-  inline TemplateArgument(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
+  inline TemplateArgument(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
+      : package(std::move(package_)),
+        fragment(std::move(fragment_)),
         offset_(offset__) {}
 
   TemplateArgumentKind kind(void) const;

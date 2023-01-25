@@ -74,7 +74,6 @@ add_custom_target("copy_headers"
 
 set(api_headers
   "${source_include_dir}/AST.h"
-  $<BUILD_INTERFACE:${source_include_dir}/Compress.h>
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   "${source_include_dir}/File.h"
   "${source_include_dir}/Fragment.h"
@@ -99,8 +98,6 @@ add_library("mx-api" STATIC
   
   "API.cpp"
   "API.h"
-  "Compress.cpp"
-  "Compress.h"
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
   "Database.cpp"
@@ -120,6 +117,8 @@ add_library("mx-api" STATIC
   "Re2Impl.h"
   "SQLiteEntityProvider.cpp"
   "SQLiteEntityProvider.h"
+  "SQLiteCompression.cpp"
+  "SQLiteCompression.h"
   "SQLiteStore.cpp"
   "SQLiteStore.h"
   "ThreadLocal.cpp"
@@ -154,7 +153,7 @@ target_link_libraries("mx-api"
     gap::gap-settings
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
-    "ZLIB::ZLIB"
+    $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>
 )
 
 if(MX_ENABLE_RE2)

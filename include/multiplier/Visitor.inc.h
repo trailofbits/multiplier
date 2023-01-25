@@ -6364,8 +6364,8 @@ MX_END_VISIT_MACRO(MacroArgument)
 MX_BEGIN_VISIT_MACRO(MacroParameter)
   MX_ENTER_VISIT_MacroParameter
   MX_VISIT_BASE(MacroParameter, Macro)
-  MX_VISIT_ENTITY(MacroParameter, variadic_dots, 4, MX_APPLY_METHOD, VariadicDots, MacroToken, NthMacro, TokenUseSelector::VARIADIC_DOTS)
-  MX_VISIT_ENTITY(MacroParameter, name, 8, MX_APPLY_METHOD, Name, MacroToken, NthMacro, TokenUseSelector::NAME)
+  MX_VISIT_ENTITY(MacroParameter, variadic_dots, 4, MX_APPLY_METHOD, VariadicDots, Token, NthMacro, TokenUseSelector::VARIADIC_DOTS)
+  MX_VISIT_ENTITY(MacroParameter, name, 8, MX_APPLY_METHOD, Name, Token, NthMacro, TokenUseSelector::NAME)
   MX_VISIT_INT(MacroParameter, index, 7, MX_APPLY_METHOD, Index, unsigned, NthMacro)
   MX_EXIT_VISIT_MacroParameter
 MX_END_VISIT_MACRO(MacroParameter)
@@ -6380,8 +6380,8 @@ MX_END_VISIT_MACRO(MacroParameter)
 MX_BEGIN_VISIT_ABSTRACT_MACRO(MacroDirective)
   MX_ENTER_VISIT_MacroDirective
   MX_VISIT_BASE(MacroDirective, Macro)
-  MX_VISIT_ENTITY(MacroDirective, hash, 4, MX_APPLY_METHOD, Hash, MacroToken, NthMacro, TokenUseSelector::HASH)
-  MX_VISIT_ENTITY(MacroDirective, directive_name, 8, MX_APPLY_METHOD, DirectiveName, MacroToken, NthMacro, TokenUseSelector::DIRECTIVE_NAME)
+  MX_VISIT_ENTITY(MacroDirective, hash, 4, MX_APPLY_METHOD, Hash, Token, NthMacro, TokenUseSelector::HASH)
+  MX_VISIT_ENTITY(MacroDirective, directive_name, 8, MX_APPLY_METHOD, DirectiveName, Token, NthMacro, TokenUseSelector::DIRECTIVE_NAME)
   MX_EXIT_VISIT_MacroDirective
 MX_END_VISIT_MACRO(MacroDirective)
 
@@ -6395,7 +6395,7 @@ MX_END_VISIT_MACRO(MacroDirective)
 MX_BEGIN_VISIT_MACRO(DefineMacroDirective)
   MX_ENTER_VISIT_DefineMacroDirective
   MX_VISIT_BASE(DefineMacroDirective, MacroDirective)
-  MX_VISIT_ENTITY(DefineMacroDirective, name, 9, MX_APPLY_METHOD, Name, MacroToken, NthMacro, TokenUseSelector::NAME)
+  MX_VISIT_ENTITY(DefineMacroDirective, name, 9, MX_APPLY_METHOD, Name, Token, NthMacro, TokenUseSelector::NAME)
   MX_VISIT_MACRO_RANGE(DefineMacroDirective, body, 3, NthMacro)
   MX_VISIT_INT(DefineMacroDirective, num_explicit_parameters, 7, MX_APPLY_METHOD, NumExplicitParameters, unsigned, NthMacro)
   MX_VISIT_BOOL(DefineMacroDirective, is_variadic, 6, MX_APPLY_METHOD, IsVariadic, bool, NthMacro)

@@ -14,6 +14,7 @@
 #include <pasta/AST/Macro.h>
 #include <type_traits>
 #include <unordered_set>
+#include <deque>
 
 #include "NameMangler.h"
 #include "PendingFragment.h"
@@ -175,13 +176,20 @@ pasta::PseudoKind Get_Pseudo_Kind(const Reader &);
 // fragment ID in the data store.
 void LinkExternalUsesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    mx::rpc::Fragment::Builder &b) {
+    mx::rpc::Fragment::Builder &b,
+    std::deque<EntityBuilder<mx::ast::Decl>> &decls,
+    std::deque<EntityBuilder<mx::ast::Stmt>> &stmts,
+    std::deque<EntityBuilder<mx::ast::Type>> &types,
+    std::deque<EntityBuilder<mx::ast::Attr>> &attrs,
+    std::deque<EntityBuilder<mx::ast::Macro>> &macros,
+    std::deque<EntityBuilder<mx::ast::Pseudo>> &pseudos) {
 
   std::unordered_set<mx::RawEntityId> entity_ids;
 
   // Look for declaration methods with a return value of the corresponding
   // entity ID.
-  for (mx::ast::Decl::Reader entity : b.getDeclarations().asReader()) {
+  for (auto &d : decls) {
+    auto entity = d.builder.asReader();
 #define MX_VISIT_DECL(decl) \
     case pasta::DeclKind::k ## decl: \
       FindUses_ ## decl ## Decl(entity_ids, entity); \
@@ -195,7 +203,8 @@ void LinkExternalUsesInFragment(
 
   // Look for statement methods with a return value of the corresponding
   // entity ID.
-  for (mx::ast::Stmt::Reader entity : b.getStatements().asReader()) {
+  for (auto &s : stmts) {
+    auto entity = s.builder.asReader();
 #define MX_VISIT_STMT(stmt) \
     case pasta::StmtKind::k ## stmt: \
       FindUses_ ## stmt(entity_ids, entity); \
@@ -215,7 +224,8 @@ void LinkExternalUsesInFragment(
 
   // Look for type methods with a return value of the corresponding
   // entity ID.
-  for (mx::ast::Type::Reader entity : b.getTypes().asReader()) {
+  for (auto &t : types) {
+    auto entity = t.builder.asReader();
 #define MX_VISIT_TYPE(type) \
     case pasta::TypeKind::k ## type: \
       FindUses_ ## type ## Type(entity_ids, entity); \
@@ -230,7 +240,8 @@ void LinkExternalUsesInFragment(
 
   // Look for type methods with a return value of the corresponding
   // entity ID.
-  for (mx::ast::Attr::Reader entity : b.getAttributes().asReader()) {
+  for (auto &a : attrs) {
+    auto entity = a.builder.asReader();
 #define MX_VISIT_ATTR(type) \
     case pasta::AttrKind::k ## type: \
       FindUses_ ## type ## Attr(entity_ids, entity); \
@@ -245,7 +256,8 @@ void LinkExternalUsesInFragment(
 
   // Look for macro methods with a return value of the corresponding
   // entity ID.
-  for (mx::ast::Macro::Reader entity : b.getMacros().asReader()) {
+  for (auto &m : macros) {
+    auto entity = m.builder.asReader();
     // We need to manually do these because some of the macro kinds are invented
     // inside of Multiplier, and not present in PASTA.
     switch (static_cast<mx::MacroKind>(Get_Macro_Kind(entity))) {
@@ -327,7 +339,8 @@ void LinkExternalUsesInFragment(
   // Look for pseudo-entity methods with a return value of the corresponding
   // entity ID.
   pasta::TemplateArgument *tag = nullptr;
-  for (mx::ast::Pseudo::Reader entity : b.getOthers().asReader()) {
+  for (auto &p : pseudos) {
+    auto entity = p.builder.asReader();
 #define MX_VISIT_PSEUDO(pseudo) \
     case pasta::PseudoKind::k ## pseudo: \
       FindUses_ ## pseudo(entity_ids, entity); \
