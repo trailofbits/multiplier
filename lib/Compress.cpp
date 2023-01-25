@@ -18,7 +18,7 @@ namespace mx {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
-Result<std::string, std::error_code> TryCompress(std::string_view input) {
+std::variant<std::string, std::error_code> TryCompress(std::string_view input) {
   std::string compressed_output;
   auto source_len = static_cast<uLong>(input.size());
   auto source_data = reinterpret_cast<const Bytef *>(input.data());
@@ -41,7 +41,7 @@ Result<std::string, std::error_code> TryCompress(std::string_view input) {
   }
 }
 
-Result<std::string, std::error_code>
+std::variant<std::string, std::error_code>
 TryUncompress(std::string_view compressed_input, size_t output_size) {
   auto source_len = static_cast<uLong>(compressed_input.size());
   auto source_data = reinterpret_cast<const Bytef *>(compressed_input.data());
@@ -77,7 +77,6 @@ TryUncompress(std::string_view compressed_input, size_t output_size) {
   return std::make_error_code(std::errc::no_buffer_space);
 }
 
-
 // Compress a message.
 std::string CompressedMessage(capnp::MessageBuilder &message) {
   size_t old_size = message.sizeInWords() * sizeof(capnp::word);
@@ -90,8 +89,8 @@ std::string CompressedMessage(capnp::MessageBuilder &message) {
       reinterpret_cast<const char *>(packed_data.begin()), packed_size);
   auto maybe_compressed = mx::TryCompress(packed_data_sv);
   std::string output;
-  if (maybe_compressed.Succeeded()) {
-    output = maybe_compressed.TakeValue();
+  if (std::holds_alternative<std::string>(maybe_compressed)) {
+    output = std::move(std::get<std::string>(maybe_compressed));
     if (output.size() >= packed_size) {
       output.clear();
       goto use_uncompressed;
@@ -116,10 +115,10 @@ void WithUncompressedMessageImpl(std::string data,
   std::string_view untagged_data(begin, data.size());
   if (tag) {  // Compressed and packed.
     auto maybe_uncompressed = mx::TryUncompress(untagged_data);
-    if (!maybe_uncompressed.Succeeded()) {
+    if (!std::holds_alternative<std::string>(maybe_uncompressed)) {
       return;
     }
-    data = maybe_uncompressed.TakeValue();
+    data = std::move(std::get<std::string>(maybe_uncompressed));
   }
 
   capnp::ReaderOptions options;

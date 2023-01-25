@@ -26,13 +26,14 @@ PackedReaderState::PackedReaderState(capnp::Data::Reader data) {
 
   } else {  // Compressed and packed.
     auto maybe_uncompressed = TryUncompress(untagged_data);
-    if (!maybe_uncompressed.Succeeded()) {
+    if (std::holds_alternative<std::error_code>(maybe_uncompressed)) {
       throw kj::Exception(
           kj::Exception::Type::FAILED, __FILE__, __LINE__,
-          kj::heapString(maybe_uncompressed.Error().message().c_str()));
+          kj::heapString(
+              std::get<std::error_code>(maybe_uncompressed).message().c_str()));
 
     } else {
-      maybe_uncompressed.TakeValue().swap(storage);
+      storage = std::move(std::get<std::string>(maybe_uncompressed));
     }
   }
 

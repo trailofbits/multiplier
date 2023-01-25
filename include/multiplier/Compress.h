@@ -8,16 +8,15 @@
 
 #include <string>
 #include <system_error>
-
-#include "Result.h"
+#include <variant>
 
 namespace mx {
 
 // Try to compress `input`.
-Result<std::string, std::error_code> TryCompress(std::string_view input);
+std::variant<std::string, std::error_code> TryCompress(std::string_view input);
 
 // Try to uncompress `compressed_input`.
-Result<std::string, std::error_code> TryUncompress(
+std::variant<std::string, std::error_code> TryUncompress(
     std::string_view compressed_input, size_t output_size=0);
 
 }  // namespace mx

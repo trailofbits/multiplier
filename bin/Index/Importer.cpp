@@ -23,7 +23,6 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 #include <multiplier/AST.h>
-#include <multiplier/Result.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
@@ -166,6 +165,11 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
   envp["PWD"] = cwd;
 }
 
+struct CompilerPathInfo {
+  std::string sysroot;
+  std::string no_sysroot;
+};
+
 class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
@@ -174,8 +178,7 @@ class BuildCommandAction final : public Action {
 
   // If we are using something like CMake commands, then pull in the relevant
   // information by trying to execute the compiler directly.
-  mx::Result<std::pair<std::string, std::string>, std::error_code>
-  InitCompilerFromCommand(void);
+  std::variant<CompilerPathInfo, std::string> InitCompilerFromCommand(void);
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
@@ -195,7 +198,7 @@ class BuildCommandAction final : public Action {
 
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
-mx::Result<std::pair<std::string, std::string>, std::error_code>
+std::variant<CompilerPathInfo, std::string>
 BuildCommandAction::InitCompilerFromCommand(void) {
   std::vector<std::string> new_args;
   bool skip = false;
@@ -257,13 +260,13 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 //  std::cerr << "\n\n";
 //  std::cerr.flush();
 
-  std::string output_sysroot;
+  CompilerPathInfo output;
   auto ret = Subprocess::Execute(
       new_args, &(command.env), nullptr /* stdin */, nullptr /* stdout */,
-      &output_sysroot);
+      &output.sysroot);
 
-  if (!ret.Succeeded() && output_sysroot.empty()) {
-    return ret.TakeError();
+  if (std::holds_alternative<std::error_code>(ret) && output.sysroot.empty()) {
+    return std::get<std::error_code>(ret).message();
   }
 
 //  if (output_sysroot.find("udf.c") != std::string::npos) {
@@ -271,24 +274,28 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 //    write(fd, output_sysroot.data(), output_sysroot.size());
 //  }
 
-  if (auto it = output_sysroot.find("End of search list.");
+  if (auto it = output.sysroot.find("End of search list.");
       it == std::string::npos) {
-    if (!ret.Succeeded()) {
-      return ret.TakeError();
+    if (std::holds_alternative<std::error_code>(ret)) {
+      return std::get<std::error_code>(ret).message();
+    } else if (it = output.sysroot.find("error: "); it != std::string::npos) {
+      while (!output.sysroot.empty() && output.sysroot.back() == '\n') {
+        output.sysroot.pop_back();
+      }
+      return output.sysroot.substr(it + 7);
     } else {
-      return std::make_error_code(std::errc::invalid_argument);
+      return "Unknown error: " + output.sysroot;
     }
   }
 
-  std::string output_no_sysroot;
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/trail_of_bits");
-  auto ret2 = Subprocess::Execute(
-      new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
+  ret = Subprocess::Execute(
+      new_args, &(command.env), nullptr, nullptr, &output.no_sysroot);
 
   // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
-  if (!ret2.Succeeded() && output_no_sysroot.empty()) {
-    return ret2.TakeError();
+  if (std::holds_alternative<std::error_code>(ret) && output.no_sysroot.empty()) {
+    return std::get<std::error_code>(ret).message();
   }
 
 //  if (output_no_sysroot.find("udf.c") != std::string::npos) {
@@ -296,16 +303,16 @@ BuildCommandAction::InitCompilerFromCommand(void) {
 //    write(fd, output_no_sysroot.data(), output_no_sysroot.size());
 //  }
 
-  if (auto it = output_no_sysroot.find("End of search list.");
+  if (auto it = output.no_sysroot.find("End of search list.");
       it == std::string::npos) {
-    if (!ret.Succeeded()) {
-      return ret.TakeError();
+    if (std::holds_alternative<std::error_code>(ret)) {
+      return std::get<std::error_code>(ret).message();
     } else {
-      return std::make_error_code(std::errc::invalid_argument);
+      return "Unknown error: " + output.sysroot;
     }
   }
 
-  return std::make_pair(output_sysroot, output_no_sysroot);
+  return output;
 }
 
 bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
@@ -387,21 +394,21 @@ void BuildCommandAction::Run(void) {
     return;
   }
 
-  auto cc_info = InitCompilerFromCommand();
-  if (!cc_info.Succeeded()) {
+  auto maybe_cc_info = InitCompilerFromCommand();
+  if (!std::holds_alternative<CompilerPathInfo>(maybe_cc_info)) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
-        << cc_info.TakeError().message() << "; original command was: "
+        << std::get<std::string>(maybe_cc_info) << "; original command was: "
         << command.vec.Join();
     return;
   }
 
-  auto [cc_version_sysroot, cc_version_no_sysroot] = cc_info.TakeValue();
+  CompilerPathInfo &cc_info = std::get<CompilerPathInfo>(maybe_cc_info);
 
   pasta::Result<pasta::Compiler, std::string> maybe_cc =
       pasta::Compiler::Create(fm, command.vec[0], command.working_dir,
-                              command.name, command.lang, cc_version_sysroot,
-                              cc_version_no_sysroot);
+                              command.name, command.lang, cc_info.sysroot,
+                              cc_info.no_sysroot);
 
   if (maybe_cc.Succeeded()) {
     RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue());

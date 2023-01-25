@@ -27,8 +27,8 @@ std::string CompressedMessage(capnp::MessageBuilder &message) {
       reinterpret_cast<const char *>(packed_data.begin()), packed_size);
   auto maybe_compressed = mx::TryCompress(packed_data_sv);
   std::string output;
-  if (maybe_compressed.Succeeded()) {
-    output = maybe_compressed.TakeValue();
+  if (std::holds_alternative<std::string>(maybe_compressed)) {
+    output = std::move(std::get<std::string>(maybe_compressed));
     if (output.size() >= packed_size) {
       output.clear();
       goto use_uncompressed;
@@ -38,7 +38,7 @@ std::string CompressedMessage(capnp::MessageBuilder &message) {
   } else {
     LOG(ERROR)
         << "Unable to compress: "
-        << maybe_compressed.TakeError().message();
+        << std::get<std::error_code>(maybe_compressed).message();
   use_uncompressed:
     output.reserve(packed_size + 1u);
     output.insert(output.end(), packed_data_sv.begin(), packed_data_sv.end());
@@ -58,11 +58,15 @@ void WithUncompressedMessageImpl(
   std::string_view untagged_data(begin, data.size());
   if (tag) {  // Compressed and packed.
     auto maybe_uncompressed = mx::TryUncompress(untagged_data);
-    CHECK(maybe_uncompressed.Succeeded())
+    if (std::holds_alternative<std::string>(maybe_uncompressed)) {
+      data = std::move(std::get<std::string>(maybe_uncompressed));
+    } else {
+      LOG(FATAL)
         << "Unable to uncompress: "
-        << maybe_uncompressed.TakeError().message();
+        << std::get<std::error_code>(maybe_uncompressed).message();
+    }
 
-    data = maybe_uncompressed.TakeValue();
+    data = std::move(std::get<std::string>(maybe_uncompressed));
   }
 
   capnp::ReaderOptions options;

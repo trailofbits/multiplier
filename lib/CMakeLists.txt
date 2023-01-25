@@ -83,7 +83,6 @@ set(api_headers
   "${source_include_dir}/Query.h"
   "${source_include_dir}/Re2.h"
   "${source_include_dir}/Reference.h"
-  "${source_include_dir}/Result.h"
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
   "${source_include_dir}/Use.h"
