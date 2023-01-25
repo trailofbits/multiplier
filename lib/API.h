@@ -38,7 +38,7 @@ using MacroListReader = capnp::List<ast::Macro, capnp::Kind::STRUCT>::Reader;
 using PseudoListReader = capnp::List<ast::Pseudo, capnp::Kind::STRUCT>::Reader;
 using EntityIdListReader = capnp::List<uint64_t, capnp::Kind::PRIMITIVE>::Reader;
 
-struct PackedReaderState {
+class PackedReaderState {
  private:
   std::string storage;
   std::optional<kj::ArrayInputStream> stream;

@@ -221,11 +221,11 @@ VariantEntity Index::entity(EntityId eid) const {
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
     auto frag_ptr = impl->FragmentFor(impl, fid);
-    if(!frag_ptr) {
+    if (!frag_ptr) {
       return NotAnEntity();
     }
     auto reader = frag_ptr->NthDecl(id.offset);
-    if(!reader.has_value()) {
+    if (!reader.has_value()) {
       return NotAnEntity();
     }
     Decl decl(std::move(*reader), std::move(frag_ptr), id.offset);
@@ -241,11 +241,11 @@ VariantEntity Index::entity(EntityId eid) const {
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
     auto frag_ptr = impl->FragmentFor(impl, fid);
-    if(!frag_ptr) {
+    if (!frag_ptr) {
       return NotAnEntity();
     }
     auto reader = frag_ptr->NthStmt(id.offset);
-    if(!reader.has_value()) {
+    if (!reader.has_value()) {
       return NotAnEntity();
     }
     Stmt stmt(std::move(*reader), std::move(frag_ptr), id.offset);
@@ -261,11 +261,11 @@ VariantEntity Index::entity(EntityId eid) const {
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
     auto frag_ptr = impl->FragmentFor(impl, fid);
-    if(!frag_ptr) {
+    if (!frag_ptr) {
       return NotAnEntity();
     }
     auto reader = frag_ptr->NthType(id.offset);
-    if(!reader.has_value()) {
+    if (!reader.has_value()) {
       return NotAnEntity();
     }
     Type type(std::move(*reader), std::move(frag_ptr), id.offset);
@@ -281,11 +281,11 @@ VariantEntity Index::entity(EntityId eid) const {
     FragmentId fid(id.fragment_id);
     assert(id == EntityId(id));
     auto frag_ptr = impl->FragmentFor(impl, fid);
-    if(!frag_ptr) {
+    if (!frag_ptr) {
       return NotAnEntity();
     }
     auto reader = frag_ptr->NthAttr(id.offset);
-    if(!reader.has_value()) {
+    if (!reader.has_value()) {
       return NotAnEntity();
     }
     Attr attr(std::move(*reader), std::move(frag_ptr), id.offset);
@@ -332,11 +332,11 @@ VariantEntity Index::entity(EntityId eid) const {
     assert(id == EntityId(id));
 
     auto frag_ptr = impl->FragmentFor(impl, fid);
-    if(!frag_ptr) {
+    if (!frag_ptr) {
       return NotAnEntity();
     }
     auto reader = frag_ptr->NthMacro(id.offset);
-    if(!reader.has_value()) {
+    if (!reader.has_value()) {
       return NotAnEntity();
     }
     Macro macro(std::move(*reader), std::move(frag_ptr), id.offset);
@@ -364,11 +364,11 @@ VariantEntity Index::entity(EntityId eid) const {
     DesignatorId id = std::get<DesignatorId>(vid);
     FragmentId fid(id.fragment_id);
     auto frag_ptr = impl->FragmentFor(impl, fid);
-    if(!frag_ptr) {
+    if (!frag_ptr) {
       return NotAnEntity();
     }
     auto reader = frag_ptr->NthPseudo(id.offset);
-    if(!reader.has_value()) {
+    if (!reader.has_value()) {
       return NotAnEntity();
     }
     return Designator(std::move(*reader), std::move(frag_ptr), id.offset);

@@ -520,7 +520,7 @@ bool BulkInserterState::InsertAsync(
 
 #define MX_INSERT_ASYNC_ENTITY(name) \
   bool BulkInserterState::InsertAsync(name ## EntityRecord record, sqlite::Statement &insert) { \
-    if(!record.content.empty()) { \
+    if (!record.content.empty()) { \
       insert.BindValues(record.id.Pack(), record.content); \
       return true; \
     } \

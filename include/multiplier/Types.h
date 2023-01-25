@@ -64,6 +64,7 @@ struct MacroId;
 struct DesignatorId;
 
 using EntityOffset = uint32_t;
+using SignedEntityOffset = int32_t;
 
 // Identifies a serialized file.
 struct FileId {

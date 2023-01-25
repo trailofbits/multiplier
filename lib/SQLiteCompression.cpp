@@ -8,120 +8,128 @@
 
 #include <sqlite3.h>
 #include <zstd.h>
-#include <vector>
 #include <memory>
 
 namespace sqlite {
-void ZstdCompress(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
-    auto blob_data = sqlite3_value_blob(argv[0]);
-    auto blob_size = sqlite3_value_bytes(argv[0]);
-
-    ZSTD_CCtx *cctx = static_cast<ZSTD_CCtx*>(sqlite3_user_data(sql_ctx));
-
-    auto bound = ZSTD_compressBound(blob_size);
-    std::vector<char> res;
-    res.resize(bound);
-
-    auto result_size =
-        ZSTD_compressCCtx(cctx, res.data(), bound, blob_data, blob_size, ZSTD_maxCLevel());
-    if(ZSTD_isError(result_size)) {
-        sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
-        return;
-    }
-
-    sqlite3_result_blob(sql_ctx, res.data(), result_size, SQLITE_TRANSIENT);
-}
-
-void ZstdDecompress(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
-    auto blob_data = sqlite3_value_blob(argv[0]);
-    auto blob_size = sqlite3_value_bytes(argv[0]);
-
-    ZSTD_DCtx *dctx = static_cast<ZSTD_DCtx*>(sqlite3_user_data(sql_ctx));
-
-    auto decompressed_size = ZSTD_getFrameContentSize(blob_data, blob_size);
-    std::vector<char> res;
-    res.resize(decompressed_size);
-
-    auto result_size =
-        ZSTD_decompressDCtx(dctx, res.data(), decompressed_size, blob_data, blob_size);
-    if(ZSTD_isError(result_size)) {
-        sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
-        return;
-    }
-
-    sqlite3_result_blob(sql_ctx, res.data(), result_size, SQLITE_TRANSIENT);
-}
-
+namespace {
 static constexpr const char *kCDictId = "ZSTD_CDict";
 static constexpr const char *kDDictId = "ZSTD_DDict";
 
-void ZstdCreateCDict(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
-    auto blob_data = sqlite3_value_blob(argv[0]);
-    auto blob_size = sqlite3_value_bytes(argv[0]);
-
-    auto dict = ZSTD_createCDict(blob_data, blob_size, ZSTD_maxCLevel());
-    if(!dict) {
-        sqlite3_result_error(ctx, "Couldn't create dictionary", -1);
-        return;
-    }
-    sqlite3_result_pointer(ctx, dict, kCDictId,
-        [](void *dict) { ZSTD_freeCDict(static_cast<ZSTD_CDict *>(dict)); });
+static void DeleteCharArray(void *arr) {
+  delete [] reinterpret_cast<char *>(arr);
 }
 
-void ZstdCreateDDict(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
-    auto blob_data = sqlite3_value_blob(argv[0]);
-    auto blob_size = sqlite3_value_bytes(argv[0]);
-
-    auto dict = ZSTD_createDDict(blob_data, blob_size);
-    if(!dict) {
-        sqlite3_result_error(ctx, "Couldn't create dictionary", -1);
-        return;
-    }
-    sqlite3_result_pointer(ctx, dict, kDDictId,
-        [](void *dict) { ZSTD_freeDDict(static_cast<ZSTD_DDict *>(dict)); });
+static void FreeZStdDict(void *dict) {
+  ZSTD_freeCDict(reinterpret_cast<ZSTD_CDict *>(dict));
 }
 
-void ZstdCompressDict(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
-    auto blob_data = sqlite3_value_blob(argv[0]);
-    auto blob_size = sqlite3_value_bytes(argv[0]);
-    auto dict =
-        static_cast<const ZSTD_CDict*>(sqlite3_value_pointer(argv[1], kCDictId));
+}  // namespace
 
-    ZSTD_CCtx *cctx = static_cast<ZSTD_CCtx*>(sqlite3_user_data(sql_ctx));
+void ZstdCompress(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  auto blob_data = sqlite3_value_blob(argv[0]);
+  auto blob_size = static_cast<unsigned>(sqlite3_value_bytes(argv[0]));
 
-    auto bound = ZSTD_compressBound(blob_size);
-    std::vector<char> res;
-    res.resize(bound);
+  ZSTD_CCtx *cctx = static_cast<ZSTD_CCtx*>(sqlite3_user_data(sql_ctx));
 
-    auto result_size =
-        ZSTD_compress_usingCDict(cctx, res.data(), bound, blob_data, blob_size, dict);
-    if(ZSTD_isError(result_size)) {
-        sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
-        return;
-    }
+  auto bound = ZSTD_compressBound(blob_size);
+  std::unique_ptr<char[]> res(new char[bound]);
 
-    sqlite3_result_blob(sql_ctx, res.data(), result_size, SQLITE_TRANSIENT);
+  auto result_size =
+      ZSTD_compressCCtx(cctx, res.get(), bound, blob_data, blob_size,
+                        ZSTD_maxCLevel());
+  if (ZSTD_isError(result_size)) {
+    sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
+    return;
+  }
+
+  sqlite3_result_blob64(sql_ctx, res.release(), result_size, DeleteCharArray);
 }
 
-void ZstdDecompressDict(sqlite3_context *sql_ctx, int argc, sqlite3_value **argv) {
-    auto blob_data = sqlite3_value_blob(argv[0]);
-    auto blob_size = sqlite3_value_bytes(argv[0]);
-    auto dict =
-        static_cast<const ZSTD_DDict*>(sqlite3_value_pointer(argv[1], kDDictId));
+void ZstdDecompress(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  auto blob_data = sqlite3_value_blob(argv[0]);
+  auto blob_size = static_cast<unsigned>(sqlite3_value_bytes(argv[0]));
 
-    ZSTD_DCtx *dctx = static_cast<ZSTD_DCtx*>(sqlite3_user_data(sql_ctx));
+  ZSTD_DCtx *dctx = static_cast<ZSTD_DCtx *>(sqlite3_user_data(sql_ctx));
 
-    auto decompressed_size = ZSTD_getFrameContentSize(blob_data, blob_size);
-    std::vector<char> res;
-    res.resize(decompressed_size);
+  auto bound = ZSTD_getFrameContentSize(blob_data, blob_size);
+  std::unique_ptr<char[]> res(new char[bound]);
 
-    auto result_size =
-        ZSTD_decompress_usingDDict(dctx, res.data(), decompressed_size, blob_data, blob_size, dict);
-    if(ZSTD_isError(result_size)) {
-        sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
-        return;
-    }
+  auto result_size =
+      ZSTD_decompressDCtx(dctx, res.get(), bound, blob_data, blob_size);
 
-    sqlite3_result_blob(sql_ctx, res.data(), result_size, SQLITE_TRANSIENT);
+  if (ZSTD_isError(result_size)) {
+    sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
+    return;
+  }
+
+  sqlite3_result_blob64(sql_ctx, res.release(), result_size, DeleteCharArray);
 }
+
+void ZstdCreateCDict(sqlite3_context *ctx, int, sqlite3_value **argv) {
+  auto blob_data = sqlite3_value_blob(argv[0]);
+  auto blob_size = static_cast<unsigned>(sqlite3_value_bytes(argv[0]));
+
+  auto dict = ZSTD_createCDict(blob_data, blob_size, ZSTD_maxCLevel());
+  if (!dict) {
+    sqlite3_result_error(ctx, "Couldn't create dictionary", -1);
+    return;
+  }
+  sqlite3_result_pointer(ctx, dict, kCDictId, FreeZStdDict);
 }
+
+void ZstdCreateDDict(sqlite3_context *ctx, int, sqlite3_value **argv) {
+  auto blob_data = sqlite3_value_blob(argv[0]);
+  auto blob_size = static_cast<unsigned>(sqlite3_value_bytes(argv[0]));
+
+  auto dict = ZSTD_createDDict(blob_data, blob_size);
+  if (!dict) {
+    sqlite3_result_error(ctx, "Couldn't create dictionary", -1);
+    return;
+  }
+  sqlite3_result_pointer(ctx, dict, kDDictId, FreeZStdDict);
+}
+
+void ZstdCompressDict(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  auto blob_data = sqlite3_value_blob(argv[0]);
+  auto blob_size = static_cast<unsigned>(sqlite3_value_bytes(argv[0]));
+  auto dict = static_cast<const ZSTD_CDict*>(
+      sqlite3_value_pointer(argv[1], kCDictId));
+
+  ZSTD_CCtx *cctx = static_cast<ZSTD_CCtx*>(sqlite3_user_data(sql_ctx));
+
+  auto bound = ZSTD_compressBound(blob_size);
+  std::unique_ptr<char[]> res(new char[bound]);
+
+  auto result_size =
+      ZSTD_compress_usingCDict(cctx, res.get(), bound, blob_data, blob_size,
+                               dict);
+  if (ZSTD_isError(result_size)) {
+    sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
+    return;
+  }
+
+  sqlite3_result_blob64(sql_ctx, res.release(), result_size, DeleteCharArray);
+}
+
+void ZstdDecompressDict(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  auto blob_data = sqlite3_value_blob(argv[0]);
+  auto blob_size = static_cast<unsigned>(sqlite3_value_bytes(argv[0]));
+  auto dict = static_cast<const ZSTD_DDict*>(
+      sqlite3_value_pointer(argv[1], kDDictId));
+
+  ZSTD_DCtx *dctx = static_cast<ZSTD_DCtx *>(sqlite3_user_data(sql_ctx));
+
+  auto bound = ZSTD_getFrameContentSize(blob_data, blob_size);
+  std::unique_ptr<char[]> res(new char[bound]);
+
+  auto result_size = ZSTD_decompress_usingDDict(
+      dctx, res.get(), bound, blob_data, blob_size, dict);
+  if (ZSTD_isError(result_size)) {
+    sqlite3_result_error(sql_ctx, ZSTD_getErrorName(result_size), -1);
+    return;
+  }
+
+  sqlite3_result_blob64(sql_ctx, res.release(), result_size, DeleteCharArray);
+}
+
+}  // namespace indexer

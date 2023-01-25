@@ -696,9 +696,9 @@ std::optional<Decl> FragmentImpl::DeclFor(
   DeclarationId decl_id = std::get<DeclarationId>(vid);
 
   if (decl_id.fragment_id == fragment_id) {
-    auto reader = ep->DeclFor(ep, FragmentId(fragment_id), decl_id.offset);
-    if(reader.has_value()) {
-      Decl decl(std::move(*reader), self, decl_id.offset);
+    auto decl_reader = ep->DeclFor(ep, FragmentId(fragment_id), decl_id.offset);
+    if (decl_reader.has_value()) {
+      Decl decl(std::move(*decl_reader), self, decl_id.offset);
       if (decl.id() == eid) {
         return decl;
       } else {
@@ -708,9 +708,10 @@ std::optional<Decl> FragmentImpl::DeclFor(
 
   // It's a decl inside of another fragment, go get the other fragment.
   } else if (auto frag = ep->FragmentFor(ep, FragmentId(decl_id.fragment_id))) {
-    auto reader = ep->DeclFor(ep, FragmentId(decl_id.fragment_id), decl_id.offset);
-    if(reader.has_value()) {
-      Decl decl(std::move(*reader), std::move(frag), decl_id.offset);
+    auto decl_reader = ep->DeclFor(ep, FragmentId(decl_id.fragment_id),
+                                   decl_id.offset);
+    if (decl_reader.has_value()) {
+      Decl decl(std::move(*decl_reader), std::move(frag), decl_id.offset);
       if (decl.id() == eid) {
         return decl;
       } else {
@@ -740,9 +741,9 @@ std::optional<Stmt> FragmentImpl::StmtFor(
 
   // It's a statement inside of the current fragment.
   if (stmt_id.fragment_id == fragment_id) {
-    auto reader = ep->StmtFor(ep, FragmentId(fragment_id), stmt_id.offset);
-    if(reader.has_value()) {
-      Stmt stmt(std::move(*reader), self, stmt_id.offset);
+    auto stmt_reader = ep->StmtFor(ep, FragmentId(fragment_id), stmt_id.offset);
+    if (stmt_reader.has_value()) {
+      Stmt stmt(std::move(*stmt_reader), self, stmt_id.offset);
       if (stmt.id() == eid) {
         return stmt;
       } else {
@@ -751,9 +752,10 @@ std::optional<Stmt> FragmentImpl::StmtFor(
     }
   // It's a statement inside of another fragment, go get the other fragment.
   } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    auto reader = ep->DeclFor(ep, FragmentId(stmt_id.fragment_id), stmt_id.offset);
-    if(reader.has_value()) {
-      Stmt stmt(std::move(*reader), self, stmt_id.offset);
+    auto stmt_reader = ep->DeclFor(ep, FragmentId(stmt_id.fragment_id),
+                                   stmt_id.offset);
+    if (stmt_reader.has_value()) {
+      Stmt stmt(std::move(*stmt_reader), self, stmt_id.offset);
       if (stmt.id() == eid) {
         return stmt;
       } else {
@@ -783,9 +785,9 @@ std::optional<Type> FragmentImpl::TypeFor(
 
   // It's a type inside of the current fragment.
   if (type_id.fragment_id == fragment_id) {
-    auto reader = ep->TypeFor(ep, FragmentId(fragment_id), type_id.offset);
-    if(reader.has_value()) {
-      Type type(std::move(*reader), self, type_id.offset);
+    auto type_reader = ep->TypeFor(ep, FragmentId(fragment_id), type_id.offset);
+    if (type_reader.has_value()) {
+      Type type(std::move(*type_reader), self, type_id.offset);
       if (type.id() == eid) {
         return type;
       } else {
@@ -795,9 +797,10 @@ std::optional<Type> FragmentImpl::TypeFor(
 
   // It's a type inside of another fragment, go get the other fragment.
   } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    auto reader = ep->TypeFor(ep, FragmentId(type_id.fragment_id), type_id.offset);
-    if(reader.has_value()) {
-      Type type(std::move(*reader), self, type_id.offset);
+    auto type_reader = ep->TypeFor(ep, FragmentId(type_id.fragment_id),
+                                   type_id.offset);
+    if (type_reader.has_value()) {
+      Type type(std::move(*type_reader), self, type_id.offset);
       if (type.id() == eid) {
         return type;
       } else {
@@ -827,9 +830,10 @@ std::optional<Macro> FragmentImpl::MacroFor(
 
   // It's a type inside of the current fragment.
   if (macro_id.fragment_id == fragment_id) {
-    auto reader = ep->MacroFor(ep, FragmentId(fragment_id), macro_id.offset);
-    if(reader.has_value()) {
-      Macro macro(std::move(*reader), self, macro_id.offset);
+    auto macro_reader = ep->MacroFor(ep, FragmentId(fragment_id),
+                                     macro_id.offset);
+    if (macro_reader.has_value()) {
+      Macro macro(std::move(*macro_reader), self, macro_id.offset);
       if (macro.id() == eid) {
         return macro;
       } else {
@@ -839,9 +843,10 @@ std::optional<Macro> FragmentImpl::MacroFor(
 
   // It's a type inside of another fragment, go get the other fragment.
   } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    auto reader = ep->MacroFor(ep, FragmentId(macro_id.fragment_id), macro_id.offset);
-    if(reader.has_value()) {
-      Macro macro(std::move(*reader), self, macro_id.offset);
+    auto macro_reader = ep->MacroFor(ep, FragmentId(macro_id.fragment_id),
+                                     macro_id.offset);
+    if (macro_reader.has_value()) {
+      Macro macro(std::move(*macro_reader), self, macro_id.offset);
       if (macro.id() == eid) {
         return macro;
       } else {
@@ -871,9 +876,9 @@ std::optional<Attr> FragmentImpl::AttrFor(
 
   // It's an attribute inside of the current fragment.
   if (attr_id.fragment_id == fragment_id) {
-    auto reader = ep->AttrFor(ep, FragmentId(fragment_id), attr_id.offset);
-    if(reader.has_value()) {
-      Attr attr(std::move(*reader), self, attr_id.offset);
+    auto attr_reader = ep->AttrFor(ep, FragmentId(fragment_id), attr_id.offset);
+    if (attr_reader.has_value()) {
+      Attr attr(std::move(*attr_reader), self, attr_id.offset);
       if (attr.id() == eid) {
         return attr;
       } else {
@@ -884,9 +889,10 @@ std::optional<Attr> FragmentImpl::AttrFor(
   // It's an attribute inside of another fragment, go get the other fragment.
   } else {
     auto frag = ep->FragmentFor(ep, fid);
-    auto reader = ep->TypeFor(ep, FragmentId(attr_id.fragment_id), attr_id.offset);
-    if(reader.has_value()) {
-      Attr attr(std::move(*reader), self, attr_id.offset);
+    auto attr_reader = ep->TypeFor(ep, FragmentId(attr_id.fragment_id),
+                                   attr_id.offset);
+    if (attr_reader.has_value()) {
+      Attr attr(std::move(*attr_reader), self, attr_id.offset);
       if (attr.id() == eid) {
         return attr;
       } else {

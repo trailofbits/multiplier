@@ -44,7 +44,7 @@ class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
 
-struct PackedReaderState;
+class PackedReaderState;
 using ReaderPtr = std::shared_ptr<PackedReaderState>;
 
 using DeclUse = Use<DeclUseSelector>;

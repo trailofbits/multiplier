@@ -222,7 +222,7 @@ struct UseRecord {
          ON use(entity_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT INTO use (fragment_id, entity_id)
+      R"(INSERT OR IGNORE INTO use (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
   SpecificEntityId<FragmentId> fragment_id;

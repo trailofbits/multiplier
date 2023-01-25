@@ -170,188 +170,9 @@ pasta::MacroKind Get_Macro_Kind(const Reader &);
 template <typename Reader>
 pasta::PseudoKind Get_Pseudo_Kind(const Reader &);
 
-}  // namespace
-
-// Identify all unique entity IDs used by this fragment, and map them to the
-// fragment ID in the data store.
-void LinkExternalUsesInFragment(
+static void LinkExternalUses(
     mx::DatabaseWriter &database, const PendingFragment &pf,
-    mx::rpc::Fragment::Builder &b,
-    std::deque<EntityBuilder<mx::ast::Decl>> &decls,
-    std::deque<EntityBuilder<mx::ast::Stmt>> &stmts,
-    std::deque<EntityBuilder<mx::ast::Type>> &types,
-    std::deque<EntityBuilder<mx::ast::Attr>> &attrs,
-    std::deque<EntityBuilder<mx::ast::Macro>> &macros,
-    std::deque<EntityBuilder<mx::ast::Pseudo>> &pseudos) {
-
-  std::unordered_set<mx::RawEntityId> entity_ids;
-
-  // Look for declaration methods with a return value of the corresponding
-  // entity ID.
-  for (auto &d : decls) {
-    auto entity = d.builder.asReader();
-#define MX_VISIT_DECL(decl) \
-    case pasta::DeclKind::k ## decl: \
-      FindUses_ ## decl ## Decl(entity_ids, entity); \
-      break;
-
-    switch (Get_Decl_Kind(entity)) {
-    PASTA_FOR_EACH_DECL_IMPL(MX_VISIT_DECL, PASTA_IGNORE_ABSTRACT)
-    }
-#undef MX_VISIT_DECL
-  }
-
-  // Look for statement methods with a return value of the corresponding
-  // entity ID.
-  for (auto &s : stmts) {
-    auto entity = s.builder.asReader();
-#define MX_VISIT_STMT(stmt) \
-    case pasta::StmtKind::k ## stmt: \
-      FindUses_ ## stmt(entity_ids, entity); \
-      break;
-
-    switch (Get_Stmt_Kind(entity)) {
-    PASTA_FOR_EACH_STMT_IMPL(MX_VISIT_STMT,
-                             MX_VISIT_STMT,
-                             MX_VISIT_STMT,
-                             MX_VISIT_STMT,
-                             MX_VISIT_STMT,
-                             PASTA_IGNORE_ABSTRACT)
-    }
-
-#undef MX_VISIT_STMT
-  }
-
-  // Look for type methods with a return value of the corresponding
-  // entity ID.
-  for (auto &t : types) {
-    auto entity = t.builder.asReader();
-#define MX_VISIT_TYPE(type) \
-    case pasta::TypeKind::k ## type: \
-      FindUses_ ## type ## Type(entity_ids, entity); \
-      break;
-
-    switch (Get_Type_Kind(entity)) {
-    PASTA_FOR_EACH_TYPE_IMPL(MX_VISIT_TYPE, PASTA_IGNORE_ABSTRACT)
-    }
-
-#undef MX_VISIT_TYPE
-  }
-
-  // Look for type methods with a return value of the corresponding
-  // entity ID.
-  for (auto &a : attrs) {
-    auto entity = a.builder.asReader();
-#define MX_VISIT_ATTR(type) \
-    case pasta::AttrKind::k ## type: \
-      FindUses_ ## type ## Attr(entity_ids, entity); \
-      break;
-
-    switch (Get_Attr_Kind(entity)) {
-    PASTA_FOR_EACH_ATTR_IMPL(MX_VISIT_ATTR, PASTA_IGNORE_ABSTRACT)
-    }
-
-#undef MX_VISIT_ATTR
-  }
-
-  // Look for macro methods with a return value of the corresponding
-  // entity ID.
-  for (auto &m : macros) {
-    auto entity = m.builder.asReader();
-    // We need to manually do these because some of the macro kinds are invented
-    // inside of Multiplier, and not present in PASTA.
-    switch (static_cast<mx::MacroKind>(Get_Macro_Kind(entity))) {
-      case mx::MacroKind::SUBSTITUTION:
-        FindUses_MacroSubstitution(entity_ids, entity);
-        break;
-      case mx::MacroKind::EXPANSION:
-        FindUses_MacroExpansion(entity_ids, entity);
-        break;
-      case mx::MacroKind::ARGUMENT:
-        FindUses_MacroArgument(entity_ids, entity);
-        break;
-      case mx::MacroKind::PARAMETER:
-        FindUses_MacroParameter(entity_ids, entity);
-        break;
-      case mx::MacroKind::OTHER_DIRECTIVE:
-        FindUses_OtherMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::IF_DIRECTIVE:
-        FindUses_IfMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::IF_DEFINED_DIRECTIVE:
-        FindUses_IfDefinedMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
-        FindUses_IfNotDefinedMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::ELSE_IF_DIRECTIVE:
-        FindUses_ElseIfMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::ELSE_IF_DEFINED_DIRECTIVE:
-        FindUses_ElseIfDefinedMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
-        FindUses_ElseIfNotDefinedMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::ELSE_DIRECTIVE:
-        FindUses_ElseMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::END_IF_DIRECTIVE:
-        FindUses_EndIfMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::DEFINE_DIRECTIVE:
-        FindUses_DefineMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::UNDEFINE_DIRECTIVE:
-        FindUses_UndefineMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::PRAGMA_DIRECTIVE:
-        FindUses_PragmaMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::INCLUDE_DIRECTIVE:
-        FindUses_IncludeMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
-        FindUses_IncludeNextMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
-        FindUses_IncludeMacrosMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::IMPORT_DIRECTIVE:
-        FindUses_ImportMacroDirective(entity_ids, entity);
-        break;
-      case mx::MacroKind::STRINGIFY:
-        FindUses_MacroStringify(entity_ids, entity);
-        break;
-      case mx::MacroKind::CONCATENATE:
-        FindUses_MacroConcatenate(entity_ids, entity);
-        break;
-      case mx::MacroKind::VA_OPT:
-        FindUses_MacroVAOpt(entity_ids, entity);
-        break;
-      case mx::MacroKind::VA_OPT_ARGUMENT:
-        FindUses_MacroVAOptArgument(entity_ids, entity);
-        break;
-    }
-  }
-
-  // Look for pseudo-entity methods with a return value of the corresponding
-  // entity ID.
-  pasta::TemplateArgument *tag = nullptr;
-  for (auto &p : pseudos) {
-    auto entity = p.builder.asReader();
-#define MX_VISIT_PSEUDO(pseudo) \
-    case pasta::PseudoKind::k ## pseudo: \
-      FindUses_ ## pseudo(entity_ids, entity); \
-      break;
-
-    switch (Get_Pseudo_Kind(entity, tag)) {
-      PSEUDO_ENTITY_TYPES(MX_VISIT_PSEUDO)
-    }
-
-#undef MX_VISIT_PSEUDO
-  }
+    std::unordered_set<mx::RawEntityId> entity_ids) {
 
   mx::SpecificEntityId<mx::FragmentId> fid = pf.fragment_id;
   for (mx::RawEntityId eid : entity_ids) {
@@ -393,6 +214,230 @@ void LinkExternalUsesInFragment(
 
     database.AddAsync(mx::UseRecord{fid, eid});
   }
+}
+
+}  // namespace
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Decl> &d) {
+
+  std::unordered_set<mx::RawEntityId> entity_ids;
+
+  auto entity = d.builder.asReader();
+#define MX_VISIT_DECL(decl) \
+  case pasta::DeclKind::k ## decl: \
+    FindUses_ ## decl ## Decl(entity_ids, entity); \
+    break;
+
+  // Look for declaration methods with a return value of the corresponding
+  // entity ID.
+  switch (Get_Decl_Kind(entity)) {
+  PASTA_FOR_EACH_DECL_IMPL(MX_VISIT_DECL, PASTA_IGNORE_ABSTRACT)
+  }
+#undef MX_VISIT_DECL
+
+  LinkExternalUses(database, pf, std::move(entity_ids));
+}
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Stmt> &s) {
+
+  std::unordered_set<mx::RawEntityId> entity_ids;
+
+  auto entity = s.builder.asReader();
+#define MX_VISIT_STMT(stmt) \
+  case pasta::StmtKind::k ## stmt: \
+    FindUses_ ## stmt(entity_ids, entity); \
+    break;
+
+  // Look for statement methods with a return value of the corresponding
+  // entity ID.
+  switch (Get_Stmt_Kind(entity)) {
+  PASTA_FOR_EACH_STMT_IMPL(MX_VISIT_STMT,
+                           MX_VISIT_STMT,
+                           MX_VISIT_STMT,
+                           MX_VISIT_STMT,
+                           MX_VISIT_STMT,
+                           PASTA_IGNORE_ABSTRACT)
+  }
+
+#undef MX_VISIT_STMT
+
+  LinkExternalUses(database, pf, std::move(entity_ids));
+}
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Type> &t) {
+
+  std::unordered_set<mx::RawEntityId> entity_ids;
+
+  auto entity = t.builder.asReader();
+#define MX_VISIT_TYPE(type) \
+  case pasta::TypeKind::k ## type: \
+    FindUses_ ## type ## Type(entity_ids, entity); \
+    break;
+
+  // Look for type methods with a return value of the corresponding
+  // entity ID.
+  switch (Get_Type_Kind(entity)) {
+  PASTA_FOR_EACH_TYPE_IMPL(MX_VISIT_TYPE, PASTA_IGNORE_ABSTRACT)
+  }
+
+#undef MX_VISIT_TYPE
+
+  LinkExternalUses(database, pf, std::move(entity_ids));
+}
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Attr> &a) {
+
+  std::unordered_set<mx::RawEntityId> entity_ids;
+
+  auto entity = a.builder.asReader();
+#define MX_VISIT_ATTR(type) \
+  case pasta::AttrKind::k ## type: \
+    FindUses_ ## type ## Attr(entity_ids, entity); \
+    break;
+
+  // Look for type methods with a return value of the corresponding
+  // attribute ID.
+  switch (Get_Attr_Kind(entity)) {
+  PASTA_FOR_EACH_ATTR_IMPL(MX_VISIT_ATTR, PASTA_IGNORE_ABSTRACT)
+  }
+
+#undef MX_VISIT_ATTR
+
+  LinkExternalUses(database, pf, std::move(entity_ids));
+}
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Macro> &m) {
+
+  std::unordered_set<mx::RawEntityId> entity_ids;
+
+  // Look for macro methods with a return value of the corresponding
+  // entity ID.
+  auto entity = m.builder.asReader();
+
+  // We need to manually do these because some of the macro kinds are invented
+  // inside of Multiplier, and not present in PASTA.
+  switch (static_cast<mx::MacroKind>(Get_Macro_Kind(entity))) {
+    case mx::MacroKind::SUBSTITUTION:
+      FindUses_MacroSubstitution(entity_ids, entity);
+      break;
+    case mx::MacroKind::EXPANSION:
+      FindUses_MacroExpansion(entity_ids, entity);
+      break;
+    case mx::MacroKind::ARGUMENT:
+      FindUses_MacroArgument(entity_ids, entity);
+      break;
+    case mx::MacroKind::PARAMETER:
+      FindUses_MacroParameter(entity_ids, entity);
+      break;
+    case mx::MacroKind::OTHER_DIRECTIVE:
+      FindUses_OtherMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::IF_DIRECTIVE:
+      FindUses_IfMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::IF_DEFINED_DIRECTIVE:
+      FindUses_IfDefinedMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::IF_NOT_DEFINED_DIRECTIVE:
+      FindUses_IfNotDefinedMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::ELSE_IF_DIRECTIVE:
+      FindUses_ElseIfMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::ELSE_IF_DEFINED_DIRECTIVE:
+      FindUses_ElseIfDefinedMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::ELSE_IF_NOT_DEFINED_DIRECTIVE:
+      FindUses_ElseIfNotDefinedMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::ELSE_DIRECTIVE:
+      FindUses_ElseMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::END_IF_DIRECTIVE:
+      FindUses_EndIfMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::DEFINE_DIRECTIVE:
+      FindUses_DefineMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::UNDEFINE_DIRECTIVE:
+      FindUses_UndefineMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::PRAGMA_DIRECTIVE:
+      FindUses_PragmaMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::INCLUDE_DIRECTIVE:
+      FindUses_IncludeMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
+      FindUses_IncludeNextMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
+      FindUses_IncludeMacrosMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::IMPORT_DIRECTIVE:
+      FindUses_ImportMacroDirective(entity_ids, entity);
+      break;
+    case mx::MacroKind::STRINGIFY:
+      FindUses_MacroStringify(entity_ids, entity);
+      break;
+    case mx::MacroKind::CONCATENATE:
+      FindUses_MacroConcatenate(entity_ids, entity);
+      break;
+    case mx::MacroKind::VA_OPT:
+      FindUses_MacroVAOpt(entity_ids, entity);
+      break;
+    case mx::MacroKind::VA_OPT_ARGUMENT:
+      FindUses_MacroVAOptArgument(entity_ids, entity);
+      break;
+  }
+
+  LinkExternalUses(database, pf, std::move(entity_ids));
+}
+
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Pseudo> &p) {
+
+  std::unordered_set<mx::RawEntityId> entity_ids;
+
+  pasta::TemplateArgument *tag = nullptr;
+  auto entity = p.builder.asReader();
+#define MX_VISIT_PSEUDO(pseudo) \
+  case pasta::PseudoKind::k ## pseudo: \
+    FindUses_ ## pseudo(entity_ids, entity); \
+    break;
+
+  // Look for pseudo-entity methods with a return value of the corresponding
+  // entity ID.
+  switch (Get_Pseudo_Kind(entity, tag)) {
+    PSEUDO_ENTITY_TYPES(MX_VISIT_PSEUDO)
+  }
+
+#undef MX_VISIT_PSEUDO
+
+  LinkExternalUses(database, pf, std::move(entity_ids));
 }
 
 }  // namespace indexer

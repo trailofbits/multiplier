@@ -74,29 +74,29 @@ void InvalidEntityProvider::FindSymbol(
 }
 
 gap::generator<ReaderPtr> InvalidEntityProvider::DeclsFor(
-  const Ptr &, PackedFragmentId id) { co_return; }
+  const Ptr &, PackedFragmentId) { co_return; }
 gap::generator<ReaderPtr> InvalidEntityProvider::TypesFor(
-  const Ptr &, PackedFragmentId id) { co_return; }
+  const Ptr &, PackedFragmentId) { co_return; }
 gap::generator<ReaderPtr> InvalidEntityProvider::StmtsFor(
-  const Ptr &, PackedFragmentId id) { co_return; }
+  const Ptr &, PackedFragmentId) { co_return; }
 gap::generator<ReaderPtr> InvalidEntityProvider::AttrsFor(
-  const Ptr &, PackedFragmentId id) { co_return; }
+  const Ptr &, PackedFragmentId) { co_return; }
 gap::generator<ReaderPtr> InvalidEntityProvider::MacrosFor(
-  const Ptr &, PackedFragmentId id) { co_return; }
+  const Ptr &, PackedFragmentId) { co_return; }
 gap::generator<ReaderPtr> InvalidEntityProvider::PseudosFor(
-  const Ptr &, PackedFragmentId id) { co_return; }
+  const Ptr &, PackedFragmentId) { co_return; }
 std::optional<ReaderPtr> InvalidEntityProvider::DeclFor(
-  const Ptr &, PackedFragmentId id, unsigned offset) { return std::nullopt; }
+  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
 std::optional<ReaderPtr> InvalidEntityProvider::TypeFor(
-  const Ptr &, PackedFragmentId id, unsigned offset) { return std::nullopt; }
+  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
 std::optional<ReaderPtr> InvalidEntityProvider::StmtFor(
-  const Ptr &, PackedFragmentId id, unsigned offset) { return std::nullopt; }
+  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
 std::optional<ReaderPtr> InvalidEntityProvider::AttrFor(
-  const Ptr &, PackedFragmentId id, unsigned offset) { return std::nullopt; }
+  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
 std::optional<ReaderPtr> InvalidEntityProvider::MacroFor(
-  const Ptr &, PackedFragmentId id, unsigned offset) { return std::nullopt; }
+  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
 std::optional<ReaderPtr> InvalidEntityProvider::PseudoFor(
-  const Ptr &, PackedFragmentId id, unsigned offset) { return std::nullopt; }
+  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
 
 Index::Index(void)
     : impl(std::make_shared<InvalidEntityProvider>()) {}

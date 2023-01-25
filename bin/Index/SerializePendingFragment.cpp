@@ -145,21 +145,38 @@ void DispatchSerializeMacro(const EntityMapper &em,
   }
 }
 
+// Identify all unique entity IDs used by this fragment, and map them to the
+// fragment ID in the data store.
+extern void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Decl> &entity);
+
+extern void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Stmt> &entity);
+
+extern void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Type> &entity);
+
+extern void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Attr> &entity);
+
+extern void LinkExternalUsesInFragment(
+    mx::DatabaseWriter &database, const PendingFragment &pf,
+    EntityBuilder<mx::ast::Pseudo> &entity);
+
 // Serialize all entities into the Cap'n Proto version of the fragment.
 void SerializePendingFragment(mx::DatabaseWriter &database,
                               const PendingFragment &pf,
-                              const EntityMapper &em,
-                              mx::rpc::Fragment::Builder &b,
-                              std::deque<EntityBuilder<mx::ast::Decl>> &decls,
-                              std::deque<EntityBuilder<mx::ast::Stmt>> &stmts,
-                              std::deque<EntityBuilder<mx::ast::Type>> &types,
-                              std::deque<EntityBuilder<mx::ast::Attr>> &attrs,
-                              std::deque<EntityBuilder<mx::ast::Pseudo>> &pseudos) {
+                              const EntityMapper &em) {
 
   auto i = 0u;
   for (const pasta::Decl &entity : pf.decls_to_serialize) {
-    auto &storage = decls.emplace_back();
+    EntityBuilder<mx::ast::Decl> storage;
     DispatchSerializeDecl(em, storage.builder, entity);
+    LinkExternalUsesInFragment(database, pf, storage);
     mx::DeclarationId id;
     id.fragment_id = pf.fragment_index;
     id.offset = i++;
@@ -172,8 +189,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 
   i = 0u;
   for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
-    auto &storage = stmts.emplace_back();
+    EntityBuilder<mx::ast::Stmt> storage;
     DispatchSerializeStmt(em, storage.builder, entity);
+    LinkExternalUsesInFragment(database, pf, storage);
     mx::StatementId id;
     id.fragment_id = pf.fragment_index;
     id.offset = i++;
@@ -185,8 +203,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 
   i = 0u;
   for (const pasta::Type &entity : pf.types_to_serialize) {
-    auto &storage = types.emplace_back();
+    EntityBuilder<mx::ast::Type> storage;
     DispatchSerializeType(em, storage.builder, entity);
+    LinkExternalUsesInFragment(database, pf, storage);
     mx::TypeId id;
     id.fragment_id = pf.fragment_index;
     id.offset = i++;
@@ -198,8 +217,9 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 
   i = 0u;
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
-    auto &storage = attrs.emplace_back();
+    EntityBuilder<mx::ast::Attr> storage;
     DispatchSerializeAttr(em, storage.builder, entity);
+    LinkExternalUsesInFragment(database, pf, storage);
     mx::AttributeId id;
     id.fragment_id = pf.fragment_id.Unpack().fragment_id;
     id.offset = i++;
@@ -211,7 +231,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
 
   i = 0u;
   for (const Pseudo &pseudo : pf.pseudos_to_serialize) {
-    auto &storage = pseudos.emplace_back();
+    EntityBuilder<mx::ast::Pseudo> storage;
     if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
       SerializeTemplateArgument(
           em, storage.builder, std::get<pasta::TemplateArgument>(pseudo));
@@ -229,6 +249,8 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     } else {
       assert(false);
     }
+
+    LinkExternalUsesInFragment(database, pf, storage);
     mx::DesignatorId id;
     id.fragment_id = pf.fragment_index;
     id.offset = i++;

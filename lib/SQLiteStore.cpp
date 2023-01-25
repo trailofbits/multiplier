@@ -18,20 +18,22 @@
 #include "SQLiteCompression.h"
 
 namespace std {
-  template<>
-  struct default_delete<ZSTD_CCtx> {
-    void operator()(ZSTD_CCtx* cctx) {
-      ZSTD_freeCCtx(cctx);
-    }
-  };
 
-  template<>
-  struct default_delete<ZSTD_DCtx> {
-    void operator()(ZSTD_DCtx* cctx) {
-      ZSTD_freeDCtx(cctx);
-    }
-  };
-}
+template <>
+struct default_delete<ZSTD_CCtx> {
+  inline void operator()(ZSTD_CCtx *cctx) {
+    ZSTD_freeCCtx(cctx);
+  }
+};
+
+template <>
+struct default_delete<ZSTD_DCtx> {
+  inline void operator()(ZSTD_DCtx *cctx) {
+    ZSTD_freeDCtx(cctx);
+  }
+};
+
+}  // namespace std
 
 namespace sqlite {
 
@@ -41,12 +43,6 @@ namespace sqlite {
       return reader.getVal ## storage(); \
     }
 #include <multiplier/Visitor.inc.h>
-
-#ifndef NDEBUG
-// Nifty to double check that only one connection is being used/created
-// per-thread.
-static thread_local sqlite3 *tDatabase = nullptr;
-#endif
 
 class ConnectionImpl {
  public:
@@ -281,126 +277,143 @@ void Statement::bind(const size_t i, const std::string_view &value) {
 #pragma GCC diagnostic pop
 
 template<typename T>
-static void EntityFragmentId(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
-  mx::EntityId id(sqlite3_value_int64(argv[0]));
+static void EntityFragmentId(sqlite3_context *ctx, int, sqlite3_value **argv) {
+  mx::EntityId id(static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
   auto unpacked = id.Unpack();
-  if(!std::holds_alternative<T>(unpacked)) {
-    sqlite3_result_error(ctx, "The id does not correspond to the specified type", -1);
+  if (!std::holds_alternative<T>(unpacked)) {
+    sqlite3_result_error(
+        ctx, "The id does not correspond to the specified type", -1);
     return;
   }
 
   auto entity_id = std::get<T>(unpacked);
   mx::SpecificEntityId<mx::FragmentId> packed(entity_id);
-  sqlite3_result_int64(ctx, packed.Pack());
+  sqlite3_result_int64(ctx, static_cast<int64_t>(packed.Pack()));
 }
 
 template<typename T>
-static void EntityOffset(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
-  mx::EntityId id(sqlite3_value_int64(argv[0]));
+static void EntityOffset(sqlite3_context *ctx, int, sqlite3_value **argv) {
+  mx::EntityId id(static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
   auto unpacked = id.Unpack();
-  if(!std::holds_alternative<T>(unpacked)) {
-    sqlite3_result_error(ctx, "The id does not correspond to the specified type", -1);
+  if (!std::holds_alternative<T>(unpacked)) {
+    sqlite3_result_error(
+        ctx, "The id does not correspond to the specified type", -1);
     return;
   }
 
   auto entity_id = std::get<T>(unpacked);
-  sqlite3_result_int64(ctx, entity_id.offset);
+  if constexpr (sizeof(mx::EntityOffset) == 8u) {
+    sqlite3_result_int64(
+        ctx, static_cast<mx::SignedEntityOffset>(entity_id.offset));
+  } else {
+    sqlite3_result_int(
+        ctx, static_cast<mx::SignedEntityOffset>(entity_id.offset));
+  }
 }
 
 template<typename T>
-static void EntityKind(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
-  mx::EntityId id(sqlite3_value_int64(argv[0]));
+static void EntityKind(sqlite3_context *ctx, int, sqlite3_value **argv) {
+  mx::EntityId id(static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
   auto unpacked = id.Unpack();
-  if(!std::holds_alternative<T>(unpacked)) {
-    sqlite3_result_error(ctx, "The id does not correspond to the specified type", -1);
+  if (!std::holds_alternative<T>(unpacked)) {
+    sqlite3_result_error(
+        ctx, "The id does not correspond to the specified type", -1);
     return;
   }
 
   auto entity_id = std::get<T>(unpacked);
-  sqlite3_result_int64(ctx, static_cast<unsigned>(entity_id.kind));
+  sqlite3_result_int(ctx, static_cast<int>(entity_id.kind));
 }
 
 template<>
-void EntityKind<mx::ast::Pseudo>(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
-  // TODO(frabert): This needs to change once we store pseudos other than Designators
+void EntityKind<mx::ast::Pseudo>(sqlite3_context *ctx, int, sqlite3_value **) {
+  // TODO(frabert): This needs to change once we store pseudos other than
+  //                Designators
   sqlite3_result_int(ctx, static_cast<int>(mx::PseudoKind::DESIGNATOR));
 }
 
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
     : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
-      CreateFunction("Decl_kind", 1, SQLITE_DETERMINISTIC,
-        EntityKind<mx::DeclarationId>, nullptr, nullptr, nullptr);
+  CreateFunction("Decl_kind", 1, SQLITE_DETERMINISTIC,
+                 EntityKind<mx::DeclarationId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Stmt_kind", 1, SQLITE_DETERMINISTIC,
-        EntityKind<mx::StatementId>, nullptr, nullptr, nullptr);
+  CreateFunction("Stmt_kind", 1, SQLITE_DETERMINISTIC,
+                 EntityKind<mx::StatementId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Type_kind", 1, SQLITE_DETERMINISTIC,
-        EntityKind<mx::TypeId>, nullptr, nullptr, nullptr);
+  CreateFunction("Type_kind", 1, SQLITE_DETERMINISTIC,
+                 EntityKind<mx::TypeId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Attr_kind", 1, SQLITE_DETERMINISTIC,
-        EntityKind<mx::AttributeId>, nullptr, nullptr, nullptr);
+  CreateFunction("Attr_kind", 1, SQLITE_DETERMINISTIC,
+                 EntityKind<mx::AttributeId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Macro_kind", 1, SQLITE_DETERMINISTIC,
-        EntityKind<mx::MacroId>, nullptr, nullptr, nullptr);
+  CreateFunction("Macro_kind", 1, SQLITE_DETERMINISTIC,
+                 EntityKind<mx::MacroId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Pseudo_kind", 1, SQLITE_DETERMINISTIC,
-        EntityKind<mx::ast::Pseudo>, nullptr, nullptr, nullptr);
+  CreateFunction("Pseudo_kind", 1, SQLITE_DETERMINISTIC,
+                 EntityKind<mx::ast::Pseudo>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Decl_fragment", 1, SQLITE_DETERMINISTIC,
-        EntityFragmentId<mx::DeclarationId>, nullptr, nullptr, nullptr);
+  CreateFunction("Decl_fragment", 1, SQLITE_DETERMINISTIC,
+                 EntityFragmentId<mx::DeclarationId>, nullptr, nullptr,
+                 nullptr);
 
-      CreateFunction("Stmt_fragment", 1, SQLITE_DETERMINISTIC,
-        EntityFragmentId<mx::StatementId>, nullptr, nullptr, nullptr);
+  CreateFunction("Stmt_fragment", 1, SQLITE_DETERMINISTIC,
+                 EntityFragmentId<mx::StatementId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Type_fragment", 1, SQLITE_DETERMINISTIC,
-        EntityFragmentId<mx::TypeId>, nullptr, nullptr, nullptr);
+  CreateFunction("Type_fragment", 1, SQLITE_DETERMINISTIC,
+                 EntityFragmentId<mx::TypeId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Attr_fragment", 1, SQLITE_DETERMINISTIC,
-        EntityFragmentId<mx::AttributeId>, nullptr, nullptr, nullptr);
+  CreateFunction("Attr_fragment", 1, SQLITE_DETERMINISTIC,
+                 EntityFragmentId<mx::AttributeId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Macro_fragment", 1, SQLITE_DETERMINISTIC,
-        EntityFragmentId<mx::MacroId>, nullptr, nullptr, nullptr);
+  CreateFunction("Macro_fragment", 1, SQLITE_DETERMINISTIC,
+                 EntityFragmentId<mx::MacroId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Pseudo_fragment", 1, SQLITE_DETERMINISTIC,
-        EntityFragmentId<mx::DesignatorId>, nullptr, nullptr, nullptr);
+  CreateFunction("Pseudo_fragment", 1, SQLITE_DETERMINISTIC,
+                 EntityFragmentId<mx::DesignatorId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Decl_offset", 1, SQLITE_DETERMINISTIC,
-        EntityOffset<mx::DeclarationId>, nullptr, nullptr, nullptr);
+  CreateFunction("Decl_offset", 1, SQLITE_DETERMINISTIC,
+                 EntityOffset<mx::DeclarationId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Stmt_offset", 1, SQLITE_DETERMINISTIC,
-        EntityOffset<mx::StatementId>, nullptr, nullptr, nullptr);
+  CreateFunction("Stmt_offset", 1, SQLITE_DETERMINISTIC,
+                 EntityOffset<mx::StatementId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Type_offset", 1, SQLITE_DETERMINISTIC,
-        EntityOffset<mx::TypeId>, nullptr, nullptr, nullptr);
+  CreateFunction("Type_offset", 1, SQLITE_DETERMINISTIC,
+                 EntityOffset<mx::TypeId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Attr_offset", 1, SQLITE_DETERMINISTIC,
-        EntityOffset<mx::AttributeId>, nullptr, nullptr, nullptr);
+  CreateFunction("Attr_offset", 1, SQLITE_DETERMINISTIC,
+                 EntityOffset<mx::AttributeId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Macro_offset", 1, SQLITE_DETERMINISTIC,
-        EntityOffset<mx::MacroId>, nullptr, nullptr, nullptr);
+  CreateFunction("Macro_offset", 1, SQLITE_DETERMINISTIC,
+                 EntityOffset<mx::MacroId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("Pseudo_offset", 1, SQLITE_DETERMINISTIC,
-        EntityOffset<mx::DesignatorId>, nullptr, nullptr, nullptr);
+  CreateFunction("Pseudo_offset", 1, SQLITE_DETERMINISTIC,
+                 EntityOffset<mx::DesignatorId>, nullptr, nullptr, nullptr);
 
-      CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC,
-        ZstdCompress, nullptr, nullptr, nullptr, impl->compression_ctx.get());
+  CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC,
+                 ZstdCompress, nullptr, nullptr, nullptr,
+                 impl->compression_ctx.get());
 
-      CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC,
-        ZstdCompressDict, nullptr, nullptr, nullptr, impl->compression_ctx.get());
+  CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC,
+                 ZstdCompressDict, nullptr, nullptr, nullptr,
+                 impl->compression_ctx.get());
 
-      CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC,
-        ZstdDecompress, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
+  CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC,
+                 ZstdDecompress, nullptr, nullptr, nullptr,
+                 impl->decompression_ctx.get());
 
-      CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC,
-        ZstdDecompressDict, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
+  CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC,
+                 ZstdDecompressDict, nullptr, nullptr, nullptr,
+                 impl->decompression_ctx.get());
 
-      CreateFunction("zstd_create_cdict", 1, 0,
-        ZstdCreateCDict, nullptr, nullptr, nullptr, impl->compression_ctx.get());
+  CreateFunction("zstd_create_cdict", 1, 0,
+                 ZstdCreateCDict, nullptr, nullptr, nullptr,
+                 impl->compression_ctx.get());
 
-      CreateFunction("zstd_create_ddict", 1, 0,
-        ZstdCreateDDict, nullptr, nullptr, nullptr, impl->decompression_ctx.get());
-    };
+  CreateFunction("zstd_create_ddict", 1, 0,
+                 ZstdCreateDDict, nullptr, nullptr, nullptr,
+                 impl->decompression_ctx.get());
+}
 
 // Get the filename used to open the database
 std::filesystem::path Connection::GetFilename(void) const {
@@ -413,7 +426,7 @@ bool Connection::IsReadOnly(void) const {
 }
 
 void Connection::CreateFunction(
-    std::string func_name, unsigned n_args, int flags,
+    const char *func_name, unsigned n_args, int flags,
     void (*x_func)(sqlite3_context *, int, sqlite3_value **),
     void (*x_step)(sqlite3_context *, int, sqlite3_value **),
     void (*x_final)(sqlite3_context *),
@@ -421,7 +434,7 @@ void Connection::CreateFunction(
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
-      impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
+      impl->db, func_name, static_cast<int>(n_args), rflags,
       pApp, x_func, x_step, x_final, x_destroy);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
@@ -429,11 +442,11 @@ void Connection::CreateFunction(
 }
 
 void Connection::DeleteFunction(
-    std::string func_name, unsigned n_args, int flags) {
+    const char *func_name, unsigned n_args, int flags) {
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
-      impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
+      impl->db, func_name, static_cast<int>(n_args), rflags,
       nullptr, nullptr, nullptr, nullptr, nullptr);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
