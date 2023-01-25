@@ -1257,6 +1257,7 @@ void CodeGenerator::RunOnOptional(
       needed_decls.insert("TokenUseSelector");
       token_use_ids[api_name].SetId(cls, i);
       selector << "TokenUseSelector";
+      element_name = "Token";
       lib_cpp_os
           << "    return fragment->TokenFor(fragment, id, "
              "true /* can_fail */).value();\n";
@@ -2793,6 +2794,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       // both as references.
       if (record_name == "Token" || record_name == "FileToken" ||
           record_name == "MacroToken") {
+        record_name = "Token";
 
         const auto i = storage.AddMethod("UInt64");  // Reference.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
