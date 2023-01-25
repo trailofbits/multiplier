@@ -246,18 +246,29 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
     if (strstr(arg, "-Wno") == arg) {
       // Keep the argument.
 
-    } else if (strstr(arg, "-W") == arg || strstr(arg, "-pedantic") == arg ||
+    } else if (strstr(arg, "-W") == arg ||
+               strstr(arg, "-pedantic") == arg ||
                strstr(arg, "-fsanitize") == arg) {
       continue;  // Skip the argument.
 
-    } else if (strstr(arg, "-mllvm") == arg ||
-               strstr(arg, "-Xclang") == arg) {
+    } else if (!strcmp(arg, "-mllvm") ||
+               !strcmp(arg, "-Xclang") ||
+               !strcmp(arg, "-dependency-file") ||
+               !strcmp(arg, "-diagnostic-log-file") ||
+               !strcmp(arg, "-header-include-file") ||
+               !strcmp(arg, "-stack-usage-file")) {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
-    // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` then
-    // drop it.
-    } else if (strstr(arg, "-file=")) {
+    // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` or
+    // `-fprofile-remapping-file=`, or ..., then drop it.
+    } else if (strstr(arg, "-file=") /* NOTE(pag): find anywhere */ ||
+               strstr(arg, "-dependent-lib=") == arg ||
+               strstr(arg, "-stats-file=") == arg ||
+               strstr(arg, "-fprofile-list=") == arg ||
+               strstr(arg, "-fxray-always-instrument=") == arg ||
+               strstr(arg, "-fxray-never-instrument=") == arg ||
+               strstr(arg, "-fxray-attr-list=") == arg) {
       continue;
 
     // Output file.
