@@ -253,6 +253,7 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
     if (strstr(arg, "-Wno") == arg) {
       // Keep the argument.
 
+    // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
     } else if (strstr(arg, "-W") == arg ||
                strstr(arg, "-pedantic") == arg ||
                strstr(arg, "-fsanitize") == arg ||
@@ -296,7 +297,6 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
 
   new_args.emplace_back("-w");  // Disable all warnings (GCC).
   new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
-  new_args.emplace_back("-Qunused-arguments");  // Don't warn on unknown args.
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
 //  new_args.emplace_back("-dD");  // Print macro definitions in -E mode.
