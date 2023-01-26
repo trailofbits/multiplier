@@ -280,8 +280,8 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
                strstr(arg, "-fxray-always-instrument=") == arg ||
                strstr(arg, "-fxray-never-instrument=") == arg ||
                strstr(arg, "-fxray-attr-list=") == arg ||
-               strstr(arg, "-tsan-compound-read-before-write=") ||
-               strstr(arg, "-tsan-distinguish-volatile=") ||
+               strstr(arg, "-tsan-compound-read-before-write=") == arg ||
+               strstr(arg, "-tsan-distinguish-volatile=") == arg ||
                strstr(arg, "-treat") == arg) {
       continue;
 
