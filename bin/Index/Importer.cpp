@@ -245,7 +245,7 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
       //
       //      ... -main-file-name -mrelocation-model ...
       //
-      if (arg[0] != '-') {
+      if (arg[0] != '-' && 1u < strlen(arg)) {
         continue;
       }
     }
