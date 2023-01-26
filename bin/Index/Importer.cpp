@@ -240,7 +240,14 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
   for (const char *arg : command.vec) {
     if (skip) {
       skip = false;
-      continue;
+
+      // NOTE(pag): Have observed things like the following in the Linux kernel:
+      //
+      //      ... -main-file-name -mrelocation-model ...
+      //
+      if (arg[0] != '-') {
+        continue;
+      }
     }
 
     if (strstr(arg, "-Wno") == arg) {
@@ -248,7 +255,8 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
 
     } else if (strstr(arg, "-W") == arg ||
                strstr(arg, "-pedantic") == arg ||
-               strstr(arg, "-fsanitize") == arg) {
+               strstr(arg, "-fsanitize") == arg ||
+               !strcmp(arg, "-pic-is-pie")) {
       continue;  // Skip the argument.
 
     } else if (!strcmp(arg, "-mllvm") ||
@@ -256,7 +264,10 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
                !strcmp(arg, "-dependency-file") ||
                !strcmp(arg, "-diagnostic-log-file") ||
                !strcmp(arg, "-header-include-file") ||
-               !strcmp(arg, "-stack-usage-file")) {
+               !strcmp(arg, "-stack-usage-file") ||
+               !strcmp(arg, "-mrelocation-model") ||
+               !strcmp(arg, "-pic-level") ||
+               !strcmp(arg, "-main-file-name")) {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
