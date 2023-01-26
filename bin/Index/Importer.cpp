@@ -279,7 +279,8 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
                strstr(arg, "-fprofile-list=") == arg ||
                strstr(arg, "-fxray-always-instrument=") == arg ||
                strstr(arg, "-fxray-never-instrument=") == arg ||
-               strstr(arg, "-fxray-attr-list=") == arg) {
+               strstr(arg, "-fxray-attr-list=") == arg ||
+               strstr(arg, "-treat") == arg) {
       continue;
 
     // Output file.
@@ -295,6 +296,7 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
 
   new_args.emplace_back("-w");  // Disable all warnings (GCC).
   new_args.emplace_back("-Wno-everything");  // Disable all warnings (Clang).
+  new_args.emplace_back("-Qunused-arguments");  // Don't warn on unknown args.
   new_args.emplace_back("-P");  // Disable preprocessor line markers.
   new_args.emplace_back("-v");
 //  new_args.emplace_back("-dD");  // Print macro definitions in -E mode.
