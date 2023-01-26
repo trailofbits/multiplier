@@ -256,7 +256,6 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
     // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
     } else if (strstr(arg, "-W") == arg ||
                strstr(arg, "-pedantic") == arg ||
-               strstr(arg, "-fsanitize") == arg ||
                !strcmp(arg, "-pic-is-pie")) {
       continue;  // Skip the argument.
 
@@ -281,6 +280,8 @@ CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
                strstr(arg, "-fxray-always-instrument=") == arg ||
                strstr(arg, "-fxray-never-instrument=") == arg ||
                strstr(arg, "-fxray-attr-list=") == arg ||
+               strstr(arg, "-tsan-compound-read-before-write=") ||
+               strstr(arg, "-tsan-distinguish-volatile=") ||
                strstr(arg, "-treat") == arg) {
       continue;
 
