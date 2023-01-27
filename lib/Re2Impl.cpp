@@ -6,6 +6,7 @@
 
 #include "Re2Impl.h"
 
+#include <algorithm>
 #include <cassert>
 #include <multiplier/Index.h>
 #include <multiplier/Types.h>
@@ -13,6 +14,7 @@
 #include "File.h"
 #include "Fragment.h"
 #include "Token.h"
+#include "Util.h"
 
 #ifndef MX_DISABLE_RE2
 
@@ -295,41 +297,59 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
 
 // Match this regular expression against a file.
 gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &file) const {
-  auto &reader = file.impl->Reader();
-
-  std::map<unsigned, unsigned> eol_offset_to_line_num;
-  for (mx::rpc::UpperBound::Reader ubr : reader.getEolOffsets()) {
-    eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
-  }
-
-  std::vector<unsigned> line_nums;
+  const FileReader &reader = file.impl->reader;
+  std::vector<EntityOffset> matched_offsets;
 
   this->for_each_match(
       file.data(),
-      [&eol_offset_to_line_num, &line_nums]
+      [&matched_offsets]
       (std::string_view, unsigned begin, unsigned end) -> bool {
-        unsigned prev_line = 0;
-        for (auto i = begin; i < end; ++i) {
-          auto line_it = eol_offset_to_line_num.upper_bound(i);
-          if (line_it != eol_offset_to_line_num.end()) {
-            auto line = line_it->second;
-            if (line != prev_line) {
-              prev_line = line;
-              line_nums.push_back(line);
-            }
-          }
+        if (begin < end) {
+          matched_offsets.push_back(begin);
         }
         return true;
       });
 
-  if (line_nums.empty()) {
+  std::sort(matched_offsets.begin(), matched_offsets.end());
+  auto unique_it = std::unique(matched_offsets.begin(), matched_offsets.end());
+  matched_offsets.erase(unique_it, matched_offsets.end());
+
+  if (matched_offsets.empty()) {
     co_return;
+  }
+
+  const auto byte_offsets = reader.getTokenOffsets();
+  const auto tok_kinds = reader.getTokenKinds();
+  const auto num_file_toks = tok_kinds.size();
+  const auto it_begin = byte_offsets.begin();
+  const auto it_end = byte_offsets.end();
+
+  // Convert from byte offsets to token offsets.
+  for (EntityOffset &offset : matched_offsets) {
+    auto it = LowerBound(it_begin, it_end, offset);
+    if (it == it_end) {
+      assert(false);
+      continue;
+    }
+
+    auto diff = it - it_begin;
+    if (0 > diff) {
+      assert(false);
+      offset = ~0u;
+      continue;
+    }
+
+    offset = static_cast<EntityOffset>(diff);
+    if (offset >= num_file_toks) {
+      assert(false);
+      offset = ~0u;
+    }
   }
 
   const EntityProvider::Ptr &ep = file.impl->ep;
   RegexQueryResultImpl result_impl(
       *this, ep,
-      ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
+      ep->FragmentsCoveringTokens(ep, file.id(), std::move(matched_offsets)));
   for (auto match : result_impl.Enumerate()) {
     co_yield match;
   }

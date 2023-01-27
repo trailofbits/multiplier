@@ -458,25 +458,33 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    FragmentLineCoverageRecord record, sqlite::Statement &insert) {
-  auto raw_file_id = record.file_id.Pack();
-  if (raw_file_id != mx::kInvalidEntityId && record.first_line_number &&
-      record.first_line_number <= record.last_line_number) {
-    insert.BindValues(record.fragment_id.Pack(), record.first_line_number,
-                      record.last_line_number, raw_file_id);
-    return true;
-  }
-  return false;
+    FragmentFileRecord record, sqlite::Statement &insert) {
+  insert.BindValues(record.fragment_id.Pack(), record.file_id.Pack());
+  return true;
+}
+
+bool BulkInserterState::InsertAsync(
+    FragmentFileRangeRecord record, sqlite::Statement &insert) {
+  FileTokenId begin = record.first_file_token.Unpack();
+  FileTokenId end = record.last_file_token.Unpack();
+  assert(begin.file_id == end.file_id);
+  FileId fid(begin.file_id);
+  insert.BindValues(
+      record.fragment_id.Pack(), begin.offset, end.offset,
+      EntityId(fid).Pack());
+  return true;
 }
 
 bool BulkInserterState::InsertAsync(
     SerializedFileRecord record, sqlite::Statement &insert) {
+  assert(!record.data.empty());
   insert.BindValues(record.file_id.Pack(), record.data);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
     SerializedFragmentRecord record, sqlite::Statement &insert) {
+  assert(!record.data.empty());
   insert.BindValues(record.fragment_id.Pack(), record.data);
   return true;
 }

@@ -153,9 +153,9 @@ class EntityProvider {
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, PackedFragmentId id) = 0;
 
-  // Return the list of fragments covering / overlapping some lines in a file.
-  virtual FragmentIdList FragmentsCoveringLines(
-      const Ptr &, PackedFileId file, std::vector<unsigned> lines) = 0;
+  // Return the list of fragments covering / overlapping some tokens in a file.
+  virtual FragmentIdList FragmentsCoveringTokens(
+      const Ptr &, PackedFileId, std::vector<EntityOffset> tokens) = 0;
 
   // Return the redeclarations of a given declaration.
   virtual RawEntityIdList Redeclarations(

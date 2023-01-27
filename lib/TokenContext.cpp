@@ -42,7 +42,7 @@ std::optional<TokenContext> Token::context(void) const {
     return std::nullopt;
   }
 
-  const FragmentReader &frag_reader = frag->Fragment();
+  const FragmentReader &frag_reader = frag->reader;
   unsigned tagged_offset = frag_reader.getParsedTokenContextOffsets()[offset];
   if (!(tagged_offset & 1u)) {
     assert(!tagged_offset);
@@ -131,7 +131,7 @@ std::optional<TokenContext> TokenContext::aliasee(void) const {
     return std::nullopt;
 
   } else {
-    auto tc = impl->Fragment().getParsedTokenContexts()[alias_offset.value()];
+    auto tc = impl->reader.getParsedTokenContexts()[alias_offset.value()];
     (void) tc;
     TokenContext ret(impl);
     assert(entity_id == tc.getEntityId());
@@ -149,7 +149,7 @@ std::optional<TokenContext> TokenContext::parent(void) const {
     return std::nullopt;
   }
 
-  auto tc = impl->Fragment().getParsedTokenContexts()[parent_offset.value()];
+  auto tc = impl->reader.getParsedTokenContexts()[parent_offset.value()];
 
   // NOTE(pag): `+1` to skip `kInvalid`.
   TokenContext ret(impl);

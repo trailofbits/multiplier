@@ -1018,8 +1018,7 @@ found_tokens:
   etid.kind = TokenKindFromPasta(end_tok.value());
   etid.offset = static_cast<unsigned>(end_tok->Index());
 
-  return FileLocationOfFragment(
-      fid, btid, begin_tok.value(), etid, end_tok.value());
+  return FileLocationOfFragment(fid, btid, etid);
 }
 
 static void CreatePendingFragment(

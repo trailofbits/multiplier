@@ -41,9 +41,9 @@ FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(
   return {};
 }
 
-// Return the list of fragments covering / overlapping some lines in a file.
-FragmentIdList InvalidEntityProvider::FragmentsCoveringLines(
-    const Ptr &, PackedFileId, std::vector<unsigned>) {
+// Return the list of fragments covering / overlapping some tokens in a file.
+FragmentIdList InvalidEntityProvider::FragmentsCoveringTokens(
+    const Ptr &, PackedFileId, std::vector<EntityOffset>) {
   return {};
 }
 

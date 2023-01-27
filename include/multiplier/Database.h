@@ -33,7 +33,7 @@ struct FilePathRecord {
   static constexpr const char *kInsertStatement =
       "INSERT OR IGNORE INTO file_path (file_id, path) VALUES (?1, ?2)";
 
-  SpecificEntityId<FileId> file_id;
+  PackedFileId file_id;
   std::filesystem::path path;
 };
 
@@ -53,33 +53,57 @@ struct SerializedFileRecord {
   static constexpr const char *kInsertStatement =
       "INSERT OR IGNORE INTO file (file_id, data) VALUES (?1, ?2)";
 
-  SpecificEntityId<FileId> file_id;
+  PackedFileId file_id;
   std::string data;
 };
 
-// Tells us a the inclusive range of lines of a file covered by a fragment.
-struct FragmentLineCoverageRecord {
-  static constexpr const char *kTableName = "fragment_line";
+// Tells us which file the "root" of a fragment belongs to. Note that a fragment
+// can span/include other files internally.
+struct FragmentFileRecord {
+  static constexpr const char *kTableName = "fragment_file";
 
   static constexpr const char *kInitStatements[] =
-      {R"(CREATE VIRTUAL TABLE IF NOT EXISTS fragment_line USING rtree_i32(
+      {R"(CREATE TABLE IF NOT EXISTS fragment_file (
+            fragment_id INT NOT NULL PRIMARY KEY,
+            file_id INT NOT NULL
+          ) WITHOUT rowid)"};
+
+  static constexpr const char *kExitStatements[] = {
+      R"(CREATE INDEX IF NOT EXISTS fragments_in_file
+         ON fragment_file(file_id))"};
+
+  static constexpr const char *kInsertStatement =
+      R"(INSERT OR IGNORE INTO fragment_file
+         (fragment_id, file_id)
+         VALUES (?1, ?2))";
+
+  PackedFragmentId fragment_id;
+  PackedFileId file_id;
+};
+
+// Tells us a the inclusive range of file tokens of a file covered by a
+// fragment.
+struct FragmentFileRangeRecord {
+  static constexpr const char *kTableName = "fragment_file_range";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE VIRTUAL TABLE IF NOT EXISTS fragment_file_range USING rtree_i32(
             fragment_id INT PRIMARY KEY NOT NULL,
-            first_line_number INT NOT NULL,
-            last_line_number INT NOT NULL,
+            first_file_token_offset INT NOT NULL,
+            last_file_token_offset INT NOT NULL,
             +file_id INT NOT NULL
           ))"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO fragment_line
-         (fragment_id, first_line_number, last_line_number, file_id)
+      R"(INSERT OR IGNORE INTO fragment_file_range
+         (fragment_id, first_file_token_offset, last_file_token_offset, file_id)
          VALUES (?1, ?2, ?3, ?4))";
 
-  SpecificEntityId<FragmentId> fragment_id;
-  SpecificEntityId<FileId> file_id;
-  unsigned first_line_number;
-  unsigned last_line_number;
+  PackedFragmentId fragment_id;
+  PackedFileTokenId first_file_token;
+  PackedFileTokenId last_file_token;
 };
 
 // Maps a fragment id to the fragment's serialized data.
@@ -99,7 +123,7 @@ struct SerializedFragmentRecord {
       R"(INSERT OR IGNORE INTO fragment (fragment_id, data)
          VALUES (?1, ?2))";
 
-  SpecificEntityId<FragmentId> fragment_id;
+  PackedFragmentId fragment_id;
   std::string data;
 };
 
@@ -124,8 +148,8 @@ struct RedeclarationRecord {
       R"(INSERT OR IGNORE INTO redeclaration (decl_id, redecl_id)
          VALUES (?1, ?2))";
 
-  SpecificEntityId<DeclarationId> decl_id;
-  SpecificEntityId<DeclarationId> redecl_id;
+  PackedDeclarationId decl_id;
+  PackedDeclarationId redecl_id;
 };
 
 // Maps a declaration ID to a mangled name. We use mangled names to help us
@@ -225,7 +249,7 @@ struct UseRecord {
       R"(INSERT INTO use (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
-  SpecificEntityId<FragmentId> fragment_id;
+  PackedFragmentId fragment_id;
   RawEntityId entity_id;
 };
 
@@ -254,14 +278,15 @@ struct ReferenceRecord {
       R"(INSERT INTO reference (fragment_id, entity_id)
          VALUES (?1, ?2))";
 
-  SpecificEntityId<FragmentId> fragment_id;
+  PackedFragmentId fragment_id;
   RawEntityId entity_id;
 };
 
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
     m(SerializedFileRecord) \
-    m(FragmentLineCoverageRecord) \
+    m(FragmentFileRecord) \
+    m(FragmentFileRangeRecord) \
     m(SerializedFragmentRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \

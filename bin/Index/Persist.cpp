@@ -9,9 +9,11 @@
 #include <algorithm>
 #include <capnp/common.h>
 #include <capnp/message.h>
+#include <capnp/serialize.h>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
+#include <kj/io.h>
 #include <llvm/Support/JSON.h>
 #include <multiplier/AST.h>
 #include <multiplier/AST.capnp.h>
@@ -24,7 +26,6 @@
 #include <unordered_set>
 
 #include "Codegen.h"
-#include "Compress.h"
 #include "EntityMapper.h"
 #include "PASTA.h"
 #include "PendingFragment.h"
@@ -132,6 +133,22 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
   }
 }
 
+class StringOutputStream final : public kj::OutputStream {
+ private:
+  std::string &str;
+
+ public:
+  virtual ~StringOutputStream(void) = default;
+
+  explicit StringOutputStream(std::string &str_)
+      : str(str_) {}
+
+  void write(const void *buffer_, size_t size) final {
+    auto ptr = reinterpret_cast<const char *>(buffer_);
+    str.append(ptr, &(ptr[size]));
+  }
+};
+
 }  // namespace
 
 
@@ -205,9 +222,22 @@ void GlobalIndexingState::PersistFile(
     ubb.setVal(eol_offset_line_num.second);
   }
 
+  // Serialize the message into a flat Cap'n Proto.
+  std::string data;
+  data.reserve(message.sizeInWords() * sizeof(capnp::word));
+  StringOutputStream os(data);
+  capnp::writeMessage(os, message);
+  assert(!data.empty());
+
+  // Pad the size out to be a multiple of the `capnp::word` size.
+  while (data.size() % sizeof(capnp::word)) {
+    data.push_back('\0');
+  }
+
+  // Add it to the database.
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, CompressedMessage(message)});
+      mx::SerializedFileRecord{file_id, std::move(data)});
 }
 
 namespace {
@@ -959,11 +989,19 @@ void GlobalIndexingState::PersistFragment(
   if (pf.file_location) {
     fb.setFirstFileTokenId(pf.file_location->first_file_token_id.Pack());
     fb.setLastFileTokenId(pf.file_location->last_file_token_id.Pack());
+
+    // Associate the fragment with the file.
     database.AddAsync(
-        mx::FragmentLineCoverageRecord{
-            pf.fragment_id, pf.file_location->file_id,
-            pf.file_location->first_line_number,
-            pf.file_location->last_line_number});
+        mx::FragmentFileRecord{pf.fragment_id, pf.file_location->file_id});
+
+    // Associate the range of file tokens with the fragment. This helps with
+    // implementing things like regular expression (via RE2) and Weggli searches
+    // over code.
+    database.AddAsync(
+        mx::FragmentFileRangeRecord{
+            pf.fragment_id,
+            pf.file_location->first_file_token_id,
+            pf.file_location->last_file_token_id});
   }
 
   // Generate source IR before saving the fragments to the persistent
@@ -1010,14 +1048,26 @@ void GlobalIndexingState::PersistFragment(
   }
 
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
-  database.AddAsync(
-      mx::SerializedFragmentRecord{
-          pf.fragment_id, CompressedMessage(message)});
-
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalUsesInFragment(database, pf, fb);
   LinkExternalReferencesInFragment(database, pf, em);
   LinkEntityNamesToFragment(database, pf, em);
+
+  // Serialize the message into a flat Cap'n Proto.
+  std::string data;
+  data.reserve(message.sizeInWords() * sizeof(capnp::word));
+  StringOutputStream os(data);
+  capnp::writeMessage(os, message);
+  assert(!data.empty());
+
+  // Pad the size out to be a multiple of the `capnp::word` size.
+  while (data.size() % sizeof(capnp::word)) {
+    data.push_back('\0');
+  }
+
+  // Add the fragment to the database.
+  database.AddAsync(
+      mx::SerializedFragmentRecord{pf.fragment_id, std::move(data)});
 }
 
 }  // namespace indexer

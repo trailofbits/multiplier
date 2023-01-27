@@ -66,9 +66,9 @@ class SQLiteEntityProvider final : public EntityProvider {
   std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
 
-  // Return the list of fragments covering / overlapping some lines in a file.
-  FragmentIdList FragmentsCoveringLines(
-      const Ptr &, PackedFileId file, std::vector<unsigned> lines) final;
+  // Return the list of fragments covering / overlapping some tokens in a file.
+  FragmentIdList FragmentsCoveringTokens(
+      const Ptr &, PackedFileId, std::vector<EntityOffset> tokens) final;
 
   RawEntityIdList Redeclarations(
       const Ptr &, SpecificEntityId<DeclarationId>) final;
