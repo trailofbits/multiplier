@@ -102,7 +102,8 @@ class CXXUnresolvedConstructExpr : public Expr {
     }
   }
 
-  std::vector<Expr> arguments(void) const;
+  std::optional<Expr> nth_argument(unsigned n) const;
+  gap::generator<Expr> arguments(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
   Type type_as_written(void) const;

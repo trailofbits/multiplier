@@ -34,8 +34,16 @@ class CachingEntityProvider final : public EntityProvider {
   // cycles.
   std::vector<std::shared_ptr<const void>> entities;
 
+  EntityImplPtr x;
   std::unordered_map<RawEntityId, FragmentImpl::WeakPtr> fragments;
   std::unordered_map<RawEntityId, FileImpl::WeakPtr> files;
+
+#define DECLARE_ENTITY_CACHE(name, lower_name) \
+    std::unordered_map<RawEntityId, WeakEntityImplPtr> lower_name ## s;
+
+  MX_FOR_EACH_ENTITY_RECORD(DECLARE_ENTITY_CACHE)
+#undef DECLARE_ENTITY_CACHE
+
 
   // Cached list of fragments inside of files.
   std::unordered_map<RawEntityId, FragmentIdList> file_fragments;
@@ -90,41 +98,16 @@ class CachingEntityProvider final : public EntityProvider {
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
 
-  gap::generator<EntityImplPtr> DeclsFor(const Ptr &,
-                                PackedFragmentId id) final;
+#define DECLARE_ENTITY_METHODS(name, lower_name) \
+    gap::generator<EntityImplPtr> \
+    name ## sFor(const Ptr &, PackedFragmentId id) final; \
+    std::optional<EntityImplPtr> \
+    name ## For(const Ptr &, PackedFragmentId id, EntityOffset offset) final; \
+    std::optional<EntityImplPtr> \
+    name ## For(const Ptr &ep, RawEntityId id) final;
 
-  gap::generator<EntityImplPtr> TypesFor(const Ptr &,
-                                PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> StmtsFor(const Ptr &,
-                                PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> AttrsFor(const Ptr &,
-                                PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> MacrosFor(const Ptr &,
-                                  PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> PseudosFor(const Ptr &,
-                                  PackedFragmentId id) final;
-
-  std::optional<EntityImplPtr> DeclFor(const Ptr &,
-                               PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> TypeFor(const Ptr &,
-                              PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> StmtFor(const Ptr &,
-                              PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> AttrFor(const Ptr &,
-                              PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> MacroFor(const Ptr &,
-                                PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> PseudoFor(const Ptr &,
-                                PackedFragmentId id, unsigned offset) final;
+  MX_FOR_EACH_ENTITY_RECORD(DECLARE_ENTITY_METHODS)
+#undef DECLARE_ENTITY_METHODS
 };
 
 }  // namespace mx

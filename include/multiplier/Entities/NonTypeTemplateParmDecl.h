@@ -125,7 +125,8 @@ class NonTypeTemplateParmDecl : public DeclaratorDecl {
   bool has_placeholder_type_constraint(void) const;
   bool is_expanded_parameter_pack(void) const;
   bool is_pack_expansion(void) const;
-  std::vector<Type> expansion_types(void) const;
+  std::optional<Type> nth_expansion_type(unsigned n) const;
+  gap::generator<Type> expansion_types(void) const;
 };
 
 static_assert(sizeof(NonTypeTemplateParmDecl) == sizeof(DeclaratorDecl));

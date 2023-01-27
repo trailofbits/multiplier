@@ -105,8 +105,10 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
-  std::vector<Token> protocol_tokens(void) const;
-  std::vector<ObjCProtocolDecl> protocols(void) const;
+  std::optional<Token> nth_protocol_token(unsigned n) const;
+  gap::generator<Token> protocol_tokens(void) const;
+  std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const;
 };
 
 static_assert(sizeof(ObjCProtocolDecl) == sizeof(ObjCContainerDecl));

@@ -102,7 +102,8 @@ class OMPArrayShapingExpr : public Expr {
   }
 
   Expr base(void) const;
-  std::vector<Expr> dimensions(void) const;
+  std::optional<Expr> nth_dimension(unsigned n) const;
+  gap::generator<Expr> dimensions(void) const;
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
 };

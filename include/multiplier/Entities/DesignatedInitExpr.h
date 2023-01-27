@@ -102,13 +102,15 @@ class DesignatedInitExpr : public Expr {
     }
   }
 
-  std::vector<Designator> designators(void) const;
+  std::optional<Designator> nth_designator(unsigned n) const;
+  gap::generator<Designator> designators(void) const;
   TokenRange designators_source_range(void) const;
   Token equal_or_colon_token(void) const;
   Expr initializer(void) const;
   bool is_direct_initializer(void) const;
   bool uses_gnu_syntax(void) const;
-  std::vector<Expr> sub_expressions(void) const;
+  std::optional<Expr> nth_sub_expression(unsigned n) const;
+  gap::generator<Expr> sub_expressions(void) const;
 };
 
 static_assert(sizeof(DesignatedInitExpr) == sizeof(Expr));

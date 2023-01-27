@@ -105,7 +105,8 @@ class TypeTraitExpr : public Expr {
 
   TypeTrait trait(void) const;
   std::optional<bool> value(void) const;
-  std::vector<Type> arguments(void) const;
+  std::optional<Type> nth_argument(unsigned n) const;
+  gap::generator<Type> arguments(void) const;
 };
 
 static_assert(sizeof(TypeTraitExpr) == sizeof(Expr));

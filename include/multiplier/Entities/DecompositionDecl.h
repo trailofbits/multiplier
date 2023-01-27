@@ -126,7 +126,8 @@ class DecompositionDecl : public VarDecl {
     }
   }
 
-  std::vector<BindingDecl> bindings(void) const;
+  std::optional<BindingDecl> nth_binding(unsigned n) const;
+  gap::generator<BindingDecl> bindings(void) const;
 };
 
 static_assert(sizeof(DecompositionDecl) == sizeof(VarDecl));

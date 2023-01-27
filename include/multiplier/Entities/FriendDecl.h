@@ -86,7 +86,8 @@ class FriendDecl : public Decl {
   Token friend_token(void) const;
   std::optional<Type> friend_type(void) const;
   bool is_unsupported_friend(void) const;
-  std::vector<TemplateParameterList> friend_type_template_parameter_lists(void) const;
+  std::optional<TemplateParameterList> nth_friend_type_template_parameter_list(unsigned n) const;
+  gap::generator<TemplateParameterList> friend_type_template_parameter_lists(void) const;
 };
 
 static_assert(sizeof(FriendDecl) == sizeof(Decl));

@@ -89,7 +89,8 @@ class UsingPackDecl : public NamedDecl {
     }
   }
 
-  std::vector<NamedDecl> expansions(void) const;
+  std::optional<NamedDecl> nth_expansion(unsigned n) const;
+  gap::generator<NamedDecl> expansions(void) const;
   NamedDecl instantiated_from_using_declaration(void) const;
 };
 

@@ -76,15 +76,22 @@ class AsmStmt : public Stmt {
 
   std::string_view generate_assembly_string(void) const;
   Token assembly_token(void) const;
-  std::vector<Expr> inputs(void) const;
+  std::optional<Expr> nth_input(unsigned n) const;
+  gap::generator<Expr> inputs(void) const;
   bool is_simple(void) const;
   bool is_volatile(void) const;
-  std::vector<Expr> outputs(void) const;
-  std::vector<std::string_view> output_constraints(void) const;
-  std::vector<Expr> output_expressions(void) const;
-  std::vector<std::string_view> input_constraints(void) const;
-  std::vector<Expr> input_expressions(void) const;
-  std::vector<std::string_view> clobbers(void) const;
+  std::optional<Expr> nth_output(unsigned n) const;
+  gap::generator<Expr> outputs(void) const;
+  std::optional<std::string_view> nth_output_constraint(unsigned n) const;
+  gap::generator<std::string_view> output_constraints(void) const;
+  std::optional<Expr> nth_output_expression(unsigned n) const;
+  gap::generator<Expr> output_expressions(void) const;
+  std::optional<std::string_view> nth_input_constraint(unsigned n) const;
+  gap::generator<std::string_view> input_constraints(void) const;
+  std::optional<Expr> nth_input_expression(unsigned n) const;
+  gap::generator<Expr> input_expressions(void) const;
+  std::optional<std::string_view> nth_clobber(unsigned n) const;
+  gap::generator<std::string_view> clobbers(void) const;
 };
 
 static_assert(sizeof(AsmStmt) == sizeof(Stmt));

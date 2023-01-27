@@ -108,7 +108,8 @@ class CallExpr : public Expr {
     }
   }
 
-  std::vector<Expr> arguments(void) const;
+  std::optional<Expr> nth_argument(unsigned n) const;
+  gap::generator<Expr> arguments(void) const;
   CallExprADLCallKind adl_call_kind(void) const;
   Type call_return_type(void) const;
   Expr callee(void) const;

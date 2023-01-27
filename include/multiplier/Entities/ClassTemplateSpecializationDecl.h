@@ -146,8 +146,10 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   Token point_of_instantiation(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
   ClassTemplateDecl specialized_template(void) const;
-  std::vector<TemplateArgument> template_arguments(void) const;
-  std::vector<TemplateArgument> template_instantiation_arguments(void) const;
+  std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  gap::generator<TemplateArgument> template_arguments(void) const;
+  std::optional<TemplateArgument> nth_template_instantiation_argument(unsigned n) const;
+  gap::generator<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;
   std::optional<Type> type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;

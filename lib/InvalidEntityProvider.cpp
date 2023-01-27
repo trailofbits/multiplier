@@ -73,30 +73,22 @@ void InvalidEntityProvider::FindSymbol(
   ids_out.clear();
 }
 
-gap::generator<EntityImplPtr> InvalidEntityProvider::DeclsFor(
-  const Ptr &, PackedFragmentId) { co_return; }
-gap::generator<EntityImplPtr> InvalidEntityProvider::TypesFor(
-  const Ptr &, PackedFragmentId) { co_return; }
-gap::generator<EntityImplPtr> InvalidEntityProvider::StmtsFor(
-  const Ptr &, PackedFragmentId) { co_return; }
-gap::generator<EntityImplPtr> InvalidEntityProvider::AttrsFor(
-  const Ptr &, PackedFragmentId) { co_return; }
-gap::generator<EntityImplPtr> InvalidEntityProvider::MacrosFor(
-  const Ptr &, PackedFragmentId) { co_return; }
-gap::generator<EntityImplPtr> InvalidEntityProvider::PseudosFor(
-  const Ptr &, PackedFragmentId) { co_return; }
-std::optional<EntityImplPtr> InvalidEntityProvider::DeclFor(
-  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
-std::optional<EntityImplPtr> InvalidEntityProvider::TypeFor(
-  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
-std::optional<EntityImplPtr> InvalidEntityProvider::StmtFor(
-  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
-std::optional<EntityImplPtr> InvalidEntityProvider::AttrFor(
-  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
-std::optional<EntityImplPtr> InvalidEntityProvider::MacroFor(
-  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
-std::optional<EntityImplPtr> InvalidEntityProvider::PseudoFor(
-  const Ptr &, PackedFragmentId, unsigned) { return std::nullopt; }
+#define DEFINE_ENTITY_METHODS(name, lower_name) \
+    gap::generator<EntityImplPtr> \
+    InvalidEntityProvider::name ## sFor(const Ptr &, PackedFragmentId) { \
+      co_return; \
+    } \
+    std::optional<EntityImplPtr> \
+    InvalidEntityProvider::name ## For(const Ptr &, PackedFragmentId, EntityOffset) { \
+      return std::nullopt; \
+    } \
+    std::optional<EntityImplPtr> \
+    InvalidEntityProvider::name ## For(const Ptr &, RawEntityId) { \
+      return std::nullopt; \
+    } \
+
+  MX_FOR_EACH_ENTITY_RECORD(DEFINE_ENTITY_METHODS)
+#undef DEFINE_ENTITY_METHODS
 
 Index::Index(void)
     : impl(std::make_shared<InvalidEntityProvider>()) {}

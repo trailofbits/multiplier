@@ -4,7 +4,7 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
-#include <multiplier/Types.h>
+#include "Types.h"
 
 #include <cassert>
 #include <multiplier/AST.h>
@@ -461,6 +461,36 @@ EntityId::EntityId(FileTokenId id) {
 }
 
 #pragma GCC diagnostic pop
+
+EntityOffset FragmentOffsetFromEntityId(RawEntityId id) {
+  PackedEntityId packed = {};
+  packed.opaque = id;
+  if (!packed.entity_or_other.is_fragment_entity) {
+    return ~0u;
+  }
+
+  if (packed.small_or_big.is_big) {
+    return static_cast<EntityOffset>(packed.big_entity.offset);
+  } else {
+    return static_cast<EntityOffset>(packed.small_entity.offset);
+  }
+}
+
+RawEntityId FragmentIdFromEntityId(RawEntityId id) {
+  PackedEntityId packed = {};
+  packed.opaque = id;
+  if (!packed.entity_or_other.is_fragment_entity) {
+    return kInvalidEntityId;
+  }
+
+  if (packed.small_or_big.is_big) {
+    FragmentId fid(packed.big_entity.code_id);
+    return EntityId(fid).Pack();
+  } else {
+    FragmentId fid(packed.small_entity.code_id + kMaxBigFragmentId);
+    return EntityId(fid).Pack();
+  }
+}
 
 // Unpack this entity ID into a concrete type.
 VariantId EntityId::Unpack(void) const noexcept {

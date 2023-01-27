@@ -115,7 +115,7 @@ class OMPDeclareMapperDecl : public OMPDeclarativeDirectiveValueDecl {
   }
 
   Expr mapper_variable_reference(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(OMPDeclareMapperDecl) == sizeof(OMPDeclarativeDirectiveValueDecl));

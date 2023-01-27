@@ -86,7 +86,8 @@ class DependentTemplateSpecializationType : public TypeWithKeyword {
 
   Type desugar(void) const;
   bool is_sugared(void) const;
-  std::vector<TemplateArgument> template_arguments(void) const;
+  std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  gap::generator<TemplateArgument> template_arguments(void) const;
 };
 
 static_assert(sizeof(DependentTemplateSpecializationType) == sizeof(TypeWithKeyword));

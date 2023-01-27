@@ -78,11 +78,11 @@ class DefineMacroDirective : public MacroDirective {
   }
 
   Token name(void) const;
-  std::vector<MacroOrToken> body(void) const;
+  gap::generator<MacroOrToken> body(void) const;
   unsigned num_explicit_parameters(void) const;
   bool is_variadic(void) const;
   bool is_function_like(void) const;
-  std::vector<MacroOrToken> parameters(void) const;
+  gap::generator<MacroOrToken> parameters(void) const;
 };
 
 static_assert(sizeof(DefineMacroDirective) == sizeof(MacroDirective));

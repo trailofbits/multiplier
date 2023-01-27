@@ -82,7 +82,8 @@ class ObjCAtTryStmt : public Stmt {
   Token at_try_token(void) const;
   ObjCAtFinallyStmt finally_statement(void) const;
   Stmt try_body(void) const;
-  std::vector<ObjCAtCatchStmt> catch_statements(void) const;
+  std::optional<ObjCAtCatchStmt> nth_catch_statement(unsigned n) const;
+  gap::generator<ObjCAtCatchStmt> catch_statements(void) const;
 };
 
 static_assert(sizeof(ObjCAtTryStmt) == sizeof(Stmt));

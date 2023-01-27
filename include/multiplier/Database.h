@@ -12,10 +12,37 @@
 
 #include "Types.h"
 
-#define MX_SQLITE_HAS_FTS5 1
+#define MX_DATABASE_HAS_FTS5 1
+#define MX_DATABASE_PRAGMA_SYNCHRONOUS "NORMAL"
+#define MX_DATABASE_TEMP_STORE "MEMORY"
+#define MX_DATABASE_JOURNAL_MODE "WAL"
 
 namespace mx {
 class DatabaseWriterImpl;
+
+#define MX_FOR_EACH_ENTITY_RECORD(m, ...) \
+    m(Decl, decl __VA_OPT__(,) __VA_ARGS__) \
+    m(Type, type __VA_OPT__(,) __VA_ARGS__) \
+    m(Stmt, stmt __VA_OPT__(,) __VA_ARGS__) \
+    m(Attr, attr __VA_OPT__(,) __VA_ARGS__) \
+    m(Macro, macro __VA_OPT__(,) __VA_ARGS__) \
+    m(Pseudo, pseudo __VA_OPT__(,) __VA_ARGS__)
+
+#define MX_ASYNC_REORD_TYPE(name, lower_name, m) m(name ## EntityRecord)
+
+#define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
+    m(FilePathRecord) \
+    m(SerializedFileRecord) \
+    m(FragmentFileRecord) \
+    m(FragmentFileRangeRecord) \
+    m(SerializedFragmentRecord) \
+    m(RedeclarationRecord) \
+    m(MangledNameRecord) \
+    m(UseRecord) \
+    m(ReferenceRecord) \
+    m(SymbolNameRecord) \
+    MX_FOR_EACH_ENTITY_RECORD(MX_ASYNC_REORD_TYPE, m)
+
 
 // Tells us one of the valid file paths associated with a file id.
 struct FilePathRecord {
@@ -194,7 +221,7 @@ struct MangledNameRecord {
 struct SymbolNameRecord {
   static constexpr const char *kTableName = "symbol";
 
-#if MX_SQLITE_HAS_FTS5
+#if MX_DATABASE_HAS_FTS5
   static constexpr const char *kInitStatements[] = {
       R"(CREATE VIRTUAL TABLE IF NOT EXISTS symbol
          USING fts5(name, content=''))"};
@@ -282,55 +309,35 @@ struct ReferenceRecord {
   RawEntityId entity_id;
 };
 
-#define MX_ENTITY_TABLE(name) \
+#define DEFINE_ENTITY_TABLE(name, lower_name) \
   struct name ## EntityRecord { \
-    static constexpr const char *kTableName = #name; \
-    static constexpr const char *kInitStatements[] = \
-      {"CREATE TABLE IF NOT EXISTS " #name "( \
-            id INT PRIMARY KEY, \
-            contents BLOB NOT NULL, \
-            fragment_id INT GENERATED ALWAYS AS (" #name "_fragment(id)) VIRTUAL, \
-            offset INT GENERATED ALWAYS AS (" #name "_offset(id)) VIRTUAL, \
-            kind INT GENERATED ALWAYS AS (" #name "_kind(id)) VIRTUAL \
-          )"}; \
-    static constexpr const char *kExitStatements[] = \
-      {"CREATE INDEX IF NOT EXISTS " #name "_kind_index ON " #name "(kind)", \
-       "CREATE INDEX IF NOT EXISTS " #name "_fragment_index ON " #name "(fragment_id)", \
-       "CREATE INDEX IF NOT EXISTS " #name "_offset_index ON " #name "(fragment_id, offset ASC)"}; \
+    static constexpr const char *kTableName = #lower_name; \
+    \
+    static constexpr const char *kInitStatements[] = { \
+        "CREATE TABLE IF NOT EXISTS " #lower_name "(" \
+        "  id INT PRIMARY KEY, " \
+        "  fragment_id INT NOT NULL, " \
+        "  fragment_offset INT NOT NULL, " \
+        "  data BLOB NOT NULL " \
+        ")"}; \
+    \
+    static constexpr const char *kExitStatements[] = { \
+        "CREATE INDEX IF NOT EXISTS " #lower_name "_fragment_index " \
+        "ON " #lower_name "(fragment_id)", \
+        \
+        "CREATE INDEX IF NOT EXISTS " #lower_name "_offset_index " \
+        "ON " #lower_name "(fragment_id, fragment_offset)"}; \
+    \
     static constexpr const char *kInsertStatement = \
-      "INSERT INTO " #name " (id, contents) VALUES (?1, zstd_compress(?2))"; \
-    mx::EntityId id; \
-    std::string content; \
+        "INSERT INTO " #lower_name " (id, fragment_id, fragment_offset, data) "\
+        "VALUES (?1, ?2, ?3, zstd_compress(?4))"; \
+    \
+    mx::RawEntityId id; \
+    std::string data; \
   };
 
-MX_ENTITY_TABLE(Decl)
-MX_ENTITY_TABLE(Type)
-MX_ENTITY_TABLE(Stmt)
-MX_ENTITY_TABLE(Attr)
-MX_ENTITY_TABLE(Macro)
-MX_ENTITY_TABLE(Pseudo)
-
-#define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
-    m(FilePathRecord) \
-    m(SerializedFileRecord) \
-    m(FragmentFileRecord) \
-    m(FragmentFileRangeRecord) \
-    m(SerializedFragmentRecord) \
-    m(RedeclarationRecord) \
-    m(MangledNameRecord) \
-    m(UseRecord) \
-    m(ReferenceRecord) \
-    m(SymbolNameRecord) \
-    m(DeclEntityRecord) \
-    m(TypeEntityRecord) \
-    m(StmtEntityRecord) \
-    m(AttrEntityRecord) \
-    m(MacroEntityRecord) \
-    m(PseudoEntityRecord)
-
-#define MX_DATABASE_PRAGMA_SYNCHRONOUS "NORMAL"
-#define MX_DATABASE_TEMP_STORE "MEMORY"
-#define MX_DATABASE_JOURNAL_MODE "WAL"
+MX_FOR_EACH_ENTITY_RECORD(DEFINE_ENTITY_TABLE)
+#undef DEFINE_ENTITY_TABLE
 
 // API for write access to the Multiplier database.
 class DatabaseWriter final {

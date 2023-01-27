@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <gap/core/generator.hpp>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -102,7 +103,7 @@ class Fragment {
   std::vector<Decl> top_level_declarations(void) const;
 
   // Return the list of top-level macros or macro tokens in this code.
-  std::vector<MacroOrToken> preprocessed_code(void) const;
+  gap::generator<MacroOrToken> preprocessed_code(void) const;
 
   // Returns source IR for the fragment.
   std::optional<std::string_view> source_ir(void) const noexcept;

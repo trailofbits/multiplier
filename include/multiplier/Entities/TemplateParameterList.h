@@ -64,7 +64,8 @@ class TemplateParameterList {
   Token left_angle_token(void) const;
   Token right_angle_token(void) const;
   TokenRange tokens(void) const;
-  std::vector<NamedDecl> parameters(void) const;
+  std::optional<NamedDecl> nth_parameter(unsigned n) const;
+  gap::generator<NamedDecl> parameters(void) const;
 };
 
 #endif

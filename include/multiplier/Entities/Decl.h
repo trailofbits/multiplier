@@ -79,7 +79,8 @@ class Decl {
   std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> definition(void) const;
   bool is_definition(void) const;
-  std::vector<Decl> redeclarations(void) const;
+  Decl canonical_declaration(void) const;
+  gap::generator<Decl> redeclarations(void) const;
   SpecificEntityId<DeclarationId> id(void) const;
   gap::generator<Use<DeclUseSelector>> uses(void) const;
   gap::generator<StmtReference> references(void) const;
@@ -118,7 +119,8 @@ class Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  std::vector<Attr> attributes(void) const;
+  std::optional<Attr> nth_attribute(unsigned n) const;
+  gap::generator<Attr> attributes(void) const;
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;

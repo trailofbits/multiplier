@@ -202,11 +202,12 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_user_provided(void) const;
   bool is_variadic(void) const;
   bool is_virtual_as_written(void) const;
-  std::vector<ParmVarDecl> parameters(void) const;
+  std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  gap::generator<ParmVarDecl> parameters(void) const;
   bool uses_seh_try(void) const;
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));

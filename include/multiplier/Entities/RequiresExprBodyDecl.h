@@ -77,7 +77,7 @@ class RequiresExprBodyDecl : public Decl {
     }
   }
 
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(RequiresExprBodyDecl) == sizeof(Decl));

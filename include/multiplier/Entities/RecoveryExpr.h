@@ -101,7 +101,8 @@ class RecoveryExpr : public Expr {
     }
   }
 
-  std::vector<Expr> sub_expressions(void) const;
+  std::optional<Expr> nth_sub_expression(unsigned n) const;
+  gap::generator<Expr> sub_expressions(void) const;
 };
 
 static_assert(sizeof(RecoveryExpr) == sizeof(Expr));

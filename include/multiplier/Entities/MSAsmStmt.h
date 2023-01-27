@@ -90,8 +90,10 @@ class MSAsmStmt : public AsmStmt {
     }
   }
 
-  std::vector<std::string_view> all_constraints(void) const;
-  std::vector<Expr> all_expressions(void) const;
+  std::optional<std::string_view> nth_all_constraint(unsigned n) const;
+  gap::generator<std::string_view> all_constraints(void) const;
+  std::optional<Expr> nth_all_expression(unsigned n) const;
+  gap::generator<Expr> all_expressions(void) const;
   std::string_view assembly_string(void) const;
   Token l_brace_token(void) const;
   bool has_braces(void) const;

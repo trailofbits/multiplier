@@ -439,11 +439,9 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
     return;
   }
 
-  std::vector<mx::ParmVarDecl> params = called_func->parameters();
-
   // Go try to match the argument to a parameter.
+  std::optional<mx::ParmVarDecl> matched_param;
   auto arg_num = 0u;
-  auto matched = false;
   for (mx::Expr arg : call.arguments()) {
     if (arg.id() != taint_source.id()) {
       ++arg_num;
@@ -451,17 +449,12 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
     }
 
     // TODO(pag): Taint `va_arg` macro use when variadic arguments are used.
-    if (arg_num >= params.size()) {
-      break;
-    }
-
-    // Found the parameter associated with this call argument.
-    matched = true;
+    matched_param = called_func->nth_parameter(arg_num);
     break;
   }
 
   // Didn't match the argument to a parameter.
-  if (!matched) {
+  if (!matched_param) {
     std::cerr
         << ESC(ATTR_BRIGHT) "Tainted argument cannot be matched with "
            "function parameter at "
@@ -487,10 +480,10 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
   std::optional<mx::Decl> def = called_func->definition();
 
   if (std::optional<mx::FunctionDecl> func_def = mx::FunctionDecl::from(def)) {
-    TaintTrackVarOrVarLike(func_def->parameters()[arg_num], entry, seen);
+    TaintTrackVarOrVarLike(matched_param.value(), entry, seen);
 
   } else {
-    ModelLibraryFunction(call, called_func.value(), params[arg_num],
+    ModelLibraryFunction(call, called_func.value(), matched_param.value(),
                          taint_source, arg_num, entry, seen);
   }
 }

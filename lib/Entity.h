@@ -39,16 +39,17 @@ class EntityImpl {
 };
 
 class OffsetEntityImpl : public EntityImpl {
-  public:
-    const PackedFragmentId fragment_id;
-    const unsigned offset;
+ public:
+  const PackedFragmentId fragment_id;
+  const EntityOffset offset;
 
-    explicit inline OffsetEntityImpl(
-        std::shared_ptr<EntityProvider> ep_, std::string data_,
-        PackedFragmentId fragment_id_, unsigned offset_)
+  explicit inline OffsetEntityImpl(std::shared_ptr<EntityProvider> ep_,
+                                   std::string data_,
+                                   PackedFragmentId fragment_id_,
+                                   EntityOffset offset_)
       : EntityImpl(std::move(ep_), std::move(data_)),
-      fragment_id(fragment_id_),
-      offset(offset_) {}
+        fragment_id(fragment_id_),
+        offset(offset_) {}
 };
 
 }  // namespace mx

@@ -139,7 +139,8 @@ class CXXMethodDecl : public FunctionDecl {
   bool is_move_assignment_operator(void) const;
   bool is_virtual(void) const;
   bool is_volatile(void) const;
-  std::vector<CXXMethodDecl> overridden_methods(void) const;
+  std::optional<CXXMethodDecl> nth_overridden_method(unsigned n) const;
+  gap::generator<CXXMethodDecl> overridden_methods(void) const;
 };
 
 static_assert(sizeof(CXXMethodDecl) == sizeof(FunctionDecl));

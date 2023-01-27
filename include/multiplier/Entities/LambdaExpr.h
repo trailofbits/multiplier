@@ -116,7 +116,8 @@ class LambdaExpr : public Expr {
   Token capture_default_token(void) const;
   CompoundStmt compound_statement_body(void) const;
   std::optional<FunctionTemplateDecl> dependent_call_operator(void) const;
-  std::vector<NamedDecl> explicit_template_parameters(void) const;
+  std::optional<NamedDecl> nth_explicit_template_parameter(unsigned n) const;
+  gap::generator<NamedDecl> explicit_template_parameters(void) const;
   TokenRange introducer_range(void) const;
   CXXRecordDecl lambda_class(void) const;
   std::optional<TemplateParameterList> template_parameter_list(void) const;

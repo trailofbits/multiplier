@@ -80,7 +80,7 @@ class ExportDecl : public Decl {
   Token export_token(void) const;
   Token r_brace_token(void) const;
   bool has_braces(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(ExportDecl) == sizeof(Decl));

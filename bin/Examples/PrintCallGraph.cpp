@@ -51,7 +51,7 @@ void PrintCallGraphEdge(const mx::Decl &from_entity, mx::Stmt entity) {
   auto decls = mx::Decl::containing(entity);
   auto decl = decls.begin();
   if (decl != decls.end()) {
-    PrintCallGraphEdge(from_entity, decl->redeclarations()[0]);
+    PrintCallGraphEdge(from_entity, decl->canonical_declaration());
   }  
 }
 
@@ -89,7 +89,7 @@ void PrintCallGraph(mx::Decl entity) {
   auto decls = mx::Decl::containing(entity);
   auto decl = decls.begin();
   if (decl != decls.end()) {
-    PrintCallGraphEdge(entity, decl->redeclarations()[0]);
+    PrintCallGraphEdge(entity, decl->canonical_declaration());
   } else {
     for (const mx::StmtReference &ref : entity.references()) {
       PrintCallGraphEdge(entity, ref);
@@ -101,7 +101,7 @@ void PrintCallGraph(mx::Stmt entity) {
   auto decls = mx::Decl::containing(entity);
   auto decl = decls.begin();
   if (decl != decls.end()) {
-    PrintCallGraph(decl->redeclarations()[0]);
+    PrintCallGraph(decl->canonical_declaration());
   }
 }
 
@@ -123,7 +123,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   auto maybe_entity = index.entity(FLAGS_entity_id);
   if (std::holds_alternative<mx::Decl>(maybe_entity)) {
-    PrintCallGraph(std::get<mx::Decl>(maybe_entity).redeclarations()[0]);
+    PrintCallGraph(std::get<mx::Decl>(maybe_entity).canonical_declaration());
 
   } else if (std::holds_alternative<mx::Stmt>(maybe_entity)) {
     PrintCallGraph(std::get<mx::Stmt>(maybe_entity));
@@ -138,7 +138,7 @@ extern "C" int main(int argc, char *argv[]) {
       PrintCallGraph(*stmt);
 
     } else if (decl != decls.end()) {
-      PrintCallGraph(decl->redeclarations()[0]);
+      PrintCallGraph(decl->canonical_declaration());
     }
 
   } else {
@@ -160,7 +160,7 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     mx::Decl reach_entity =
-        std::get<mx::Decl>(maybe_reach_entity).redeclarations()[0];
+        std::get<mx::Decl>(maybe_reach_entity).canonical_declaration();
 
     std::vector<mx::PackedDeclarationId> next_reaching_edges;
     std::vector<mx::PackedDeclarationId> curr_reaching_edges;

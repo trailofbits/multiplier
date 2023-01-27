@@ -131,22 +131,6 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
   }
 }
 
-class StringOutputStream final : public kj::OutputStream {
- private:
-  std::string &str;
-
- public:
-  virtual ~StringOutputStream(void) = default;
-
-  explicit StringOutputStream(std::string &str_)
-      : str(str_) {}
-
-  void write(const void *buffer_, size_t size) final {
-    auto ptr = reinterpret_cast<const char *>(buffer_);
-    str.append(ptr, &(ptr[size]));
-  }
-};
-
 }  // namespace
 
 
@@ -220,22 +204,10 @@ void GlobalIndexingState::PersistFile(
     ubb.setVal(eol_offset_line_num.second);
   }
 
-  // Serialize the message into a flat Cap'n Proto.
-  std::string data;
-  data.reserve(message.sizeInWords() * sizeof(capnp::word));
-  StringOutputStream os(data);
-  capnp::writeMessage(os, message);
-  assert(!data.empty());
-
-  // Pad the size out to be a multiple of the `capnp::word` size.
-  while (data.size() % sizeof(capnp::word)) {
-    data.push_back('\0');
-  }
-
   // Add it to the database.
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, std::move(data)});
+      mx::SerializedFileRecord{file_id, GetSerializedData(message)});
 }
 
 namespace {
@@ -538,7 +510,7 @@ static void PersistParsedTokens(
     id.kind = mx::FromPasta(macros_to_serialize[i].Kind());
     database.AddAsync(
         mx::MacroEntityRecord{
-          id, GetSerializedData(storage.message)});
+          EntityId(id).Pack(), GetSerializedData(storage.message)});
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
@@ -1065,21 +1037,9 @@ void GlobalIndexingState::PersistFragment(
   LinkExternalReferencesInFragment(database, pf, em);
   LinkEntityNamesToFragment(database, pf, em);
 
-  // Serialize the message into a flat Cap'n Proto.
-  std::string data;
-  data.reserve(message.sizeInWords() * sizeof(capnp::word));
-  StringOutputStream os(data);
-  capnp::writeMessage(os, message);
-  assert(!data.empty());
-
-  // Pad the size out to be a multiple of the `capnp::word` size.
-  while (data.size() % sizeof(capnp::word)) {
-    data.push_back('\0');
-  }
-
   // Add the fragment to the database.
   database.AddAsync(
-      mx::SerializedFragmentRecord{pf.fragment_id, std::move(data)});
+      mx::SerializedFragmentRecord{pf.fragment_id, GetSerializedData(message)});
 }
 
 }  // namespace indexer

@@ -144,7 +144,8 @@ class CXXRecordDecl : public RecordDecl {
   std::optional<bool> allow_const_default_initializer(void) const;
   std::optional<std::vector<CXXBaseSpecifier>> bases(void) const;
   std::optional<MSInheritanceModel> calculate_inheritance_model(void) const;
-  std::vector<CXXConstructorDecl> constructors(void) const;
+  std::optional<CXXConstructorDecl> nth_constructor(unsigned n) const;
+  gap::generator<CXXConstructorDecl> constructors(void) const;
   std::optional<std::vector<FriendDecl>> friends(void) const;
   std::optional<FunctionTemplateDecl> dependent_lambda_call_operator(void) const;
   std::optional<ClassTemplateDecl> described_class_template(void) const;

@@ -104,7 +104,7 @@ class IndirectFieldDecl : public ValueDecl {
     }
   }
 
-  std::vector<NamedDecl> chain(void) const;
+  gap::generator<NamedDecl> chain(void) const;
   std::optional<FieldDecl> anonymous_field(void) const;
   std::optional<VarDecl> variable_declaration(void) const;
 };

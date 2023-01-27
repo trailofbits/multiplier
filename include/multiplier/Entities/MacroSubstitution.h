@@ -60,7 +60,7 @@ class MacroSubstitution : public Macro {
     }
   }
 
-  std::vector<MacroOrToken> replacement_children(void) const;
+  gap::generator<MacroOrToken> replacement_children(void) const;
 };
 
 static_assert(sizeof(MacroSubstitution) == sizeof(Macro));

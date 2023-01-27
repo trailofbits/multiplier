@@ -36,6 +36,75 @@ static sqlite::Connection Connect(std::filesystem::path path,
   return db;
 }
 
+// Get all of the entity IDs from a query.
+//
+// TODO(pag): Eventually, we'd want to just query and generate, but we don't
+//            yet support query reuse/caching.
+static std::vector<RawEntityId> GetEntityIds(sqlite::Statement &query,
+                                             PackedFragmentId frag_id) {
+  std::vector<RawEntityId> ids;
+  query.BindValues(frag_id.Pack());
+  while (query.ExecuteStep()) {
+    auto row = query.Row();
+    RawEntityId id = kInvalidEntityId;
+    std::string storage;
+    row.Columns(id);
+    ids.push_back(id);
+  }
+  query.Reset();
+  return ids;
+}
+
+// Get an entity by its ID.
+static std::optional<EntityImplPtr> GetEntityById(
+    const std::shared_ptr<EntityProvider> &ep, sqlite::Statement &query,
+    RawEntityId id) {
+
+  query.BindValues(id);
+  if (!query.ExecuteStep()) {
+    query.Reset();
+    return std::nullopt;
+  }
+
+  auto row = query.Row();
+  std::string storage;
+  RawEntityId frag_id = kInvalidEntityId;
+  EntityOffset offset = 0u;
+
+  row.Columns(storage, frag_id, offset);
+  query.Reset();
+
+  VariantId vid = EntityId(frag_id).Unpack();
+  if (!std::holds_alternative<FragmentId>(vid)) {
+    assert(false);
+    return std::nullopt;
+  }
+
+  return std::make_shared<OffsetEntityImpl>(
+      ep, std::move(storage), std::get<FragmentId>(vid), offset);
+}
+
+// Get an entity ID by its fragment offset. In theory we could get an entity's
+// data and return an `EntityImplPtr`. In practice, we want to roundtrip through
+// the entity provider to benefit from ID-based caching.
+static RawEntityId GetEntityIdByFragmentOffset(sqlite::Statement &query,
+                                               PackedFragmentId frag_id,
+                                               EntityOffset offset) {
+
+  RawEntityId eid = kInvalidEntityId;
+
+  query.BindValues(frag_id.Pack(), offset);
+  if (!query.ExecuteStep()) {
+    query.Reset();
+    return eid;
+  }
+
+  auto row = query.Row();
+  row.Columns(eid);
+  query.Reset();
+  return eid;
+}
+
 }  // namespace
 
 class SQLiteEntityProviderImpl {
@@ -58,19 +127,13 @@ class SQLiteEntityProviderImpl {
   sqlite::Statement get_references;
   sqlite::Statement get_fragments_covered_by_tokens;
 
-  sqlite::Statement get_decls;
-  sqlite::Statement get_types;
-  sqlite::Statement get_stmts;
-  sqlite::Statement get_attrs;
-  sqlite::Statement get_macros;
-  sqlite::Statement get_pseudos;
+#define DECLARE_GETTERS(name, lower_name) \
+    sqlite::Statement get_ ## lower_name ## s ; \
+    sqlite::Statement get_ ## lower_name ## _by_id ; \
+    sqlite::Statement get_ ## lower_name ## _by_offset ;
 
-  sqlite::Statement get_decl;
-  sqlite::Statement get_type;
-  sqlite::Statement get_stmt;
-  sqlite::Statement get_attr;
-  sqlite::Statement get_macro;
-  sqlite::Statement get_pseudo;
+  MX_FOR_EACH_ENTITY_RECORD(DECLARE_GETTERS)
+#undef DECLARE_GETTERS
 
   SQLiteEntityProviderImpl(unsigned worker_index, std::filesystem::path path)
       : entity_id_list("entity_id_list_" + std::to_string(worker_index)),
@@ -118,7 +181,7 @@ class SQLiteEntityProviderImpl {
             "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
             ") SELECT entity_id FROM transitive_redeclaration")),
 
-#if MX_SQLITE_HAS_FTS5
+#if MX_DATABASE_HAS_FTS5
         get_entities_by_name(db.Prepare(
             "SELECT rowid FROM symbol WHERE name MATCH ?1 || '*'")),
 #else
@@ -135,39 +198,32 @@ class SQLiteEntityProviderImpl {
             "JOIN " + entity_id_list + " AS l "
             "ON r.entity_id = l.entity_id")),
 
-        get_decls(db.Prepare(
-          "SELECT zstd_decompress(contents), offset FROM Decl WHERE fragment_id = ?1 ORDER BY offset ASC")),
-        get_types(db.Prepare(
-          "SELECT zstd_decompress(contents), offset FROM Type WHERE fragment_id = ?1 ORDER BY offset ASC")),
-        get_stmts(db.Prepare(
-          "SELECT zstd_decompress(contents), offset FROM Stmt WHERE fragment_id = ?1 ORDER BY offset ASC")),
-        get_attrs(db.Prepare(
-          "SELECT zstd_decompress(contents), offset FROM Attr WHERE fragment_id = ?1 ORDER BY offset ASC")),
-        get_macros(db.Prepare(
-          "SELECT zstd_decompress(contents), offset FROM Macro WHERE fragment_id = ?1 ORDER BY offset ASC")),
-        get_pseudos(db.Prepare(
-          "SELECT zstd_decompress(contents), offset FROM Pseudo WHERE fragment_id = ?1 ORDER BY offset ASC")),
-
-        get_decl(db.Prepare(
-          "SELECT zstd_decompress(contents) FROM Decl WHERE fragment_id = ?1 AND offset = ?2")),
-        get_type(db.Prepare(
-          "SELECT zstd_decompress(contents) FROM Type WHERE fragment_id = ?1 AND offset = ?2")),
-        get_stmt(db.Prepare(
-          "SELECT zstd_decompress(contents) FROM Stmt WHERE fragment_id = ?1 AND offset = ?2")),
-        get_attr(db.Prepare(
-          "SELECT zstd_decompress(contents) FROM Attr WHERE fragment_id = ?1 AND offset = ?2")),
-        get_macro(db.Prepare(
-          "SELECT zstd_decompress(contents) FROM Macro WHERE fragment_id = ?1 AND offset = ?2")),
-        get_pseudo(db.Prepare(
-          "SELECT zstd_decompress(contents) FROM Pseudo WHERE fragment_id = ?1 AND offset = ?2")),
-
         get_fragments_covered_by_tokens(db.Prepare(
             "SELECT DISTINCT(ffr.fragment_id) "
             "FROM fragment_file_range AS ffr "
             "JOIN " + entity_id_list + " AS el "
             "ON ffr.first_file_token_offset <= el.entity_id "
             "AND ffr.last_file_token_offset >= el.entity_id "
-            "AND ffr.file_id = ?1")) {}
+            "AND ffr.file_id = ?1"))
+
+#define INIT_GETTERS(name, lower_name) \
+      , get_ ## lower_name ## s(db.Prepare( \
+            "SELECT id " \
+            "FROM " #lower_name " WHERE fragment_id = ?1 ORDER BY id ASC")) \
+      , get_ ## lower_name ## _by_id(db.Prepare( \
+            "SELECT zstd_decompress(data), " \
+            "       fragment_id, " \
+            "       " #lower_name "_offset(?1) " \
+            "FROM " #lower_name " WHERE id = ?1")) \
+      , get_ ## lower_name ## _by_offset(db.Prepare( \
+            "SELECT id " \
+            "FROM " #lower_name " WHERE fragment_id = ?1 " \
+            "                       AND fragment_offset = ?2"))
+
+  MX_FOR_EACH_ENTITY_RECORD(INIT_GETTERS)
+#undef INIT_GETTERS
+
+  {}  // Constructor body.
 };
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
@@ -544,145 +600,33 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
   entity_ids.erase(it, entity_ids.end());
 }
 
-static gap::generator<EntityImplPtr> read_entities(
-    std::shared_ptr<EntityProvider> ep,
-    sqlite::Statement &query,
-    mx::PackedFragmentId frag) {
-  while (query.ExecuteStep()) {
-    auto row = query.Row();
-    std::string storage;
-    unsigned offset;
-    row.Columns(storage, offset);
+#define DEFINE_GETTERS(name, lower_name) \
+    gap::generator<EntityImplPtr> SQLiteEntityProvider:: name ## sFor( \
+        const Ptr &ep, PackedFragmentId id) { \
+      ImplPtr context = impl.Lock(); \
+      for (RawEntityId eid : GetEntityIds( \
+                                 context->get_ ## lower_name ## s, id)) { \
+        if (auto ptr = ep->name ## For(ep, eid)) { \
+          co_yield std::move(ptr.value()); \
+        } \
+      } \
+    } \
+    std::optional<EntityImplPtr> SQLiteEntityProvider:: name ## For( \
+        const Ptr &ep, RawEntityId eid) { \
+      ImplPtr context = impl.Lock(); \
+      return GetEntityById(ep, context->get_ ## lower_name ## _by_id, eid); \
+    } \
+    std::optional<EntityImplPtr> SQLiteEntityProvider:: name ## For( \
+        const Ptr &ep, PackedFragmentId fid, EntityOffset offset) { \
+      ImplPtr context = impl.Lock(); \
+      return ep->name ## For( \
+          ep, \
+          GetEntityIdByFragmentOffset( \
+              context->get_ ## lower_name ## _by_offset, fid, offset)); \
+    }
 
-    co_yield std::make_shared<OffsetEntityImpl>(ep, storage, frag, offset);
-  }
-  query.Reset();
-}
-
-static std::optional<EntityImplPtr> read_entity(
-    std::shared_ptr<EntityProvider> ep,
-    sqlite::Statement &query,
-    mx::PackedFragmentId frag,
-    unsigned offset) {
-  if(query.ExecuteStep()) {
-    auto row = query.Row();
-    std::string storage;
-    row.Columns(storage);
-    query.Reset();
-
-    return std::make_shared<OffsetEntityImpl>(ep, storage, frag, offset);
-  }
-  query.Reset();
-  return std::nullopt;
-}
-
-gap::generator<EntityImplPtr> SQLiteEntityProvider::DeclsFor(
-    const Ptr &ep, PackedFragmentId id) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_decls;
-  query.BindValues(id.Pack());
-
-  return read_entities(ep, query, id);
-}
-
-gap::generator<EntityImplPtr> SQLiteEntityProvider::TypesFor(
-    const Ptr &ep, PackedFragmentId id) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_types;
-  query.BindValues(id.Pack());
-
-  return read_entities(ep, query, id);
-}
-
-gap::generator<EntityImplPtr> SQLiteEntityProvider::StmtsFor(
-    const Ptr &ep, PackedFragmentId id) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_stmts;
-  query.BindValues(id.Pack());
-
-  return read_entities(ep, query, id);
-}
-
-gap::generator<EntityImplPtr> SQLiteEntityProvider::AttrsFor(
-    const Ptr &ep, PackedFragmentId id) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_attrs;
-  query.BindValues(id.Pack());
-
-  return read_entities(ep, query, id);
-}
-
-gap::generator<EntityImplPtr> SQLiteEntityProvider::MacrosFor(
-    const Ptr &ep, PackedFragmentId id) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_macros;
-  query.BindValues(id.Pack());
-
-  return read_entities(ep, query, id);
-}
-
-gap::generator<EntityImplPtr> SQLiteEntityProvider::PseudosFor(
-    const Ptr &ep, PackedFragmentId id) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_pseudos;
-  query.BindValues(id.Pack());
-
-  return read_entities(ep, query, id);
-}
-
-std::optional<EntityImplPtr> SQLiteEntityProvider::DeclFor(
-    const Ptr &ep, PackedFragmentId id, unsigned offset) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_decl;
-  query.BindValues(id.Pack(), offset);
-
-  return read_entity(ep, query, id, offset);
-}
-
-std::optional<EntityImplPtr> SQLiteEntityProvider::TypeFor(
-    const Ptr &ep, PackedFragmentId id, unsigned offset) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_type;
-  query.BindValues(id.Pack(), offset);
-
-  return read_entity(ep, query, id, offset);
-}
-
-std::optional<EntityImplPtr> SQLiteEntityProvider::StmtFor(
-    const Ptr &ep, PackedFragmentId id, unsigned offset) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_stmt;
-  query.BindValues(id.Pack(), offset);
-
-  return read_entity(ep, query, id, offset);
-}
-
-std::optional<EntityImplPtr> SQLiteEntityProvider::AttrFor(
-    const Ptr &ep, PackedFragmentId id, unsigned offset) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_attr;
-  query.BindValues(id.Pack(), offset);
-
-  return read_entity(ep, query, id, offset);
-}
-
-std::optional<EntityImplPtr> SQLiteEntityProvider::MacroFor(
-    const Ptr &ep, PackedFragmentId id, unsigned offset) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_macro;
-  query.BindValues(id.Pack(), offset);
-
-  return read_entity(ep, query, id, offset);
-}
-
-std::optional<EntityImplPtr> SQLiteEntityProvider::PseudoFor(
-    const Ptr &ep, PackedFragmentId id, unsigned offset) {
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_pseudo;
-  query.BindValues(id.Pack(), offset);
-
-  return read_entity(ep, query, id, offset);
-}
+  MX_FOR_EACH_ENTITY_RECORD(DEFINE_GETTERS)
+#undef DEFINE_GETTERS
 
 EntityProvider::Ptr EntityProvider::from_database(std::filesystem::path path) {
   return std::make_shared<SQLiteEntityProvider>(path);

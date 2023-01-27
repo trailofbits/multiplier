@@ -56,41 +56,16 @@ class InvalidEntityProvider final : public EntityProvider {
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
 
-  gap::generator<EntityImplPtr> DeclsFor(const Ptr &,
-                                PackedFragmentId id) final;
+#define DECLARE_ENTITY_METHODS(name, lower_name) \
+    gap::generator<EntityImplPtr> \
+    name ## sFor(const Ptr &, PackedFragmentId) final; \
+    std::optional<EntityImplPtr> \
+    name ## For(const Ptr &, PackedFragmentId, EntityOffset) final; \
+    std::optional<EntityImplPtr> \
+    name ## For(const Ptr &, RawEntityId) final;
 
-  gap::generator<EntityImplPtr> TypesFor(const Ptr &,
-                                PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> StmtsFor(const Ptr &,
-                                PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> AttrsFor(const Ptr &,
-                                PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> MacrosFor(const Ptr &,
-                                  PackedFragmentId id) final;
-
-  gap::generator<EntityImplPtr> PseudosFor(const Ptr &,
-                                  PackedFragmentId id) final;
-
-  std::optional<EntityImplPtr> DeclFor(const Ptr &,
-                               PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> TypeFor(const Ptr &,
-                              PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> StmtFor(const Ptr &,
-                              PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> AttrFor(const Ptr &,
-                              PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> MacroFor(const Ptr &,
-                                PackedFragmentId id, unsigned offset) final;
-
-  std::optional<EntityImplPtr> PseudoFor(const Ptr &,
-                                PackedFragmentId id, unsigned offset) final;
+  MX_FOR_EACH_ENTITY_RECORD(DECLARE_ENTITY_METHODS)
+#undef DECLARE_ENTITY_METHODS
 };
 
 }  // namespace mx

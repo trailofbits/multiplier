@@ -86,7 +86,8 @@ class BaseUsingDecl : public NamedDecl {
     }
   }
 
-  std::vector<UsingShadowDecl> shadows(void) const;
+  std::optional<UsingShadowDecl> nth_shadow(unsigned n) const;
+  gap::generator<UsingShadowDecl> shadows(void) const;
 };
 
 static_assert(sizeof(BaseUsingDecl) == sizeof(NamedDecl));

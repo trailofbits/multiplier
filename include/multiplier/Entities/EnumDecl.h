@@ -118,7 +118,8 @@ class EnumDecl : public TagDecl {
     }
   }
 
-  std::vector<EnumConstantDecl> enumerators(void) const;
+  std::optional<EnumConstantDecl> nth_enumerator(unsigned n) const;
+  gap::generator<EnumConstantDecl> enumerators(void) const;
   std::optional<EnumDecl> instantiated_from_member_enum(void) const;
   std::optional<Type> integer_type(void) const;
   TokenRange integer_type_range(void) const;

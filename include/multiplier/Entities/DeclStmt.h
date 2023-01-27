@@ -79,7 +79,8 @@ class DeclStmt : public Stmt {
     }
   }
 
-  std::vector<Decl> declarations(void) const;
+  std::optional<Decl> nth_declaration(unsigned n) const;
+  gap::generator<Decl> declarations(void) const;
   std::optional<Decl> single_declaration(void) const;
   bool is_single_declaration(void) const;
 };

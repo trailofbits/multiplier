@@ -1247,8 +1247,19 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    EntityId id(self." << getter_name
-        << "());\n";
+        << "    RawEntityId eid = self." << getter_name << "();\n"
+        << "    if (eid == kInvalidEntityId) {\n";
+
+    if (is_token) {
+      lib_cpp_os
+          << "      return Token();\n";
+    } else {
+      lib_cpp_os
+          << "      return std::nullopt;\n";
+    }
+
+    lib_cpp_os
+        << "    }\n";
 
     selector << ", ";
 
@@ -1259,18 +1270,17 @@ void CodeGenerator::RunOnOptional(
       selector << "TokenUseSelector";
       element_name = "Token";
       lib_cpp_os
-          << "    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n"
-          << "    return fragment->TokenFor(fragment, id, true /* can_fail */).value();\n";
+          << "    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {\n"
+          << "      return frag->TokenFor(frag, eid, true /* can_fail */).value();\n"
+          << "    }\n";
 
     } else if (*element_name == "File") {
       needed_decls.insert("FileUseSelector");
       file_use_ids[api_name].SetId(cls, i);
       selector << "FileUseSelector";
       lib_cpp_os
-          << "    if (auto file = impl->ep->FileFor(impl->ep, id.Pack())) {\n"
+          << "    if (auto file = impl->ep->FileFor(impl->ep, eid)) {\n"
           << "      return File(std::move(file));\n"
-          << "    } else {\n"
-          << "      return std::nullopt;\n"
           << "    }\n";
 
     } else if (*element_name == "Decl") {
@@ -1278,85 +1288,95 @@ void CodeGenerator::RunOnOptional(
       decl_use_ids[api_name].SetId(cls, i);
       selector << "DeclUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::DeclarationId>();\n"
-          << "    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());\n";
+          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {\n"
+          << "      return Decl(std::move(eptr.value()));\n"
+          << "    }\n";
 
     } else if (*element_name == "Stmt") {
       needed_decls.insert("StmtUseSelector");
       stmt_use_ids[api_name].SetId(cls, i);
       selector << "StmtUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::StatementId>();\n"
-          << "    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());\n";
+          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {\n"
+          << "      return Stmt(std::move(eptr.value()));\n"
+          << "    }\n";
 
     } else if (*element_name == "Type") {
       needed_decls.insert("TypeUseSelector");
       type_use_ids[api_name].SetId(cls, i);
       selector << "TypeUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::TypeId>();\n"
-          << "    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());\n";
+          << "    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {\n"
+          << "      return Type(std::move(eptr.value()));\n"
+          << "    }\n";
 
     } else if (*element_name == "Attr") {
       needed_decls.insert("AttrUseSelector");
       attr_use_ids[api_name].SetId(cls, i);
       selector << "AttrUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::AttributeId>();\n"
-          << "    return Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value());\n";
+          << "    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {\n"
+          << "      return Attr(std::move(eptr.value()));\n"
+          << "    }\n";
 
     } else if (*element_name == "Macro") {
       needed_decls.insert("MacroUseSelector");
       macro_use_ids[api_name].SetId(cls, i);
       selector << "MacroUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::MacroId>();\n"
-          << "    return Macro(impl->ep->MacroFor(impl->ep, *unpacked_id).value());\n";
+          << "    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {\n"
+          << "      return Macro(std::move(eptr.value()));\n"
+          << "    }\n";
 
     } else if (gDeclNames.count(element_name.value())) {
       needed_decls.insert("DeclUseSelector");
       decl_use_ids[api_name].SetId(cls, i);
       selector << "DeclUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::DeclarationId>();\n"
-          << "    return " << element_name.value()
-          << "::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));\n";
+          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {\n"
+          << "      return " << element_name.value()
+          << "::from(Decl(std::move(eptr.value())));\n"
+          << "    }\n";
 
     } else if (gStmtNames.count(element_name.value())) {
       needed_decls.insert("StmtUseSelector");
       stmt_use_ids[api_name].SetId(cls, i);
       selector << "StmtUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::StatementId>();\n"
-          << "    return " << element_name.value()
-          << "::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));\n";
+          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {\n"
+          << "      return " << element_name.value()
+          << "::from(Stmt(std::move(eptr.value())));\n"
+          << "    }\n";
 
     } else if (gTypeNames.count(element_name.value())) {
       needed_decls.insert("TypeUseSelector");
       type_use_ids[api_name].SetId(cls, i);
       selector << "TypeUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::TypeId>();\n"
-          << "    return " << element_name.value()
-          << "::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));\n";
+          << "    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {\n"
+          << "      return " << element_name.value()
+          << "::from(Type(std::move(eptr.value())));\n"
+          << "    }\n";
 
     } else if (gAttrNames.count(element_name.value())) {
       needed_decls.insert("AttrUseSelector");
       attr_use_ids[api_name].SetId(cls, i);
       selector << "AttrUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::AttributeId>();\n"
-          << "    return " << element_name.value()
-          << "::from(Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value()));\n";
+          << "    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {\n"
+          << "      return " << element_name.value()
+          << "::from(Attr(std::move(eptr.value())));\n"
+          << "    }\n";
 
     } else if (gMacroNames.count(element_name.value())) {
       needed_decls.insert("MacroUseSelector");
       macro_use_ids[api_name].SetId(cls, i);
       selector << "MacroUseSelector";
       lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::MacroId>();\n"
-          << "    return " << element_name.value()
-          << "::from(Macro(impl->ep->MacroFor(impl->ep, *unpacked_id).value()));\n";
+          << "    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {\n"
+          << "      return " << element_name.value()
+          << "::from(Macro(std::move(eptr.value())));\n"
+          << "    }\n";
 
     } else {
       std::cerr << "??? optional element_name=" << (*element_name) << '\n';
@@ -1381,9 +1401,12 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    auto offset = self." << getter_name << "();\n"
-        << "    auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);\n"
-        << "    return " << element_name.value() << "(std::move(*ps_impl));\n";
+        << "    if (RawEntityId eid = self." << getter_name << "();\n"
+        << "        eid != kInvalidEntityId) {\n"
+        << "      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {\n"
+        << "        return " << element_name.value() << "(std::move(eptr.value()));\n"
+        << "      }\n"
+        << "    }\n";
 
   // Enums, bools, ints, etc.
   } else {
@@ -1414,7 +1437,17 @@ void CodeGenerator::RunOnOptional(
   }
 
   lib_cpp_os
-      << "  }\n"
+      << "  }\n";
+
+  if (is_token) {
+    lib_cpp_os
+        << "  return Token();\n";
+  } else {
+    lib_cpp_os
+        << "  return std::nullopt;\n";
+  }
+
+  lib_cpp_os
       << "}\n\n";
 
   serialize_inc_os
@@ -1479,6 +1512,9 @@ void CodeGenerator::RunOnVector(
     return;
   }
 
+  auto is_token = *element_name == "Token" || *element_name == "FileToken" ||
+                  *element_name == "MacroToken";
+
   const auto i = storage.AddMethod("List(" + capn_element_name + ")");
   unsigned opt_i = 0;
   if (optional) {
@@ -1496,12 +1532,34 @@ void CodeGenerator::RunOnVector(
         << "std::optional<std::vector<" << cxx_element_name << ">> ";
 
   } else {
+
+    // Try to auto-generate an `nth_*` method.
+    if (api_name.ends_with('s')) {
+      auto singular_api = api_name;
+      singular_api.pop_back();
+      os
+          << "  std::optional<" << cxx_element_name << "> nth_"
+          << singular_api << "(unsigned n) const;\n";
+
+      lib_cpp_os
+          << "std::optional<" << cxx_element_name << "> " << class_name
+          << "::nth_" << singular_api << "(unsigned n) const {\n"
+          << "  unsigned i = 0u;\n"
+          << "  for (auto ent : " << api_name << "()) {\n"
+          << "    if (i++ == n) {\n"
+          << "      return ent;\n"
+          << "    }\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n";
+    }
+
     os
-        << "  std::vector<" << cxx_element_name << "> "
+        << "  gap::generator<" << cxx_element_name << "> "
         << api_name << "(void) const;\n";
 
     lib_cpp_os
-        << "std::vector<" << cxx_element_name << "> ";
+        << "gap::generator<" << cxx_element_name << "> ";
   }
 
   lib_cpp_os
@@ -1513,13 +1571,21 @@ void CodeGenerator::RunOnVector(
     lib_cpp_os
         << "  if (!self." << opt_getter_name << "()) {\n"
         << "    return std::nullopt;\n"
-        << "  }\n";
+        << "  }\n"
+        << "  auto list = self." << getter_name << "();\n"
+        << "  std::vector<" << cxx_element_name << "> vec;\n"
+        << "  vec.reserve(list.size());\n";
+  } else {
+    lib_cpp_os
+        << "  auto list = self." << getter_name << "();\n";
+  }
+
+  if (is_token) {
+    lib_cpp_os
+        << "  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n";
   }
 
   lib_cpp_os
-      << "  auto list = self." << getter_name << "();\n"
-      << "  std::vector<" << cxx_element_name << "> vec;\n"
-      << "  vec.reserve(list.size());\n"
       << "  for (auto v : list) {\n";
 
   serialize_cpp_os << "  do {\n";
@@ -1553,8 +1619,13 @@ void CodeGenerator::RunOnVector(
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", e" << i << ");\n";
 
-    lib_cpp_os
-        << "vec.emplace_back(v.cStr(), v.size());\n";
+    if (optional) {
+      lib_cpp_os
+          << "vec.emplace_back(v.cStr(), v.size());\n";
+    } else {
+      lib_cpp_os
+          << "co_yield std::string_view(v.cStr(), v.size());\n";
+    }
 
   // String views need to be converted to `std::string` because Cap'n
   // Proto requires `:Text` fields to be `NUL`-terminated.
@@ -1570,8 +1641,13 @@ void CodeGenerator::RunOnVector(
         << i << ".size());\n"
         << "      sv" << i << ".set(i" << i << ", se" << i << ");\n";
 
-    lib_cpp_os
-        << "vec.emplace_back(v.cStr(), v.size());\n";
+    if (optional) {
+      lib_cpp_os
+          << "vec.emplace_back(v.cStr(), v.size());\n";
+    } else {
+      lib_cpp_os
+          << "co_yield std::string_view(v.cStr(), v.size());\n";
+    }
 
   // Filesystem paths.
   } else if (*element_name == "path") {
@@ -1584,8 +1660,13 @@ void CodeGenerator::RunOnVector(
         << "      sv" << i << ".set(i" << i << ", e" << i
         << ".lexically_normal().generic_string());\n";
 
-    lib_cpp_os
-        << "    vec.emplace_back(v.cStr());\n";
+    if (optional) {
+      lib_cpp_os
+          << "vec.emplace_back(v.cStr());\n";
+    } else {
+      lib_cpp_os
+          << "co_yield std::filesystem::path(v.cStr());\n";
+    }
 
   // Reference types.
   } else if (gEntityClassNames.count(*element_name)) {
@@ -1603,98 +1684,68 @@ void CodeGenerator::RunOnVector(
         << "    EntityId id(v);\n";
 
     // Tokens are more like pseudo-entities but whatever.
-    if (*element_name == "Token" || *element_name == "FileToken" ||
-        *element_name == "MacroToken") {
-      lib_cpp_os
-          << "    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n"
-          << "    if (auto t" << i << " = fragment->TokenFor(fragment, id)) {\n"
-          << "      vec.emplace_back(std::move(t" << i << ".value()));\n"
-          << "    }\n";
+    if (is_token) {
+      if (optional) {
+        lib_cpp_os
+            << "    if (auto t" << i << " = fragment->TokenFor(fragment, v)) {\n"
+            << "      vec.emplace_back(std::move(t" << i << ".value()));\n"
+            << "    }\n";
+      } else {
+        lib_cpp_os
+            << "    if (auto t" << i << " = fragment->TokenFor(fragment, v)) {\n"
+            << "      co_yield std::move(t" << i << ".value());\n"
+            << "    }\n";
+      }
 
-    } else if (*element_name == "Decl") {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::DeclarationId>();\n"
-          << "    if (auto d" << i << " = impl->ep->DeclFor(impl->ep, *unpacked_id)) {\n"
-          << "      vec.emplace_back(std::move(d" << i << ".value()));\n"
-          << "    }\n";
+#define YIELD_ENTITY(name) \
+    } else if (*element_name == #name) { \
+      if (optional) { \
+        lib_cpp_os \
+            << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
+            << "      vec.emplace_back(std::move(d" << i << ".value()));\n" \
+            << "    }\n"; \
+      } else { \
+        lib_cpp_os \
+            << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
+            << "      co_yield std::move(d" << i << ".value());\n" \
+            << "    }\n"; \
+      }
 
-    } else if (*element_name == "Stmt") {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::StatementId>();\n"
-          << "    if (auto s" << i << " = impl->ep->StmtFor(impl->ep, *unpacked_id)) {\n"
-          << "      vec.emplace_back(std::move(s" << i << ".value()));\n"
-          << "    }\n";
+    YIELD_ENTITY(Decl)
+    YIELD_ENTITY(Stmt)
+    YIELD_ENTITY(Type)
+    YIELD_ENTITY(Attr)
+    YIELD_ENTITY(Macro)
 
-    } else if (*element_name == "Type") {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::TypeId>();\n"
-          << "    if (auto t" << i << " = impl->ep->TypeFor(impl->ep, *unpacked_id)) {\n"
-          << "      vec.emplace_back(std::move(t" << i << ".value()));\n"
-          << "    }\n";
+#undef YIELD_ENTITY
 
-    } else if (*element_name == "Attr") {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::AttributeId>();\n"
-          << "    if (auto a" << i << " = impl->ep->AttrFor(impl->ep, *unpacked_id)) {\n"
-          << "      vec.emplace_back(std::move(a" << i << ".value()));\n"
-          << "    }\n";
+#define YIELD_DERIVED_ENTITY(name) \
+    } else if (g ## name ## Names.count(*element_name)) { \
+      if (optional) { \
+        lib_cpp_os \
+            << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
+            << "      if (auto e = " << (*element_name) \
+            << "::from(" #name "(d" << i << ".value()))) {\n" \
+            << "        vec.emplace_back(std::move(*e));\n" \
+            << "      }\n" \
+            << "    }\n"; \
+      } else { \
+        lib_cpp_os \
+            << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
+            << "      if (auto e = " << (*element_name) \
+            << "::from(" #name "(d" << i << ".value()))) {\n" \
+            << "        co_yield std::move(*e);\n" \
+            << "      }\n" \
+            << "    }\n"; \
+      }
 
-    } else if (*element_name == "Macro") {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::MacroId>();\n"
-          << "    if (auto m" << i << " = impl->ep->MacroFor(impl->ep, *unpacked_id)) {\n"
-          << "      vec.emplace_back(std::move(m" << i << ".value()));\n"
-          << "    }\n";
+    YIELD_DERIVED_ENTITY(Decl)
+    YIELD_DERIVED_ENTITY(Stmt)
+    YIELD_DERIVED_ENTITY(Type)
+    YIELD_DERIVED_ENTITY(Attr)
+    YIELD_DERIVED_ENTITY(Macro)
 
-    } else if (gDeclNames.count(*element_name)) {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::DeclarationId>();\n"
-          << "    if (auto d" << i << " = impl->ep->DeclFor(impl->ep, *unpacked_id)) {\n"
-          << "      if (auto e = " << (*element_name)
-          << "::from(Decl(d" << i << ".value()))) {\n"
-          << "        vec.emplace_back(std::move(*e));\n"
-          << "      }\n"
-          << "    }\n";
-
-    } else if (gStmtNames.count(*element_name)) {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::StatementId>();\n"
-          << "    if (auto d" << i << " = impl->ep->StmtFor(impl->ep, *unpacked_id)) {\n"
-          << "      if (auto e = " << (*element_name)
-          << "::from(Stmt(d" << i << ".value()))) {\n"
-          << "        vec.emplace_back(std::move(*e));\n"
-          << "      }\n"
-          << "    }\n";
-
-    } else if (gTypeNames.count(*element_name)) {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::TypeId>();\n"
-          << "    if (auto d" << i << " = impl->ep->TypeFor(impl->ep, *unpacked_id)) {\n"
-          << "      if (auto e = " << (*element_name)
-          << "::from(Type(d" << i << ".value()))) {\n"
-          << "        vec.emplace_back(std::move(*e));\n"
-          << "      }\n"
-          << "    }\n";
-
-    } else if (gAttrNames.count(*element_name)) {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::AttributeId>();\n"
-          << "    if (auto d" << i << " = impl->ep->AttrFor(impl->ep, *unpacked_id)) {\n"
-          << "      if (auto e = " << (*element_name)
-          << "::from(Attr(d" << i << ".value()))) {\n"
-          << "        vec.emplace_back(std::move(*e));\n"
-          << "      }\n"
-          << "    }\n";
-
-    } else if (gMacroNames.count(*element_name)) {
-      lib_cpp_os
-          << "    auto unpacked_id = id.Extract<mx::MacroId>();\n"
-          << "    if (auto d" << i << " = impl->ep->MacroFor(impl->ep, *unpacked_id)) {\n"
-          << "      if (auto e = " << (*element_name)
-          << "::from(Macro(d" << i << ".value()))) {\n"
-          << "        vec.emplace_back(std::move(*e));\n"
-          << "      }\n"
-          << "    }\n";
+#undef YIELD_DERIVED_ENTITY
 
     } else {
       std::cerr << "??? vec " << (*element_name) << '\n';
@@ -1712,14 +1763,30 @@ void CodeGenerator::RunOnVector(
     serialize_cpp_os
         << "      sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
 
-    lib_cpp_os
-        << "  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);\n"
-        << "  vec.emplace_back(std::move(*ps_impl));\n";
+    if (optional) {
+      lib_cpp_os
+          << "  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {\n"
+          << "    vec.emplace_back(std::move(*ps_impl));\n"
+          << "  }\n";
+    } else {
+      lib_cpp_os
+          << "  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {\n"
+          << "    co_yield std::move(*ps_impl);\n"
+          << "  }\n";
+    }
   }
 
   lib_cpp_os
-      << "  }\n"
-      << "  return vec;\n"
+      << "  }\n";
+
+  if (optional) {
+    lib_cpp_os
+        << "  return vec;\n";
+  } else {
+    lib_cpp_os
+        << "  co_return;\n";
+  }
+  lib_cpp_os
       << "}\n\n";
 
   serialize_cpp_os
@@ -2104,23 +2171,23 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
           << "  if (auto id = self." << cd_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
-          << "    mx::EntityId eid(id);\n"
-          << "    auto decl_id = eid.Extract<mx::DeclarationId>();\n"
-          << "    return Decl(impl->ep->DeclFor(impl->ep, *decl_id).value());\n"
-          << "  } else {\n"
-          << "    return std::nullopt;\n"
+          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
+          << "      return Decl(std::move(eptr.value()));\n"
+          << "    }\n"
+          << "    assert(false);\n"
           << "  }\n"
+          << "  return std::nullopt;\n"
           << "}\n\n"
           << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
           << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
           << "  if (auto id = self." << cs_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
-          << "    mx::EntityId eid(id);\n"
-          << "    auto stmt_id = eid.Extract<mx::StatementId>();\n"
-          << "    return Stmt(impl->ep->StmtFor(impl->ep, *stmt_id).value());\n"
-          << "  } else {\n"
-          << "    return std::nullopt;\n"
+          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {\n"
+          << "      return Stmt(std::move(eptr.value()));\n"
+          << "    }\n"
+          << "    assert(false);\n"
           << "  }\n"
+          << "  return std::nullopt;\n"
           << "}\n\n";
     }
 
@@ -2169,7 +2236,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> definition(void) const;\n"
           << "  bool is_definition(void) const;\n"
-          << "  std::vector<Decl> redeclarations(void) const;\n"
+          << "  Decl canonical_declaration(void) const;\n"
+          << "  gap::generator<Decl> redeclarations(void) const;\n"
           << "  SpecificEntityId<DeclarationId> id(void) const;\n"
           << "  gap::generator<Use<DeclUseSelector>> uses(void) const;\n"
           << "  gap::generator<StmtReference> references(void) const;\n\n"
@@ -2227,13 +2295,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       lib_cpp_os
           << "std::optional<Decl> Stmt::referenced_declaration(void) const {\n"
-          << "  if (auto id = impl->Reader<mx::ast::Decl>()." << ref_getter_name << "(); id != kInvalidEntityId) {\n"
-          << "    mx::EntityId eid(id);\n"
-          << "    auto decl_id = eid.Extract<mx::DeclarationId>();\n"
-          << "    return Decl(impl->ep->DeclFor(impl->ep, *decl_id).value());\n"
-          << "  } else {\n"
-          << "    return std::nullopt;\n"
+          << "  if (auto id = impl->Reader<mx::ast::Decl>()." << ref_getter_name << "();\n"
+          << "      id != kInvalidEntityId) {\n"
+          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
+          << "      return Decl(std::move(eptr.value()));\n"
+          << "    }\n"
+          << "    assert(false);\n"
           << "  }\n"
+          << "  return std::nullopt;\n"
           << "}\n\n";
 
       serialize_cpp_os
@@ -2895,29 +2964,26 @@ MethodListPtr CodeGenerator::RunOnClass(
               << api_name << ", " << i << ", " << nth_entity_reader << ")\n";
 
         class_os
-            << "  std::vector<" << cxx_element_name << "> "
+            << "  gap::generator<" << cxx_element_name << "> "
             << api_name << "(void) const;\n";
 
         lib_cpp_os
-            << "std::vector<" << cxx_element_name << "> "
+            << "gap::generator<" << cxx_element_name << "> "
             << class_name << "::" << api_name
             << "(void) const {\n"
             << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
             << "  auto index = Index(impl->ep);\n"
             << "  auto list = self." << getter_name << "();\n"
-            << "  std::vector<" << cxx_element_name << "> vec;\n"
-            << "  vec.reserve(list.size());\n"
             << "  for (auto v : list) {\n"
             << "    VariantEntity e = index.entity(EntityId(v));\n"
             << "    if (std::holds_alternative<Macro>(e)) {\n"
-            << "      vec.emplace_back(std::move(std::get<Macro>(e)));\n"
+            << "      co_yield std::move(std::get<Macro>(e));\n"
             << "    } else if (std::holds_alternative<Token>(e)) {\n"
-            << "      vec.emplace_back(std::move(std::get<Token>(e)));\n"
+            << "      co_yield std::move(std::get<Token>(e));\n"
             << "    } else {\n"
             << "      assert(false);\n"
             << "    }\n"
             << "  }\n"
-            << "  return vec;\n"
             << "}\n\n";
 
         // If we have a `TokenTree`, then we want to use it for our
@@ -3110,8 +3176,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << record_name << " " << class_name << "::" << api_name
             << "(void) const {\n"
             << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  EntityId id(self." << getter_name
-            << "());\n";
+            << "  RawEntityId eid = self." << getter_name
+            << "();\n";
 
         const char *selector = nullptr;
 
@@ -3119,86 +3185,66 @@ MethodListPtr CodeGenerator::RunOnClass(
           decl_use_ids[api_name].SetId(cls, i);
           selector = "DeclUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<DeclarationId>();\n"
-              << "  return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());\n";
+              << "  return Decl(impl->ep->DeclFor(impl->ep, eid).value());\n";
 
         } else if (record_name == "Stmt") {
           stmt_use_ids[api_name].SetId(cls, i);
           selector = "StmtUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<StatementId>();\n"
-              << "  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());\n";
+              << "  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());\n";
 
         } else if (record_name == "Type") {
           type_use_ids[api_name].SetId(cls, i);
           selector = "TypeUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<TypeId>();\n"
-              << "  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());\n";
+              << "  return Type(impl->ep->TypeFor(impl->ep, eid).value());\n";
 
         } else if (record_name == "Attr") {
           attr_use_ids[api_name].SetId(cls, i);
           selector = "AttrUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<AttributeId>();\n"
-              << "  return Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value());\n";
+              << "  return Attr(impl->ep->AttrFor(impl->ep, eid).value());\n";
 
         } else if (record_name == "Macro") {
           macro_use_ids[api_name].SetId(cls, i);
           selector = "MacroUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<MacroId>();\n"
-              << "  return Macro(impl->ep->MacroFor(impl->ep, *unpacked_id).value());\n";
+              << "  return Macro(impl->ep->MacroFor(impl->ep, eid).value());\n";
 
         } else if (gDeclNames.count(record_name)) {
           decl_use_ids[api_name].SetId(cls, i);
           selector = "DeclUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<DeclarationId>();\n"
               << "  return " << record_name
-              << "::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();\n";
+              << "::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();\n";
 
         } else if (gStmtNames.count(record_name)) {
           stmt_use_ids[api_name].SetId(cls, i);
           selector = "StmtUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<StatementId>();\n"
               << "  return " << record_name
-              << "::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();\n";
+              << "::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();\n";
 
         } else if (gTypeNames.count(record_name)) {
           type_use_ids[api_name].SetId(cls, i);
           selector = "TypeUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<TypeId>();\n"
               << "  return " << record_name
-              << "::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();\n";
+              << "::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();\n";
 
         } else if (gAttrNames.count(record_name)) {
           attr_use_ids[api_name].SetId(cls, i);
           selector = "AttrUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<AttributeId>();\n"
               << "  return " << record_name
-              << "::from(Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value())).value();\n";
+              << "::from(Attr(impl->ep->AttrFor(impl->ep, eid).value())).value();\n";
 
         } else if (gMacroNames.count(record_name)) {
           macro_use_ids[api_name].SetId(cls, i);
           selector = "MacroUseSelector";
           lib_cpp_os
-              << "  mx::EntityId eid(id);\n"
-              << "  auto unpacked_id = eid.Extract<MacroId>();\n"
               << "  return " << record_name
-              << "::from(Macro(impl->ep->MacroFor(impl->ep, *unpacked_id).value())).value();\n";
+              << "::from(Macro(impl->ep->MacroFor(impl->ep, eid).value())).value();\n";
 
         } else {
           std::cerr << "??? record " << record_name << '\n';
@@ -3362,24 +3408,19 @@ MethodListPtr CodeGenerator::RunOnClass(
           << nth_entity_reader << ")\n";
 
       class_os
-          << "  std::vector<Decl> " << api_name << "(void) const;\n";
+          << "  gap::generator<Decl> " << api_name << "(void) const;\n";
 
       lib_cpp_os
-          << "std::vector<Decl> "
+          << "gap::generator<Decl> "
           << class_name << "::" << api_name
           << "(void) const {\n"
           << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
           << "  auto list = self." << getter_name << "();\n"
-          << "  std::vector<Decl> vec;\n"
-          << "  vec.reserve(list.size());\n"
           << "  for (auto v : list) {\n"
-          << "    EntityId eid(v);\n"
-          << "    auto unpacked_id = eid.Extract<DeclarationId>();\n"
-          << "    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {\n"
-          << "      vec.emplace_back(std::move(decl.value()));\n"
+          << "    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {\n"
+          << "      co_yield std::move(decl.value());\n"
           << "    }\n"
           << "  }\n"
-          << "  return vec;\n"
           << "}\n\n";
 
       serialize_cpp_os

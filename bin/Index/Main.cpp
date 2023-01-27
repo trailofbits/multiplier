@@ -63,7 +63,8 @@ ReadFileBuffer(const std::string file_name) {
   if (!file_name.empty()) {
     auto maybe_envp = llvm::MemoryBuffer::getFileOrSTDIN(file_name, -1, false);
     if (maybe_envp) {
-      return std::move(*maybe_envp);
+      auto envp = std::move(*maybe_envp);
+      return envp;
     }
   }
   return nullptr;

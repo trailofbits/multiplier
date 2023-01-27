@@ -86,7 +86,8 @@ class CoroutineBodyStmt : public Stmt {
   Stmt fallthrough_handler(void) const;
   Stmt final_suspend_statement(void) const;
   Stmt initializer_suspend_statement(void) const;
-  std::vector<Stmt> parameter_moves(void) const;
+  std::optional<Stmt> nth_parameter_move(unsigned n) const;
+  gap::generator<Stmt> parameter_moves(void) const;
   VarDecl promise_declaration(void) const;
   Stmt promise_declaration_statement(void) const;
   Stmt return_statement(void) const;

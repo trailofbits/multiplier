@@ -83,7 +83,8 @@ class FriendTemplateDecl : public Decl {
   NamedDecl friend_declaration(void) const;
   Token friend_token(void) const;
   Type friend_type(void) const;
-  std::vector<TemplateParameterList> template_parameter_lists(void) const;
+  std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
+  gap::generator<TemplateParameterList> template_parameter_lists(void) const;
 };
 
 static_assert(sizeof(FriendTemplateDecl) == sizeof(Decl));

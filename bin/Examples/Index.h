@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <gap/core/generator.hpp>
 #include <iostream>
 #include <multiplier/Index.h>
 #include <string>
@@ -22,10 +23,11 @@ void HighlightToken(std::ostream &os, mx::Token token);
 
 void PrintToken(std::ostream &os, mx::Token token);
 
-bool ContainsHighlightedTokens(std::vector<mx::MacroOrToken> nodes,
+bool ContainsHighlightedTokens(gap::generator<mx::MacroOrToken> nodes,
                                const mx::TokenRange &entity_tokens);
 
-void PrintUnparsedTokens(std::ostream &os, std::vector<mx::MacroOrToken> nodes,
+void PrintUnparsedTokens(std::ostream &os,
+                         gap::generator<mx::MacroOrToken> nodes,
                          const mx::TokenRange &entity_tokens=mx::TokenRange(),
                          bool force_highlight=false);
 

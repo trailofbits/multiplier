@@ -100,7 +100,8 @@ class ObjCImplDecl : public ObjCContainerDecl {
   }
 
   ObjCInterfaceDecl class_interface(void) const;
-  std::vector<ObjCPropertyImplDecl> property_implementations(void) const;
+  std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;
+  gap::generator<ObjCPropertyImplDecl> property_implementations(void) const;
 };
 
 static_assert(sizeof(ObjCImplDecl) == sizeof(ObjCContainerDecl));

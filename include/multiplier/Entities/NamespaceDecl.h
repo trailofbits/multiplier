@@ -89,7 +89,7 @@ class NamespaceDecl : public NamedDecl {
     }
   }
 
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(NamespaceDecl) == sizeof(NamedDecl));

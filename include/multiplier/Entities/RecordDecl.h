@@ -116,7 +116,8 @@ class RecordDecl : public TagDecl {
   }
 
   bool can_pass_in_registers(void) const;
-  std::vector<FieldDecl> fields(void) const;
+  std::optional<FieldDecl> nth_field(unsigned n) const;
+  gap::generator<FieldDecl> fields(void) const;
   RecordDeclArgPassingKind argument_passing_restrictions(void) const;
   bool has_flexible_array_member(void) const;
   bool has_loaded_fields_from_external_storage(void) const;

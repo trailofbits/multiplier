@@ -78,7 +78,8 @@ class ImportDecl : public Decl {
     }
   }
 
-  std::vector<Token> identifier_tokens(void) const;
+  std::optional<Token> nth_identifier_token(unsigned n) const;
+  gap::generator<Token> identifier_tokens(void) const;
 };
 
 static_assert(sizeof(ImportDecl) == sizeof(Decl));

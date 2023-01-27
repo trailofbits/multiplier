@@ -42,26 +42,30 @@ SpecificEntityId<DeclarationId> Decl::id(void) const {
 }
 
 std::optional<Decl> Decl::definition(void) const {
-  for (const Decl &decl : redeclarations()) {
-    if (decl.is_definition()) {
-      return decl;
+  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id())) {
+    if (std::optional<Decl> redecl = impl->ep->DeclFor(impl->ep, raw_id);
+        redecl && redecl->is_definition()) {
+      return std::move(redecl.value());
     }
   }
   return std::nullopt;
 }
 
-std::vector<Decl> Decl::redeclarations(void) const {
-  std::vector<Decl> redecls;
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+Decl Decl::canonical_declaration(void) const {
   for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id())) {
-    EntityId eid(raw_id);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (std::optional<Decl> redecl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      redecls.emplace_back(std::move(redecl.value()));
+    if (std::optional<Decl> redecl = impl->ep->DeclFor(impl->ep, raw_id)) {
+      return std::move(redecl.value());
     }
   }
+  return *this;
+}
 
-  return redecls;
+gap::generator<Decl> Decl::redeclarations(void) const {
+  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id())) {
+    if (std::optional<Decl> redecl = impl->ep->DeclFor(impl->ep, raw_id)) {
+      co_yield std::move(redecl.value());
+    }
+  }
 }
 
 gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
@@ -114,7 +118,6 @@ SpecificEntityId<TypeId> Type::id(void) const {
 }
 
 gap::generator<Type> Type::in_internal(const Fragment &fragment) {
-  unsigned i = 0;
   for (auto reader : fragment.impl->Types()) {
     co_yield Type(std::move(reader));
   }

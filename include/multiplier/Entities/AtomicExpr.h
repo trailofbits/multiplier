@@ -118,7 +118,8 @@ class AtomicExpr : public Expr {
   bool is_cmp_x_chg(void) const;
   bool is_open_cl(void) const;
   bool is_volatile(void) const;
-  std::vector<Expr> sub_expressions(void) const;
+  std::optional<Expr> nth_sub_expression(unsigned n) const;
+  gap::generator<Expr> sub_expressions(void) const;
 };
 
 static_assert(sizeof(AtomicExpr) == sizeof(Expr));

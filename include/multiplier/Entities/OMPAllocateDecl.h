@@ -90,7 +90,8 @@ class OMPAllocateDecl : public OMPDeclarativeDirectiveDecl {
     }
   }
 
-  std::vector<Expr> varlists(void) const;
+  std::optional<Expr> nth_varlist(unsigned n) const;
+  gap::generator<Expr> varlists(void) const;
 };
 
 static_assert(sizeof(OMPAllocateDecl) == sizeof(OMPDeclarativeDirectiveDecl));

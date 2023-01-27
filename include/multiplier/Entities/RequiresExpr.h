@@ -104,7 +104,8 @@ class RequiresExpr : public Expr {
   }
 
   RequiresExprBodyDecl body(void) const;
-  std::vector<ParmVarDecl> local_parameters(void) const;
+  std::optional<ParmVarDecl> nth_local_parameter(unsigned n) const;
+  gap::generator<ParmVarDecl> local_parameters(void) const;
   Token r_brace_token(void) const;
   Token requires_keyword_token(void) const;
   bool is_satisfied(void) const;

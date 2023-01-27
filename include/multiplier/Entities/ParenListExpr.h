@@ -103,7 +103,8 @@ class ParenListExpr : public Expr {
 
   Token l_paren_token(void) const;
   Token r_paren_token(void) const;
-  std::vector<Expr> expressions(void) const;
+  std::optional<Expr> nth_expression(unsigned n) const;
+  gap::generator<Expr> expressions(void) const;
 };
 
 static_assert(sizeof(ParenListExpr) == sizeof(Expr));

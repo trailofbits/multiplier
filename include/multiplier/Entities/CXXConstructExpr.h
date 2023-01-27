@@ -103,7 +103,8 @@ class CXXConstructExpr : public Expr {
     }
   }
 
-  std::vector<Expr> arguments(void) const;
+  std::optional<Expr> nth_argument(unsigned n) const;
+  gap::generator<Expr> arguments(void) const;
   CXXConstructExprConstructionKind construction_kind(void) const;
   CXXConstructorDecl constructor(void) const;
   Token token(void) const;

@@ -107,7 +107,8 @@ class ObjCMessageExpr : public Expr {
     }
   }
 
-  std::vector<Expr> arguments(void) const;
+  std::optional<Expr> nth_argument(unsigned n) const;
+  gap::generator<Expr> arguments(void) const;
   Type call_return_type(void) const;
   Type class_receiver(void) const;
   Type class_receiver_type(void) const;
@@ -127,7 +128,8 @@ class ObjCMessageExpr : public Expr {
   bool is_delegate_initializer_call(void) const;
   bool is_implicit(void) const;
   bool is_instance_message(void) const;
-  std::vector<Token> selector_tokens(void) const;
+  std::optional<Token> nth_selector_token(unsigned n) const;
+  gap::generator<Token> selector_tokens(void) const;
 };
 
 static_assert(sizeof(ObjCMessageExpr) == sizeof(Expr));

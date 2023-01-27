@@ -139,10 +139,9 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
 
 // Return the list of top-level macros in this fragment.
 // This will return a mix of `Macro` or `Token` values.
-std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
-  std::vector<std::variant<Macro, Token>> macros;
+gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
-  macros.reserve(macro_ids.size());
+
   for (RawEntityId eid_ : macro_ids) {
     EntityId eid(eid_);
     VariantId vid = eid.Unpack();
@@ -150,7 +149,7 @@ std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
       MacroId macro_id = std::get<MacroId>(vid);
       auto macro_reader = impl->NthMacro(macro_id.offset);
       if (macro_id.fragment_id == impl->fragment_id && macro_reader.has_value()) {
-        macros.emplace_back(std::move(*macro_reader));
+        co_yield std::move(*macro_reader);
       } else {
         assert(false);
       }
@@ -158,7 +157,7 @@ std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
       MacroTokenId macro_id = std::get<MacroTokenId>(vid);
       if (macro_id.fragment_id == impl->fragment_id) {
-        macros.emplace_back(Token(impl->MacroTokenReader(impl), macro_id.offset));
+        co_yield Token(impl->MacroTokenReader(impl), macro_id.offset);
       } else {
         assert(false);
       }
@@ -166,7 +165,7 @@ std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
       ParsedTokenId macro_id = std::get<ParsedTokenId>(vid);
       if (macro_id.fragment_id == impl->fragment_id) {
-        macros.emplace_back(Token(impl->ParsedTokenReader(impl), macro_id.offset));
+        co_yield Token(impl->ParsedTokenReader(impl), macro_id.offset);
       } else {
         assert(false);
       }
@@ -178,7 +177,6 @@ std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
       assert(false);
     }
   }
-  return macros;
 }
 
 // Returns source IR for the fragment.

@@ -112,7 +112,8 @@ class InitListExpr : public Expr {
   std::optional<InitListExpr> syntactic_form(void) const;
   bool had_array_range_designator(void) const;
   bool has_array_filler(void) const;
-  std::vector<Expr> initializers(void) const;
+  std::optional<Expr> nth_initializer(unsigned n) const;
+  gap::generator<Expr> initializers(void) const;
   bool is_explicit(void) const;
   bool is_semantic_form(void) const;
   bool is_string_literal_initializer(void) const;

@@ -12,6 +12,7 @@
 #include <string_view>
 #include <vector>
 
+#include "Database.h"
 #include "Iterator.h"
 #include "Use.h"
 #include "Fragment.h"
@@ -46,6 +47,7 @@ class WeggliQueryMatch;
 class OffsetEntityImpl;
 
 using EntityImplPtr = std::shared_ptr<OffsetEntityImpl>;
+using WeakEntityImplPtr = std::weak_ptr<OffsetEntityImpl>;
 
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
@@ -159,77 +161,17 @@ class EntityProvider {
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<EntityImplPtr>
-  DeclsFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<EntityImplPtr>
-  TypesFor(const Ptr &, PackedFragmentId id) = 0;
+#define DECLARE_ENTITY_METHODS(name, lower_name) \
+    virtual gap::generator<EntityImplPtr> \
+    name ## sFor(const Ptr &, PackedFragmentId id) = 0; \
+    virtual std::optional<EntityImplPtr> \
+    name ## For(const Ptr &, PackedFragmentId id, EntityOffset offset) = 0; \
+    virtual std::optional<EntityImplPtr> \
+    name ## For(const Ptr &ep, RawEntityId id) = 0;
 
-  virtual gap::generator<EntityImplPtr>
-  StmtsFor(const Ptr &, PackedFragmentId id) = 0;
-
-  virtual gap::generator<EntityImplPtr>
-  AttrsFor(const Ptr &, PackedFragmentId id) = 0;
-
-  virtual gap::generator<EntityImplPtr>
-  MacrosFor(const Ptr &, PackedFragmentId id) = 0;
-
-  virtual gap::generator<EntityImplPtr>
-  PseudosFor(const Ptr &, PackedFragmentId id) = 0;
-
-  virtual std::optional<EntityImplPtr>
-  DeclFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
-
-  inline std::optional<EntityImplPtr>
-  DeclFor(const Ptr &ep, PackedDeclarationId id) {
-    auto unpacked = id.Unpack();
-    return DeclFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
-  }
-
-  virtual std::optional<EntityImplPtr>
-  TypeFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
-
-  inline std::optional<EntityImplPtr>
-  TypeFor(const Ptr &ep, PackedTypeId id) {
-    auto unpacked = id.Unpack();
-    return TypeFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
-  }
-
-  virtual std::optional<EntityImplPtr>
-  StmtFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
-
-  inline std::optional<EntityImplPtr>
-  StmtFor(const Ptr &ep, PackedStatementId id) {
-    auto unpacked = id.Unpack();
-    return StmtFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
-  }
-
-  virtual std::optional<EntityImplPtr>
-  AttrFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
-
-  inline std::optional<EntityImplPtr>
-  AttrFor(const Ptr &ep, PackedAttributeId id) {
-    auto unpacked = id.Unpack();
-    return AttrFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
-  }
-
-  virtual std::optional<EntityImplPtr>
-  MacroFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
-
-  inline std::optional<EntityImplPtr>
-  MacroFor(const Ptr &ep, PackedMacroId id) {
-    auto unpacked = id.Unpack();
-    return MacroFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
-  }
-
-  virtual std::optional<EntityImplPtr>
-  PseudoFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
-
-  inline std::optional<EntityImplPtr>
-  PseudoFor(const Ptr &ep, PackedDesignatorId id) {
-    auto unpacked = id.Unpack();
-    return TypeFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
-  }
+  MX_FOR_EACH_ENTITY_RECORD(DECLARE_ENTITY_METHODS)
+#undef DECLARE_ENTITY_METHODS
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   virtual FragmentIdList FragmentsCoveringTokens(

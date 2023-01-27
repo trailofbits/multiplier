@@ -104,7 +104,7 @@ class Stmt {
   bool contains(const Stmt &stmt);
 
   Stmt ignore_containers(void) const;
-  std::vector<Stmt> children(void) const;
+  gap::generator<Stmt> children(void) const;
   TokenRange tokens(void) const;
   StmtKind kind(void) const;
   Stmt strip_label_like_statements(void) const;

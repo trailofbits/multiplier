@@ -76,7 +76,8 @@ class MacroExpansion : public MacroSubstitution {
   }
 
   std::optional<DefineMacroDirective> definition(void) const;
-  std::vector<MacroArgument> arguments(void) const;
+  std::optional<MacroArgument> nth_argument(unsigned n) const;
+  gap::generator<MacroArgument> arguments(void) const;
 };
 
 static_assert(sizeof(MacroExpansion) == sizeof(MacroSubstitution));

@@ -78,7 +78,8 @@ class TemplateSpecializationType : public Type {
   bool is_current_instantiation(void) const;
   bool is_sugared(void) const;
   bool is_type_alias(void) const;
-  std::vector<TemplateArgument> template_arguments(void) const;
+  std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  gap::generator<TemplateArgument> template_arguments(void) const;
 };
 
 static_assert(sizeof(TemplateSpecializationType) == sizeof(Type));

@@ -98,11 +98,16 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
     }
   }
 
-  std::vector<Expr> counters(void) const;
-  std::vector<Expr> dependent_counters(void) const;
-  std::vector<Expr> dependent_initializers(void) const;
-  std::vector<Expr> finals(void) const;
-  std::vector<Expr> finals_conditions(void) const;
+  std::optional<Expr> nth_counter(unsigned n) const;
+  gap::generator<Expr> counters(void) const;
+  std::optional<Expr> nth_dependent_counter(unsigned n) const;
+  gap::generator<Expr> dependent_counters(void) const;
+  std::optional<Expr> nth_dependent_initializer(unsigned n) const;
+  gap::generator<Expr> dependent_initializers(void) const;
+  std::optional<Expr> nth_final(unsigned n) const;
+  gap::generator<Expr> finals(void) const;
+  std::optional<Expr> nth_finals_condition(unsigned n) const;
+  gap::generator<Expr> finals_conditions(void) const;
   Stmt body(void) const;
   Expr calculate_last_iteration(void) const;
   Expr combined_condition(void) const;
@@ -133,9 +138,12 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   Expr prev_upper_bound_variable(void) const;
   Expr stride_variable(void) const;
   Expr upper_bound_variable(void) const;
-  std::vector<Expr> initializers(void) const;
-  std::vector<Expr> private_counters(void) const;
-  std::vector<Expr> updates(void) const;
+  std::optional<Expr> nth_initializer(unsigned n) const;
+  gap::generator<Expr> initializers(void) const;
+  std::optional<Expr> nth_private_counter(unsigned n) const;
+  gap::generator<Expr> private_counters(void) const;
+  std::optional<Expr> nth_update(unsigned n) const;
+  gap::generator<Expr> updates(void) const;
 };
 
 static_assert(sizeof(OMPLoopDirective) == sizeof(OMPLoopBasedDirective));

@@ -122,7 +122,8 @@ class ObjCImplementationDecl : public ObjCImplDecl {
   Token super_class_token(void) const;
   bool has_destructors(void) const;
   bool has_non_zero_constructors(void) const;
-  std::vector<ObjCIvarDecl> instance_variables(void) const;
+  std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
+  gap::generator<ObjCIvarDecl> instance_variables(void) const;
 };
 
 static_assert(sizeof(ObjCImplementationDecl) == sizeof(ObjCImplDecl));

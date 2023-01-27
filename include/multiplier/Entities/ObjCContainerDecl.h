@@ -87,15 +87,21 @@ class ObjCContainerDecl : public NamedDecl {
     }
   }
 
-  std::vector<ObjCMethodDecl> class_methods(void) const;
-  std::vector<ObjCPropertyDecl> class_properties(void) const;
+  std::optional<ObjCMethodDecl> nth_class_method(unsigned n) const;
+  gap::generator<ObjCMethodDecl> class_methods(void) const;
+  std::optional<ObjCPropertyDecl> nth_class_propertie(unsigned n) const;
+  gap::generator<ObjCPropertyDecl> class_properties(void) const;
   TokenRange at_end_range(void) const;
   Token at_start_token(void) const;
-  std::vector<ObjCMethodDecl> instance_methods(void) const;
-  std::vector<ObjCPropertyDecl> instance_properties(void) const;
-  std::vector<ObjCMethodDecl> methods(void) const;
-  std::vector<ObjCPropertyDecl> properties(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  std::optional<ObjCMethodDecl> nth_instance_method(unsigned n) const;
+  gap::generator<ObjCMethodDecl> instance_methods(void) const;
+  std::optional<ObjCPropertyDecl> nth_instance_propertie(unsigned n) const;
+  gap::generator<ObjCPropertyDecl> instance_properties(void) const;
+  std::optional<ObjCMethodDecl> nth_method(unsigned n) const;
+  gap::generator<ObjCMethodDecl> methods(void) const;
+  std::optional<ObjCPropertyDecl> nth_propertie(unsigned n) const;
+  gap::generator<ObjCPropertyDecl> properties(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(ObjCContainerDecl) == sizeof(NamedDecl));

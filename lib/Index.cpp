@@ -401,10 +401,7 @@ NamedEntityList Index::query_entities(std::string name) const {
   for (RawEntityId eid : entity_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<DeclarationId>(vid)) {
-
-      DeclarationId id = std::get<DeclarationId>(vid);
-
-      auto decl_ptr = impl->DeclFor(impl, id);
+      auto decl_ptr = impl->DeclFor(impl, eid);
       if (!decl_ptr) {
         assert(false);
         continue;
@@ -419,10 +416,7 @@ NamedEntityList Index::query_entities(std::string name) const {
       entities.emplace_back(std::move(nd.value()));
 
     } else if (std::holds_alternative<MacroId>(vid)) {
-
-      MacroId id = std::get<MacroId>(vid);
-
-      auto macro_ptr = impl->MacroFor(impl, id);
+      auto macro_ptr = impl->MacroFor(impl, eid);
       if (!macro_ptr) {
         assert(false);
         continue;

@@ -7645,10 +7645,15 @@ bool Designator::is_array_range_designator(void) const {
 std::optional<FieldDecl> Designator::field(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal4());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal4();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FieldDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TokenRange Designator::tokens(void) const {
@@ -7714,6 +7719,7 @@ std::optional<unsigned> Designator::first_expression_index(void) const {
   } else {
     return static_cast<unsigned>(self.getVal12());
   }
+  return std::nullopt;
 }
 
 unsigned TemplateParameterList::num_parameters(void) const {
@@ -7744,10 +7750,15 @@ bool TemplateParameterList::has_parameter_pack(void) const {
 std::optional<Expr> TemplateParameterList::requires_clause(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal4());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal4();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token TemplateParameterList::template_keyword_token(void) const {
@@ -7786,21 +7797,28 @@ TokenRange TemplateParameterList::tokens(void) const {
   return fragment->TokenRangeFor(fragment, self.getVal8(), self.getVal9());
 }
 
-std::vector<NamedDecl> TemplateParameterList::parameters(void) const {
+std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<NamedDecl> TemplateParameterList::parameters(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   auto list = self.getVal16();
-  std::vector<NamedDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d16 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d16 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = NamedDecl::from(Decl(d16.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 TemplateArgumentKind TemplateArgument::kind(void) const {
@@ -7836,37 +7854,57 @@ bool TemplateArgument::is_pack_expansion(void) const {
 std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal4());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal4();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ValueDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> TemplateArgument::as_type(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal5());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal5();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> TemplateArgument::parameter_type_for_declaration(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal6());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal6();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> TemplateArgument::null_pointer_type(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal7());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal7();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 TokenRange CXXBaseSpecifier::tokens(void) const {
@@ -7908,10 +7946,15 @@ bool CXXBaseSpecifier::constructors_are_inherited(void) const {
 Token CXXBaseSpecifier::ellipsis_token(void) const {
   auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    EntityId id(self.getVal7());
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
+    RawEntityId eid = self.getVal7();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
+      return frag->TokenFor(frag, eid, true /* can_fail */).value();
+    }
   }
+  return Token();
 }
 
 AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const {
@@ -7926,10 +7969,8 @@ AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const {
 
 Type CXXBaseSpecifier::base_type(void) const {
   auto self = impl->Reader<ast::Pseudo>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 gap::generator<Macro> Macro::containing(const Macro &macro) {
@@ -7972,29 +8013,31 @@ MacroKind Macro::kind(void) const {
 std::optional<Macro> Macro::parent(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal1());
-    auto unpacked_id = id.Extract<mx::MacroId>();
-    return Macro(impl->ep->MacroFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal1();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
+      return Macro(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
-std::vector<MacroOrToken> Macro::children(void) const {
+gap::generator<MacroOrToken> Macro::children(void) const {
   auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
   auto list = self.getVal2();
-  std::vector<MacroOrToken> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
-      vec.emplace_back(std::move(std::get<Macro>(e)));
+      co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
-      vec.emplace_back(std::move(std::get<Token>(e)));
+      co_yield std::move(std::get<Token>(e));
     } else {
       assert(false);
     }
   }
-  return vec;
 }
 
 gap::generator<MacroVAOptArgument> MacroVAOptArgument::containing(const Macro &macro) {
@@ -8081,23 +8124,20 @@ std::optional<MacroSubstitution> MacroSubstitution::from(const Macro &parent) {
   }
 }
 
-std::vector<MacroOrToken> MacroSubstitution::replacement_children(void) const {
+gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const {
   auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
   auto list = self.getVal3();
-  std::vector<MacroOrToken> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
-      vec.emplace_back(std::move(std::get<Macro>(e)));
+      co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
-      vec.emplace_back(std::move(std::get<Token>(e)));
+      co_yield std::move(std::get<Token>(e));
     } else {
       assert(false);
     }
   }
-  return vec;
 }
 
 gap::generator<MacroVAOpt> MacroVAOpt::containing(const Macro &macro) {
@@ -8279,27 +8319,39 @@ std::optional<MacroExpansion> MacroExpansion::from(const Macro &parent) {
 std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal4());
-    auto unpacked_id = id.Extract<mx::MacroId>();
-    return DefineMacroDirective::from(Macro(impl->ep->MacroFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal4();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
+      return DefineMacroDirective::from(Macro(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
-std::vector<MacroArgument> MacroExpansion::arguments(void) const {
+std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<MacroArgument> MacroExpansion::arguments(void) const {
   auto self = impl->Reader<ast::Macro>();
   auto list = self.getVal5();
-  std::vector<MacroArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::MacroId>();
-    if (auto d5 = impl->ep->MacroFor(impl->ep, *unpacked_id)) {
+    if (auto d5 = impl->ep->MacroFor(impl->ep, v)) {
       if (auto e = MacroArgument::from(Macro(d5.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<MacroArgument> MacroArgument::containing(const Macro &macro) {
@@ -8395,19 +8447,29 @@ std::optional<MacroParameter> MacroParameter::from(const Macro &parent) {
 Token MacroParameter::variadic_dots(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal4());
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
+    RawEntityId eid = self.getVal4();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
+      return frag->TokenFor(frag, eid, true /* can_fail */).value();
+    }
   }
+  return Token();
 }
 
 Token MacroParameter::name(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal8());
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
+    RawEntityId eid = self.getVal8();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
+      return frag->TokenFor(frag, eid, true /* can_fail */).value();
+    }
   }
+  return Token();
 }
 
 unsigned MacroParameter::index(void) const {
@@ -8483,10 +8545,15 @@ Token MacroDirective::hash(void) const {
 Token MacroDirective::directive_name(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal8());
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
+    RawEntityId eid = self.getVal8();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
+      return frag->TokenFor(frag, eid, true /* can_fail */).value();
+    }
   }
+  return Token();
 }
 
 gap::generator<DefineMacroDirective> DefineMacroDirective::containing(const Macro &macro) {
@@ -8536,29 +8603,31 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const Macro &pare
 Token DefineMacroDirective::name(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal9());
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    return fragment->TokenFor(fragment, id, true /* can_fail */).value();
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
+      return frag->TokenFor(frag, eid, true /* can_fail */).value();
+    }
   }
+  return Token();
 }
 
-std::vector<MacroOrToken> DefineMacroDirective::body(void) const {
+gap::generator<MacroOrToken> DefineMacroDirective::body(void) const {
   auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
   auto list = self.getVal3();
-  std::vector<MacroOrToken> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
-      vec.emplace_back(std::move(std::get<Macro>(e)));
+      co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
-      vec.emplace_back(std::move(std::get<Token>(e)));
+      co_yield std::move(std::get<Token>(e));
     } else {
       assert(false);
     }
   }
-  return vec;
 }
 
 unsigned DefineMacroDirective::num_explicit_parameters(void) const {
@@ -8576,23 +8645,20 @@ bool DefineMacroDirective::is_function_like(void) const {
   return self.getVal10();
 }
 
-std::vector<MacroOrToken> DefineMacroDirective::parameters(void) const {
+gap::generator<MacroOrToken> DefineMacroDirective::parameters(void) const {
   auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
   auto list = self.getVal5();
-  std::vector<MacroOrToken> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
-      vec.emplace_back(std::move(std::get<Macro>(e)));
+      co_yield std::move(std::get<Macro>(e));
     } else if (std::holds_alternative<Token>(e)) {
-      vec.emplace_back(std::move(std::get<Token>(e)));
+      co_yield std::move(std::get<Token>(e));
     } else {
       assert(false);
     }
   }
-  return vec;
 }
 
 gap::generator<PragmaMacroDirective> PragmaMacroDirective::containing(const Macro &macro) {
@@ -9212,13 +9278,15 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const M
 std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
   auto self = impl->Reader<ast::Macro>();
   if (true) {
-    EntityId id(self.getVal9());
-    if (auto file = impl->ep->FileFor(impl->ep, id.Pack())) {
-      return File(std::move(file));
-    } else {
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
+    if (auto file = impl->ep->FileFor(impl->ep, eid)) {
+      return File(std::move(file));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<ImportMacroDirective> ImportMacroDirective::containing(const Macro &macro) {
@@ -9468,10 +9536,8 @@ std::optional<AlignValueAttr> AlignValueAttr::from(const Attr &parent) {
 
 Expr AlignValueAttr::alignment(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<AliasAttr> AliasAttr::from(const TokenContext &c) {
@@ -10281,10 +10347,8 @@ std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::from(const Attr &paren
 
 Expr OMPReferencedVarAttr::reference(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const TokenContext &c) {
@@ -10306,10 +10370,8 @@ OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) c
 
 Expr OMPDeclareSimdDeclAttr::simdlen(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const TokenContext &c) {
@@ -10389,10 +10451,8 @@ LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
 
 Expr LoopHintAttr::value(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::from(const TokenContext &c) {
@@ -10758,18 +10818,14 @@ std::optional<IBOutletCollectionAttr> IBOutletCollectionAttr::from(const Attr &p
 
 Type IBOutletCollectionAttr::interface(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type IBOutletCollectionAttr::interface_token(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<IBOutletAttr> IBOutletAttr::from(const TokenContext &c) {
@@ -10923,10 +10979,8 @@ std::optional<GuardedByAttr> GuardedByAttr::from(const Attr &parent) {
 
 Expr GuardedByAttr::argument(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<GNUInlineAttr> GNUInlineAttr::from(const TokenContext &c) {
@@ -11123,10 +11177,8 @@ std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(c
 
 Expr ExclusiveTrylockFunctionAttr::success_value(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantiationAttr::from(const TokenContext &c) {
@@ -11265,10 +11317,8 @@ std::optional<EnableIfAttr> EnableIfAttr::from(const Attr &parent) {
 
 Expr EnableIfAttr::condition(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::string_view EnableIfAttr::message(void) const {
@@ -11348,10 +11398,8 @@ bool DiagnoseIfAttr::argument_dependent(void) const {
 
 Expr DiagnoseIfAttr::condition(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 DiagnoseIfAttrDiagnosticType DiagnoseIfAttr::diagnostic_type(void) const {
@@ -11367,10 +11415,8 @@ std::string_view DiagnoseIfAttr::message(void) const {
 
 NamedDecl DiagnoseIfAttr::parent(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal16();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool DiagnoseIfAttr::is_error(void) const {
@@ -11401,10 +11447,8 @@ std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const Attr &par
 
 FunctionDecl DiagnoseAsBuiltinAttr::function(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<DestructorAttr> DestructorAttr::from(const TokenContext &c) {
@@ -11823,10 +11867,8 @@ std::optional<CleanupAttr> CleanupAttr::from(const Attr &parent) {
 
 FunctionDecl CleanupAttr::function_declaration(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const TokenContext &c) {
@@ -11964,18 +12006,14 @@ std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const Attr &paren
 
 Expr CUDALaunchBoundsAttr::max_threads(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CUDALaunchBoundsAttr::min_blocks(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const TokenContext &c) {
@@ -12408,19 +12446,22 @@ std::optional<AssumeAlignedAttr> AssumeAlignedAttr::from(const Attr &parent) {
 
 Expr AssumeAlignedAttr::alignment(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<Expr> AssumeAlignedAttr::offset(void) const {
   auto self = impl->Reader<ast::Attr>();
   if (true) {
-    EntityId id(self.getVal16());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal16();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<AssertSharedLockAttr> AssertSharedLockAttr::from(const TokenContext &c) {
@@ -12713,19 +12754,29 @@ std::optional<AlignedAttr> AlignedAttr::from(const Attr &parent) {
 std::optional<Expr> AlignedAttr::alignment_expression(void) const {
   auto self = impl->Reader<ast::Attr>();
   if (true) {
-    EntityId id(self.getVal8());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal8();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> AlignedAttr::alignment_type(void) const {
   auto self = impl->Reader<ast::Attr>();
   if (true) {
-    EntityId id(self.getVal16());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal16();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 AlignedAttrSpelling AlignedAttr::semantic_spelling(void) const {
@@ -12951,18 +13002,14 @@ std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const Attr &paren
 
 Expr AMDGPUWavesPerEUAttr::max(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr AMDGPUWavesPerEUAttr::min(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const TokenContext &c) {
@@ -13031,18 +13078,14 @@ std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(con
 
 Expr AMDGPUFlatWorkGroupSizeAttr::max(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr AMDGPUFlatWorkGroupSizeAttr::min(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const TokenContext &c) {
@@ -13400,18 +13443,14 @@ std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const Attr &parent) {
 
 Type VecTypeHintAttr::type_hint(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type VecTypeHintAttr::type_hint_token(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<VecReturnAttr> VecReturnAttr::from(const TokenContext &c) {
@@ -13454,10 +13493,8 @@ std::string_view UuidAttr::guid(void) const {
 
 MSGuidDecl UuidAttr::guid_declaration(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const TokenContext &c) {
@@ -13600,18 +13637,14 @@ bool TypeTagForDatatypeAttr::layout_compatible(void) const {
 
 Type TypeTagForDatatypeAttr::matching_c_type(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type_token(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool TypeTagForDatatypeAttr::must_be_null(void) const {
@@ -13642,10 +13675,8 @@ TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(voi
 
 Expr TryAcquireCapabilityAttr::success_value(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool TryAcquireCapabilityAttr::is_shared(void) const {
@@ -14127,10 +14158,8 @@ std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const A
 
 Expr SharedTrylockFunctionAttr::success_value(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<SetTypestateAttr> SetTypestateAttr::from(const TokenContext &c) {
@@ -14543,10 +14572,8 @@ std::optional<PtGuardedByAttr> PtGuardedByAttr::from(const Attr &parent) {
 
 Expr PtGuardedByAttr::argument(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<PreserveMostAttr> PreserveMostAttr::from(const TokenContext &c) {
@@ -14599,18 +14626,14 @@ std::optional<PreferredNameAttr> PreferredNameAttr::from(const Attr &parent) {
 
 Type PreferredNameAttr::typedef_type(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type PreferredNameAttr::typedef_type_token(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const TokenContext &c) {
@@ -14741,18 +14764,14 @@ std::optional<PointerAttr> PointerAttr::from(const Attr &parent) {
 
 Type PointerAttr::deref_type(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type PointerAttr::deref_type_token(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<PcsAttr> PcsAttr::from(const TokenContext &c) {
@@ -14904,18 +14923,14 @@ std::optional<OwnerAttr> OwnerAttr::from(const Attr &parent) {
 
 Type OwnerAttr::deref_type(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type OwnerAttr::deref_type_token(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<OverrideAttr> OverrideAttr::from(const TokenContext &c) {
@@ -15357,10 +15372,8 @@ std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const Attr &par
 
 Expr OMPDeclareVariantAttr::variant_func_reference(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const TokenContext &c) {
@@ -15391,10 +15404,8 @@ bool OMPDeclareTargetDeclAttr::indirect(void) const {
 
 Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {
@@ -15436,18 +15447,14 @@ std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const Attr &parent)
 
 Expr OMPAllocateDeclAttr::alignment(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAllocateDeclAttr::allocator(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal16());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 OMPAllocateDeclAttrAllocatorTypeTy OMPAllocateDeclAttr::allocator_type(void) const {
@@ -15846,10 +15853,8 @@ std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const Attr &parent) {
 
 VarDecl NSErrorDomainAttr::error_domain(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from(const TokenContext &c) {
@@ -16225,10 +16230,8 @@ std::optional<LockReturnedAttr> LockReturnedAttr::from(const Attr &parent) {
 
 Expr LockReturnedAttr::argument(void) const {
   auto self = impl->Reader<ast::Attr>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const TokenContext &c) {
@@ -16757,10 +16760,8 @@ bool Type::is_qualified(void) const {
 
 Type Type::unqualified_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal1());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal1();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool Type::accepts_obj_c_type_parameters(void) const {
@@ -16791,136 +16792,211 @@ bool Type::contains_unexpanded_parameter_pack(void) const {
 std::optional<Type> Type::array_element_type_no_type_qualified(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal7());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal7();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> Type::as_cxx_record_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal8());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal8();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ComplexType> Type::as_complex_integer_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal9());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return ComplexType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return ComplexType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ObjCObjectPointerType> Type::as_obj_c_interface_pointer_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal10());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return ObjCObjectPointerType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ObjCObjectType> Type::as_obj_c_interface_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return ObjCObjectType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ObjCObjectPointerType> Type::as_obj_c_qualified_class_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal12());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal12();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return ObjCObjectPointerType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ObjCObjectPointerType> Type::as_obj_c_qualified_id_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal13());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return ObjCObjectPointerType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ObjCObjectType> Type::as_obj_c_qualified_interface_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal14());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal14();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return ObjCObjectType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<BuiltinType> Type::as_placeholder_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal15());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return BuiltinType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal15();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return BuiltinType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<RecordDecl> Type::as_record_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal16());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal16();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return RecordDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<RecordType> Type::as_structure_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal17());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return RecordType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal17();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return RecordType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<TagDecl> Type::as_tag_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal18());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal18();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TagDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<RecordType> Type::as_union_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal19());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return RecordType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal19();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return RecordType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<AutoType> Type::contained_auto_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal20());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return AutoType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal20();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return AutoType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<DeducedType> Type::contained_deduced_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal21());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return DeducedType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal21();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return DeducedType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Linkage Type::linkage(void) const {
@@ -16930,10 +17006,8 @@ Linkage Type::linkage(void) const {
 
 Type Type::locally_unqualified_single_step_desugared_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal23());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal23();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<NullabilityKind> Type::nullability(void) const {
@@ -16943,33 +17017,49 @@ std::optional<NullabilityKind> Type::nullability(void) const {
   } else {
     return static_cast<NullabilityKind>(self.getVal24());
   }
+  return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> Type::pointee_cxx_record_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal26());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal26();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> Type::pointee_or_array_element_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal27());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal27();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> Type::pointee_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal28());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal28();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<TypeScalarTypeKind> Type::scalar_type_kind(void) const {
@@ -16979,15 +17069,21 @@ std::optional<TypeScalarTypeKind> Type::scalar_type_kind(void) const {
   } else {
     return static_cast<TypeScalarTypeKind>(self.getVal29());
   }
+  return std::nullopt;
 }
 
 std::optional<Type> Type::sve_element_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal31());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal31();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 TypeKind Type::kind(void) const {
@@ -16997,10 +17093,8 @@ TypeKind Type::kind(void) const {
 
 Type Type::unqualified_desugared_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal33());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal33();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Visibility Type::visibility(void) const {
@@ -17060,6 +17154,7 @@ std::optional<bool> Type::is_aggregate_type(void) const {
   } else {
     return static_cast<bool>(self.getVal44());
   }
+  return std::nullopt;
 }
 
 bool Type::is_align_value_t(void) const {
@@ -17209,6 +17304,7 @@ std::optional<bool> Type::is_constant_size_type(void) const {
   } else {
     return static_cast<bool>(self.getVal74());
   }
+  return std::nullopt;
 }
 
 bool Type::is_decltype_type(void) const {
@@ -17393,6 +17489,7 @@ std::optional<bool> Type::is_literal_type(void) const {
   } else {
     return static_cast<bool>(self.getVal111());
   }
+  return std::nullopt;
 }
 
 bool Type::is_matrix_type(void) const {
@@ -17692,6 +17789,7 @@ std::optional<bool> Type::is_obj_carc_implicitly_unretained_type(void) const {
   } else {
     return static_cast<bool>(self.getVal171());
   }
+  return std::nullopt;
 }
 
 bool Type::is_obj_c_boxable_record_type(void) const {
@@ -17916,6 +18014,7 @@ std::optional<bool> Type::is_standard_layout_type(void) const {
   } else {
     return static_cast<bool>(self.getVal216());
   }
+  return std::nullopt;
 }
 
 bool Type::is_std_byte_type(void) const {
@@ -17930,6 +18029,7 @@ std::optional<bool> Type::is_structural_type(void) const {
   } else {
     return static_cast<bool>(self.getVal219());
   }
+  return std::nullopt;
 }
 
 bool Type::is_structure_or_class_type(void) const {
@@ -18034,10 +18134,8 @@ bool Type::is_wide_character_type(void) const {
 
 Type Type::ignore_parentheses(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal241());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal241();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 LangAS Type::address_space(void) const {
@@ -18047,66 +18145,50 @@ LangAS Type::address_space(void) const {
 
 Type Type::atomic_unqualified_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal243());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal243();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::canonical_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal244());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal244();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::desugared_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal245());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal245();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::local_unqualified_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal246());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal246();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::non_l_value_expression_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal247());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal247();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::non_pack_expansion_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal248());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal248();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::non_reference_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal249());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal249();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::single_step_desugared_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal250());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal250();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool Type::has_address_space(void) const {
@@ -18286,42 +18368,32 @@ bool Type::may_be_not_dynamic_class(void) const {
 
 Type Type::strip_obj_c_kind_of_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal286());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal286();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::with_const(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal287());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal287();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::with_restrict(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal288());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal288();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::with_volatile(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal289());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal289();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type Type::without_local_fast_qualifiers(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal290());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal290();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const TokenContext &c) {
@@ -18338,19 +18410,22 @@ std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const Type &paren
 
 Type TemplateTypeParmType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal292());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TemplateTypeParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal292();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TemplateTypeParmDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool TemplateTypeParmType::is_parameter_pack(void) const {
@@ -18377,19 +18452,22 @@ std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const
 
 Type TemplateSpecializationType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal292());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal292();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool TemplateSpecializationType::is_current_instantiation(void) const {
@@ -18407,16 +18485,25 @@ bool TemplateSpecializationType::is_type_alias(void) const {
   return self.getVal295();
 }
 
-std::vector<TemplateArgument> TemplateSpecializationType::template_arguments(void) const {
+std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> TemplateSpecializationType::template_arguments(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal296();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 std::optional<TagType> TagType::from(const TokenContext &c) {
@@ -18434,10 +18521,8 @@ std::optional<TagType> TagType::from(const Type &parent) {
 
 TagDecl TagType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal291();
+  return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool TagType::is_being_defined(void) const {
@@ -18463,10 +18548,8 @@ std::optional<RecordType> RecordType::from(const Type &parent) {
 
 Type RecordType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool RecordType::has_const_fields(void) const {
@@ -18497,10 +18580,8 @@ std::optional<EnumType> EnumType::from(const Type &parent) {
 
 Type EnumType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool EnumType::is_sugared(void) const {
@@ -18522,26 +18603,20 @@ std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const T
 
 Type SubstTemplateTypeParmType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TemplateTypeParmType SubstTemplateTypeParmType::replaced_parameter(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
 Type SubstTemplateTypeParmType::replacement_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool SubstTemplateTypeParmType::is_sugared(void) const {
@@ -18563,18 +18638,14 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
 
 Type SubstTemplateTypeParmPackType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TemplateTypeParmType SubstTemplateTypeParmPackType::replaced_parameter(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
 bool SubstTemplateTypeParmPackType::is_sugared(void) const {
@@ -18597,10 +18668,8 @@ std::optional<ReferenceType> ReferenceType::from(const Type &parent) {
 
 Type ReferenceType::pointee_type_as_written(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ReferenceType::is_inner_reference(void) const {
@@ -18631,10 +18700,8 @@ std::optional<RValueReferenceType> RValueReferenceType::from(const Type &parent)
 
 Type RValueReferenceType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool RValueReferenceType::is_sugared(void) const {
@@ -18660,10 +18727,8 @@ std::optional<LValueReferenceType> LValueReferenceType::from(const Type &parent)
 
 Type LValueReferenceType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool LValueReferenceType::is_sugared(void) const {
@@ -18685,10 +18750,8 @@ std::optional<PointerType> PointerType::from(const Type &parent) {
 
 Type PointerType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool PointerType::is_sugared(void) const {
@@ -18710,18 +18773,14 @@ std::optional<PipeType> PipeType::from(const Type &parent) {
 
 Type PipeType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type PipeType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool PipeType::is_read_only(void) const {
@@ -18748,18 +18807,14 @@ std::optional<ParenType> ParenType::from(const Type &parent) {
 
 Type ParenType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ParenType::inner_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ParenType::is_sugared(void) const {
@@ -18781,10 +18836,8 @@ std::optional<PackExpansionType> PackExpansionType::from(const Type &parent) {
 
 Type PackExpansionType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<unsigned> PackExpansionType::num_expansions(void) const {
@@ -18794,14 +18847,13 @@ std::optional<unsigned> PackExpansionType::num_expansions(void) const {
   } else {
     return static_cast<unsigned>(self.getVal298());
   }
+  return std::nullopt;
 }
 
 Type PackExpansionType::pattern(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool PackExpansionType::is_sugared(void) const {
@@ -18823,18 +18875,14 @@ std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const Type &parent) {
 
 Type ObjCTypeParamType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ObjCTypeParamDecl ObjCTypeParamType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCTypeParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return ObjCTypeParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool ObjCTypeParamType::is_sugared(void) const {
@@ -18857,65 +18905,68 @@ std::optional<ObjCObjectType> ObjCObjectType::from(const Type &parent) {
 
 Type ObjCObjectType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ObjCObjectType::base_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ObjCInterfaceDecl ObjCObjectType::interface(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal297();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<Type> ObjCObjectType::super_class_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal299());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal299();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
-std::vector<Type> ObjCObjectType::type_arguments(void) const {
+std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : type_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Type> ObjCObjectType::type_arguments(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal300();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t300 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t300.value()));
+    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d300.value());
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Type> ObjCObjectType::type_arguments_as_written(void) const {
+gap::generator<Type> ObjCObjectType::type_arguments_as_written(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal301();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t301 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t301.value()));
+    if (auto d301 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d301.value());
     }
   }
-  return vec;
+  co_return;
 }
 
 bool ObjCObjectType::is_kind_of_type(void) const {
@@ -18990,10 +19041,8 @@ bool ObjCObjectType::is_unspecialized_as_written(void) const {
 
 Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal313());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal313();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const TokenContext &c) {
@@ -19014,10 +19063,8 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Type &parent) {
 
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal314());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal314();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const TokenContext &c) {
@@ -19034,72 +19081,66 @@ std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const Type &par
 
 Type ObjCObjectPointerType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ObjCInterfaceDecl ObjCObjectPointerType::interface_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCInterfaceType ObjCObjectPointerType::interface_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return ObjCInterfaceType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal297();
+  return ObjCInterfaceType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
 ObjCObjectType ObjCObjectPointerType::object_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal299());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal299();
+  return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
 Type ObjCObjectPointerType::super_class_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal313());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal313();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
-std::vector<Type> ObjCObjectPointerType::type_arguments(void) const {
+std::optional<Type> ObjCObjectPointerType::nth_type_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : type_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Type> ObjCObjectPointerType::type_arguments(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal300();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t300 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t300.value()));
+    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d300.value());
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Type> ObjCObjectPointerType::type_arguments_as_written(void) const {
+gap::generator<Type> ObjCObjectPointerType::type_arguments_as_written(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal301();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t301 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t301.value()));
+    if (auto d301 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d301.value());
     }
   }
-  return vec;
+  co_return;
 }
 
 bool ObjCObjectPointerType::is_kind_of_type(void) const {
@@ -19137,46 +19178,58 @@ bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
   return self.getVal305();
 }
 
-std::vector<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const {
+std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : qualifiers()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal315();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d315 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCProtocolDecl::from(Decl(d315.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal314());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal314();
+  return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
-std::vector<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const {
+std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocols()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal316();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d316 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d316 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCProtocolDecl::from(Decl(d316.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 std::optional<MemberPointerType> MemberPointerType::from(const TokenContext &c) {
@@ -19193,26 +19246,20 @@ std::optional<MemberPointerType> MemberPointerType::from(const Type &parent) {
 
 Type MemberPointerType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type MemberPointerType::class_(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal297();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool MemberPointerType::is_member_data_pointer(void) const {
@@ -19245,18 +19292,14 @@ std::optional<MatrixType> MatrixType::from(const Type &parent) {
 
 Type MatrixType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type MatrixType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool MatrixType::is_sugared(void) const {
@@ -19292,18 +19335,14 @@ Token DependentSizedMatrixType::attribute_token(void) const {
 
 Expr DependentSizedMatrixType::column_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal299());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal299();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal313());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal313();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<ConstantMatrixType> ConstantMatrixType::from(const TokenContext &c) {
@@ -19336,26 +19375,20 @@ std::optional<MacroQualifiedType> MacroQualifiedType::from(const Type &parent) {
 
 Type MacroQualifiedType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type MacroQualifiedType::modified_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type MacroQualifiedType::underlying_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool MacroQualifiedType::is_sugared(void) const {
@@ -19377,34 +19410,26 @@ std::optional<InjectedClassNameType> InjectedClassNameType::from(const Type &par
 
 Type InjectedClassNameType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 CXXRecordDecl InjectedClassNameType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Type InjectedClassNameType::injected_specialization_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TemplateSpecializationType InjectedClassNameType::injected_tst(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal299());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal299();
+  return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
 bool InjectedClassNameType::is_sugared(void) const {
@@ -19432,10 +19457,8 @@ CallingConv FunctionType::call_conv(void) const {
 
 Type FunctionType::call_result_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool FunctionType::cmse_ns_call_attribute(void) const {
@@ -19455,10 +19478,8 @@ bool FunctionType::no_return_attribute(void) const {
 
 Type FunctionType::return_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool FunctionType::is_const(void) const {
@@ -19499,14 +19520,13 @@ std::optional<CanThrowResult> FunctionProtoType::can_throw(void) const {
   } else {
     return static_cast<CanThrowResult>(self.getVal318());
   }
+  return std::nullopt;
 }
 
 Type FunctionProtoType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token FunctionProtoType::ellipsis_token(void) const {
@@ -19522,19 +19542,29 @@ Token FunctionProtoType::ellipsis_token(void) const {
 std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal313());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal313();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal314());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal314();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 ExceptionSpecificationType FunctionProtoType::exception_spec_type(void) const {
@@ -19545,25 +19575,37 @@ ExceptionSpecificationType FunctionProtoType::exception_spec_type(void) const {
 std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal320());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
-  }
-}
-
-std::vector<Type> FunctionProtoType::parameter_types(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal300();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t300 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t300.value()));
+    RawEntityId eid = self.getVal320();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+std::optional<Type> FunctionProtoType::nth_parameter_type(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameter_types()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Type> FunctionProtoType::parameter_types(void) const {
+  auto self = impl->Reader<ast::Type>();
+  auto list = self.getVal300();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d300.value());
+    }
+  }
+  co_return;
 }
 
 RefQualifierKind FunctionProtoType::reference_qualifier(void) const {
@@ -19613,6 +19655,7 @@ std::optional<bool> FunctionProtoType::is_nothrow(void) const {
   } else {
     return static_cast<bool>(self.getVal322());
   }
+  return std::nullopt;
 }
 
 bool FunctionProtoType::is_sugared(void) const {
@@ -19630,19 +19673,26 @@ bool FunctionProtoType::is_variadic(void) const {
   return self.getVal326();
 }
 
-std::vector<Type> FunctionProtoType::exception_types(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal301();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t301 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t301.value()));
+std::optional<Type> FunctionProtoType::nth_exception_type(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : exception_types()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Type> FunctionProtoType::exception_types(void) const {
+  auto self = impl->Reader<ast::Type>();
+  auto list = self.getVal301();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d301 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d301.value());
+    }
+  }
+  co_return;
 }
 
 std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const TokenContext &c) {
@@ -19663,10 +19713,8 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const Type &parent)
 
 Type FunctionNoProtoType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
@@ -19688,10 +19736,8 @@ std::optional<DependentVectorType> DependentVectorType::from(const Type &parent)
 
 Type DependentVectorType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token DependentVectorType::attribute_token(void) const {
@@ -19706,18 +19752,14 @@ Token DependentVectorType::attribute_token(void) const {
 
 Type DependentVectorType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr DependentVectorType::size_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal299());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal299();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 VectorTypeVectorKind DependentVectorType::vector_kind(void) const {
@@ -19744,10 +19786,8 @@ std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(con
 
 Type DependentSizedExtVectorType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token DependentSizedExtVectorType::attribute_token(void) const {
@@ -19762,18 +19802,14 @@ Token DependentSizedExtVectorType::attribute_token(void) const {
 
 Type DependentSizedExtVectorType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr DependentSizedExtVectorType::size_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal299());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal299();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool DependentSizedExtVectorType::is_sugared(void) const {
@@ -19795,18 +19831,14 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const Type &parent)
 
 Type DependentBitIntType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr DependentBitIntType::num_bits_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool DependentBitIntType::is_signed(void) const {
@@ -19838,18 +19870,14 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const T
 
 Type DependentAddressSpaceType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr DependentAddressSpaceType::address_space_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token DependentAddressSpaceType::attribute_token(void) const {
@@ -19882,19 +19910,22 @@ std::optional<DeducedType> DeducedType::from(const Type &parent) {
 
 Type DeducedType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<Type> DeducedType::resolved_type(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal292());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal292();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool DeducedType::is_deduced(void) const {
@@ -19944,25 +19975,39 @@ AutoTypeKeyword AutoType::keyword(void) const {
   return static_cast<AutoTypeKeyword>(self.getVal317());
 }
 
-std::vector<TemplateArgument> AutoType::type_constraint_arguments(void) const {
+std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : type_constraint_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal296();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal297());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ConceptDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal297();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ConceptDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool AutoType::is_constrained(void) const {
@@ -19994,26 +20039,20 @@ std::optional<DecltypeType> DecltypeType::from(const Type &parent) {
 
 Type DecltypeType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr DecltypeType::underlying_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Type DecltypeType::underlying_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool DecltypeType::is_sugared(void) const {
@@ -20035,18 +20074,14 @@ std::optional<ComplexType> ComplexType::from(const Type &parent) {
 
 Type ComplexType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ComplexType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ComplexType::is_sugared(void) const {
@@ -20068,10 +20103,8 @@ std::optional<BuiltinType> BuiltinType::from(const Type &parent) {
 
 Type BuiltinType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
@@ -20123,10 +20156,8 @@ std::optional<BlockPointerType> BlockPointerType::from(const Type &parent) {
 
 Type BlockPointerType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool BlockPointerType::is_sugared(void) const {
@@ -20148,10 +20179,8 @@ std::optional<BitIntType> BitIntType::from(const Type &parent) {
 
 Type BitIntType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool BitIntType::is_signed(void) const {
@@ -20183,26 +20212,20 @@ std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Type &paren
 
 Type BTFTagAttributedType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 BTFTypeTagAttr BTFTagAttributedType::attribute(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<AttributeId>();
-  return BTFTypeTagAttr::from(Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return BTFTypeTagAttr::from(Attr(impl->ep->AttrFor(impl->ep, eid).value())).value();
 }
 
 Type BTFTagAttributedType::wrapped_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool BTFTagAttributedType::is_sugared(void) const {
@@ -20224,10 +20247,8 @@ std::optional<AttributedType> AttributedType::from(const Type &parent) {
 
 Type AttributedType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 AttrKind AttributedType::attribute_kind(void) const {
@@ -20237,10 +20258,8 @@ AttrKind AttributedType::attribute_kind(void) const {
 
 Type AttributedType::equivalent_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const {
@@ -20250,14 +20269,13 @@ std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const
   } else {
     return static_cast<NullabilityKind>(self.getVal317());
   }
+  return std::nullopt;
 }
 
 Type AttributedType::modified_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool AttributedType::is_calling_conv(void) const {
@@ -20294,18 +20312,14 @@ std::optional<AtomicType> AtomicType::from(const Type &parent) {
 
 Type AtomicType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type AtomicType::value_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool AtomicType::is_sugared(void) const {
@@ -20330,10 +20344,8 @@ std::optional<ArrayType> ArrayType::from(const Type &parent) {
 
 Type ArrayType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
@@ -20359,10 +20371,8 @@ std::optional<VariableArrayType> VariableArrayType::from(const Type &parent) {
 
 Type VariableArrayType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TokenRange VariableArrayType::brackets_range(void) const {
@@ -20393,10 +20403,8 @@ Token VariableArrayType::r_bracket_token(void) const {
 
 Expr VariableArrayType::size_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal320());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal320();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool VariableArrayType::is_sugared(void) const {
@@ -20422,10 +20430,8 @@ std::optional<IncompleteArrayType> IncompleteArrayType::from(const Type &parent)
 
 Type IncompleteArrayType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool IncompleteArrayType::is_sugared(void) const {
@@ -20451,10 +20457,8 @@ std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Type 
 
 Type DependentSizedArrayType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TokenRange DependentSizedArrayType::brackets_range(void) const {
@@ -20485,10 +20489,8 @@ Token DependentSizedArrayType::r_bracket_token(void) const {
 
 Expr DependentSizedArrayType::size_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal320());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal320();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool DependentSizedArrayType::is_sugared(void) const {
@@ -20514,19 +20516,22 @@ std::optional<ConstantArrayType> ConstantArrayType::from(const Type &parent) {
 
 Type ConstantArrayType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<Expr> ConstantArrayType::size_expression(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal297());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal297();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool ConstantArrayType::is_sugared(void) const {
@@ -20549,26 +20554,20 @@ std::optional<AdjustedType> AdjustedType::from(const Type &parent) {
 
 Type AdjustedType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type AdjustedType::resolved_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type AdjustedType::original_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool AdjustedType::is_sugared(void) const {
@@ -20629,27 +20628,28 @@ std::optional<ElaboratedType> ElaboratedType::from(const Type &parent) {
 
 Type ElaboratedType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ElaboratedType::named_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
   if (true) {
-    EntityId id(self.getVal297());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal297();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TagDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool ElaboratedType::is_sugared(void) const {
@@ -20675,10 +20675,8 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
 
 Type DependentTemplateSpecializationType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool DependentTemplateSpecializationType::is_sugared(void) const {
@@ -20686,16 +20684,25 @@ bool DependentTemplateSpecializationType::is_sugared(void) const {
   return self.getVal293();
 }
 
-std::vector<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const {
+std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_template_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const {
   auto self = impl->Reader<ast::Type>();
   auto list = self.getVal296();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 std::optional<DependentNameType> DependentNameType::from(const TokenContext &c) {
@@ -20716,10 +20723,8 @@ std::optional<DependentNameType> DependentNameType::from(const Type &parent) {
 
 Type DependentNameType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool DependentNameType::is_sugared(void) const {
@@ -20742,18 +20747,14 @@ std::optional<VectorType> VectorType::from(const Type &parent) {
 
 Type VectorType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type VectorType::element_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 VectorTypeVectorKind VectorType::vector_kind(void) const {
@@ -20796,26 +20797,20 @@ std::optional<UsingType> UsingType::from(const Type &parent) {
 
 Type UsingType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 UsingShadowDecl UsingType::found_declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Type UsingType::underlying_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool UsingType::is_sugared(void) const {
@@ -20837,18 +20832,14 @@ std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const Type &parent)
 
 Type UnresolvedUsingType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 UnresolvedUsingTypenameDecl UnresolvedUsingType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return UnresolvedUsingTypenameDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return UnresolvedUsingTypenameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool UnresolvedUsingType::is_sugared(void) const {
@@ -20870,18 +20861,14 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const Type &parent) {
 
 Type UnaryTransformType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type UnaryTransformType::base_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
@@ -20891,10 +20878,8 @@ UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
 
 Type UnaryTransformType::underlying_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal297());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool UnaryTransformType::is_sugared(void) const {
@@ -20916,18 +20901,14 @@ std::optional<TypedefType> TypedefType::from(const Type &parent) {
 
 Type TypedefType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TypedefNameDecl TypedefType::declaration(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool TypedefType::is_sugared(void) const {
@@ -20949,18 +20930,14 @@ std::optional<TypeOfType> TypeOfType::from(const Type &parent) {
 
 Type TypeOfType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type TypeOfType::underlying_type(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool TypeOfType::is_sugared(void) const {
@@ -20982,18 +20959,14 @@ std::optional<TypeOfExprType> TypeOfExprType::from(const Type &parent) {
 
 Type TypeOfExprType::desugar(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal291());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr TypeOfExprType::underlying_expression(void) const {
   auto self = impl->Reader<ast::Type>();
-  EntityId id(self.getVal292());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {
@@ -21004,33 +20977,34 @@ bool TypeOfExprType::is_sugared(void) const {
 std::optional<Decl> Stmt::parent_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (auto id = self.getVal0(); id != kInvalidEntityId) {
-    mx::EntityId eid(id);
-    auto decl_id = eid.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *decl_id).value());
-  } else {
-    return std::nullopt;
+    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
+      return Decl(std::move(eptr.value()));
+    }
+    assert(false);
   }
+  return std::nullopt;
 }
 
 std::optional<Stmt> Stmt::parent_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (auto id = self.getVal1(); id != kInvalidEntityId) {
-    mx::EntityId eid(id);
-    auto stmt_id = eid.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *stmt_id).value());
-  } else {
-    return std::nullopt;
+    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {
+      return Stmt(std::move(eptr.value()));
+    }
+    assert(false);
   }
+  return std::nullopt;
 }
 
 std::optional<Decl> Stmt::referenced_declaration(void) const {
-  if (auto id = impl->Reader<mx::ast::Decl>().getVal2(); id != kInvalidEntityId) {
-    mx::EntityId eid(id);
-    auto decl_id = eid.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *decl_id).value());
-  } else {
-    return std::nullopt;
+  if (auto id = impl->Reader<mx::ast::Decl>().getVal2();
+      id != kInvalidEntityId) {
+    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
+      return Decl(std::move(eptr.value()));
+    }
+    assert(false);
   }
+  return std::nullopt;
 }
 
 gap::generator<Stmt> Stmt::containing(const Decl &decl) {
@@ -21065,25 +21039,20 @@ bool Stmt::contains(const Stmt &stmt) {
 
 Stmt Stmt::ignore_containers(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal3());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal3();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
-std::vector<Stmt> Stmt::children(void) const {
+gap::generator<Stmt> Stmt::children(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal4();
-  std::vector<Stmt> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto s4 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(s4.value()));
+    if (auto d4 = impl->ep->StmtFor(impl->ep, v)) {
+      co_yield std::move(d4.value());
     }
   }
-  return vec;
+  co_return;
 }
 
 TokenRange Stmt::tokens(void) const {
@@ -21099,10 +21068,8 @@ StmtKind Stmt::kind(void) const {
 
 Stmt Stmt::strip_label_like_statements(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal8());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal8();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<SEHTryStmt> SEHTryStmt::containing(const Decl &decl) {
@@ -21149,26 +21116,20 @@ std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
 
 SEHExceptStmt SEHTryStmt::except_handler(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 SEHFinallyStmt SEHTryStmt::finally_handler(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return SEHFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return SEHFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt SEHTryStmt::handler(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 bool SEHTryStmt::is_cxx_try(void) const {
@@ -21178,10 +21139,8 @@ bool SEHTryStmt::is_cxx_try(void) const {
 
 CompoundStmt SEHTryStmt::try_block(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal13();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token SEHTryStmt::try_token(void) const {
@@ -21290,10 +21249,8 @@ std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
 
 CompoundStmt SEHFinallyStmt::block(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token SEHFinallyStmt::finally_token(void) const {
@@ -21350,10 +21307,8 @@ std::optional<SEHExceptStmt> SEHExceptStmt::from(const Stmt &parent) {
 
 CompoundStmt SEHExceptStmt::block(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token SEHExceptStmt::except_token(void) const {
@@ -21368,10 +21323,8 @@ Token SEHExceptStmt::except_token(void) const {
 
 Expr SEHExceptStmt::filter_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ReturnStmt> ReturnStmt::containing(const Decl &decl) {
@@ -21419,19 +21372,29 @@ std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
 std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal9());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> ReturnStmt::return_value(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal10());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token ReturnStmt::return_token(void) const {
@@ -21488,26 +21451,20 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &par
 
 Stmt ObjCForCollectionStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr ObjCForCollectionStmt::collection(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt ObjCForCollectionStmt::element(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Token ObjCForCollectionStmt::for_token(void) const {
@@ -21584,10 +21541,8 @@ Token ObjCAutoreleasePoolStmt::at_token(void) const {
 
 Stmt ObjCAutoreleasePoolStmt::sub_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::containing(const Decl &decl) {
@@ -21644,35 +21599,38 @@ Token ObjCAtTryStmt::at_try_token(void) const {
 
 ObjCAtFinallyStmt ObjCAtTryStmt::finally_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return ObjCAtFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return ObjCAtFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt ObjCAtTryStmt::try_body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
-std::vector<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const {
+std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : catch_statements()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<ObjCAtCatchStmt> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = ObjCAtCatchStmt::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ObjCAtThrowStmt> ObjCAtThrowStmt::containing(const Decl &decl) {
@@ -21719,10 +21677,8 @@ std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Stmt &parent) {
 
 Expr ObjCAtThrowStmt::throw_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCAtThrowStmt::throw_token(void) const {
@@ -21789,18 +21745,14 @@ Token ObjCAtSynchronizedStmt::at_synchronized_token(void) const {
 
 CompoundStmt ObjCAtSynchronizedStmt::synch_body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ObjCAtSynchronizedStmt::synch_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const Decl &decl) {
@@ -21857,10 +21809,8 @@ Token ObjCAtFinallyStmt::at_finally_token(void) const {
 
 Stmt ObjCAtFinallyStmt::finally_body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::containing(const Decl &decl) {
@@ -21917,18 +21867,14 @@ Token ObjCAtCatchStmt::at_catch_token(void) const {
 
 Stmt ObjCAtCatchStmt::catch_body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 VarDecl ObjCAtCatchStmt::catch_parameter_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCAtCatchStmt::r_paren_token(void) const {
@@ -22059,34 +22005,26 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
 
 Stmt OMPExecutableDirective::associated_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 CapturedStmt OMPExecutableDirective::innermost_captured_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt OMPExecutableDirective::raw_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt OMPExecutableDirective::structured_block(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 bool OMPExecutableDirective::has_associated_statement(void) const {
@@ -22433,58 +22371,44 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Stmt &parent) {
 
 Expr OMPAtomicDirective::condition_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAtomicDirective::d(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal17());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal17();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAtomicDirective::expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal18());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAtomicDirective::r(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal19());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAtomicDirective::update_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal20());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal20();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAtomicDirective::v(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal21());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal21();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPAtomicDirective::x(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal22());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal22();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPAtomicDirective::is_fail_only(void) const {
@@ -22688,10 +22612,8 @@ std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const Stmt &par
 
 Expr OMPTaskgroupDirective::reduction_reference(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<OMPTaskDirective> OMPTaskDirective::containing(const Decl &decl) {
@@ -22885,10 +22807,8 @@ std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const
 
 Expr OMPTargetParallelDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPTargetParallelDirective::has_cancel(void) const {
@@ -23174,10 +23094,8 @@ std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Stmt &paren
 
 Expr OMPSectionsDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPSectionsDirective::has_cancel(void) const {
@@ -23330,10 +23248,8 @@ std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(c
 
 Expr OMPParallelSectionsDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPParallelSectionsDirective::has_cancel(void) const {
@@ -23389,10 +23305,8 @@ std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const
 
 Expr OMPParallelMasterDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<OMPParallelMaskedDirective> OMPParallelMaskedDirective::containing(const Decl &decl) {
@@ -23443,10 +23357,8 @@ std::optional<OMPParallelMaskedDirective> OMPParallelMaskedDirective::from(const
 
 Expr OMPParallelMaskedDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<OMPParallelDirective> OMPParallelDirective::containing(const Decl &decl) {
@@ -23497,10 +23409,8 @@ std::optional<OMPParallelDirective> OMPParallelDirective::from(const Stmt &paren
 
 Expr OMPParallelDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPParallelDirective::has_cancel(void) const {
@@ -23602,10 +23512,8 @@ std::optional<OMPMetaDirective> OMPMetaDirective::from(const Stmt &parent) {
 
 Stmt OMPMetaDirective::if_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<OMPMasterDirective> OMPMasterDirective::containing(const Decl &decl) {
@@ -23835,18 +23743,14 @@ std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::fr
 
 Stmt OMPLoopTransformationDirective::pre_initializers(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt OMPLoopTransformationDirective::transformed_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal17());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal17();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<OMPUnrollDirective> OMPUnrollDirective::containing(const Decl &decl) {
@@ -24041,380 +23945,376 @@ std::optional<OMPLoopDirective> OMPLoopDirective::from(const Stmt &parent) {
   }
 }
 
-std::vector<Expr> OMPLoopDirective::counters(void) const {
+std::optional<Expr> OMPLoopDirective::nth_counter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : counters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::counters(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> OMPLoopDirective::dependent_counters(void) const {
+std::optional<Expr> OMPLoopDirective::nth_dependent_counter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : dependent_counters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::dependent_counters(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal26();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d26 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d26.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> OMPLoopDirective::dependent_initializers(void) const {
+std::optional<Expr> OMPLoopDirective::nth_dependent_initializer(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : dependent_initializers()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::dependent_initializers(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal27();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d27 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d27 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d27.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> OMPLoopDirective::finals(void) const {
+std::optional<Expr> OMPLoopDirective::nth_final(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : finals()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::finals(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal28();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d28 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d28 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d28.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> OMPLoopDirective::finals_conditions(void) const {
+std::optional<Expr> OMPLoopDirective::nth_finals_condition(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : finals_conditions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::finals_conditions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal29();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d29 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d29 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d29.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 Stmt OMPLoopDirective::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr OMPLoopDirective::calculate_last_iteration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal17());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal17();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal18());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_distance_condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal19());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_ensure_upper_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal20());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal20();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal21());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal21();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_lower_bound_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal22());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal22();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_next_lower_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal30());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal30();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_next_upper_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal31());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_parallel_for_in_distance_condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal32());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal32();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::combined_upper_bound_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal33());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal33();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal34());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal34();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::distance_increment(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal35());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal35();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::ensure_upper_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal36());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal36();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::increment(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal37());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal37();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::is_last_iteration_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::iteration_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::last_iteration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::lower_bound_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::next_lower_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::next_upper_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::num_iterations(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::pre_condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal46());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal46();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt OMPLoopDirective::pre_initializers(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal47());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal47();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr OMPLoopDirective::prev_ensure_upper_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal48());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal48();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::prev_lower_bound_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal49());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal49();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::prev_upper_bound_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal50());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal50();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::stride_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal51());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal51();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPLoopDirective::upper_bound_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
-std::vector<Expr> OMPLoopDirective::initializers(void) const {
+std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : initializers()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::initializers(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal53();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d53 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d53 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d53.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> OMPLoopDirective::private_counters(void) const {
+std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : private_counters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::private_counters(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal54();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d54 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d54 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d54.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> OMPLoopDirective::updates(void) const {
+std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : updates()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPLoopDirective::updates(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal55();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d55 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d55 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d55.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<OMPGenericLoopDirective> OMPGenericLoopDirective::containing(const Decl &decl) {
@@ -24581,10 +24481,8 @@ std::optional<OMPForDirective> OMPForDirective::from(const Stmt &parent) {
 
 Expr OMPForDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal56());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPForDirective::has_cancel(void) const {
@@ -24756,10 +24654,8 @@ std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirecti
 
 Expr OMPDistributeParallelForDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal56());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPDistributeParallelForDirective::has_cancel(void) const {
@@ -25039,10 +24935,8 @@ std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallel
 
 Expr OMPTeamsDistributeParallelForDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal56());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPTeamsDistributeParallelForDirective::has_cancel(void) const {
@@ -25435,10 +25329,8 @@ std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistri
 
 Expr OMPTargetTeamsDistributeParallelForDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal56());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::has_cancel(void) const {
@@ -25718,10 +25610,8 @@ std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from
 
 Expr OMPTargetParallelForDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal56());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPTargetParallelForDirective::has_cancel(void) const {
@@ -26173,10 +26063,8 @@ std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const Stmt 
 
 Expr OMPParallelForDirective::task_reduction_reference_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal56());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OMPParallelForDirective::has_cancel(void) const {
@@ -26546,34 +26434,26 @@ std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const Stmt &parent) {
 
 CapturedStmt OMPCanonicalLoop::distance_func(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt OMPCanonicalLoop::loop_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 CapturedStmt OMPCanonicalLoop::loop_variable_func(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 DeclRefExpr OMPCanonicalLoop::loop_variable_reference(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return DeclRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal13();
+  return DeclRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<NullStmt> NullStmt::containing(const Decl &decl) {
@@ -26687,10 +26567,8 @@ Token MSDependentExistsStmt::keyword_token(void) const {
 
 CompoundStmt MSDependentExistsStmt::sub_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool MSDependentExistsStmt::is_if_exists(void) const {
@@ -26748,10 +26626,15 @@ std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
 std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal9());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return LabelDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token IndirectGotoStmt::goto_token(void) const {
@@ -26776,10 +26659,8 @@ Token IndirectGotoStmt::star_token(void) const {
 
 Expr IndirectGotoStmt::target(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal13();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<IfStmt> IfStmt::containing(const Decl &decl) {
@@ -26826,37 +26707,50 @@ std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
 
 Expr IfStmt::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<VarDecl> IfStmt::condition_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal10());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return DeclStmt::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Stmt> IfStmt::else_(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal13());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token IfStmt::else_token(void) const {
@@ -26882,10 +26776,15 @@ Token IfStmt::if_token(void) const {
 std::optional<Stmt> IfStmt::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal18());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal18();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token IfStmt::l_paren_token(void) const {
@@ -26915,10 +26814,8 @@ IfStatementKind IfStmt::statement_kind(void) const {
 
 Stmt IfStmt::then(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal21());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal21();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 bool IfStmt::has_else_storage(void) const {
@@ -27015,10 +26912,8 @@ Token GotoStmt::goto_token(void) const {
 
 LabelDecl GotoStmt::label(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token GotoStmt::label_token(void) const {
@@ -27075,37 +26970,50 @@ std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
 
 Stmt ForStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 std::optional<Expr> ForStmt::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal10());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<VarDecl> ForStmt::condition_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal13());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return DeclStmt::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token ForStmt::for_token(void) const {
@@ -27121,19 +27029,29 @@ Token ForStmt::for_token(void) const {
 std::optional<Expr> ForStmt::increment(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal17());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal17();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Stmt> ForStmt::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal18());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal18();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token ForStmt::l_paren_token(void) const {
@@ -27200,18 +27118,14 @@ std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
 
 Stmt DoStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr DoStmt::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token DoStmt::do_token(void) const {
@@ -27286,28 +27200,40 @@ std::optional<DeclStmt> DeclStmt::from(const Stmt &parent) {
   }
 }
 
-std::vector<Decl> DeclStmt::declarations(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d15 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(d15.value()));
+std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : declarations()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Decl> DeclStmt::declarations(void) const {
+  auto self = impl->Reader<ast::Stmt>();
+  auto list = self.getVal15();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(d15.value());
+    }
+  }
+  co_return;
 }
 
 std::optional<Decl> DeclStmt::single_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal9());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool DeclStmt::is_single_declaration(void) const {
@@ -27359,121 +27285,102 @@ std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Stmt &parent) {
 
 Expr CoroutineBodyStmt::allocate(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt CoroutineBodyStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr CoroutineBodyStmt::deallocate(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt CoroutineBodyStmt::exception_handler(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt CoroutineBodyStmt::fallthrough_handler(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt CoroutineBodyStmt::final_suspend_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal17());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal17();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal18());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal18();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
-std::vector<Stmt> CoroutineBodyStmt::parameter_moves(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
-  std::vector<Stmt> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto s15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(s15.value()));
+std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameter_moves()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Stmt> CoroutineBodyStmt::parameter_moves(void) const {
+  auto self = impl->Reader<ast::Stmt>();
+  auto list = self.getVal15();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
+      co_yield std::move(d15.value());
+    }
+  }
+  co_return;
 }
 
 VarDecl CoroutineBodyStmt::promise_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal19());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal19();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Stmt CoroutineBodyStmt::promise_declaration_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal20());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal20();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt CoroutineBodyStmt::return_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal21());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal21();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Stmt CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal22());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal22();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr CoroutineBodyStmt::return_value(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal30());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal30();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CoroutineBodyStmt::return_value_initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal31());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool CoroutineBodyStmt::has_dependent_promise_type(void) const {
@@ -27535,18 +27442,14 @@ Token CoreturnStmt::keyword_token(void) const {
 
 Expr CoreturnStmt::operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CoreturnStmt::promise_call(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool CoreturnStmt::is_implicit(void) const {
@@ -27671,10 +27574,15 @@ Token CompoundStmt::right_brace_token(void) const {
 std::optional<Stmt> CompoundStmt::statement_expression_result(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool CompoundStmt::has_stored_fp_features(void) const {
@@ -27726,18 +27634,14 @@ std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
 
 CapturedDecl CapturedStmt::captured_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 RecordDecl CapturedStmt::captured_record_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const {
@@ -27747,10 +27651,8 @@ CapturedRegionKind CapturedStmt::captured_region_kind(void) const {
 
 Stmt CapturedStmt::captured_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<CXXTryStmt> CXXTryStmt::containing(const Decl &decl) {
@@ -27797,10 +27699,8 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
 
 CompoundStmt CXXTryStmt::try_block(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CXXTryStmt::try_token(void) const {
@@ -27813,21 +27713,28 @@ Token CXXTryStmt::try_token(void) const {
   }
 }
 
-std::vector<CXXCatchStmt> CXXTryStmt::handlers(void) const {
+std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : handlers()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<CXXCatchStmt> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = CXXCatchStmt::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<CXXForRangeStmt> CXXForRangeStmt::containing(const Decl &decl) {
@@ -27874,18 +27781,14 @@ std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Stmt &parent) {
 
 DeclStmt CXXForRangeStmt::begin_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal9();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Stmt CXXForRangeStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Token CXXForRangeStmt::coawait_token(void) const {
@@ -27910,18 +27813,14 @@ Token CXXForRangeStmt::colon_token(void) const {
 
 Expr CXXForRangeStmt::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 DeclStmt CXXForRangeStmt::end_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal17());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal17();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CXXForRangeStmt::for_token(void) const {
@@ -27936,35 +27835,34 @@ Token CXXForRangeStmt::for_token(void) const {
 
 Expr CXXForRangeStmt::increment(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal19());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal20());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal20();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 DeclStmt CXXForRangeStmt::loop_variable_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal21());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal21();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 VarDecl CXXForRangeStmt::loop_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal22());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal22();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token CXXForRangeStmt::r_paren_token(void) const {
@@ -27979,18 +27877,14 @@ Token CXXForRangeStmt::r_paren_token(void) const {
 
 Expr CXXForRangeStmt::range_initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal31());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 DeclStmt CXXForRangeStmt::range_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal32());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal32();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<CXXCatchStmt> CXXCatchStmt::containing(const Decl &decl) {
@@ -28047,27 +27941,28 @@ Token CXXCatchStmt::catch_token(void) const {
 
 Type CXXCatchStmt::caught_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal10();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<VarDecl> CXXCatchStmt::exception_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Stmt CXXCatchStmt::handler_block(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<BreakStmt> BreakStmt::containing(const Decl &decl) {
@@ -28181,21 +28076,28 @@ Token AsmStmt::assembly_token(void) const {
   }
 }
 
-std::vector<Expr> AsmStmt::inputs(void) const {
+std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : inputs()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> AsmStmt::inputs(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 bool AsmStmt::is_simple(void) const {
@@ -28208,88 +28110,133 @@ bool AsmStmt::is_volatile(void) const {
   return self.getVal16();
 }
 
-std::vector<Expr> AsmStmt::outputs(void) const {
+std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : outputs()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> AsmStmt::outputs(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal26();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d26 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d26.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<std::string_view> AsmStmt::output_constraints(void) const {
+std::optional<std::string_view> AsmStmt::nth_output_constraint(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : output_constraints()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::string_view> AsmStmt::output_constraints(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal62();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+co_yield std::string_view(v.cStr(), v.size());
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> AsmStmt::output_expressions(void) const {
+std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : output_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> AsmStmt::output_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal27();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d27 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d27 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d27.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<std::string_view> AsmStmt::input_constraints(void) const {
+std::optional<std::string_view> AsmStmt::nth_input_constraint(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : input_constraints()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::string_view> AsmStmt::input_constraints(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal63();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+co_yield std::string_view(v.cStr(), v.size());
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> AsmStmt::input_expressions(void) const {
+std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : input_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> AsmStmt::input_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal28();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d28 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d28 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d28.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<std::string_view> AsmStmt::clobbers(void) const {
+std::optional<std::string_view> AsmStmt::nth_clobber(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : clobbers()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::string_view> AsmStmt::clobbers(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal64();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+co_yield std::string_view(v.cStr(), v.size());
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<MSAsmStmt> MSAsmStmt::containing(const Decl &decl) {
@@ -28338,32 +28285,47 @@ std::optional<MSAsmStmt> MSAsmStmt::from(const Stmt &parent) {
   }
 }
 
-std::vector<std::string_view> MSAsmStmt::all_constraints(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal65();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+std::optional<std::string_view> MSAsmStmt::nth_all_constraint(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : all_constraints()) {
+    if (i++ == n) {
+      return ent;
+    }
   }
-  return vec;
+  return std::nullopt;
 }
 
-std::vector<Expr> MSAsmStmt::all_expressions(void) const {
+gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const {
+  auto self = impl->Reader<ast::Stmt>();
+  auto list = self.getVal65();
+  for (auto v : list) {
+co_yield std::string_view(v.cStr(), v.size());
+  }
+  co_return;
+}
+
+std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : all_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> MSAsmStmt::all_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal29();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d29 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d29 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d29.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 std::string_view MSAsmStmt::assembly_string(void) const {
@@ -28435,10 +28397,8 @@ std::optional<GCCAsmStmt> GCCAsmStmt::from(const Stmt &parent) {
 
 StringLiteral GCCAsmStmt::assembly_string(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token GCCAsmStmt::r_paren_token(void) const {
@@ -28456,122 +28416,181 @@ bool GCCAsmStmt::is_assembly_goto(void) const {
   return self.getVal23();
 }
 
-std::vector<AddrLabelExpr> GCCAsmStmt::labels(void) const {
+std::optional<AddrLabelExpr> GCCAsmStmt::nth_label(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : labels()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal29();
-  std::vector<AddrLabelExpr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d29 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d29 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = AddrLabelExpr::from(Stmt(d29.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : output_constraint_literals()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal53();
-  std::vector<StringLiteral> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d53 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d53 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = StringLiteral::from(Stmt(d53.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<std::string_view> GCCAsmStmt::output_names(void) const {
+std::optional<std::string_view> GCCAsmStmt::nth_output_name(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : output_names()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::string_view> GCCAsmStmt::output_names(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal65();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+co_yield std::string_view(v.cStr(), v.size());
   }
-  return vec;
+  co_return;
 }
 
-std::vector<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : input_constraint_literals()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal54();
-  std::vector<StringLiteral> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d54 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d54 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = StringLiteral::from(Stmt(d54.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<std::string_view> GCCAsmStmt::input_names(void) const {
+std::optional<std::string_view> GCCAsmStmt::nth_input_name(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : input_names()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::string_view> GCCAsmStmt::input_names(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal67();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+co_yield std::string_view(v.cStr(), v.size());
   }
-  return vec;
+  co_return;
 }
 
-std::vector<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const {
+std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : clobber_string_literals()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal55();
-  std::vector<StringLiteral> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d55 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d55 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = StringLiteral::from(Stmt(d55.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const {
+std::optional<AddrLabelExpr> GCCAsmStmt::nth_label_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : label_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal68();
-  std::vector<AddrLabelExpr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d68 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d68 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = AddrLabelExpr::from(Stmt(d68.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<std::string_view> GCCAsmStmt::label_names(void) const {
+std::optional<std::string_view> GCCAsmStmt::nth_label_name(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : label_names()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<std::string_view> GCCAsmStmt::label_names(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal69();
-  std::vector<std::string_view> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-vec.emplace_back(v.cStr(), v.size());
+co_yield std::string_view(v.cStr(), v.size());
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<WhileStmt> WhileStmt::containing(const Decl &decl) {
@@ -28618,36 +28637,42 @@ std::optional<WhileStmt> WhileStmt::from(const Stmt &parent) {
 
 Stmt WhileStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr WhileStmt::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<VarDecl> WhileStmt::condition_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal13());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return DeclStmt::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token WhileStmt::l_paren_token(void) const {
@@ -28854,10 +28879,15 @@ std::optional<ValueStmt> ValueStmt::from(const Stmt &parent) {
 std::optional<Expr> ValueStmt::expression_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal9());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal9();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<LabelStmt> LabelStmt::containing(const Decl &decl) {
@@ -28908,10 +28938,8 @@ std::optional<LabelStmt> LabelStmt::from(const Stmt &parent) {
 
 LabelDecl LabelStmt::declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token LabelStmt::identifier_token(void) const {
@@ -28932,10 +28960,8 @@ std::string_view LabelStmt::name(void) const {
 
 Stmt LabelStmt::sub_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 bool LabelStmt::is_side_entry(void) const {
@@ -29118,98 +29144,74 @@ bool Expr::has_side_effects(void) const {
 
 Expr Expr::ignore_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_conversion_operator_single_step(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_implicit_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal13();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_implicit(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal14());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_implicit_as_written(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal17());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal17();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_parenthesis_base_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal18());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_parenthesis_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal19());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_parenthesis_implicit_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal20());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal20();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_parenthesis_l_value_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal21());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal21();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_parenthesis_noop_casts(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal22());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal22();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_parentheses(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal30());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal30();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr Expr::ignore_unless_spelled_in_source(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal31());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool Expr::contains_errors(void) const {
@@ -29224,10 +29226,8 @@ bool Expr::contains_unexpanded_parameter_pack(void) const {
 
 Expr Expr::best_dynamic_class_type_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal32());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal32();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token Expr::expression_token(void) const {
@@ -29243,10 +29243,15 @@ Token Expr::expression_token(void) const {
 std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal34());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return ObjCPropertyRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal34();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return ObjCPropertyRefExpr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 ExprObjectKind Expr::object_kind(void) const {
@@ -29257,28 +29262,43 @@ ExprObjectKind Expr::object_kind(void) const {
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal35());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal35();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<FieldDecl> Expr::source_bit_field(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal36());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal36();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FieldDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> Expr::type(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal37());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal37();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 ExprValueKind Expr::value_kind(void) const {
@@ -29298,6 +29318,7 @@ std::optional<bool> Expr::is_cxx98_integral_constant_expression(void) const {
   } else {
     return static_cast<bool>(self.getVal25());
   }
+  return std::nullopt;
 }
 
 bool Expr::is_default_argument(void) const {
@@ -29327,6 +29348,7 @@ std::optional<bool> Expr::is_integer_constant_expression(void) const {
   } else {
     return static_cast<bool>(self.getVal73());
   }
+  return std::nullopt;
 }
 
 bool Expr::is_known_to_have_boolean_value(void) const {
@@ -29451,18 +29473,14 @@ std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Stm
 
 Expr DesignatedInitUpdateExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 InitListExpr DesignatedInitUpdateExpr::updater(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<DesignatedInitExpr> DesignatedInitExpr::containing(const Decl &decl) {
@@ -29515,16 +29533,25 @@ std::optional<DesignatedInitExpr> DesignatedInitExpr::from(const Stmt &parent) {
   }
 }
 
-std::vector<Designator> DesignatedInitExpr::designators(void) const {
+std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : designators()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Designator> DesignatedInitExpr::designators(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal89();
-  std::vector<Designator> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 TokenRange DesignatedInitExpr::designators_source_range(void) const {
@@ -29545,10 +29572,8 @@ Token DesignatedInitExpr::equal_or_colon_token(void) const {
 
 Expr DesignatedInitExpr::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
@@ -29561,21 +29586,28 @@ bool DesignatedInitExpr::uses_gnu_syntax(void) const {
   return self.getVal91();
 }
 
-std::vector<Expr> DesignatedInitExpr::sub_expressions(void) const {
+std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : sub_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::containing(const Decl &decl) {
@@ -29730,18 +29762,14 @@ Token DependentCoawaitExpr::keyword_token(void) const {
 
 Expr DependentCoawaitExpr::operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 UnresolvedLookupExpr DependentCoawaitExpr::operator_coawait_lookup(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<DeclRefExpr> DeclRefExpr::containing(const Decl &decl) {
@@ -29796,18 +29824,14 @@ std::optional<DeclRefExpr> DeclRefExpr::from(const Stmt &parent) {
 
 ValueDecl DeclRefExpr::declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 NamedDecl DeclRefExpr::found_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token DeclRefExpr::l_angle_token(void) const {
@@ -29928,10 +29952,8 @@ std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Stmt &paren
 
 Expr CoroutineSuspendExpr::common_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CoroutineSuspendExpr::keyword_token(void) const {
@@ -29946,42 +29968,32 @@ Token CoroutineSuspendExpr::keyword_token(void) const {
 
 OpaqueValueExpr CoroutineSuspendExpr::opaque_value(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CoroutineSuspendExpr::operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CoroutineSuspendExpr::ready_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CoroutineSuspendExpr::resume_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CoroutineSuspendExpr::suspend_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<CoawaitExpr> CoawaitExpr::containing(const Decl &decl) {
@@ -30169,10 +30181,8 @@ Token ConvertVectorExpr::r_paren_token(void) const {
 
 Expr ConvertVectorExpr::src_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(const Decl &decl) {
@@ -30225,16 +30235,25 @@ std::optional<ConceptSpecializationExpr> ConceptSpecializationExpr::from(const S
   }
 }
 
-std::vector<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const {
+std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal89();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const {
@@ -30294,10 +30313,8 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Stmt &parent)
 
 Expr CompoundLiteralExpr::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const {
@@ -30377,34 +30394,26 @@ Token ChooseExpr::builtin_token(void) const {
 
 Expr ChooseExpr::chosen_sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ChooseExpr::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ChooseExpr::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ChooseExpr::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token ChooseExpr::r_paren_token(void) const {
@@ -30565,35 +30574,41 @@ std::string_view CastExpr::cast_kind_name(void) const {
 std::optional<NamedDecl> CastExpr::conversion_function(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return NamedDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Expr CastExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CastExpr::sub_expression_as_written(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<FieldDecl> CastExpr::target_union_field(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal41());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal41();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FieldDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool CastExpr::has_stored_fp_features(void) const {
@@ -30724,10 +30739,8 @@ std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Stmt &parent) {
 
 Type ExplicitCastExpr::type_as_written(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal42();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 gap::generator<CXXNamedCastExpr> CXXNamedCastExpr::containing(const Decl &decl) {
@@ -31501,21 +31514,28 @@ std::optional<CallExpr> CallExpr::from(const Stmt &parent) {
   }
 }
 
-std::vector<Expr> CallExpr::arguments(void) const {
+std::optional<Expr> CallExpr::nth_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> CallExpr::arguments(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
@@ -31525,36 +31545,42 @@ CallExprADLCallKind CallExpr::adl_call_kind(void) const {
 
 Type CallExpr::call_return_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr CallExpr::callee(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<Decl> CallExpr::callee_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal40());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal41());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal41();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token CallExpr::r_paren_token(void) const {
@@ -31570,10 +31596,15 @@ Token CallExpr::r_paren_token(void) const {
 std::optional<Attr> CallExpr::unused_result_attribute(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal43());
-    auto unpacked_id = id.Extract<mx::AttributeId>();
-    return Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
+      return Attr(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
@@ -31746,35 +31777,34 @@ std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Stmt &parent) {
 
 Expr CXXMemberCallExpr::implicit_object_argument(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal45());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal45();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXMethodDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Type CXXMemberCallExpr::object_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal46());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal46();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 CXXRecordDecl CXXMemberCallExpr::record_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal47());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal47();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const Decl &decl) {
@@ -31833,10 +31863,8 @@ std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const Stmt &parent) {
 
 CallExpr CUDAKernelCallExpr::config(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CallExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return CallExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const Decl &decl) {
@@ -31895,10 +31923,8 @@ std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const Stmt &parent) {
 
 Expr UserDefinedLiteral::cooked_literal(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
@@ -31969,34 +31995,33 @@ std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Stmt &parent) {
 std::optional<Expr> CXXUuidofExpr::expression_operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 MSGuidDecl CXXUuidofExpr::guid_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Type CXXUuidofExpr::type_operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type CXXUuidofExpr::type_operand_source_info(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal41();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool CXXUuidofExpr::is_type_operand(void) const {
@@ -32054,21 +32079,28 @@ std::optional<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::from(const
   }
 }
 
-std::vector<Expr> CXXUnresolvedConstructExpr::arguments(void) const {
+std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 Token CXXUnresolvedConstructExpr::l_paren_token(void) const {
@@ -32093,10 +32125,8 @@ Token CXXUnresolvedConstructExpr::r_paren_token(void) const {
 
 Type CXXUnresolvedConstructExpr::type_as_written(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool CXXUnresolvedConstructExpr::is_list_initialization(void) const {
@@ -32157,26 +32187,27 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Stmt &parent) {
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Type CXXTypeidExpr::type_operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type CXXTypeidExpr::type_operand_source_info(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {
@@ -32186,6 +32217,7 @@ std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {
   } else {
     return static_cast<bool>(self.getVal90());
   }
+  return std::nullopt;
 }
 
 bool CXXTypeidExpr::is_potentially_evaluated(void) const {
@@ -32251,10 +32283,15 @@ std::optional<CXXThrowExpr> CXXThrowExpr::from(const Stmt &parent) {
 std::optional<Expr> CXXThrowExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token CXXThrowExpr::throw_token(void) const {
@@ -32389,10 +32426,8 @@ std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const S
 
 Expr CXXStdInitializerListExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const Decl &decl) {
@@ -32507,10 +32542,8 @@ std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const
 
 Expr CXXRewrittenBinaryOperator::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
@@ -32541,18 +32574,14 @@ Token CXXRewrittenBinaryOperator::operator_token(void) const {
 
 Expr CXXRewrittenBinaryOperator::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {
@@ -32622,10 +32651,8 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Stmt 
 
 Expr CXXPseudoDestructorExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
@@ -32640,10 +32667,8 @@ Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
 
 Type CXXPseudoDestructorExpr::destroyed_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const {
@@ -32669,10 +32694,15 @@ Token CXXPseudoDestructorExpr::operator_token(void) const {
 std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal43());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token CXXPseudoDestructorExpr::tilde_token(void) const {
@@ -32807,10 +32837,8 @@ std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Stmt &parent) {
 
 Expr CXXNoexceptExpr::operand(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool CXXNoexceptExpr::value(void) const {
@@ -32875,28 +32903,36 @@ bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
 
 Type CXXNewExpr::allocated_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<Expr> CXXNewExpr::array_size(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal39());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal40());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return CXXConstructExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return CXXConstructExpr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
@@ -32913,26 +32949,27 @@ CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
 std::optional<Expr> CXXNewExpr::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal43());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 FunctionDecl CXXNewExpr::operator_new(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
@@ -32966,21 +33003,28 @@ bool CXXNewExpr::pass_alignment(void) const {
   return self.getVal96();
 }
 
-std::vector<Expr> CXXNewExpr::placement_arguments(void) const {
+std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : placement_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> CXXNewExpr::placement_arguments(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 bool CXXNewExpr::should_null_check_allocation(void) const {
@@ -33050,10 +33094,8 @@ CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(voi
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token CXXInheritedCtorInitExpr::token(void) const {
@@ -33123,10 +33165,8 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
 
 UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
@@ -33141,18 +33181,14 @@ Token CXXFoldExpr::ellipsis_token(void) const {
 
 Expr CXXFoldExpr::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CXXFoldExpr::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CXXFoldExpr::l_paren_token(void) const {
@@ -33172,6 +33208,7 @@ std::optional<unsigned> CXXFoldExpr::num_expansions(void) const {
   } else {
     return static_cast<unsigned>(self.getVal101());
   }
+  return std::nullopt;
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
@@ -33181,18 +33218,14 @@ BinaryOperatorKind CXXFoldExpr::operator_(void) const {
 
 Expr CXXFoldExpr::pattern(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr CXXFoldExpr::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token CXXFoldExpr::r_paren_token(void) const {
@@ -33268,27 +33301,35 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Type CXXDependentScopeMemberExpr::base_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal40());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return NamedDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const {
@@ -33418,26 +33459,20 @@ bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
 
 Expr CXXDeleteExpr::argument(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Type CXXDeleteExpr::destroyed_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 FunctionDecl CXXDeleteExpr::operator_delete(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
@@ -33508,18 +33543,21 @@ std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Stmt &parent) {
 std::optional<Expr> CXXDefaultInitExpr::expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 FieldDecl CXXDefaultInitExpr::field(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token CXXDefaultInitExpr::used_token(void) const {
@@ -33584,18 +33622,14 @@ std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Stmt &parent) {
 
 Expr CXXDefaultArgExpr::expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ParmVarDecl CXXDefaultArgExpr::parameter(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ParmVarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return ParmVarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token CXXDefaultArgExpr::used_token(void) const {
@@ -33659,21 +33693,28 @@ std::optional<CXXConstructExpr> CXXConstructExpr::from(const Stmt &parent) {
   }
 }
 
-std::vector<Expr> CXXConstructExpr::arguments(void) const {
+std::optional<Expr> CXXConstructExpr::nth_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> CXXConstructExpr::arguments(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const {
@@ -33683,10 +33724,8 @@ CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token CXXConstructExpr::token(void) const {
@@ -33901,10 +33940,8 @@ std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Stmt &paren
 
 Expr CXXBindTemporaryExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<BlockExpr> BlockExpr::containing(const Decl &decl) {
@@ -33959,18 +33996,14 @@ std::optional<BlockExpr> BlockExpr::from(const Stmt &parent) {
 
 BlockDecl BlockExpr::block_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return BlockDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return BlockDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Stmt BlockExpr::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Token BlockExpr::caret_token(void) const {
@@ -33985,10 +34018,8 @@ Token BlockExpr::caret_token(void) const {
 
 FunctionProtoType BlockExpr::function_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return FunctionProtoType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return FunctionProtoType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<BinaryOperator> BinaryOperator::containing(const Decl &decl) {
@@ -34044,10 +34075,8 @@ std::optional<BinaryOperator> BinaryOperator::from(const Stmt &parent) {
 
 Expr BinaryOperator::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
@@ -34073,10 +34102,8 @@ Token BinaryOperator::operator_token(void) const {
 
 Expr BinaryOperator::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool BinaryOperator::has_stored_fp_features(void) const {
@@ -34205,18 +34232,14 @@ std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const Stmt &p
 
 Type CompoundAssignOperator::computation_lhs_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal41();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type CompoundAssignOperator::computation_result_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal42();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 gap::generator<AtomicExpr> AtomicExpr::containing(const Decl &decl) {
@@ -34286,27 +34309,28 @@ AtomicExprAtomicOp AtomicExpr::operation(void) const {
 
 Expr AtomicExpr::order(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<Expr> AtomicExpr::order_fail(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal40());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Expr AtomicExpr::pointer(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token AtomicExpr::r_paren_token(void) const {
@@ -34322,45 +34346,63 @@ Token AtomicExpr::r_paren_token(void) const {
 std::optional<Expr> AtomicExpr::scope(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal43());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> AtomicExpr::value1(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal44());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal44();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> AtomicExpr::value2(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal45());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal45();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Type AtomicExpr::value_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal46());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal46();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<Expr> AtomicExpr::weak(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal47());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal47();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const {
@@ -34378,21 +34420,28 @@ bool AtomicExpr::is_volatile(void) const {
   return self.getVal92();
 }
 
-std::vector<Expr> AtomicExpr::sub_expressions(void) const {
+std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : sub_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> AtomicExpr::sub_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<AsTypeExpr> AsTypeExpr::containing(const Decl &decl) {
@@ -34467,10 +34516,8 @@ Token AsTypeExpr::r_paren_token(void) const {
 
 Expr AsTypeExpr::src_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::containing(const Decl &decl) {
@@ -34525,18 +34572,14 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Stmt &parent) {
 
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Type ArrayTypeTraitExpr::queried_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
@@ -34596,26 +34639,20 @@ std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Stmt &parent) {
 
 Expr ArraySubscriptExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ArraySubscriptExpr::index(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ArraySubscriptExpr::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token ArraySubscriptExpr::r_bracket_token(void) const {
@@ -34630,10 +34667,8 @@ Token ArraySubscriptExpr::r_bracket_token(void) const {
 
 Expr ArraySubscriptExpr::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::containing(const Decl &decl) {
@@ -34688,18 +34723,14 @@ std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Stmt &parent) {
 
 OpaqueValueExpr ArrayInitLoopExpr::common_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ArrayInitLoopExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::containing(const Decl &decl) {
@@ -34814,10 +34845,8 @@ Token AddrLabelExpr::amp_amp_token(void) const {
 
 LabelDecl AddrLabelExpr::label(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token AddrLabelExpr::label_token(void) const {
@@ -34893,18 +34922,14 @@ Token AbstractConditionalOperator::colon_token(void) const {
 
 Expr AbstractConditionalOperator::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr AbstractConditionalOperator::false_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token AbstractConditionalOperator::question_token(void) const {
@@ -34919,10 +34944,8 @@ Token AbstractConditionalOperator::question_token(void) const {
 
 Expr AbstractConditionalOperator::true_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ConditionalOperator> ConditionalOperator::containing(const Decl &decl) {
@@ -34981,18 +35004,14 @@ std::optional<ConditionalOperator> ConditionalOperator::from(const Stmt &parent)
 
 Expr ConditionalOperator::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ConditionalOperator::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(const Decl &decl) {
@@ -35051,18 +35070,14 @@ std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const S
 
 Expr BinaryConditionalOperator::common(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 OpaqueValueExpr BinaryConditionalOperator::opaque_value(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<VAArgExpr> VAArgExpr::containing(const Decl &decl) {
@@ -35137,18 +35152,14 @@ Token VAArgExpr::r_paren_token(void) const {
 
 Expr VAArgExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Type VAArgExpr::written_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal41();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool VAArgExpr::is_microsoft_abi(void) const {
@@ -35228,10 +35239,8 @@ Token UnaryOperator::operator_token(void) const {
 
 Expr UnaryOperator::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const {
@@ -35322,19 +35331,29 @@ std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Stm
 std::optional<Expr> UnaryExprOrTypeTraitExpr::argument_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal39());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::expression_or_trait_kind(void) const {
@@ -35364,10 +35383,8 @@ Token UnaryExprOrTypeTraitExpr::r_paren_token(void) const {
 
 Type UnaryExprOrTypeTraitExpr::type_of_argument(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal42();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const {
@@ -35487,21 +35504,29 @@ std::optional<bool> TypeTraitExpr::value(void) const {
   } else {
     return static_cast<bool>(self.getVal90());
   }
+  return std::nullopt;
 }
 
-std::vector<Type> TypeTraitExpr::arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t15 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t15.value()));
+std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : arguments()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Type> TypeTraitExpr::arguments(void) const {
+  auto self = impl->Reader<ast::Stmt>();
+  auto list = self.getVal15();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d15 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d15.value());
+    }
+  }
+  co_return;
 }
 
 gap::generator<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr::containing(const Decl &decl) {
@@ -35556,10 +35581,8 @@ std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmPackExpr::parameter_pack(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const {
@@ -35634,26 +35657,20 @@ Token SubstNonTypeTemplateParmExpr::name_token(void) const {
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmExpr::parameter(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Type SubstNonTypeTemplateParmExpr::parameter_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr SubstNonTypeTemplateParmExpr::replacement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
@@ -35718,6 +35735,7 @@ std::optional<bool> StringLiteral::contains_non_ascii(void) const {
   } else {
     return static_cast<bool>(self.getVal90());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii_or_null(void) const {
@@ -35727,6 +35745,7 @@ std::optional<bool> StringLiteral::contains_non_ascii_or_null(void) const {
   } else {
     return static_cast<bool>(self.getVal92());
   }
+  return std::nullopt;
 }
 
 std::string_view StringLiteral::bytes(void) const {
@@ -35748,6 +35767,7 @@ std::optional<std::string_view> StringLiteral::string(void) const {
     capnp::Text::Reader data = self.getVal66();
     return std::string_view(data.cStr(), data.size());
   }
+  return std::nullopt;
 }
 
 bool StringLiteral::is_ordinary(void) const {
@@ -35852,10 +35872,8 @@ Token StmtExpr::r_paren_token(void) const {
 
 CompoundStmt StmtExpr::sub_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<SourceLocExpr> SourceLocExpr::containing(const Decl &decl) {
@@ -35996,10 +36014,8 @@ Token SizeOfPackExpr::operator_token(void) const {
 
 NamedDecl SizeOfPackExpr::pack(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
@@ -36009,6 +36025,7 @@ std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
   } else {
     return static_cast<unsigned>(self.getVal101());
   }
+  return std::nullopt;
 }
 
 Token SizeOfPackExpr::pack_token(void) const {
@@ -36030,8 +36047,9 @@ std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(v
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    vec.emplace_back(std::move(*ps_impl));
+  }
   }
   return vec;
 }
@@ -36259,27 +36277,32 @@ std::optional<RequiresExpr> RequiresExpr::from(const Stmt &parent) {
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<ParmVarDecl> RequiresExpr::local_parameters(void) const {
+std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : local_parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d15 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ParmVarDecl::from(Decl(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 Token RequiresExpr::r_brace_token(void) const {
@@ -36357,21 +36380,28 @@ std::optional<RecoveryExpr> RecoveryExpr::from(const Stmt &parent) {
   }
 }
 
-std::vector<Expr> RecoveryExpr::sub_expressions(void) const {
+std::optional<Expr> RecoveryExpr::nth_sub_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : sub_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> RecoveryExpr::sub_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<PseudoObjectExpr> PseudoObjectExpr::containing(const Decl &decl) {
@@ -36426,52 +36456,62 @@ std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Stmt &parent) {
 
 Expr PseudoObjectExpr::result_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr PseudoObjectExpr::syntactic_form(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
-std::vector<Expr> PseudoObjectExpr::semantics(void) const {
+std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : semantics()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> PseudoObjectExpr::semantics(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Expr> PseudoObjectExpr::semantic_expressions(void) const {
+std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : semantic_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> PseudoObjectExpr::semantic_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal26();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d26 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d26.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<PredefinedExpr> PredefinedExpr::containing(const Decl &decl) {
@@ -36526,10 +36566,8 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const Stmt &parent) {
 
 StringLiteral PredefinedExpr::function_name(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {
@@ -36623,21 +36661,28 @@ Token ParenListExpr::r_paren_token(void) const {
   }
 }
 
-std::vector<Expr> ParenListExpr::expressions(void) const {
+std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> ParenListExpr::expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ParenExpr> ParenExpr::containing(const Decl &decl) {
@@ -36712,10 +36757,8 @@ Token ParenExpr::r_paren_token(void) const {
 
 Expr ParenExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<PackExpansionExpr> PackExpansionExpr::containing(const Decl &decl) {
@@ -36785,14 +36828,13 @@ std::optional<unsigned> PackExpansionExpr::num_expansions(void) const {
   } else {
     return static_cast<unsigned>(self.getVal101());
   }
+  return std::nullopt;
 }
 
 Expr PackExpansionExpr::pattern(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<OverloadExpr> OverloadExpr::containing(const Decl &decl) {
@@ -36869,10 +36911,15 @@ Token OverloadExpr::name_token(void) const {
 std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal40());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal40();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token OverloadExpr::r_angle_token(void) const {
@@ -36961,18 +37008,14 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Stmt &paren
 
 Expr UnresolvedMemberExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Type UnresolvedMemberExpr::base_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal44();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token UnresolvedMemberExpr::member_token(void) const {
@@ -37136,10 +37179,8 @@ Token OpaqueValueExpr::token(void) const {
 
 Expr OpaqueValueExpr::source_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
@@ -37269,26 +37310,20 @@ std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Stmt &paren
 
 ObjCMethodDecl ObjCSubscriptRefExpr::at_index_method_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Expr ObjCSubscriptRefExpr::base_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr ObjCSubscriptRefExpr::key_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCSubscriptRefExpr::r_bracket_token(void) const {
@@ -37368,10 +37403,8 @@ Token ObjCStringLiteral::at_token(void) const {
 
 StringLiteral ObjCStringLiteral::string(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::containing(const Decl &decl) {
@@ -37506,10 +37539,8 @@ Token ObjCProtocolExpr::at_token(void) const {
 
 ObjCProtocolDecl ObjCProtocolExpr::protocol(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCProtocolDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return ObjCProtocolDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCProtocolExpr::protocol_id_token(void) const {
@@ -37584,42 +37615,32 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Stmt &parent)
 
 Expr ObjCPropertyRefExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ObjCInterfaceDecl ObjCPropertyRefExpr::class_receiver(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCPropertyDecl ObjCPropertyRefExpr::explicit_property(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_getter(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_setter(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCPropertyRefExpr::token(void) const {
@@ -37644,18 +37665,14 @@ Token ObjCPropertyRefExpr::receiver_token(void) const {
 
 Type ObjCPropertyRefExpr::receiver_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal45();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ObjCPropertyRefExpr::super_receiver_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal46());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal46();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ObjCPropertyRefExpr::is_class_receiver(void) const {
@@ -37743,53 +37760,52 @@ std::optional<ObjCMessageExpr> ObjCMessageExpr::from(const Stmt &parent) {
   }
 }
 
-std::vector<Expr> ObjCMessageExpr::arguments(void) const {
+std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> ObjCMessageExpr::arguments(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 Type ObjCMessageExpr::call_return_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ObjCMessageExpr::class_receiver(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Type ObjCMessageExpr::class_receiver_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Expr ObjCMessageExpr::instance_receiver(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCMessageExpr::left_token(void) const {
@@ -37804,10 +37820,8 @@ Token ObjCMessageExpr::left_token(void) const {
 
 ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal43());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal43();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
@@ -37817,10 +37831,8 @@ ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
@@ -37836,10 +37848,8 @@ TokenRange ObjCMessageExpr::receiver_range(void) const {
 
 Type ObjCMessageExpr::receiver_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal47());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal47();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token ObjCMessageExpr::right_token(void) const {
@@ -37874,10 +37884,8 @@ Token ObjCMessageExpr::super_token(void) const {
 
 Type ObjCMessageExpr::super_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal51());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal51();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ObjCMessageExpr::is_class_message(void) const {
@@ -37900,19 +37908,27 @@ bool ObjCMessageExpr::is_instance_message(void) const {
   return self.getVal93();
 }
 
-std::vector<Token> ObjCMessageExpr::selector_tokens(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal26();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    if (auto t26 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t26.value()));
+std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : selector_tokens()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Token> ObjCMessageExpr::selector_tokens(void) const {
+  auto self = impl->Reader<ast::Stmt>();
+  auto list = self.getVal26();
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto t26 = fragment->TokenFor(fragment, v)) {
+      co_yield std::move(t26.value());
+    }
+  }
+  co_return;
 }
 
 gap::generator<ObjCIvarRefExpr> ObjCIvarRefExpr::containing(const Decl &decl) {
@@ -37967,18 +37983,14 @@ std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Stmt &parent) {
 
 Expr ObjCIvarRefExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ObjCIvarDecl ObjCIvarRefExpr::declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCIvarRefExpr::token(void) const {
@@ -38063,10 +38075,8 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Stmt &parent) {
 
 Expr ObjCIsaExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCIsaExpr::base_token_end(void) const {
@@ -38156,10 +38166,8 @@ std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(con
 
 Expr ObjCIndirectCopyRestoreExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool ObjCIndirectCopyRestoreExpr::should_copy(void) const {
@@ -38229,10 +38237,8 @@ Token ObjCEncodeExpr::at_token(void) const {
 
 Type ObjCEncodeExpr::encoded_type(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 Token ObjCEncodeExpr::r_paren_token(void) const {
@@ -38297,10 +38303,8 @@ std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Stmt &par
 
 ObjCMethodDecl ObjCDictionaryLiteral::dictionary_with_objects_method(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::containing(const Decl &decl) {
@@ -38365,18 +38369,14 @@ Token ObjCBoxedExpr::at_token(void) const {
 
 ObjCMethodDecl ObjCBoxedExpr::boxing_method(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Expr ObjCBoxedExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const {
@@ -38556,27 +38556,32 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Stmt &parent) {
 
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<Expr> ObjCArrayLiteral::elements(void) const {
+std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : elements()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> ObjCArrayLiteral::elements(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<OMPIteratorExpr> OMPIteratorExpr::containing(const Decl &decl) {
@@ -38711,27 +38716,32 @@ std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Stmt &parent)
 
 Expr OMPArrayShapingExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
-std::vector<Expr> OMPArrayShapingExpr::dimensions(void) const {
+std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : dimensions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 Token OMPArrayShapingExpr::l_paren_token(void) const {
@@ -38806,10 +38816,8 @@ std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Stmt &parent)
 
 Expr OMPArraySectionExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token OMPArraySectionExpr::first_colon_token(void) const {
@@ -38834,18 +38842,14 @@ Token OMPArraySectionExpr::second_colon_token(void) const {
 
 Expr OMPArraySectionExpr::length(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPArraySectionExpr::lower_bound(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token OMPArraySectionExpr::r_bracket_token(void) const {
@@ -38860,10 +38864,8 @@ Token OMPArraySectionExpr::r_bracket_token(void) const {
 
 Expr OMPArraySectionExpr::stride(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal44());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<NoInitExpr> NoInitExpr::containing(const Decl &decl) {
@@ -38968,10 +38970,8 @@ std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
 
 Expr MemberExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token MemberExpr::l_angle_token(void) const {
@@ -38986,10 +38986,8 @@ Token MemberExpr::l_angle_token(void) const {
 
 ValueDecl MemberExpr::member_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token MemberExpr::member_token(void) const {
@@ -39119,18 +39117,14 @@ std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Stmt &parent)
 
 Expr MatrixSubscriptExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr MatrixSubscriptExpr::column_index(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token MatrixSubscriptExpr::r_bracket_token(void) const {
@@ -39145,10 +39139,8 @@ Token MatrixSubscriptExpr::r_bracket_token(void) const {
 
 Expr MatrixSubscriptExpr::row_index(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool MatrixSubscriptExpr::is_incomplete(void) const {
@@ -39209,19 +39201,29 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Stm
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ValueDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_extended_temporary_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal39());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return LifetimeExtendedTemporaryDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
@@ -39231,10 +39233,8 @@ StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const {
@@ -39299,18 +39299,14 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Stmt 
 
 Expr MSPropertySubscriptExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr MSPropertySubscriptExpr::index(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token MSPropertySubscriptExpr::r_bracket_token(void) const {
@@ -39375,10 +39371,8 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Stmt &parent) {
 
 Expr MSPropertyRefExpr::base_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token MSPropertyRefExpr::member_token(void) const {
@@ -39393,10 +39387,8 @@ Token MSPropertyRefExpr::member_token(void) const {
 
 MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal40());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal40();
+  return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const {
@@ -39461,18 +39453,14 @@ std::optional<LambdaExpr> LambdaExpr::from(const Stmt &parent) {
 
 Stmt LambdaExpr::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal38();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 CXXMethodDecl LambdaExpr::call_operator(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
@@ -39492,36 +39480,46 @@ Token LambdaExpr::capture_default_token(void) const {
 
 CompoundStmt LambdaExpr::compound_statement_body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal41());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal41();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal42());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal42();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
-std::vector<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
+std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : explicit_template_parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<NamedDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d15 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = NamedDecl::from(Decl(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 TokenRange LambdaExpr::introducer_range(void) const {
@@ -39532,10 +39530,8 @@ TokenRange LambdaExpr::introducer_range(void) const {
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const {
@@ -39543,19 +39539,28 @@ std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) c
   if (!self.getVal90()) {
     return std::nullopt;
   } else {
-    auto offset = self.getVal101();
-    auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);
-    return TemplateParameterList(std::move(*ps_impl));
+    if (RawEntityId eid = self.getVal101();
+        eid != kInvalidEntityId) {
+      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {
+        return TemplateParameterList(std::move(eptr.value()));
+      }
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal46());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal46();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool LambdaExpr::has_explicit_parameters(void) const {
@@ -39691,19 +39696,29 @@ std::optional<InitListExpr> InitListExpr::from(const Stmt &parent) {
 std::optional<Expr> InitListExpr::array_filler(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal38());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal38();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal39());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal39();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FieldDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token InitListExpr::l_brace_token(void) const {
@@ -39729,19 +39744,29 @@ Token InitListExpr::r_brace_token(void) const {
 std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal42());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal42();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return InitListExpr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal43());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal43();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return InitListExpr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool InitListExpr::had_array_range_designator(void) const {
@@ -39754,21 +39779,28 @@ bool InitListExpr::has_array_filler(void) const {
   return self.getVal91();
 }
 
-std::vector<Expr> InitListExpr::initializers(void) const {
+std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : initializers()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> InitListExpr::initializers(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 bool InitListExpr::is_explicit(void) const {
@@ -39798,6 +39830,7 @@ std::optional<bool> InitListExpr::is_transparent(void) const {
   } else {
     return static_cast<bool>(self.getVal98());
   }
+  return std::nullopt;
 }
 
 gap::generator<ImplicitValueInitExpr> ImplicitValueInitExpr::containing(const Decl &decl) {
@@ -39902,10 +39935,8 @@ std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Stmt &parent) {
 
 Expr ImaginaryLiteral::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::containing(const Decl &decl) {
@@ -39958,29 +39989,34 @@ std::optional<GenericSelectionExpr> GenericSelectionExpr::from(const Stmt &paren
   }
 }
 
-std::vector<Expr> GenericSelectionExpr::association_expressions(void) const {
+std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : association_expressions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d15 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 Expr GenericSelectionExpr::controlling_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token GenericSelectionExpr::default_token(void) const {
@@ -40015,10 +40051,8 @@ Token GenericSelectionExpr::r_paren_token(void) const {
 
 Expr GenericSelectionExpr::result_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal42());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const {
@@ -40138,10 +40172,8 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Stmt &paren
 
 VarDecl FunctionParmPackExpr::parameter_pack(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token FunctionParmPackExpr::parameter_pack_token(void) const {
@@ -40154,21 +40186,28 @@ Token FunctionParmPackExpr::parameter_pack_token(void) const {
   }
 }
 
-std::vector<VarDecl> FunctionParmPackExpr::expansions(void) const {
+std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : expansions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<VarDecl> FunctionParmPackExpr::expansions(void) const {
   auto self = impl->Reader<ast::Stmt>();
   auto list = self.getVal15();
-  std::vector<VarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d15 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = VarDecl::from(Decl(d15.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<FullExpr> FullExpr::containing(const Decl &decl) {
@@ -40224,10 +40263,8 @@ std::optional<FullExpr> FullExpr::from(const Stmt &parent) {
 
 Expr FullExpr::sub_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ExprWithCleanups> ExprWithCleanups::containing(const Decl &decl) {
@@ -40550,10 +40587,8 @@ Token ExtVectorElementExpr::accessor_token(void) const {
 
 Expr ExtVectorElementExpr::base(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal39());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
@@ -40613,10 +40648,8 @@ std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Stmt &parent)
 
 Expr ExpressionTraitExpr::queried_expression(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal38());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const {
@@ -40685,27 +40718,32 @@ Token AttributedStmt::attribute_token(void) const {
   }
 }
 
-std::vector<Attr> AttributedStmt::attributes(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
-  std::vector<Attr> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::AttributeId>();
-    if (auto a15 = impl->ep->AttrFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(a15.value()));
+std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : attributes()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Attr> AttributedStmt::attributes(void) const {
+  auto self = impl->Reader<ast::Stmt>();
+  auto list = self.getVal15();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d15 = impl->ep->AttrFor(impl->ep, v)) {
+      co_yield std::move(d15.value());
+    }
+  }
+  co_return;
 }
 
 Stmt AttributedStmt::sub_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal11());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<SwitchStmt> SwitchStmt::containing(const Decl &decl) {
@@ -40752,45 +40790,56 @@ std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
 
 Stmt SwitchStmt::body(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal9());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 Expr SwitchStmt::condition(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal10());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal13());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return DeclStmt::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Stmt> SwitchStmt::initializer(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal14());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal14();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token SwitchStmt::l_paren_token(void) const {
@@ -40816,10 +40865,15 @@ Token SwitchStmt::r_paren_token(void) const {
 std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal19());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return SwitchCase::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal19();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return SwitchCase::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token SwitchStmt::switch_token(void) const {
@@ -40913,18 +40967,21 @@ Token SwitchCase::keyword_token(void) const {
 std::optional<SwitchCase> SwitchCase::next_switch_case(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal11());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return SwitchCase::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal11();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return SwitchCase::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Stmt SwitchCase::sub_statement(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal13());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
 }
 
 gap::generator<DefaultStmt> DefaultStmt::containing(const Decl &decl) {
@@ -41056,19 +41113,22 @@ Token CaseStmt::ellipsis_token(void) const {
 
 Expr CaseStmt::lhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
-  EntityId id(self.getVal18());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 std::optional<Expr> CaseStmt::rhs(void) const {
   auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    EntityId id(self.getVal19());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal19();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool Decl::is_definition(void) const {
@@ -41078,23 +41138,23 @@ bool Decl::is_definition(void) const {
 std::optional<Decl> Decl::parent_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (auto id = self.getVal0(); id != kInvalidEntityId) {
-    mx::EntityId eid(id);
-    auto decl_id = eid.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *decl_id).value());
-  } else {
-    return std::nullopt;
+    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
+      return Decl(std::move(eptr.value()));
+    }
+    assert(false);
   }
+  return std::nullopt;
 }
 
 std::optional<Stmt> Decl::parent_statement(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (auto id = self.getVal1(); id != kInvalidEntityId) {
-    mx::EntityId eid(id);
-    auto stmt_id = eid.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *stmt_id).value());
-  } else {
-    return std::nullopt;
+    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {
+      return Stmt(std::move(eptr.value()));
+    }
+    assert(false);
   }
+  return std::nullopt;
 }
 
 gap::generator<Decl> Decl::containing(const Decl &decl) {
@@ -41127,19 +41187,26 @@ bool Decl::contains(const Stmt &stmt) {
   return false;
 }
 
-std::vector<Attr> Decl::attributes(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal3();
-  std::vector<Attr> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::AttributeId>();
-    if (auto a3 = impl->ep->AttrFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(a3.value()));
+std::optional<Attr> Decl::nth_attribute(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : attributes()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Attr> Decl::attributes(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal3();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d3 = impl->ep->AttrFor(impl->ep, v)) {
+      co_yield std::move(d3.value());
+    }
+  }
+  co_return;
 }
 
 AccessSpecifier Decl::access(void) const {
@@ -41155,19 +41222,29 @@ AvailabilityResult Decl::availability(void) const {
 std::optional<Attr> Decl::defining_attribute(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal6());
-    auto unpacked_id = id.Extract<mx::AttributeId>();
-    return Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal6();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
+      return Attr(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<TemplateDecl> Decl::described_template(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal7());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal7();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<TemplateParameterList> Decl::described_template_parameters(void) const {
@@ -41175,19 +41252,28 @@ std::optional<TemplateParameterList> Decl::described_template_parameters(void) c
   if (!self.getVal9()) {
     return std::nullopt;
   } else {
-    auto offset = self.getVal8();
-    auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);
-    return TemplateParameterList(std::move(*ps_impl));
+    if (RawEntityId eid = self.getVal8();
+        eid != kInvalidEntityId) {
+      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {
+        return TemplateParameterList(std::move(eptr.value()));
+      }
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal10());
-    auto unpacked_id = id.Extract<mx::AttributeId>();
-    return ExternalSourceSymbolAttr::from(Attr(impl->ep->AttrFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal10();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
+      return ExternalSourceSymbolAttr::from(Attr(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 DeclFriendObjectKind Decl::friend_object_kind(void) const {
@@ -41203,10 +41289,15 @@ DeclModuleOwnershipKind Decl::module_ownership_kind(void) const {
 std::optional<Decl> Decl::non_closure_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal13());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal13();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool Decl::has_attributes(void) const {
@@ -41409,10 +41500,8 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const {
@@ -41464,10 +41553,8 @@ std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
 
 ImplicitParamDecl CapturedDecl::context_parameter(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool CapturedDecl::is_nothrow(void) const {
@@ -41475,36 +41562,38 @@ bool CapturedDecl::is_nothrow(void) const {
   return self.getVal46();
 }
 
-std::vector<ImplicitParamDecl> CapturedDecl::parameters(void) const {
+std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<ImplicitParamDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ImplicitParamDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Decl> CapturedDecl::declarations_in_context(void) const {
+gap::generator<Decl> CapturedDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal48();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<BlockDecl> BlockDecl::containing(const Decl &decl) {
@@ -41572,10 +41661,15 @@ bool BlockDecl::does_not_escape(void) const {
 std::optional<Decl> BlockDecl::block_mangling_context_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal45());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal45();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token BlockDecl::caret_token(void) const {
@@ -41590,18 +41684,14 @@ Token BlockDecl::caret_token(void) const {
 
 CompoundStmt BlockDecl::compound_body(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Type BlockDecl::signature_as_written(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal54();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool BlockDecl::has_captures(void) const {
@@ -41619,53 +41709,62 @@ bool BlockDecl::is_variadic(void) const {
   return self.getVal57();
 }
 
-std::vector<ParmVarDecl> BlockDecl::parameters(void) const {
+std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ParmVarDecl> BlockDecl::parameters(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ParmVarDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
+std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameter_declarations()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal48();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d48 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ParmVarDecl::from(Decl(d48.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Decl> BlockDecl::declarations_in_context(void) const {
+gap::generator<Decl> BlockDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal58();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<AccessSpecDecl> AccessSpecDecl::containing(const Decl &decl) {
@@ -41820,21 +41919,28 @@ std::optional<OMPThreadPrivateDecl> OMPThreadPrivateDecl::from(const Decl &paren
   }
 }
 
-std::vector<Expr> OMPThreadPrivateDecl::varlists(void) const {
+std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : varlists()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPThreadPrivateDecl::varlists(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d47 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<OMPRequiresDecl> OMPRequiresDecl::containing(const Decl &decl) {
@@ -41929,21 +42035,28 @@ std::optional<OMPAllocateDecl> OMPAllocateDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<Expr> OMPAllocateDecl::varlists(void) const {
+std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : varlists()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Expr> OMPAllocateDecl::varlists(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Expr> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto d47 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->StmtFor(impl->ep, v)) {
       if (auto e = Expr::from(Stmt(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<TranslationUnitDecl> TranslationUnitDecl::containing(const Decl &decl) {
@@ -41988,19 +42101,14 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Decl &parent)
   }
 }
 
-std::vector<Decl> TranslationUnitDecl::declarations_in_context(void) const {
+gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<StaticAssertDecl> StaticAssertDecl::containing(const Decl &decl) {
@@ -42047,18 +42155,14 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
 
 Expr StaticAssertDecl::assert_expression(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 StringLiteral StaticAssertDecl::message(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
@@ -42118,19 +42222,14 @@ std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &paren
   }
 }
 
-std::vector<Decl> RequiresExprBodyDecl::declarations_in_context(void) const {
+gap::generator<Decl> RequiresExprBodyDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::containing(const Decl &decl) {
@@ -42284,26 +42383,20 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &paren
 
 Expr ObjCPropertyImplDecl::getter_cxx_constructor(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::getter_method_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCPropertyDecl ObjCPropertyImplDecl::property_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const {
@@ -42313,10 +42406,8 @@ ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) con
 
 ObjCIvarDecl ObjCPropertyImplDecl::property_instance_variable_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal54();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const {
@@ -42331,18 +42422,14 @@ Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) c
 
 Expr ObjCPropertyImplDecl::setter_cxx_assignment(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal63();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::setter_method_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal64());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal64();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const {
@@ -42471,6 +42558,7 @@ std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family
   } else {
     return static_cast<ObjCStringFormatFamily>(self.getVal65());
   }
+  return std::nullopt;
 }
 
 std::string_view NamedDecl::qualified_name_as_string(void) const {
@@ -42481,10 +42569,8 @@ std::string_view NamedDecl::qualified_name_as_string(void) const {
 
 NamedDecl NamedDecl::underlying_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Visibility NamedDecl::visibility(void) const {
@@ -42586,10 +42672,8 @@ std::string_view LabelDecl::ms_assembly_label(void) const {
 
 LabelStmt LabelDecl::statement(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return LabelStmt::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return LabelStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool LabelDecl::is_gnu_local(void) const {
@@ -42654,21 +42738,28 @@ std::optional<BaseUsingDecl> BaseUsingDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<UsingShadowDecl> BaseUsingDecl::shadows(void) const {
+std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : shadows()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<UsingShadowDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = UsingShadowDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<UsingEnumDecl> UsingEnumDecl::containing(const Decl &decl) {
@@ -42723,10 +42814,8 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {
@@ -42893,10 +42982,8 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
 
 Type ValueDecl::type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal52();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ValueDecl::is_weak(void) const {
@@ -43136,50 +43223,38 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Decl 
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal54();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_out(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal62());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal62();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_original(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal63();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_private(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal64());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal64();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal73());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal73();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
@@ -43187,19 +43262,14 @@ OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) 
   return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal74());
 }
 
-std::vector<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const {
+gap::generator<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<MSGuidDecl> MSGuidDecl::containing(const Decl &decl) {
@@ -43302,39 +43372,46 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<NamedDecl> IndirectFieldDecl::chain(void) const {
+gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<NamedDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = NamedDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal53());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal53();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FieldDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal54());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal54();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<EnumConstantDecl> EnumConstantDecl::containing(const Decl &decl) {
@@ -43390,10 +43467,15 @@ std::optional<EnumConstantDecl> EnumConstantDecl::from(const Decl &parent) {
 std::optional<Expr> EnumConstantDecl::initializer_expression(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal53());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal53();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<DeclaratorDecl> DeclaratorDecl::containing(const Decl &decl) {
@@ -43486,10 +43568,15 @@ Token DeclaratorDecl::first_outer_token(void) const {
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal62());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal62();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const {
@@ -43512,16 +43599,25 @@ Token DeclaratorDecl::type_spec_start_token(void) const {
   }
 }
 
-std::vector<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const {
+std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_parameter_lists()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal75();
-  std::vector<TemplateParameterList> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 gap::generator<VarDecl> VarDecl::containing(const Decl &decl) {
@@ -43587,28 +43683,43 @@ std::optional<VarDecl> VarDecl::from(const Decl &parent) {
 std::optional<VarDecl> VarDecl::acting_definition(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal73());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal73();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<VarTemplateDecl> VarDecl::described_variable_template(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal76());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal76();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> VarDecl::initializer(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal77());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal77();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 VarDeclInitializationStyle VarDecl::initializer_style(void) const {
@@ -43619,19 +43730,29 @@ VarDeclInitializationStyle VarDecl::initializer_style(void) const {
 std::optional<VarDecl> VarDecl::initializing_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal78());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal78();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<VarDecl> VarDecl::instantiated_from_static_data_member(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal79());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal79();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 LanguageLinkage VarDecl::language_linkage(void) const {
@@ -43672,10 +43793,15 @@ ThreadStorageClassSpecifier VarDecl::tsc_spec(void) const {
 std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal86());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal86();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return VarDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind(void) const {
@@ -43710,6 +43836,7 @@ std::optional<bool> VarDecl::has_flexible_array_initializer(void) const {
   } else {
     return static_cast<bool>(self.getVal90());
   }
+  return std::nullopt;
 }
 
 bool VarDecl::has_global_storage(void) const {
@@ -43724,6 +43851,7 @@ std::optional<bool> VarDecl::has_ice_initializer(void) const {
   } else {
     return static_cast<bool>(self.getVal93());
   }
+  return std::nullopt;
 }
 
 bool VarDecl::has_initializer(void) const {
@@ -43937,10 +44065,15 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal125());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal125();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const {
@@ -43956,19 +44089,22 @@ DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const {
 
 Type ParmVarDecl::original_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal129());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal129();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal130());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal130();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool ParmVarDecl::has_default_argument(void) const {
@@ -44185,21 +44321,28 @@ std::optional<DecompositionDecl> DecompositionDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<BindingDecl> DecompositionDecl::bindings(void) const {
+std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : bindings()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<BindingDecl> DecompositionDecl::bindings(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<BindingDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = BindingDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::containing(const Decl &decl) {
@@ -44278,34 +44421,50 @@ TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(vo
 
 VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal126());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal126();
+  return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const {
+std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal138();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
-std::vector<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const {
+std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_instantiation_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal139();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
@@ -44320,10 +44479,8 @@ Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
 
 Type VarTemplateSpecializationDecl::type_as_written(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal129());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal129();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
@@ -44405,10 +44562,8 @@ std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializa
 
 VarTemplatePartialSpecializationDecl VarTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal130());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal130();
+  return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 TemplateParameterList VarTemplatePartialSpecializationDecl::template_parameters(void) const {
@@ -44485,10 +44640,15 @@ bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
 std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal73());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal73();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token NonTypeTemplateParmDecl::default_argument_token(void) const {
@@ -44508,15 +44668,21 @@ std::optional<unsigned> NonTypeTemplateParmDecl::num_expansion_types(void) const
   } else {
     return static_cast<unsigned>(self.getVal140());
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal77());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal77();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool NonTypeTemplateParmDecl::has_default_argument(void) const {
@@ -44539,19 +44705,26 @@ bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
   return self.getVal92();
 }
 
-std::vector<Type> NonTypeTemplateParmDecl::expansion_types(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
-  std::vector<Type> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    if (auto t47 = impl->ep->TypeFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(t47.value()));
+std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : expansion_types()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Type> NonTypeTemplateParmDecl::expansion_types(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal47();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d47 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield std::move(d47.value());
+    }
+  }
+  co_return;
 }
 
 gap::generator<MSPropertyDecl> MSPropertyDecl::containing(const Decl &decl) {
@@ -44689,6 +44862,7 @@ std::optional<bool> FunctionDecl::does_declaration_force_externally_visible_defi
   } else {
     return static_cast<bool>(self.getVal72());
   }
+  return std::nullopt;
 }
 
 bool FunctionDecl::does_this_declaration_have_a_body(void) const {
@@ -44698,10 +44872,8 @@ bool FunctionDecl::does_this_declaration_have_a_body(void) const {
 
 Type FunctionDecl::call_result_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal73());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal73();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ConstexprSpecKind FunctionDecl::constexpr_kind(void) const {
@@ -44711,19 +44883,22 @@ ConstexprSpecKind FunctionDecl::constexpr_kind(void) const {
 
 Type FunctionDecl::declared_return_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal76());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal76();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 std::optional<FunctionTemplateDecl> FunctionDecl::described_function_template(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal77());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal77();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token FunctionDecl::ellipsis_token(void) const {
@@ -44750,19 +44925,29 @@ ExceptionSpecificationType FunctionDecl::exception_spec_type(void) const {
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal86());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal86();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_member_function(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal125());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal125();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 LanguageLinkage FunctionDecl::language_linkage(void) const {
@@ -44782,6 +44967,7 @@ std::optional<unsigned> FunctionDecl::odr_hash(void) const {
   } else {
     return static_cast<unsigned>(self.getVal140());
   }
+  return std::nullopt;
 }
 
 OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const {
@@ -44808,18 +44994,21 @@ Token FunctionDecl::point_of_instantiation(void) const {
 std::optional<FunctionTemplateDecl> FunctionDecl::primary_template(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal130());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal130();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Type FunctionDecl::return_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal141());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal141();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TokenRange FunctionDecl::return_type_source_range(void) const {
@@ -44836,10 +45025,15 @@ StorageClass FunctionDecl::storage_class(void) const {
 std::optional<FunctionDecl> FunctionDecl::template_instantiation_pattern(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal144());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal144();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind(void) const {
@@ -44994,6 +45188,7 @@ std::optional<bool> FunctionDecl::is_inline_definition_externally_visible(void) 
   } else {
     return static_cast<bool>(self.getVal118());
   }
+  return std::nullopt;
 }
 
 bool FunctionDecl::is_inline_specified(void) const {
@@ -45018,6 +45213,7 @@ std::optional<bool> FunctionDecl::is_ms_extern_inline(void) const {
   } else {
     return static_cast<bool>(self.getVal123());
   }
+  return std::nullopt;
 }
 
 bool FunctionDecl::is_msvcrt_entry_point(void) const {
@@ -45062,6 +45258,7 @@ std::optional<bool> FunctionDecl::is_reserved_global_placement_operator(void) co
   } else {
     return static_cast<bool>(self.getVal146());
   }
+  return std::nullopt;
 }
 
 bool FunctionDecl::is_static(void) const {
@@ -45114,21 +45311,28 @@ bool FunctionDecl::is_virtual_as_written(void) const {
   return self.getVal157();
 }
 
-std::vector<ParmVarDecl> FunctionDecl::parameters(void) const {
+std::optional<ParmVarDecl> FunctionDecl::nth_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ParmVarDecl> FunctionDecl::parameters(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ParmVarDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 bool FunctionDecl::uses_seh_try(void) const {
@@ -45144,25 +45348,25 @@ bool FunctionDecl::will_have_body(void) const {
 std::optional<Stmt> FunctionDecl::body(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal160());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value());
-  }
-}
-
-std::vector<Decl> FunctionDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    RawEntityId eid = self.getVal160();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Stmt(std::move(eptr.value()));
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Decl> FunctionDecl::declarations_in_context(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal48();
+  for (auto v : list) {
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
+    }
+  }
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::containing(const Decl &decl) {
@@ -45234,19 +45438,29 @@ RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
 std::optional<Type> CXXMethodDecl::this_object_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal161());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal161();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> CXXMethodDecl::this_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal162());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal162();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool CXXMethodDecl::has_inline_body(void) const {
@@ -45289,21 +45503,28 @@ bool CXXMethodDecl::is_volatile(void) const {
   return self.getVal170();
 }
 
-std::vector<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const {
+std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : overridden_methods()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal58();
-  std::vector<CXXMethodDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d58 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d58 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = CXXMethodDecl::from(Decl(d58.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<CXXDestructorDecl> CXXDestructorDecl::containing(const Decl &decl) {
@@ -45371,19 +45592,29 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Decl &parent) {
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal171());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal171();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal172());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal172();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<CXXConversionDecl> CXXConversionDecl::containing(const Decl &decl) {
@@ -45450,10 +45681,8 @@ std::optional<CXXConversionDecl> CXXConversionDecl::from(const Decl &parent) {
 
 Type CXXConversionDecl::conversion_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal171());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal171();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool CXXConversionDecl::is_explicit(void) const {
@@ -45531,10 +45760,15 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const Decl &parent) {
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal171());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal171();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXConstructorDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
@@ -45622,18 +45856,14 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &par
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal161());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal161();
+  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal162());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal162();
+  return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const {
@@ -45705,19 +45935,29 @@ std::optional<FieldDecl> FieldDecl::from(const Decl &parent) {
 std::optional<Expr> FieldDecl::bit_width(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal73());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal73();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal76());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return VariableArrayType::from(Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal76();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return VariableArrayType::from(Type(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 InClassInitStyle FieldDecl::in_class_initializer_style(void) const {
@@ -45728,10 +45968,15 @@ InClassInitStyle FieldDecl::in_class_initializer_style(void) const {
 std::optional<Expr> FieldDecl::in_class_initializer(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal77());
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal77();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
+      return Expr::from(Stmt(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool FieldDecl::has_captured_vla_type(void) const {
@@ -45844,18 +46089,14 @@ ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const {
 
 ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal78());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal78();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCIvarDecl ObjCIvarDecl::next_instance_variable(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal79());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal79();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool ObjCIvarDecl::synthesize(void) const {
@@ -45973,26 +46214,20 @@ std::optional<BindingDecl> BindingDecl::from(const Decl &parent) {
 
 Expr BindingDecl::binding(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal54();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 VarDecl BindingDecl::holding_variable(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal62());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal62();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::containing(const Decl &decl) {
@@ -46101,25 +46336,18 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Decl &paren
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
-std::vector<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const {
+gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<UsingShadowDecl> UsingShadowDecl::containing(const Decl &decl) {
@@ -46171,27 +46399,28 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const Decl &parent) {
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal53());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal53();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return UsingShadowDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal54();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::containing(const Decl &decl) {
@@ -46251,36 +46480,42 @@ bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const {
 
 CXXRecordDecl ConstructorUsingShadowDecl::constructed_base_class(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal62());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal62();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal63());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ConstructorUsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal63();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ConstructorUsingShadowDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::nominated_base_class(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal64());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal64();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal73());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ConstructorUsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal73();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ConstructorUsingShadowDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<UsingPackDecl> UsingPackDecl::containing(const Decl &decl) {
@@ -46329,29 +46564,34 @@ std::optional<UsingPackDecl> UsingPackDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<NamedDecl> UsingPackDecl::expansions(void) const {
+std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : expansions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<NamedDecl> UsingPackDecl::expansions(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<NamedDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = NamedDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::containing(const Decl &decl) {
@@ -46422,10 +46662,8 @@ Token UsingDirectiveDecl::namespace_key_token(void) const {
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal54();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {
@@ -46542,10 +46780,15 @@ std::optional<TypeDecl> TypeDecl::from(const Decl &parent) {
 std::optional<Type> TypeDecl::type_for_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal52());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal52();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<TemplateTypeParmDecl> TemplateTypeParmDecl::containing(const Decl &decl) {
@@ -46606,19 +46849,29 @@ bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal53());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal53();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal54());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal54();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Token TemplateTypeParmDecl::default_argument_token(void) const {
@@ -46744,10 +46997,15 @@ TagTypeKind TagDecl::tag_kind(void) const {
 std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal64());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal64();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TypedefNameDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool TagDecl::has_name_for_linkage(void) const {
@@ -46820,31 +47078,35 @@ bool TagDecl::may_have_out_of_date_definition(void) const {
   return self.getVal99();
 }
 
-std::vector<TemplateParameterList> TagDecl::template_parameter_lists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal75();
-  std::vector<TemplateParameterList> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
-  }
-  return vec;
-}
-
-std::vector<Decl> TagDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_parameter_lists()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<TemplateParameterList> TagDecl::template_parameter_lists(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal75();
+  for (auto v : list) {
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
+  }
+  }
+  co_return;
+}
+
+gap::generator<Decl> TagDecl::declarations_in_context(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal47();
+  for (auto v : list) {
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
+    }
+  }
 }
 
 gap::generator<RecordDecl> RecordDecl::containing(const Decl &decl) {
@@ -46909,21 +47171,28 @@ bool RecordDecl::can_pass_in_registers(void) const {
   return self.getVal100();
 }
 
-std::vector<FieldDecl> RecordDecl::fields(void) const {
+std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : fields()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<FieldDecl> RecordDecl::fields(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal48();
-  std::vector<FieldDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d48 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = FieldDecl::from(Decl(d48.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 RecordDeclArgPassingKind RecordDecl::argument_passing_restrictions(void) const {
@@ -47093,6 +47362,7 @@ std::optional<bool> CXXRecordDecl::allow_const_default_initializer(void) const {
   } else {
     return static_cast<bool>(self.getVal120());
   }
+  return std::nullopt;
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::bases(void) const {
@@ -47104,8 +47374,9 @@ std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::bases(void) const {
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    vec.emplace_back(std::move(*ps_impl));
+  }
   }
   return vec;
 }
@@ -47117,23 +47388,31 @@ std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(voi
   } else {
     return static_cast<MSInheritanceModel>(self.getVal82());
   }
+  return std::nullopt;
 }
 
-std::vector<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
+std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : constructors()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal58();
-  std::vector<CXXConstructorDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d58 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d58 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = CXXConstructorDecl::from(Decl(d58.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
@@ -47146,8 +47425,7 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d178 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d178 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = FriendDecl::from(Decl(d178.value()))) {
         vec.emplace_back(std::move(*e));
       }
@@ -47159,28 +47437,43 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
 std::optional<FunctionTemplateDecl> CXXRecordDecl::dependent_lambda_call_operator(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal73());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal73();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<ClassTemplateDecl> CXXRecordDecl::described_class_template(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal76());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ClassTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal76();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ClassTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal77());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXDestructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal77();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXDestructorDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const {
@@ -47188,28 +47481,42 @@ std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_para
   if (!self.getVal132()) {
     return std::nullopt;
   } else {
-    auto offset = self.getVal140();
-    auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);
-    return TemplateParameterList(std::move(*ps_impl));
+    if (RawEntityId eid = self.getVal140();
+        eid != kInvalidEntityId) {
+      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {
+        return TemplateParameterList(std::move(eptr.value()));
+      }
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal78());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal78();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal79());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal79();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXMethodDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) const {
@@ -47219,15 +47526,21 @@ std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) 
   } else {
     return static_cast<LambdaCaptureDefault>(self.getVal83());
   }
+  return std::nullopt;
 }
 
 std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal81());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal81();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return Decl(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_parameters(void) const {
@@ -47240,8 +47553,7 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d179 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d179 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = NamedDecl::from(Decl(d179.value()))) {
         vec.emplace_back(std::move(*e));
       }
@@ -47257,15 +47569,21 @@ std::optional<unsigned> CXXRecordDecl::lambda_mangling_number(void) const {
   } else {
     return static_cast<unsigned>(self.getVal180());
   }
+  return std::nullopt;
 }
 
 std::optional<Type> CXXRecordDecl::lambda_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal86());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal86();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
@@ -47275,6 +47593,7 @@ std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) cons
   } else {
     return static_cast<MSInheritanceModel>(self.getVal84());
   }
+  return std::nullopt;
 }
 
 MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const {
@@ -47289,6 +47608,7 @@ std::optional<unsigned> CXXRecordDecl::num_bases(void) const {
   } else {
     return static_cast<unsigned>(self.getVal181());
   }
+  return std::nullopt;
 }
 
 std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
@@ -47298,6 +47618,7 @@ std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
   } else {
     return static_cast<unsigned>(self.getVal182());
   }
+  return std::nullopt;
 }
 
 std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
@@ -47307,15 +47628,21 @@ std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
   } else {
     return static_cast<unsigned>(self.getVal183());
   }
+  return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal125());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal125();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const {
@@ -47330,6 +47657,7 @@ std::optional<bool> CXXRecordDecl::has_any_dependent_bases(void) const {
   } else {
     return static_cast<bool>(self.getVal147());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const {
@@ -47339,6 +47667,7 @@ std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const
   } else {
     return static_cast<bool>(self.getVal149());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
@@ -47348,6 +47677,7 @@ std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal151());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const {
@@ -47357,6 +47687,7 @@ std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void)
   } else {
     return static_cast<bool>(self.getVal153());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const {
@@ -47366,6 +47697,7 @@ std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void
   } else {
     return static_cast<bool>(self.getVal155());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const {
@@ -47375,6 +47707,7 @@ std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(voi
   } else {
     return static_cast<bool>(self.getVal157());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
@@ -47384,6 +47717,7 @@ std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal159());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_definition(void) const {
@@ -47393,6 +47727,7 @@ std::optional<bool> CXXRecordDecl::has_definition(void) const {
   } else {
     return static_cast<bool>(self.getVal164());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
@@ -47402,6 +47737,7 @@ std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
   } else {
     return static_cast<bool>(self.getVal166());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_friends(void) const {
@@ -47411,6 +47747,7 @@ std::optional<bool> CXXRecordDecl::has_friends(void) const {
   } else {
     return static_cast<bool>(self.getVal168());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_in_class_initializer(void) const {
@@ -47420,6 +47757,7 @@ std::optional<bool> CXXRecordDecl::has_in_class_initializer(void) const {
   } else {
     return static_cast<bool>(self.getVal170());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
@@ -47429,6 +47767,7 @@ std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal174());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
@@ -47438,6 +47777,7 @@ std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal176());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
@@ -47447,6 +47787,7 @@ std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
   } else {
     return static_cast<bool>(self.getVal184());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
@@ -47456,6 +47797,7 @@ std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal186());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
@@ -47465,6 +47807,7 @@ std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const
   } else {
     return static_cast<bool>(self.getVal188());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
@@ -47474,6 +47817,7 @@ std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal190());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_move_constructor(void) const {
@@ -47483,6 +47827,7 @@ std::optional<bool> CXXRecordDecl::has_move_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal192());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
@@ -47492,6 +47837,7 @@ std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
   } else {
     return static_cast<bool>(self.getVal194());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const {
@@ -47501,6 +47847,7 @@ std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) co
   } else {
     return static_cast<bool>(self.getVal196());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
@@ -47510,6 +47857,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal198());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const {
@@ -47519,6 +47867,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const 
   } else {
     return static_cast<bool>(self.getVal200());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const {
@@ -47528,6 +47877,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(voi
   } else {
     return static_cast<bool>(self.getVal202());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) const {
@@ -47537,6 +47887,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) con
   } else {
     return static_cast<bool>(self.getVal204());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
@@ -47546,6 +47897,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal206());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) const {
@@ -47555,6 +47907,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) con
   } else {
     return static_cast<bool>(self.getVal208());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
@@ -47564,6 +47917,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal210());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const {
@@ -47573,6 +47927,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const 
   } else {
     return static_cast<bool>(self.getVal212());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const {
@@ -47582,6 +47937,7 @@ std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(voi
   } else {
     return static_cast<bool>(self.getVal214());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
@@ -47591,6 +47947,7 @@ std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
   } else {
     return static_cast<bool>(self.getVal216());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
@@ -47600,6 +47957,7 @@ std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
   } else {
     return static_cast<bool>(self.getVal218());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
@@ -47609,6 +47967,7 @@ std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal220());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
@@ -47618,6 +47977,7 @@ std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal222());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
@@ -47627,6 +47987,7 @@ std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal224());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
@@ -47636,6 +47997,7 @@ std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal226());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
@@ -47645,6 +48007,7 @@ std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal228());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
@@ -47654,6 +48017,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal230());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
@@ -47663,6 +48027,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal232());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const {
@@ -47672,6 +48037,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) c
   } else {
     return static_cast<bool>(self.getVal234());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
@@ -47681,6 +48047,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal236());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
@@ -47690,6 +48057,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal238());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
@@ -47699,6 +48067,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
   } else {
     return static_cast<bool>(self.getVal240());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
@@ -47708,6 +48077,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal242());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
@@ -47717,6 +48087,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal244());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) const {
@@ -47726,6 +48097,7 @@ std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) c
   } else {
     return static_cast<bool>(self.getVal246());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) const {
@@ -47735,6 +48107,7 @@ std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) cons
   } else {
     return static_cast<bool>(self.getVal248());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
@@ -47744,6 +48117,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal250());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const {
@@ -47753,6 +48127,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const
   } else {
     return static_cast<bool>(self.getVal252());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) const {
@@ -47762,6 +48137,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) cons
   } else {
     return static_cast<bool>(self.getVal254());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
@@ -47771,6 +48147,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal256());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const {
@@ -47780,6 +48157,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const
   } else {
     return static_cast<bool>(self.getVal258());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) const {
@@ -47789,6 +48167,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) cons
   } else {
     return static_cast<bool>(self.getVal260());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const {
@@ -47798,6 +48177,7 @@ std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const 
   } else {
     return static_cast<bool>(self.getVal262());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) const {
@@ -47807,6 +48187,7 @@ std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) c
   } else {
     return static_cast<bool>(self.getVal264());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
@@ -47816,6 +48197,7 @@ std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
   } else {
     return static_cast<bool>(self.getVal266());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const {
@@ -47825,6 +48207,7 @@ std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(
   } else {
     return static_cast<bool>(self.getVal268());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const {
@@ -47834,6 +48217,7 @@ std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter
   } else {
     return static_cast<bool>(self.getVal270());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_abstract(void) const {
@@ -47843,6 +48227,7 @@ std::optional<bool> CXXRecordDecl::is_abstract(void) const {
   } else {
     return static_cast<bool>(self.getVal272());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
@@ -47852,6 +48237,7 @@ std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
   } else {
     return static_cast<bool>(self.getVal274());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
@@ -47861,6 +48247,7 @@ std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
   } else {
     return static_cast<bool>(self.getVal276());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_c_like(void) const {
@@ -47870,6 +48257,7 @@ std::optional<bool> CXXRecordDecl::is_c_like(void) const {
   } else {
     return static_cast<bool>(self.getVal278());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
@@ -47879,6 +48267,7 @@ std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
   } else {
     return static_cast<bool>(self.getVal280());
   }
+  return std::nullopt;
 }
 
 bool CXXRecordDecl::is_dependent_lambda(void) const {
@@ -47893,6 +48282,7 @@ std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
   } else {
     return static_cast<bool>(self.getVal283());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
@@ -47902,6 +48292,7 @@ std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
   } else {
     return static_cast<bool>(self.getVal285());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_empty(void) const {
@@ -47911,6 +48302,7 @@ std::optional<bool> CXXRecordDecl::is_empty(void) const {
   } else {
     return static_cast<bool>(self.getVal287());
   }
+  return std::nullopt;
 }
 
 bool CXXRecordDecl::is_generic_lambda(void) const {
@@ -47925,6 +48317,7 @@ std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
   } else {
     return static_cast<bool>(self.getVal290());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_literal(void) const {
@@ -47934,15 +48327,21 @@ std::optional<bool> CXXRecordDecl::is_literal(void) const {
   } else {
     return static_cast<bool>(self.getVal292());
   }
+  return std::nullopt;
 }
 
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal126());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal126();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return FunctionDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 bool CXXRecordDecl::is_never_dependent_lambda(void) const {
@@ -47957,6 +48356,7 @@ std::optional<bool> CXXRecordDecl::is_pod(void) const {
   } else {
     return static_cast<bool>(self.getVal295());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
@@ -47966,6 +48366,7 @@ std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
   } else {
     return static_cast<bool>(self.getVal297());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
@@ -47975,6 +48376,7 @@ std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
   } else {
     return static_cast<bool>(self.getVal299());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_structural(void) const {
@@ -47984,6 +48386,7 @@ std::optional<bool> CXXRecordDecl::is_structural(void) const {
   } else {
     return static_cast<bool>(self.getVal301());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_trivial(void) const {
@@ -47993,6 +48396,7 @@ std::optional<bool> CXXRecordDecl::is_trivial(void) const {
   } else {
     return static_cast<bool>(self.getVal303());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
@@ -48002,6 +48406,7 @@ std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
   } else {
     return static_cast<bool>(self.getVal305());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
@@ -48011,6 +48416,7 @@ std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignabl
   } else {
     return static_cast<bool>(self.getVal307());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
@@ -48020,6 +48426,7 @@ std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
   } else {
     return static_cast<bool>(self.getVal309());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
@@ -48029,6 +48436,7 @@ std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
   } else {
     return static_cast<bool>(self.getVal311());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
@@ -48038,6 +48446,7 @@ std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
   } else {
     return static_cast<bool>(self.getVal313());
   }
+  return std::nullopt;
 }
 
 std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
@@ -48050,8 +48459,7 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d315 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = CXXMethodDecl::from(Decl(d315.value()))) {
         vec.emplace_back(std::move(*e));
       }
@@ -48067,6 +48475,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_copy_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal317());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
@@ -48076,6 +48485,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal319());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
@@ -48085,6 +48495,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) cons
   } else {
     return static_cast<bool>(self.getVal321());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
@@ -48094,6 +48505,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
   } else {
     return static_cast<bool>(self.getVal323());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
@@ -48103,6 +48515,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
   } else {
     return static_cast<bool>(self.getVal325());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
@@ -48112,6 +48525,7 @@ std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
   } else {
     return static_cast<bool>(self.getVal327());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
@@ -48121,6 +48535,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment
   } else {
     return static_cast<bool>(self.getVal329());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
@@ -48130,6 +48545,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructo
   } else {
     return static_cast<bool>(self.getVal331());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
@@ -48139,6 +48555,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void
   } else {
     return static_cast<bool>(self.getVal333());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
@@ -48148,6 +48565,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment
   } else {
     return static_cast<bool>(self.getVal335());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
@@ -48157,6 +48575,7 @@ std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructo
   } else {
     return static_cast<bool>(self.getVal337());
   }
+  return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
@@ -48166,6 +48585,7 @@ std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
   } else {
     return static_cast<bool>(self.getVal339());
   }
+  return std::nullopt;
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
@@ -48177,8 +48597,9 @@ std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) 
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    vec.emplace_back(std::move(*ps_impl));
+  }
   }
   return vec;
 }
@@ -48273,34 +48694,50 @@ TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(
 
 ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal130());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ClassTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal130();
+  return ClassTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const {
+std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal342();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
-std::vector<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const {
+std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_instantiation_argument(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_instantiation_arguments()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal343();
-  std::vector<TemplateArgument> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
@@ -48316,10 +48753,15 @@ Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
 std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal142());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal142();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
@@ -48405,26 +48847,20 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal143());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal143();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal144());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal144();
+  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal160());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal160();
+  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
@@ -48493,39 +48929,56 @@ std::optional<EnumDecl> EnumDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<EnumConstantDecl> EnumDecl::enumerators(void) const {
+std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : enumerators()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal48();
-  std::vector<EnumConstantDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d48 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = EnumConstantDecl::from(Decl(d48.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal73());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal73();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return EnumDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::integer_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal76());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal76();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
@@ -48541,24 +48994,35 @@ std::optional<unsigned> EnumDecl::odr_hash(void) const {
   } else {
     return static_cast<unsigned>(self.getVal140());
   }
+  return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::promotion_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal79());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal79();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal81());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal81();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return EnumDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
@@ -48741,18 +49205,21 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal53());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal53();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TagDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Type TypedefNameDecl::underlying_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal54();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool TypedefNameDecl::is_moded(void) const {
@@ -48876,10 +49343,15 @@ std::optional<TypeAliasDecl> TypeAliasDecl::from(const Decl &parent) {
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal62());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return TypeAliasTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal62();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return TypeAliasTemplateDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 gap::generator<ObjCTypeParamDecl> ObjCTypeParamDecl::containing(const Decl &decl) {
@@ -49027,10 +49499,8 @@ TemplateParameterList TemplateDecl::template_parameters(void) const {
 
 NamedDecl TemplateDecl::templated_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
@@ -49093,10 +49563,8 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Dec
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
@@ -49377,10 +49845,8 @@ std::optional<ConceptDecl> ConceptDecl::from(const Decl &parent) {
 
 Expr ConceptDecl::constraint_expression(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 bool ConceptDecl::is_type_concept(void) const {
@@ -49576,10 +50042,8 @@ Token ObjCPropertyDecl::at_token(void) const {
 
 ObjCMethodDecl ObjCPropertyDecl::getter_method_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCPropertyDecl::getter_name_token(void) const {
@@ -49609,10 +50073,8 @@ ObjCPropertyDeclPropertyControl ObjCPropertyDecl::property_implementation(void) 
 
 ObjCIvarDecl ObjCPropertyDecl::property_instance_variable_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal63();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const {
@@ -49627,10 +50089,8 @@ ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const {
 
 ObjCMethodDecl ObjCPropertyDecl::setter_method_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal64());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal64();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCPropertyDecl::setter_name_token(void) const {
@@ -49645,10 +50105,8 @@ Token ObjCPropertyDecl::setter_name_token(void) const {
 
 Type ObjCPropertyDecl::type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal76());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal76();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ObjCPropertyDecl::is_atomic(void) const {
@@ -49739,26 +50197,20 @@ bool ObjCMethodDecl::defined_in_ns_object(void) const {
 
 ObjCPropertyDecl ObjCMethodDecl::find_property_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCInterfaceDecl ObjCMethodDecl::class_interface(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ImplicitParamDecl ObjCMethodDecl::command_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal54());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal54();
+  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCMethodDecl::declarator_end_token(void) const {
@@ -49788,10 +50240,8 @@ DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const {
 
 Type ObjCMethodDecl::return_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal63();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 TokenRange ObjCMethodDecl::return_type_source_range(void) const {
@@ -49812,10 +50262,8 @@ Token ObjCMethodDecl::selector_start_token(void) const {
 
 ImplicitParamDecl ObjCMethodDecl::self_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal77());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal77();
+  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 bool ObjCMethodDecl::has_parameter_destroyed_in_callee(void) const {
@@ -49898,51 +50346,61 @@ bool ObjCMethodDecl::is_variadic(void) const {
   return self.getVal102();
 }
 
-std::vector<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
+std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : parameters()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<ParmVarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ParmVarDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Token> ObjCMethodDecl::selector_tokens(void) const {
+std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : selector_tokens()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal48();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
   for (auto v : list) {
     EntityId id(v);
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    if (auto t48 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t48.value()));
+    if (auto t48 = fragment->TokenFor(fragment, v)) {
+      co_yield std::move(t48.value());
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Decl> ObjCMethodDecl::declarations_in_context(void) const {
+gap::generator<Decl> ObjCMethodDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal58();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<ObjCContainerDecl> ObjCContainerDecl::containing(const Decl &decl) {
@@ -49995,38 +50453,52 @@ std::optional<ObjCContainerDecl> ObjCContainerDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
-  std::vector<ObjCMethodDecl> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d47 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      if (auto e = ObjCMethodDecl::from(Decl(d47.value()))) {
-        vec.emplace_back(std::move(*e));
-      }
+std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : class_methods()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
 }
 
-std::vector<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
+gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
   auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
-  std::vector<ObjCPropertyDecl> vec;
-  vec.reserve(list.size());
+  auto list = self.getVal47();
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d48 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(d48.value()))) {
-        vec.emplace_back(std::move(*e));
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(d47.value()))) {
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
+}
+
+std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : class_properties()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal48();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(d48.value()))) {
+        co_yield std::move(*e);
+      }
+    }
+  }
+  co_return;
 }
 
 TokenRange ObjCContainerDecl::at_end_range(void) const {
@@ -50045,87 +50517,110 @@ Token ObjCContainerDecl::at_start_token(void) const {
   }
 }
 
-std::vector<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
+std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : instance_methods()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal58();
-  std::vector<ObjCMethodDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d58 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d58 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCMethodDecl::from(Decl(d58.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const {
+std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : instance_properties()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal178();
-  std::vector<ObjCPropertyDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d178 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d178 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCPropertyDecl::from(Decl(d178.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
+std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : methods()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal179();
-  std::vector<ObjCMethodDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d179 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d179 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCMethodDecl::from(Decl(d179.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
+std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : properties()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal315();
-  std::vector<ObjCPropertyDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d315 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCPropertyDecl::from(Decl(d315.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Decl> ObjCContainerDecl::declarations_in_context(void) const {
+gap::generator<Decl> ObjCContainerDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal349();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<ObjCCategoryDecl> ObjCCategoryDecl::containing(const Decl &decl) {
@@ -50195,18 +50690,14 @@ Token ObjCCategoryDecl::category_name_token(void) const {
 
 ObjCInterfaceDecl ObjCCategoryDecl::class_interface(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal63();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 ObjCCategoryImplDecl ObjCCategoryDecl::implementation(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal64());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCCategoryImplDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal64();
+  return ObjCCategoryImplDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const {
@@ -50231,59 +50722,79 @@ Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const {
 
 ObjCCategoryDecl ObjCCategoryDecl::next_class_category(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal77());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal77();
+  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
+std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : instance_variables()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal350();
-  std::vector<ObjCIvarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d350 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d350 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCIvarDecl::from(Decl(d350.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Token> ObjCCategoryDecl::protocol_tokens(void) const {
+std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocol_tokens()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal351();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
   for (auto v : list) {
     EntityId id(v);
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    if (auto t351 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t351.value()));
+    if (auto t351 = fragment->TokenFor(fragment, v)) {
+      co_yield std::move(t351.value());
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
+std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocols()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal352();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d352 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d352 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCProtocolDecl::from(Decl(d352.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::containing(const Decl &decl) {
@@ -50352,36 +50863,51 @@ bool ObjCProtocolDecl::is_non_runtime_protocol(void) const {
   return self.getVal71();
 }
 
-std::vector<Token> ObjCProtocolDecl::protocol_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal350();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    if (auto t350 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t350.value()));
+std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocol_tokens()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
 }
 
-std::vector<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
+gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const {
   auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal351();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
+  auto list = self.getVal350();
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d351 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto t350 = fragment->TokenFor(fragment, v)) {
+      co_yield std::move(t350.value());
+    }
+  }
+  co_return;
+}
+
+std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocols()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal351();
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto d351 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCProtocolDecl::from(Decl(d351.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ObjCInterfaceDecl> ObjCInterfaceDecl::containing(const Decl &decl) {
@@ -50434,21 +50960,28 @@ std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const {
+std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : all_referenced_protocols()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal350();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d350 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d350 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCProtocolDecl::from(Decl(d350.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 bool ObjCInterfaceDecl::declares_or_inherits_designated_initializers(void) const {
@@ -50468,10 +51001,8 @@ Token ObjCInterfaceDecl::end_of_definition_token(void) const {
 
 ObjCImplementationDecl ObjCInterfaceDecl::implementation(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCImplementationDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal63();
+  return ObjCImplementationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const {
@@ -50483,10 +51014,15 @@ std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const {
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::super_class(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal64());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal64();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return ObjCInterfaceDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token ObjCInterfaceDecl::super_class_token(void) const {
@@ -50502,18 +51038,21 @@ Token ObjCInterfaceDecl::super_class_token(void) const {
 std::optional<Type> ObjCInterfaceDecl::super_class_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal76());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal76();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 Type ObjCInterfaceDecl::type_for_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal77());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal77();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 bool ObjCInterfaceDecl::has_definition(void) const {
@@ -50538,127 +51077,175 @@ bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const {
 
 ObjCInterfaceDecl ObjCInterfaceDecl::is_obj_c_requires_property_definitions(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal78());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal78();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
+std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : instance_variables()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal351();
-  std::vector<ObjCIvarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d351 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d351 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCIvarDecl::from(Decl(d351.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
+std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : known_categories()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal352();
-  std::vector<ObjCCategoryDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d352 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d352 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCCategoryDecl::from(Decl(d352.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
+std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_extension(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : known_extensions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal353();
-  std::vector<ObjCCategoryDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d353 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d353 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCCategoryDecl::from(Decl(d353.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
+std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocol_tokens()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal354();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
   for (auto v : list) {
     EntityId id(v);
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    if (auto t354 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t354.value()));
+    if (auto t354 = fragment->TokenFor(fragment, v)) {
+      co_yield std::move(t354.value());
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
+std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : protocols()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal355();
-  std::vector<ObjCProtocolDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d355 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d355 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCProtocolDecl::from(Decl(d355.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
+std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : visible_categories()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal356();
-  std::vector<ObjCCategoryDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d356 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d356 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCCategoryDecl::from(Decl(d356.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
-std::vector<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const {
+std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : visible_extensions()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal357();
-  std::vector<ObjCCategoryDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d357 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d357 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCCategoryDecl::from(Decl(d357.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ObjCImplDecl> ObjCImplDecl::containing(const Decl &decl) {
@@ -50714,27 +51301,32 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
 
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal62());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal62();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
-std::vector<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const {
+std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : property_implementations()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal350();
-  std::vector<ObjCPropertyImplDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d350 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d350 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCPropertyImplDecl::from(Decl(d350.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ObjCCategoryImplDecl> ObjCCategoryImplDecl::containing(const Decl &decl) {
@@ -50793,10 +51385,8 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &paren
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal63());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal63();
+  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
@@ -50891,10 +51481,8 @@ std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) cons
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal73());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal73();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
@@ -50917,21 +51505,28 @@ bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
   return self.getVal71();
 }
 
-std::vector<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const {
+std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : instance_variables()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal351();
-  std::vector<ObjCIvarDecl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    if (auto d351 = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
+    if (auto d351 = impl->ep->DeclFor(impl->ep, v)) {
       if (auto e = ObjCIvarDecl::from(Decl(d351.value()))) {
-        vec.emplace_back(std::move(*e));
+        co_yield std::move(*e);
       }
     }
   }
-  return vec;
+  co_return;
 }
 
 gap::generator<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::containing(const Decl &decl) {
@@ -50982,10 +51577,8 @@ std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Decl 
 
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<NamespaceDecl> NamespaceDecl::containing(const Decl &decl) {
@@ -51034,19 +51627,14 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<Decl> NamespaceDecl::declarations_in_context(void) const {
+gap::generator<Decl> NamespaceDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<NamespaceAliasDecl> NamespaceAliasDecl::containing(const Decl &decl) {
@@ -51107,10 +51695,8 @@ Token NamespaceAliasDecl::alias_token(void) const {
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal53();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token NamespaceAliasDecl::namespace_token(void) const {
@@ -51175,19 +51761,14 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<Decl> LinkageSpecDecl::declarations_in_context(void) const {
+gap::generator<Decl> LinkageSpecDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::containing(const Decl &decl) {
@@ -51232,27 +51813,22 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
   }
 }
 
-std::vector<Stmt> LifetimeExtendedTemporaryDecl::children(void) const {
+gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Stmt> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    auto unpacked_id = id.Extract<mx::StatementId>();
-    if (auto s47 = impl->ep->StmtFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(s47.value()));
+    if (auto d47 = impl->ep->StmtFor(impl->ep, v)) {
+      co_yield std::move(d47.value());
     }
   }
-  return vec;
+  co_return;
 }
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
@@ -51262,10 +51838,8 @@ StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 gap::generator<ImportDecl> ImportDecl::containing(const Decl &decl) {
@@ -51310,19 +51884,27 @@ std::optional<ImportDecl> ImportDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<Token> ImportDecl::identifier_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
-  std::vector<Token> vec;
-  vec.reserve(list.size());
-  for (auto v : list) {
-    EntityId id(v);
-    auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-    if (auto t47 = fragment->TokenFor(fragment, id)) {
-      vec.emplace_back(std::move(t47.value()));
+std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : identifier_tokens()) {
+    if (i++ == n) {
+      return ent;
     }
   }
-  return vec;
+  return std::nullopt;
+}
+
+gap::generator<Token> ImportDecl::identifier_tokens(void) const {
+  auto self = impl->Reader<ast::Decl>();
+  auto list = self.getVal47();
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  for (auto v : list) {
+    EntityId id(v);
+    if (auto t47 = fragment->TokenFor(fragment, v)) {
+      co_yield std::move(t47.value());
+    }
+  }
+  co_return;
 }
 
 gap::generator<FriendTemplateDecl> FriendTemplateDecl::containing(const Decl &decl) {
@@ -51369,10 +51951,8 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
 
 NamedDecl FriendTemplateDecl::friend_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal45());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<DeclarationId>();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal45();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
 }
 
 Token FriendTemplateDecl::friend_token(void) const {
@@ -51387,22 +51967,29 @@ Token FriendTemplateDecl::friend_token(void) const {
 
 Type FriendTemplateDecl::friend_type(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal53());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<TypeId>();
-  return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+  RawEntityId eid = self.getVal53();
+  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
-std::vector<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const {
+std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_list(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : template_parameter_lists()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal75();
-  std::vector<TemplateParameterList> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 gap::generator<FriendDecl> FriendDecl::containing(const Decl &decl) {
@@ -51450,10 +52037,15 @@ std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
 std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal45());
-    auto unpacked_id = id.Extract<mx::DeclarationId>();
-    return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, *unpacked_id).value()));
+    RawEntityId eid = self.getVal45();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
+      return NamedDecl::from(Decl(std::move(eptr.value())));
+    }
   }
+  return std::nullopt;
 }
 
 Token FriendDecl::friend_token(void) const {
@@ -51469,10 +52061,15 @@ Token FriendDecl::friend_token(void) const {
 std::optional<Type> FriendDecl::friend_type(void) const {
   auto self = impl->Reader<ast::Decl>();
   if (true) {
-    EntityId id(self.getVal53());
-    auto unpacked_id = id.Extract<mx::TypeId>();
-    return Type(impl->ep->TypeFor(impl->ep, *unpacked_id).value());
+    RawEntityId eid = self.getVal53();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
+      return Type(std::move(eptr.value()));
+    }
   }
+  return std::nullopt;
 }
 
 bool FriendDecl::is_unsupported_friend(void) const {
@@ -51480,16 +52077,25 @@ bool FriendDecl::is_unsupported_friend(void) const {
   return self.getVal46();
 }
 
-std::vector<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const {
+std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parameter_list(unsigned n) const {
+  unsigned i = 0u;
+  for (auto ent : friend_type_template_parameter_lists()) {
+    if (i++ == n) {
+      return ent;
+    }
+  }
+  return std::nullopt;
+}
+
+gap::generator<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal75();
-  std::vector<TemplateParameterList> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-  auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v);
-  vec.emplace_back(std::move(*ps_impl));
+  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
+    co_yield std::move(*ps_impl);
   }
-  return vec;
+  }
+  co_return;
 }
 
 gap::generator<FileScopeAsmDecl> FileScopeAsmDecl::containing(const Decl &decl) {
@@ -51546,10 +52152,8 @@ Token FileScopeAsmDecl::assembly_token(void) const {
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
   auto self = impl->Reader<ast::Decl>();
-  EntityId id(self.getVal52());
-  mx::EntityId eid(id);
-  auto unpacked_id = eid.Extract<StatementId>();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, *unpacked_id).value())).value();
+  RawEntityId eid = self.getVal52();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
@@ -51604,19 +52208,14 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const Decl &parent) {
   }
 }
 
-std::vector<Decl> ExternCContextDecl::declarations_in_context(void) const {
+gap::generator<Decl> ExternCContextDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<ExportDecl> ExportDecl::containing(const Decl &decl) {
@@ -51686,19 +52285,14 @@ bool ExportDecl::has_braces(void) const {
   return self.getVal46();
 }
 
-std::vector<Decl> ExportDecl::declarations_in_context(void) const {
+gap::generator<Decl> ExportDecl::declarations_in_context(void) const {
   auto self = impl->Reader<ast::Decl>();
   auto list = self.getVal47();
-  std::vector<Decl> vec;
-  vec.reserve(list.size());
   for (auto v : list) {
-    EntityId eid(v);
-    auto unpacked_id = eid.Extract<DeclarationId>();
-    if (auto decl = impl->ep->DeclFor(impl->ep, *unpacked_id)) {
-      vec.emplace_back(std::move(decl.value()));
+    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(decl.value());
     }
   }
-  return vec;
 }
 
 gap::generator<EmptyDecl> EmptyDecl::containing(const Decl &decl) {

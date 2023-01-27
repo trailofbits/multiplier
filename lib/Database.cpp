@@ -24,8 +24,10 @@
 
 #include "SQLiteStore.h"
 #include "ThreadLocal.h"
+#include "Types.h"
 
 namespace mx {
+namespace {
 
 // Fragment hashes are sharded by the file token index and with the file ID.
 //
@@ -193,6 +195,8 @@ class BulkInserterState {
 #undef MX_DEFINE_STMT
       {}  // End of constructor
 };
+
+}  // namespace
 
 class DatabaseWriterImpl {
  public:
@@ -526,21 +530,17 @@ bool BulkInserterState::InsertAsync(
   return false;
 }
 
-#define MX_INSERT_ASYNC_ENTITY(name) \
-  bool BulkInserterState::InsertAsync(name ## EntityRecord record, sqlite::Statement &insert) { \
-    if (!record.content.empty()) { \
-      insert.BindValues(record.id.Pack(), record.content); \
-      return true; \
-    } \
-    return false; \
+#define MX_INSERT_ASYNC_ENTITY(name, lower_name) \
+  bool BulkInserterState::InsertAsync(name ## EntityRecord record, \
+                                      sqlite::Statement &insert) { \
+    insert.BindValues(record.id, record.data, \
+                      FragmentIdFromEntityId(record.id), \
+                      FragmentOffsetFromEntityId(record.id)); \
+    return true; \
   }
 
-MX_INSERT_ASYNC_ENTITY(Decl)
-MX_INSERT_ASYNC_ENTITY(Type)
-MX_INSERT_ASYNC_ENTITY(Stmt)
-MX_INSERT_ASYNC_ENTITY(Attr)
-MX_INSERT_ASYNC_ENTITY(Macro)
-MX_INSERT_ASYNC_ENTITY(Pseudo)
+MX_FOR_EACH_ENTITY_RECORD(MX_INSERT_ASYNC_ENTITY)
+#undef MX_INSERT_ASYNC_ENTITY
 
 DatabaseWriter::DatabaseWriter(
     std::filesystem::path db_path)

@@ -110,7 +110,7 @@ class OMPDeclareReductionDecl : public ValueDecl {
   Expr initializer_private(void) const;
   Expr initializer(void) const;
   OMPDeclareReductionDeclInitKind initializer_kind(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(OMPDeclareReductionDecl) == sizeof(ValueDecl));

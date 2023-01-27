@@ -480,55 +480,64 @@ UseBase::~UseBase(void) {}
 
 UseBase::UseBase(Decl entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::DECLARATION) {}
 
 UseBase::UseBase(Stmt entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::STATEMENT) {}
 
 UseBase::UseBase(Type entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::TYPE) {}
 
 UseBase::UseBase(Attr entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::ATTRIBUTE) {}
 
 UseBase::UseBase(Macro entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::MACRO) {}
 
 UseBase::UseBase(Designator entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::DESIGNATOR) {}
 
 UseBase::UseBase(CXXBaseSpecifier entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::CXX_BASE_SPECIFIER) {}
 
 UseBase::UseBase(TemplateArgument entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::TEMPLATE_ARGUMENT) {}
 
 UseBase::UseBase(TemplateParameterList entity, UseSelectorSet selectors_)
     : selectors(std::move(selectors_)),
-      fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id)),
+      fragment(entity.impl->ep->FragmentFor(entity.impl->ep,
+                                            entity.impl->fragment_id)),
       offset(entity.impl->offset),
       kind(UseKind::TEMPLATE_PARAMETER_LIST) {}
 

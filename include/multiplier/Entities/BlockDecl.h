@@ -92,9 +92,11 @@ class BlockDecl : public Decl {
   bool has_captures(void) const;
   bool is_conversion_from_lambda(void) const;
   bool is_variadic(void) const;
-  std::vector<ParmVarDecl> parameters(void) const;
-  std::vector<ParmVarDecl> parameter_declarations(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  gap::generator<ParmVarDecl> parameters(void) const;
+  std::optional<ParmVarDecl> nth_parameter_declaration(unsigned n) const;
+  gap::generator<ParmVarDecl> parameter_declarations(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(BlockDecl) == sizeof(Decl));

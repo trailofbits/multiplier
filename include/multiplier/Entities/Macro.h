@@ -84,7 +84,7 @@ class Macro {
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
-  std::vector<MacroOrToken> children(void) const;
+  gap::generator<MacroOrToken> children(void) const;
 };
 
 #endif
