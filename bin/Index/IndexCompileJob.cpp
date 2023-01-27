@@ -811,14 +811,19 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
   // This helps keep later `TokenTree` stuff balanced, and relates to Issue
   // #258.
   std::vector<uint64_t> open_indexes;
+  open_indexes.reserve(64u);
   for (const pasta::Token &tok : tokens) {
     switch (tok.Role()) {
       case pasta::TokenRole::kBeginOfFileMarker:
         open_indexes.push_back(tok.Index());
         break;
       case pasta::TokenRole::kEndOfFileMarker:
-        bof_to_eof.emplace(open_indexes.back(), tok.Index());
-        open_indexes.pop_back();
+        if (open_indexes.empty()) {
+          assert(false);  // Unbalanced EOF marker.
+        } else {
+          bof_to_eof.emplace(open_indexes.back(), tok.Index());
+          open_indexes.pop_back();
+        }
         break;
       case pasta::TokenRole::kFileToken:
         if (open_indexes.empty()) {
