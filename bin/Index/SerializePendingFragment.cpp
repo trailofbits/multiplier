@@ -184,7 +184,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     id.is_definition = IsDefinition(entity);
     database.AddAsync(
         mx::DeclEntityRecord{
-          id, GetPackedData(storage.message)});
+          id, GetSerializedData(storage.message)});
   }
 
   i = 0u;
@@ -198,7 +198,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
         mx::StmtEntityRecord{
-          id, GetPackedData(storage.message)});
+          id, GetSerializedData(storage.message)});
   }
 
   i = 0u;
@@ -212,7 +212,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
         mx::TypeEntityRecord{
-          id, GetPackedData(storage.message)});
+          id, GetSerializedData(storage.message)});
   }
 
   i = 0u;
@@ -226,7 +226,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
         mx::AttrEntityRecord{
-          id, GetPackedData(storage.message)});
+          id, GetSerializedData(storage.message)});
   }
 
   i = 0u;
@@ -256,7 +256,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     id.offset = i++;
     database.AddAsync(
         mx::PseudoEntityRecord{
-          id, GetPackedData(storage.message)});
+          id, GetSerializedData(storage.message)});
   }
 }
 

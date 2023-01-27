@@ -106,6 +106,6 @@ struct EntityBuilder {
   EntityBuilder() : builder(message.initRoot<T>()) {}
 };
 
-std::string GetPackedData(capnp::MessageBuilder& builder);
+std::string GetSerializedData(capnp::MessageBuilder& builder);
 
 }  // namespace indexer

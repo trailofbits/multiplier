@@ -204,7 +204,7 @@ void GlobalIndexingState::PersistFile(
 
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, GetPackedData(message)});
+      mx::SerializedFileRecord{file_id, GetSerializedData(message)});
 }
 
 namespace {
@@ -507,7 +507,7 @@ static void PersistParsedTokens(
     id.kind = mx::FromPasta(macros_to_serialize[i].Kind());
     database.AddAsync(
         mx::MacroEntityRecord{
-          id, GetPackedData(storage.message)});
+          id, GetSerializedData(storage.message)});
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
@@ -680,7 +680,7 @@ static void PersistTokenTree(
       LinkExternalUsesInFragment(database, pf, storage);
 
       database.AddAsync(
-          mx::MacroEntityRecord{id, GetPackedData(storage.message)});
+          mx::MacroEntityRecord{id, GetSerializedData(storage.message)});
     }
   }
 
@@ -1024,7 +1024,7 @@ void GlobalIndexingState::PersistFragment(
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
   database.AddAsync(
       mx::SerializedFragmentRecord{
-          pf.fragment_id, GetPackedData(message)});
+          pf.fragment_id, GetSerializedData(message)});
 
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
   LinkExternalReferencesInFragment(database, pf, em);

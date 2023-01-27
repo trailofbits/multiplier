@@ -864,7 +864,7 @@ mx::RawEntityId RelatedEntityId(
   return RelatedEntityId(em, tok.ParsedLocation(), related_ids);
 }
 
-std::string GetPackedData(capnp::MessageBuilder& builder) {
+std::string GetSerializedData(capnp::MessageBuilder& builder) {
   kj::VectorOutputStream os(builder.sizeInWords());
   capnp::writeMessage(os, builder);
   auto packed_data = os.getArray().asChars();
