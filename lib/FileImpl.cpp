@@ -14,21 +14,23 @@ namespace mx {
 FileImpl::~FileImpl(void) noexcept {}
 
 FileImpl::FileImpl(
-    FileId id_, EntityProvider::Ptr ep_,
-    const std::string &data)
-    : file_id(id_.file_id),
-      ep(std::move(ep_)),
-      package(data),
-      reader(package.Reader<rpc::File>()),
+    FileId id_, EntityProvider::Ptr ep_, std::string data_)
+    : EntityImpl(std::move(ep_), std::move(data_)),
       file_token_reader(this),
+      file_id(id_.file_id),
+      reader(this->EntityImpl::Reader<rpc::File>()),
       num_tokens(reader.getTokenKinds().size()) {
   assert((num_tokens + 1u) == reader.getTokenOffsets().size());
 }
 
 // Return the data of the file.
-std::string_view FileImpl::Data(void) const {
-  auto data = reader.getData();
-  return std::string_view(data.cStr(), data.size());
+std::string_view FileImpl::Data(void) const & noexcept {
+  if (reader.hasData()) {
+    if (auto data = reader.getData(); auto size = data.size()) {
+      return std::string_view(data.cStr(), size);
+    }
+  }
+  return {};
 }
 
 // Return the number of tokens in the file.
@@ -37,9 +39,9 @@ unsigned ReadFileTokensFromFile::NumTokens(void) const {
 }
 
 // Return the kind of the Nth token.
-TokenKind ReadFileTokensFromFile::NthTokenKind(unsigned token_index) const {
-  if (token_index < file->num_tokens) {
-    return static_cast<TokenKind>(file->reader.getTokenKinds()[token_index]);
+TokenKind ReadFileTokensFromFile::NthTokenKind(unsigned ti) const {
+  if (ti < file->num_tokens) {
+    return static_cast<TokenKind>(file->reader.getTokenKinds()[ti]);
   } else {
     return TokenKind::UNKNOWN;
   }
@@ -79,12 +81,12 @@ EntityId ReadFileTokensFromFile::NthRelatedEntityId(unsigned) const {
 }
 
 // Return the id of the Nth token.
-EntityId ReadFileTokensFromFile::NthTokenId(unsigned token_index) const {
-  if (token_index < file->num_tokens) {
+EntityId ReadFileTokensFromFile::NthTokenId(unsigned ti) const {
+  if (ti < file->num_tokens) {
     FileTokenId id;
     id.file_id = file->file_id;
-    id.kind = static_cast<TokenKind>(file->reader.getTokenKinds()[token_index]);
-    id.offset = token_index;
+    id.kind = static_cast<TokenKind>(file->reader.getTokenKinds()[ti]);
+    id.offset = ti;
     return id;
   } else {
     return kInvalidEntityId;

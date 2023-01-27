@@ -31,7 +31,7 @@ class FragmentListImpl {
 
 class ReadMacroTokensFromFragment : public TokenReader {
  public:
-  const FragmentImpl * const fragment;
+  FragmentImpl * const fragment;
 
   inline ReadMacroTokensFromFragment(FragmentImpl *fragment_)
       : fragment(fragment_) {}
@@ -105,7 +105,7 @@ class ReadParsedTokensFromFragment final
   bool Equals(const class TokenReader *that) const final;
 };
 
-class FragmentImpl final {
+class FragmentImpl final : public EntityImpl {
  public:
   using Ptr = std::shared_ptr<const FragmentImpl>;
   using WeakPtr = std::weak_ptr<const FragmentImpl>;
@@ -116,25 +116,17 @@ class FragmentImpl final {
   // TODO(pag): Rename to `fragment_index`.
   const RawEntityId fragment_id;
 
-  // Needed for us to be able to look up the file containing this fragment,
-  // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
-
  private:
   friend class ReadParsedTokensFromFragment;
   friend class ReadMacroTokensFromFragment;
-
-  // Stores the Cap'n-Proto serialized data.
-  PackedReaderState package;
-
-  // Reader for `package`.
-  const rpc::Fragment::Reader reader;
 
   // Token readers for this fragment.
   const ReadParsedTokensFromFragment parsed_token_reader;
   const ReadMacroTokensFromFragment macro_token_reader;
 
  public:
+
+  const FragmentReader reader;
 
   // For bounds checking.
   const EntityOffset num_parsed_tokens;
@@ -143,7 +135,7 @@ class FragmentImpl final {
   ~FragmentImpl(void) noexcept;
 
   explicit FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                        const std::string &data);
+                        std::string data_);
 
   // Return the ID of the file containing the first token.
   //
@@ -160,11 +152,6 @@ class FragmentImpl final {
   std::shared_ptr<const class TokenReader>
   ParsedTokenReader(const FragmentImpl::Ptr &) const;
 
-  // Return a reader for the whole fragment.
-  inline const FragmentReader &Fragment(void) const noexcept {
-    return reader;
-  }
-
   // Return a specific type of entity.
   std::optional<ReaderPtr> NthDecl(unsigned offset) const;
   std::optional<ReaderPtr> NthStmt(unsigned offset) const;
@@ -180,9 +167,9 @@ class FragmentImpl final {
   gap::generator<ReaderPtr> Macros() const;
   gap::generator<ReaderPtr> Pseudos() const;
 
-  std::string_view SourceIR(void) const;
+  std::string_view SourceIR(void) const & noexcept;
 
-  std::string_view Data(void) const;
+  std::string_view Data(void) const & noexcept;
 
   // Return the token associated with a specific entity ID.
   std::optional<Token> TokenFor(const FragmentImpl::Ptr &, EntityId id,

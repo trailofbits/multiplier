@@ -17,7 +17,7 @@ namespace indexer {
 // Execute the command specified in `args` with the ability to feed the
 // command input and capture output. Passing `nullptr` to any of `input`,
 // `output`, or `error` is acceptable.
-mx::Result<int, std::error_code> Subprocess::Execute(
+std::variant<int, std::error_code> Subprocess::Execute(
     const std::vector<std::string> &cmd,
     const std::unordered_map<std::string, std::string> *env,
     std::string *input, std::string *output, std::string *error) {

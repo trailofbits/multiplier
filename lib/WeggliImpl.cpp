@@ -6,10 +6,12 @@
 
 #include "WeggliImpl.h"
 
+#include <algorithm>
 #include <cassert>
 
 #include "File.h"
 #include "Fragment.h"
+#include "Util.h"
 
 namespace mx {
 
@@ -64,8 +66,7 @@ bool WeggliQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   return true;
 }
 
-gap::generator<WeggliQueryMatch>
-WeggliQueryResultImpl::Enumerate(void) {
+gap::generator<WeggliQueryMatch> WeggliQueryResultImpl::Enumerate(void) {
 
 #ifndef MX_DISABLE_WEGGLI
   unsigned index = 0u;
@@ -235,43 +236,61 @@ std::optional<size_t> WeggliQueryMatch::index_of_captured_variable(
 #ifndef MX_DISABLE_WEGGLI
 
 // Match this Weggli query against a file.
-gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const File &file) const {
-  auto &reader = file.impl->Reader();
-
-  std::map<unsigned, unsigned> eol_offset_to_line_num;
-  for (mx::rpc::UpperBound::Reader ubr : reader.getEolOffsets()) {
-    eol_offset_to_line_num.emplace(ubr.getOffset(), ubr.getVal());
-  }
-
-  std::vector<unsigned> line_nums;
-
+gap::generator<WeggliQueryMatch>
+WeggliQuery::match_fragments(const File &file) const {
+  std::vector<EntityOffset> matched_offsets;
   this->for_each_match(
       file.data(),
-      [&eol_offset_to_line_num, &line_nums]
+      [&matched_offsets]
       (WeggliMatchData match) -> bool {
-        unsigned prev_line = 0;
-        for (auto i = match.begin_offset; i < match.end_offset; ++i) {
-          auto line_it = eol_offset_to_line_num.upper_bound(i);
-          if (line_it != eol_offset_to_line_num.end()) {
-            auto line = line_it->second;
-            if (line != prev_line) {
-              prev_line = line;
-              line_nums.push_back(line);
-            }
-          }
+        if (match.begin_offset < match.end_offset) {
+          matched_offsets.push_back(match.begin_offset);
         }
         return true;
       });
 
-  if (line_nums.empty()) {
+  std::sort(matched_offsets.begin(), matched_offsets.end());
+  auto unique_it = std::unique(matched_offsets.begin(), matched_offsets.end());
+  matched_offsets.erase(unique_it, matched_offsets.end());
+
+  if (matched_offsets.empty()) {
     co_return;
+  }
+
+  const FileReader &reader = file.impl->reader;
+  const auto byte_offsets = reader.getTokenOffsets();
+  const auto tok_kinds = reader.getTokenKinds();
+  const auto num_file_toks = tok_kinds.size();
+  const auto it_begin = byte_offsets.begin();
+  const auto it_end = byte_offsets.end();
+
+  // Convert from byte offsets to token offsets.
+  for (EntityOffset &offset : matched_offsets) {
+    auto it = LowerBound(it_begin, it_end, offset);
+    if (it == it_end) {
+      assert(false);
+      continue;
+    }
+
+    auto diff = it - it_begin;
+    if (0 > diff) {
+      assert(false);
+      offset = ~0u;
+      continue;
+    }
+
+    offset = static_cast<EntityOffset>(diff);
+    if (offset >= num_file_toks) {
+      assert(false);
+      offset = ~0u;
+    }
   }
 
   const EntityProvider::Ptr &ep = file.impl->ep;
 
   WeggliQueryResultImpl it(
       *this, ep,
-      ep->FragmentsCoveringLines(ep, file.id(), std::move(line_nums)));
+      ep->FragmentsCoveringTokens(ep, file.id(), std::move(matched_offsets)));
   for (auto match : it.Enumerate()) {
     co_yield match;
   }

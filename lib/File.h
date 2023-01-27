@@ -74,40 +74,32 @@ class ReadFileTokensFromFile final : public TokenReader {
 };
 
 // Interface for accessing the tokens of a file.
-class FileImpl final {
+class FileImpl final : public EntityImpl {
  public:
   using Ptr = std::shared_ptr<const FileImpl>;
   using WeakPtr = std::weak_ptr<const FileImpl>;
 
-  // NOTE(pag): This is *NOT* a packed file id / entity ID representation, it
-  //            is the raw ID that would go into a `FileId`.
-  const RawEntityId file_id;
-
-  // Needed for us to be able to look up the file containing this fragment,
-  // or look up entities related to other fragments.
-  const EntityProvider::Ptr ep;
-
  private:
   friend class ReadFileTokensFromFile;
-
-  // Stores the serialized Cap'n Proto data for this file.
-  PackedReaderState package;
-
-  // Reader for the data in `package`.
-  const rpc::File::Reader reader;
 
   // Reads the tokens from `reader`.
   const ReadFileTokensFromFile file_token_reader;
 
  public:
 
+  // NOTE(pag): This is *NOT* a packed file id / entity ID representation, it
+  //            is the raw ID that would go into a `FileId`.
+  const RawEntityId file_id;
+
+  // Reader for the file data.
+  const FileReader reader;
+
   // Number of tokens in this file.
   const unsigned num_tokens;
 
   ~FileImpl(void) noexcept;
 
-  explicit FileImpl(FileId id_, EntityProvider::Ptr ep_,
-                    const std::string &data);
+  explicit FileImpl(FileId id_, EntityProvider::Ptr ep_, std::string data_);
 
   // Return a reader for the tokens in the file.
   inline std::shared_ptr<const class TokenReader> TokenReader(
@@ -115,12 +107,8 @@ class FileImpl final {
     return TokenReader::Ptr(self, &file_token_reader);
   }
 
-  inline const rpc::File::Reader &Reader(void) const noexcept {
-    return reader;
-  }
-
   // Return the data of the file.
-  std::string_view Data(void) const;
+  std::string_view Data(void) const & noexcept;
 };
 
 }  // namespace mx

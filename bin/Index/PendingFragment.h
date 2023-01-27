@@ -36,20 +36,14 @@ class FileLocationOfFragment {
   mx::SpecificEntityId<mx::FileId> file_id;
   mx::SpecificEntityId<mx::FileTokenId> first_file_token_id;
   mx::SpecificEntityId<mx::FileTokenId> last_file_token_id;
-  unsigned first_line_number;
-  unsigned last_line_number;
 
   FileLocationOfFragment(const mx::FileId &fid,
                          const mx::FileTokenId &begin,
-                         const pasta::FileToken &begin_tok,
-                         const mx::FileTokenId &end,
-                         const pasta::FileToken &end_tok)
+                         const mx::FileTokenId &end)
       : file_index(fid.file_id),
         file_id(fid),
         first_file_token_id(begin),
-        last_file_token_id(end),
-        first_line_number(begin_tok.Line()),
-        last_line_number(end_tok.Line()) {}
+        last_file_token_id(end) {}
 };
 
 // Summary information about a group of top-level declarations that are

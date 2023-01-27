@@ -390,6 +390,7 @@ class SpecificEntityId final {
 
 using PackedFragmentId = SpecificEntityId<FragmentId>;
 using PackedFileId = SpecificEntityId<FileId>;
+using PackedFileTokenId = SpecificEntityId<FileTokenId>;
 using PackedDeclarationId = SpecificEntityId<DeclarationId>;
 using PackedStatementId = SpecificEntityId<StatementId>;
 using PackedTypeId = SpecificEntityId<TypeId>;

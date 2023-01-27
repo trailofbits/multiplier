@@ -179,6 +179,10 @@ void Statement::Reset(void) {
 #ifndef NDEBUG
   needs_reset = false;
 #endif
+#if MX_ENABLE_SQLITE_LOGGING
+  logged = true;
+#endif
+
   ClearBoundValues();
   sqlite3_reset(impl.get());
 }
@@ -188,9 +192,18 @@ void Statement::Execute(void) {
   needs_reset = false;
 #endif
 
-  auto ret = TryExecuteStep();
+  auto stmt = impl.get();
+
+#if MX_ENABLE_SQLITE_LOGGING
+  if (!logged) {
+    std::cerr << sqlite3_expanded_sql(stmt) << '\n';
+    logged = true;
+  }
+#endif
+
+  auto ret = sqlite3_step(stmt);
   if (SQLITE_DONE != ret) {
-    auto db = sqlite3_db_handle(impl.get());
+    auto db = sqlite3_db_handle(stmt);
     if (SQLITE_ROW == ret) {
       throw Error("Execute() does not expect results. Use executeStep.");
     } else if (ret == sqlite3_errcode(db)) {
@@ -200,29 +213,33 @@ void Statement::Execute(void) {
     }
   }
 
-  auto stmt = impl.get();
   sqlite3_clear_bindings(stmt);
   sqlite3_reset(stmt);
 }
 
 bool Statement::ExecuteStep(void) {
+
+  auto stmt = impl.get();
 #ifndef NDEBUG
   needs_reset = true;
 #endif
 
-  auto ret = TryExecuteStep();
+#if MX_ENABLE_SQLITE_LOGGING
+  if (!logged) {
+    std::cerr << sqlite3_expanded_sql(stmt) << '\n';
+    logged = true;
+  }
+#endif
+
+  auto ret = sqlite3_step(stmt);
   if ((SQLITE_ROW != ret) && (SQLITE_DONE != ret)) {
-    throw Error("ExecuteStep failed", sqlite3_db_handle(impl.get()));
+    throw Error("ExecuteStep failed", sqlite3_db_handle(stmt));
   }
   return (ret == SQLITE_ROW);
 }
 
 QueryResult Statement::Row(void) {
   return QueryResult(impl);
-}
-
-int Statement::TryExecuteStep(void) {
-  return sqlite3_step(impl.get());
 }
 
 void Statement::bind(const size_t i, const int32_t &value) {

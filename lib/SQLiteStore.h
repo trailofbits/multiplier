@@ -25,6 +25,8 @@ struct sqlite3_value;
 }  // extern C
 namespace sqlite {
 
+#define MX_ENABLE_SQLITE_LOGGING 0
+
 class Connection;
 class ConnectionImpl;
 class Statement;
@@ -96,6 +98,10 @@ class Statement {
   bool needs_reset{false};
 #endif
 
+#if MX_ENABLE_SQLITE_LOGGING
+  bool logged{false};
+#endif
+
   inline Statement(std::shared_ptr<sqlite3_stmt> impl_)
       : impl(std::move(impl_)) {}
 
@@ -132,8 +138,6 @@ class Statement {
   friend class QueryResult;
 
   size_t NumParams(void) const noexcept;
-
-  int TryExecuteStep(void);
 
   // Binding functions for the statements
   void bind(const size_t i, const int32_t &value);

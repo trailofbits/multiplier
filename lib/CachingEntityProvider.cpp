@@ -117,10 +117,10 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
   return ptr;
 }
 
-// Return the list of fragments covering / overlapping some lines in a file.
-FragmentIdList CachingEntityProvider::FragmentsCoveringLines(
-    const Ptr &self, PackedFileId file, std::vector<unsigned> lines) {
-  return next->FragmentsCoveringLines(self, file, std::move(lines));
+// Return the list of fragments covering / overlapping some tokens in a file.
+FragmentIdList CachingEntityProvider::FragmentsCoveringTokens(
+    const Ptr &self, PackedFileId file_id, std::vector<EntityOffset> tokens) {
+  return next->FragmentsCoveringTokens(self, file_id, std::move(tokens));
 }
 
 RawEntityIdList CachingEntityProvider::Redeclarations(

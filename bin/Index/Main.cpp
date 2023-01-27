@@ -18,7 +18,6 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/MemoryBuffer.h>
 #include <memory>
-#include <multiplier/Result.h>
 #include <pasta/Util/FileManager.h>
 #include <pasta/Util/Init.h>
 #include <sstream>
@@ -36,6 +35,10 @@ DECLARE_bool(help);
 DEFINE_int32(num_indexer_workers, -1, "Number of worker threads to use for parallel indexing jobs");
 
 DEFINE_int32(num_command_workers, -1, "Number of worker threads to use for parallel command interpretation jobs");
+
+// Only execute the target compiler twice per working directory, rather than
+// twice per command.
+DEFINE_bool(fast_import, false, "Operate in a 'fast mode' when importing compile commands.");
 
 // Should we show progress bars when indexing?
 DEFINE_bool(show_progress, false, "Show indexing progress bars");
@@ -107,10 +110,12 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
 
   std::stringstream ss;
   ss << "Usage: " << argv[0]
-     << " [--num_workers N]\n"
+     << " [--num_indexer_workers N]\n"
+     << " [--num_command_workers N]\n"
      << " [--env PATH_TO_COPIED_ENV_VARS]\n"
      << " [--show_progress]\n"
      << " [--generate_sourceir]\n"
+     << " [--fast_import]\n"
      << " --db DATABASE\n"
      << " --target COMPILE_COMMANDS\n";
 
@@ -226,7 +231,7 @@ extern "C" int main(int argc, char *argv[], char *envp[]) {
   // commands, albeit slightly modified, so that we can get the compiler to
   // tell us about include search paths, etc. The result of this is that
   // indexing actions are enqueued into the `executor`.
-  importer.Import(command_exe_options);
+  importer.Import(command_exe_options, FLAGS_fast_import);
 
   // Start the executor, so that we can start processing the indexing actions.
   // Wait for all actions to complete.

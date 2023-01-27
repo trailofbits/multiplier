@@ -7,6 +7,7 @@
 #include "Importer.h"
 
 #include <cstring>
+#include <fcntl.h>
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -23,7 +24,6 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
 #include <multiplier/AST.h>
-#include <multiplier/Result.h>
 #include <multiplier/Types.h>
 #include <pasta/Compile/Command.h>
 #include <pasta/Compile/Compiler.h>
@@ -39,8 +39,6 @@
 #include "IndexCompileJob.h"
 #include "PASTA.h"
 #include "Subprocess.h"
-
-#include <fcntl.h>
 
 namespace indexer {
 namespace {
@@ -104,6 +102,10 @@ struct PathCache {
 
     // Look for the binary in the `PATH` variable.
     for (std::string dir; std::getline(path_ss, dir, sep); dir.clear()) {
+      if (dir.empty()) {
+        continue;
+      }
+
       std::filesystem::path exe_path(dir);
       exe_path /= exe;
       pasta::Result<pasta::Stat, std::error_code> res = fs->Stat(exe_path, cwd);
@@ -166,16 +168,32 @@ static void FixEnvVariablesAndPath(Command &command, const std::string &cwd,
   envp["PWD"] = cwd;
 }
 
+struct CompilerPathInfo {
+  std::string sysroot;
+  std::string no_sysroot;
+};
+
+class CompilerPathInfoCache {
+ private:
+  const bool enable_cache;
+
+  std::unordered_map<std::string, CompilerPathInfo> cached_info;
+  std::mutex cached_info_lock;
+
+ public:
+  inline CompilerPathInfoCache(bool enable_cache_)
+      : enable_cache(enable_cache_) {}
+
+  std::variant<CompilerPathInfo, std::string> GetCompilerInfo(
+      const Command &command);
+};
+
 class BuildCommandAction final : public Action {
  private:
   pasta::FileManager &fm;
   const Command &command;
   std::shared_ptr<GlobalIndexingState> ctx;
-
-  // If we are using something like CMake commands, then pull in the relevant
-  // information by trying to execute the compiler directly.
-  mx::Result<std::pair<std::string, std::string>, std::error_code>
-  InitCompilerFromCommand(void);
+  CompilerPathInfoCache &cache;
 
   void RunWithCompiler(pasta::CompileCommand cmd, pasta::Compiler cc);
 
@@ -185,41 +203,86 @@ class BuildCommandAction final : public Action {
   virtual ~BuildCommandAction(void) = default;
 
   inline BuildCommandAction(pasta::FileManager &fm_, const Command &command_,
-                            std::shared_ptr<GlobalIndexingState> ctx_)
+                            std::shared_ptr<GlobalIndexingState> ctx_,
+                            CompilerPathInfoCache &cache_)
       : fm(fm_),
         command(command_),
-        ctx(std::move(ctx_)) {}
+        ctx(std::move(ctx_)),
+        cache(cache_) {}
 
   void Run(void) final;
 };
 
 // If we are using something like CMake commands, then pull in the relevant
 // information by trying to execute the compiler directly.
-mx::Result<std::pair<std::string, std::string>, std::error_code>
-BuildCommandAction::InitCompilerFromCommand(void) {
+std::variant<CompilerPathInfo, std::string>
+CompilerPathInfoCache::GetCompilerInfo(const Command &command) {
+
+  std::unique_lock<std::mutex> locker;
+
+  // In caching mode, we check to see if, for the given compiler path, if we've
+  // already got compiler info. If so then great, if not then we need to run
+  // a command. We'll use the info generated from the first successful command.
+  //
+  // NOTE(pag): This is technically sketchy, but for some tests, in uniform
+  //            codebases, this can significantly speed up the import step for
+  //            compile commands.
+  if (enable_cache) {
+    std::unique_lock<std::mutex>(cached_info_lock).swap(locker);
+    if (auto info_it = cached_info.find(command.vec[0]);
+        info_it != cached_info.end()) {
+      return info_it->second;  // Cache hit.
+    }
+  }
+
   std::vector<std::string> new_args;
   bool skip = false;
   for (const char *arg : command.vec) {
     if (skip) {
       skip = false;
-      continue;
+
+      // NOTE(pag): Have observed things like the following in the Linux kernel:
+      //
+      //      ... -main-file-name -mrelocation-model ...
+      //
+      if (arg[0] != '-' && 1u < strlen(arg)) {
+        continue;
+      }
     }
 
     if (strstr(arg, "-Wno") == arg) {
       // Keep the argument.
 
-    } else if (strstr(arg, "-W") == arg || strstr(arg, "-pedantic") == arg ||
-               strstr(arg, "-fsanitize") == arg) {
+    // Drop things like `-Wall`, `-Werror, `-fsanitize=..`, etc.
+    } else if (strstr(arg, "-W") == arg ||
+               strstr(arg, "-pedantic") == arg ||
+               !strcmp(arg, "-pic-is-pie")) {
       continue;  // Skip the argument.
 
-    } else if (strstr(arg, "-mllvm") == arg ||
-               strstr(arg, "-Xclang") == arg) {
+    } else if (!strcmp(arg, "-mllvm") ||
+               !strcmp(arg, "-Xclang") ||
+               !strcmp(arg, "-dependency-file") ||
+               !strcmp(arg, "-diagnostic-log-file") ||
+               !strcmp(arg, "-header-include-file") ||
+               !strcmp(arg, "-stack-usage-file") ||
+               !strcmp(arg, "-mrelocation-model") ||
+               !strcmp(arg, "-pic-level") ||
+               !strcmp(arg, "-main-file-name")) {
       skip = true;
       continue;  // Skip the argument and the next argument.
 
-    // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` then
-    // drop it.
-    } else if (strstr(arg, "-file=")) {
+    // If it specifies some file, e.g. `-frandomize-layout-seed-file=...` or
+    // `-fprofile-remapping-file=`, or ..., then drop it.
+    } else if (strstr(arg, "-file=") /* NOTE(pag): find anywhere */ ||
+               strstr(arg, "-dependent-lib=") == arg ||
+               strstr(arg, "-stats-file=") == arg ||
+               strstr(arg, "-fprofile-list=") == arg ||
+               strstr(arg, "-fxray-always-instrument=") == arg ||
+               strstr(arg, "-fxray-never-instrument=") == arg ||
+               strstr(arg, "-fxray-attr-list=") == arg ||
+               strstr(arg, "-tsan-compound-read-before-write=") == arg ||
+               strstr(arg, "-tsan-distinguish-volatile=") == arg ||
+               strstr(arg, "-treat") == arg) {
       continue;
 
     // Output file.
@@ -245,67 +308,53 @@ BuildCommandAction::InitCompilerFromCommand(void) {
   new_args.emplace_back("-include");
   new_args.emplace_back("/trail/of/bits");
 
-//  for (auto &[k, v] : command.env) {
-//    std::cerr << k << '=' << v << " \\\n";
-//  }
-//  auto sep = "";
-//  for (auto a : new_args) {
-//    std::cerr << sep << a;
-//    sep = " ";
-//  }
-//
-//  std::cerr << "\n\n";
-//  std::cerr.flush();
-
-  std::string output_sysroot;
+  CompilerPathInfo output;
   auto ret = Subprocess::Execute(
       new_args, &(command.env), nullptr /* stdin */, nullptr /* stdout */,
-      &output_sysroot);
+      &output.sysroot);
 
-  if (!ret.Succeeded() && output_sysroot.empty()) {
-    return ret.TakeError();
+  if (std::holds_alternative<std::error_code>(ret) && output.sysroot.empty()) {
+    return std::get<std::error_code>(ret).message();
   }
 
-//  if (output_sysroot.find("udf.c") != std::string::npos) {
-//    auto fd = open("/tmp/udf_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-//    write(fd, output_sysroot.data(), output_sysroot.size());
-//  }
-
-  if (auto it = output_sysroot.find("End of search list.");
+  if (auto it = output.sysroot.find("End of search list.");
       it == std::string::npos) {
-    if (!ret.Succeeded()) {
-      return ret.TakeError();
+    if (std::holds_alternative<std::error_code>(ret)) {
+      return std::get<std::error_code>(ret).message();
+    } else if (it = output.sysroot.find("error: "); it != std::string::npos) {
+      while (!output.sysroot.empty() && output.sysroot.back() == '\n') {
+        output.sysroot.pop_back();
+      }
+      return output.sysroot.substr(it + 7);
     } else {
-      return std::make_error_code(std::errc::invalid_argument);
+      return "Unknown error: " + output.sysroot;
     }
   }
 
-  std::string output_no_sysroot;
   new_args.emplace_back("-isysroot");
   new_args.emplace_back(command.working_dir + "/trail_of_bits");
-  auto ret2 = Subprocess::Execute(
-      new_args, &(command.env), nullptr, nullptr, &output_no_sysroot);
+  ret = Subprocess::Execute(
+      new_args, &(command.env), nullptr, nullptr, &output.no_sysroot);
 
   // NOTE(pag): Changing the sysroot might make parts of the compilation fail.
-  if (!ret2.Succeeded() && output_no_sysroot.empty()) {
-    return ret2.TakeError();
+  if (std::holds_alternative<std::error_code>(ret) && output.no_sysroot.empty()) {
+    return std::get<std::error_code>(ret).message();
   }
 
-//  if (output_no_sysroot.find("udf.c") != std::string::npos) {
-//    auto fd = open("/tmp/udf_no_sysroot", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-//    write(fd, output_no_sysroot.data(), output_no_sysroot.size());
-//  }
-
-  if (auto it = output_no_sysroot.find("End of search list.");
+  if (auto it = output.no_sysroot.find("End of search list.");
       it == std::string::npos) {
-    if (!ret.Succeeded()) {
-      return ret.TakeError();
+    if (std::holds_alternative<std::error_code>(ret)) {
+      return std::get<std::error_code>(ret).message();
     } else {
-      return std::make_error_code(std::errc::invalid_argument);
+      return "Unknown error: " + output.sysroot;
     }
   }
 
-  return std::make_pair(output_sysroot, output_no_sysroot);
+  if (enable_cache) {
+    cached_info.emplace(command.vec[0], output);
+  }
+
+  return output;
 }
 
 bool BuildCommandAction::CanRunCompileJob(const pasta::CompileJob &job) {
@@ -387,21 +436,21 @@ void BuildCommandAction::Run(void) {
     return;
   }
 
-  auto cc_info = InitCompilerFromCommand();
-  if (!cc_info.Succeeded()) {
+  auto maybe_cc_info = cache.GetCompilerInfo(command);
+  if (!std::holds_alternative<CompilerPathInfo>(maybe_cc_info)) {
     LOG(ERROR)
         << "Error invoking original compiler to find version information: "
-        << cc_info.TakeError().message() << "; original command was: "
+        << std::get<std::string>(maybe_cc_info) << "; original command was: "
         << command.vec.Join();
     return;
   }
 
-  auto [cc_version_sysroot, cc_version_no_sysroot] = cc_info.TakeValue();
+  CompilerPathInfo &cc_info = std::get<CompilerPathInfo>(maybe_cc_info);
 
   pasta::Result<pasta::Compiler, std::string> maybe_cc =
       pasta::Compiler::Create(fm, command.vec[0], command.working_dir,
-                              command.name, command.lang, cc_version_sysroot,
-                              cc_version_no_sysroot);
+                              command.name, command.lang, cc_info.sysroot,
+                              cc_info.no_sysroot);
 
   if (maybe_cc.Succeeded()) {
     RunWithCompiler(maybe_cmd.TakeValue(), maybe_cc.TakeValue());
@@ -604,10 +653,11 @@ namespace {
 static std::mutex gImportLock;
 }  // namespace
 
-void Importer::Import(const ExecutorOptions &options) {
+void Importer::Import(const ExecutorOptions &options, bool fast_import) {
   Executor per_path_exe(options);
 
   for (auto &[cwd, commands] : d->commands) {
+    CompilerPathInfoCache cc_info_cache(fast_import);
 
     // Make sure that even concurrent calls to `Import` never concurrently
     // change the current working directory.
@@ -625,7 +675,8 @@ void Importer::Import(const ExecutorOptions &options) {
     }
 
     for (const Command &cmd : commands) {
-      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx);
+      per_path_exe.EmplaceAction<BuildCommandAction>(d->fm, cmd, d->ctx,
+                                                     cc_info_cache);
     }
 
     per_path_exe.Start();

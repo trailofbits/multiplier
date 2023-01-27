@@ -82,7 +82,7 @@ SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
 
 // The range of file tokens in this fragment.
 TokenRange Fragment::file_tokens(void) const {
-  auto fr = impl->Fragment();
+  const FragmentReader &fr = impl->reader;
   VariantId first_vid = EntityId(fr.getFirstFileTokenId()).Unpack();
   VariantId last_vid = EntityId(fr.getLastFileTokenId()).Unpack();
   if (!std::holds_alternative<FileTokenId>(first_vid) ||
@@ -117,7 +117,7 @@ TokenRange Fragment::parsed_tokens(void) const {
 // Return the list of top-level declarations in this fragment.
 std::vector<Decl> Fragment::top_level_declarations(void) const {
   std::vector<Decl> decls;
-  EntityIdListReader decl_ids = impl->Fragment().getTopLevelDeclarations();
+  EntityIdListReader decl_ids = impl->reader.getTopLevelDeclarations();
   decls.reserve(decl_ids.size());
   for (RawEntityId eid_ : decl_ids) {
     EntityId eid(eid_);
@@ -141,7 +141,7 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
 // This will return a mix of `Macro` or `Token` values.
 std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
   std::vector<std::variant<Macro, Token>> macros;
-  EntityIdListReader macro_ids = impl->Fragment().getTopLevelMacros();
+  EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
   macros.reserve(macro_ids.size());
   for (RawEntityId eid_ : macro_ids) {
     EntityId eid(eid_);
