@@ -7,7 +7,6 @@
 #include <atomic>
 #include <cassert>
 #include <iostream>
-#include <multiplier/Compress.h>
 #include <sstream>
 #include <stdexcept>
 #include <thread>
