@@ -43,9 +43,9 @@ class RegexQueryMatch;
 class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
+class OffsetEntityImpl;
 
-class PackedReaderState;
-using ReaderPtr = std::shared_ptr<PackedReaderState>;
+using EntityImplPtr = std::shared_ptr<OffsetEntityImpl>;
 
 using DeclUse = Use<DeclUseSelector>;
 using StmtUse = Use<StmtUseSelector>;
@@ -100,7 +100,7 @@ class EntityProvider {
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
 
- protected:
+ public:
 
   // Clients may make requests while the indexer is still running. For many
   // things this doesn't generally matter, but for others it does. For example,
@@ -115,8 +115,6 @@ class EntityProvider {
   // Update the version number. This is basically a signal to invalidate any
   // caches.
   virtual void VersionNumberChanged(unsigned new_version_number) = 0;
-
- private:
 
   // Clear the cache.
   virtual void ClearCache(void) = 0;
@@ -161,41 +159,77 @@ class EntityProvider {
   virtual std::shared_ptr<const FragmentImpl>
   FragmentFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<ReaderPtr>
+  virtual gap::generator<EntityImplPtr>
   DeclsFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<ReaderPtr>
+  virtual gap::generator<EntityImplPtr>
   TypesFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<ReaderPtr>
+  virtual gap::generator<EntityImplPtr>
   StmtsFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<ReaderPtr>
+  virtual gap::generator<EntityImplPtr>
   AttrsFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<ReaderPtr>
+  virtual gap::generator<EntityImplPtr>
   MacrosFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual gap::generator<ReaderPtr>
+  virtual gap::generator<EntityImplPtr>
   PseudosFor(const Ptr &, PackedFragmentId id) = 0;
 
-  virtual std::optional<ReaderPtr>
+  virtual std::optional<EntityImplPtr>
   DeclFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
 
-  virtual std::optional<ReaderPtr>
+  inline std::optional<EntityImplPtr>
+  DeclFor(const Ptr &ep, PackedDeclarationId id) {
+    auto unpacked = id.Unpack();
+    return DeclFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
+  }
+
+  virtual std::optional<EntityImplPtr>
   TypeFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
 
-  virtual std::optional<ReaderPtr>
+  inline std::optional<EntityImplPtr>
+  TypeFor(const Ptr &ep, PackedTypeId id) {
+    auto unpacked = id.Unpack();
+    return TypeFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
+  }
+
+  virtual std::optional<EntityImplPtr>
   StmtFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
 
-  virtual std::optional<ReaderPtr>
+  inline std::optional<EntityImplPtr>
+  StmtFor(const Ptr &ep, PackedStatementId id) {
+    auto unpacked = id.Unpack();
+    return StmtFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
+  }
+
+  virtual std::optional<EntityImplPtr>
   AttrFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
 
-  virtual std::optional<ReaderPtr>
+  inline std::optional<EntityImplPtr>
+  AttrFor(const Ptr &ep, PackedAttributeId id) {
+    auto unpacked = id.Unpack();
+    return AttrFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
+  }
+
+  virtual std::optional<EntityImplPtr>
   MacroFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
 
-  virtual std::optional<ReaderPtr>
+  inline std::optional<EntityImplPtr>
+  MacroFor(const Ptr &ep, PackedMacroId id) {
+    auto unpacked = id.Unpack();
+    return MacroFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
+  }
+
+  virtual std::optional<EntityImplPtr>
   PseudoFor(const Ptr &, PackedFragmentId id, unsigned offset) = 0;
+
+  inline std::optional<EntityImplPtr>
+  PseudoFor(const Ptr &ep, PackedDesignatorId id) {
+    auto unpacked = id.Unpack();
+    return TypeFor(ep, FragmentId(unpacked.fragment_id), unpacked.offset);
+  }
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   virtual FragmentIdList FragmentsCoveringTokens(

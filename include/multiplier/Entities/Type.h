@@ -40,7 +40,7 @@ class ComplexType;
 class DeducedType;
 class ObjCObjectPointerType;
 class ObjCObjectType;
-class PackedReaderState;
+class OffsetEntityImpl;
 class RecordDecl;
 class RecordType;
 class TagDecl;
@@ -60,20 +60,15 @@ class Type {
   friend class TokenContext;
   friend class UseBase;
   friend class UseIteratorImpl;
-  std::shared_ptr<PackedReaderState> package;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  std::shared_ptr<OffsetEntityImpl> impl;
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;
   Type &operator=(Type &&) noexcept = default;
   Type &operator=(const Type &) = default;
 
-  inline Type(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : package(std::move(package_)),
-        fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  inline Type(std::shared_ptr<OffsetEntityImpl> impl_)
+      : impl(std::move(impl_)) {}
 
   inline static std::optional<Type> from(const Type &self) {
     return self;

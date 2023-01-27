@@ -27,7 +27,7 @@
 
 namespace mx {
 class CXXBaseSpecifier;
-class PackedReaderState;
+class OffsetEntityImpl;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -46,20 +46,15 @@ class CXXBaseSpecifier {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
-  std::shared_ptr<PackedReaderState> package;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  std::shared_ptr<OffsetEntityImpl> impl;
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
-  inline CXXBaseSpecifier(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : package(std::move(package_)),
-        fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  inline CXXBaseSpecifier(std::shared_ptr<OffsetEntityImpl> impl_)
+      : impl(std::move(impl_)) {}
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;

@@ -79,7 +79,8 @@ std::optional<TokenContext> Token::context(void) const {
 
 // Return the declaration associated with this context, if any.
 std::optional<Decl> TokenContext::as_declaration(void) const {
-  if (auto ptr = impl->DeclFor(impl, EntityId(entity_id), true)) {
+  auto id = EntityId(entity_id).Extract<DeclarationId>().value();
+  if (auto ptr = impl->ep->DeclFor(impl->ep, id)) {
     return ptr.value();
   } else {
     return std::nullopt;
@@ -88,7 +89,8 @@ std::optional<Decl> TokenContext::as_declaration(void) const {
 
 // Return the statement associated with this context, if any.
 std::optional<Stmt> TokenContext::as_statement(void) const {
-  if (auto ptr = impl->StmtFor(impl, EntityId(entity_id), true)) {
+  auto id = EntityId(entity_id).Extract<StatementId>().value();
+  if (auto ptr = impl->ep->StmtFor(impl->ep, id)) {
     return ptr.value();
   } else {
     return std::nullopt;
@@ -97,7 +99,8 @@ std::optional<Stmt> TokenContext::as_statement(void) const {
 
 // Return the type associated with this context, if any.
 std::optional<Type> TokenContext::as_type(void) const {
-  if (auto ptr = impl->TypeFor(impl, EntityId(entity_id), true)) {
+  auto id = EntityId(entity_id).Extract<TypeId>().value();
+  if (auto ptr = impl->ep->TypeFor(impl->ep, id)) {
     return ptr.value();
   } else {
     return std::nullopt;
@@ -106,7 +109,8 @@ std::optional<Type> TokenContext::as_type(void) const {
 
 // Return the attribute associated with this context, if any.
 std::optional<Attr> TokenContext::as_attribute(void) const {
-  if (auto ptr = impl->AttrFor(impl, EntityId(entity_id), true)) {
+  auto id = EntityId(entity_id).Extract<AttributeId>().value();
+  if (auto ptr = impl->ep->AttrFor(impl->ep, id)) {
     return ptr.value();
   } else {
     return std::nullopt;
@@ -120,7 +124,7 @@ std::optional<Designator> TokenContext::as_designator(void) const {
     DesignatorId did = std::get<DesignatorId>(vid);
     auto reader = impl->NthPseudo(did.offset);
     if (reader.has_value()) {
-      return Designator(std::move(*reader), impl, did.offset);
+      return Designator(std::move(*reader));
     }
   }
   return std::nullopt;

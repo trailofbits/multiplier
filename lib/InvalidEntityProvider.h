@@ -56,40 +56,40 @@ class InvalidEntityProvider final : public EntityProvider {
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
 
-  gap::generator<ReaderPtr> DeclsFor(const Ptr &,
+  gap::generator<EntityImplPtr> DeclsFor(const Ptr &,
                                 PackedFragmentId id) final;
 
-  gap::generator<ReaderPtr> TypesFor(const Ptr &,
+  gap::generator<EntityImplPtr> TypesFor(const Ptr &,
                                 PackedFragmentId id) final;
 
-  gap::generator<ReaderPtr> StmtsFor(const Ptr &,
+  gap::generator<EntityImplPtr> StmtsFor(const Ptr &,
                                 PackedFragmentId id) final;
 
-  gap::generator<ReaderPtr> AttrsFor(const Ptr &,
+  gap::generator<EntityImplPtr> AttrsFor(const Ptr &,
                                 PackedFragmentId id) final;
 
-  gap::generator<ReaderPtr> MacrosFor(const Ptr &,
+  gap::generator<EntityImplPtr> MacrosFor(const Ptr &,
                                   PackedFragmentId id) final;
 
-  gap::generator<ReaderPtr> PseudosFor(const Ptr &,
+  gap::generator<EntityImplPtr> PseudosFor(const Ptr &,
                                   PackedFragmentId id) final;
 
-  std::optional<ReaderPtr> DeclFor(const Ptr &,
+  std::optional<EntityImplPtr> DeclFor(const Ptr &,
                                PackedFragmentId id, unsigned offset) final;
 
-  std::optional<ReaderPtr> TypeFor(const Ptr &,
+  std::optional<EntityImplPtr> TypeFor(const Ptr &,
                               PackedFragmentId id, unsigned offset) final;
 
-  std::optional<ReaderPtr> StmtFor(const Ptr &,
+  std::optional<EntityImplPtr> StmtFor(const Ptr &,
                               PackedFragmentId id, unsigned offset) final;
 
-  std::optional<ReaderPtr> AttrFor(const Ptr &,
+  std::optional<EntityImplPtr> AttrFor(const Ptr &,
                               PackedFragmentId id, unsigned offset) final;
 
-  std::optional<ReaderPtr> MacroFor(const Ptr &,
+  std::optional<EntityImplPtr> MacroFor(const Ptr &,
                                 PackedFragmentId id, unsigned offset) final;
 
-  std::optional<ReaderPtr> PseudoFor(const Ptr &,
+  std::optional<EntityImplPtr> PseudoFor(const Ptr &,
                                 PackedFragmentId id, unsigned offset) final;
 };
 

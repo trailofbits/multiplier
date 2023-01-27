@@ -35,23 +35,23 @@ Fragment Fragment::containing(const RegexQueryMatch &match) {
 }
 
 Fragment Fragment::containing(const Decl &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Stmt &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Type &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Attr &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Designator &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id));
 }
 
 std::optional<Fragment> Fragment::containing(const Token &entity) {
@@ -64,7 +64,7 @@ std::optional<Fragment> Fragment::containing(const Token &entity) {
 }
 
 Fragment Fragment::containing(const Macro &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const UseBase &use) {
@@ -126,7 +126,7 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
       DeclarationId decl_id = std::get<DeclarationId>(vid);
       auto decl_reader = impl->NthDecl(decl_id.offset);
       if (decl_id.fragment_id == impl->fragment_id && decl_reader.has_value()) {
-        decls.emplace_back(std::move(*decl_reader), impl, decl_id.offset);
+        decls.emplace_back(std::move(*decl_reader));
       } else {
         assert(false);
       }
@@ -150,7 +150,7 @@ std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
       MacroId macro_id = std::get<MacroId>(vid);
       auto macro_reader = impl->NthMacro(macro_id.offset);
       if (macro_id.fragment_id == impl->fragment_id && macro_reader.has_value()) {
-        macros.emplace_back(Macro(std::move(*macro_reader), impl, macro_id.offset));
+        macros.emplace_back(std::move(*macro_reader));
       } else {
         assert(false);
       }

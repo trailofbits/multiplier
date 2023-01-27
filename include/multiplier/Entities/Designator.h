@@ -26,7 +26,7 @@
 namespace mx {
 class Designator;
 class FieldDecl;
-class PackedReaderState;
+class OffsetEntityImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
  protected:
@@ -43,20 +43,15 @@ class Designator {
   friend class Type;
   friend class UseBase;
   friend class UseIteratorImpl;
-  std::shared_ptr<PackedReaderState> package;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  std::shared_ptr<OffsetEntityImpl> impl;
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
 
-  inline Designator(std::shared_ptr<PackedReaderState> package_, std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : package(std::move(package_)),
-        fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  inline Designator(std::shared_ptr<OffsetEntityImpl> impl_)
+      : impl(std::move(impl_)) {}
 
   bool is_field_designator(void) const;
   bool is_array_designator(void) const;

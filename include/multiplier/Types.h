@@ -12,6 +12,7 @@
 #include <functional>
 #include <iosfwd>
 #include <utility>
+#include <optional>
 #include <variant>
 
 namespace mx {
@@ -336,6 +337,15 @@ class EntityId final {
   inline auto operator<=>(const EntityId &that) const noexcept
       -> decltype(RawEntityId() <=> RawEntityId()) {
     return opaque <=> that.opaque;
+  }
+
+  template<typename T>
+  std::optional<T> Extract() {
+    auto unpacked = Unpack();
+    if(!std::holds_alternative<T>(unpacked)) {
+      return std::nullopt;
+    }
+    return std::get<T>(unpacked);
   }
 };
 

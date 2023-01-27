@@ -179,8 +179,9 @@ std::optional<File> File::containing(const Fragment &fragment) {
 
 // Return the file containing a specific token substitution.
 std::optional<File> File::containing(const Designator &entity) {
-  const auto &ep = entity.fragment->ep;
-  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+  const auto &ep = entity.impl->ep;
+  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
+  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
     return File(std::move(fp));
   }
   return std::nullopt;
@@ -188,8 +189,9 @@ std::optional<File> File::containing(const Designator &entity) {
 
 // Return the file containing the fragment containing a specific entity.
 std::optional<File> File::containing(const Decl &entity) {
-  const auto &ep = entity.fragment->ep;
-  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+  const auto &ep = entity.impl->ep;
+  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
+  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
     return File(std::move(fp));
   }
   return std::nullopt;
@@ -197,8 +199,9 @@ std::optional<File> File::containing(const Decl &entity) {
 
 // Return the file containing the fragment containing a specific entity.
 std::optional<File> File::containing(const Stmt &entity) {
-  const auto &ep = entity.fragment->ep;
-  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+  const auto &ep = entity.impl->ep;
+  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
+  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
     return File(std::move(fp));
   }
   return std::nullopt;
@@ -206,8 +209,9 @@ std::optional<File> File::containing(const Stmt &entity) {
 
 // Return the file containing the fragment containing a specific entity.
 std::optional<File> File::containing(const Type &entity) {
-  const auto &ep = entity.fragment->ep;
-  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+  const auto &ep = entity.impl->ep;
+  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
+  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
     return File(std::move(fp));
   }
   return std::nullopt;
@@ -215,8 +219,9 @@ std::optional<File> File::containing(const Type &entity) {
 
 // Return the file containing a specific fragment.
 std::optional<File> File::containing(const Attr &entity) {
-  const auto &ep = entity.fragment->ep;
-  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+  const auto &ep = entity.impl->ep;
+  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
+  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
     return File(std::move(fp));
   }
   return std::nullopt;
@@ -224,8 +229,9 @@ std::optional<File> File::containing(const Attr &entity) {
 
 // Return the file containing a specific fragment.
 std::optional<File> File::containing(const Macro &entity) {
-  const auto &ep = entity.fragment->ep;
-  if (auto fp = ep->FileFor(ep, entity.fragment->FileContaingFirstToken())) {
+  const auto &ep = entity.impl->ep;
+  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
+  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
     return File(std::move(fp));
   }
   return std::nullopt;

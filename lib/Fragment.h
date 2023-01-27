@@ -153,19 +153,19 @@ class FragmentImpl final : public EntityImpl {
   ParsedTokenReader(const FragmentImpl::Ptr &) const;
 
   // Return a specific type of entity.
-  std::optional<ReaderPtr> NthDecl(unsigned offset) const;
-  std::optional<ReaderPtr> NthStmt(unsigned offset) const;
-  std::optional<ReaderPtr> NthType(unsigned offset) const;
-  std::optional<ReaderPtr> NthAttr(unsigned offset) const;
-  std::optional<ReaderPtr> NthMacro(unsigned offset) const;
-  std::optional<ReaderPtr> NthPseudo(unsigned offset) const;
+  std::optional<EntityImplPtr> NthDecl(unsigned offset) const;
+  std::optional<EntityImplPtr> NthStmt(unsigned offset) const;
+  std::optional<EntityImplPtr> NthType(unsigned offset) const;
+  std::optional<EntityImplPtr> NthAttr(unsigned offset) const;
+  std::optional<EntityImplPtr> NthMacro(unsigned offset) const;
+  std::optional<EntityImplPtr> NthPseudo(unsigned offset) const;
 
-  gap::generator<ReaderPtr> Decls() const;
-  gap::generator<ReaderPtr> Stmts() const;
-  gap::generator<ReaderPtr> Types() const;
-  gap::generator<ReaderPtr> Attrs() const;
-  gap::generator<ReaderPtr> Macros() const;
-  gap::generator<ReaderPtr> Pseudos() const;
+  gap::generator<EntityImplPtr> Decls() const;
+  gap::generator<EntityImplPtr> Stmts() const;
+  gap::generator<EntityImplPtr> Types() const;
+  gap::generator<EntityImplPtr> Attrs() const;
+  gap::generator<EntityImplPtr> Macros() const;
+  gap::generator<EntityImplPtr> Pseudos() const;
 
   std::string_view SourceIR(void) const & noexcept;
 
@@ -178,26 +178,6 @@ class FragmentImpl final : public EntityImpl {
   // Return the inclusive token range associated with two entity IDs.
   TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
                            EntityId end_id) const;
-
-  // Return the declaration associated with a specific entity ID.
-  std::optional<Decl> DeclFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-
-  // Return the statement associated with a specific entity ID.
-  std::optional<Stmt> StmtFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-
-  // Return the type associated with a specific entity ID.
-  std::optional<Type> TypeFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
-
-  // Return the attribute associated with a specific entity ID.
-  std::optional<Macro> MacroFor(const FragmentImpl::Ptr &, EntityId id,
-                                bool can_fail=true) const;
-
-  // Return the attribute associated with a specific entity ID.
-  std::optional<Attr> AttrFor(const FragmentImpl::Ptr &, EntityId id,
-                              bool can_fail=true) const;
 };
 
 }  // namespace mx

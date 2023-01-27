@@ -61,27 +61,27 @@ Index Index::containing(const File &file) {
 }
 
 Index Index::containing(const Decl &entity) {
-  return Index(entity.fragment->ep);
+  return Index(entity.impl->ep);
 }
 
 Index Index::containing(const Stmt &entity) {
-  return Index(entity.fragment->ep);
+  return Index(entity.impl->ep);
 }
 
 Index Index::containing(const Type &entity) {
-  return Index(entity.fragment->ep);
+  return Index(entity.impl->ep);
 }
 
 Index Index::containing(const Attr &entity) {
-  return Index(entity.fragment->ep);
+  return Index(entity.impl->ep);
 }
 
 Index Index::containing(const Macro &entity) {
-  return Index(entity.fragment->ep);
+  return Index(entity.impl->ep);
 }
 
 Index Index::containing(const Designator &entity) {
-  return Index(entity.fragment->ep);
+  return Index(entity.impl->ep);
 }
 
 std::optional<Index> Index::containing(const Token &entity) {
@@ -228,7 +228,7 @@ VariantEntity Index::entity(EntityId eid) const {
     if (!reader.has_value()) {
       return NotAnEntity();
     }
-    Decl decl(std::move(*reader), std::move(frag_ptr), id.offset);
+    Decl decl(std::move(*reader));
     if (decl.id() == eid) {
       return decl;
     } else {
@@ -248,7 +248,7 @@ VariantEntity Index::entity(EntityId eid) const {
     if (!reader.has_value()) {
       return NotAnEntity();
     }
-    Stmt stmt(std::move(*reader), std::move(frag_ptr), id.offset);
+    Stmt stmt(std::move(*reader));
     if (stmt.id() == eid) {
       return stmt;
     } else {
@@ -268,7 +268,7 @@ VariantEntity Index::entity(EntityId eid) const {
     if (!reader.has_value()) {
       return NotAnEntity();
     }
-    Type type(std::move(*reader), std::move(frag_ptr), id.offset);
+    Type type(std::move(*reader));
     if (type.id() == eid) {
       return type;
     } else {
@@ -288,7 +288,7 @@ VariantEntity Index::entity(EntityId eid) const {
     if (!reader.has_value()) {
       return NotAnEntity();
     }
-    Attr attr(std::move(*reader), std::move(frag_ptr), id.offset);
+    Attr attr(std::move(*reader));
     if (attr.id() == eid) {
       return attr;
     } else {
@@ -339,7 +339,7 @@ VariantEntity Index::entity(EntityId eid) const {
     if (!reader.has_value()) {
       return NotAnEntity();
     }
-    Macro macro(std::move(*reader), std::move(frag_ptr), id.offset);
+    Macro macro(std::move(*reader));
     if (macro.id() == eid) {
       return macro;
     } else {
@@ -371,7 +371,7 @@ VariantEntity Index::entity(EntityId eid) const {
     if (!reader.has_value()) {
       return NotAnEntity();
     }
-    return Designator(std::move(*reader), std::move(frag_ptr), id.offset);
+    return Designator(std::move(*reader));
  
   } else if (std::holds_alternative<FragmentId>(vid)) {
     FragmentId id = std::get<FragmentId>(vid);
@@ -403,20 +403,14 @@ NamedEntityList Index::query_entities(std::string name) const {
     if (std::holds_alternative<DeclarationId>(vid)) {
 
       DeclarationId id = std::get<DeclarationId>(vid);
-      FragmentId fid(id.fragment_id);
-      FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-      if (!frag_ptr) {
-        assert(false);
-        continue;
-      }
 
-      auto decl_ptr = frag_ptr->DeclFor(frag_ptr, eid);
+      auto decl_ptr = impl->DeclFor(impl, id);
       if (!decl_ptr) {
         assert(false);
         continue;
       }
 
-      auto nd = NamedDecl::from(std::move(decl_ptr.value()));
+      auto nd = NamedDecl::from(std::move(decl_ptr));
       if (!nd) {
         assert(false);
         continue;
@@ -427,20 +421,14 @@ NamedEntityList Index::query_entities(std::string name) const {
     } else if (std::holds_alternative<MacroId>(vid)) {
 
       MacroId id = std::get<MacroId>(vid);
-      FragmentId fid(id.fragment_id);
-      FragmentImpl::Ptr frag_ptr = impl->FragmentFor(impl, fid);
-      if (!frag_ptr) {
-        assert(false);
-        continue;
-      }
 
-      auto macro_ptr = frag_ptr->MacroFor(frag_ptr, eid);
+      auto macro_ptr = impl->MacroFor(impl, id);
       if (!macro_ptr) {
         assert(false);
         continue;
       }
 
-      auto def = DefineMacroDirective::from(std::move(macro_ptr.value()));
+      auto def = DefineMacroDirective::from(std::move(macro_ptr));
       if (!def) {
         assert(false);
         continue;

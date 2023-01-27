@@ -10,6 +10,7 @@
 #include <capnp/serialize.h>
 #include <memory>
 #include <string>
+#include <multiplier/Types.h>
 
 namespace mx {
 
@@ -23,19 +24,31 @@ class EntityImpl {
   const std::string data;
   capnp::FlatArrayMessageReader message;
 
- protected:
+ public:
+
+  // Needed for us to be able to look up the file containing this fragment,
+  // or look up entities related to other fragments.
+  const std::shared_ptr<EntityProvider> ep;
+
   explicit EntityImpl(std::shared_ptr<EntityProvider> ep_, std::string data_);
 
   template <typename T>
   inline auto Reader(void) & noexcept -> typename T::Reader {
     return message.getRoot<T>();
   }
+};
 
- public:
+class OffsetEntityImpl : public EntityImpl {
+  public:
+    const PackedFragmentId fragment_id;
+    const unsigned offset;
 
-  // Needed for us to be able to look up the file containing this fragment,
-  // or look up entities related to other fragments.
-  const std::shared_ptr<EntityProvider> ep;
+    explicit inline OffsetEntityImpl(
+        std::shared_ptr<EntityProvider> ep_, std::string data_,
+        PackedFragmentId fragment_id_, unsigned offset_)
+      : EntityImpl(std::move(ep_), std::move(data_)),
+      fragment_id(fragment_id_),
+      offset(offset_) {}
 };
 
 }  // namespace mx

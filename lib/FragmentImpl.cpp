@@ -150,7 +150,7 @@ EntityId ReadMacroTokensFromFragment::NthContainingMacroId(
 
   // NOTE(pag): This is a huge hack. We can't let this `frag` pointer leak.
   FragmentImpl::Ptr frag(fragment->ep, fragment);
-  Macro m(std::move(*macro_reader), std::move(frag), mo);
+  Macro m(std::move(*macro_reader));
   return m.id().Pack();
 }
 
@@ -384,7 +384,7 @@ EntityId ReadParsedTokensFromFragment::NthContainingMacroId(
 
   // NOTE(pag): This is a huge hack. We can't let this `frag` pointer leak.
   FragmentImpl::Ptr frag(fragment->ep, fragment);
-  Macro m(std::move(*macro_reader), std::move(frag), mo);
+  Macro m(std::move(*macro_reader));
   return m.id().Pack();
 }
 
@@ -458,51 +458,51 @@ bool ReadParsedTokensFromFragment::Equals(const class TokenReader *that_) const 
 }
 
 // Return a specific type of entity.
-std::optional<ReaderPtr> FragmentImpl::NthDecl(EntityOffset offset) const {
+std::optional<EntityImplPtr> FragmentImpl::NthDecl(EntityOffset offset) const {
   return ep->DeclFor(ep, FragmentId(fragment_id), offset);
 }
 
-std::optional<ReaderPtr> FragmentImpl::NthStmt(EntityOffset offset) const {
+std::optional<EntityImplPtr> FragmentImpl::NthStmt(EntityOffset offset) const {
   return ep->StmtFor(ep, FragmentId(fragment_id), offset);
 }
 
-std::optional<ReaderPtr> FragmentImpl::NthType(EntityOffset offset) const {
+std::optional<EntityImplPtr> FragmentImpl::NthType(EntityOffset offset) const {
   return ep->TypeFor(ep, FragmentId(fragment_id), offset);
 }
 
-std::optional<ReaderPtr> FragmentImpl::NthAttr(EntityOffset offset) const {
+std::optional<EntityImplPtr> FragmentImpl::NthAttr(EntityOffset offset) const {
   return ep->AttrFor(ep, FragmentId(fragment_id), offset);
 }
 
-std::optional<ReaderPtr> FragmentImpl::NthMacro(EntityOffset offset) const {
+std::optional<EntityImplPtr> FragmentImpl::NthMacro(EntityOffset offset) const {
   return ep->MacroFor(ep, FragmentId(fragment_id), offset);
 }
 
-std::optional<ReaderPtr> FragmentImpl::NthPseudo(EntityOffset offset) const {
+std::optional<EntityImplPtr> FragmentImpl::NthPseudo(EntityOffset offset) const {
   return ep->PseudoFor(ep, FragmentId(fragment_id), offset);
 }
 
-gap::generator<ReaderPtr> FragmentImpl::Decls() const {
+gap::generator<EntityImplPtr> FragmentImpl::Decls() const {
   return ep->DeclsFor(ep, FragmentId(fragment_id));
 }
 
-gap::generator<ReaderPtr> FragmentImpl::Stmts() const {
+gap::generator<EntityImplPtr> FragmentImpl::Stmts() const {
   return ep->StmtsFor(ep, FragmentId(fragment_id));
 }
 
-gap::generator<ReaderPtr> FragmentImpl::Types() const {
+gap::generator<EntityImplPtr> FragmentImpl::Types() const {
   return ep->TypesFor(ep, FragmentId(fragment_id));
 }
 
-gap::generator<ReaderPtr> FragmentImpl::Attrs() const {
+gap::generator<EntityImplPtr> FragmentImpl::Attrs() const {
   return ep->AttrsFor(ep, FragmentId(fragment_id));
 }
 
-gap::generator<ReaderPtr> FragmentImpl::Macros() const {
+gap::generator<EntityImplPtr> FragmentImpl::Macros() const {
   return ep->MacrosFor(ep, FragmentId(fragment_id));
 }
 
-gap::generator<ReaderPtr> FragmentImpl::Pseudos() const {
+gap::generator<EntityImplPtr> FragmentImpl::Pseudos() const {
   return ep->PseudosFor(ep, FragmentId(fragment_id));
 }
 
@@ -679,230 +679,6 @@ TokenRange FragmentImpl::TokenRangeFor(
   }
 
   return TokenRange();
-}
-
-// Return the declaration associated with a specific entity ID.
-std::optional<Decl> FragmentImpl::DeclFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<DeclarationId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  DeclarationId decl_id = std::get<DeclarationId>(vid);
-
-  if (decl_id.fragment_id == fragment_id) {
-    auto decl_reader = ep->DeclFor(ep, FragmentId(fragment_id), decl_id.offset);
-    if (decl_reader.has_value()) {
-      Decl decl(std::move(*decl_reader), self, decl_id.offset);
-      if (decl.id() == eid) {
-        return decl;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's a decl inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, FragmentId(decl_id.fragment_id))) {
-    auto decl_reader = ep->DeclFor(ep, FragmentId(decl_id.fragment_id),
-                                   decl_id.offset);
-    if (decl_reader.has_value()) {
-      Decl decl(std::move(*decl_reader), std::move(frag), decl_id.offset);
-      if (decl.id() == eid) {
-        return decl;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the statement associated with a specific entity ID.
-std::optional<Stmt> FragmentImpl::StmtFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<StatementId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  StatementId stmt_id = std::get<StatementId>(vid);
-  FragmentId fid(stmt_id.fragment_id);
-
-  // It's a statement inside of the current fragment.
-  if (stmt_id.fragment_id == fragment_id) {
-    auto stmt_reader = ep->StmtFor(ep, FragmentId(fragment_id), stmt_id.offset);
-    if (stmt_reader.has_value()) {
-      Stmt stmt(std::move(*stmt_reader), self, stmt_id.offset);
-      if (stmt.id() == eid) {
-        return stmt;
-      } else {
-        assert(false);
-      }
-    }
-  // It's a statement inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    auto stmt_reader = ep->DeclFor(ep, FragmentId(stmt_id.fragment_id),
-                                   stmt_id.offset);
-    if (stmt_reader.has_value()) {
-      Stmt stmt(std::move(*stmt_reader), self, stmt_id.offset);
-      if (stmt.id() == eid) {
-        return stmt;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the type associated with a specific entity ID.
-std::optional<Type> FragmentImpl::TypeFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<TypeId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  TypeId type_id = std::get<TypeId>(vid);
-  FragmentId fid(type_id.fragment_id);
-
-  // It's a type inside of the current fragment.
-  if (type_id.fragment_id == fragment_id) {
-    auto type_reader = ep->TypeFor(ep, FragmentId(fragment_id), type_id.offset);
-    if (type_reader.has_value()) {
-      Type type(std::move(*type_reader), self, type_id.offset);
-      if (type.id() == eid) {
-        return type;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's a type inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    auto type_reader = ep->TypeFor(ep, FragmentId(type_id.fragment_id),
-                                   type_id.offset);
-    if (type_reader.has_value()) {
-      Type type(std::move(*type_reader), self, type_id.offset);
-      if (type.id() == eid) {
-        return type;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the attribute associated with a specific entity ID.
-std::optional<Macro> FragmentImpl::MacroFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<MacroId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  MacroId macro_id = std::get<MacroId>(vid);
-  FragmentId fid(macro_id.fragment_id);
-
-  // It's a type inside of the current fragment.
-  if (macro_id.fragment_id == fragment_id) {
-    auto macro_reader = ep->MacroFor(ep, FragmentId(fragment_id),
-                                     macro_id.offset);
-    if (macro_reader.has_value()) {
-      Macro macro(std::move(*macro_reader), self, macro_id.offset);
-      if (macro.id() == eid) {
-        return macro;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's a type inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    auto macro_reader = ep->MacroFor(ep, FragmentId(macro_id.fragment_id),
-                                     macro_id.offset);
-    if (macro_reader.has_value()) {
-      Macro macro(std::move(*macro_reader), self, macro_id.offset);
-      if (macro.id() == eid) {
-        return macro;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the type associated with a specific entity ID.
-std::optional<Attr> FragmentImpl::AttrFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<AttributeId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  AttributeId attr_id = std::get<AttributeId>(vid);
-  FragmentId fid(attr_id.fragment_id);
-
-  // It's an attribute inside of the current fragment.
-  if (attr_id.fragment_id == fragment_id) {
-    auto attr_reader = ep->AttrFor(ep, FragmentId(fragment_id), attr_id.offset);
-    if (attr_reader.has_value()) {
-      Attr attr(std::move(*attr_reader), self, attr_id.offset);
-      if (attr.id() == eid) {
-        return attr;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's an attribute inside of another fragment, go get the other fragment.
-  } else {
-    auto frag = ep->FragmentFor(ep, fid);
-    auto attr_reader = ep->TypeFor(ep, FragmentId(attr_id.fragment_id),
-                                   attr_id.offset);
-    if (attr_reader.has_value()) {
-      Attr attr(std::move(*attr_reader), self, attr_id.offset);
-      if (attr.id() == eid) {
-        return attr;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
 }
 
 }  // namespace mx

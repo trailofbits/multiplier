@@ -217,29 +217,29 @@ void CachingEntityProvider::FindSymbol(
   return next->FindSymbol(self, std::move(name), ids_out);
 }
 
-gap::generator<ReaderPtr> CachingEntityProvider::DeclsFor(
+gap::generator<EntityImplPtr> CachingEntityProvider::DeclsFor(
   const Ptr &self, PackedFragmentId id) { return next->DeclsFor(self, id); }
-gap::generator<ReaderPtr> CachingEntityProvider::TypesFor(
+gap::generator<EntityImplPtr> CachingEntityProvider::TypesFor(
   const Ptr &self, PackedFragmentId id) { return next->TypesFor(self, id); }
-gap::generator<ReaderPtr> CachingEntityProvider::StmtsFor(
+gap::generator<EntityImplPtr> CachingEntityProvider::StmtsFor(
   const Ptr &self, PackedFragmentId id) { return next->StmtsFor(self, id); }
-gap::generator<ReaderPtr> CachingEntityProvider::AttrsFor(
+gap::generator<EntityImplPtr> CachingEntityProvider::AttrsFor(
   const Ptr &self, PackedFragmentId id) { return next->AttrsFor(self, id); }
-gap::generator<ReaderPtr> CachingEntityProvider::MacrosFor(
+gap::generator<EntityImplPtr> CachingEntityProvider::MacrosFor(
   const Ptr &self, PackedFragmentId id) { return next->MacrosFor(self, id); }
-gap::generator<ReaderPtr> CachingEntityProvider::PseudosFor(
+gap::generator<EntityImplPtr> CachingEntityProvider::PseudosFor(
   const Ptr &self, PackedFragmentId id) { return next->PseudosFor(self, id); }
-std::optional<ReaderPtr> CachingEntityProvider::DeclFor(
+std::optional<EntityImplPtr> CachingEntityProvider::DeclFor(
   const Ptr &self, PackedFragmentId id, unsigned offset) { return next->DeclFor(self, id, offset); }
-std::optional<ReaderPtr> CachingEntityProvider::TypeFor(
+std::optional<EntityImplPtr> CachingEntityProvider::TypeFor(
   const Ptr &self, PackedFragmentId id, unsigned offset) { return next->TypeFor(self, id, offset); }
-std::optional<ReaderPtr> CachingEntityProvider::StmtFor(
+std::optional<EntityImplPtr> CachingEntityProvider::StmtFor(
   const Ptr &self, PackedFragmentId id, unsigned offset) { return next->StmtFor(self, id, offset); }
-std::optional<ReaderPtr> CachingEntityProvider::AttrFor(
+std::optional<EntityImplPtr> CachingEntityProvider::AttrFor(
   const Ptr &self, PackedFragmentId id, unsigned offset) { return next->AttrFor(self, id, offset); }
-std::optional<ReaderPtr> CachingEntityProvider::MacroFor(
+std::optional<EntityImplPtr> CachingEntityProvider::MacroFor(
   const Ptr &self, PackedFragmentId id, unsigned offset) { return next->MacroFor(self, id, offset); }
-std::optional<ReaderPtr> CachingEntityProvider::PseudoFor(
+std::optional<EntityImplPtr> CachingEntityProvider::PseudoFor(
   const Ptr &self, PackedFragmentId id, unsigned offset) { return next->PseudoFor(self, id, offset); }
 
 // Returns an entity provider that gets entities from a UNIX domain socket.
