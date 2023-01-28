@@ -161,7 +161,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitDecl(const pasta::Decl &decl) final {
-    if (!decl.IsImplicit()) {
+    if (!decl.IsInvalidDeclaration()) {
       tlds.emplace_back(decl, order++);
     }
   }

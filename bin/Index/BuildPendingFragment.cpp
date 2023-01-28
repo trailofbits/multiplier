@@ -242,6 +242,9 @@ bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
     //            internalizing class templates and partial specializations
     //            into the fragments using their complete specializations.
     default:
+      if (entity.IsInvalidDeclaration()) {
+        return false;
+      }
       break;
   }
 
@@ -255,29 +258,17 @@ bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
   if (added) {
     decls_to_serialize.emplace_back(entity);  // New decl found.
     return true;
-
-  // NOTE(pag): An interesting side-effect of this approach is that builtin/
-  //            implicit declarations become internalized into the fragments.
-  //            E.g. we might have a `CallExpr` that calls a compiler intrinsic,
-  //            and that intrinsic will turn into a declaration embedded in this
-  //            fragment.
-  } else if (entity.IsImplicit()) {
-    mx::VariantId vid = it->second.Unpack();
-    if (std::holds_alternative<mx::DeclarationId>(vid)) {
-      auto prev_id = std::get<mx::DeclarationId>(vid);
-      if (prev_id.fragment_id != fragment_index) {
-        entity_ids[entity.RawDecl()] = id;  // Overwrite and force it in.
-        decls_to_serialize.emplace_back(entity);
-        return true;
-      }
-    } else {
-      assert(false);
-    }
   }
   return false;
 }
 
 bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
+  if (auto expr = pasta::Expr::From(entity)) {
+    if (expr->ContainsErrors()) {
+      return false;
+    }
+  }
+
   auto kind = entity.Kind();
   mx::StatementId id;
   id.fragment_id = fragment_index;
