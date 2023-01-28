@@ -77,6 +77,13 @@ class PendingFragment {
   EntityIdMap parent_decl_ids;
   EntityIdMap parent_stmt_ids;
 
+  // Type IDs for types used inside of this fragment.
+  //
+  // TODO(pag): Types are redundantly represented in/across fragments; no
+  //            de-duplication is done. Investigate smarter fragment-specific
+  //            attribution.
+  TypeIdMap type_ids;
+
   // Offsets of the serialized version of pseudo entities in this fragment.
   PseudoOffsetMap pseudo_offsets;
 

@@ -1016,12 +1016,12 @@ found_tokens:
   mx::FileTokenId btid;
   btid.file_id = file_index;
   btid.kind = TokenKindFromPasta(begin_tok.value());
-  btid.offset = static_cast<unsigned>(begin_tok->Index());
+  btid.offset = static_cast<mx::EntityOffset>(begin_tok->Index());
 
   mx::FileTokenId etid;
   etid.file_id = file_index;
   etid.kind = TokenKindFromPasta(end_tok.value());
-  etid.offset = static_cast<unsigned>(end_tok->Index());
+  etid.offset = static_cast<mx::EntityOffset>(end_tok->Index());
 
   return FileLocationOfFragment(fid, btid, etid);
 }

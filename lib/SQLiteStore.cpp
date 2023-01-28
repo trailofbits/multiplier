@@ -14,8 +14,8 @@
 #include <vector>
 #include <zstd.h>
 
-#include "API.h"
 #include "SQLiteCompression.h"
+#include "Types.h"
 
 namespace std {
 
@@ -36,13 +36,29 @@ struct default_delete<ZSTD_DCtx> {
 }  // namespace std
 
 namespace sqlite {
+namespace {
 
-#define MX_VISIT_PSEUDO_KIND(cls, storage) \
-    inline static unsigned Get_Pseudo_Kind( \
-        const mx::ast::Pseudo::Reader &reader, mx::cls *) { \
-      return reader.getVal ## storage(); \
-    }
-#include <multiplier/Visitor.inc.h>
+static void IdToFragmentOffset(sqlite3_context *sql_ctx, int,
+                               sqlite3_value **argv) {
+  mx::EntityOffset offset = mx::FragmentOffsetFromEntityId(
+      static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
+  if (offset == ~0u) {
+    sqlite3_result_error(
+        sql_ctx,
+        "Input ID does not correspond to a fragment-specific entity", -1);
+    return;
+  }
+
+  if constexpr (sizeof(mx::EntityOffset) == 8u) {
+    sqlite3_result_int64(
+        sql_ctx, static_cast<mx::SignedEntityOffset>(offset));
+  } else {
+    sqlite3_result_int(
+        sql_ctx, static_cast<mx::SignedEntityOffset>(offset));
+  }
+}
+
+}  // namespace
 
 class ConnectionImpl {
  public:
@@ -297,19 +313,24 @@ Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
     : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
 
-  CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC,
+
+  CreateFunction("id_to_fragment_offset", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToFragmentOffset, nullptr, nullptr, nullptr);
+
+  CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  ZstdCompress, nullptr, nullptr, nullptr,
                  impl->compression_ctx.get());
 
-  CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC,
+  CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  ZstdCompressDict, nullptr, nullptr, nullptr,
                  impl->compression_ctx.get());
 
-  CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC,
+  CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  ZstdDecompress, nullptr, nullptr, nullptr,
                  impl->decompression_ctx.get());
 
-  CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC,
+  CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  ZstdDecompressDict, nullptr, nullptr, nullptr,
                  impl->decompression_ctx.get());
 

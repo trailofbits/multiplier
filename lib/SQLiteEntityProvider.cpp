@@ -213,7 +213,7 @@ class SQLiteEntityProviderImpl {
       , get_ ## lower_name ## _by_id(db.Prepare( \
             "SELECT zstd_decompress(data), " \
             "       fragment_id, " \
-            "       " #lower_name "_offset(?1) " \
+            "       id_to_fragment_offset(?1) " \
             "FROM " #lower_name " WHERE id = ?1")) \
       , get_ ## lower_name ## _by_offset(db.Prepare( \
             "SELECT id " \

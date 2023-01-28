@@ -319,7 +319,7 @@ struct ReferenceRecord {
         "  fragment_id INT NOT NULL, " \
         "  fragment_offset INT NOT NULL, " \
         "  data BLOB NOT NULL " \
-        ")"}; \
+        ") WITHOUT rowid"}; \
     \
     static constexpr const char *kExitStatements[] = { \
         "CREATE INDEX IF NOT EXISTS " #lower_name "_fragment_index " \

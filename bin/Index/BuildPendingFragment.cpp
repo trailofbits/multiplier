@@ -93,7 +93,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
 
   mx::DeclarationId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
   id.is_definition = IsDefinition(entity);
 
@@ -124,7 +124,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
   mx::StatementId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.stmts_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
   if (entity_ids.emplace(entity.RawStmt(), id).second) {
@@ -136,7 +136,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Type &entity) {
   auto kind = entity.Kind();
   mx::TypeId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.types_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.types_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
@@ -153,7 +153,7 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
   auto kind = entity.Kind();
   mx::AttributeId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.attrs_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.attrs_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
   if (entity_ids.emplace(entity.RawAttr(), id).second) {
@@ -162,7 +162,8 @@ void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
 }
 
 void FragmentBuilder::MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-  auto offset = static_cast<uint32_t>(fragment.pseudos_to_serialize.size());
+  auto offset = static_cast<mx::EntityOffset>(
+      fragment.pseudos_to_serialize.size());
   if (fragment.pseudo_offsets.emplace(
           pseudo.RawTemplateArgument(), offset).second) {
     fragment.pseudos_to_serialize.emplace_back(pseudo);
@@ -170,7 +171,8 @@ void FragmentBuilder::MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
 }
 
 void FragmentBuilder::MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-  auto offset = static_cast<uint32_t>(fragment.pseudos_to_serialize.size());
+  auto offset = static_cast<mx::EntityOffset>(
+      fragment.pseudos_to_serialize.size());
   if (fragment.pseudo_offsets.emplace(
           pseudo.RawCXXBaseSpecifier(), offset).second) {
     fragment.pseudos_to_serialize.emplace_back(pseudo);
@@ -179,7 +181,8 @@ void FragmentBuilder::MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
 
 void FragmentBuilder::MaybeVisitNext(
     const pasta::TemplateParameterList &pseudo) {
-  auto offset = static_cast<uint32_t>(fragment.pseudos_to_serialize.size());
+  auto offset = static_cast<mx::EntityOffset>(
+      fragment.pseudos_to_serialize.size());
   if (fragment.pseudo_offsets.emplace(
           pseudo.RawTemplateParameterList(), offset).second) {
     fragment.pseudos_to_serialize.emplace_back(pseudo);
@@ -188,7 +191,8 @@ void FragmentBuilder::MaybeVisitNext(
 
 void FragmentBuilder::MaybeVisitNext(
     const pasta::Designator &pseudo) {
-  auto offset = static_cast<uint32_t>(fragment.pseudos_to_serialize.size());
+  auto offset = static_cast<mx::EntityOffset>(
+      fragment.pseudos_to_serialize.size());
   if (fragment.pseudo_offsets.emplace(
           pseudo.RawDesignator(), offset).second) {
     fragment.pseudos_to_serialize.emplace_back(pseudo);
@@ -329,14 +333,14 @@ void FragmentBuilder::Accept(const pasta::Macro &) {}
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
 void BuildPendingFragment(
     PendingFragment &pf, EntityIdMap &entity_ids,
-    TypeIdMap &type_ids, const pasta::TokenRange &tokens) {
+    const pasta::TokenRange &tokens) {
   size_t prev_num_decls = 0ul;
   size_t prev_num_stmts = 0ul;
   size_t prev_num_types = 0ul;
   size_t prev_num_attrs = 0ul;
   size_t prev_num_pseudos = 0ul;
 
-  FragmentBuilder builder(entity_ids, type_ids, pf);
+  FragmentBuilder builder(entity_ids, pf.type_ids, pf);
 
   // Make sure to collect everything reachable from token contexts.
   for (auto i = pf.begin_index; i <= pf.end_index; ++i) {

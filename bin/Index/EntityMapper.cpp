@@ -157,7 +157,7 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
   mx::FileTokenId id;
   id.file_id = std::get<mx::FileId>(vid).file_id;
   id.kind = TokenKindFromPasta(entity);
-  id.offset = static_cast<uint32_t>(entity.Index());
+  id.offset = static_cast<mx::EntityOffset>(entity.Index());
   ::mx::EntityId ret_id(id);
   return ret_id.Pack();
 }
@@ -165,7 +165,8 @@ mx::RawEntityId EntityMapper::EntityId(const pasta::FileToken &entity) const {
 mx::RawEntityId EntityMapper::EntityId(const pasta::Type &entity) const {
   TypeKey type_key(entity.RawType(), entity.RawQualifiers());
   assert(type_key.first != nullptr);
-  if (auto it = type_ids.find(type_key); it != type_ids.end()) {
+  if (auto it = fragment.type_ids.find(type_key);
+      it != fragment.type_ids.end()) {
     return it->second.Pack();
   } else {
     assert(false);
@@ -214,10 +215,12 @@ uint32_t EntityMapper::PseudoId(const pasta::Designator &pseudo) const {
   }
 }
 
-mx::RawEntityId EntityMapper::EntityIdOfType(const void *type, uint32_t quals) const {
+mx::RawEntityId EntityMapper::EntityIdOfType(
+    const void *type, uint32_t quals) const {
   TypeKey type_key(type, quals);
   assert(type_key.first != nullptr);
-  if (auto it = type_ids.find(type_key); it != type_ids.end()) {
+  if (auto it = fragment.type_ids.find(type_key);
+      it != fragment.type_ids.end()) {
     return it->second.Pack();
   } else {
     return mx::kInvalidEntityId;

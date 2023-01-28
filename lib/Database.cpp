@@ -533,9 +533,10 @@ bool BulkInserterState::InsertAsync(
 #define MX_INSERT_ASYNC_ENTITY(name, lower_name) \
   bool BulkInserterState::InsertAsync(name ## EntityRecord record, \
                                       sqlite::Statement &insert) { \
-    insert.BindValues(record.id, record.data, \
+    insert.BindValues(record.id, \
                       FragmentIdFromEntityId(record.id), \
-                      FragmentOffsetFromEntityId(record.id)); \
+                      FragmentOffsetFromEntityId(record.id), \
+                      record.data); \
     return true; \
   }
 

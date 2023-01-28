@@ -462,6 +462,8 @@ EntityId::EntityId(FileTokenId id) {
 
 #pragma GCC diagnostic pop
 
+// Return the fragment offset from an entity ID. Returns `~0u` if it's not
+// a fragment-specific entity ID.
 EntityOffset FragmentOffsetFromEntityId(RawEntityId id) {
   PackedEntityId packed = {};
   packed.opaque = id;
@@ -476,10 +478,17 @@ EntityOffset FragmentOffsetFromEntityId(RawEntityId id) {
   }
 }
 
+// Returns the fragment ID corresponding with a fragment-specific entity ID.
 RawEntityId FragmentIdFromEntityId(RawEntityId id) {
   PackedEntityId packed = {};
   packed.opaque = id;
+
   if (!packed.entity_or_other.is_fragment_entity) {
+    if (packed.other.kind == static_cast<uint64_t>(OtherKind::kFragment) &&
+        !packed.other.sub_kind && packed.other.opaque) {
+      return id;
+    }
+
     return kInvalidEntityId;
   }
 

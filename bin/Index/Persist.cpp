@@ -56,7 +56,7 @@ extern void DispatchSerializeMacro(const EntityMapper &em,
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
 extern void BuildPendingFragment(
     PendingFragment &pf, EntityIdMap &entity_ids,
-    TypeIdMap &type_ids, const pasta::TokenRange &tokens);
+    const pasta::TokenRange &tokens);
 
 // Label the parent entity ids.
 extern void LabelParentsInPendingFragment(PendingFragment &pf,
@@ -510,7 +510,7 @@ static void PersistParsedTokens(
     id.kind = mx::FromPasta(macros_to_serialize[i].Kind());
     database.AddAsync(
         mx::MacroEntityRecord{
-          EntityId(id).Pack(), GetSerializedData(storage.message)});
+          mx::EntityId(id).Pack(), GetSerializedData(storage.message)});
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
@@ -622,7 +622,7 @@ static void PersistTokenTree(
   for (const pasta::Token &parsed_tok : parsed_tokens) {
     auto it = sched.parsed_token_index.find(parsed_tok.RawToken());
     if (it != sched.parsed_token_index.end()) {
-      auto mi = static_cast<unsigned>(it->second);
+      auto mi = static_cast<mx::EntityOffset>(it->second);
       pto2i.set(i, mi);
       mti2po.set(mi, i);
     } else {
@@ -673,8 +673,8 @@ static void PersistTokenTree(
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
     const void *raw_tt = tt->RawNode();
 
-    mx::MacroId id = std::get<mx::MacroId>(
-        mx::EntityId(em.EntityId(raw_tt)).Unpack());
+    mx::RawEntityId eid = em.EntityId(raw_tt);
+    mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
 
     CHECK_LT(id.offset, num_macros);
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
@@ -683,7 +683,7 @@ static void PersistTokenTree(
       LinkExternalUsesInFragment(database, pf, storage);
 
       database.AddAsync(
-          mx::MacroEntityRecord{id, GetSerializedData(storage.message)});
+          mx::MacroEntityRecord{eid, GetSerializedData(storage.message)});
     }
   }
 
@@ -946,7 +946,6 @@ void GlobalIndexingState::PersistFragment(
     NameMangler &mangler, EntityIdMap &entity_ids,
     PendingFragment &pf) {
 
-  TypeIdMap type_ids;
   const mx::SpecificEntityId<mx::FragmentId> fragment_id = pf.fragment_id;
   const uint64_t begin_index = pf.begin_index;
   const uint64_t end_index = pf.end_index;
@@ -956,9 +955,9 @@ void GlobalIndexingState::PersistFragment(
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf, entity_ids, type_ids, tokens);
+  BuildPendingFragment(pf, entity_ids, tokens);
 
-  EntityMapper em(entity_ids, type_ids, pf);
+  EntityMapper em(entity_ids, pf);
 
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf, em);

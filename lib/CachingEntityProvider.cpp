@@ -122,7 +122,7 @@ FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
     fragments[raw_id] = ptr;
   }
 
-  // Extend the liftime of `ptr`.
+  // Extend the lifetime of `ptr`.
   entities.emplace_back(ptr, ptr.get());
   
   return ptr;
@@ -235,17 +235,22 @@ void CachingEntityProvider::FindSymbol(
     } \
     std::optional<EntityImplPtr> CachingEntityProvider:: name ## For( \
         const Ptr &ep, RawEntityId eid) { \
+      EntityImplPtr ptr; \
       std::lock_guard<std::recursive_mutex> locker(lock); \
       if (auto it = lower_name ## s.find(eid); it != lower_name ## s.end()) {\
-        if (auto ptr = it->second.lock()) { \
-          return ptr; \
+        ptr = it->second.lock(); \
+      } \
+      if (!ptr) { \
+        if (auto ret = next->name ## For(ep, eid)) { \
+          ptr = std::move(ret.value()); \
+          lower_name ## s[eid] = ptr; \
         } \
       } \
-      auto ret = next->name ## For(ep, eid); \
-      if (ret) { \
-        lower_name ## s.emplace(eid, ret.value()); \
+      if (ptr) { \
+        entities.emplace_back(ptr, ptr.get()); /* extend the lifetime */ \
+        return ptr; \
       } \
-      return ret; \
+      return std::nullopt; \
     } \
     std::optional<EntityImplPtr> CachingEntityProvider:: name ## For( \
         const Ptr &ep, PackedFragmentId id, EntityOffset offset) { \

@@ -73,7 +73,7 @@ bool EntityLabeller::Enter(const pasta::Decl &entity) {
   auto kind = entity.Kind();
   mx::DeclarationId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.decls_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
   id.is_definition = IsDefinition(entity);
 
@@ -91,7 +91,7 @@ bool EntityLabeller::Enter(const pasta::Stmt &entity) {
   auto kind = entity.Kind();
   mx::StatementId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.stmts_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
   if (entity_ids.emplace(entity.RawStmt(), id).second) {
@@ -109,10 +109,12 @@ bool EntityLabeller::Enter(const pasta::Type &entity) {
   auto kind = entity.Kind();
   mx::TypeId id;
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.types_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.types_to_serialize.size());
   id.kind = mx::FromPasta(kind);
 
-  if (entity_ids.emplace(entity.RawType(), id).second) {
+  TypeKey key(entity.RawType(), entity.RawQualifiers());
+
+  if (fragment.type_ids.emplace(key, id).second) {
 
     // NOTE(pag): Will visit in `PendingTokenRange::Build()`.
     fragment.types_to_serialize.emplace_back(entity);
@@ -176,7 +178,7 @@ bool EntityLabeller::Label(const pasta::Macro &entity) {
   mx::MacroId id;
   id.kind = mx::FromPasta(entity.Kind());
   id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<uint32_t>(fragment.macros_to_serialize.size());
+  id.offset = static_cast<mx::EntityOffset>(fragment.macros_to_serialize.size());
 
   // If we added this node (we should have), then add in a `nullopt` reservation
   // to `macros_to_serialize`.

@@ -4,19 +4,23 @@
 // This source code is licensed in accordance with the terms specified in
 // the LICENSE file found in the root directory of this source tree.
 
+#include <cassert>
 #include <capnp/common.h>
 #include <capnp/message.h>
+#include <deque>
 
 #include <multiplier/AST.capnp.h>
 #include <multiplier/RPC.capnp.h>
 #include <multiplier/Database.h>
 
+#ifndef NDEBUG
+# include <unordered_set>
+#endif
+
 #include "EntityMapper.h"
 #include "PendingFragment.h"
 #include "Serialize.h"
 #include "PASTA.h"
-
-#include <deque>
 
 namespace indexer {
 namespace {
@@ -171,65 +175,81 @@ extern void LinkExternalUsesInFragment(
 void SerializePendingFragment(mx::DatabaseWriter &database,
                               const PendingFragment &pf,
                               const EntityMapper &em) {
+#ifndef NDEBUG
+  std::unordered_set<mx::RawEntityId> seen_eids;
+  auto is_new_eid = [&seen_eids] (mx::RawEntityId eid) {
+    auto old_size = seen_eids.size();
+    seen_eids.insert(eid);
+    return old_size != seen_eids.size();
+  };
+#endif
 
-  auto i = 0u;
   for (const pasta::Decl &entity : pf.decls_to_serialize) {
+    mx::RawEntityId eid = em.EntityId(entity);
+
+#ifndef NDEBUG
+    auto vid = std::get<mx::DeclarationId>(mx::EntityId(eid).Unpack());
+    assert(vid.fragment_id == pf.fragment_index);
+    assert(is_new_eid(eid));
+#endif
+
     EntityBuilder<mx::ast::Decl> storage;
     DispatchSerializeDecl(em, storage.builder, entity);
     LinkExternalUsesInFragment(database, pf, storage);
-    mx::DeclarationId id;
-    id.fragment_id = pf.fragment_index;
-    id.offset = i++;
-    id.kind = mx::FromPasta(entity.Kind());
-    id.is_definition = IsDefinition(entity);
     database.AddAsync(
-        mx::DeclEntityRecord{
-          id, GetSerializedData(storage.message)});
+        mx::DeclEntityRecord{eid, GetSerializedData(storage.message)});
   }
 
-  i = 0u;
   for (const pasta::Stmt &entity : pf.stmts_to_serialize) {
+    mx::RawEntityId eid = em.EntityId(entity);
+
+#ifndef NDEBUG
+    auto vid = std::get<mx::StatementId>(mx::EntityId(eid).Unpack());
+    assert(vid.fragment_id == pf.fragment_index);
+    assert(is_new_eid(eid));
+#endif
+
     EntityBuilder<mx::ast::Stmt> storage;
     DispatchSerializeStmt(em, storage.builder, entity);
     LinkExternalUsesInFragment(database, pf, storage);
-    mx::StatementId id;
-    id.fragment_id = pf.fragment_index;
-    id.offset = i++;
-    id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
-        mx::StmtEntityRecord{
-          id, GetSerializedData(storage.message)});
+        mx::StmtEntityRecord{eid, GetSerializedData(storage.message)});
   }
 
-  i = 0u;
   for (const pasta::Type &entity : pf.types_to_serialize) {
+    mx::RawEntityId eid = em.EntityId(entity);
+
+#ifndef NDEBUG
+    auto vid = std::get<mx::TypeId>(mx::EntityId(eid).Unpack());
+    assert(vid.fragment_id == pf.fragment_index);
+    assert(is_new_eid(eid));
+#endif
+
     EntityBuilder<mx::ast::Type> storage;
     DispatchSerializeType(em, storage.builder, entity);
     LinkExternalUsesInFragment(database, pf, storage);
-    mx::TypeId id;
-    id.fragment_id = pf.fragment_index;
-    id.offset = i++;
-    id.kind = mx::FromPasta(entity.Kind());
+
     database.AddAsync(
-        mx::TypeEntityRecord{
-          id, GetSerializedData(storage.message)});
+        mx::TypeEntityRecord{eid, GetSerializedData(storage.message)});
   }
 
-  i = 0u;
   for (const pasta::Attr &entity : pf.attrs_to_serialize) {
+    mx::RawEntityId eid = em.EntityId(entity);
+
+#ifndef NDEBUG
+    auto vid = std::get<mx::AttributeId>(mx::EntityId(eid).Unpack());
+    assert(vid.fragment_id == pf.fragment_index);
+    assert(is_new_eid(eid));
+#endif
+
     EntityBuilder<mx::ast::Attr> storage;
     DispatchSerializeAttr(em, storage.builder, entity);
     LinkExternalUsesInFragment(database, pf, storage);
-    mx::AttributeId id;
-    id.fragment_id = pf.fragment_id.Unpack().fragment_id;
-    id.offset = i++;
-    id.kind = mx::FromPasta(entity.Kind());
     database.AddAsync(
-        mx::AttrEntityRecord{
-          id, GetSerializedData(storage.message)});
+        mx::AttrEntityRecord{eid, GetSerializedData(storage.message)});
   }
 
-  i = 0u;
+  auto i = 0u;
   for (const Pseudo &pseudo : pf.pseudos_to_serialize) {
     EntityBuilder<mx::ast::Pseudo> storage;
     if (std::holds_alternative<pasta::TemplateArgument>(pseudo)) {
@@ -256,7 +276,7 @@ void SerializePendingFragment(mx::DatabaseWriter &database,
     id.offset = i++;
     database.AddAsync(
         mx::PseudoEntityRecord{
-          id, GetSerializedData(storage.message)});
+            mx::EntityId(id).Pack(), GetSerializedData(storage.message)});
   }
 }
 

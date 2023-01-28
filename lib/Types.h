@@ -10,7 +10,11 @@
 
 namespace mx {
 
+// Return the fragment offset from an entity ID. Returns `~0u` if it's not
+// a fragment-specific entity ID.
 EntityOffset FragmentOffsetFromEntityId(RawEntityId id);
+
+// Returns the fragment ID corresponding with a fragment-specific entity ID.
 RawEntityId FragmentIdFromEntityId(RawEntityId id);
 
 }  // namespace mx

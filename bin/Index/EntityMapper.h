@@ -21,27 +21,16 @@ class EntityMapper final {
  public:
   EntityIdMap &entity_ids;
 
-  // Offsets of the serialized version of types in this fragment.
-  //
-  // NOTE(pag): Types are redundantly represented in/across fragments; no
-  //            de-duplication is done.
-  //
-  // TODO(pag): Eventually split PASTA's `Type` back into a `QualType` and
-  //            a `Type`?
-  TypeIdMap &type_ids;
-
   // These are "fresh" for each instance of the entity mapper, because we
   // create different token trees per fragment, though they may occupy the
   // same memory locations.
   EntityIdMap token_tree_ids;
 
-  const PendingFragment &fragment;
+  PendingFragment &fragment;
 
   inline explicit EntityMapper(
-      EntityIdMap &entity_ids_, TypeIdMap &type_ids_,
-      const PendingFragment &fragment_)
+      EntityIdMap &entity_ids_, PendingFragment &fragment_)
       : entity_ids(entity_ids_),
-        type_ids(type_ids_),
         token_tree_ids(entity_ids_),
         fragment(fragment_) {}
 
