@@ -208,15 +208,16 @@ class SQLiteEntityProviderImpl {
 
 #define INIT_GETTERS(name, lower_name) \
       , get_ ## lower_name ## s(db.Prepare( \
-            "SELECT id " \
-            "FROM " #lower_name " WHERE fragment_id = ?1 ORDER BY id ASC")) \
+            "SELECT " #lower_name "_id " \
+            "FROM " #lower_name " WHERE fragment_id = ?1 " \
+            "ORDER BY " #lower_name "_id ASC")) \
       , get_ ## lower_name ## _by_id(db.Prepare( \
             "SELECT zstd_decompress(data), " \
             "       fragment_id, " \
             "       id_to_fragment_offset(?1) " \
-            "FROM " #lower_name " WHERE id = ?1")) \
+            "FROM " #lower_name " WHERE " #lower_name "_id = ?1")) \
       , get_ ## lower_name ## _by_offset(db.Prepare( \
-            "SELECT id " \
+            "SELECT " #lower_name "_id " \
             "FROM " #lower_name " WHERE fragment_id = ?1 " \
             "                       AND fragment_offset = ?2"))
 

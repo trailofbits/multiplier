@@ -140,7 +140,7 @@ std::optional<File> Index::file(SpecificEntityId<FileId> id) const {
 std::optional<File> Index::file(RawEntityId id) const {
   VariantId vid = EntityId(id).Unpack();
   if (std::holds_alternative<FileId>(vid)) {
-    return file(SpecificEntityId<FileId>(std::get<FileId>(vid)));
+    return file(std::get<FileId>(vid));
   } else {
     return std::nullopt;
   }
@@ -161,7 +161,7 @@ std::optional<Fragment> Index::fragment(FragmentId id) const {
 std::optional<Fragment> Index::fragment(RawEntityId id) const {
   VariantId vid = EntityId(id).Unpack();
   if (std::holds_alternative<FragmentId>(vid)) {
-    return fragment(SpecificEntityId<FragmentId>(std::get<FragmentId>(vid)));
+    return fragment(std::get<FragmentId>(vid));
   } else {
     return std::nullopt;
   }

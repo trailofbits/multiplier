@@ -480,14 +480,14 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    SerializedFileRecord record, sqlite::Statement &insert) {
+    FileRecord record, sqlite::Statement &insert) {
   assert(!record.data.empty());
   insert.BindValues(record.file_id.Pack(), record.data);
   return true;
 }
 
 bool BulkInserterState::InsertAsync(
-    SerializedFragmentRecord record, sqlite::Statement &insert) {
+    FragmentRecord record, sqlite::Statement &insert) {
   assert(!record.data.empty());
   insert.BindValues(record.fragment_id.Pack(), record.data);
   return true;

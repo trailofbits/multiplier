@@ -37,6 +37,10 @@ class EntityLabeller final : public EntityVisitor {
   EntityIdMap &entity_ids;
   PendingFragment &fragment;
 
+  std::vector<pasta::Decl> next_decls;
+  std::vector<pasta::Stmt> next_stmts;
+  std::vector<pasta::Type> next_types;
+
   // Tracks the index of the next parsed token. Logic surrounding this
   // processing is replicated when serializing `TokenTree`s. The key is that
   // we want to serialize the final parsed tokens, and not any marker tokens
@@ -50,9 +54,61 @@ class EntityLabeller final : public EntityVisitor {
 
   virtual ~EntityLabeller(void) = default;
 
-  bool Enter(const pasta::Decl &entity) final;
-  bool Enter(const pasta::Stmt &entity) final;
-  bool Enter(const pasta::Type &entity) final;
+  bool Enter(const pasta::Decl &entity) final {
+    return fragment.Add(entity, entity_ids);
+  }
+
+  bool Enter(const pasta::Stmt &entity) final {
+    return fragment.Add(entity, entity_ids);
+  }
+
+  bool Enter(const pasta::Type &entity) final {
+    return fragment.Add(entity);
+  }
+
+  void Run(void) {
+    std::vector<pasta::Decl> curr_decls;
+    std::vector<pasta::Stmt> curr_stmts;
+    std::vector<pasta::Type> curr_types;
+
+    for (auto changed = true; changed; ) {
+      changed = false;
+      curr_decls.swap(next_decls);
+      curr_stmts.swap(next_stmts);
+      curr_types.swap(next_types);
+
+      next_decls.clear();
+      next_stmts.clear();
+      next_types.clear();
+
+      for (const auto &entity : curr_decls) {
+        changed = true;
+        this->EntityVisitor::Accept(entity);
+      }
+
+      for (const auto &entity : curr_stmts) {
+        changed = true;
+        this->EntityVisitor::Accept(entity);
+      }
+
+      for (const auto &entity : curr_types) {
+        changed = true;
+        this->EntityVisitor::Accept(entity);
+      }
+    }
+  }
+
+  void Accept(const pasta::Decl &entity) final {
+    next_decls.push_back(entity);
+  }
+
+  void Accept(const pasta::Stmt &entity) final {
+    next_stmts.push_back(entity);
+  }
+
+  void Accept(const pasta::Type &entity) final {
+    next_types.push_back(entity);
+  }
 
   // Create initial fragment token IDs for all of the tokens in the range of
   // this fragment. This needs to be careful about assigning IDs to tokens that
@@ -68,62 +124,6 @@ class EntityLabeller final : public EntityVisitor {
   // this fragment.
   bool Label(const pasta::Macro &entity);
 };
-
-bool EntityLabeller::Enter(const pasta::Decl &entity) {
-  auto kind = entity.Kind();
-  mx::DeclarationId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.decls_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-  id.is_definition = IsDefinition(entity);
-
-  if (entity_ids.emplace(entity.RawDecl(), id).second) {
-
-    // NOTE(pag): Will visit in `PendingTokenRange::Build()`.
-    fragment.decls_to_serialize.emplace_back(entity);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-bool EntityLabeller::Enter(const pasta::Stmt &entity) {
-  auto kind = entity.Kind();
-  mx::StatementId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.stmts_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  if (entity_ids.emplace(entity.RawStmt(), id).second) {
-
-    // NOTE(pag): Will visit in `PendingTokenRange::Build()`.
-    fragment.stmts_to_serialize.emplace_back(entity);
-    return true;
-
-  } else {
-    return false;
-  }
-}
-
-bool EntityLabeller::Enter(const pasta::Type &entity) {
-  auto kind = entity.Kind();
-  mx::TypeId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.types_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  TypeKey key(entity.RawType(), entity.RawQualifiers());
-
-  if (fragment.type_ids.emplace(key, id).second) {
-
-    // NOTE(pag): Will visit in `PendingTokenRange::Build()`.
-    fragment.types_to_serialize.emplace_back(entity);
-    return true;
-
-  } else {
-    return false;
-  }
-}
 
 // Create initial fragment token IDs for all of the tokens in the range of
 // this fragment. This needs to be careful about assigning IDs to tokens that
@@ -216,12 +216,15 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityIdMap &entity_ids,
   // `stmts_to_serialize`. This list will be expanded to fixpoint by
   // `PendingFragment::Build`.
   //
-  // This process is manual, as opposed to `PendingFragment::Build` being a
+  // This process is manual, as opposed to `BuildPendingFragment` being a
   // more automated process, because the "hands on touch" of the manual effort
   // lets us be a bit more decisive about what should actually belong to a given
   // fragment, and stop when we go too far, whereas the automated approach might
   // just scoop everything reachable into a fragment, even if it doesn't really
   // belong there.
+
+  assert(pf.decls_to_serialize.empty());
+
   for (const pasta::Decl &decl : pf.top_level_decls) {
     (void) labeller.Accept(decl);
   }
@@ -229,6 +232,16 @@ void LabelEntitiesInFragment(PendingFragment &pf, EntityIdMap &entity_ids,
   for (const pasta::Macro &macro : pf.top_level_macros) {
     (void) labeller.Label(macro);
   }
+
+  labeller.Run();
+
+#ifndef NDEBUG
+  auto i = 0u;
+  assert(pf.top_level_decls.size() <= pf.decls_to_serialize.size());
+  for (const pasta::Decl &decl : pf.top_level_decls) {
+    assert(decl == pf.decls_to_serialize[i++]);
+  }
+#endif
 }
 
 }  // namespace indexer

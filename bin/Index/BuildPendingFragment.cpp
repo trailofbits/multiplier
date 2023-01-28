@@ -62,142 +62,42 @@ class FragmentBuilder final {
   void MaybeVisitNext(std::optional<pasta::Token>) {}
   void MaybeVisitNext(const pasta::Token &) {}
 
-  void MaybeVisitNext(const pasta::Decl &entity);
-  void MaybeVisitNext(const pasta::Stmt &entity);
-  void MaybeVisitNext(const pasta::Type &entity);
-  void MaybeVisitNext(const pasta::Attr &entity);
-  void MaybeVisitNext(const pasta::Macro &entity);
-  void MaybeVisitNext(const pasta::File &entity);
+  void MaybeVisitNext(const pasta::Decl &entity) {
+    fragment.Add(entity, entity_ids);
+  }
 
-  void MaybeVisitNext(const pasta::TemplateArgument &pseudo);
-  void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo);
-  void MaybeVisitNext(const pasta::TemplateParameterList &pseudo);
-  void MaybeVisitNext(const pasta::Designator &pseudo);
+  void MaybeVisitNext(const pasta::Stmt &entity) {
+    fragment.Add(entity, entity_ids);
+  }
+
+  void MaybeVisitNext(const pasta::Type &entity) {
+    fragment.Add(entity);
+  }
+
+  void MaybeVisitNext(const pasta::Attr &entity) {
+    fragment.Add(entity, entity_ids);
+  }
+
+  void MaybeVisitNext(const pasta::Macro &) {}
+
+  void MaybeVisitNext(const pasta::File &) {}
+
+  void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
+    fragment.Add(pseudo);
+  }
+
+  void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
+    fragment.Add(pseudo);
+  }
+
+  void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
+    fragment.Add(pseudo);
+  }
+
+  void MaybeVisitNext(const pasta::Designator &pseudo) {
+    fragment.Add(pseudo);
+  }
 };
-
-void FragmentBuilder::MaybeVisitNext(const pasta::Decl &entity) {
-  auto kind = entity.Kind();
-  switch (kind) {
-    case pasta::DeclKind::kTranslationUnit:
-    case pasta::DeclKind::kNamespace:
-    case pasta::DeclKind::kExternCContext:
-    case pasta::DeclKind::kLinkageSpec:
-      return;
-
-    // TODO(pag): Think about this a bit more. It's possible that we end up
-    //            internalizing class templates and partial specializations
-    //            into the fragments using their complete specializations.
-    default:
-      break;
-  }
-
-  mx::DeclarationId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.decls_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-  id.is_definition = IsDefinition(entity);
-
-  auto [it, added] = entity_ids.emplace(entity.RawDecl(), id);
-  if (added) {
-    fragment.decls_to_serialize.emplace_back(entity);  // New decl found.
-
-  // NOTE(pag): An interesting side-effect of this approach is that builtin/
-  //            implicit declarations become internalized into the fragments.
-  //            E.g. we might have a `CallExpr` that calls a compiler intrinsic,
-  //            and that intrinsic will turn into a declaration embedded in this
-  //            fragment.
-  } else if (entity.IsImplicit()) {
-    mx::VariantId vid = it->second.Unpack();
-    if (std::holds_alternative<mx::DeclarationId>(vid)) {
-      auto prev_id = std::get<mx::DeclarationId>(vid);
-      if (prev_id.fragment_id != fragment.fragment_index) {
-        entity_ids[entity.RawDecl()] = id;  // Overwrite and force it in.
-        fragment.decls_to_serialize.emplace_back(entity);
-      }
-    } else {
-      assert(false);
-    }
-  }
-}
-
-void FragmentBuilder::MaybeVisitNext(const pasta::Stmt &entity) {
-  auto kind = entity.Kind();
-  mx::StatementId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.stmts_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  if (entity_ids.emplace(entity.RawStmt(), id).second) {
-    fragment.stmts_to_serialize.emplace_back(entity);  // New stmt found.
-  }
-}
-
-void FragmentBuilder::MaybeVisitNext(const pasta::Type &entity) {
-  auto kind = entity.Kind();
-  mx::TypeId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.types_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
-  if (type_ids.emplace(type_key, id).second) {
-    fragment.types_to_serialize.emplace_back(entity);  // New type found.
-  }
-}
-
-
-void FragmentBuilder::MaybeVisitNext(const pasta::Macro &) {}
-void FragmentBuilder::MaybeVisitNext(const pasta::File &) {}
-
-void FragmentBuilder::MaybeVisitNext(const pasta::Attr &entity) {
-  auto kind = entity.Kind();
-  mx::AttributeId id;
-  id.fragment_id = fragment.fragment_index;
-  id.offset = static_cast<mx::EntityOffset>(fragment.attrs_to_serialize.size());
-  id.kind = mx::FromPasta(kind);
-
-  if (entity_ids.emplace(entity.RawAttr(), id).second) {
-    fragment.attrs_to_serialize.emplace_back(entity);  // New attribute found.
-  }
-}
-
-void FragmentBuilder::MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(
-      fragment.pseudos_to_serialize.size());
-  if (fragment.pseudo_offsets.emplace(
-          pseudo.RawTemplateArgument(), offset).second) {
-    fragment.pseudos_to_serialize.emplace_back(pseudo);
-  }
-}
-
-void FragmentBuilder::MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(
-      fragment.pseudos_to_serialize.size());
-  if (fragment.pseudo_offsets.emplace(
-          pseudo.RawCXXBaseSpecifier(), offset).second) {
-    fragment.pseudos_to_serialize.emplace_back(pseudo);
-  }
-}
-
-void FragmentBuilder::MaybeVisitNext(
-    const pasta::TemplateParameterList &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(
-      fragment.pseudos_to_serialize.size());
-  if (fragment.pseudo_offsets.emplace(
-          pseudo.RawTemplateParameterList(), offset).second) {
-    fragment.pseudos_to_serialize.emplace_back(pseudo);
-  }
-}
-
-void FragmentBuilder::MaybeVisitNext(
-    const pasta::Designator &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(
-      fragment.pseudos_to_serialize.size());
-  if (fragment.pseudo_offsets.emplace(
-          pseudo.RawDesignator(), offset).second) {
-    fragment.pseudos_to_serialize.emplace_back(pseudo);
-  }
-}
 
 #define MX_VISIT_BASE(derived_type, base_type) \
     Visit ## base_type(entity);
@@ -327,6 +227,142 @@ void FragmentBuilder::Accept(const pasta::Attr &entity) {
 void FragmentBuilder::Accept(const pasta::Macro &) {}
 
 }  // namespace
+
+
+bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
+  auto kind = entity.Kind();
+  switch (kind) {
+    case pasta::DeclKind::kTranslationUnit:
+    case pasta::DeclKind::kNamespace:
+    case pasta::DeclKind::kExternCContext:
+    case pasta::DeclKind::kLinkageSpec:
+      return false;
+
+    // TODO(pag): Think about this a bit more. It's possible that we end up
+    //            internalizing class templates and partial specializations
+    //            into the fragments using their complete specializations.
+    default:
+      break;
+  }
+
+  mx::DeclarationId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(decls_to_serialize.size());
+  id.kind = mx::FromPasta(kind);
+  id.is_definition = IsDefinition(entity);
+
+  auto [it, added] = entity_ids.emplace(entity.RawDecl(), id);
+  if (added) {
+    decls_to_serialize.emplace_back(entity);  // New decl found.
+    return true;
+
+  // NOTE(pag): An interesting side-effect of this approach is that builtin/
+  //            implicit declarations become internalized into the fragments.
+  //            E.g. we might have a `CallExpr` that calls a compiler intrinsic,
+  //            and that intrinsic will turn into a declaration embedded in this
+  //            fragment.
+  } else if (entity.IsImplicit()) {
+    mx::VariantId vid = it->second.Unpack();
+    if (std::holds_alternative<mx::DeclarationId>(vid)) {
+      auto prev_id = std::get<mx::DeclarationId>(vid);
+      if (prev_id.fragment_id != fragment_index) {
+        entity_ids[entity.RawDecl()] = id;  // Overwrite and force it in.
+        decls_to_serialize.emplace_back(entity);
+        return true;
+      }
+    } else {
+      assert(false);
+    }
+  }
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
+  auto kind = entity.Kind();
+  mx::StatementId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(stmts_to_serialize.size());
+  id.kind = mx::FromPasta(kind);
+
+  if (entity_ids.emplace(entity.RawStmt(), id).second) {
+    stmts_to_serialize.emplace_back(entity);  // New stmt found.
+    return true;
+  }
+
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::Type &entity) {
+  auto kind = entity.Kind();
+  mx::TypeId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(types_to_serialize.size());
+  id.kind = mx::FromPasta(kind);
+
+  TypeKey type_key(entity.RawType(), entity.RawQualifiers());
+  if (type_ids.emplace(type_key, id).second) {
+    types_to_serialize.emplace_back(entity);  // New type found.
+    return true;
+  }
+
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::Attr &entity, EntityIdMap &entity_ids) {
+  auto kind = entity.Kind();
+  mx::AttributeId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(attrs_to_serialize.size());
+  id.kind = mx::FromPasta(kind);
+
+  if (entity_ids.emplace(entity.RawAttr(), id).second) {
+    attrs_to_serialize.emplace_back(entity);  // New attribute found.
+    return true;
+  }
+
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::TemplateArgument &pseudo) {
+  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
+  if (pseudo_offsets.emplace(
+          pseudo.RawTemplateArgument(), offset).second) {
+    pseudos_to_serialize.emplace_back(pseudo);
+    return true;
+  }
+
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::CXXBaseSpecifier &pseudo) {
+  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
+  if (pseudo_offsets.emplace(
+          pseudo.RawCXXBaseSpecifier(), offset).second) {
+    pseudos_to_serialize.emplace_back(pseudo);
+    return true;
+  }
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::TemplateParameterList &pseudo) {
+  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
+  if (pseudo_offsets.emplace(
+          pseudo.RawTemplateParameterList(), offset).second) {
+    pseudos_to_serialize.emplace_back(pseudo);
+    return true;
+  }
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::Designator &pseudo) {
+  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
+  if (pseudo_offsets.emplace(
+          pseudo.RawDesignator(), offset).second) {
+    pseudos_to_serialize.emplace_back(pseudo);
+    return true;
+  }
+  return false;
+}
 
 // Build the fragment. This fills out the decls/stmts/types to serialize.
 //

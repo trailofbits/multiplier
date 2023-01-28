@@ -104,6 +104,15 @@ class PendingFragment {
   // `TemplateParamterList` or a `TemplateArgument` is a pseudo entity.
   std::vector<Pseudo> pseudos_to_serialize;
 
+  bool Add(const pasta::Decl &entity, EntityIdMap &entity_ids);
+  bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);
+  bool Add(const pasta::Type &entity);
+  bool Add(const pasta::Attr &entity, EntityIdMap &entity_ids);
+  bool Add(const pasta::TemplateArgument &pseudo);
+  bool Add(const pasta::CXXBaseSpecifier &pseudo);
+  bool Add(const pasta::TemplateParameterList &pseudo);
+  bool Add(const pasta::Designator &pseudo);
+
   // Find and initialize `parent_decl_ids` and `last_file_token_id`.
   void InitFileLocationRange(
       EntityIdMap &entity_ids, const pasta::TokenRange &toks);

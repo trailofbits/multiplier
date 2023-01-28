@@ -207,7 +207,7 @@ void GlobalIndexingState::PersistFile(
   // Add it to the database.
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, GetSerializedData(message)});
+      mx::FileRecord{file_id, GetSerializedData(message)});
 }
 
 namespace {
@@ -1038,7 +1038,7 @@ void GlobalIndexingState::PersistFragment(
 
   // Add the fragment to the database.
   database.AddAsync(
-      mx::SerializedFragmentRecord{pf.fragment_id, GetSerializedData(message)});
+      mx::FragmentRecord{pf.fragment_id, GetSerializedData(message)});
 }
 
 }  // namespace indexer

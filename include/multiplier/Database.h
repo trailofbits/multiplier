@@ -32,10 +32,10 @@ class DatabaseWriterImpl;
 
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
-    m(SerializedFileRecord) \
+    m(FileRecord) \
     m(FragmentFileRecord) \
     m(FragmentFileRangeRecord) \
-    m(SerializedFragmentRecord) \
+    m(FragmentRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
     m(UseRecord) \
@@ -65,7 +65,7 @@ struct FilePathRecord {
 };
 
 // Maps a file id to the file's serialized data.
-struct SerializedFileRecord {
+struct FileRecord {
   static constexpr const char *kTableName = "file";
 
   static constexpr const char *kInitStatements[] =
@@ -134,7 +134,7 @@ struct FragmentFileRangeRecord {
 };
 
 // Maps a fragment id to the fragment's serialized data.
-struct SerializedFragmentRecord {
+struct FragmentRecord {
   static constexpr const char *kTableName = "fragment";
 
   static constexpr const char *kInitStatements[] =
@@ -315,7 +315,7 @@ struct ReferenceRecord {
     \
     static constexpr const char *kInitStatements[] = { \
         "CREATE TABLE IF NOT EXISTS " #lower_name "(" \
-        "  id INT PRIMARY KEY, " \
+        "  " #lower_name "_id INT PRIMARY KEY, " \
         "  fragment_id INT NOT NULL, " \
         "  fragment_offset INT NOT NULL, " \
         "  data BLOB NOT NULL " \
@@ -329,7 +329,8 @@ struct ReferenceRecord {
         "ON " #lower_name "(fragment_id, fragment_offset)"}; \
     \
     static constexpr const char *kInsertStatement = \
-        "INSERT INTO " #lower_name " (id, fragment_id, fragment_offset, data) "\
+        "INSERT INTO " #lower_name " (" #lower_name "_id, fragment_id, " \
+        "                             fragment_offset, data) "\
         "VALUES (?1, ?2, ?3, zstd_compress(?4))"; \
     \
     mx::RawEntityId id; \

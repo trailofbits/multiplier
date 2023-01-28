@@ -818,8 +818,8 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
         open_indexes.push_back(tok.Index());
         break;
       case pasta::TokenRole::kEndOfFileMarker:
-        if (open_indexes.empty()) {
-          assert(false);  // Unbalanced EOF marker.
+        if (open_indexes.empty()) {  // Unbalanced EOF marker.
+          assert((tok.Index() + 1u) == tokens.Size());
         } else {
           bof_to_eof.emplace(open_indexes.back(), tok.Index());
           open_indexes.pop_back();
