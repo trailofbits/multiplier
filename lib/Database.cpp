@@ -238,6 +238,9 @@ class DatabaseWriterImpl {
   // bit for token offset bits.
   std::atomic<RawEntityId> next_big_fragment_index;
 
+  // Number of rows pending insertion.
+  std::atomic<size_t> num_pending_rows;
+
   // A thread and it's multiple-producer, single-consumer.
   moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
   std::thread bulk_insertion_thread;
@@ -316,11 +319,12 @@ void DatabaseWriterImpl::InitMetadata(void) {
 void DatabaseWriterImpl::BulkInserter(void) {
   BulkInserterState async(db_path);
 
-
   bool should_exit{false};
   bool should_flush{false};
+  size_t num_added_rows = 0u;
 
-  for (; !should_exit; should_flush = false) {
+  for (; !should_exit || num_added_rows < num_pending_rows.load();
+      should_flush = false) {
 
     QueueItem item;
 
@@ -349,11 +353,11 @@ void DatabaseWriterImpl::BulkInserter(void) {
 
             } else {
               async.DoInsertAsync(std::move(arg));
+              ++transaction_size;
             }
           },
           std::move(item));
 
-      ++transaction_size;
       if (transaction_size >= kMaxTransactionSize) {
         should_flush = true;
       }
@@ -365,6 +369,8 @@ void DatabaseWriterImpl::BulkInserter(void) {
     // Try to get the next thing.
     } while (insertion_queue.try_dequeue(item) ||
              insertion_queue.wait_dequeue_timed(item, 10 * 1000));
+
+    num_added_rows += transaction_size;
   }
 }
 
@@ -446,7 +452,7 @@ DatabaseWriterImpl::DatabaseWriterImpl(
           [] (void *ptr) {
             delete reinterpret_cast<WriterThreadState *>(ptr);
           }),
-      insertion_queue() {
+      insertion_queue(kMaxTransactionSize) {
 
   InitMetadata();
   InitRecords();
@@ -671,6 +677,7 @@ void DatabaseWriterImpl::ExitRecords(void) {
 
 #define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
+      impl->num_pending_rows.fetch_add(1u); \
       impl->insertion_queue.enqueue(std::move(record)); \
     }
 
