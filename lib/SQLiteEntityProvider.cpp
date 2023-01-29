@@ -359,10 +359,7 @@ std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
     return {};
   }
 
-  auto ret = std::make_shared<FileImpl>(
-      file_id.Unpack(), self, std::move(data));
-  auto ret_ptr = ret.get();
-  return FileImpl::Ptr(std::move(ret), ret_ptr);
+  return std::make_shared<FileImpl>(file_id.Unpack(), self, std::move(data));
 }
 
 std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
@@ -385,10 +382,8 @@ std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
     return {};
   }
 
-  auto ret = std::make_shared<FragmentImpl>(
+  return std::make_shared<FragmentImpl>(
       fragment_id.Unpack(), self, std::move(data));
-  auto ret_ptr = ret.get();
-  return FragmentImpl::Ptr(std::move(ret), ret_ptr);
 }
 
 // Return the list of fragments covering / overlapping some tokens in a file.

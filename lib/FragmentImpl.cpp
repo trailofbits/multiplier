@@ -459,63 +459,63 @@ bool ReadParsedTokensFromFragment::Equals(const class TokenReader *that_) const 
 
 // Return a specific type of entity.
 std::optional<EntityImplPtr> FragmentImpl::NthDecl(EntityOffset offset) const {
-  return ep->DeclFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value(), offset);
+  FragmentId id(fragment_id);
+  return ep->DeclFor(ep, id, offset);
 }
 
 std::optional<EntityImplPtr> FragmentImpl::NthStmt(EntityOffset offset) const {
-  return ep->StmtFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value(), offset);
+  FragmentId id(fragment_id);
+  return ep->StmtFor(ep, id, offset);
 }
 
 std::optional<EntityImplPtr> FragmentImpl::NthType(EntityOffset offset) const {
-  return ep->TypeFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value(), offset);
+  FragmentId id(fragment_id);
+  return ep->TypeFor(ep, id, offset);
 }
 
 std::optional<EntityImplPtr> FragmentImpl::NthAttr(EntityOffset offset) const {
-  return ep->AttrFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value(), offset);
+  FragmentId id(fragment_id);
+  return ep->AttrFor(ep, id, offset);
 }
 
 std::optional<EntityImplPtr> FragmentImpl::NthMacro(EntityOffset offset) const {
-  return ep->MacroFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value(), offset);
+  FragmentId id(fragment_id);
+  return ep->MacroFor(ep, id, offset);
 }
 
 std::optional<EntityImplPtr> FragmentImpl::NthPseudo(EntityOffset offset) const {
-  return ep->PseudoFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value(), offset);
+  FragmentId id(fragment_id);
+  return ep->PseudoFor(ep, id, offset);
 }
 
 gap::generator<EntityImplPtr> FragmentImpl::Decls(void) const {
-  return ep->DeclsFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value());
+  FragmentId id(fragment_id);
+  return ep->DeclsFor(ep, id);
 }
 
 gap::generator<EntityImplPtr> FragmentImpl::Stmts(void) const {
-  return ep->StmtsFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value());
+  FragmentId id(fragment_id);
+  return ep->StmtsFor(ep, id);
 }
 
 gap::generator<EntityImplPtr> FragmentImpl::Types(void) const {
-  return ep->TypesFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value());
+  FragmentId id(fragment_id);
+  return ep->TypesFor(ep, id);
 }
 
 gap::generator<EntityImplPtr> FragmentImpl::Attrs(void) const {
-  return ep->AttrsFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value());
+  FragmentId id(fragment_id);
+  return ep->AttrsFor(ep, id);
 }
 
 gap::generator<EntityImplPtr> FragmentImpl::Macros(void) const {
-  return ep->MacrosFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value());
+  FragmentId id(fragment_id);
+  return ep->MacrosFor(ep, id);
 }
 
 gap::generator<EntityImplPtr> FragmentImpl::Pseudos(void) const {
-  return ep->PseudosFor(
-      ep, EntityId(fragment_id).Extract<FragmentId>().value());
+  FragmentId id(fragment_id);
+  return ep->PseudosFor(ep, id);
 }
 
 std::string_view FragmentImpl::SourceIR(void) const & noexcept {
