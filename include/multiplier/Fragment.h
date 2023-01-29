@@ -88,7 +88,6 @@ class Fragment {
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const Macro &);
   static Fragment containing(const UseBase &);
-  static Fragment containing(const StmtReference &);
 
   // Return the entity ID of this fragment.
   SpecificEntityId<FragmentId> id(void) const noexcept;

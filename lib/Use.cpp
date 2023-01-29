@@ -13,6 +13,8 @@
 #include "API.h"
 #include "Fragment.h"
 
+#include <iostream>
+
 namespace mx {
 namespace {
 
@@ -694,9 +696,131 @@ std::optional<Designator> UseBase::as_designator(void) const {
   }
 }
 
-ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
-                                             const Decl &entity)
-    : ep(std::move(ep_)) {
+namespace {
+
+static gap::generator<Macro> EnumerateMacros(
+    EntityProvider::Ptr ep, std::vector<RawEntityId> search_ids,
+    FragmentIdList fragment_ids) {
+
+  if (search_ids.empty()) {
+    co_return;
+  }
+
+  assert(search_ids.size() == 1u);
+  RawEntityId search_id = search_ids[0];
+
+  for (PackedFragmentId fragment_id : fragment_ids) {
+    for (EntityOffset offset = 0u; ; ++offset) {
+
+      // We've exhausted the macros in this fragment; skip to the next
+      // fragment.
+      auto macro_reader = ep->MacroFor(ep, fragment_id, offset);
+      if (!macro_reader.has_value()) {
+        break;
+      }
+
+      Macro macro(std::move(macro_reader.value()));
+
+      // Needs to match what is in `LinkExternalReferencesInFragment` in
+      // `bin/Index/LinkExternalReferencesInFragment.cpp`.
+      switch (macro.kind()) {
+        case mx::MacroKind::EXPANSION: {
+          auto &exp = reinterpret_cast<const MacroExpansion &>(macro);
+          if (auto def = exp.definition()) {
+            SpecificEntityId<MacroId> referenced_id = def->id();
+            if (referenced_id.Pack() == search_id) {
+              co_yield macro;  // Hit!
+            }
+          }
+          continue;
+        }
+        case mx::MacroKind::INCLUDE_DIRECTIVE:
+        case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
+        case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
+        case mx::MacroKind::IMPORT_DIRECTIVE: {
+          auto &inc = reinterpret_cast<const IncludeLikeMacroDirective &>(macro);
+          if (auto file = inc.included_file()) {
+            SpecificEntityId<FileId> referenced_id = file->id();
+            if (referenced_id.Pack() == search_id) {
+              co_yield macro;  // Hit!
+            }
+          }
+          continue;
+        }
+
+        default:
+          continue;
+      }
+    }
+  }
+}
+
+static gap::generator<Stmt> EnumerateStatements(
+    EntityProvider::Ptr ep, std::vector<RawEntityId> search_ids,
+    FragmentIdList fragment_ids) {
+
+  if (search_ids.empty()) {
+    co_return;
+  }
+
+  const auto search_ids_begin = search_ids.begin();
+  const auto search_ids_end = search_ids.end();
+
+  for (PackedFragmentId fragment_id : fragment_ids) {
+    for (EntityOffset offset = 0u; ; ++offset) {
+      auto stmt_reader = ep->StmtFor(ep, fragment_id, offset);
+      if (!stmt_reader.has_value()) {
+        break;
+      }
+
+      Stmt stmt(std::move(*stmt_reader));
+      switch (stmt.kind()) {
+        // Has to match with what is supported by `ReferencedDecl` in
+        // `bin/Index/Util.cpp`.
+        case StmtKind::DECL_REF_EXPR:
+        case StmtKind::MEMBER_EXPR:
+        case StmtKind::CXX_CONSTRUCT_EXPR:
+        case StmtKind::CXX_NEW_EXPR:
+        case StmtKind::GOTO_STMT:
+        case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
+        case StmtKind::BUILTIN_BIT_CAST_EXPR:
+        case StmtKind::C_STYLE_CAST_EXPR:
+        case StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
+        case StmtKind::CXX_ADDRSPACE_CAST_EXPR:
+        case StmtKind::CXX_CONST_CAST_EXPR:
+        case StmtKind::CXX_DYNAMIC_CAST_EXPR:
+        case StmtKind::CXX_REINTERPRET_CAST_EXPR:
+        case StmtKind::CXX_STATIC_CAST_EXPR:
+        case StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
+
+        // TODO(pag): Do we want implicit casts? They end up being quite "verbose"
+        //            in terms of quantities of outputs. If so, make sure to
+        //            update `ReferencedDecl`.
+        // case StmtKind::IMPLICIT_CAST_EXPR:
+          if (std::optional<PackedDeclarationId> ref_decl_id =
+                  stmt.referenced_declaration_id()) {
+            const RawEntityId decl_id = ref_decl_id->Pack();
+            if (std::find(search_ids_begin, search_ids_end, decl_id) !=
+                search_ids_end) {
+              co_yield stmt;
+            }
+          }
+          continue;
+        default:
+          continue;
+      }
+    }
+  }
+}
+
+}  // namespace
+
+gap::generator<Stmt> EnumerateStatements(EntityProvider::Ptr ep,
+                                         const Decl &entity) {
+
+  std::vector<RawEntityId> search_ids;
+  FragmentIdList fragment_ids;
+
   PackedDeclarationId sid = entity.id();
 
   ep->FillReferences(ep, sid.Pack(), search_ids, fragment_ids);
@@ -715,11 +839,17 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   std::sort(fragment_ids.begin(), fragment_ids.end());
   auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it2, fragment_ids.end());
+
+  return EnumerateStatements(std::move(ep), std::move(search_ids),
+                             std::move(fragment_ids));
 }
 
-ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
-                                             const Macro &entity)
-    : ep(std::move(ep_)) {
+gap::generator<Macro> EnumerateMacros(EntityProvider::Ptr ep,
+                                      const Macro &entity) {
+
+  std::vector<RawEntityId> search_ids;
+  FragmentIdList fragment_ids;
+
   SpecificEntityId<MacroId> sid = entity.id();
   ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
   assert(tIgnoredRedecls.empty());
@@ -732,11 +862,16 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
   std::sort(fragment_ids.begin(), fragment_ids.end());
   auto it2 = std::unique(fragment_ids.begin(), fragment_ids.end());
   fragment_ids.erase(it2, fragment_ids.end());
+
+  return EnumerateMacros(std::move(ep), std::move(search_ids),
+                         std::move(fragment_ids));
 }
 
-ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
-                                             const File &entity)
-    : ep(std::move(ep_)) {
+gap::generator<Macro> EnumerateMacros(EntityProvider::Ptr ep,
+                                      const File &entity) {
+
+  std::vector<RawEntityId> search_ids;
+  FragmentIdList fragment_ids;
 
   SpecificEntityId<FileId> sid = entity.id();
   ep->FillReferences(ep, sid.Pack(), tIgnoredRedecls, fragment_ids);
@@ -750,197 +885,9 @@ ReferenceIteratorImpl::ReferenceIteratorImpl(EntityProvider::Ptr ep_,
 
   // NOTE(pag): Not all files will have uses, as some are the main source
   //            files of the compiler itself.
-}
 
-gap::generator<MacroReference> ReferenceIteratorImpl::EnumerateMacros(void) {
-  if (search_ids.empty() || fragment_ids.empty()) {
-    co_return;
-  }
-
-  assert(search_ids.size() == 1u);
-  RawEntityId search_id = search_ids[0];
-  unsigned fragment_offset = 0u;
-  MacroReference user;
-
-  for (;;) {
-    // Initialize to the first macro of the fragment.
-    if (!user.fragment) {
-      if (fragment_offset >= fragment_ids.size()) {
-        co_return;
-      }
-
-      auto frag_id = fragment_ids[fragment_offset++];
-      user.fragment = ep->FragmentFor(ep, frag_id);
-      if (!user.fragment) {
-        continue;
-      }
-
-      user.offset = 0u;
-
-    // Skip to the next macro.
-    } else {
-      ++user.offset;
-    }
-
-    // We've exhausted the macros in this fragment; skip to the next
-    // fragment.
-    auto macro_reader = user.fragment->NthMacro(user.offset);
-    if (!macro_reader.has_value()) {
-      user.fragment.reset();
-      user.offset = 0u;
-      continue;
-    }
-
-    Macro macro(std::move(*macro_reader));
-
-    // Needs to match what is in `LinkExternalReferencesInFragment` in
-    // `bin/Index/LinkExternalReferencesInFragment.cpp`.
-    switch (macro.kind()) {
-      case mx::MacroKind::EXPANSION: {
-        auto &exp = reinterpret_cast<const MacroExpansion &>(macro);
-        if (auto def = exp.definition()) {
-          SpecificEntityId<MacroId> referenced_id = def->id();
-          if (referenced_id.Pack() == search_id) {
-            co_yield user;  // Hit!
-          }
-        }
-        break;
-      }
-      case mx::MacroKind::INCLUDE_DIRECTIVE:
-      case mx::MacroKind::INCLUDE_NEXT_DIRECTIVE:
-      case mx::MacroKind::INCLUDE_MACROS_DIRECTIVE:
-      case mx::MacroKind::IMPORT_DIRECTIVE: {
-        auto &inc = reinterpret_cast<const IncludeLikeMacroDirective &>(macro);
-        if (auto file = inc.included_file()) {
-          SpecificEntityId<FileId> referenced_id = file->id();
-          if (referenced_id.Pack() == search_id) {
-            co_yield user;  // Hit!
-          }
-        }
-        break;
-      }
-
-      default:
-        break;
-    }
-  }
-}
-
-gap::generator<StmtReference> ReferenceIteratorImpl::EnumerateStatements(void) {
-  if (search_ids.empty() || fragment_ids.empty()) {
-    co_return;
-  }
-
-  unsigned fragment_offset = 0;
-  StmtReference user;
-  for (;;) {
-    // Initialize to the first statement of the fragment.
-    if (!user.fragment) {
-      if (fragment_offset >= fragment_ids.size()) {
-        co_return;
-      }
-
-      auto frag_id = fragment_ids[fragment_offset++];
-      user.fragment = ep->FragmentFor(ep, frag_id);
-      if (!user.fragment) {
-        continue;
-      }
-
-      user.offset = 0u;
-
-    // Skip to the next statement.
-    } else {
-      ++user.offset;
-    }
-
-    // We've exhausted the statements in this fragment; skip to the next
-    // fragment.
-    auto stmt_reader = user.fragment->NthStmt(user.offset);
-    if (!stmt_reader.has_value()) {
-      user.fragment.reset();
-      user.offset = 0u;
-      continue;
-    }
-
-    Stmt stmt(std::move(*stmt_reader));
-    switch (stmt.kind()) {
-      // Has to match with what is supported by `ReferencedDecl` in
-      // `bin/Index/Util.cpp`.
-      case StmtKind::DECL_REF_EXPR:
-      case StmtKind::MEMBER_EXPR:
-      case StmtKind::CXX_CONSTRUCT_EXPR:
-      case StmtKind::CXX_NEW_EXPR:
-      case StmtKind::GOTO_STMT:
-      case StmtKind::UNARY_EXPR_OR_TYPE_TRAIT_EXPR:
-      case StmtKind::BUILTIN_BIT_CAST_EXPR:
-      case StmtKind::C_STYLE_CAST_EXPR:
-      case StmtKind::CXX_FUNCTIONAL_CAST_EXPR:
-      case StmtKind::CXX_ADDRSPACE_CAST_EXPR:
-      case StmtKind::CXX_CONST_CAST_EXPR:
-      case StmtKind::CXX_DYNAMIC_CAST_EXPR:
-      case StmtKind::CXX_REINTERPRET_CAST_EXPR:
-      case StmtKind::CXX_STATIC_CAST_EXPR:
-      case StmtKind::OBJ_C_BRIDGED_CAST_EXPR:
-
-      // TODO(pag): Do we want implicit casts? They end up being quite "verbose"
-      //            in terms of quantities of outputs. If so, make sure to
-      //            update `ReferencedDecl`.
-      // case StmtKind::IMPLICIT_CAST_EXPR:
-
-        if (std::optional<Decl> ref_decl = stmt.referenced_declaration()) {
-          PackedDeclarationId referenced_id = ref_decl->id();
-          for (RawEntityId search_id : search_ids) {
-            if (referenced_id == search_id) {
-              co_yield user;
-            }
-          }
-        }
-        break;
-      default:
-        break;
-    }
-
-  }
-}
-
-Stmt StmtReference::statement(void) && noexcept {
-  auto reader = fragment->NthStmt(offset);
-  return Stmt(std::move(*reader));
-}
-
-Stmt StmtReference::statement(void) const & noexcept {
-  auto reader = fragment->NthStmt(offset);
-  return Stmt(std::move(*reader));
-}
-
-StmtReference::operator Stmt(void) && noexcept {
-  auto reader = fragment->NthStmt(offset);
-  return Stmt(std::move(*reader));
-}
-
-StmtReference::operator Stmt(void) const & noexcept {
-  auto reader = fragment->NthStmt(offset);
-  return Stmt(std::move(*reader));
-}
-
-Macro MacroReference::macro(void) && noexcept {
-  auto reader = fragment->NthMacro(offset);
-  return Macro(std::move(*reader));
-}
-
-Macro MacroReference::macro(void) const & noexcept {
-  auto reader = fragment->NthMacro(offset);
-  return Macro(std::move(*reader));
-}
-
-MacroReference::operator Macro(void) && noexcept {
-  auto reader = fragment->NthMacro(offset);
-  return Macro(std::move(*reader));
-}
-
-MacroReference::operator Macro(void) const & noexcept {
-  auto reader = fragment->NthMacro(offset);
-  return Macro(std::move(*reader));
+  return EnumerateMacros(std::move(ep), std::move(search_ids),
+                         std::move(fragment_ids));
 }
 
 }  // namespace mx

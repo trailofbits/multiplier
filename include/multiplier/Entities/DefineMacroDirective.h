@@ -28,7 +28,6 @@ namespace mx {
 class DefineMacroDirective;
 class Macro;
 class MacroDirective;
-class MacroReference;
 class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DefineMacroDirective : public MacroDirective {
@@ -55,7 +54,7 @@ class DefineMacroDirective : public MacroDirective {
   static gap::generator<DefineMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  gap::generator<MacroReference> references(void) const;
+  gap::generator<Macro> references(void) const;
 
   static std::optional<DefineMacroDirective> from(const MacroDirective &parent);
 

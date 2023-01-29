@@ -91,7 +91,7 @@ void PrintCallGraph(mx::Decl entity) {
   if (decl != decls.end()) {
     PrintCallGraphEdge(entity, decl->canonical_declaration());
   } else {
-    for (const mx::StmtReference &ref : entity.references()) {
+    for (mx::Stmt ref : entity.references()) {
       PrintCallGraphEdge(entity, ref);
     }
   }

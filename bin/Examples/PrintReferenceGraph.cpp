@@ -93,8 +93,8 @@ extern "C" int main(int argc, char *argv[]) {
       if (std::holds_alternative<mx::Decl>(ent)) {
         mx::Decl decl = std::get<mx::Decl>(ent);
 
-        for (mx::StmtReference ref : decl.references()) {
-          auto stmt_id = ref.statement().id().Pack();
+        for (mx::Stmt ref_stmt : decl.references()) {
+          auto stmt_id = ref_stmt.id().Pack();
           add_edge(stmt_id, user_id, "reference", path_len);
         }
 
@@ -131,8 +131,8 @@ extern "C" int main(int argc, char *argv[]) {
         mx::Macro macro = std::get<mx::Macro>(ent);
 
         if (auto def = mx::DefineMacroDirective::from(macro)) {
-          for (mx::MacroReference ref : def->references()) {
-            auto macro_id = ref.macro().id().Pack();  // Expansion.
+          for (mx::Macro ref : def->references()) {
+            auto macro_id = ref.id().Pack();  // Expansion.
             add_back_edge(macro_id, user_id, "reference", path_len);
           }
         }
@@ -145,8 +145,8 @@ extern "C" int main(int argc, char *argv[]) {
       } else if (std::holds_alternative<mx::File>(ent)) {
         mx::File file = std::get<mx::File>(ent);
 
-        for (mx::MacroReference ref : file.references()) {
-          auto macro_id = ref.macro().id().Pack();  // Include.
+        for (mx::Macro ref : file.references()) {
+          auto macro_id = ref.id().Pack();  // Include.
           add_back_edge(macro_id, user_id, "reference", path_len);
         }
       }

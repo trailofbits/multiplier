@@ -2221,7 +2221,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     if (class_name == "Decl") {
       needed_decls.insert("DeclUseSelector");
       forward_decls.insert("Stmt");
-      forward_decls.insert("StmtReference");
       class_os
           << "  inline static std::optional<Decl> from(const Decl &self) {\n"
           << "    return self;\n"
@@ -2240,7 +2239,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  gap::generator<Decl> redeclarations(void) const;\n"
           << "  SpecificEntityId<DeclarationId> id(void) const;\n"
           << "  gap::generator<Use<DeclUseSelector>> uses(void) const;\n"
-          << "  gap::generator<StmtReference> references(void) const;\n\n"
+          << "  gap::generator<Stmt> references(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -2277,6 +2276,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
+          << "  std::optional<PackedDeclarationId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
           << "  SpecificEntityId<StatementId> id(void) const;\n"
           << "  gap::generator<Use<StmtUseSelector>> uses(void) const;\n\n"
@@ -2294,8 +2294,21 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "DeclUseSelector::REFERENCED_DECLARATION)\n";
 
       lib_cpp_os
+          << "std::optional<PackedDeclarationId> Stmt::referenced_declaration_id(void) const {\n"
+          << "  if (auto id = impl->Reader<ast::Stmt>()." << ref_getter_name << "();\n"
+          << "      id != kInvalidEntityId) {\n"
+          << "    VariantId vid = EntityId(id).Unpack();\n"
+          << "    if (std::holds_alternative<DeclarationId>(vid)) {\n"
+          << "      return std::get<DeclarationId>(vid);\n"
+          << "    }\n"
+          << "    assert(false);\n"
+          << "  }\n"
+          << "  return std::nullopt;\n"
+          << "}\n\n";
+
+      lib_cpp_os
           << "std::optional<Decl> Stmt::referenced_declaration(void) const {\n"
-          << "  if (auto id = impl->Reader<mx::ast::Decl>()." << ref_getter_name << "();\n"
+          << "  if (auto id = impl->Reader<ast::Stmt>()." << ref_getter_name << "();\n"
           << "      id != kInvalidEntityId) {\n"
           << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
           << "      return Decl(std::move(eptr.value()));\n"
@@ -2608,9 +2621,9 @@ MethodListPtr CodeGenerator::RunOnClass(
     // Add in our custom uses iterator. We have a custom definition of this
     // in the API.
     if (class_name == "DefineMacroDirective") {
-      forward_decls.insert("MacroReference");
+      forward_decls.insert("Macro");
       class_os
-          << "  gap::generator<MacroReference> references(void) const;\n\n";
+          << "  gap::generator<Macro> references(void) const;\n\n";
     }
   }
 

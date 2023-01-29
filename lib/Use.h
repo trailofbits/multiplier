@@ -8,7 +8,6 @@
 
 #include <multiplier/Use.h>
 
-#include <multiplier/Reference.h>
 #include <vector>
 
 #include "API.h"
@@ -54,19 +53,13 @@ class UseIteratorImpl final {
   }
 };
 
-class ReferenceIteratorImpl final {
- private:
-  std::shared_ptr<EntityProvider> ep;
-  std::vector<RawEntityId> search_ids;
-  FragmentIdList fragment_ids;
+gap::generator<Stmt> EnumerateStatements(
+    EntityProvider::Ptr, const Decl &entity);
 
- public:
-  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Decl &entity);
-  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const Macro &entity);
-  ReferenceIteratorImpl(EntityProvider::Ptr ep_, const File &entity);
+gap::generator<Macro> EnumerateMacros(
+    EntityProvider::Ptr, const Macro &entity);
 
-  gap::generator<MacroReference> EnumerateMacros(void);
-  gap::generator<StmtReference> EnumerateStatements(void);
-};
+gap::generator<Macro> EnumerateMacros(
+    EntityProvider::Ptr, const File &entity);
 
 }  // namespace mx

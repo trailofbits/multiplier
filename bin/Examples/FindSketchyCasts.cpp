@@ -226,8 +226,7 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     mx::Decl decl = std::get<mx::Decl>(maybe_entity);
-    for (mx::StmtReference ref : decl.references()) {
-      const mx::Stmt ref_stmt = ref.statement();
+    for (mx::Stmt ref_stmt : decl.references()) {
       for (const mx::CallExpr &call_expr : mx::CallExpr::containing(ref_stmt)) {
         CheckCallForImplicitCast(call_expr);
       }

@@ -8,7 +8,6 @@
 
 #include <memory>
 #include <multiplier/Entities/FileUseSelector.h>
-#include <multiplier/Reference.h>
 #include <string_view>
 #include <gap/core/generator.hpp>
 
@@ -24,7 +23,7 @@ class FileLocationCacheImpl;
 class Fragment;
 class FragmentImpl;
 class Index;
-class MacroReference;
+class Macro;
 class RegexQueryMatch;
 class WeggliQueryMatch;
 
@@ -149,7 +148,7 @@ class File {
   gap::generator<Use<FileUseSelector>> uses(void) const;
 
   // References of this file.
-  gap::generator<MacroReference> references(void) const;
+  gap::generator<Macro> references(void) const;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();

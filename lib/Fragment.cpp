@@ -71,10 +71,6 @@ Fragment Fragment::containing(const UseBase &use) {
   return Fragment(use.fragment);
 }
 
-Fragment Fragment::containing(const StmtReference &ref) {
-  return Fragment(ref.fragment);
-}
-
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
   return FragmentId{impl->fragment_id};

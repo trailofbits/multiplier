@@ -20996,8 +20996,20 @@ std::optional<Stmt> Stmt::parent_statement(void) const {
   return std::nullopt;
 }
 
+std::optional<PackedDeclarationId> Stmt::referenced_declaration_id(void) const {
+  if (auto id = impl->Reader<ast::Stmt>().getVal2();
+      id != kInvalidEntityId) {
+    VariantId vid = EntityId(id).Unpack();
+    if (std::holds_alternative<DeclarationId>(vid)) {
+      return std::get<DeclarationId>(vid);
+    }
+    assert(false);
+  }
+  return std::nullopt;
+}
+
 std::optional<Decl> Stmt::referenced_declaration(void) const {
-  if (auto id = impl->Reader<mx::ast::Decl>().getVal2();
+  if (auto id = impl->Reader<ast::Stmt>().getVal2();
       id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
       return Decl(std::move(eptr.value()));

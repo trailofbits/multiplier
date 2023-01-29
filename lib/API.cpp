@@ -75,11 +75,8 @@ gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
   }
 }
 
-gap::generator<StmtReference> Decl::references(void) const {
-  ReferenceIteratorImpl it(impl->ep, *this);
-  for (auto ref : it.EnumerateStatements()) {
-    co_yield ref;
-  }
+gap::generator<Stmt> Decl::references(void) const {
+  return EnumerateStatements(impl->ep, *this);
 }
 
 gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
@@ -191,11 +188,8 @@ gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
 }
 
 
-gap::generator<MacroReference> DefineMacroDirective::references(void) const {
-  ReferenceIteratorImpl it(impl->ep, *this);
-  for (auto ref : it.EnumerateMacros()) {
-    co_yield ref;
-  }
+gap::generator<Macro> DefineMacroDirective::references(void) const {
+  return EnumerateMacros(impl->ep, *this);
 }
 
 }  // namespace mx

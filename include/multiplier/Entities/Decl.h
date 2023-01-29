@@ -35,7 +35,6 @@ class Decl;
 class ExternalSourceSymbolAttr;
 class OffsetEntityImpl;
 class Stmt;
-class StmtReference;
 class TemplateDecl;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -83,7 +82,7 @@ class Decl {
   gap::generator<Decl> redeclarations(void) const;
   SpecificEntityId<DeclarationId> id(void) const;
   gap::generator<Use<DeclUseSelector>> uses(void) const;
-  gap::generator<StmtReference> references(void) const;
+  gap::generator<Stmt> references(void) const;
 
  protected:
   static gap::generator<Decl> in_internal(const Fragment &fragment);

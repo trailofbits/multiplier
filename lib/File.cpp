@@ -316,11 +316,8 @@ gap::generator<Use<FileUseSelector>> File::uses(void) const {
 }
 
 // References of this file.
-gap::generator<MacroReference> File::references(void) const {
-  ReferenceIteratorImpl it(impl->ep, *this);
-  for (auto ref : it.EnumerateMacros()) {
-    co_yield ref;
-  }
+gap::generator<Macro> File::references(void) const {
+  return EnumerateMacros(impl->ep, *this);
 }
 
 }  // namespace mx

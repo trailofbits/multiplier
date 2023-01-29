@@ -65,6 +65,7 @@ class Stmt {
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
+  std::optional<PackedDeclarationId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
   SpecificEntityId<StatementId> id(void) const;
   gap::generator<Use<StmtUseSelector>> uses(void) const;
