@@ -458,6 +458,17 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 // out the compiler builtins to a file and then introduced those as a special
 // preamble.
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
+
+  // NOTE(pag): Not all implicit declarations are builtin, but in general, most
+  //            top-level implicit declarations are builtins. An example of a
+  //            nested implicit decl is the implicit field decl for the `union`:
+  //
+  //                    struct Blah {
+  //                      union {
+  //                        int foo;
+  //                        float bar;
+  //                      } /* implicit field here */ ;
+  //                    };
   if (decl.IsImplicit()) {
     return true;
 
@@ -595,7 +606,7 @@ static void AddDeclRangeToEntityList(
   }
 
   // There should always be at least two tokens in any top-level decl.
-  LOG_IF(ERROR, begin_index == end_index)
+  LOG_IF(ERROR, begin_index == end_index && !IsProbablyABuiltinDecl(decl))
       << "Only found one token " << tok.Data() << " for: "
       << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
       << " on main job file " << main_file_path;
