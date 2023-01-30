@@ -63,9 +63,9 @@ void InvalidEntityProvider::FillUses(
 void InvalidEntityProvider::FillReferences(
     const Ptr &, RawEntityId,
     RawEntityIdList &redecl_ids_out,
-    FragmentIdList &fragment_ids_out) {
+    RawEntityIdList &references_ids_out) {
   redecl_ids_out.clear();
-  fragment_ids_out.clear();
+  references_ids_out.clear();
 }
 
 void InvalidEntityProvider::FindSymbol(

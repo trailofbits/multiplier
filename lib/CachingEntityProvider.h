@@ -93,7 +93,7 @@ class CachingEntityProvider final : public EntityProvider {
 
   void FillReferences(const Ptr &, RawEntityId eid,
                       RawEntityIdList &redecl_ids_out,
-                      FragmentIdList &fragment_ids_out) final;
+                      RawEntityIdList &references_ids_out) final;
 
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;

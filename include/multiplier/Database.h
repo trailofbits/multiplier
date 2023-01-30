@@ -50,10 +50,10 @@ struct FilePathRecord {
 
   static constexpr const char *kInitStatements[] = {
       R"(CREATE TABLE IF NOT EXISTS file_path (
-            file_id INT NOT NULL,
-            path TEXT NOT NULL,
-            PRIMARY KEY(path)
-          ) WITHOUT rowid)"};
+           file_id INT NOT NULL,
+           path TEXT NOT NULL,
+           PRIMARY KEY(path)
+         ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
@@ -281,32 +281,28 @@ struct UseRecord {
 };
 
 // Records an entry telling us that one entity references another entity.
-// a reference has a from-entity-specific meaning, and so we don't need an
+// A reference has a to-entity-specific meaning, and so we don't need an
 // edge label.
-//
-// NOTE(pag): We opportunistically assume all entities are referenced by their
-//            own fragments, so we don't record edges between a fragment and its
-//            own entities.
 struct ReferenceRecord {
   static constexpr const char *kTableName = "reference";
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS reference (
-            fragment_id INT NOT NULL,
-            entity_id INT NOT NULL,
-            PRIMARY KEY(fragment_id, entity_id)
+            from_entity_id INT NOT NULL,
+            to_entity_id INT NOT NULL,
+            PRIMARY KEY(from_entity_id, to_entity_id)
           ) WITHOUT rowid)"};
 
   static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS fragments_referencing_entities
-         ON reference(entity_id))"};
+      R"(CREATE INDEX IF NOT EXISTS references_by_target
+         ON reference(to_entity_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT INTO reference (fragment_id, entity_id)
+      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id)
          VALUES (?1, ?2))";
 
-  PackedFragmentId fragment_id;
-  RawEntityId entity_id;
+  RawEntityId from_entity_id;
+  RawEntityId to_entity_id;
 };
 
 #define DEFINE_ENTITY_TABLE(name, lower_name) \

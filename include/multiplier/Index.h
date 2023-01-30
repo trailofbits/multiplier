@@ -188,14 +188,11 @@ class EntityProvider {
                         RawEntityIdList &redecl_ids_out,
                         FragmentIdList &fragment_ids_out) = 0;
 
-  // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
+  // Fill out `redecl_ids_out` and `references_ids_out` with the set of things
   // to analyze when looking for references.
-  //
-  // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
-  //            with `eid` if `eid` resides in a fragment.
   virtual void FillReferences(const Ptr &, RawEntityId eid,
                               RawEntityIdList &redecl_ids_out,
-                              FragmentIdList &fragment_ids_out) = 0;
+                              RawEntityIdList &references_ids_out) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,

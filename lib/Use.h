@@ -53,13 +53,4 @@ class UseIteratorImpl final {
   }
 };
 
-gap::generator<Stmt> EnumerateStatements(
-    EntityProvider::Ptr, const Decl &entity);
-
-gap::generator<Macro> EnumerateMacros(
-    EntityProvider::Ptr, const Macro &entity);
-
-gap::generator<Macro> EnumerateMacros(
-    EntityProvider::Ptr, const File &entity);
-
 }  // namespace mx

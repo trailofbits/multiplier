@@ -25,10 +25,14 @@
 #include "InvalidEntityProvider.h"
 #include "Re2Impl.h"
 #include "Token.h"
-#include "Use.h"
 #include "WeggliImpl.h"
 
 namespace mx {
+namespace {
+
+static thread_local RawEntityIdList tIgnoredRedecls;
+
+}  // namespace
 
 EntityProvider::~EntityProvider(void) noexcept {}
 
@@ -76,7 +80,25 @@ gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
 }
 
 gap::generator<Stmt> Decl::references(void) const {
-  return EnumerateStatements(impl->ep, *this);
+  const EntityProvider::Ptr &ep = impl->ep;
+  RawEntityIdList references_ids;
+
+  tIgnoredRedecls.clear();
+  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
+  assert(!tIgnoredRedecls.empty());
+
+  for (RawEntityId raw_stmt_id : references_ids) {
+    VariantId vid = EntityId(raw_stmt_id).Unpack();
+    if (!std::holds_alternative<StatementId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    auto entity_reader = ep->StmtFor(ep, raw_stmt_id);
+    if (entity_reader.has_value()) {
+      co_yield Stmt(std::move(entity_reader.value()));
+    }
+  }
 }
 
 gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
@@ -187,9 +209,50 @@ gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
   }
 }
 
+// References of this file.
+gap::generator<Macro> File::references(void) const {
+  const EntityProvider::Ptr &ep = impl->ep;
+  RawEntityIdList references_ids;
 
+  tIgnoredRedecls.clear();
+  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
+  assert(tIgnoredRedecls.empty());
+
+  for (RawEntityId raw_stmt_id : references_ids) {
+    VariantId vid = EntityId(raw_stmt_id).Unpack();
+    if (!std::holds_alternative<MacroId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    auto entity_reader = ep->MacroFor(ep, raw_stmt_id);
+    if (entity_reader.has_value()) {
+      co_yield Macro(std::move(entity_reader.value()));
+    }
+  }
+}
+
+// References to this macro definition.
 gap::generator<Macro> DefineMacroDirective::references(void) const {
-  return EnumerateMacros(impl->ep, *this);
+  const EntityProvider::Ptr &ep = impl->ep;
+  RawEntityIdList references_ids;
+
+  tIgnoredRedecls.clear();
+  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
+  assert(tIgnoredRedecls.empty());
+
+  for (RawEntityId raw_stmt_id : references_ids) {
+    VariantId vid = EntityId(raw_stmt_id).Unpack();
+    if (!std::holds_alternative<MacroId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    auto entity_reader = ep->MacroFor(ep, raw_stmt_id);
+    if (entity_reader.has_value()) {
+      co_yield Macro(std::move(entity_reader.value()));
+    }
+  }
 }
 
 }  // namespace mx

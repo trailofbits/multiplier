@@ -315,9 +315,4 @@ gap::generator<Use<FileUseSelector>> File::uses(void) const {
   }
 }
 
-// References of this file.
-gap::generator<Macro> File::references(void) const {
-  return EnumerateMacros(impl->ep, *this);
-}
-
 }  // namespace mx

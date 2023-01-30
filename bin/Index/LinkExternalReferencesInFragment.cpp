@@ -27,30 +27,35 @@ void LinkExternalReferencesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
     EntityMapper &em) {
 
-  std::unordered_set<mx::RawEntityId> referenced_entities;
-
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
+    mx::RawEntityId stmt_id = em.EntityId(stmt);
+    mx::VariantId vid = mx::EntityId(stmt_id).Unpack();
+    if (!std::holds_alternative<mx::StatementId>(vid)) {
+      assert(false);
+      continue;
+    }
+
+    mx::StatementId sid = std::get<mx::StatementId>(vid);
+    if (sid.fragment_id != pf.fragment_index) {
+      assert(false);
+      continue;  // This is weird?
+    }
+
     std::optional<pasta::Decl> ref_decl = ReferencedDecl(stmt);
     if (!ref_decl) {
       continue;
     }
 
-    mx::RawEntityId raw_id = em.EntityId(ref_decl.value());
-    mx::VariantId vid = mx::EntityId(raw_id).Unpack();
+    mx::RawEntityId decl_id = em.EntityId(ref_decl.value());
+    vid = mx::EntityId(decl_id).Unpack();
     if (!std::holds_alternative<mx::DeclarationId>(vid)) {
       assert(false);
       continue;
     }
 
-    // We're referencing something in another fragment, so by definition it's
-    // an external reference.
-    mx::DeclarationId did = std::get<mx::DeclarationId>(vid);
-    if (did.fragment_id != pf.fragment_index) {
-      referenced_entities.insert(raw_id);
-    }
+    database.AddAsync(mx::ReferenceRecord{stmt_id, decl_id});
   }
 
-  // TODO(pag): Add references for macros and files.
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
     if (!tt) {
 
@@ -66,17 +71,12 @@ void LinkExternalReferencesInFragment(
       continue;
     }
 
-    mx::RawEntityId raw_id = em.EntityId(tt->RawNode());
-    if (raw_id == mx::kInvalidEntityId) {
-      raw_id = em.EntityId(m.value());
+    mx::RawEntityId macro_id = em.EntityId(tt->RawNode());
+    if (macro_id == mx::kInvalidEntityId) {
+      macro_id = em.EntityId(m.value());
     }
 
-    if (raw_id == mx::kInvalidEntityId) {
-      assert(false);
-      continue;
-    }
-
-    mx::VariantId vid = mx::EntityId(raw_id).Unpack();
+    mx::VariantId vid = mx::EntityId(macro_id).Unpack();
     if (!std::holds_alternative<mx::MacroId>(vid)) {
       assert(false);
       continue;
@@ -100,8 +100,8 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          raw_id = em.EntityId(def.value());
-          vid = mx::EntityId(raw_id).Unpack();
+          mx::RawEntityId def_id = em.EntityId(def.value());
+          vid = mx::EntityId(def_id).Unpack();
           if (!std::holds_alternative<mx::MacroId>(vid)) {
             auto macro_name = def->Name();
             if (!macro_name) {
@@ -125,10 +125,7 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          mid = std::get<mx::MacroId>(vid);
-          if (mid.fragment_id != pf.fragment_index) {
-            referenced_entities.insert(raw_id);
-          }
+          database.AddAsync(mx::ReferenceRecord{macro_id, def_id});
         }
         break;
 
@@ -143,21 +140,17 @@ void LinkExternalReferencesInFragment(
             continue;
           }
 
-          raw_id = em.EntityId(f.value());
-          vid = mx::EntityId(raw_id).Unpack();
+          mx::RawEntityId file_id = em.EntityId(f.value());
+          vid = mx::EntityId(file_id).Unpack();
           if (!std::holds_alternative<mx::FileId>(vid)) {
             assert(false);
             continue;
           }
 
-          referenced_entities.insert(raw_id);
+          database.AddAsync(mx::ReferenceRecord{macro_id, file_id});
         }
         break;
     }
-  }
-
-  for (mx::RawEntityId raw_id : referenced_entities) {
-    database.AddAsync(mx::ReferenceRecord{pf.fragment_id, raw_id});
   }
 }
 

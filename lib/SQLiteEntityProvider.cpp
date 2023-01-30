@@ -194,9 +194,9 @@ class SQLiteEntityProviderImpl {
             "ON u.entity_id = l.entity_id")),
 
         get_references(db.Prepare(
-            "SELECT DISTINCT(r.fragment_id) FROM reference AS r "
+            "SELECT DISTINCT(r.from_entity_id) FROM reference AS r "
             "JOIN " + entity_id_list + " AS l "
-            "ON r.entity_id = l.entity_id")),
+            "ON r.to_entity_id = l.entity_id")),
 
         get_fragments_covered_by_tokens(db.Prepare(
             "SELECT DISTINCT(ffr.fragment_id) "
@@ -483,16 +483,22 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
   return ret;
 }
 
-void SQLiteEntityProvider::FillFragments(
-    SQLiteEntityProviderImpl &context, sqlite::Statement &get_fragments,
-    RawEntityId raw_id, RawEntityIdList &redecl_ids_out,
+// Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
+// to analyze when looking for uses.
+//
+// NOTE(pag): `fragment_ids_out` will always contain the fragment associated
+//            with `eid` if `eid` resides in a fragment.
+void SQLiteEntityProvider::FillUses(
+    const Ptr &, RawEntityId raw_id, RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
-  sqlite::Statement &add_entity_id = context.add_entity_id_to_list;
-  sqlite::AbortingTransaction temporary_changes_only(context.db);
+  ImplPtr context = impl.Lock();
+  sqlite::Statement &get_fragments = context->get_uses;
+  sqlite::Statement &add_entity_id = context->add_entity_id_to_list;
+  sqlite::AbortingTransaction temporary_changes_only(context->db);
 
   // Clear our old entity id list.
-  context.clear_entity_id_list.Execute();
+  context->clear_entity_id_list.Execute();
 
   fragment_ids_out.clear();
   fragment_ids_out.reserve(16u);
@@ -508,7 +514,7 @@ void SQLiteEntityProvider::FillFragments(
       add_entity_id.BindValues(eid);
       add_entity_id.Execute();
 
-      redecl_ids_out = ReadRedeclarations(context);
+      redecl_ids_out = ReadRedeclarations(*context);
       assert(!redecl_ids_out.empty());
       assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(),
                        eid.Pack()) != redecl_ids_out.end());
@@ -545,30 +551,71 @@ void SQLiteEntityProvider::FillFragments(
 }
 
 // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
-// to analyze when looking for uses.
-//
-// NOTE(pag): `fragment_ids_out` will always contain the fragment associated
-//            with `eid` if `eid` resides in a fragment.
-void SQLiteEntityProvider::FillUses(
-    const Ptr &, RawEntityId eid, RawEntityIdList &redecl_ids_out,
-    FragmentIdList &fragment_ids_out) {
-  ImplPtr context = impl.Lock();
-  FillFragments(*context, context->get_uses, eid, redecl_ids_out,
-                fragment_ids_out);
-}
-
-// Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
 // to analyze when looking for references.
 //
 // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
 //            with `eid` if `eid` resides in a fragment.
 void SQLiteEntityProvider::FillReferences(
-    const Ptr &, RawEntityId eid, RawEntityIdList &redecl_ids_out,
-    FragmentIdList &fragment_ids_out) {
+    const Ptr &, RawEntityId raw_id, RawEntityIdList &redecl_ids_out,
+    RawEntityIdList &references_ids_out) {
 
   ImplPtr context = impl.Lock();
-  FillFragments(*context, context->get_references, eid, redecl_ids_out,
-                fragment_ids_out);
+  sqlite::Statement &get_references = context->get_references;
+  sqlite::Statement &add_entity_id = context->add_entity_id_to_list;
+  sqlite::AbortingTransaction temporary_changes_only(context->db);
+
+  // Clear our old entity id list.
+  context->clear_entity_id_list.Execute();
+
+  references_ids_out.clear();
+  references_ids_out.reserve(16u);
+
+  EntityId eid(raw_id);
+  VariantId vid = eid.Unpack();
+
+  // We need to find uses of declarations.
+  if (std::holds_alternative<DeclarationId>(vid)) {
+
+    // If we don't have a set of redeclarations, then calculate them.
+    if (redecl_ids_out.empty()) {
+      add_entity_id.BindValues(eid);
+      add_entity_id.Execute();
+
+      redecl_ids_out = ReadRedeclarations(*context);
+      assert(!redecl_ids_out.empty());
+      assert(std::find(redecl_ids_out.begin(), redecl_ids_out.end(),
+                       eid.Pack()) != redecl_ids_out.end());
+
+    // If we already have a set then use them.
+    } else {
+      for (RawEntityId raw_redecl_id : redecl_ids_out) {
+        add_entity_id.BindValues(raw_redecl_id);
+        add_entity_id.Execute();
+      }
+    }
+
+  // Macros, files, tokens, etc.
+  } else {
+    assert(redecl_ids_out.empty());
+    add_entity_id.BindValues(raw_id);
+    add_entity_id.Execute();
+  }
+
+  // Get the using fragments.
+  while (get_references.ExecuteStep()) {
+    raw_id = kInvalidEntityId;
+    get_references.Row().Columns(raw_id);
+
+    vid = EntityId(raw_id).Unpack();
+    if (std::holds_alternative<StatementId>(vid) ||
+        std::holds_alternative<MacroId>(vid)) {
+      references_ids_out.emplace_back(raw_id);
+    } else {
+      assert(false);
+    }
+  }
+
+  get_references.Reset();
 }
 
 void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
