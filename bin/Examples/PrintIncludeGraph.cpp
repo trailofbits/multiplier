@@ -37,8 +37,12 @@ extern "C" int main(int argc, char *argv[]) {
         << "f" << fid << " [label=\"" << file_paths[fid].generic_string()
         << "\"];\n";
 
-    for (mx::Macro ref : file.references()) {
-      auto inc = mx::IncludeLikeMacroDirective::from(ref);
+    for (mx::Reference ref : file.references()) {
+      auto ref_macro = ref.as_macro();
+      if (!ref_macro) {
+        continue;
+      }
+      auto inc = mx::IncludeLikeMacroDirective::from(*ref_macro);
       if (!inc) {
         assert(false);
         continue;

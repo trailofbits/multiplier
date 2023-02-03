@@ -21,12 +21,12 @@ static void TrackRedeclarations(
 
   mx::RawEntityId a_id = em.EntityId(decl);
   mx::VariantId a_vid = mx::EntityId(a_id).Unpack();
-  if (!std::holds_alternative<mx::DeclarationId>(a_vid)) {
+  if (!std::holds_alternative<mx::DeclId>(a_vid)) {
     assert(false);
     return;
   }
 
-  mx::DeclarationId decl_id = std::get<mx::DeclarationId>(a_vid);
+  mx::DeclId decl_id = std::get<mx::DeclId>(a_vid);
   if (decl_id.fragment_id != pf.fragment_index) {
     assert(false);
     return;
@@ -41,12 +41,12 @@ static void TrackRedeclarations(
     }
 
     mx::VariantId b_vid = mx::EntityId(b_id).Unpack();
-    if (!std::holds_alternative<mx::DeclarationId>(b_vid)) {
+    if (!std::holds_alternative<mx::DeclId>(b_vid)) {
       assert(false);
       continue;
     }
 
-    mx::DeclarationId redecl_id = std::get<mx::DeclarationId>(b_vid);
+    mx::DeclId redecl_id = std::get<mx::DeclId>(b_vid);
     database.AddAsync(mx::RedeclarationRecord{decl_id, redecl_id});
   }
 }

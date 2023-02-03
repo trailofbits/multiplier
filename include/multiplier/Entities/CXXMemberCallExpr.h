@@ -18,10 +18,8 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CallExpr.h"
-#include "DeclUseSelector.h"
 #include "StmtKind.h"
 
 namespace mx {

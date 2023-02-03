@@ -18,11 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroDirective.h"
 #include "MacroKind.h"
-#include "TokenUseSelector.h"
 
 namespace mx {
 class DefineMacroDirective;
@@ -53,8 +51,6 @@ class DefineMacroDirective : public MacroDirective {
 
   static gap::generator<DefineMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
-
-  gap::generator<Macro> references(void) const;
 
   static std::optional<DefineMacroDirective> from(const MacroDirective &parent);
 

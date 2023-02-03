@@ -8,13 +8,21 @@
 
 #include <multiplier/Types.h>
 
+#include <optional>
+
 namespace mx {
 
 // Return the fragment offset from an entity ID. Returns `~0u` if it's not
 // a fragment-specific entity ID.
-EntityOffset FragmentOffsetFromEntityId(RawEntityId id);
+std::optional<EntityOffset> FragmentOffsetFromEntityId(RawEntityId id);
 
 // Returns the fragment ID corresponding with a fragment-specific entity ID.
-RawEntityId FragmentIdFromEntityId(RawEntityId id);
+std::optional<PackedFragmentId> FragmentIdFromEntityId(RawEntityId id);
+
+// Returns the kind of an entity as an undifferentiated integer.
+int KindFromEntityId(RawEntityId id);
+
+// Returns the category of entity as an enum.
+EntityCategory CategoryFromEntityId(RawEntityId);
 
 }  // namespace mx

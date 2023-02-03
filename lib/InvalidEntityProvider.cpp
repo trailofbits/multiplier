@@ -31,16 +31,6 @@ FragmentIdList InvalidEntityProvider::ListFragmentsInFile(
   return {};
 }
 
-FileImpl::Ptr InvalidEntityProvider::FileFor(
-    const Ptr &, SpecificEntityId<FileId>) {
-  return {};
-}
-
-FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(
-    const Ptr &, SpecificEntityId<FragmentId>) {
-  return {};
-}
-
 // Return the list of fragments covering / overlapping some tokens in a file.
 FragmentIdList InvalidEntityProvider::FragmentsCoveringTokens(
     const Ptr &, PackedFileId, std::vector<EntityOffset>) {
@@ -48,7 +38,7 @@ FragmentIdList InvalidEntityProvider::FragmentsCoveringTokens(
 }
 
 RawEntityIdList InvalidEntityProvider::Redeclarations(
-    const Ptr &, SpecificEntityId<DeclarationId>) {
+    const Ptr &, SpecificEntityId<DeclId>) {
   return {};
 }
 
@@ -73,21 +63,26 @@ void InvalidEntityProvider::FindSymbol(
   ids_out.clear();
 }
 
-#define DEFINE_ENTITY_METHODS(name, lower_name) \
-    gap::generator<EntityImplPtr> \
-    InvalidEntityProvider::name ## sFor(const Ptr &, PackedFragmentId) { \
+#define DEFINE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> \
+    InvalidEntityProvider::type_name ## sFor(const Ptr &, PackedFragmentId) { \
       co_return; \
     } \
-    std::optional<EntityImplPtr> \
-    InvalidEntityProvider::name ## For(const Ptr &, PackedFragmentId, EntityOffset) { \
-      return std::nullopt; \
+    \
+    type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
+        const Ptr &, PackedFragmentId, EntityOffset) { \
+      return {}; \
     } \
-    std::optional<EntityImplPtr> \
-    InvalidEntityProvider::name ## For(const Ptr &, RawEntityId) { \
-      return std::nullopt; \
-    } \
+    \
+    type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
+        const Ptr &, RawEntityId) { \
+      return {}; \
+    }
 
-  MX_FOR_EACH_ENTITY_RECORD(DEFINE_ENTITY_METHODS)
+  MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_ENTITY_METHODS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DEFINE_ENTITY_METHODS,
+                              DEFINE_ENTITY_METHODS)
 #undef DEFINE_ENTITY_METHODS
 
 Index::Index(void)

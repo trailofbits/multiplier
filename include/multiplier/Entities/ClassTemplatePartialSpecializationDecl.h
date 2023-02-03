@@ -18,7 +18,6 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "ClassTemplateSpecializationDecl.h"
 #include "DeclKind.h"
@@ -31,6 +30,7 @@ class Decl;
 class NamedDecl;
 class RecordDecl;
 class TagDecl;
+class TemplateParameterList;
 class Type;
 class TypeDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)

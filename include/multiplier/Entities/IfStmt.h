@@ -18,13 +18,10 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "IfStatementKind.h"
 #include "Stmt.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class DeclStmt;

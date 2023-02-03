@@ -18,9 +18,7 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "LangAS.h"
 #include "Linkage.h"
 #include "NullabilityKind.h"
@@ -29,7 +27,6 @@
 #include "QualTypePrimitiveDefaultInitializeKind.h"
 #include "TypeKind.h"
 #include "TypeScalarTypeKind.h"
-#include "TypeUseSelector.h"
 #include "Visibility.h"
 
 namespace mx {
@@ -40,11 +37,12 @@ class ComplexType;
 class DeducedType;
 class ObjCObjectPointerType;
 class ObjCObjectType;
-class OffsetEntityImpl;
 class RecordDecl;
 class RecordType;
+class Reference;
 class TagDecl;
 class Type;
+class TypeImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Type {
  protected:
@@ -55,20 +53,22 @@ class Type {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class TypeImpl;
+  std::shared_ptr<const TypeImpl> impl;
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;
   Type &operator=(Type &&) noexcept = default;
   Type &operator=(const Type &) = default;
 
-  inline Type(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline Type(std::shared_ptr<const TypeImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedTypeId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   inline static std::optional<Type> from(const Type &self) {
     return self;
@@ -81,9 +81,6 @@ class Type {
   inline static std::optional<Type> from(const TokenContext &c) {
     return c.as_type();
   }
-
-  SpecificEntityId<TypeId> id(void) const;
-  gap::generator<Use<TypeUseSelector>> uses(void) const;
 
  protected:
   static gap::generator<Type> in_internal(const Fragment &fragment);

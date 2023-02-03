@@ -18,12 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CXXMethodDecl.h"
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class CXXDestructorDecl;

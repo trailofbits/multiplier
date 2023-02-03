@@ -8,7 +8,15 @@
 
 #include <multiplier/AST.h>
 #include <cassert>
+
+#include "Attr.h"
+#include "Decl.h"
+#include "File.h"
 #include "Fragment.h"
+#include "Macro.h"
+#include "Pseudo.h"
+#include "Stmt.h"
+#include "Type.h"
 
 namespace mx {
 const char *EnumeratorName(DeclKind e) {
@@ -7628,173 +7636,161 @@ const char *EnumeratorName(TokenCategory e) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 bool Designator::is_field_designator(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal1();
+  return impl->reader.getVal0();
 }
 
 bool Designator::is_array_designator(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal2();
+  return impl->reader.getVal1();
 }
 
 bool Designator::is_array_range_designator(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal3();
+  return impl->reader.getVal2();
 }
 
 std::optional<FieldDecl> Designator::field(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    RawEntityId eid = self.getVal4();
+    RawEntityId eid = impl->reader.getVal3();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr.value())));
+      return FieldDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TokenRange Designator::tokens(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal6());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal4(), impl->reader.getVal5());
 }
 
 Token Designator::dot_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal7())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal6());
 }
 
 Token Designator::field_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal8())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal7());
 }
 
 Token Designator::left_bracket_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal8());
 }
 
 Token Designator::right_bracket_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Token Designator::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<unsigned> Designator::first_expression_index(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  if (!self.getVal13()) {
+  if (!impl->reader.getVal12()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal12());
+    return static_cast<unsigned>(impl->reader.getVal11());
   }
   return std::nullopt;
 }
 
+TokenRange CXXBaseSpecifier::tokens(void) const {
+  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal0(), impl->reader.getVal1());
+}
+
+Token CXXBaseSpecifier::base_type_token(void) const {
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal2());
+}
+
+bool CXXBaseSpecifier::is_virtual(void) const {
+  return impl->reader.getVal3();
+}
+
+TagTypeKind CXXBaseSpecifier::base_kind(void) const {
+  return static_cast<TagTypeKind>(impl->reader.getVal4());
+}
+
+bool CXXBaseSpecifier::is_pack_expansion(void) const {
+  return impl->reader.getVal5();
+}
+
+bool CXXBaseSpecifier::constructors_are_inherited(void) const {
+  return impl->reader.getVal6();
+}
+
+Token CXXBaseSpecifier::ellipsis_token(void) const {
+  if (true) {
+    RawEntityId eid = impl->reader.getVal7();
+    if (eid == kInvalidEntityId) {
+      return Token();
+    }
+    return impl->ep->TokenFor(impl->ep, eid);
+  }
+  return Token();
+}
+
+AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const {
+  return static_cast<AccessSpecifier>(impl->reader.getVal8());
+}
+
+AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const {
+  return static_cast<AccessSpecifier>(impl->reader.getVal9());
+}
+
+Type CXXBaseSpecifier::base_type(void) const {
+  RawEntityId eid = impl->reader.getVal10();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
+}
+
 unsigned TemplateParameterList::num_parameters(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal12();
+  return impl->reader.getVal0();
 }
 
 unsigned TemplateParameterList::num_required_parameters(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal14();
+  return impl->reader.getVal1();
 }
 
 unsigned TemplateParameterList::depth(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal15();
+  return impl->reader.getVal2();
 }
 
 bool TemplateParameterList::has_unexpanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal1();
+  return impl->reader.getVal3();
 }
 
 bool TemplateParameterList::has_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal2();
+  return impl->reader.getVal4();
 }
 
 std::optional<Expr> TemplateParameterList::requires_clause(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    RawEntityId eid = self.getVal4();
+    RawEntityId eid = impl->reader.getVal5();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token TemplateParameterList::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal5())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal6());
 }
 
 Token TemplateParameterList::left_angle_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal6())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal7());
 }
 
 Token TemplateParameterList::right_angle_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal7())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal8());
 }
 
 TokenRange TemplateParameterList::tokens(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal8(), self.getVal9());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal9(), impl->reader.getVal10());
 }
 
 std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const {
@@ -7808,12 +7804,11 @@ std::optional<NamedDecl> TemplateParameterList::nth_parameter(unsigned n) const 
 }
 
 gap::generator<NamedDecl> TemplateParameterList::parameters(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto list = self.getVal16();
+  auto list = impl->reader.getVal11();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d16 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = NamedDecl::from(Decl(d16.value()))) {
+    if (auto d11 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = NamedDecl::from(Decl(d11))) {
         co_yield std::move(*e);
       }
     }
@@ -7822,155 +7817,79 @@ gap::generator<NamedDecl> TemplateParameterList::parameters(void) const {
 }
 
 TemplateArgumentKind TemplateArgument::kind(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return static_cast<TemplateArgumentKind>(self.getVal17());
+  return static_cast<TemplateArgumentKind>(impl->reader.getVal0());
 }
 
 bool TemplateArgument::is_null(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal1();
+  return impl->reader.getVal1();
 }
 
 bool TemplateArgument::is_dependent(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal2();
+  return impl->reader.getVal2();
 }
 
 bool TemplateArgument::is_instantiation_dependent(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal3();
+  return impl->reader.getVal3();
 }
 
 bool TemplateArgument::contains_unexpanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal13();
+  return impl->reader.getVal4();
 }
 
 bool TemplateArgument::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal18();
+  return impl->reader.getVal5();
 }
 
 std::optional<ValueDecl> TemplateArgument::as_declaration(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    RawEntityId eid = self.getVal4();
+    RawEntityId eid = impl->reader.getVal6();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ValueDecl::from(Decl(std::move(eptr.value())));
+      return ValueDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> TemplateArgument::as_type(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    RawEntityId eid = self.getVal5();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> TemplateArgument::parameter_type_for_declaration(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    RawEntityId eid = self.getVal6();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> TemplateArgument::null_pointer_type(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
   if (true) {
-    RawEntityId eid = self.getVal7();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
-}
-
-TokenRange CXXBaseSpecifier::tokens(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal4(), self.getVal5());
-}
-
-Token CXXBaseSpecifier::base_type_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal6())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
-}
-
-bool CXXBaseSpecifier::is_virtual(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal1();
-}
-
-TagTypeKind CXXBaseSpecifier::base_kind(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return static_cast<TagTypeKind>(self.getVal17());
-}
-
-bool CXXBaseSpecifier::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal2();
-}
-
-bool CXXBaseSpecifier::constructors_are_inherited(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return self.getVal3();
-}
-
-Token CXXBaseSpecifier::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  if (true) {
-    RawEntityId eid = self.getVal7();
-    if (eid == kInvalidEntityId) {
-      return Token();
-    }
-    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
-      return frag->TokenFor(frag, eid, true /* can_fail */).value();
-    }
-  }
-  return Token();
-}
-
-AccessSpecifier CXXBaseSpecifier::semantic_access_specifier(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return static_cast<AccessSpecifier>(self.getVal19());
-}
-
-AccessSpecifier CXXBaseSpecifier::lexical_access_specifier(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  return static_cast<AccessSpecifier>(self.getVal20());
-}
-
-Type CXXBaseSpecifier::base_type(void) const {
-  auto self = impl->Reader<ast::Pseudo>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
 }
 
 gap::generator<Macro> Macro::containing(const Macro &macro) {
@@ -8006,28 +7925,25 @@ gap::generator<Macro> Macro::containing(const Token &token) {
 }
 
 MacroKind Macro::kind(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return static_cast<MacroKind>(self.getVal0());
+  return static_cast<MacroKind>(impl->reader.getVal0());
 }
 
 std::optional<Macro> Macro::parent(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal1();
+    RawEntityId eid = impl->reader.getVal1();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
-      return Macro(std::move(eptr.value()));
+      return Macro(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 gap::generator<MacroOrToken> Macro::children(void) const {
-  auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
-  auto list = self.getVal2();
+  auto list = impl->reader.getVal2();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
@@ -8125,9 +8041,8 @@ std::optional<MacroSubstitution> MacroSubstitution::from(const Macro &parent) {
 }
 
 gap::generator<MacroOrToken> MacroSubstitution::replacement_children(void) const {
-  auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
-  auto list = self.getVal3();
+  auto list = impl->reader.getVal3();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
@@ -8317,14 +8232,13 @@ std::optional<MacroExpansion> MacroExpansion::from(const Macro &parent) {
 }
 
 std::optional<DefineMacroDirective> MacroExpansion::definition(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal4();
+    RawEntityId eid = impl->reader.getVal4();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {
-      return DefineMacroDirective::from(Macro(std::move(eptr.value())));
+      return DefineMacroDirective::from(Macro(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -8341,12 +8255,11 @@ std::optional<MacroArgument> MacroExpansion::nth_argument(unsigned n) const {
 }
 
 gap::generator<MacroArgument> MacroExpansion::arguments(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  auto list = self.getVal5();
+  auto list = impl->reader.getVal5();
   for (auto v : list) {
     EntityId id(v);
     if (auto d5 = impl->ep->MacroFor(impl->ep, v)) {
-      if (auto e = MacroArgument::from(Macro(d5.value()))) {
+      if (auto e = MacroArgument::from(Macro(d5))) {
         co_yield std::move(*e);
       }
     }
@@ -8395,13 +8308,11 @@ std::optional<MacroArgument> MacroArgument::from(const Macro &parent) {
 }
 
 bool MacroArgument::is_variadic(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return self.getVal6();
+  return impl->reader.getVal6();
 }
 
 unsigned MacroArgument::index(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return self.getVal7();
+  return impl->reader.getVal7();
 }
 
 gap::generator<MacroParameter> MacroParameter::containing(const Macro &macro) {
@@ -8445,36 +8356,29 @@ std::optional<MacroParameter> MacroParameter::from(const Macro &parent) {
 }
 
 Token MacroParameter::variadic_dots(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal4();
+    RawEntityId eid = impl->reader.getVal4();
     if (eid == kInvalidEntityId) {
       return Token();
     }
-    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
-      return frag->TokenFor(frag, eid, true /* can_fail */).value();
-    }
+    return impl->ep->TokenFor(impl->ep, eid);
   }
   return Token();
 }
 
 Token MacroParameter::name(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal8();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return Token();
     }
-    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
-      return frag->TokenFor(frag, eid, true /* can_fail */).value();
-    }
+    return impl->ep->TokenFor(impl->ep, eid);
   }
   return Token();
 }
 
 unsigned MacroParameter::index(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return self.getVal7();
+  return impl->reader.getVal7();
 }
 
 gap::generator<MacroDirective> MacroDirective::containing(const Macro &macro) {
@@ -8533,25 +8437,16 @@ std::optional<MacroDirective> MacroDirective::from(const Macro &parent) {
 }
 
 Token MacroDirective::hash(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal4())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal4());
 }
 
 Token MacroDirective::directive_name(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal8();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return Token();
     }
-    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
-      return frag->TokenFor(frag, eid, true /* can_fail */).value();
-    }
+    return impl->ep->TokenFor(impl->ep, eid);
   }
   return Token();
 }
@@ -8601,23 +8496,19 @@ std::optional<DefineMacroDirective> DefineMacroDirective::from(const Macro &pare
 }
 
 Token DefineMacroDirective::name(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return Token();
     }
-    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {
-      return frag->TokenFor(frag, eid, true /* can_fail */).value();
-    }
+    return impl->ep->TokenFor(impl->ep, eid);
   }
   return Token();
 }
 
 gap::generator<MacroOrToken> DefineMacroDirective::body(void) const {
-  auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
-  auto list = self.getVal3();
+  auto list = impl->reader.getVal3();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
@@ -8631,24 +8522,20 @@ gap::generator<MacroOrToken> DefineMacroDirective::body(void) const {
 }
 
 unsigned DefineMacroDirective::num_explicit_parameters(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return self.getVal7();
+  return impl->reader.getVal7();
 }
 
 bool DefineMacroDirective::is_variadic(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return self.getVal6();
+  return impl->reader.getVal6();
 }
 
 bool DefineMacroDirective::is_function_like(void) const {
-  auto self = impl->Reader<ast::Macro>();
-  return self.getVal10();
+  return impl->reader.getVal10();
 }
 
 gap::generator<MacroOrToken> DefineMacroDirective::parameters(void) const {
-  auto self = impl->Reader<ast::Macro>();
   auto index = Index(impl->ep);
-  auto list = self.getVal5();
+  auto list = impl->reader.getVal5();
   for (auto v : list) {
     VariantEntity e = index.entity(EntityId(v));
     if (std::holds_alternative<Macro>(e)) {
@@ -9276,14 +9163,13 @@ std::optional<IncludeLikeMacroDirective> IncludeLikeMacroDirective::from(const M
 }
 
 std::optional<File> IncludeLikeMacroDirective::included_file(void) const {
-  auto self = impl->Reader<ast::Macro>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
-    if (auto file = impl->ep->FileFor(impl->ep, eid)) {
-      return File(std::move(file));
+    if (auto eptr = impl->ep->FileFor(impl->ep, eid)) {
+      return File(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -9482,44 +9368,32 @@ std::optional<IncludeMacroDirective> IncludeMacroDirective::from(const Macro &pa
 }
 
 Token Attr::token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal0())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal0());
 }
 
 bool Attr::is_implicit(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal1();
+  return impl->reader.getVal1();
 }
 
 bool Attr::is_inherited(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal2();
+  return impl->reader.getVal2();
 }
 
 bool Attr::is_late_parsed(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal3();
+  return impl->reader.getVal3();
 }
 
 bool Attr::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal4();
+  return impl->reader.getVal4();
 }
 
 AttrKind Attr::kind(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<AttrKind>(self.getVal5());
+  return static_cast<AttrKind>(impl->reader.getVal5());
 }
 
 TokenRange Attr::tokens(void) const {
-  auto self = impl->Reader<ast::Attr>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal6(), self.getVal7());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal6(), impl->reader.getVal7());
 }
 
 std::optional<AlignValueAttr> AlignValueAttr::from(const TokenContext &c) {
@@ -9535,9 +9409,8 @@ std::optional<AlignValueAttr> AlignValueAttr::from(const Attr &parent) {
 }
 
 Expr AlignValueAttr::alignment(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<AliasAttr> AliasAttr::from(const TokenContext &c) {
@@ -9553,8 +9426,7 @@ std::optional<AliasAttr> AliasAttr::from(const Attr &parent) {
 }
 
 std::string_view AliasAttr::aliasee(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -9670,8 +9542,7 @@ std::optional<OpenCLPrivateAddressSpaceAttr> OpenCLPrivateAddressSpaceAttr::from
 }
 
 OpenCLPrivateAddressSpaceAttrSpelling OpenCLPrivateAddressSpaceAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OpenCLPrivateAddressSpaceAttrSpelling>(self.getVal10());
+  return static_cast<OpenCLPrivateAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::from(const TokenContext &c) {
@@ -9691,8 +9562,7 @@ std::optional<OpenCLLocalAddressSpaceAttr> OpenCLLocalAddressSpaceAttr::from(con
 }
 
 OpenCLLocalAddressSpaceAttrSpelling OpenCLLocalAddressSpaceAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OpenCLLocalAddressSpaceAttrSpelling>(self.getVal10());
+  return static_cast<OpenCLLocalAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<OpenCLGlobalHostAddressSpaceAttr> OpenCLGlobalHostAddressSpaceAttr::from(const TokenContext &c) {
@@ -9744,8 +9614,7 @@ std::optional<OpenCLGlobalAddressSpaceAttr> OpenCLGlobalAddressSpaceAttr::from(c
 }
 
 OpenCLGlobalAddressSpaceAttrSpelling OpenCLGlobalAddressSpaceAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OpenCLGlobalAddressSpaceAttrSpelling>(self.getVal10());
+  return static_cast<OpenCLGlobalAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from(const TokenContext &c) {
@@ -9765,8 +9634,7 @@ std::optional<OpenCLGenericAddressSpaceAttr> OpenCLGenericAddressSpaceAttr::from
 }
 
 OpenCLGenericAddressSpaceAttrSpelling OpenCLGenericAddressSpaceAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OpenCLGenericAddressSpaceAttrSpelling>(self.getVal10());
+  return static_cast<OpenCLGenericAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::from(const TokenContext &c) {
@@ -9786,8 +9654,7 @@ std::optional<OpenCLConstantAddressSpaceAttr> OpenCLConstantAddressSpaceAttr::fr
 }
 
 OpenCLConstantAddressSpaceAttrSpelling OpenCLConstantAddressSpaceAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OpenCLConstantAddressSpaceAttrSpelling>(self.getVal10());
+  return static_cast<OpenCLConstantAddressSpaceAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<ObjCKindOfAttr> ObjCKindOfAttr::from(const TokenContext &c) {
@@ -9887,8 +9754,7 @@ std::optional<BTFTypeTagAttr> BTFTypeTagAttr::from(const Attr &parent) {
 }
 
 std::string_view BTFTypeTagAttr::btf_type_tag(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -9925,8 +9791,7 @@ std::optional<AnnotateTypeAttr> AnnotateTypeAttr::from(const Attr &parent) {
 }
 
 std::string_view AnnotateTypeAttr::annotation(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -10200,23 +10065,19 @@ std::optional<OpenCLAccessAttr> OpenCLAccessAttr::from(const Attr &parent) {
 }
 
 OpenCLAccessAttrSpelling OpenCLAccessAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OpenCLAccessAttrSpelling>(self.getVal10());
+  return static_cast<OpenCLAccessAttrSpelling>(impl->reader.getVal10());
 }
 
 bool OpenCLAccessAttr::is_read_only(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal11();
+  return impl->reader.getVal11();
 }
 
 bool OpenCLAccessAttr::is_read_write(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool OpenCLAccessAttr::is_write_only(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 std::optional<ObjCRuntimeVisibleAttr> ObjCRuntimeVisibleAttr::from(const TokenContext &c) {
@@ -10244,8 +10105,7 @@ std::optional<ObjCRuntimeNameAttr> ObjCRuntimeNameAttr::from(const Attr &parent)
 }
 
 std::string_view ObjCRuntimeNameAttr::metadata_name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -10346,9 +10206,8 @@ std::optional<OMPReferencedVarAttr> OMPReferencedVarAttr::from(const Attr &paren
 }
 
 Expr OMPReferencedVarAttr::reference(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const TokenContext &c) {
@@ -10364,14 +10223,12 @@ std::optional<OMPDeclareSimdDeclAttr> OMPDeclareSimdDeclAttr::from(const Attr &p
 }
 
 OMPDeclareSimdDeclAttrBranchStateTy OMPDeclareSimdDeclAttr::branch_state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(self.getVal10());
+  return static_cast<OMPDeclareSimdDeclAttrBranchStateTy>(impl->reader.getVal10());
 }
 
 Expr OMPDeclareSimdDeclAttr::simdlen(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<OMPCaptureKindAttr> OMPCaptureKindAttr::from(const TokenContext &c) {
@@ -10435,24 +10292,20 @@ std::optional<LoopHintAttr> LoopHintAttr::from(const Attr &parent) {
 }
 
 LoopHintAttrOptionType LoopHintAttr::option(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<LoopHintAttrOptionType>(self.getVal10());
+  return static_cast<LoopHintAttrOptionType>(impl->reader.getVal10());
 }
 
 LoopHintAttrSpelling LoopHintAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<LoopHintAttrSpelling>(self.getVal14());
+  return static_cast<LoopHintAttrSpelling>(impl->reader.getVal14());
 }
 
 LoopHintAttrLoopHintState LoopHintAttr::state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<LoopHintAttrLoopHintState>(self.getVal15());
+  return static_cast<LoopHintAttrLoopHintState>(impl->reader.getVal15());
 }
 
 Expr LoopHintAttr::value(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<LoaderUninitializedAttr> LoaderUninitializedAttr::from(const TokenContext &c) {
@@ -10480,8 +10333,7 @@ std::optional<InitSegAttr> InitSegAttr::from(const Attr &parent) {
 }
 
 std::string_view InitSegAttr::section(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -10796,8 +10648,7 @@ std::optional<InheritableAttr> InheritableAttr::from(const Attr &parent) {
 }
 
 bool InheritableAttr::should_inherit_even_if_already_present(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal11();
+  return impl->reader.getVal11();
 }
 
 std::optional<IBOutletCollectionAttr> IBOutletCollectionAttr::from(const TokenContext &c) {
@@ -10817,15 +10668,13 @@ std::optional<IBOutletCollectionAttr> IBOutletCollectionAttr::from(const Attr &p
 }
 
 Type IBOutletCollectionAttr::interface(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type IBOutletCollectionAttr::interface_token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<IBOutletAttr> IBOutletAttr::from(const TokenContext &c) {
@@ -10893,8 +10742,7 @@ std::optional<HLSLShaderAttr> HLSLShaderAttr::from(const Attr &parent) {
 }
 
 HLSLShaderAttrShaderType HLSLShaderAttr::type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<HLSLShaderAttrShaderType>(self.getVal10());
+  return static_cast<HLSLShaderAttrShaderType>(impl->reader.getVal10());
 }
 
 std::optional<HLSLSV_GroupIndexAttr> HLSLSV_GroupIndexAttr::from(const TokenContext &c) {
@@ -10978,9 +10826,8 @@ std::optional<GuardedByAttr> GuardedByAttr::from(const Attr &parent) {
 }
 
 Expr GuardedByAttr::argument(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<GNUInlineAttr> GNUInlineAttr::from(const TokenContext &c) {
@@ -11016,8 +10863,7 @@ std::optional<FunctionReturnThunksAttr> FunctionReturnThunksAttr::from(const Att
 }
 
 FunctionReturnThunksAttrKind FunctionReturnThunksAttr::thunk_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<FunctionReturnThunksAttrKind>(self.getVal10());
+  return static_cast<FunctionReturnThunksAttrKind>(impl->reader.getVal10());
 }
 
 std::optional<FormatAttr> FormatAttr::from(const TokenContext &c) {
@@ -11101,13 +10947,11 @@ std::optional<FinalAttr> FinalAttr::from(const Attr &parent) {
 }
 
 FinalAttrSpelling FinalAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<FinalAttrSpelling>(self.getVal10());
+  return static_cast<FinalAttrSpelling>(impl->reader.getVal10());
 }
 
 bool FinalAttr::is_spelled_as_sealed(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<FastCallAttr> FastCallAttr::from(const TokenContext &c) {
@@ -11143,19 +10987,16 @@ std::optional<ExternalSourceSymbolAttr> ExternalSourceSymbolAttr::from(const Att
 }
 
 std::string_view ExternalSourceSymbolAttr::defined_in(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool ExternalSourceSymbolAttr::generated_declaration(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::string_view ExternalSourceSymbolAttr::language(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11176,9 +11017,8 @@ std::optional<ExclusiveTrylockFunctionAttr> ExclusiveTrylockFunctionAttr::from(c
 }
 
 Expr ExclusiveTrylockFunctionAttr::success_value(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<ExcludeFromExplicitInstantiationAttr> ExcludeFromExplicitInstantiationAttr::from(const TokenContext &c) {
@@ -11214,24 +11054,20 @@ std::optional<ErrorAttr> ErrorAttr::from(const Attr &parent) {
 }
 
 ErrorAttrSpelling ErrorAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ErrorAttrSpelling>(self.getVal10());
+  return static_cast<ErrorAttrSpelling>(impl->reader.getVal10());
 }
 
 std::string_view ErrorAttr::user_diagnostic(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool ErrorAttr::is_error(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool ErrorAttr::is_warning(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const TokenContext &c) {
@@ -11251,8 +11087,7 @@ std::optional<EnumExtensibilityAttr> EnumExtensibilityAttr::from(const Attr &par
 }
 
 EnumExtensibilityAttrKind EnumExtensibilityAttr::extensibility(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<EnumExtensibilityAttrKind>(self.getVal10());
+  return static_cast<EnumExtensibilityAttrKind>(impl->reader.getVal10());
 }
 
 std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const TokenContext &c) {
@@ -11272,8 +11107,7 @@ std::optional<EnforceTCBLeafAttr> EnforceTCBLeafAttr::from(const Attr &parent) {
 }
 
 std::string_view EnforceTCBLeafAttr::tcb_name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11294,8 +11128,7 @@ std::optional<EnforceTCBAttr> EnforceTCBAttr::from(const Attr &parent) {
 }
 
 std::string_view EnforceTCBAttr::tcb_name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11316,14 +11149,12 @@ std::optional<EnableIfAttr> EnableIfAttr::from(const Attr &parent) {
 }
 
 Expr EnableIfAttr::condition(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::string_view EnableIfAttr::message(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11392,41 +11223,34 @@ std::optional<DiagnoseIfAttr> DiagnoseIfAttr::from(const Attr &parent) {
 }
 
 bool DiagnoseIfAttr::argument_dependent(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 Expr DiagnoseIfAttr::condition(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DiagnoseIfAttrDiagnosticType DiagnoseIfAttr::diagnostic_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<DiagnoseIfAttrDiagnosticType>(self.getVal10());
+  return static_cast<DiagnoseIfAttrDiagnosticType>(impl->reader.getVal10());
 }
 
 std::string_view DiagnoseIfAttr::message(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 NamedDecl DiagnoseIfAttr::parent(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal16();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool DiagnoseIfAttr::is_error(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 bool DiagnoseIfAttr::is_warning(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal18();
+  return impl->reader.getVal18();
 }
 
 std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const TokenContext &c) {
@@ -11446,9 +11270,8 @@ std::optional<DiagnoseAsBuiltinAttr> DiagnoseAsBuiltinAttr::from(const Attr &par
 }
 
 FunctionDecl DiagnoseAsBuiltinAttr::function(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<DestructorAttr> DestructorAttr::from(const TokenContext &c) {
@@ -11484,14 +11307,12 @@ std::optional<DeprecatedAttr> DeprecatedAttr::from(const Attr &parent) {
 }
 
 std::string_view DeprecatedAttr::message(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view DeprecatedAttr::replacement(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11534,13 +11355,11 @@ std::optional<AlwaysInlineAttr> AlwaysInlineAttr::from(const Attr &parent) {
 }
 
 AlwaysInlineAttrSpelling AlwaysInlineAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<AlwaysInlineAttrSpelling>(self.getVal10());
+  return static_cast<AlwaysInlineAttrSpelling>(impl->reader.getVal10());
 }
 
 bool AlwaysInlineAttr::is_clang_always_inline(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<NoMergeAttr> NoMergeAttr::from(const TokenContext &c) {
@@ -11584,8 +11403,7 @@ std::optional<NoInlineAttr> NoInlineAttr::from(const Attr &parent) {
 }
 
 bool NoInlineAttr::is_clang_no_inline(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<DLLImportStaticLocalAttr> DLLImportStaticLocalAttr::from(const TokenContext &c) {
@@ -11717,8 +11535,7 @@ std::optional<ConsumableAttr> ConsumableAttr::from(const Attr &parent) {
 }
 
 ConsumableAttrConsumedState ConsumableAttr::default_state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ConsumableAttrConsumedState>(self.getVal10());
+  return static_cast<ConsumableAttrConsumedState>(impl->reader.getVal10());
 }
 
 std::optional<ConstructorAttr> ConstructorAttr::from(const TokenContext &c) {
@@ -11754,13 +11571,11 @@ std::optional<ConstInitAttr> ConstInitAttr::from(const Attr &parent) {
 }
 
 ConstInitAttrSpelling ConstInitAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ConstInitAttrSpelling>(self.getVal10());
+  return static_cast<ConstInitAttrSpelling>(impl->reader.getVal10());
 }
 
 bool ConstInitAttr::is_constinit(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<ConstAttr> ConstAttr::from(const TokenContext &c) {
@@ -11828,8 +11643,7 @@ std::optional<CodeSegAttr> CodeSegAttr::from(const Attr &parent) {
 }
 
 std::string_view CodeSegAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -11866,9 +11680,8 @@ std::optional<CleanupAttr> CleanupAttr::from(const Attr &parent) {
 }
 
 FunctionDecl CleanupAttr::function_declaration(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<CapturedRecordAttr> CapturedRecordAttr::from(const TokenContext &c) {
@@ -11904,19 +11717,16 @@ std::optional<CapabilityAttr> CapabilityAttr::from(const Attr &parent) {
 }
 
 std::string_view CapabilityAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 CapabilityAttrSpelling CapabilityAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<CapabilityAttrSpelling>(self.getVal10());
+  return static_cast<CapabilityAttrSpelling>(impl->reader.getVal10());
 }
 
 bool CapabilityAttr::is_shared(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<CallbackAttr> CallbackAttr::from(const TokenContext &c) {
@@ -11968,8 +11778,7 @@ std::optional<CXX11NoReturnAttr> CXX11NoReturnAttr::from(const Attr &parent) {
 }
 
 CXX11NoReturnAttrSpelling CXX11NoReturnAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<CXX11NoReturnAttrSpelling>(self.getVal10());
+  return static_cast<CXX11NoReturnAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<CUDASharedAttr> CUDASharedAttr::from(const TokenContext &c) {
@@ -12005,15 +11814,13 @@ std::optional<CUDALaunchBoundsAttr> CUDALaunchBoundsAttr::from(const Attr &paren
 }
 
 Expr CUDALaunchBoundsAttr::max_threads(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CUDALaunchBoundsAttr::min_blocks(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<CUDAInvalidTargetAttr> CUDAInvalidTargetAttr::from(const TokenContext &c) {
@@ -12241,8 +12048,7 @@ std::optional<CFGuardAttr> CFGuardAttr::from(const Attr &parent) {
 }
 
 CFGuardAttrGuardArg CFGuardAttr::guard(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<CFGuardAttrGuardArg>(self.getVal10());
+  return static_cast<CFGuardAttrGuardArg>(impl->reader.getVal10());
 }
 
 std::optional<CFAuditedTransferAttr> CFAuditedTransferAttr::from(const TokenContext &c) {
@@ -12326,8 +12132,7 @@ std::optional<BlocksAttr> BlocksAttr::from(const Attr &parent) {
 }
 
 BlocksAttrBlockType BlocksAttr::type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<BlocksAttrBlockType>(self.getVal10());
+  return static_cast<BlocksAttrBlockType>(impl->reader.getVal10());
 }
 
 std::optional<BTFDeclTagAttr> BTFDeclTagAttr::from(const TokenContext &c) {
@@ -12347,8 +12152,7 @@ std::optional<BTFDeclTagAttr> BTFDeclTagAttr::from(const Attr &parent) {
 }
 
 std::string_view BTFDeclTagAttr::btf_decl_tag(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -12385,25 +12189,21 @@ std::optional<AvailabilityAttr> AvailabilityAttr::from(const Attr &parent) {
 }
 
 std::string_view AvailabilityAttr::message(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view AvailabilityAttr::replacement(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool AvailabilityAttr::strict(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool AvailabilityAttr::unavailable(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 std::optional<AssumptionAttr> AssumptionAttr::from(const TokenContext &c) {
@@ -12423,8 +12223,7 @@ std::optional<AssumptionAttr> AssumptionAttr::from(const Attr &parent) {
 }
 
 std::string_view AssumptionAttr::assumption(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -12445,20 +12244,18 @@ std::optional<AssumeAlignedAttr> AssumeAlignedAttr::from(const Attr &parent) {
 }
 
 Expr AssumeAlignedAttr::alignment(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> AssumeAlignedAttr::offset(void) const {
-  auto self = impl->Reader<ast::Attr>();
   if (true) {
-    RawEntityId eid = self.getVal16();
+    RawEntityId eid = impl->reader.getVal16();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -12513,13 +12310,11 @@ std::optional<AssertCapabilityAttr> AssertCapabilityAttr::from(const Attr &paren
 }
 
 AssertCapabilityAttrSpelling AssertCapabilityAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<AssertCapabilityAttrSpelling>(self.getVal10());
+  return static_cast<AssertCapabilityAttrSpelling>(impl->reader.getVal10());
 }
 
 bool AssertCapabilityAttr::is_shared(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<AsmLabelAttr> AsmLabelAttr::from(const TokenContext &c) {
@@ -12539,13 +12334,11 @@ std::optional<AsmLabelAttr> AsmLabelAttr::from(const Attr &parent) {
 }
 
 bool AsmLabelAttr::is_literal_label(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::string_view AsmLabelAttr::label(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -12598,13 +12391,11 @@ std::optional<ArgumentWithTypeTagAttr> ArgumentWithTypeTagAttr::from(const Attr 
 }
 
 bool ArgumentWithTypeTagAttr::is_pointer(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 ArgumentWithTypeTagAttrSpelling ArgumentWithTypeTagAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ArgumentWithTypeTagAttrSpelling>(self.getVal10());
+  return static_cast<ArgumentWithTypeTagAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<ArcWeakrefUnavailableAttr> ArcWeakrefUnavailableAttr::from(const TokenContext &c) {
@@ -12752,71 +12543,61 @@ std::optional<AlignedAttr> AlignedAttr::from(const Attr &parent) {
 }
 
 std::optional<Expr> AlignedAttr::alignment_expression(void) const {
-  auto self = impl->Reader<ast::Attr>();
   if (true) {
-    RawEntityId eid = self.getVal8();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> AlignedAttr::alignment_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
   if (true) {
-    RawEntityId eid = self.getVal16();
+    RawEntityId eid = impl->reader.getVal16();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 AlignedAttrSpelling AlignedAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<AlignedAttrSpelling>(self.getVal10());
+  return static_cast<AlignedAttrSpelling>(impl->reader.getVal10());
 }
 
 bool AlignedAttr::is_alignas(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool AlignedAttr::is_alignment_dependent(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 bool AlignedAttr::is_alignment_error_dependent(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal18();
+  return impl->reader.getVal18();
 }
 
 bool AlignedAttr::is_alignment_expression(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal19();
+  return impl->reader.getVal19();
 }
 
 bool AlignedAttr::is_c11(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal20();
+  return impl->reader.getVal20();
 }
 
 bool AlignedAttr::is_declspec(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal21();
+  return impl->reader.getVal21();
 }
 
 bool AlignedAttr::is_gnu(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal22();
+  return impl->reader.getVal22();
 }
 
 std::optional<AlignNaturalAttr> AlignNaturalAttr::from(const TokenContext &c) {
@@ -12900,8 +12681,7 @@ std::optional<AcquireHandleAttr> AcquireHandleAttr::from(const Attr &parent) {
 }
 
 std::string_view AcquireHandleAttr::handle_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -12922,13 +12702,11 @@ std::optional<AcquireCapabilityAttr> AcquireCapabilityAttr::from(const Attr &par
 }
 
 AcquireCapabilityAttrSpelling AcquireCapabilityAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<AcquireCapabilityAttrSpelling>(self.getVal10());
+  return static_cast<AcquireCapabilityAttrSpelling>(impl->reader.getVal10());
 }
 
 bool AcquireCapabilityAttr::is_shared(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<AVRSignalAttr> AVRSignalAttr::from(const TokenContext &c) {
@@ -12980,8 +12758,7 @@ std::optional<ARMInterruptAttr> ARMInterruptAttr::from(const Attr &parent) {
 }
 
 ARMInterruptAttrInterruptType ARMInterruptAttr::interrupt(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ARMInterruptAttrInterruptType>(self.getVal10());
+  return static_cast<ARMInterruptAttrInterruptType>(impl->reader.getVal10());
 }
 
 std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const TokenContext &c) {
@@ -13001,15 +12778,13 @@ std::optional<AMDGPUWavesPerEUAttr> AMDGPUWavesPerEUAttr::from(const Attr &paren
 }
 
 Expr AMDGPUWavesPerEUAttr::max(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr AMDGPUWavesPerEUAttr::min(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<AMDGPUNumVGPRAttr> AMDGPUNumVGPRAttr::from(const TokenContext &c) {
@@ -13077,15 +12852,13 @@ std::optional<AMDGPUFlatWorkGroupSizeAttr> AMDGPUFlatWorkGroupSizeAttr::from(con
 }
 
 Expr AMDGPUFlatWorkGroupSizeAttr::max(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr AMDGPUFlatWorkGroupSizeAttr::min(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<AArch64VectorPcsAttr> AArch64VectorPcsAttr::from(const TokenContext &c) {
@@ -13137,8 +12910,7 @@ std::optional<ZeroCallUsedRegsAttr> ZeroCallUsedRegsAttr::from(const Attr &paren
 }
 
 ZeroCallUsedRegsAttrZeroCallUsedRegsKind ZeroCallUsedRegsAttr::zero_call_used_regs(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(self.getVal10());
+  return static_cast<ZeroCallUsedRegsAttrZeroCallUsedRegsKind>(impl->reader.getVal10());
 }
 
 std::optional<XRayLogArgsAttr> XRayLogArgsAttr::from(const TokenContext &c) {
@@ -13174,18 +12946,15 @@ std::optional<XRayInstrumentAttr> XRayInstrumentAttr::from(const Attr &parent) {
 }
 
 bool XRayInstrumentAttr::always_x_ray_instrument(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 XRayInstrumentAttrSpelling XRayInstrumentAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<XRayInstrumentAttrSpelling>(self.getVal10());
+  return static_cast<XRayInstrumentAttrSpelling>(impl->reader.getVal10());
 }
 
 bool XRayInstrumentAttr::never_x_ray_instrument(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 std::optional<X86ForceAlignArgPointerAttr> X86ForceAlignArgPointerAttr::from(const TokenContext &c) {
@@ -13237,8 +13006,7 @@ std::optional<WebAssemblyImportNameAttr> WebAssemblyImportNameAttr::from(const A
 }
 
 std::string_view WebAssemblyImportNameAttr::import_name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13259,8 +13027,7 @@ std::optional<WebAssemblyImportModuleAttr> WebAssemblyImportModuleAttr::from(con
 }
 
 std::string_view WebAssemblyImportModuleAttr::import_module(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13281,8 +13048,7 @@ std::optional<WebAssemblyExportNameAttr> WebAssemblyExportNameAttr::from(const A
 }
 
 std::string_view WebAssemblyExportNameAttr::export_name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13303,8 +13069,7 @@ std::optional<WeakRefAttr> WeakRefAttr::from(const Attr &parent) {
 }
 
 std::string_view WeakRefAttr::aliasee(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13357,19 +13122,16 @@ std::optional<WarnUnusedResultAttr> WarnUnusedResultAttr::from(const Attr &paren
 }
 
 bool WarnUnusedResultAttr::is_cxx11_no_discard(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::string_view WarnUnusedResultAttr::message(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 WarnUnusedResultAttrSpelling WarnUnusedResultAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<WarnUnusedResultAttrSpelling>(self.getVal10());
+  return static_cast<WarnUnusedResultAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<WarnUnusedAttr> WarnUnusedAttr::from(const TokenContext &c) {
@@ -13405,8 +13167,7 @@ std::optional<VisibilityAttr> VisibilityAttr::from(const Attr &parent) {
 }
 
 VisibilityAttrVisibilityType VisibilityAttr::visibility(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<VisibilityAttrVisibilityType>(self.getVal10());
+  return static_cast<VisibilityAttrVisibilityType>(impl->reader.getVal10());
 }
 
 std::optional<VectorCallAttr> VectorCallAttr::from(const TokenContext &c) {
@@ -13442,15 +13203,13 @@ std::optional<VecTypeHintAttr> VecTypeHintAttr::from(const Attr &parent) {
 }
 
 Type VecTypeHintAttr::type_hint(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type VecTypeHintAttr::type_hint_token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<VecReturnAttr> VecReturnAttr::from(const TokenContext &c) {
@@ -13486,15 +13245,13 @@ std::optional<UuidAttr> UuidAttr::from(const Attr &parent) {
 }
 
 std::string_view UuidAttr::guid(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 MSGuidDecl UuidAttr::guid_declaration(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<UsingIfExistsAttr> UsingIfExistsAttr::from(const TokenContext &c) {
@@ -13546,8 +13303,7 @@ std::optional<UnusedAttr> UnusedAttr::from(const Attr &parent) {
 }
 
 UnusedAttrSpelling UnusedAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<UnusedAttrSpelling>(self.getVal10());
+  return static_cast<UnusedAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<UninitializedAttr> UninitializedAttr::from(const TokenContext &c) {
@@ -13583,13 +13339,11 @@ std::optional<UnavailableAttr> UnavailableAttr::from(const Attr &parent) {
 }
 
 UnavailableAttrImplicitReason UnavailableAttr::implicit_reason(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<UnavailableAttrImplicitReason>(self.getVal10());
+  return static_cast<UnavailableAttrImplicitReason>(impl->reader.getVal10());
 }
 
 std::string_view UnavailableAttr::message(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13610,8 +13364,7 @@ std::optional<TypeVisibilityAttr> TypeVisibilityAttr::from(const Attr &parent) {
 }
 
 TypeVisibilityAttrVisibilityType TypeVisibilityAttr::visibility(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<TypeVisibilityAttrVisibilityType>(self.getVal10());
+  return static_cast<TypeVisibilityAttrVisibilityType>(impl->reader.getVal10());
 }
 
 std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const TokenContext &c) {
@@ -13631,25 +13384,21 @@ std::optional<TypeTagForDatatypeAttr> TypeTagForDatatypeAttr::from(const Attr &p
 }
 
 bool TypeTagForDatatypeAttr::layout_compatible(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type TypeTagForDatatypeAttr::matching_c_type_token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool TypeTagForDatatypeAttr::must_be_null(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const TokenContext &c) {
@@ -13669,19 +13418,16 @@ std::optional<TryAcquireCapabilityAttr> TryAcquireCapabilityAttr::from(const Att
 }
 
 TryAcquireCapabilityAttrSpelling TryAcquireCapabilityAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<TryAcquireCapabilityAttrSpelling>(self.getVal10());
+  return static_cast<TryAcquireCapabilityAttrSpelling>(impl->reader.getVal10());
 }
 
 Expr TryAcquireCapabilityAttr::success_value(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool TryAcquireCapabilityAttr::is_shared(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<TrivialABIAttr> TrivialABIAttr::from(const TokenContext &c) {
@@ -13749,8 +13495,7 @@ std::optional<TestTypestateAttr> TestTypestateAttr::from(const Attr &parent) {
 }
 
 TestTypestateAttrConsumedState TestTypestateAttr::test_state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<TestTypestateAttrConsumedState>(self.getVal10());
+  return static_cast<TestTypestateAttrConsumedState>(impl->reader.getVal10());
 }
 
 std::optional<TargetClonesAttr> TargetClonesAttr::from(const TokenContext &c) {
@@ -13786,20 +13531,17 @@ std::optional<TargetAttr> TargetAttr::from(const Attr &parent) {
 }
 
 std::string_view TargetAttr::architecture(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view TargetAttr::features_string(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal17();
+  capnp::Text::Reader data = impl->reader.getVal17();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool TargetAttr::is_default_version(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<TLSModelAttr> TLSModelAttr::from(const TokenContext &c) {
@@ -13819,8 +13561,7 @@ std::optional<TLSModelAttr> TLSModelAttr::from(const Attr &parent) {
 }
 
 std::string_view TLSModelAttr::model(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13873,13 +13614,11 @@ std::optional<SwiftNewTypeAttr> SwiftNewTypeAttr::from(const Attr &parent) {
 }
 
 SwiftNewTypeAttrNewtypeKind SwiftNewTypeAttr::newtype_kind(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<SwiftNewTypeAttrNewtypeKind>(self.getVal10());
+  return static_cast<SwiftNewTypeAttrNewtypeKind>(impl->reader.getVal10());
 }
 
 SwiftNewTypeAttrSpelling SwiftNewTypeAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<SwiftNewTypeAttrSpelling>(self.getVal14());
+  return static_cast<SwiftNewTypeAttrSpelling>(impl->reader.getVal14());
 }
 
 std::optional<SwiftNameAttr> SwiftNameAttr::from(const TokenContext &c) {
@@ -13899,8 +13638,7 @@ std::optional<SwiftNameAttr> SwiftNameAttr::from(const Attr &parent) {
 }
 
 std::string_view SwiftNameAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13921,8 +13659,7 @@ std::optional<SwiftErrorAttr> SwiftErrorAttr::from(const Attr &parent) {
 }
 
 SwiftErrorAttrConventionKind SwiftErrorAttr::convention(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<SwiftErrorAttrConventionKind>(self.getVal10());
+  return static_cast<SwiftErrorAttrConventionKind>(impl->reader.getVal10());
 }
 
 std::optional<SwiftCallAttr> SwiftCallAttr::from(const TokenContext &c) {
@@ -13974,8 +13711,7 @@ std::optional<SwiftBridgeAttr> SwiftBridgeAttr::from(const Attr &parent) {
 }
 
 std::string_view SwiftBridgeAttr::swift_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -13996,8 +13732,7 @@ std::optional<SwiftAttrAttr> SwiftAttrAttr::from(const Attr &parent) {
 }
 
 std::string_view SwiftAttrAttr::attribute(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14018,8 +13753,7 @@ std::optional<SwiftAsyncNameAttr> SwiftAsyncNameAttr::from(const Attr &parent) {
 }
 
 std::string_view SwiftAsyncNameAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14040,8 +13774,7 @@ std::optional<SwiftAsyncErrorAttr> SwiftAsyncErrorAttr::from(const Attr &parent)
 }
 
 SwiftAsyncErrorAttrConventionKind SwiftAsyncErrorAttr::convention(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<SwiftAsyncErrorAttrConventionKind>(self.getVal10());
+  return static_cast<SwiftAsyncErrorAttrConventionKind>(impl->reader.getVal10());
 }
 
 std::optional<SwiftAsyncCallAttr> SwiftAsyncCallAttr::from(const TokenContext &c) {
@@ -14157,9 +13890,8 @@ std::optional<SharedTrylockFunctionAttr> SharedTrylockFunctionAttr::from(const A
 }
 
 Expr SharedTrylockFunctionAttr::success_value(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<SetTypestateAttr> SetTypestateAttr::from(const TokenContext &c) {
@@ -14179,8 +13911,7 @@ std::optional<SetTypestateAttr> SetTypestateAttr::from(const Attr &parent) {
 }
 
 SetTypestateAttrConsumedState SetTypestateAttr::new_state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<SetTypestateAttrConsumedState>(self.getVal10());
+  return static_cast<SetTypestateAttrConsumedState>(impl->reader.getVal10());
 }
 
 std::optional<SentinelAttr> SentinelAttr::from(const TokenContext &c) {
@@ -14232,14 +13963,12 @@ std::optional<SectionAttr> SectionAttr::from(const Attr &parent) {
 }
 
 std::string_view SectionAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
 SectionAttrSpelling SectionAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<SectionAttrSpelling>(self.getVal10());
+  return static_cast<SectionAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<ScopedLockableAttr> ScopedLockableAttr::from(const TokenContext &c) {
@@ -14339,8 +14068,7 @@ std::optional<ReturnTypestateAttr> ReturnTypestateAttr::from(const Attr &parent)
 }
 
 ReturnTypestateAttrConsumedState ReturnTypestateAttr::state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ReturnTypestateAttrConsumedState>(self.getVal10());
+  return static_cast<ReturnTypestateAttrConsumedState>(impl->reader.getVal10());
 }
 
 std::optional<RetainAttr> RetainAttr::from(const TokenContext &c) {
@@ -14376,8 +14104,7 @@ std::optional<RestrictAttr> RestrictAttr::from(const Attr &parent) {
 }
 
 RestrictAttrSpelling RestrictAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<RestrictAttrSpelling>(self.getVal10());
+  return static_cast<RestrictAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const TokenContext &c) {
@@ -14397,13 +14124,11 @@ std::optional<RequiresCapabilityAttr> RequiresCapabilityAttr::from(const Attr &p
 }
 
 RequiresCapabilityAttrSpelling RequiresCapabilityAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<RequiresCapabilityAttrSpelling>(self.getVal10());
+  return static_cast<RequiresCapabilityAttrSpelling>(impl->reader.getVal10());
 }
 
 bool RequiresCapabilityAttr::is_shared(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<ReqdWorkGroupSizeAttr> ReqdWorkGroupSizeAttr::from(const TokenContext &c) {
@@ -14439,18 +14164,15 @@ std::optional<ReleaseCapabilityAttr> ReleaseCapabilityAttr::from(const Attr &par
 }
 
 ReleaseCapabilityAttrSpelling ReleaseCapabilityAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ReleaseCapabilityAttrSpelling>(self.getVal10());
+  return static_cast<ReleaseCapabilityAttrSpelling>(impl->reader.getVal10());
 }
 
 bool ReleaseCapabilityAttr::is_generic(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool ReleaseCapabilityAttr::is_shared(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 std::optional<ReinitializesAttr> ReinitializesAttr::from(const TokenContext &c) {
@@ -14518,8 +14240,7 @@ std::optional<RISCVInterruptAttr> RISCVInterruptAttr::from(const Attr &parent) {
 }
 
 RISCVInterruptAttrInterruptType RISCVInterruptAttr::interrupt(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<RISCVInterruptAttrInterruptType>(self.getVal10());
+  return static_cast<RISCVInterruptAttrInterruptType>(impl->reader.getVal10());
 }
 
 std::optional<PureAttr> PureAttr::from(const TokenContext &c) {
@@ -14571,9 +14292,8 @@ std::optional<PtGuardedByAttr> PtGuardedByAttr::from(const Attr &parent) {
 }
 
 Expr PtGuardedByAttr::argument(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<PreserveMostAttr> PreserveMostAttr::from(const TokenContext &c) {
@@ -14625,15 +14345,13 @@ std::optional<PreferredNameAttr> PreferredNameAttr::from(const Attr &parent) {
 }
 
 Type PreferredNameAttr::typedef_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type PreferredNameAttr::typedef_type_token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const TokenContext &c) {
@@ -14653,8 +14371,7 @@ std::optional<PragmaClangTextSectionAttr> PragmaClangTextSectionAttr::from(const
 }
 
 std::string_view PragmaClangTextSectionAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14675,8 +14392,7 @@ std::optional<PragmaClangRodataSectionAttr> PragmaClangRodataSectionAttr::from(c
 }
 
 std::string_view PragmaClangRodataSectionAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14697,8 +14413,7 @@ std::optional<PragmaClangRelroSectionAttr> PragmaClangRelroSectionAttr::from(con
 }
 
 std::string_view PragmaClangRelroSectionAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14719,8 +14434,7 @@ std::optional<PragmaClangDataSectionAttr> PragmaClangDataSectionAttr::from(const
 }
 
 std::string_view PragmaClangDataSectionAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14741,8 +14455,7 @@ std::optional<PragmaClangBSSSectionAttr> PragmaClangBSSSectionAttr::from(const A
 }
 
 std::string_view PragmaClangBSSSectionAttr::name(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -14763,15 +14476,13 @@ std::optional<PointerAttr> PointerAttr::from(const Attr &parent) {
 }
 
 Type PointerAttr::deref_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type PointerAttr::deref_type_token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<PcsAttr> PcsAttr::from(const TokenContext &c) {
@@ -14791,8 +14502,7 @@ std::optional<PcsAttr> PcsAttr::from(const Attr &parent) {
 }
 
 PcsAttrPCSType PcsAttr::pcs(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<PcsAttrPCSType>(self.getVal10());
+  return static_cast<PcsAttrPCSType>(impl->reader.getVal10());
 }
 
 std::optional<PatchableFunctionEntryAttr> PatchableFunctionEntryAttr::from(const TokenContext &c) {
@@ -14844,8 +14554,7 @@ std::optional<ParamTypestateAttr> ParamTypestateAttr::from(const Attr &parent) {
 }
 
 ParamTypestateAttrConsumedState ParamTypestateAttr::parameter_state(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ParamTypestateAttrConsumedState>(self.getVal10());
+  return static_cast<ParamTypestateAttrConsumedState>(impl->reader.getVal10());
 }
 
 std::optional<PackedAttr> PackedAttr::from(const TokenContext &c) {
@@ -14881,28 +14590,23 @@ std::optional<OwnershipAttr> OwnershipAttr::from(const Attr &parent) {
 }
 
 OwnershipAttrOwnershipKind OwnershipAttr::own_kind(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OwnershipAttrOwnershipKind>(self.getVal10());
+  return static_cast<OwnershipAttrOwnershipKind>(impl->reader.getVal10());
 }
 
 OwnershipAttrSpelling OwnershipAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OwnershipAttrSpelling>(self.getVal14());
+  return static_cast<OwnershipAttrSpelling>(impl->reader.getVal14());
 }
 
 bool OwnershipAttr::is_holds(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool OwnershipAttr::is_returns(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal13();
+  return impl->reader.getVal13();
 }
 
 bool OwnershipAttr::is_takes(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal18();
+  return impl->reader.getVal18();
 }
 
 std::optional<OwnerAttr> OwnerAttr::from(const TokenContext &c) {
@@ -14922,15 +14626,13 @@ std::optional<OwnerAttr> OwnerAttr::from(const Attr &parent) {
 }
 
 Type OwnerAttr::deref_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type OwnerAttr::deref_type_token(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal16();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<OverrideAttr> OverrideAttr::from(const TokenContext &c) {
@@ -15142,8 +14844,7 @@ std::optional<ObjCMethodFamilyAttr> ObjCMethodFamilyAttr::from(const Attr &paren
 }
 
 ObjCMethodFamilyAttrFamilyKind ObjCMethodFamilyAttr::family(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ObjCMethodFamilyAttrFamilyKind>(self.getVal10());
+  return static_cast<ObjCMethodFamilyAttrFamilyKind>(impl->reader.getVal10());
 }
 
 std::optional<ObjCIndependentClassAttr> ObjCIndependentClassAttr::from(const TokenContext &c) {
@@ -15371,9 +15072,8 @@ std::optional<OMPDeclareVariantAttr> OMPDeclareVariantAttr::from(const Attr &par
 }
 
 Expr OMPDeclareVariantAttr::variant_func_reference(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const TokenContext &c) {
@@ -15393,24 +15093,20 @@ std::optional<OMPDeclareTargetDeclAttr> OMPDeclareTargetDeclAttr::from(const Att
 }
 
 OMPDeclareTargetDeclAttrDevTypeTy OMPDeclareTargetDeclAttr::dev_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(self.getVal10());
+  return static_cast<OMPDeclareTargetDeclAttrDevTypeTy>(impl->reader.getVal10());
 }
 
 bool OMPDeclareTargetDeclAttr::indirect(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 Expr OMPDeclareTargetDeclAttr::indirect_expression(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 OMPDeclareTargetDeclAttrMapTypeTy OMPDeclareTargetDeclAttr::map_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(self.getVal14());
+  return static_cast<OMPDeclareTargetDeclAttrMapTypeTy>(impl->reader.getVal14());
 }
 
 std::optional<OMPCaptureNoInitAttr> OMPCaptureNoInitAttr::from(const TokenContext &c) {
@@ -15446,20 +15142,17 @@ std::optional<OMPAllocateDeclAttr> OMPAllocateDeclAttr::from(const Attr &parent)
 }
 
 Expr OMPAllocateDeclAttr::alignment(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAllocateDeclAttr::allocator(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal16();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal16();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 OMPAllocateDeclAttrAllocatorTypeTy OMPAllocateDeclAttr::allocator_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<OMPAllocateDeclAttrAllocatorTypeTy>(self.getVal10());
+  return static_cast<OMPAllocateDeclAttrAllocatorTypeTy>(impl->reader.getVal10());
 }
 
 std::optional<NotTailCalledAttr> NotTailCalledAttr::from(const TokenContext &c) {
@@ -15591,8 +15284,7 @@ std::optional<NoSanitizeAttr> NoSanitizeAttr::from(const Attr &parent) {
 }
 
 bool NoSanitizeAttr::has_coverage(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<NoReturnAttr> NoReturnAttr::from(const TokenContext &c) {
@@ -15852,9 +15544,8 @@ std::optional<NSErrorDomainAttr> NSErrorDomainAttr::from(const Attr &parent) {
 }
 
 VarDecl NSErrorDomainAttr::error_domain(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<NSConsumesSelfAttr> NSConsumesSelfAttr::from(const TokenContext &c) {
@@ -15890,8 +15581,7 @@ std::optional<MipsShortCallAttr> MipsShortCallAttr::from(const Attr &parent) {
 }
 
 MipsShortCallAttrSpelling MipsShortCallAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<MipsShortCallAttrSpelling>(self.getVal10());
+  return static_cast<MipsShortCallAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const TokenContext &c) {
@@ -15911,8 +15601,7 @@ std::optional<MipsLongCallAttr> MipsLongCallAttr::from(const Attr &parent) {
 }
 
 MipsLongCallAttrSpelling MipsLongCallAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<MipsLongCallAttrSpelling>(self.getVal10());
+  return static_cast<MipsLongCallAttrSpelling>(impl->reader.getVal10());
 }
 
 std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const TokenContext &c) {
@@ -15932,8 +15621,7 @@ std::optional<MipsInterruptAttr> MipsInterruptAttr::from(const Attr &parent) {
 }
 
 MipsInterruptAttrInterruptType MipsInterruptAttr::interrupt(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<MipsInterruptAttrInterruptType>(self.getVal10());
+  return static_cast<MipsInterruptAttrInterruptType>(impl->reader.getVal10());
 }
 
 std::optional<Mips16Attr> Mips16Attr::from(const TokenContext &c) {
@@ -16049,8 +15737,7 @@ std::optional<MSVtorDispAttr> MSVtorDispAttr::from(const Attr &parent) {
 }
 
 MSVtorDispMode MSVtorDispAttr::vtor_disp_mode(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<MSVtorDispMode>(self.getVal10());
+  return static_cast<MSVtorDispMode>(impl->reader.getVal10());
 }
 
 std::optional<MSStructAttr> MSStructAttr::from(const TokenContext &c) {
@@ -16118,18 +15805,15 @@ std::optional<MSInheritanceAttr> MSInheritanceAttr::from(const Attr &parent) {
 }
 
 bool MSInheritanceAttr::best_case(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 MSInheritanceModel MSInheritanceAttr::inheritance_model(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<MSInheritanceModel>(self.getVal10());
+  return static_cast<MSInheritanceModel>(impl->reader.getVal10());
 }
 
 MSInheritanceAttrSpelling MSInheritanceAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<MSInheritanceAttrSpelling>(self.getVal14());
+  return static_cast<MSInheritanceAttrSpelling>(impl->reader.getVal14());
 }
 
 std::optional<MSAllocatorAttr> MSAllocatorAttr::from(const TokenContext &c) {
@@ -16229,9 +15913,8 @@ std::optional<LockReturnedAttr> LockReturnedAttr::from(const Attr &parent) {
 }
 
 Expr LockReturnedAttr::argument(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  RawEntityId eid = self.getVal8();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal8();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<LifetimeBoundAttr> LifetimeBoundAttr::from(const TokenContext &c) {
@@ -16435,8 +16118,7 @@ std::optional<AnnotateAttr> AnnotateAttr::from(const Attr &parent) {
 }
 
 std::string_view AnnotateAttr::annotation(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -16461,8 +16143,7 @@ std::optional<UseHandleAttr> UseHandleAttr::from(const Attr &parent) {
 }
 
 std::string_view UseHandleAttr::handle_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -16487,8 +16168,7 @@ std::optional<ReleaseHandleAttr> ReleaseHandleAttr::from(const Attr &parent) {
 }
 
 std::string_view ReleaseHandleAttr::handle_type(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -16513,13 +16193,11 @@ std::optional<PassObjectSizeAttr> PassObjectSizeAttr::from(const Attr &parent) {
 }
 
 PassObjectSizeAttrSpelling PassObjectSizeAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<PassObjectSizeAttrSpelling>(self.getVal10());
+  return static_cast<PassObjectSizeAttrSpelling>(impl->reader.getVal10());
 }
 
 bool PassObjectSizeAttr::is_dynamic(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 std::optional<ParameterABIAttr> ParameterABIAttr::from(const TokenContext &c) {
@@ -16546,8 +16224,7 @@ std::optional<ParameterABIAttr> ParameterABIAttr::from(const Attr &parent) {
 }
 
 ParameterABI ParameterABIAttr::abi(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<ParameterABI>(self.getVal10());
+  return static_cast<ParameterABI>(impl->reader.getVal10());
 }
 
 std::optional<SwiftIndirectResultAttr> SwiftIndirectResultAttr::from(const TokenContext &c) {
@@ -16719,8 +16396,7 @@ std::optional<IFuncAttr> IFuncAttr::from(const Attr &parent) {
 }
 
 std::string_view IFuncAttr::resolver(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  capnp::Text::Reader data = self.getVal9();
+  capnp::Text::Reader data = impl->reader.getVal9();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -16749,1651 +16425,1367 @@ std::optional<BuiltinAliasAttr> BuiltinAliasAttr::from(const Attr &parent) {
 }
 
 BuiltinAliasAttrSpelling BuiltinAliasAttr::semantic_spelling(void) const {
-  auto self = impl->Reader<ast::Attr>();
-  return static_cast<BuiltinAliasAttrSpelling>(self.getVal10());
+  return static_cast<BuiltinAliasAttrSpelling>(impl->reader.getVal10());
 }
 
 bool Type::is_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal0();
+  return impl->reader.getVal0();
 }
 
 Type Type::unqualified_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal1();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal1();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool Type::accepts_obj_c_type_parameters(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal2();
+  return impl->reader.getVal2();
 }
 
 bool Type::can_decay_to_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal3();
+  return impl->reader.getVal3();
 }
 
 bool Type::can_have_nullability(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal4();
+  return impl->reader.getVal4();
 }
 
 bool Type::contains_errors(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal5();
+  return impl->reader.getVal5();
 }
 
 bool Type::contains_unexpanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal6();
+  return impl->reader.getVal6();
 }
 
 std::optional<Type> Type::array_element_type_no_type_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal7();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> Type::as_cxx_record_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal8();
+    RawEntityId eid = impl->reader.getVal8();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ComplexType> Type::as_complex_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return ComplexType::from(Type(std::move(eptr.value())));
+      return ComplexType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ObjCObjectPointerType> Type::as_obj_c_interface_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal10();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return ObjCObjectPointerType::from(Type(std::move(eptr.value())));
+      return ObjCObjectPointerType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ObjCObjectType> Type::as_obj_c_interface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return ObjCObjectType::from(Type(std::move(eptr.value())));
+      return ObjCObjectType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ObjCObjectPointerType> Type::as_obj_c_qualified_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal12();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return ObjCObjectPointerType::from(Type(std::move(eptr.value())));
+      return ObjCObjectPointerType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ObjCObjectPointerType> Type::as_obj_c_qualified_id_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal13();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return ObjCObjectPointerType::from(Type(std::move(eptr.value())));
+      return ObjCObjectPointerType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ObjCObjectType> Type::as_obj_c_qualified_interface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal14();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return ObjCObjectType::from(Type(std::move(eptr.value())));
+      return ObjCObjectType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<BuiltinType> Type::as_placeholder_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal15();
+    RawEntityId eid = impl->reader.getVal15();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return BuiltinType::from(Type(std::move(eptr.value())));
+      return BuiltinType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<RecordDecl> Type::as_record_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal16();
+    RawEntityId eid = impl->reader.getVal16();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return RecordDecl::from(Decl(std::move(eptr.value())));
+      return RecordDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<RecordType> Type::as_structure_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal17();
+    RawEntityId eid = impl->reader.getVal17();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return RecordType::from(Type(std::move(eptr.value())));
+      return RecordType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<TagDecl> Type::as_tag_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal18();
+    RawEntityId eid = impl->reader.getVal18();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TagDecl::from(Decl(std::move(eptr.value())));
+      return TagDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<RecordType> Type::as_union_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal19();
+    RawEntityId eid = impl->reader.getVal19();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return RecordType::from(Type(std::move(eptr.value())));
+      return RecordType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<AutoType> Type::contained_auto_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal20();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return AutoType::from(Type(std::move(eptr.value())));
+      return AutoType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<DeducedType> Type::contained_deduced_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal21();
+    RawEntityId eid = impl->reader.getVal21();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return DeducedType::from(Type(std::move(eptr.value())));
+      return DeducedType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Linkage Type::linkage(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<Linkage>(self.getVal22());
+  return static_cast<Linkage>(impl->reader.getVal22());
 }
 
 Type Type::locally_unqualified_single_step_desugared_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal23();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal23();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NullabilityKind> Type::nullability(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal25()) {
+  if (!impl->reader.getVal25()) {
     return std::nullopt;
   } else {
-    return static_cast<NullabilityKind>(self.getVal24());
+    return static_cast<NullabilityKind>(impl->reader.getVal24());
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> Type::pointee_cxx_record_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal26();
+    RawEntityId eid = impl->reader.getVal26();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> Type::pointee_or_array_element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal27();
+    RawEntityId eid = impl->reader.getVal27();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> Type::pointee_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal28();
+    RawEntityId eid = impl->reader.getVal28();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<TypeScalarTypeKind> Type::scalar_type_kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal30()) {
+  if (!impl->reader.getVal30()) {
     return std::nullopt;
   } else {
-    return static_cast<TypeScalarTypeKind>(self.getVal29());
+    return static_cast<TypeScalarTypeKind>(impl->reader.getVal29());
   }
   return std::nullopt;
 }
 
 std::optional<Type> Type::sve_element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal31();
+    RawEntityId eid = impl->reader.getVal31();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 TypeKind Type::kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<TypeKind>(self.getVal32());
+  return static_cast<TypeKind>(impl->reader.getVal32());
 }
 
 Type Type::unqualified_desugared_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal33();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal33();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Visibility Type::visibility(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<Visibility>(self.getVal34());
+  return static_cast<Visibility>(impl->reader.getVal34());
 }
 
 bool Type::has_auto_for_trailing_return_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal35();
+  return impl->reader.getVal35();
 }
 
 bool Type::has_floating_representation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal36();
+  return impl->reader.getVal36();
 }
 
 bool Type::has_integer_representation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal37();
+  return impl->reader.getVal37();
 }
 
 bool Type::has_obj_c_pointer_representation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal38();
+  return impl->reader.getVal38();
 }
 
 bool Type::has_pointer_representation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal39();
+  return impl->reader.getVal39();
 }
 
 bool Type::has_signed_integer_representation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal40();
+  return impl->reader.getVal40();
 }
 
 bool Type::has_sized_vla_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal41();
+  return impl->reader.getVal41();
 }
 
 bool Type::has_unnamed_or_local_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal42();
+  return impl->reader.getVal42();
 }
 
 bool Type::has_unsigned_integer_representation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal43();
+  return impl->reader.getVal43();
 }
 
 std::optional<bool> Type::is_aggregate_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal45()) {
+  if (!impl->reader.getVal45()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal44());
+    return static_cast<bool>(impl->reader.getVal44());
   }
   return std::nullopt;
 }
 
 bool Type::is_align_value_t(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal46();
+  return impl->reader.getVal46();
 }
 
 bool Type::is_any_character_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal47();
+  return impl->reader.getVal47();
 }
 
 bool Type::is_any_complex_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal48();
+  return impl->reader.getVal48();
 }
 
 bool Type::is_any_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal49();
+  return impl->reader.getVal49();
 }
 
 bool Type::is_arithmetic_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal50();
+  return impl->reader.getVal50();
 }
 
 bool Type::is_array_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal51();
+  return impl->reader.getVal51();
 }
 
 bool Type::is_atomic_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal52();
+  return impl->reader.getVal52();
 }
 
 bool Type::is_b_float16_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal53();
+  return impl->reader.getVal53();
 }
 
 bool Type::is_bit_int_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal54();
+  return impl->reader.getVal54();
 }
 
 bool Type::is_block_compatible_obj_c_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal55();
+  return impl->reader.getVal55();
 }
 
 bool Type::is_block_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal56();
+  return impl->reader.getVal56();
 }
 
 bool Type::is_boolean_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal57();
+  return impl->reader.getVal57();
 }
 
 bool Type::is_builtin_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal58();
+  return impl->reader.getVal58();
 }
 
 bool Type::is_carc_bridgable_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal59();
+  return impl->reader.getVal59();
 }
 
 bool Type::is_cuda_device_builtin_surface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal60();
+  return impl->reader.getVal60();
 }
 
 bool Type::is_cuda_device_builtin_texture_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal61();
+  return impl->reader.getVal61();
 }
 
 bool Type::is_canonical_unqualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal62();
+  return impl->reader.getVal62();
 }
 
 bool Type::is_char16_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal63();
+  return impl->reader.getVal63();
 }
 
 bool Type::is_char32_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal64();
+  return impl->reader.getVal64();
 }
 
 bool Type::is_char8_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal65();
+  return impl->reader.getVal65();
 }
 
 bool Type::is_character_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal66();
+  return impl->reader.getVal66();
 }
 
 bool Type::is_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal67();
+  return impl->reader.getVal67();
 }
 
 bool Type::is_clk_event_t(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal68();
+  return impl->reader.getVal68();
 }
 
 bool Type::is_complex_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal69();
+  return impl->reader.getVal69();
 }
 
 bool Type::is_complex_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal70();
+  return impl->reader.getVal70();
 }
 
 bool Type::is_compound_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal71();
+  return impl->reader.getVal71();
 }
 
 bool Type::is_constant_array_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal72();
+  return impl->reader.getVal72();
 }
 
 bool Type::is_constant_matrix_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal73();
+  return impl->reader.getVal73();
 }
 
 std::optional<bool> Type::is_constant_size_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal75()) {
+  if (!impl->reader.getVal75()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal74());
+    return static_cast<bool>(impl->reader.getVal74());
   }
   return std::nullopt;
 }
 
 bool Type::is_decltype_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal76();
+  return impl->reader.getVal76();
 }
 
 bool Type::is_dependent_address_space_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal77();
+  return impl->reader.getVal77();
 }
 
 bool Type::is_dependent_sized_array_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal78();
+  return impl->reader.getVal78();
 }
 
 bool Type::is_dependent_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal79();
+  return impl->reader.getVal79();
 }
 
 bool Type::is_elaborated_type_specifier(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal80();
+  return impl->reader.getVal80();
 }
 
 bool Type::is_enumeral_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal81();
+  return impl->reader.getVal81();
 }
 
 bool Type::is_event_t(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal82();
+  return impl->reader.getVal82();
 }
 
 bool Type::is_ext_vector_boolean_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal83();
+  return impl->reader.getVal83();
 }
 
 bool Type::is_ext_vector_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal84();
+  return impl->reader.getVal84();
 }
 
 bool Type::is_fixed_point_or_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal85();
+  return impl->reader.getVal85();
 }
 
 bool Type::is_fixed_point_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal86();
+  return impl->reader.getVal86();
 }
 
 bool Type::is_float128_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal87();
+  return impl->reader.getVal87();
 }
 
 bool Type::is_float16_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal88();
+  return impl->reader.getVal88();
 }
 
 bool Type::is_floating_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal89();
+  return impl->reader.getVal89();
 }
 
 bool Type::is_from_ast(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal90();
+  return impl->reader.getVal90();
 }
 
 bool Type::is_function_no_proto_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal91();
+  return impl->reader.getVal91();
 }
 
 bool Type::is_function_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal92();
+  return impl->reader.getVal92();
 }
 
 bool Type::is_function_proto_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal93();
+  return impl->reader.getVal93();
 }
 
 bool Type::is_function_reference_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal94();
+  return impl->reader.getVal94();
 }
 
 bool Type::is_function_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal95();
+  return impl->reader.getVal95();
 }
 
 bool Type::is_fundamental_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal96();
+  return impl->reader.getVal96();
 }
 
 bool Type::is_half_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal97();
+  return impl->reader.getVal97();
 }
 
 bool Type::is_ibm128_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal98();
+  return impl->reader.getVal98();
 }
 
 bool Type::is_image_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal99();
+  return impl->reader.getVal99();
 }
 
 bool Type::is_incomplete_array_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal100();
+  return impl->reader.getVal100();
 }
 
 bool Type::is_incomplete_or_object_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal101();
+  return impl->reader.getVal101();
 }
 
 bool Type::is_incomplete_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal102();
+  return impl->reader.getVal102();
 }
 
 bool Type::is_instantiation_dependent_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal103();
+  return impl->reader.getVal103();
 }
 
 bool Type::is_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal104();
+  return impl->reader.getVal104();
 }
 
 bool Type::is_integral_or_enumeration_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal105();
+  return impl->reader.getVal105();
 }
 
 bool Type::is_integral_or_unscoped_enumeration_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal106();
+  return impl->reader.getVal106();
 }
 
 bool Type::is_integral_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal107();
+  return impl->reader.getVal107();
 }
 
 bool Type::is_interface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal108();
+  return impl->reader.getVal108();
 }
 
 bool Type::is_l_value_reference_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal109();
+  return impl->reader.getVal109();
 }
 
 bool Type::is_linkage_valid(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal110();
+  return impl->reader.getVal110();
 }
 
 std::optional<bool> Type::is_literal_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal112()) {
+  if (!impl->reader.getVal112()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal111());
+    return static_cast<bool>(impl->reader.getVal111());
   }
   return std::nullopt;
 }
 
 bool Type::is_matrix_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal113();
+  return impl->reader.getVal113();
 }
 
 bool Type::is_member_data_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal114();
+  return impl->reader.getVal114();
 }
 
 bool Type::is_member_function_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal115();
+  return impl->reader.getVal115();
 }
 
 bool Type::is_member_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal116();
+  return impl->reader.getVal116();
 }
 
 bool Type::is_non_overload_placeholder_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal117();
+  return impl->reader.getVal117();
 }
 
 bool Type::is_nothrow_t(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal118();
+  return impl->reader.getVal118();
 }
 
 bool Type::is_null_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal119();
+  return impl->reader.getVal119();
 }
 
 bool Type::is_ocl_ext_opaque_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal120();
+  return impl->reader.getVal120();
 }
 
 bool Type::is_ocl_image_1d_array_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal121();
+  return impl->reader.getVal121();
 }
 
 bool Type::is_ocl_image_1d_array_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal122();
+  return impl->reader.getVal122();
 }
 
 bool Type::is_ocl_image_1d_array_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal123();
+  return impl->reader.getVal123();
 }
 
 bool Type::is_ocl_image_1d_buffer_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal124();
+  return impl->reader.getVal124();
 }
 
 bool Type::is_ocl_image_1d_buffer_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal125();
+  return impl->reader.getVal125();
 }
 
 bool Type::is_ocl_image_1d_buffer_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal126();
+  return impl->reader.getVal126();
 }
 
 bool Type::is_ocl_image_1d_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal127();
+  return impl->reader.getVal127();
 }
 
 bool Type::is_ocl_image_1d_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal128();
+  return impl->reader.getVal128();
 }
 
 bool Type::is_ocl_image_1d_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal129();
+  return impl->reader.getVal129();
 }
 
 bool Type::is_ocl_image_2d_array_depth_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal130();
+  return impl->reader.getVal130();
 }
 
 bool Type::is_ocl_image_2d_array_depth_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal131();
+  return impl->reader.getVal131();
 }
 
 bool Type::is_ocl_image_2d_array_depth_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal132();
+  return impl->reader.getVal132();
 }
 
 bool Type::is_ocl_image_2d_array_msaa_depth_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal133();
+  return impl->reader.getVal133();
 }
 
 bool Type::is_ocl_image_2d_array_msaa_depth_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal134();
+  return impl->reader.getVal134();
 }
 
 bool Type::is_ocl_image_2d_array_msaa_depth_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal135();
+  return impl->reader.getVal135();
 }
 
 bool Type::is_ocl_image_2d_array_msaaro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal136();
+  return impl->reader.getVal136();
 }
 
 bool Type::is_ocl_image_2d_array_msaarw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal137();
+  return impl->reader.getVal137();
 }
 
 bool Type::is_ocl_image_2d_array_msaawo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal138();
+  return impl->reader.getVal138();
 }
 
 bool Type::is_ocl_image_2d_array_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal139();
+  return impl->reader.getVal139();
 }
 
 bool Type::is_ocl_image_2d_array_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal140();
+  return impl->reader.getVal140();
 }
 
 bool Type::is_ocl_image_2d_array_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal141();
+  return impl->reader.getVal141();
 }
 
 bool Type::is_ocl_image_2d_depth_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal142();
+  return impl->reader.getVal142();
 }
 
 bool Type::is_ocl_image_2d_depth_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal143();
+  return impl->reader.getVal143();
 }
 
 bool Type::is_ocl_image_2d_depth_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal144();
+  return impl->reader.getVal144();
 }
 
 bool Type::is_ocl_image_2d_msaa_depth_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal145();
+  return impl->reader.getVal145();
 }
 
 bool Type::is_ocl_image_2d_msaa_depth_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal146();
+  return impl->reader.getVal146();
 }
 
 bool Type::is_ocl_image_2d_msaa_depth_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal147();
+  return impl->reader.getVal147();
 }
 
 bool Type::is_ocl_image_2d_msaaro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal148();
+  return impl->reader.getVal148();
 }
 
 bool Type::is_ocl_image_2d_msaarw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal149();
+  return impl->reader.getVal149();
 }
 
 bool Type::is_ocl_image_2d_msaawo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal150();
+  return impl->reader.getVal150();
 }
 
 bool Type::is_ocl_image_2d_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal151();
+  return impl->reader.getVal151();
 }
 
 bool Type::is_ocl_image_2d_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal152();
+  return impl->reader.getVal152();
 }
 
 bool Type::is_ocl_image_2d_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal153();
+  return impl->reader.getVal153();
 }
 
 bool Type::is_ocl_image_3d_ro_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal154();
+  return impl->reader.getVal154();
 }
 
 bool Type::is_ocl_image_3d_rw_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal155();
+  return impl->reader.getVal155();
 }
 
 bool Type::is_ocl_image_3d_wo_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal156();
+  return impl->reader.getVal156();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ime_dual_reference_streamin_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal157();
+  return impl->reader.getVal157();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ime_payload_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal158();
+  return impl->reader.getVal158();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ime_result_dual_reference_streamout_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal159();
+  return impl->reader.getVal159();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ime_result_single_reference_streamout_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal160();
+  return impl->reader.getVal160();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ime_result_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal161();
+  return impl->reader.getVal161();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ime_single_reference_streamin_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal162();
+  return impl->reader.getVal162();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_mce_payload_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal163();
+  return impl->reader.getVal163();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_mce_result_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal164();
+  return impl->reader.getVal164();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ref_payload_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal165();
+  return impl->reader.getVal165();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_ref_result_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal166();
+  return impl->reader.getVal166();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_sic_payload_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal167();
+  return impl->reader.getVal167();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_sic_result_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal168();
+  return impl->reader.getVal168();
 }
 
 bool Type::is_ocl_intel_subgroup_avc_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal169();
+  return impl->reader.getVal169();
 }
 
 bool Type::is_obj_carc_bridgable_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal170();
+  return impl->reader.getVal170();
 }
 
 std::optional<bool> Type::is_obj_carc_implicitly_unretained_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal172()) {
+  if (!impl->reader.getVal172()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal171());
+    return static_cast<bool>(impl->reader.getVal171());
   }
   return std::nullopt;
 }
 
 bool Type::is_obj_c_boxable_record_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal173();
+  return impl->reader.getVal173();
 }
 
 bool Type::is_obj_c_builtin_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal174();
+  return impl->reader.getVal174();
 }
 
 bool Type::is_obj_c_class_or_class_kind_of_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal175();
+  return impl->reader.getVal175();
 }
 
 bool Type::is_obj_c_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal176();
+  return impl->reader.getVal176();
 }
 
 bool Type::is_obj_c_id_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal177();
+  return impl->reader.getVal177();
 }
 
 bool Type::is_obj_c_independent_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal178();
+  return impl->reader.getVal178();
 }
 
 bool Type::is_obj_c_indirect_lifetime_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal179();
+  return impl->reader.getVal179();
 }
 
 bool Type::is_obj_c_inert_unsafe_unretained_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal180();
+  return impl->reader.getVal180();
 }
 
 bool Type::is_obj_c_lifetime_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal181();
+  return impl->reader.getVal181();
 }
 
 bool Type::is_obj_cns_object_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal182();
+  return impl->reader.getVal182();
 }
 
 bool Type::is_obj_c_object_or_interface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal183();
+  return impl->reader.getVal183();
 }
 
 bool Type::is_obj_c_object_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal184();
+  return impl->reader.getVal184();
 }
 
 bool Type::is_obj_c_object_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal185();
+  return impl->reader.getVal185();
 }
 
 bool Type::is_obj_c_qualified_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal186();
+  return impl->reader.getVal186();
 }
 
 bool Type::is_obj_c_qualified_id_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal187();
+  return impl->reader.getVal187();
 }
 
 bool Type::is_obj_c_qualified_interface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal188();
+  return impl->reader.getVal188();
 }
 
 bool Type::is_obj_c_retainable_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal189();
+  return impl->reader.getVal189();
 }
 
 bool Type::is_obj_c_sel_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal190();
+  return impl->reader.getVal190();
 }
 
 bool Type::is_object_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal191();
+  return impl->reader.getVal191();
 }
 
 bool Type::is_object_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal192();
+  return impl->reader.getVal192();
 }
 
 bool Type::is_open_cl_specific_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal193();
+  return impl->reader.getVal193();
 }
 
 bool Type::is_overloadable_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal194();
+  return impl->reader.getVal194();
 }
 
 bool Type::is_pipe_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal195();
+  return impl->reader.getVal195();
 }
 
 bool Type::is_placeholder_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal196();
+  return impl->reader.getVal196();
 }
 
 bool Type::is_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal197();
+  return impl->reader.getVal197();
 }
 
 bool Type::is_promotable_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal198();
+  return impl->reader.getVal198();
 }
 
 bool Type::is_queue_t(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal199();
+  return impl->reader.getVal199();
 }
 
 bool Type::is_r_value_reference_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal200();
+  return impl->reader.getVal200();
 }
 
 bool Type::is_real_floating_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal201();
+  return impl->reader.getVal201();
 }
 
 bool Type::is_real_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal202();
+  return impl->reader.getVal202();
 }
 
 bool Type::is_record_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal203();
+  return impl->reader.getVal203();
 }
 
 bool Type::is_reference_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal204();
+  return impl->reader.getVal204();
 }
 
 bool Type::is_reserve_idt(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal205();
+  return impl->reader.getVal205();
 }
 
 bool Type::is_sampler_t(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal206();
+  return impl->reader.getVal206();
 }
 
 bool Type::is_saturated_fixed_point_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal207();
+  return impl->reader.getVal207();
 }
 
 bool Type::is_scalar_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal208();
+  return impl->reader.getVal208();
 }
 
 bool Type::is_scoped_enumeral_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal209();
+  return impl->reader.getVal209();
 }
 
 bool Type::is_signed_fixed_point_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal210();
+  return impl->reader.getVal210();
 }
 
 bool Type::is_signed_integer_or_enumeration_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal211();
+  return impl->reader.getVal211();
 }
 
 bool Type::is_signed_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal212();
+  return impl->reader.getVal212();
 }
 
 bool Type::is_sizeless_builtin_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal213();
+  return impl->reader.getVal213();
 }
 
 bool Type::is_sizeless_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal214();
+  return impl->reader.getVal214();
 }
 
 bool Type::is_specifier_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal215();
+  return impl->reader.getVal215();
 }
 
 std::optional<bool> Type::is_standard_layout_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal217()) {
+  if (!impl->reader.getVal217()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal216());
+    return static_cast<bool>(impl->reader.getVal216());
   }
   return std::nullopt;
 }
 
 bool Type::is_std_byte_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal218();
+  return impl->reader.getVal218();
 }
 
 std::optional<bool> Type::is_structural_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal220()) {
+  if (!impl->reader.getVal220()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal219());
+    return static_cast<bool>(impl->reader.getVal219());
   }
   return std::nullopt;
 }
 
 bool Type::is_structure_or_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal221();
+  return impl->reader.getVal221();
 }
 
 bool Type::is_structure_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal222();
+  return impl->reader.getVal222();
 }
 
 bool Type::is_template_type_parm_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal223();
+  return impl->reader.getVal223();
 }
 
 bool Type::is_typedef_name_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal224();
+  return impl->reader.getVal224();
 }
 
 bool Type::is_undeduced_auto_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal225();
+  return impl->reader.getVal225();
 }
 
 bool Type::is_undeduced_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal226();
+  return impl->reader.getVal226();
 }
 
 bool Type::is_union_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal227();
+  return impl->reader.getVal227();
 }
 
 bool Type::is_unsaturated_fixed_point_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal228();
+  return impl->reader.getVal228();
 }
 
 bool Type::is_unscoped_enumeration_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal229();
+  return impl->reader.getVal229();
 }
 
 bool Type::is_unsigned_fixed_point_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal230();
+  return impl->reader.getVal230();
 }
 
 bool Type::is_unsigned_integer_or_enumeration_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal231();
+  return impl->reader.getVal231();
 }
 
 bool Type::is_unsigned_integer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal232();
+  return impl->reader.getVal232();
 }
 
 bool Type::is_vlst_builtin_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal233();
+  return impl->reader.getVal233();
 }
 
 bool Type::is_variable_array_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal234();
+  return impl->reader.getVal234();
 }
 
 bool Type::is_variably_modified_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal235();
+  return impl->reader.getVal235();
 }
 
 bool Type::is_vector_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal236();
+  return impl->reader.getVal236();
 }
 
 bool Type::is_visibility_explicit(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal237();
+  return impl->reader.getVal237();
 }
 
 bool Type::is_void_pointer_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal238();
+  return impl->reader.getVal238();
 }
 
 bool Type::is_void_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal239();
+  return impl->reader.getVal239();
 }
 
 bool Type::is_wide_character_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal240();
+  return impl->reader.getVal240();
 }
 
 Type Type::ignore_parentheses(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal241();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal241();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 LangAS Type::address_space(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<LangAS>(self.getVal242());
+  return static_cast<LangAS>(impl->reader.getVal242());
 }
 
 Type Type::atomic_unqualified_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal243();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal243();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::canonical_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal244();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal244();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::desugared_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal245();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal245();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::local_unqualified_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal246();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal246();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::non_l_value_expression_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal247();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal247();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::non_pack_expansion_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal248();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal248();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::non_reference_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal249();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal249();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::single_step_desugared_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal250();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal250();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool Type::has_address_space(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal251();
+  return impl->reader.getVal251();
 }
 
 bool Type::has_local_non_fast_qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal252();
+  return impl->reader.getVal252();
 }
 
 bool Type::has_local_qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal253();
+  return impl->reader.getVal253();
 }
 
 bool Type::has_non_trivial_obj_c_lifetime(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal254();
+  return impl->reader.getVal254();
 }
 
 bool Type::has_non_trivial_to_primitive_copy_c_union(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal255();
+  return impl->reader.getVal255();
 }
 
 bool Type::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal256();
+  return impl->reader.getVal256();
 }
 
 bool Type::has_non_trivial_to_primitive_destruct_c_union(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal257();
+  return impl->reader.getVal257();
 }
 
 bool Type::has_qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal258();
+  return impl->reader.getVal258();
 }
 
 bool Type::has_strong_or_weak_obj_c_lifetime(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal259();
+  return impl->reader.getVal259();
 }
 
 bool Type::is_c_forbidden_l_value_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal260();
+  return impl->reader.getVal260();
 }
 
 bool Type::is_cxx11_pod_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal261();
+  return impl->reader.getVal261();
 }
 
 bool Type::is_cxx98_pod_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal262();
+  return impl->reader.getVal262();
 }
 
 bool Type::is_canonical(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal263();
+  return impl->reader.getVal263();
 }
 
 bool Type::is_canonical_as_parameter(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal264();
+  return impl->reader.getVal264();
 }
 
 bool Type::is_const_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal265();
+  return impl->reader.getVal265();
 }
 
 bool Type::is_constant(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal266();
+  return impl->reader.getVal266();
 }
 
 QualTypeDestructionKind Type::is_destructed_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<QualTypeDestructionKind>(self.getVal267());
+  return static_cast<QualTypeDestructionKind>(impl->reader.getVal267());
 }
 
 bool Type::is_local_const_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal268();
+  return impl->reader.getVal268();
 }
 
 bool Type::is_local_restrict_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal269();
+  return impl->reader.getVal269();
 }
 
 bool Type::is_local_volatile_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal270();
+  return impl->reader.getVal270();
 }
 
 QualTypePrimitiveCopyKind Type::is_non_trivial_to_primitive_copy(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<QualTypePrimitiveCopyKind>(self.getVal271());
+  return static_cast<QualTypePrimitiveCopyKind>(impl->reader.getVal271());
 }
 
 QualTypePrimitiveDefaultInitializeKind Type::is_non_trivial_to_primitive_default_initialize(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<QualTypePrimitiveDefaultInitializeKind>(self.getVal272());
+  return static_cast<QualTypePrimitiveDefaultInitializeKind>(impl->reader.getVal272());
 }
 
 QualTypePrimitiveCopyKind Type::is_non_trivial_to_primitive_destructive_move(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<QualTypePrimitiveCopyKind>(self.getVal273());
+  return static_cast<QualTypePrimitiveCopyKind>(impl->reader.getVal273());
 }
 
 bool Type::is_non_weak_in_mrr_with_obj_c_weak(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal274();
+  return impl->reader.getVal274();
 }
 
 bool Type::is_null(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal275();
+  return impl->reader.getVal275();
 }
 
 bool Type::is_obj_cgc_strong(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal276();
+  return impl->reader.getVal276();
 }
 
 bool Type::is_obj_cgc_weak(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal277();
+  return impl->reader.getVal277();
 }
 
 bool Type::is_pod_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal278();
+  return impl->reader.getVal278();
 }
 
 bool Type::is_restrict_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal279();
+  return impl->reader.getVal279();
 }
 
 bool Type::is_trivial_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal280();
+  return impl->reader.getVal280();
 }
 
 bool Type::is_trivially_copyable_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal281();
+  return impl->reader.getVal281();
 }
 
 bool Type::is_trivially_relocatable_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal282();
+  return impl->reader.getVal282();
 }
 
 bool Type::is_volatile_qualified(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal283();
+  return impl->reader.getVal283();
 }
 
 bool Type::may_be_dynamic_class(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal284();
+  return impl->reader.getVal284();
 }
 
 bool Type::may_be_not_dynamic_class(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal285();
+  return impl->reader.getVal285();
 }
 
 Type Type::strip_obj_c_kind_of_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal286();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal286();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::with_const(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal287();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal287();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::with_restrict(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal288();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal288();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::with_volatile(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal289();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal289();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type Type::without_local_fast_qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal290();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal290();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const TokenContext &c) {
@@ -18409,33 +17801,29 @@ std::optional<TemplateTypeParmType> TemplateTypeParmType::from(const Type &paren
 }
 
 Type TemplateTypeParmType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TemplateTypeParmDecl> TemplateTypeParmType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal292();
+    RawEntityId eid = impl->reader.getVal292();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TemplateTypeParmDecl::from(Decl(std::move(eptr.value())));
+      return TemplateTypeParmDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool TemplateTypeParmType::is_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool TemplateTypeParmType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const TokenContext &c) {
@@ -18451,38 +17839,33 @@ std::optional<TemplateSpecializationType> TemplateSpecializationType::from(const
 }
 
 Type TemplateSpecializationType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> TemplateSpecializationType::aliased_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal292();
+    RawEntityId eid = impl->reader.getVal292();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool TemplateSpecializationType::is_current_instantiation(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool TemplateSpecializationType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool TemplateSpecializationType::is_type_alias(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argument(unsigned n) const {
@@ -18496,12 +17879,12 @@ std::optional<TemplateArgument> TemplateSpecializationType::nth_template_argumen
 }
 
 gap::generator<TemplateArgument> TemplateSpecializationType::template_arguments(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal296();
+  auto list = impl->reader.getVal296();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d296 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d296));
+    }
   }
   co_return;
 }
@@ -18520,14 +17903,12 @@ std::optional<TagType> TagType::from(const Type &parent) {
 }
 
 TagDecl TagType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal291();
+  return TagDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TagType::is_being_defined(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<RecordType> RecordType::from(const TokenContext &c) {
@@ -18547,19 +17928,16 @@ std::optional<RecordType> RecordType::from(const Type &parent) {
 }
 
 Type RecordType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool RecordType::has_const_fields(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool RecordType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<EnumType> EnumType::from(const TokenContext &c) {
@@ -18579,14 +17957,12 @@ std::optional<EnumType> EnumType::from(const Type &parent) {
 }
 
 Type EnumType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool EnumType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const TokenContext &c) {
@@ -18602,26 +17978,22 @@ std::optional<SubstTemplateTypeParmType> SubstTemplateTypeParmType::from(const T
 }
 
 Type SubstTemplateTypeParmType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TemplateTypeParmType SubstTemplateTypeParmType::replaced_parameter(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 Type SubstTemplateTypeParmType::replacement_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool SubstTemplateTypeParmType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from(const TokenContext &c) {
@@ -18637,20 +18009,17 @@ std::optional<SubstTemplateTypeParmPackType> SubstTemplateTypeParmPackType::from
 }
 
 Type SubstTemplateTypeParmPackType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TemplateTypeParmType SubstTemplateTypeParmPackType::replaced_parameter(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return TemplateTypeParmType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 bool SubstTemplateTypeParmPackType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<ReferenceType> ReferenceType::from(const TokenContext &c) {
@@ -18667,19 +18036,16 @@ std::optional<ReferenceType> ReferenceType::from(const Type &parent) {
 }
 
 Type ReferenceType::pointee_type_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ReferenceType::is_inner_reference(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool ReferenceType::is_spelled_as_l_value(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 std::optional<RValueReferenceType> RValueReferenceType::from(const TokenContext &c) {
@@ -18699,14 +18065,12 @@ std::optional<RValueReferenceType> RValueReferenceType::from(const Type &parent)
 }
 
 Type RValueReferenceType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool RValueReferenceType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<LValueReferenceType> LValueReferenceType::from(const TokenContext &c) {
@@ -18726,14 +18090,12 @@ std::optional<LValueReferenceType> LValueReferenceType::from(const Type &parent)
 }
 
 Type LValueReferenceType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool LValueReferenceType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<PointerType> PointerType::from(const TokenContext &c) {
@@ -18749,14 +18111,12 @@ std::optional<PointerType> PointerType::from(const Type &parent) {
 }
 
 Type PointerType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool PointerType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<PipeType> PipeType::from(const TokenContext &c) {
@@ -18772,25 +18132,21 @@ std::optional<PipeType> PipeType::from(const Type &parent) {
 }
 
 Type PipeType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type PipeType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool PipeType::is_read_only(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool PipeType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 std::optional<ParenType> ParenType::from(const TokenContext &c) {
@@ -18806,20 +18162,17 @@ std::optional<ParenType> ParenType::from(const Type &parent) {
 }
 
 Type ParenType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ParenType::inner_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ParenType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<PackExpansionType> PackExpansionType::from(const TokenContext &c) {
@@ -18835,30 +18188,26 @@ std::optional<PackExpansionType> PackExpansionType::from(const Type &parent) {
 }
 
 Type PackExpansionType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<unsigned> PackExpansionType::num_expansions(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal293()) {
+  if (!impl->reader.getVal293()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal298());
+    return static_cast<unsigned>(impl->reader.getVal298());
   }
   return std::nullopt;
 }
 
 Type PackExpansionType::pattern(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool PackExpansionType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const TokenContext &c) {
@@ -18874,20 +18223,17 @@ std::optional<ObjCTypeParamType> ObjCTypeParamType::from(const Type &parent) {
 }
 
 Type ObjCTypeParamType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ObjCTypeParamDecl ObjCTypeParamType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return ObjCTypeParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return ObjCTypeParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCTypeParamType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<ObjCObjectType> ObjCObjectType::from(const TokenContext &c) {
@@ -18904,32 +18250,28 @@ std::optional<ObjCObjectType> ObjCObjectType::from(const Type &parent) {
 }
 
 Type ObjCObjectType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCObjectType::base_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ObjCInterfaceDecl ObjCObjectType::interface(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal297();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<Type> ObjCObjectType::super_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal299();
+    RawEntityId eid = impl->reader.getVal299();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -18946,103 +18288,86 @@ std::optional<Type> ObjCObjectType::nth_type_argument(unsigned n) const {
 }
 
 gap::generator<Type> ObjCObjectType::type_arguments(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal300();
+  auto list = impl->reader.getVal296();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d300.value());
+    if (auto d296 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield Type(std::move(d296));
     }
   }
   co_return;
 }
 
 gap::generator<Type> ObjCObjectType::type_arguments_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal301();
+  auto list = impl->reader.getVal300();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d301 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d301.value());
+    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield Type(std::move(d300));
     }
   }
   co_return;
 }
 
 bool ObjCObjectType::is_kind_of_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool ObjCObjectType::is_kind_of_type_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool ObjCObjectType::is_obj_c_class(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 bool ObjCObjectType::is_obj_c_id(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal302();
+  return impl->reader.getVal301();
 }
 
 bool ObjCObjectType::is_obj_c_qualified_class(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal303();
+  return impl->reader.getVal302();
 }
 
 bool ObjCObjectType::is_obj_c_qualified_id(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal304();
+  return impl->reader.getVal303();
 }
 
 bool ObjCObjectType::is_obj_c_unqualified_class(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal305();
+  return impl->reader.getVal304();
 }
 
 bool ObjCObjectType::is_obj_c_unqualified_id(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal306();
+  return impl->reader.getVal305();
 }
 
 bool ObjCObjectType::is_obj_c_unqualified_id_or_class(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal307();
+  return impl->reader.getVal306();
 }
 
 bool ObjCObjectType::is_specialized(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal308();
+  return impl->reader.getVal307();
 }
 
 bool ObjCObjectType::is_specialized_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal309();
+  return impl->reader.getVal308();
 }
 
 bool ObjCObjectType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal310();
+  return impl->reader.getVal309();
 }
 
 bool ObjCObjectType::is_unspecialized(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal311();
+  return impl->reader.getVal310();
 }
 
 bool ObjCObjectType::is_unspecialized_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal312();
+  return impl->reader.getVal311();
 }
 
 Type ObjCObjectType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal313();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal312();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const TokenContext &c) {
@@ -19062,9 +18387,8 @@ std::optional<ObjCInterfaceType> ObjCInterfaceType::from(const Type &parent) {
 }
 
 ObjCInterfaceDecl ObjCInterfaceType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal314();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal313();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const TokenContext &c) {
@@ -19080,33 +18404,28 @@ std::optional<ObjCObjectPointerType> ObjCObjectPointerType::from(const Type &par
 }
 
 Type ObjCObjectPointerType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ObjCInterfaceDecl ObjCObjectPointerType::interface_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCInterfaceType ObjCObjectPointerType::interface_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return ObjCInterfaceType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal297();
+  return ObjCInterfaceType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 ObjCObjectType ObjCObjectPointerType::object_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal299();
-  return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal299();
+  return ObjCObjectType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 Type ObjCObjectPointerType::super_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal313();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal312();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> ObjCObjectPointerType::nth_type_argument(unsigned n) const {
@@ -19120,62 +18439,53 @@ std::optional<Type> ObjCObjectPointerType::nth_type_argument(unsigned n) const {
 }
 
 gap::generator<Type> ObjCObjectPointerType::type_arguments(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal300();
+  auto list = impl->reader.getVal296();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d300.value());
+    if (auto d296 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield Type(std::move(d296));
     }
   }
   co_return;
 }
 
 gap::generator<Type> ObjCObjectPointerType::type_arguments_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal301();
+  auto list = impl->reader.getVal300();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d301 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d301.value());
+    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield Type(std::move(d300));
     }
   }
   co_return;
 }
 
 bool ObjCObjectPointerType::is_kind_of_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool ObjCObjectPointerType::is_obj_c_id_or_class_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool ObjCObjectPointerType::is_specialized(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 bool ObjCObjectPointerType::is_specialized_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal302();
+  return impl->reader.getVal301();
 }
 
 bool ObjCObjectPointerType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal303();
+  return impl->reader.getVal302();
 }
 
 bool ObjCObjectPointerType::is_unspecialized(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal304();
+  return impl->reader.getVal303();
 }
 
 bool ObjCObjectPointerType::is_unspecialized_as_written(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal305();
+  return impl->reader.getVal304();
 }
 
 std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n) const {
@@ -19189,12 +18499,11 @@ std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_qualifier(unsigned n)
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal315();
+  auto list = impl->reader.getVal314();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(d315.value()))) {
+    if (auto d314 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(d314))) {
         co_yield std::move(*e);
       }
     }
@@ -19203,9 +18512,8 @@ gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::qualifiers(void) const {
 }
 
 ObjCObjectPointerType ObjCObjectPointerType::strip_obj_c_kind_of_type_and_qualifiers(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal314();
-  return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal313();
+  return ObjCObjectPointerType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) const {
@@ -19219,12 +18527,11 @@ std::optional<ObjCProtocolDecl> ObjCObjectPointerType::nth_protocol(unsigned n) 
 }
 
 gap::generator<ObjCProtocolDecl> ObjCObjectPointerType::protocols(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal316();
+  auto list = impl->reader.getVal315();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d316 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(d316.value()))) {
+    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(d315))) {
         co_yield std::move(*e);
       }
     }
@@ -19245,36 +18552,30 @@ std::optional<MemberPointerType> MemberPointerType::from(const Type &parent) {
 }
 
 Type MemberPointerType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type MemberPointerType::class_(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl MemberPointerType::most_recent_cxx_record_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal297();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool MemberPointerType::is_member_data_pointer(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool MemberPointerType::is_member_function_pointer(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool MemberPointerType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<MatrixType> MatrixType::from(const TokenContext &c) {
@@ -19291,20 +18592,17 @@ std::optional<MatrixType> MatrixType::from(const Type &parent) {
 }
 
 Type MatrixType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type MatrixType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool MatrixType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const TokenContext &c) {
@@ -19324,25 +18622,17 @@ std::optional<DependentSizedMatrixType> DependentSizedMatrixType::from(const Typ
 }
 
 Token DependentSizedMatrixType::attribute_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal297())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal297());
 }
 
 Expr DependentSizedMatrixType::column_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal299();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal299();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr DependentSizedMatrixType::row_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal313();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal312();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<ConstantMatrixType> ConstantMatrixType::from(const TokenContext &c) {
@@ -19374,26 +18664,22 @@ std::optional<MacroQualifiedType> MacroQualifiedType::from(const Type &parent) {
 }
 
 Type MacroQualifiedType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type MacroQualifiedType::modified_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type MacroQualifiedType::underlying_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool MacroQualifiedType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<InjectedClassNameType> InjectedClassNameType::from(const TokenContext &c) {
@@ -19409,32 +18695,27 @@ std::optional<InjectedClassNameType> InjectedClassNameType::from(const Type &par
 }
 
 Type InjectedClassNameType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl InjectedClassNameType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type InjectedClassNameType::injected_specialization_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TemplateSpecializationType InjectedClassNameType::injected_tst(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal299();
-  return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal299();
+  return TemplateSpecializationType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 bool InjectedClassNameType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<FunctionType> FunctionType::from(const TokenContext &c) {
@@ -19451,50 +18732,41 @@ std::optional<FunctionType> FunctionType::from(const Type &parent) {
 }
 
 CallingConv FunctionType::call_conv(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<CallingConv>(self.getVal317());
+  return static_cast<CallingConv>(impl->reader.getVal316());
 }
 
 Type FunctionType::call_result_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionType::cmse_ns_call_attribute(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool FunctionType::has_reg_parm(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool FunctionType::no_return_attribute(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 Type FunctionType::return_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionType::is_const(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal302();
+  return impl->reader.getVal301();
 }
 
 bool FunctionType::is_restrict(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal303();
+  return impl->reader.getVal302();
 }
 
 bool FunctionType::is_volatile(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal304();
+  return impl->reader.getVal303();
 }
 
 std::optional<FunctionProtoType> FunctionProtoType::from(const TokenContext &c) {
@@ -19514,73 +18786,61 @@ std::optional<FunctionProtoType> FunctionProtoType::from(const Type &parent) {
 }
 
 std::optional<CanThrowResult> FunctionProtoType::can_throw(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal305()) {
+  if (!impl->reader.getVal304()) {
     return std::nullopt;
   } else {
-    return static_cast<CanThrowResult>(self.getVal318());
+    return static_cast<CanThrowResult>(impl->reader.getVal317());
   }
   return std::nullopt;
 }
 
 Type FunctionProtoType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token FunctionProtoType::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal299())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal299());
 }
 
 std::optional<FunctionDecl> FunctionProtoType::exception_spec_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal313();
+    RawEntityId eid = impl->reader.getVal312();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<FunctionDecl> FunctionProtoType::exception_spec_template(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal314();
+    RawEntityId eid = impl->reader.getVal313();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 ExceptionSpecificationType FunctionProtoType::exception_spec_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<ExceptionSpecificationType>(self.getVal319());
+  return static_cast<ExceptionSpecificationType>(impl->reader.getVal318());
 }
 
 std::optional<Expr> FunctionProtoType::noexcept_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal320();
+    RawEntityId eid = impl->reader.getVal319();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -19597,80 +18857,67 @@ std::optional<Type> FunctionProtoType::nth_parameter_type(unsigned n) const {
 }
 
 gap::generator<Type> FunctionProtoType::parameter_types(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal300();
+  auto list = impl->reader.getVal296();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d300.value());
+    if (auto d296 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield Type(std::move(d296));
     }
   }
   co_return;
 }
 
 RefQualifierKind FunctionProtoType::reference_qualifier(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<RefQualifierKind>(self.getVal321());
+  return static_cast<RefQualifierKind>(impl->reader.getVal320());
 }
 
 bool FunctionProtoType::has_dependent_exception_spec(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal306();
+  return impl->reader.getVal305();
 }
 
 bool FunctionProtoType::has_dynamic_exception_spec(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal307();
+  return impl->reader.getVal306();
 }
 
 bool FunctionProtoType::has_exception_spec(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal308();
+  return impl->reader.getVal307();
 }
 
 bool FunctionProtoType::has_ext_parameter_infos(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal309();
+  return impl->reader.getVal308();
 }
 
 bool FunctionProtoType::has_instantiation_dependent_exception_spec(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal310();
+  return impl->reader.getVal309();
 }
 
 bool FunctionProtoType::has_noexcept_exception_spec(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal311();
+  return impl->reader.getVal310();
 }
 
 bool FunctionProtoType::has_trailing_return(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal312();
+  return impl->reader.getVal311();
 }
 
 std::optional<bool> FunctionProtoType::is_nothrow(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal323()) {
+  if (!impl->reader.getVal322()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal322());
+    return static_cast<bool>(impl->reader.getVal321());
   }
   return std::nullopt;
 }
 
 bool FunctionProtoType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal324();
+  return impl->reader.getVal323();
 }
 
 bool FunctionProtoType::is_template_variadic(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal325();
+  return impl->reader.getVal324();
 }
 
 bool FunctionProtoType::is_variadic(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal326();
+  return impl->reader.getVal325();
 }
 
 std::optional<Type> FunctionProtoType::nth_exception_type(unsigned n) const {
@@ -19684,12 +18931,11 @@ std::optional<Type> FunctionProtoType::nth_exception_type(unsigned n) const {
 }
 
 gap::generator<Type> FunctionProtoType::exception_types(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal301();
+  auto list = impl->reader.getVal300();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d301 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d301.value());
+    if (auto d300 = impl->ep->TypeFor(impl->ep, v)) {
+      co_yield Type(std::move(d300));
     }
   }
   co_return;
@@ -19712,14 +18958,12 @@ std::optional<FunctionNoProtoType> FunctionNoProtoType::from(const Type &parent)
 }
 
 Type FunctionNoProtoType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool FunctionNoProtoType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal305();
+  return impl->reader.getVal304();
 }
 
 std::optional<DependentVectorType> DependentVectorType::from(const TokenContext &c) {
@@ -19735,41 +18979,30 @@ std::optional<DependentVectorType> DependentVectorType::from(const Type &parent)
 }
 
 Type DependentVectorType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token DependentVectorType::attribute_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal292())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal292());
 }
 
 Type DependentVectorType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentVectorType::size_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal299();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal299();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 VectorTypeVectorKind DependentVectorType::vector_kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<VectorTypeVectorKind>(self.getVal317());
+  return static_cast<VectorTypeVectorKind>(impl->reader.getVal316());
 }
 
 bool DependentVectorType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(const TokenContext &c) {
@@ -19785,36 +19018,26 @@ std::optional<DependentSizedExtVectorType> DependentSizedExtVectorType::from(con
 }
 
 Type DependentSizedExtVectorType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token DependentSizedExtVectorType::attribute_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal292())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal292());
 }
 
 Type DependentSizedExtVectorType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentSizedExtVectorType::size_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal299();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal299();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentSizedExtVectorType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DependentBitIntType> DependentBitIntType::from(const TokenContext &c) {
@@ -19830,30 +19053,25 @@ std::optional<DependentBitIntType> DependentBitIntType::from(const Type &parent)
 }
 
 Type DependentBitIntType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentBitIntType::num_bits_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentBitIntType::is_signed(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool DependentBitIntType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool DependentBitIntType::is_unsigned(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const TokenContext &c) {
@@ -19869,30 +19087,21 @@ std::optional<DependentAddressSpaceType> DependentAddressSpaceType::from(const T
 }
 
 Type DependentAddressSpaceType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DependentAddressSpaceType::address_space_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token DependentAddressSpaceType::attribute_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal297())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal297());
 }
 
 bool DependentAddressSpaceType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DeducedType> DeducedType::from(const TokenContext &c) {
@@ -19909,33 +19118,29 @@ std::optional<DeducedType> DeducedType::from(const Type &parent) {
 }
 
 Type DeducedType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Type> DeducedType::resolved_type(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal292();
+    RawEntityId eid = impl->reader.getVal292();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool DeducedType::is_deduced(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool DeducedType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 std::optional<DeducedTemplateSpecializationType> DeducedTemplateSpecializationType::from(const TokenContext &c) {
@@ -19971,8 +19176,7 @@ std::optional<AutoType> AutoType::from(const Type &parent) {
 }
 
 AutoTypeKeyword AutoType::keyword(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<AutoTypeKeyword>(self.getVal317());
+  return static_cast<AutoTypeKeyword>(impl->reader.getVal316());
 }
 
 std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned n) const {
@@ -19986,43 +19190,39 @@ std::optional<TemplateArgument> AutoType::nth_type_constraint_argument(unsigned 
 }
 
 gap::generator<TemplateArgument> AutoType::type_constraint_arguments(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal296();
+  auto list = impl->reader.getVal296();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d296 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d296));
+    }
   }
   co_return;
 }
 
 std::optional<ConceptDecl> AutoType::type_constraint_concept(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal297();
+    RawEntityId eid = impl->reader.getVal297();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ConceptDecl::from(Decl(std::move(eptr.value())));
+      return ConceptDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool AutoType::is_constrained(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 bool AutoType::is_decltype_auto(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal302();
+  return impl->reader.getVal301();
 }
 
 bool AutoType::is_gnu_auto_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal303();
+  return impl->reader.getVal302();
 }
 
 std::optional<DecltypeType> DecltypeType::from(const TokenContext &c) {
@@ -20038,26 +19238,22 @@ std::optional<DecltypeType> DecltypeType::from(const Type &parent) {
 }
 
 Type DecltypeType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr DecltypeType::underlying_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type DecltypeType::underlying_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DecltypeType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<ComplexType> ComplexType::from(const TokenContext &c) {
@@ -20073,20 +19269,17 @@ std::optional<ComplexType> ComplexType::from(const Type &parent) {
 }
 
 Type ComplexType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ComplexType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ComplexType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<BuiltinType> BuiltinType::from(const TokenContext &c) {
@@ -20102,44 +19295,36 @@ std::optional<BuiltinType> BuiltinType::from(const Type &parent) {
 }
 
 Type BuiltinType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 BuiltinTypeKind BuiltinType::builtin_kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<BuiltinTypeKind>(self.getVal317());
+  return static_cast<BuiltinTypeKind>(impl->reader.getVal316());
 }
 
 bool BuiltinType::is_floating_point(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool BuiltinType::is_integer(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool BuiltinType::is_sve_bool(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 bool BuiltinType::is_signed_integer(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal302();
+  return impl->reader.getVal301();
 }
 
 bool BuiltinType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal303();
+  return impl->reader.getVal302();
 }
 
 bool BuiltinType::is_unsigned_integer(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal304();
+  return impl->reader.getVal303();
 }
 
 std::optional<BlockPointerType> BlockPointerType::from(const TokenContext &c) {
@@ -20155,14 +19340,12 @@ std::optional<BlockPointerType> BlockPointerType::from(const Type &parent) {
 }
 
 Type BlockPointerType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BlockPointerType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<BitIntType> BitIntType::from(const TokenContext &c) {
@@ -20178,24 +19361,20 @@ std::optional<BitIntType> BitIntType::from(const Type &parent) {
 }
 
 Type BitIntType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BitIntType::is_signed(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 bool BitIntType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool BitIntType::is_unsigned(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const TokenContext &c) {
@@ -20211,26 +19390,22 @@ std::optional<BTFTagAttributedType> BTFTagAttributedType::from(const Type &paren
 }
 
 Type BTFTagAttributedType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 BTFTypeTagAttr BTFTagAttributedType::attribute(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return BTFTypeTagAttr::from(Attr(impl->ep->AttrFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return BTFTypeTagAttr::from(Attr(impl->ep->AttrFor(impl->ep, eid))).value();
 }
 
 Type BTFTagAttributedType::wrapped_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BTFTagAttributedType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<AttributedType> AttributedType::from(const TokenContext &c) {
@@ -20246,56 +19421,47 @@ std::optional<AttributedType> AttributedType::from(const Type &parent) {
 }
 
 Type AttributedType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 AttrKind AttributedType::attribute_kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<AttrKind>(self.getVal327());
+  return static_cast<AttrKind>(impl->reader.getVal326());
 }
 
 Type AttributedType::equivalent_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NullabilityKind> AttributedType::immediate_nullability(void) const {
-  auto self = impl->Reader<ast::Type>();
-  if (!self.getVal293()) {
+  if (!impl->reader.getVal293()) {
     return std::nullopt;
   } else {
-    return static_cast<NullabilityKind>(self.getVal317());
+    return static_cast<NullabilityKind>(impl->reader.getVal316());
   }
   return std::nullopt;
 }
 
 Type AttributedType::modified_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool AttributedType::is_calling_conv(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal294();
+  return impl->reader.getVal294();
 }
 
 bool AttributedType::is_ms_type_spec(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal295();
+  return impl->reader.getVal295();
 }
 
 bool AttributedType::is_qualifier(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal302();
+  return impl->reader.getVal301();
 }
 
 bool AttributedType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal303();
+  return impl->reader.getVal302();
 }
 
 std::optional<AtomicType> AtomicType::from(const TokenContext &c) {
@@ -20311,20 +19477,17 @@ std::optional<AtomicType> AtomicType::from(const Type &parent) {
 }
 
 Type AtomicType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type AtomicType::value_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool AtomicType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<ArrayType> ArrayType::from(const TokenContext &c) {
@@ -20343,14 +19506,12 @@ std::optional<ArrayType> ArrayType::from(const Type &parent) {
 }
 
 Type ArrayType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeArraySizeModifier ArrayType::size_modifier(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<ArrayTypeArraySizeModifier>(self.getVal317());
+  return static_cast<ArrayTypeArraySizeModifier>(impl->reader.getVal316());
 }
 
 std::optional<VariableArrayType> VariableArrayType::from(const TokenContext &c) {
@@ -20370,46 +19531,30 @@ std::optional<VariableArrayType> VariableArrayType::from(const Type &parent) {
 }
 
 Type VariableArrayType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange VariableArrayType::brackets_range(void) const {
-  auto self = impl->Reader<ast::Type>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal297(), self.getVal299());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal297(), impl->reader.getVal299());
 }
 
 Token VariableArrayType::l_bracket_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal313())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal312());
 }
 
 Token VariableArrayType::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal314())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal313());
 }
 
 Expr VariableArrayType::size_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal320();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal319();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool VariableArrayType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<IncompleteArrayType> IncompleteArrayType::from(const TokenContext &c) {
@@ -20429,14 +19574,12 @@ std::optional<IncompleteArrayType> IncompleteArrayType::from(const Type &parent)
 }
 
 Type IncompleteArrayType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool IncompleteArrayType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const TokenContext &c) {
@@ -20456,46 +19599,30 @@ std::optional<DependentSizedArrayType> DependentSizedArrayType::from(const Type 
 }
 
 Type DependentSizedArrayType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange DependentSizedArrayType::brackets_range(void) const {
-  auto self = impl->Reader<ast::Type>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal297(), self.getVal299());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal297(), impl->reader.getVal299());
 }
 
 Token DependentSizedArrayType::l_bracket_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal313())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal312());
 }
 
 Token DependentSizedArrayType::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal314())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal313());
 }
 
 Expr DependentSizedArrayType::size_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal320();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal319();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DependentSizedArrayType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<ConstantArrayType> ConstantArrayType::from(const TokenContext &c) {
@@ -20515,28 +19642,25 @@ std::optional<ConstantArrayType> ConstantArrayType::from(const Type &parent) {
 }
 
 Type ConstantArrayType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> ConstantArrayType::size_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal297();
+    RawEntityId eid = impl->reader.getVal297();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool ConstantArrayType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<AdjustedType> AdjustedType::from(const TokenContext &c) {
@@ -20553,26 +19677,22 @@ std::optional<AdjustedType> AdjustedType::from(const Type &parent) {
 }
 
 Type AdjustedType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type AdjustedType::resolved_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type AdjustedType::original_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool AdjustedType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DecayedType> DecayedType::from(const TokenContext &c) {
@@ -20606,8 +19726,7 @@ std::optional<TypeWithKeyword> TypeWithKeyword::from(const Type &parent) {
 }
 
 ElaboratedTypeKeyword TypeWithKeyword::keyword(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<ElaboratedTypeKeyword>(self.getVal317());
+  return static_cast<ElaboratedTypeKeyword>(impl->reader.getVal316());
 }
 
 std::optional<ElaboratedType> ElaboratedType::from(const TokenContext &c) {
@@ -20627,34 +19746,30 @@ std::optional<ElaboratedType> ElaboratedType::from(const Type &parent) {
 }
 
 Type ElaboratedType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ElaboratedType::named_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TagDecl> ElaboratedType::owned_tag_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
   if (true) {
-    RawEntityId eid = self.getVal297();
+    RawEntityId eid = impl->reader.getVal297();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TagDecl::from(Decl(std::move(eptr.value())));
+      return TagDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool ElaboratedType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializationType::from(const TokenContext &c) {
@@ -20674,14 +19789,12 @@ std::optional<DependentTemplateSpecializationType> DependentTemplateSpecializati
 }
 
 Type DependentTemplateSpecializationType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DependentTemplateSpecializationType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_template_argument(unsigned n) const {
@@ -20695,12 +19808,12 @@ std::optional<TemplateArgument> DependentTemplateSpecializationType::nth_templat
 }
 
 gap::generator<TemplateArgument> DependentTemplateSpecializationType::template_arguments(void) const {
-  auto self = impl->Reader<ast::Type>();
-  auto list = self.getVal296();
+  auto list = impl->reader.getVal296();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d296 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d296));
+    }
   }
   co_return;
 }
@@ -20722,14 +19835,12 @@ std::optional<DependentNameType> DependentNameType::from(const Type &parent) {
 }
 
 Type DependentNameType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool DependentNameType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<VectorType> VectorType::from(const TokenContext &c) {
@@ -20746,25 +19857,21 @@ std::optional<VectorType> VectorType::from(const Type &parent) {
 }
 
 Type VectorType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type VectorType::element_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 VectorTypeVectorKind VectorType::vector_kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<VectorTypeVectorKind>(self.getVal317());
+  return static_cast<VectorTypeVectorKind>(impl->reader.getVal316());
 }
 
 bool VectorType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<ExtVectorType> ExtVectorType::from(const TokenContext &c) {
@@ -20796,26 +19903,22 @@ std::optional<UsingType> UsingType::from(const Type &parent) {
 }
 
 Type UsingType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UsingShadowDecl UsingType::found_declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return UsingShadowDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type UsingType::underlying_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UsingType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const TokenContext &c) {
@@ -20831,20 +19934,17 @@ std::optional<UnresolvedUsingType> UnresolvedUsingType::from(const Type &parent)
 }
 
 Type UnresolvedUsingType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UnresolvedUsingTypenameDecl UnresolvedUsingType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return UnresolvedUsingTypenameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return UnresolvedUsingTypenameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool UnresolvedUsingType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<UnaryTransformType> UnaryTransformType::from(const TokenContext &c) {
@@ -20860,31 +19960,26 @@ std::optional<UnaryTransformType> UnaryTransformType::from(const Type &parent) {
 }
 
 Type UnaryTransformType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type UnaryTransformType::base_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 UnaryTransformTypeUTTKind UnaryTransformType::utt_kind(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return static_cast<UnaryTransformTypeUTTKind>(self.getVal317());
+  return static_cast<UnaryTransformTypeUTTKind>(impl->reader.getVal316());
 }
 
 Type UnaryTransformType::underlying_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal297();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal297();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UnaryTransformType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<TypedefType> TypedefType::from(const TokenContext &c) {
@@ -20900,20 +19995,17 @@ std::optional<TypedefType> TypedefType::from(const Type &parent) {
 }
 
 Type TypedefType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TypedefNameDecl TypedefType::declaration(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return TypedefNameDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TypedefType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<TypeOfType> TypeOfType::from(const TokenContext &c) {
@@ -20929,20 +20021,17 @@ std::optional<TypeOfType> TypeOfType::from(const Type &parent) {
 }
 
 Type TypeOfType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type TypeOfType::underlying_type(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal292();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool TypeOfType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<TypeOfExprType> TypeOfExprType::from(const TokenContext &c) {
@@ -20958,27 +20047,23 @@ std::optional<TypeOfExprType> TypeOfExprType::from(const Type &parent) {
 }
 
 Type TypeOfExprType::desugar(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal291();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal291();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr TypeOfExprType::underlying_expression(void) const {
-  auto self = impl->Reader<ast::Type>();
-  RawEntityId eid = self.getVal292();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal292();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool TypeOfExprType::is_sugared(void) const {
-  auto self = impl->Reader<ast::Type>();
-  return self.getVal293();
+  return impl->reader.getVal293();
 }
 
 std::optional<Decl> Stmt::parent_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (auto id = self.getVal0(); id != kInvalidEntityId) {
+  if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
     assert(false);
   }
@@ -20986,22 +20071,21 @@ std::optional<Decl> Stmt::parent_declaration(void) const {
 }
 
 std::optional<Stmt> Stmt::parent_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (auto id = self.getVal1(); id != kInvalidEntityId) {
+  if (auto id = impl->reader.getVal1(); id != kInvalidEntityId) {
     if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
     assert(false);
   }
   return std::nullopt;
 }
 
-std::optional<PackedDeclarationId> Stmt::referenced_declaration_id(void) const {
-  if (auto id = impl->Reader<ast::Stmt>().getVal2();
+std::optional<PackedDeclId> Stmt::referenced_declaration_id(void) const {
+  if (auto id = impl->reader.getVal2();
       id != kInvalidEntityId) {
     VariantId vid = EntityId(id).Unpack();
-    if (std::holds_alternative<DeclarationId>(vid)) {
-      return std::get<DeclarationId>(vid);
+    if (std::holds_alternative<DeclId>(vid)) {
+      return std::get<DeclId>(vid);
     }
     assert(false);
   }
@@ -21009,10 +20093,10 @@ std::optional<PackedDeclarationId> Stmt::referenced_declaration_id(void) const {
 }
 
 std::optional<Decl> Stmt::referenced_declaration(void) const {
-  if (auto id = impl->Reader<ast::Stmt>().getVal2();
+  if (auto id = impl->reader.getVal2();
       id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
     assert(false);
   }
@@ -21050,38 +20134,33 @@ bool Stmt::contains(const Stmt &stmt) {
 }
 
 Stmt Stmt::ignore_containers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal3();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal3();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<Stmt> Stmt::children(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal4();
+  auto list = impl->reader.getVal4();
   for (auto v : list) {
     EntityId id(v);
     if (auto d4 = impl->ep->StmtFor(impl->ep, v)) {
-      co_yield std::move(d4.value());
+      co_yield Stmt(std::move(d4));
     }
   }
   co_return;
 }
 
 TokenRange Stmt::tokens(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal5(), self.getVal6());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal5(), impl->reader.getVal6());
 }
 
 StmtKind Stmt::kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<StmtKind>(self.getVal7());
+  return static_cast<StmtKind>(impl->reader.getVal7());
 }
 
 Stmt Stmt::strip_label_like_statements(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal8();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal8();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<SEHTryStmt> SEHTryStmt::containing(const Decl &decl) {
@@ -21127,42 +20206,31 @@ std::optional<SEHTryStmt> SEHTryStmt::from(const Stmt &parent) {
 }
 
 SEHExceptStmt SEHTryStmt::except_handler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return SEHExceptStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 SEHFinallyStmt SEHTryStmt::finally_handler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return SEHFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return SEHFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt SEHTryStmt::handler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool SEHTryStmt::is_cxx_try(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 CompoundStmt SEHTryStmt::try_block(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal13();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHTryStmt::try_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 gap::generator<SEHLeaveStmt> SEHLeaveStmt::containing(const Decl &decl) {
@@ -21208,13 +20276,7 @@ std::optional<SEHLeaveStmt> SEHLeaveStmt::from(const Stmt &parent) {
 }
 
 Token SEHLeaveStmt::leave_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 gap::generator<SEHFinallyStmt> SEHFinallyStmt::containing(const Decl &decl) {
@@ -21260,19 +20322,12 @@ std::optional<SEHFinallyStmt> SEHFinallyStmt::from(const Stmt &parent) {
 }
 
 CompoundStmt SEHFinallyStmt::block(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHFinallyStmt::finally_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 gap::generator<SEHExceptStmt> SEHExceptStmt::containing(const Decl &decl) {
@@ -21318,25 +20373,17 @@ std::optional<SEHExceptStmt> SEHExceptStmt::from(const Stmt &parent) {
 }
 
 CompoundStmt SEHExceptStmt::block(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token SEHExceptStmt::except_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 Expr SEHExceptStmt::filter_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ReturnStmt> ReturnStmt::containing(const Decl &decl) {
@@ -21382,41 +20429,33 @@ std::optional<ReturnStmt> ReturnStmt::from(const Stmt &parent) {
 }
 
 std::optional<VarDecl> ReturnStmt::nrvo_candidate(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Expr> ReturnStmt::return_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal10();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token ReturnStmt::return_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 gap::generator<ObjCForCollectionStmt> ObjCForCollectionStmt::containing(const Decl &decl) {
@@ -21462,41 +20501,26 @@ std::optional<ObjCForCollectionStmt> ObjCForCollectionStmt::from(const Stmt &par
 }
 
 Stmt ObjCForCollectionStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr ObjCForCollectionStmt::collection(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt ObjCForCollectionStmt::element(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token ObjCForCollectionStmt::for_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal13())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 Token ObjCForCollectionStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 gap::generator<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::containing(const Decl &decl) {
@@ -21542,19 +20566,12 @@ std::optional<ObjCAutoreleasePoolStmt> ObjCAutoreleasePoolStmt::from(const Stmt 
 }
 
 Token ObjCAutoreleasePoolStmt::at_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Stmt ObjCAutoreleasePoolStmt::sub_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<ObjCAtTryStmt> ObjCAtTryStmt::containing(const Decl &decl) {
@@ -21600,25 +20617,17 @@ std::optional<ObjCAtTryStmt> ObjCAtTryStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtTryStmt::at_try_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 ObjCAtFinallyStmt ObjCAtTryStmt::finally_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return ObjCAtFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return ObjCAtFinallyStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt ObjCAtTryStmt::try_body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) const {
@@ -21632,12 +20641,11 @@ std::optional<ObjCAtCatchStmt> ObjCAtTryStmt::nth_catch_statement(unsigned n) co
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtTryStmt::catch_statements(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = ObjCAtCatchStmt::from(Stmt(d15.value()))) {
+      if (auto e = ObjCAtCatchStmt::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -21688,19 +20696,12 @@ std::optional<ObjCAtThrowStmt> ObjCAtThrowStmt::from(const Stmt &parent) {
 }
 
 Expr ObjCAtThrowStmt::throw_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCAtThrowStmt::throw_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 gap::generator<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::containing(const Decl &decl) {
@@ -21746,25 +20747,17 @@ std::optional<ObjCAtSynchronizedStmt> ObjCAtSynchronizedStmt::from(const Stmt &p
 }
 
 Token ObjCAtSynchronizedStmt::at_synchronized_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 CompoundStmt ObjCAtSynchronizedStmt::synch_body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ObjCAtSynchronizedStmt::synch_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ObjCAtFinallyStmt> ObjCAtFinallyStmt::containing(const Decl &decl) {
@@ -21810,19 +20803,12 @@ std::optional<ObjCAtFinallyStmt> ObjCAtFinallyStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtFinallyStmt::at_finally_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Stmt ObjCAtFinallyStmt::finally_body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<ObjCAtCatchStmt> ObjCAtCatchStmt::containing(const Decl &decl) {
@@ -21868,40 +20854,25 @@ std::optional<ObjCAtCatchStmt> ObjCAtCatchStmt::from(const Stmt &parent) {
 }
 
 Token ObjCAtCatchStmt::at_catch_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Stmt ObjCAtCatchStmt::catch_body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 VarDecl ObjCAtCatchStmt::catch_parameter_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCAtCatchStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal13())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 bool ObjCAtCatchStmt::has_ellipsis(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<OMPExecutableDirective> OMPExecutableDirective::containing(const Decl &decl) {
@@ -22016,37 +20987,31 @@ std::optional<OMPExecutableDirective> OMPExecutableDirective::from(const Stmt &p
 }
 
 Stmt OMPExecutableDirective::associated_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CapturedStmt OMPExecutableDirective::innermost_captured_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPExecutableDirective::raw_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt OMPExecutableDirective::structured_block(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool OMPExecutableDirective::has_associated_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool OMPExecutableDirective::is_standalone_directive(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal16();
+  return impl->reader.getVal16();
 }
 
 gap::generator<OMPDispatchDirective> OMPDispatchDirective::containing(const Decl &decl) {
@@ -22096,13 +21061,7 @@ std::optional<OMPDispatchDirective> OMPDispatchDirective::from(const Stmt &paren
 }
 
 Token OMPDispatchDirective::target_call_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 gap::generator<OMPDepobjDirective> OMPDepobjDirective::containing(const Decl &decl) {
@@ -22382,60 +21341,50 @@ std::optional<OMPAtomicDirective> OMPAtomicDirective::from(const Stmt &parent) {
 }
 
 Expr OMPAtomicDirective::condition_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAtomicDirective::d(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal17();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal17();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAtomicDirective::expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAtomicDirective::r(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAtomicDirective::update_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal20();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal20();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAtomicDirective::v(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal21();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal21();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPAtomicDirective::x(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal22();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal22();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPAtomicDirective::is_fail_only(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 bool OMPAtomicDirective::is_postfix_update(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal24();
+  return impl->reader.getVal24();
 }
 
 bool OMPAtomicDirective::is_xlhs_in_rhs_part(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal25();
+  return impl->reader.getVal25();
 }
 
 gap::generator<OMPTeamsDirective> OMPTeamsDirective::containing(const Decl &decl) {
@@ -22623,9 +21572,8 @@ std::optional<OMPTaskgroupDirective> OMPTaskgroupDirective::from(const Stmt &par
 }
 
 Expr OMPTaskgroupDirective::reduction_reference(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<OMPTaskDirective> OMPTaskDirective::containing(const Decl &decl) {
@@ -22675,8 +21623,7 @@ std::optional<OMPTaskDirective> OMPTaskDirective::from(const Stmt &parent) {
 }
 
 bool OMPTaskDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPTargetUpdateDirective> OMPTargetUpdateDirective::containing(const Decl &decl) {
@@ -22818,14 +21765,12 @@ std::optional<OMPTargetParallelDirective> OMPTargetParallelDirective::from(const
 }
 
 Expr OMPTargetParallelDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPTargetParallelDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPTargetExitDataDirective> OMPTargetExitDataDirective::containing(const Decl &decl) {
@@ -23105,14 +22050,12 @@ std::optional<OMPSectionsDirective> OMPSectionsDirective::from(const Stmt &paren
 }
 
 Expr OMPSectionsDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPSectionsDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPSectionDirective> OMPSectionDirective::containing(const Decl &decl) {
@@ -23162,8 +22105,7 @@ std::optional<OMPSectionDirective> OMPSectionDirective::from(const Stmt &parent)
 }
 
 bool OMPSectionDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPScanDirective> OMPScanDirective::containing(const Decl &decl) {
@@ -23259,14 +22201,12 @@ std::optional<OMPParallelSectionsDirective> OMPParallelSectionsDirective::from(c
 }
 
 Expr OMPParallelSectionsDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPParallelSectionsDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPParallelMasterDirective> OMPParallelMasterDirective::containing(const Decl &decl) {
@@ -23316,9 +22256,8 @@ std::optional<OMPParallelMasterDirective> OMPParallelMasterDirective::from(const
 }
 
 Expr OMPParallelMasterDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<OMPParallelMaskedDirective> OMPParallelMaskedDirective::containing(const Decl &decl) {
@@ -23368,9 +22307,8 @@ std::optional<OMPParallelMaskedDirective> OMPParallelMaskedDirective::from(const
 }
 
 Expr OMPParallelMaskedDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<OMPParallelDirective> OMPParallelDirective::containing(const Decl &decl) {
@@ -23420,14 +22358,12 @@ std::optional<OMPParallelDirective> OMPParallelDirective::from(const Stmt &paren
 }
 
 Expr OMPParallelDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPParallelDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPOrderedDirective> OMPOrderedDirective::containing(const Decl &decl) {
@@ -23523,9 +22459,8 @@ std::optional<OMPMetaDirective> OMPMetaDirective::from(const Stmt &parent) {
 }
 
 Stmt OMPMetaDirective::if_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<OMPMasterDirective> OMPMasterDirective::containing(const Decl &decl) {
@@ -23754,15 +22689,13 @@ std::optional<OMPLoopTransformationDirective> OMPLoopTransformationDirective::fr
 }
 
 Stmt OMPLoopTransformationDirective::pre_initializers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt OMPLoopTransformationDirective::transformed_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal17();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal17();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<OMPUnrollDirective> OMPUnrollDirective::containing(const Decl &decl) {
@@ -23968,12 +22901,11 @@ std::optional<Expr> OMPLoopDirective::nth_counter(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::counters(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -23992,12 +22924,11 @@ std::optional<Expr> OMPLoopDirective::nth_dependent_counter(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::dependent_counters(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal26();
+  auto list = impl->reader.getVal26();
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d26.value()))) {
+      if (auto e = Expr::from(Stmt(d26))) {
         co_yield std::move(*e);
       }
     }
@@ -24016,12 +22947,11 @@ std::optional<Expr> OMPLoopDirective::nth_dependent_initializer(unsigned n) cons
 }
 
 gap::generator<Expr> OMPLoopDirective::dependent_initializers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal27();
+  auto list = impl->reader.getVal27();
   for (auto v : list) {
     EntityId id(v);
     if (auto d27 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d27.value()))) {
+      if (auto e = Expr::from(Stmt(d27))) {
         co_yield std::move(*e);
       }
     }
@@ -24040,12 +22970,11 @@ std::optional<Expr> OMPLoopDirective::nth_final(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::finals(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal28();
+  auto list = impl->reader.getVal28();
   for (auto v : list) {
     EntityId id(v);
     if (auto d28 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d28.value()))) {
+      if (auto e = Expr::from(Stmt(d28))) {
         co_yield std::move(*e);
       }
     }
@@ -24064,12 +22993,11 @@ std::optional<Expr> OMPLoopDirective::nth_finals_condition(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::finals_conditions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal29();
+  auto list = impl->reader.getVal29();
   for (auto v : list) {
     EntityId id(v);
     if (auto d29 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d29.value()))) {
+      if (auto e = Expr::from(Stmt(d29))) {
         co_yield std::move(*e);
       }
     }
@@ -24078,183 +23006,153 @@ gap::generator<Expr> OMPLoopDirective::finals_conditions(void) const {
 }
 
 Stmt OMPLoopDirective::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr OMPLoopDirective::calculate_last_iteration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal17();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal17();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_distance_condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_ensure_upper_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal20();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal20();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal21();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal21();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_lower_bound_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal22();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal22();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_next_lower_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal30();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal30();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_next_upper_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal31();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_parallel_for_in_distance_condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal32();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal32();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::combined_upper_bound_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal33();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal33();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal34();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal34();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::distance_increment(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal35();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal35();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::ensure_upper_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal36();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal36();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::increment(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal37();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal37();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::is_last_iteration_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::iteration_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::last_iteration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::lower_bound_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::next_lower_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::next_upper_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::num_iterations(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal45();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal45();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::pre_condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal46();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal46();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPLoopDirective::pre_initializers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal47();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal47();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr OMPLoopDirective::prev_ensure_upper_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal48();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal48();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::prev_lower_bound_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal49();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal49();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::prev_upper_bound_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal50();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal50();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::stride_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal51();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPLoopDirective::upper_bound_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal52();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
@@ -24268,12 +23166,11 @@ std::optional<Expr> OMPLoopDirective::nth_initializer(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::initializers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal53();
+  auto list = impl->reader.getVal53();
   for (auto v : list) {
     EntityId id(v);
     if (auto d53 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d53.value()))) {
+      if (auto e = Expr::from(Stmt(d53))) {
         co_yield std::move(*e);
       }
     }
@@ -24292,12 +23189,11 @@ std::optional<Expr> OMPLoopDirective::nth_private_counter(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::private_counters(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal54();
+  auto list = impl->reader.getVal54();
   for (auto v : list) {
     EntityId id(v);
     if (auto d54 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d54.value()))) {
+      if (auto e = Expr::from(Stmt(d54))) {
         co_yield std::move(*e);
       }
     }
@@ -24316,12 +23212,11 @@ std::optional<Expr> OMPLoopDirective::nth_update(unsigned n) const {
 }
 
 gap::generator<Expr> OMPLoopDirective::updates(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal55();
+  auto list = impl->reader.getVal55();
   for (auto v : list) {
     EntityId id(v);
     if (auto d55 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d55.value()))) {
+      if (auto e = Expr::from(Stmt(d55))) {
         co_yield std::move(*e);
       }
     }
@@ -24492,14 +23387,12 @@ std::optional<OMPForDirective> OMPForDirective::from(const Stmt &parent) {
 }
 
 Expr OMPForDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPForDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPDistributeSimdDirective> OMPDistributeSimdDirective::containing(const Decl &decl) {
@@ -24665,14 +23558,12 @@ std::optional<OMPDistributeParallelForDirective> OMPDistributeParallelForDirecti
 }
 
 Expr OMPDistributeParallelForDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPDistributeParallelForDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPDistributeDirective> OMPDistributeDirective::containing(const Decl &decl) {
@@ -24946,14 +23837,12 @@ std::optional<OMPTeamsDistributeParallelForDirective> OMPTeamsDistributeParallel
 }
 
 Expr OMPTeamsDistributeParallelForDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPTeamsDistributeParallelForDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPTeamsDistributeDirective> OMPTeamsDistributeDirective::containing(const Decl &decl) {
@@ -25119,8 +24008,7 @@ std::optional<OMPTaskLoopDirective> OMPTaskLoopDirective::from(const Stmt &paren
 }
 
 bool OMPTaskLoopDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPTargetTeamsGenericLoopDirective> OMPTargetTeamsGenericLoopDirective::containing(const Decl &decl) {
@@ -25340,14 +24228,12 @@ std::optional<OMPTargetTeamsDistributeParallelForDirective> OMPTargetTeamsDistri
 }
 
 Expr OMPTargetTeamsDistributeParallelForDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPTargetTeamsDistributeParallelForDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPTargetTeamsDistributeDirective> OMPTargetTeamsDistributeDirective::containing(const Decl &decl) {
@@ -25621,14 +24507,12 @@ std::optional<OMPTargetParallelForDirective> OMPTargetParallelForDirective::from
 }
 
 Expr OMPTargetParallelForDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPTargetParallelForDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPSimdDirective> OMPSimdDirective::containing(const Decl &decl) {
@@ -25794,8 +24678,7 @@ std::optional<OMPParallelMasterTaskLoopDirective> OMPParallelMasterTaskLoopDirec
 }
 
 bool OMPParallelMasterTaskLoopDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPParallelMaskedTaskLoopSimdDirective> OMPParallelMaskedTaskLoopSimdDirective::containing(const Decl &decl) {
@@ -25907,8 +24790,7 @@ std::optional<OMPParallelMaskedTaskLoopDirective> OMPParallelMaskedTaskLoopDirec
 }
 
 bool OMPParallelMaskedTaskLoopDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPParallelGenericLoopDirective> OMPParallelGenericLoopDirective::containing(const Decl &decl) {
@@ -26074,14 +24956,12 @@ std::optional<OMPParallelForDirective> OMPParallelForDirective::from(const Stmt 
 }
 
 Expr OMPParallelForDirective::task_reduction_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal56();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal56();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OMPParallelForDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPMasterTaskLoopSimdDirective> OMPMasterTaskLoopSimdDirective::containing(const Decl &decl) {
@@ -26193,8 +25073,7 @@ std::optional<OMPMasterTaskLoopDirective> OMPMasterTaskLoopDirective::from(const
 }
 
 bool OMPMasterTaskLoopDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPMaskedTaskLoopSimdDirective> OMPMaskedTaskLoopSimdDirective::containing(const Decl &decl) {
@@ -26306,8 +25185,7 @@ std::optional<OMPMaskedTaskLoopDirective> OMPMaskedTaskLoopDirective::from(const
 }
 
 bool OMPMaskedTaskLoopDirective::has_cancel(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<OMPInteropDirective> OMPInteropDirective::containing(const Decl &decl) {
@@ -26445,27 +25323,23 @@ std::optional<OMPCanonicalLoop> OMPCanonicalLoop::from(const Stmt &parent) {
 }
 
 CapturedStmt OMPCanonicalLoop::distance_func(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt OMPCanonicalLoop::loop_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CapturedStmt OMPCanonicalLoop::loop_variable_func(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return CapturedStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclRefExpr OMPCanonicalLoop::loop_variable_reference(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return DeclRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal13();
+  return DeclRefExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<NullStmt> NullStmt::containing(const Decl &decl) {
@@ -26511,18 +25385,11 @@ std::optional<NullStmt> NullStmt::from(const Stmt &parent) {
 }
 
 Token NullStmt::semi_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 bool NullStmt::has_leading_empty_macro(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<MSDependentExistsStmt> MSDependentExistsStmt::containing(const Decl &decl) {
@@ -26568,29 +25435,20 @@ std::optional<MSDependentExistsStmt> MSDependentExistsStmt::from(const Stmt &par
 }
 
 Token MSDependentExistsStmt::keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 CompoundStmt MSDependentExistsStmt::sub_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool MSDependentExistsStmt::is_if_exists(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool MSDependentExistsStmt::is_if_not_exists(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal16();
+  return impl->reader.getVal16();
 }
 
 gap::generator<IndirectGotoStmt> IndirectGotoStmt::containing(const Decl &decl) {
@@ -26636,43 +25494,29 @@ std::optional<IndirectGotoStmt> IndirectGotoStmt::from(const Stmt &parent) {
 }
 
 std::optional<LabelDecl> IndirectGotoStmt::constant_target(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return LabelDecl::from(Decl(std::move(eptr.value())));
+      return LabelDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token IndirectGotoStmt::goto_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 Token IndirectGotoStmt::star_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 Expr IndirectGotoStmt::target(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal13();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<IfStmt> IfStmt::containing(const Decl &decl) {
@@ -26718,156 +25562,117 @@ std::optional<IfStmt> IfStmt::from(const Stmt &parent) {
 }
 
 Expr IfStmt::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<VarDecl> IfStmt::condition_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal10();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<DeclStmt> IfStmt::condition_variable_declaration_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return DeclStmt::from(Stmt(std::move(eptr.value())));
+      return DeclStmt::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Stmt> IfStmt::else_(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal13();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token IfStmt::else_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 Token IfStmt::if_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal17())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 std::optional<Stmt> IfStmt::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal18();
+    RawEntityId eid = impl->reader.getVal18();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token IfStmt::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal19())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
 }
 
 Token IfStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal20())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 IfStatementKind IfStmt::statement_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<IfStatementKind>(self.getVal57());
+  return static_cast<IfStatementKind>(impl->reader.getVal57());
 }
 
 Stmt IfStmt::then(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal21();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal21();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool IfStmt::has_else_storage(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool IfStmt::has_initializer_storage(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal16();
+  return impl->reader.getVal16();
 }
 
 bool IfStmt::has_variable_storage(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 bool IfStmt::is_consteval(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal24();
+  return impl->reader.getVal24();
 }
 
 bool IfStmt::is_constexpr(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal25();
+  return impl->reader.getVal25();
 }
 
 bool IfStmt::is_negated_consteval(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal58();
+  return impl->reader.getVal58();
 }
 
 bool IfStmt::is_non_negated_consteval(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal59();
+  return impl->reader.getVal59();
 }
 
 bool IfStmt::is_obj_c_availability_check(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal60();
+  return impl->reader.getVal60();
 }
 
 gap::generator<GotoStmt> GotoStmt::containing(const Decl &decl) {
@@ -26913,29 +25718,16 @@ std::optional<GotoStmt> GotoStmt::from(const Stmt &parent) {
 }
 
 Token GotoStmt::goto_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 LabelDecl GotoStmt::label(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token GotoStmt::label_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 gap::generator<ForStmt> ForStmt::containing(const Decl &decl) {
@@ -26981,109 +25773,85 @@ std::optional<ForStmt> ForStmt::from(const Stmt &parent) {
 }
 
 Stmt ForStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<Expr> ForStmt::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal10();
+    RawEntityId eid = impl->reader.getVal10();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<VarDecl> ForStmt::condition_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<DeclStmt> ForStmt::condition_variable_declaration_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal13();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return DeclStmt::from(Stmt(std::move(eptr.value())));
+      return DeclStmt::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token ForStmt::for_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 std::optional<Expr> ForStmt::increment(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal17();
+    RawEntityId eid = impl->reader.getVal17();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Stmt> ForStmt::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal18();
+    RawEntityId eid = impl->reader.getVal18();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token ForStmt::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal19())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal19());
 }
 
 Token ForStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal20())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 gap::generator<DoStmt> DoStmt::containing(const Decl &decl) {
@@ -27129,45 +25897,25 @@ std::optional<DoStmt> DoStmt::from(const Stmt &parent) {
 }
 
 Stmt DoStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr DoStmt::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token DoStmt::do_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 Token DoStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal13())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 Token DoStmt::while_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 gap::generator<DeclStmt> DeclStmt::containing(const Decl &decl) {
@@ -27223,34 +25971,31 @@ std::optional<Decl> DeclStmt::nth_declaration(unsigned n) const {
 }
 
 gap::generator<Decl> DeclStmt::declarations(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(d15.value());
+      co_yield Decl(std::move(d15));
     }
   }
   co_return;
 }
 
 std::optional<Decl> DeclStmt::single_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool DeclStmt::is_single_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<CoroutineBodyStmt> CoroutineBodyStmt::containing(const Decl &decl) {
@@ -27296,45 +26041,38 @@ std::optional<CoroutineBodyStmt> CoroutineBodyStmt::from(const Stmt &parent) {
 }
 
 Expr CoroutineBodyStmt::allocate(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt CoroutineBodyStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr CoroutineBodyStmt::deallocate(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt CoroutineBodyStmt::exception_handler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt CoroutineBodyStmt::fallthrough_handler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal14();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt CoroutineBodyStmt::final_suspend_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal17();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal17();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt CoroutineBodyStmt::initializer_suspend_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal18();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal18();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
@@ -27348,56 +26086,48 @@ std::optional<Stmt> CoroutineBodyStmt::nth_parameter_move(unsigned n) const {
 }
 
 gap::generator<Stmt> CoroutineBodyStmt::parameter_moves(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      co_yield std::move(d15.value());
+      co_yield Stmt(std::move(d15));
     }
   }
   co_return;
 }
 
 VarDecl CoroutineBodyStmt::promise_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal19();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal19();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Stmt CoroutineBodyStmt::promise_declaration_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal20();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal20();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt CoroutineBodyStmt::return_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal21();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal21();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Stmt CoroutineBodyStmt::return_statement_on_alloc_failure(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal22();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal22();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr CoroutineBodyStmt::return_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal30();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal30();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineBodyStmt::return_value_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal31();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool CoroutineBodyStmt::has_dependent_promise_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<CoreturnStmt> CoreturnStmt::containing(const Decl &decl) {
@@ -27443,30 +26173,21 @@ std::optional<CoreturnStmt> CoreturnStmt::from(const Stmt &parent) {
 }
 
 Token CoreturnStmt::keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Expr CoreturnStmt::operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoreturnStmt::promise_call(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool CoreturnStmt::is_implicit(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<ContinueStmt> ContinueStmt::containing(const Decl &decl) {
@@ -27512,13 +26233,7 @@ std::optional<ContinueStmt> ContinueStmt::from(const Stmt &parent) {
 }
 
 Token ContinueStmt::continue_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 gap::generator<CompoundStmt> CompoundStmt::containing(const Decl &decl) {
@@ -27564,42 +26279,28 @@ std::optional<CompoundStmt> CompoundStmt::from(const Stmt &parent) {
 }
 
 Token CompoundStmt::left_brace_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Token CompoundStmt::right_brace_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<Stmt> CompoundStmt::statement_expression_result(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool CompoundStmt::has_stored_fp_features(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<CapturedStmt> CapturedStmt::containing(const Decl &decl) {
@@ -27645,26 +26346,22 @@ std::optional<CapturedStmt> CapturedStmt::from(const Stmt &parent) {
 }
 
 CapturedDecl CapturedStmt::captured_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return CapturedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 RecordDecl CapturedStmt::captured_record_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return RecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 CapturedRegionKind CapturedStmt::captured_region_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CapturedRegionKind>(self.getVal57());
+  return static_cast<CapturedRegionKind>(impl->reader.getVal57());
 }
 
 Stmt CapturedStmt::captured_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<CXXTryStmt> CXXTryStmt::containing(const Decl &decl) {
@@ -27710,19 +26407,12 @@ std::optional<CXXTryStmt> CXXTryStmt::from(const Stmt &parent) {
 }
 
 CompoundStmt CXXTryStmt::try_block(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXTryStmt::try_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
@@ -27736,12 +26426,11 @@ std::optional<CXXCatchStmt> CXXTryStmt::nth_handler(unsigned n) const {
 }
 
 gap::generator<CXXCatchStmt> CXXTryStmt::handlers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = CXXCatchStmt::from(Stmt(d15.value()))) {
+      if (auto e = CXXCatchStmt::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -27792,111 +26481,77 @@ std::optional<CXXForRangeStmt> CXXForRangeStmt::from(const Stmt &parent) {
 }
 
 DeclStmt CXXForRangeStmt::begin_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal9();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Stmt CXXForRangeStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token CXXForRangeStmt::coawait_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 Token CXXForRangeStmt::colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal13())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal13());
 }
 
 Expr CXXForRangeStmt::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclStmt CXXForRangeStmt::end_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal17();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal17();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXForRangeStmt::for_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal18())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 Expr CXXForRangeStmt::increment(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Stmt> CXXForRangeStmt::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal20();
+    RawEntityId eid = impl->reader.getVal20();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 DeclStmt CXXForRangeStmt::loop_variable_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal21();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal21();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 VarDecl CXXForRangeStmt::loop_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal22();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal22();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXForRangeStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal30())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal30());
 }
 
 Expr CXXForRangeStmt::range_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal31();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 DeclStmt CXXForRangeStmt::range_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal32();
-  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal32();
+  return DeclStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<CXXCatchStmt> CXXCatchStmt::containing(const Decl &decl) {
@@ -27942,39 +26597,30 @@ std::optional<CXXCatchStmt> CXXCatchStmt::from(const Stmt &parent) {
 }
 
 Token CXXCatchStmt::catch_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Type CXXCatchStmt::caught_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal10();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<VarDecl> CXXCatchStmt::exception_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Stmt CXXCatchStmt::handler_block(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<BreakStmt> BreakStmt::containing(const Decl &decl) {
@@ -28020,13 +26666,7 @@ std::optional<BreakStmt> BreakStmt::from(const Stmt &parent) {
 }
 
 Token BreakStmt::break_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 gap::generator<AsmStmt> AsmStmt::containing(const Decl &decl) {
@@ -28073,19 +26713,12 @@ std::optional<AsmStmt> AsmStmt::from(const Stmt &parent) {
 }
 
 std::string_view AsmStmt::generate_assembly_string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token AsmStmt::assembly_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
@@ -28099,12 +26732,11 @@ std::optional<Expr> AsmStmt::nth_input(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::inputs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -28113,13 +26745,11 @@ gap::generator<Expr> AsmStmt::inputs(void) const {
 }
 
 bool AsmStmt::is_simple(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool AsmStmt::is_volatile(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal16();
+  return impl->reader.getVal16();
 }
 
 std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
@@ -28133,12 +26763,11 @@ std::optional<Expr> AsmStmt::nth_output(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::outputs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal26();
+  auto list = impl->reader.getVal26();
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d26.value()))) {
+      if (auto e = Expr::from(Stmt(d26))) {
         co_yield std::move(*e);
       }
     }
@@ -28157,8 +26786,7 @@ std::optional<std::string_view> AsmStmt::nth_output_constraint(unsigned n) const
 }
 
 gap::generator<std::string_view> AsmStmt::output_constraints(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal62();
+  auto list = impl->reader.getVal62();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28176,12 +26804,11 @@ std::optional<Expr> AsmStmt::nth_output_expression(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::output_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal27();
+  auto list = impl->reader.getVal27();
   for (auto v : list) {
     EntityId id(v);
     if (auto d27 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d27.value()))) {
+      if (auto e = Expr::from(Stmt(d27))) {
         co_yield std::move(*e);
       }
     }
@@ -28200,8 +26827,7 @@ std::optional<std::string_view> AsmStmt::nth_input_constraint(unsigned n) const 
 }
 
 gap::generator<std::string_view> AsmStmt::input_constraints(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal63();
+  auto list = impl->reader.getVal63();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28219,12 +26845,11 @@ std::optional<Expr> AsmStmt::nth_input_expression(unsigned n) const {
 }
 
 gap::generator<Expr> AsmStmt::input_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal28();
+  auto list = impl->reader.getVal28();
   for (auto v : list) {
     EntityId id(v);
     if (auto d28 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d28.value()))) {
+      if (auto e = Expr::from(Stmt(d28))) {
         co_yield std::move(*e);
       }
     }
@@ -28243,8 +26868,7 @@ std::optional<std::string_view> AsmStmt::nth_clobber(unsigned n) const {
 }
 
 gap::generator<std::string_view> AsmStmt::clobbers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal64();
+  auto list = impl->reader.getVal64();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28308,8 +26932,7 @@ std::optional<std::string_view> MSAsmStmt::nth_all_constraint(unsigned n) const 
 }
 
 gap::generator<std::string_view> MSAsmStmt::all_constraints(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal65();
+  auto list = impl->reader.getVal65();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28327,12 +26950,11 @@ std::optional<Expr> MSAsmStmt::nth_all_expression(unsigned n) const {
 }
 
 gap::generator<Expr> MSAsmStmt::all_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal29();
+  auto list = impl->reader.getVal29();
   for (auto v : list) {
     EntityId id(v);
     if (auto d29 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d29.value()))) {
+      if (auto e = Expr::from(Stmt(d29))) {
         co_yield std::move(*e);
       }
     }
@@ -28341,24 +26963,16 @@ gap::generator<Expr> MSAsmStmt::all_expressions(void) const {
 }
 
 std::string_view MSAsmStmt::assembly_string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal66();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token MSAsmStmt::l_brace_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 bool MSAsmStmt::has_braces(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<GCCAsmStmt> GCCAsmStmt::containing(const Decl &decl) {
@@ -28408,24 +27022,16 @@ std::optional<GCCAsmStmt> GCCAsmStmt::from(const Stmt &parent) {
 }
 
 StringLiteral GCCAsmStmt::assembly_string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token GCCAsmStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 bool GCCAsmStmt::is_assembly_goto(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 std::optional<AddrLabelExpr> GCCAsmStmt::nth_label(unsigned n) const {
@@ -28439,12 +27045,11 @@ std::optional<AddrLabelExpr> GCCAsmStmt::nth_label(unsigned n) const {
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::labels(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal29();
+  auto list = impl->reader.getVal29();
   for (auto v : list) {
     EntityId id(v);
     if (auto d29 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = AddrLabelExpr::from(Stmt(d29.value()))) {
+      if (auto e = AddrLabelExpr::from(Stmt(d29))) {
         co_yield std::move(*e);
       }
     }
@@ -28463,12 +27068,11 @@ std::optional<StringLiteral> GCCAsmStmt::nth_output_constraint_literal(unsigned 
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::output_constraint_literals(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal53();
+  auto list = impl->reader.getVal53();
   for (auto v : list) {
     EntityId id(v);
     if (auto d53 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = StringLiteral::from(Stmt(d53.value()))) {
+      if (auto e = StringLiteral::from(Stmt(d53))) {
         co_yield std::move(*e);
       }
     }
@@ -28487,8 +27091,7 @@ std::optional<std::string_view> GCCAsmStmt::nth_output_name(unsigned n) const {
 }
 
 gap::generator<std::string_view> GCCAsmStmt::output_names(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal65();
+  auto list = impl->reader.getVal65();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28506,12 +27109,11 @@ std::optional<StringLiteral> GCCAsmStmt::nth_input_constraint_literal(unsigned n
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::input_constraint_literals(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal54();
+  auto list = impl->reader.getVal54();
   for (auto v : list) {
     EntityId id(v);
     if (auto d54 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = StringLiteral::from(Stmt(d54.value()))) {
+      if (auto e = StringLiteral::from(Stmt(d54))) {
         co_yield std::move(*e);
       }
     }
@@ -28530,8 +27132,7 @@ std::optional<std::string_view> GCCAsmStmt::nth_input_name(unsigned n) const {
 }
 
 gap::generator<std::string_view> GCCAsmStmt::input_names(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal67();
+  auto list = impl->reader.getVal67();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28549,12 +27150,11 @@ std::optional<StringLiteral> GCCAsmStmt::nth_clobber_string_literal(unsigned n) 
 }
 
 gap::generator<StringLiteral> GCCAsmStmt::clobber_string_literals(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal55();
+  auto list = impl->reader.getVal55();
   for (auto v : list) {
     EntityId id(v);
     if (auto d55 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = StringLiteral::from(Stmt(d55.value()))) {
+      if (auto e = StringLiteral::from(Stmt(d55))) {
         co_yield std::move(*e);
       }
     }
@@ -28573,12 +27173,11 @@ std::optional<AddrLabelExpr> GCCAsmStmt::nth_label_expression(unsigned n) const 
 }
 
 gap::generator<AddrLabelExpr> GCCAsmStmt::label_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal68();
+  auto list = impl->reader.getVal68();
   for (auto v : list) {
     EntityId id(v);
     if (auto d68 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = AddrLabelExpr::from(Stmt(d68.value()))) {
+      if (auto e = AddrLabelExpr::from(Stmt(d68))) {
         co_yield std::move(*e);
       }
     }
@@ -28597,8 +27196,7 @@ std::optional<std::string_view> GCCAsmStmt::nth_label_name(unsigned n) const {
 }
 
 gap::generator<std::string_view> GCCAsmStmt::label_names(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal69();
+  auto list = impl->reader.getVal69();
   for (auto v : list) {
 co_yield std::string_view(v.cStr(), v.size());
   }
@@ -28648,78 +27246,55 @@ std::optional<WhileStmt> WhileStmt::from(const Stmt &parent) {
 }
 
 Stmt WhileStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr WhileStmt::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<VarDecl> WhileStmt::condition_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<DeclStmt> WhileStmt::condition_variable_declaration_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal13();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return DeclStmt::from(Stmt(std::move(eptr.value())));
+      return DeclStmt::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token WhileStmt::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 Token WhileStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal17())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 Token WhileStmt::while_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal18())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 bool WhileStmt::has_variable_storage(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<ValueStmt> ValueStmt::containing(const Decl &decl) {
@@ -28889,14 +27464,13 @@ std::optional<ValueStmt> ValueStmt::from(const Stmt &parent) {
 }
 
 std::optional<Expr> ValueStmt::expression_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal9();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -28949,36 +27523,26 @@ std::optional<LabelStmt> LabelStmt::from(const Stmt &parent) {
 }
 
 LabelDecl LabelStmt::declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token LabelStmt::identifier_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal11())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal11());
 }
 
 std::string_view LabelStmt::name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Stmt LabelStmt::sub_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 bool LabelStmt::is_side_entry(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 gap::generator<Expr> Expr::containing(const Decl &decl) {
@@ -29150,287 +27714,238 @@ std::optional<Expr> Expr::from(const Stmt &parent) {
 }
 
 bool Expr::has_side_effects(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 Expr Expr::ignore_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_conversion_operator_single_step(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal11();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_implicit_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal13();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_implicit(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal14();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal14();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_implicit_as_written(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal17();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal17();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_parenthesis_base_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_parenthesis_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal19();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal19();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_parenthesis_implicit_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal20();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal20();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_parenthesis_l_value_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal21();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal21();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_parenthesis_noop_casts(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal22();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal22();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_parentheses(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal30();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal30();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr Expr::ignore_unless_spelled_in_source(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal31();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal31();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool Expr::contains_errors(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal16();
+  return impl->reader.getVal16();
 }
 
 bool Expr::contains_unexpanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 Expr Expr::best_dynamic_class_type_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal32();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal32();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token Expr::expression_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal33())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal33());
 }
 
 std::optional<ObjCPropertyRefExpr> Expr::obj_c_property(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal34();
+    RawEntityId eid = impl->reader.getVal34();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return ObjCPropertyRefExpr::from(Stmt(std::move(eptr.value())));
+      return ObjCPropertyRefExpr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 ExprObjectKind Expr::object_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ExprObjectKind>(self.getVal57());
+  return static_cast<ExprObjectKind>(impl->reader.getVal57());
 }
 
 std::optional<Decl> Expr::referenced_declaration_of_callee(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal35();
+    RawEntityId eid = impl->reader.getVal35();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<FieldDecl> Expr::source_bit_field(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal36();
+    RawEntityId eid = impl->reader.getVal36();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr.value())));
+      return FieldDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> Expr::type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal37();
+    RawEntityId eid = impl->reader.getVal37();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 ExprValueKind Expr::value_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ExprValueKind>(self.getVal70());
+  return static_cast<ExprValueKind>(impl->reader.getVal70());
 }
 
 bool Expr::has_non_trivial_call(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal24();
+  return impl->reader.getVal24();
 }
 
 std::optional<bool> Expr::is_cxx98_integral_constant_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal58()) {
+  if (!impl->reader.getVal58()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal25());
+    return static_cast<bool>(impl->reader.getVal25());
   }
   return std::nullopt;
 }
 
 bool Expr::is_default_argument(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal59();
+  return impl->reader.getVal59();
 }
 
 bool Expr::is_gl_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal60();
+  return impl->reader.getVal60();
 }
 
 bool Expr::is_implicit_cxx_this(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal71();
+  return impl->reader.getVal71();
 }
 
 bool Expr::is_instantiation_dependent(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal72();
+  return impl->reader.getVal72();
 }
 
 std::optional<bool> Expr::is_integer_constant_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal74()) {
+  if (!impl->reader.getVal74()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal73());
+    return static_cast<bool>(impl->reader.getVal73());
   }
   return std::nullopt;
 }
 
 bool Expr::is_known_to_have_boolean_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal75();
+  return impl->reader.getVal75();
 }
 
 bool Expr::is_l_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal76();
+  return impl->reader.getVal76();
 }
 
 bool Expr::is_objcgc_candidate(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal77();
+  return impl->reader.getVal77();
 }
 
 bool Expr::is_obj_c_self_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal78();
+  return impl->reader.getVal78();
 }
 
 bool Expr::is_ordinary_or_bit_field_object(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal79();
+  return impl->reader.getVal79();
 }
 
 bool Expr::is_pr_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal80();
+  return impl->reader.getVal80();
 }
 
 bool Expr::is_read_if_discarded_in_c_plus_plus11(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal81();
+  return impl->reader.getVal81();
 }
 
 bool Expr::is_type_dependent(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal82();
+  return impl->reader.getVal82();
 }
 
 bool Expr::is_value_dependent(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal83();
+  return impl->reader.getVal83();
 }
 
 bool Expr::is_x_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal84();
+  return impl->reader.getVal84();
 }
 
 bool Expr::refers_to_bit_field(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal85();
+  return impl->reader.getVal85();
 }
 
 bool Expr::refers_to_global_register_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal86();
+  return impl->reader.getVal86();
 }
 
 bool Expr::refers_to_matrix_element(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal87();
+  return impl->reader.getVal87();
 }
 
 bool Expr::refers_to_vector_element(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal88();
+  return impl->reader.getVal88();
 }
 
 gap::generator<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::containing(const Decl &decl) {
@@ -29484,15 +27999,13 @@ std::optional<DesignatedInitUpdateExpr> DesignatedInitUpdateExpr::from(const Stm
 }
 
 Expr DesignatedInitUpdateExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 InitListExpr DesignatedInitUpdateExpr::updater(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return InitListExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<DesignatedInitExpr> DesignatedInitExpr::containing(const Decl &decl) {
@@ -29556,46 +28069,36 @@ std::optional<Designator> DesignatedInitExpr::nth_designator(unsigned n) const {
 }
 
 gap::generator<Designator> DesignatedInitExpr::designators(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal89();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d15 = impl->ep->DesignatorFor(impl->ep, v)) {
+      co_yield Designator(std::move(d15));
+    }
   }
   co_return;
 }
 
 TokenRange DesignatedInitExpr::designators_source_range(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal38(), self.getVal39());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal38(), impl->reader.getVal39());
 }
 
 Token DesignatedInitExpr::equal_or_colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr DesignatedInitExpr::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool DesignatedInitExpr::is_direct_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool DesignatedInitExpr::uses_gnu_syntax(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
@@ -29609,12 +28112,11 @@ std::optional<Expr> DesignatedInitExpr::nth_sub_expression(unsigned n) const {
 }
 
 gap::generator<Expr> DesignatedInitExpr::sub_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal26();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+    if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
+      if (auto e = Expr::from(Stmt(d26))) {
         co_yield std::move(*e);
       }
     }
@@ -29673,43 +28175,23 @@ std::optional<DependentScopeDeclRefExpr> DependentScopeDeclRefExpr::from(const S
 }
 
 Token DependentScopeDeclRefExpr::l_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token DependentScopeDeclRefExpr::r_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token DependentScopeDeclRefExpr::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool DependentScopeDeclRefExpr::has_explicit_template_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool DependentScopeDeclRefExpr::has_template_keyword(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<DependentCoawaitExpr> DependentCoawaitExpr::containing(const Decl &decl) {
@@ -29763,25 +28245,17 @@ std::optional<DependentCoawaitExpr> DependentCoawaitExpr::from(const Stmt &paren
 }
 
 Token DependentCoawaitExpr::keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr DependentCoawaitExpr::operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 UnresolvedLookupExpr DependentCoawaitExpr::operator_coawait_lookup(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<DeclRefExpr> DeclRefExpr::containing(const Decl &decl) {
@@ -29835,80 +28309,53 @@ std::optional<DeclRefExpr> DeclRefExpr::from(const Stmt &parent) {
 }
 
 ValueDecl DeclRefExpr::declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 NamedDecl DeclRefExpr::found_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token DeclRefExpr::l_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token DeclRefExpr::r_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token DeclRefExpr::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool DeclRefExpr::had_multiple_candidates(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool DeclRefExpr::has_explicit_template_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool DeclRefExpr::has_qualifier(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool DeclRefExpr::has_template_keyword_and_arguments_info(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool DeclRefExpr::has_template_keyword(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 NonOdrUseReason DeclRefExpr::is_non_odr_use(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<NonOdrUseReason>(self.getVal95());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal94());
 }
 
 bool DeclRefExpr::refers_to_enclosing_variable_or_capture(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 gap::generator<CoroutineSuspendExpr> CoroutineSuspendExpr::containing(const Decl &decl) {
@@ -29963,49 +28410,37 @@ std::optional<CoroutineSuspendExpr> CoroutineSuspendExpr::from(const Stmt &paren
 }
 
 Expr CoroutineSuspendExpr::common_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CoroutineSuspendExpr::keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 OpaqueValueExpr CoroutineSuspendExpr::opaque_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineSuspendExpr::operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineSuspendExpr::ready_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineSuspendExpr::resume_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CoroutineSuspendExpr::suspend_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<CoawaitExpr> CoawaitExpr::containing(const Decl &decl) {
@@ -30063,8 +28498,7 @@ std::optional<CoawaitExpr> CoawaitExpr::from(const Stmt &parent) {
 }
 
 bool CoawaitExpr::is_implicit(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CoyieldExpr> CoyieldExpr::containing(const Decl &decl) {
@@ -30172,29 +28606,16 @@ std::optional<ConvertVectorExpr> ConvertVectorExpr::from(const Stmt &parent) {
 }
 
 Token ConvertVectorExpr::builtin_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ConvertVectorExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr ConvertVectorExpr::src_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ConceptSpecializationExpr> ConceptSpecializationExpr::containing(const Decl &decl) {
@@ -30258,19 +28679,18 @@ std::optional<TemplateArgument> ConceptSpecializationExpr::nth_template_argument
 }
 
 gap::generator<TemplateArgument> ConceptSpecializationExpr::template_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal89();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d15 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d15));
+    }
   }
   co_return;
 }
 
 bool ConceptSpecializationExpr::is_satisfied(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CompoundLiteralExpr> CompoundLiteralExpr::containing(const Decl &decl) {
@@ -30324,24 +28744,16 @@ std::optional<CompoundLiteralExpr> CompoundLiteralExpr::from(const Stmt &parent)
 }
 
 Expr CompoundLiteralExpr::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CompoundLiteralExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool CompoundLiteralExpr::is_file_scope(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ChooseExpr> ChooseExpr::containing(const Decl &decl) {
@@ -30395,57 +28807,39 @@ std::optional<ChooseExpr> ChooseExpr::from(const Stmt &parent) {
 }
 
 Token ChooseExpr::builtin_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr ChooseExpr::chosen_sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ChooseExpr::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ChooseExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 bool ChooseExpr::is_condition_dependent(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ChooseExpr::is_condition_true(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<CharacterLiteral> CharacterLiteral::containing(const Decl &decl) {
@@ -30499,18 +28893,11 @@ std::optional<CharacterLiteral> CharacterLiteral::from(const Stmt &parent) {
 }
 
 CharacterLiteralCharacterKind CharacterLiteral::character_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CharacterLiteralCharacterKind>(self.getVal95());
+  return static_cast<CharacterLiteralCharacterKind>(impl->reader.getVal94());
 }
 
 Token CharacterLiteral::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 gap::generator<CastExpr> CastExpr::containing(const Decl &decl) {
@@ -30573,59 +28960,52 @@ std::optional<CastExpr> CastExpr::from(const Stmt &parent) {
 }
 
 CastKind CastExpr::cast_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CastKind>(self.getVal95());
+  return static_cast<CastKind>(impl->reader.getVal94());
 }
 
 std::string_view CastExpr::cast_kind_name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<NamedDecl> CastExpr::conversion_function(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return NamedDecl::from(Decl(std::move(eptr.value())));
+      return NamedDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Expr CastExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CastExpr::sub_expression_as_written(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<FieldDecl> CastExpr::target_union_field(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal41();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr.value())));
+      return FieldDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool CastExpr::has_stored_fp_features(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ImplicitCastExpr> ImplicitCastExpr::containing(const Decl &decl) {
@@ -30683,8 +29063,7 @@ std::optional<ImplicitCastExpr> ImplicitCastExpr::from(const Stmt &parent) {
 }
 
 bool ImplicitCastExpr::is_part_of_explicit_cast(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<ExplicitCastExpr> ExplicitCastExpr::containing(const Decl &decl) {
@@ -30750,9 +29129,8 @@ std::optional<ExplicitCastExpr> ExplicitCastExpr::from(const Stmt &parent) {
 }
 
 Type ExplicitCastExpr::type_as_written(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal42();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 gap::generator<CXXNamedCastExpr> CXXNamedCastExpr::containing(const Decl &decl) {
@@ -30818,35 +29196,21 @@ std::optional<CXXNamedCastExpr> CXXNamedCastExpr::from(const Stmt &parent) {
 }
 
 TokenRange CXXNamedCastExpr::angle_brackets(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal43(), self.getVal44());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal43(), impl->reader.getVal44());
 }
 
 std::string_view CXXNamedCastExpr::cast_name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal66();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token CXXNamedCastExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 Token CXXNamedCastExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal46())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 gap::generator<CXXDynamicCastExpr> CXXDynamicCastExpr::containing(const Decl &decl) {
@@ -30912,8 +29276,7 @@ std::optional<CXXDynamicCastExpr> CXXDynamicCastExpr::from(const Stmt &parent) {
 }
 
 bool CXXDynamicCastExpr::is_always_null(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<CXXConstCastExpr> CXXConstCastExpr::containing(const Decl &decl) {
@@ -31223,28 +29586,15 @@ std::optional<CXXFunctionalCastExpr> CXXFunctionalCastExpr::from(const Stmt &par
 }
 
 Token CXXFunctionalCastExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token CXXFunctionalCastExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool CXXFunctionalCastExpr::is_list_initialization(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<CStyleCastExpr> CStyleCastExpr::containing(const Decl &decl) {
@@ -31306,23 +29656,11 @@ std::optional<CStyleCastExpr> CStyleCastExpr::from(const Stmt &parent) {
 }
 
 Token CStyleCastExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token CStyleCastExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 gap::generator<BuiltinBitCastExpr> BuiltinBitCastExpr::containing(const Decl &decl) {
@@ -31442,34 +29780,20 @@ std::optional<ObjCBridgedCastExpr> ObjCBridgedCastExpr::from(const Stmt &parent)
 }
 
 Token ObjCBridgedCastExpr::bridge_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 ObjCBridgeCastKind ObjCBridgedCastExpr::bridge_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ObjCBridgeCastKind>(self.getVal97());
+  return static_cast<ObjCBridgeCastKind>(impl->reader.getVal96());
 }
 
 std::string_view ObjCBridgedCastExpr::bridge_kind_name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal66();
+  capnp::Text::Reader data = impl->reader.getVal66();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token ObjCBridgedCastExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 gap::generator<CallExpr> CallExpr::containing(const Decl &decl) {
@@ -31537,12 +29861,11 @@ std::optional<Expr> CallExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CallExpr::arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -31551,102 +29874,84 @@ gap::generator<Expr> CallExpr::arguments(void) const {
 }
 
 CallExprADLCallKind CallExpr::adl_call_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CallExprADLCallKind>(self.getVal95());
+  return static_cast<CallExprADLCallKind>(impl->reader.getVal94());
 }
 
 Type CallExpr::call_return_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr CallExpr::callee(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Decl> CallExpr::callee_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal40();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<FunctionDecl> CallExpr::direct_callee(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal41();
+    RawEntityId eid = impl->reader.getVal41();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token CallExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<Attr> CallExpr::unused_result_attribute(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal43();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
-      return Attr(std::move(eptr.value()));
+      return Attr(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool CallExpr::has_stored_fp_features(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CallExpr::has_unused_result_attribute(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CallExpr::is_builtin_assume_false(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CallExpr::is_call_to_std_move(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool CallExpr::is_unevaluated_builtin_call(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool CallExpr::uses_adl(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 gap::generator<CXXOperatorCallExpr> CXXOperatorCallExpr::containing(const Decl &decl) {
@@ -31704,33 +30009,23 @@ std::optional<CXXOperatorCallExpr> CXXOperatorCallExpr::from(const Stmt &parent)
 }
 
 OverloadedOperatorKind CXXOperatorCallExpr::operator_(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<OverloadedOperatorKind>(self.getVal97());
+  return static_cast<OverloadedOperatorKind>(impl->reader.getVal96());
 }
 
 Token CXXOperatorCallExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool CXXOperatorCallExpr::is_assignment_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool CXXOperatorCallExpr::is_comparison_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal99();
+  return impl->reader.getVal98();
 }
 
 bool CXXOperatorCallExpr::is_infix_binary_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal100();
+  return impl->reader.getVal99();
 }
 
 gap::generator<CXXMemberCallExpr> CXXMemberCallExpr::containing(const Decl &decl) {
@@ -31788,35 +30083,31 @@ std::optional<CXXMemberCallExpr> CXXMemberCallExpr::from(const Stmt &parent) {
 }
 
 Expr CXXMemberCallExpr::implicit_object_argument(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<CXXMethodDecl> CXXMemberCallExpr::method_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal45();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXMethodDecl::from(Decl(std::move(eptr.value())));
+      return CXXMethodDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Type CXXMemberCallExpr::object_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal46();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal46();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 CXXRecordDecl CXXMemberCallExpr::record_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal47();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal47();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 gap::generator<CUDAKernelCallExpr> CUDAKernelCallExpr::containing(const Decl &decl) {
@@ -31874,9 +30165,8 @@ std::optional<CUDAKernelCallExpr> CUDAKernelCallExpr::from(const Stmt &parent) {
 }
 
 CallExpr CUDAKernelCallExpr::config(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return CallExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return CallExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<UserDefinedLiteral> UserDefinedLiteral::containing(const Decl &decl) {
@@ -31934,24 +30224,16 @@ std::optional<UserDefinedLiteral> UserDefinedLiteral::from(const Stmt &parent) {
 }
 
 Expr UserDefinedLiteral::cooked_literal(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 UserDefinedLiteralLiteralOperatorKind UserDefinedLiteral::literal_operator_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<UserDefinedLiteralLiteralOperatorKind>(self.getVal97());
+  return static_cast<UserDefinedLiteralLiteralOperatorKind>(impl->reader.getVal96());
 }
 
 Token UserDefinedLiteral::ud_suffix_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 gap::generator<CXXUuidofExpr> CXXUuidofExpr::containing(const Decl &decl) {
@@ -32005,40 +30287,35 @@ std::optional<CXXUuidofExpr> CXXUuidofExpr::from(const Stmt &parent) {
 }
 
 std::optional<Expr> CXXUuidofExpr::expression_operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 MSGuidDecl CXXUuidofExpr::guid_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return MSGuidDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type CXXUuidofExpr::type_operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXUuidofExpr::type_operand_source_info(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal41();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXUuidofExpr::is_type_operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CXXUnresolvedConstructExpr> CXXUnresolvedConstructExpr::containing(const Decl &decl) {
@@ -32102,12 +30379,11 @@ std::optional<Expr> CXXUnresolvedConstructExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -32116,34 +30392,20 @@ gap::generator<Expr> CXXUnresolvedConstructExpr::arguments(void) const {
 }
 
 Token CXXUnresolvedConstructExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token CXXUnresolvedConstructExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Type CXXUnresolvedConstructExpr::type_as_written(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXUnresolvedConstructExpr::is_list_initialization(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CXXTypeidExpr> CXXTypeidExpr::containing(const Decl &decl) {
@@ -32197,49 +30459,43 @@ std::optional<CXXTypeidExpr> CXXTypeidExpr::from(const Stmt &parent) {
 }
 
 std::optional<Expr> CXXTypeidExpr::expression_operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Type CXXTypeidExpr::type_operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CXXTypeidExpr::type_operand_source_info(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<bool> CXXTypeidExpr::is_most_derived(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal91()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal90());
+    return static_cast<bool>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
 
 bool CXXTypeidExpr::is_potentially_evaluated(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXTypeidExpr::is_type_operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 gap::generator<CXXThrowExpr> CXXThrowExpr::containing(const Decl &decl) {
@@ -32293,32 +30549,24 @@ std::optional<CXXThrowExpr> CXXThrowExpr::from(const Stmt &parent) {
 }
 
 std::optional<Expr> CXXThrowExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token CXXThrowExpr::throw_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool CXXThrowExpr::is_thrown_variable_in_scope(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CXXThisExpr> CXXThisExpr::containing(const Decl &decl) {
@@ -32372,18 +30620,11 @@ std::optional<CXXThisExpr> CXXThisExpr::from(const Stmt &parent) {
 }
 
 Token CXXThisExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXThisExpr::is_implicit(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CXXStdInitializerListExpr> CXXStdInitializerListExpr::containing(const Decl &decl) {
@@ -32437,9 +30678,8 @@ std::optional<CXXStdInitializerListExpr> CXXStdInitializerListExpr::from(const S
 }
 
 Expr CXXStdInitializerListExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<CXXScalarValueInitExpr> CXXScalarValueInitExpr::containing(const Decl &decl) {
@@ -32493,13 +30733,7 @@ std::optional<CXXScalarValueInitExpr> CXXScalarValueInitExpr::from(const Stmt &p
 }
 
 Token CXXScalarValueInitExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 gap::generator<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::containing(const Decl &decl) {
@@ -32553,62 +30787,47 @@ std::optional<CXXRewrittenBinaryOperator> CXXRewrittenBinaryOperator::from(const
 }
 
 Expr CXXRewrittenBinaryOperator::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::opcode(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<BinaryOperatorKind>(self.getVal95());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
 }
 
 std::string_view CXXRewrittenBinaryOperator::opcode_string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 BinaryOperatorKind CXXRewrittenBinaryOperator::operator_(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<BinaryOperatorKind>(self.getVal97());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal96());
 }
 
 Token CXXRewrittenBinaryOperator::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr CXXRewrittenBinaryOperator::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CXXRewrittenBinaryOperator::semantic_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool CXXRewrittenBinaryOperator::is_assignment_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CXXRewrittenBinaryOperator::is_comparison_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXRewrittenBinaryOperator::is_reversed(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 gap::generator<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::containing(const Decl &decl) {
@@ -32662,79 +30881,50 @@ std::optional<CXXPseudoDestructorExpr> CXXPseudoDestructorExpr::from(const Stmt 
 }
 
 Expr CXXPseudoDestructorExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXPseudoDestructorExpr::colon_colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Type CXXPseudoDestructorExpr::destroyed_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token CXXPseudoDestructorExpr::destroyed_type_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token CXXPseudoDestructorExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<Type> CXXPseudoDestructorExpr::scope_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal43();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token CXXPseudoDestructorExpr::tilde_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool CXXPseudoDestructorExpr::has_qualifier(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CXXPseudoDestructorExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::containing(const Decl &decl) {
@@ -32788,13 +30978,7 @@ std::optional<CXXNullPtrLiteralExpr> CXXNullPtrLiteralExpr::from(const Stmt &par
 }
 
 Token CXXNullPtrLiteralExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 gap::generator<CXXNoexceptExpr> CXXNoexceptExpr::containing(const Decl &decl) {
@@ -32848,14 +31032,12 @@ std::optional<CXXNoexceptExpr> CXXNoexceptExpr::from(const Stmt &parent) {
 }
 
 Expr CXXNoexceptExpr::operand(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool CXXNoexceptExpr::value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CXXNewExpr> CXXNewExpr::containing(const Decl &decl) {
@@ -32909,110 +31091,95 @@ std::optional<CXXNewExpr> CXXNewExpr::from(const Stmt &parent) {
 }
 
 bool CXXNewExpr::does_usual_array_delete_want_size(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 Type CXXNewExpr::allocated_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> CXXNewExpr::array_size(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal39();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<CXXConstructExpr> CXXNewExpr::construct_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal40();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return CXXConstructExpr::from(Stmt(std::move(eptr.value())));
+      return CXXConstructExpr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TokenRange CXXNewExpr::direct_initializer_range(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal41(), self.getVal42());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal41(), impl->reader.getVal42());
 }
 
 CXXNewExprInitializationStyle CXXNewExpr::initialization_style(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CXXNewExprInitializationStyle>(self.getVal95());
+  return static_cast<CXXNewExprInitializationStyle>(impl->reader.getVal94());
 }
 
 std::optional<Expr> CXXNewExpr::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal43();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 FunctionDecl CXXNewExpr::operator_delete(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 FunctionDecl CXXNewExpr::operator_new(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal45();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal45();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TokenRange CXXNewExpr::type_id_parentheses(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal46(), self.getVal47());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal46(), impl->reader.getVal47());
 }
 
 bool CXXNewExpr::has_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXNewExpr::is_array(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXNewExpr::is_global_new(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool CXXNewExpr::is_parenthesis_type_id(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool CXXNewExpr::pass_alignment(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
@@ -33026,12 +31193,11 @@ std::optional<Expr> CXXNewExpr::nth_placement_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CXXNewExpr::placement_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -33040,8 +31206,7 @@ gap::generator<Expr> CXXNewExpr::placement_arguments(void) const {
 }
 
 bool CXXNewExpr::should_null_check_allocation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal98();
+  return impl->reader.getVal97();
 }
 
 gap::generator<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::containing(const Decl &decl) {
@@ -33095,34 +31260,24 @@ std::optional<CXXInheritedCtorInitExpr> CXXInheritedCtorInitExpr::from(const Stm
 }
 
 bool CXXInheritedCtorInitExpr::constructs_virtual_base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 CXXConstructExprConstructionKind CXXInheritedCtorInitExpr::construction_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CXXConstructExprConstructionKind>(self.getVal95());
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal94());
 }
 
 CXXConstructorDecl CXXInheritedCtorInitExpr::constructor(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXInheritedCtorInitExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 bool CXXInheritedCtorInitExpr::inherited_from_virtual_base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<CXXFoldExpr> CXXFoldExpr::containing(const Decl &decl) {
@@ -33176,88 +31331,61 @@ std::optional<CXXFoldExpr> CXXFoldExpr::from(const Stmt &parent) {
 }
 
 UnresolvedLookupExpr CXXFoldExpr::callee(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return UnresolvedLookupExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr CXXFoldExpr::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CXXFoldExpr::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<unsigned> CXXFoldExpr::num_expansions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal90()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal101());
+    return static_cast<unsigned>(impl->reader.getVal100());
   }
   return std::nullopt;
 }
 
 BinaryOperatorKind CXXFoldExpr::operator_(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<BinaryOperatorKind>(self.getVal95());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
 }
 
 Expr CXXFoldExpr::pattern(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr CXXFoldExpr::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token CXXFoldExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool CXXFoldExpr::is_left_fold(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXFoldExpr::is_right_fold(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 gap::generator<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::containing(const Decl &decl) {
@@ -33311,107 +31439,70 @@ std::optional<CXXDependentScopeMemberExpr> CXXDependentScopeMemberExpr::from(con
 }
 
 std::optional<Expr> CXXDependentScopeMemberExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Type CXXDependentScopeMemberExpr::base_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<NamedDecl> CXXDependentScopeMemberExpr::first_qualifier_found_in_scope(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal40();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return NamedDecl::from(Decl(std::move(eptr.value())));
+      return NamedDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token CXXDependentScopeMemberExpr::l_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token CXXDependentScopeMemberExpr::member_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token CXXDependentScopeMemberExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token CXXDependentScopeMemberExpr::r_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token CXXDependentScopeMemberExpr::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 bool CXXDependentScopeMemberExpr::has_explicit_template_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CXXDependentScopeMemberExpr::has_template_keyword(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXDependentScopeMemberExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXDependentScopeMemberExpr::is_implicit_access(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 gap::generator<CXXDeleteExpr> CXXDeleteExpr::containing(const Decl &decl) {
@@ -33465,41 +31556,34 @@ std::optional<CXXDeleteExpr> CXXDeleteExpr::from(const Stmt &parent) {
 }
 
 bool CXXDeleteExpr::does_usual_array_delete_want_size(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 Expr CXXDeleteExpr::argument(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type CXXDeleteExpr::destroyed_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 FunctionDecl CXXDeleteExpr::operator_delete(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return FunctionDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool CXXDeleteExpr::is_array_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXDeleteExpr::is_array_form_as_written(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXDeleteExpr::is_global_delete(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 gap::generator<CXXDefaultInitExpr> CXXDefaultInitExpr::containing(const Decl &decl) {
@@ -33553,33 +31637,25 @@ std::optional<CXXDefaultInitExpr> CXXDefaultInitExpr::from(const Stmt &parent) {
 }
 
 std::optional<Expr> CXXDefaultInitExpr::expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 FieldDecl CXXDefaultInitExpr::field(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return FieldDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXDefaultInitExpr::used_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<CXXDefaultArgExpr> CXXDefaultArgExpr::containing(const Decl &decl) {
@@ -33633,25 +31709,17 @@ std::optional<CXXDefaultArgExpr> CXXDefaultArgExpr::from(const Stmt &parent) {
 }
 
 Expr CXXDefaultArgExpr::expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ParmVarDecl CXXDefaultArgExpr::parameter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return ParmVarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return ParmVarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXDefaultArgExpr::used_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<CXXConstructExpr> CXXConstructExpr::containing(const Decl &decl) {
@@ -33716,12 +31784,11 @@ std::optional<Expr> CXXConstructExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Expr> CXXConstructExpr::arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -33730,55 +31797,41 @@ gap::generator<Expr> CXXConstructExpr::arguments(void) const {
 }
 
 CXXConstructExprConstructionKind CXXConstructExpr::construction_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<CXXConstructExprConstructionKind>(self.getVal95());
+  return static_cast<CXXConstructExprConstructionKind>(impl->reader.getVal94());
 }
 
 CXXConstructorDecl CXXConstructExpr::constructor(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token CXXConstructExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 TokenRange CXXConstructExpr::parenthesis_or_brace_range(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal40(), self.getVal41());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal40(), impl->reader.getVal41());
 }
 
 bool CXXConstructExpr::had_multiple_candidates(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool CXXConstructExpr::is_elidable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool CXXConstructExpr::is_list_initialization(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool CXXConstructExpr::is_std_initializer_list_initialization(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool CXXConstructExpr::requires_zero_initialization(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 gap::generator<CXXTemporaryObjectExpr> CXXTemporaryObjectExpr::containing(const Decl &decl) {
@@ -33886,18 +31939,11 @@ std::optional<CXXBoolLiteralExpr> CXXBoolLiteralExpr::from(const Stmt &parent) {
 }
 
 Token CXXBoolLiteralExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool CXXBoolLiteralExpr::value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<CXXBindTemporaryExpr> CXXBindTemporaryExpr::containing(const Decl &decl) {
@@ -33951,9 +31997,8 @@ std::optional<CXXBindTemporaryExpr> CXXBindTemporaryExpr::from(const Stmt &paren
 }
 
 Expr CXXBindTemporaryExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<BlockExpr> BlockExpr::containing(const Decl &decl) {
@@ -34007,31 +32052,22 @@ std::optional<BlockExpr> BlockExpr::from(const Stmt &parent) {
 }
 
 BlockDecl BlockExpr::block_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return BlockDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return BlockDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Stmt BlockExpr::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Token BlockExpr::caret_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 FunctionProtoType BlockExpr::function_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return FunctionProtoType::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return FunctionProtoType::from(Type(impl->ep->TypeFor(impl->ep, eid))).value();
 }
 
 gap::generator<BinaryOperator> BinaryOperator::containing(const Decl &decl) {
@@ -34086,106 +32122,82 @@ std::optional<BinaryOperator> BinaryOperator::from(const Stmt &parent) {
 }
 
 Expr BinaryOperator::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 BinaryOperatorKind BinaryOperator::opcode(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<BinaryOperatorKind>(self.getVal95());
+  return static_cast<BinaryOperatorKind>(impl->reader.getVal94());
 }
 
 std::string_view BinaryOperator::opcode_string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token BinaryOperator::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr BinaryOperator::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool BinaryOperator::has_stored_fp_features(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool BinaryOperator::is_additive_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool BinaryOperator::is_assignment_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool BinaryOperator::is_bitwise_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool BinaryOperator::is_comma_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool BinaryOperator::is_comparison_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool BinaryOperator::is_compound_assignment_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool BinaryOperator::is_equality_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal99();
+  return impl->reader.getVal98();
 }
 
 bool BinaryOperator::is_logical_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal100();
+  return impl->reader.getVal99();
 }
 
 bool BinaryOperator::is_multiplicative_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal102();
+  return impl->reader.getVal101();
 }
 
 bool BinaryOperator::is_pointer_memory_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal103();
+  return impl->reader.getVal102();
 }
 
 bool BinaryOperator::is_relational_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal104();
+  return impl->reader.getVal103();
 }
 
 bool BinaryOperator::is_shift_assign_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal105();
+  return impl->reader.getVal104();
 }
 
 bool BinaryOperator::is_shift_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal106();
+  return impl->reader.getVal105();
 }
 
 gap::generator<CompoundAssignOperator> CompoundAssignOperator::containing(const Decl &decl) {
@@ -34243,15 +32255,13 @@ std::optional<CompoundAssignOperator> CompoundAssignOperator::from(const Stmt &p
 }
 
 Type CompoundAssignOperator::computation_lhs_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal41();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type CompoundAssignOperator::computation_result_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal42();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 gap::generator<AtomicExpr> AtomicExpr::containing(const Decl &decl) {
@@ -34305,131 +32315,107 @@ std::optional<AtomicExpr> AtomicExpr::from(const Stmt &parent) {
 }
 
 Token AtomicExpr::builtin_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 AtomicExprAtomicOp AtomicExpr::operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<AtomicExprAtomicOp>(self.getVal95());
+  return static_cast<AtomicExprAtomicOp>(impl->reader.getVal94());
 }
 
 Expr AtomicExpr::order(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> AtomicExpr::order_fail(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal40();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Expr AtomicExpr::pointer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token AtomicExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 std::optional<Expr> AtomicExpr::scope(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal43();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Expr> AtomicExpr::value1(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal44();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Expr> AtomicExpr::value2(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal45();
+    RawEntityId eid = impl->reader.getVal45();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Type AtomicExpr::value_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal46();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal46();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> AtomicExpr::weak(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal47();
+    RawEntityId eid = impl->reader.getVal47();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool AtomicExpr::is_cmp_x_chg(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool AtomicExpr::is_open_cl(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool AtomicExpr::is_volatile(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
@@ -34443,12 +32429,11 @@ std::optional<Expr> AtomicExpr::nth_sub_expression(unsigned n) const {
 }
 
 gap::generator<Expr> AtomicExpr::sub_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -34507,29 +32492,16 @@ std::optional<AsTypeExpr> AsTypeExpr::from(const Stmt &parent) {
 }
 
 Token AsTypeExpr::builtin_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token AsTypeExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr AsTypeExpr::src_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ArrayTypeTraitExpr> ArrayTypeTraitExpr::containing(const Decl &decl) {
@@ -34583,20 +32555,17 @@ std::optional<ArrayTypeTraitExpr> ArrayTypeTraitExpr::from(const Stmt &parent) {
 }
 
 Expr ArrayTypeTraitExpr::dimension_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type ArrayTypeTraitExpr::queried_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ArrayTypeTrait ArrayTypeTraitExpr::trait(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ArrayTypeTrait>(self.getVal95());
+  return static_cast<ArrayTypeTrait>(impl->reader.getVal94());
 }
 
 gap::generator<ArraySubscriptExpr> ArraySubscriptExpr::containing(const Decl &decl) {
@@ -34650,37 +32619,27 @@ std::optional<ArraySubscriptExpr> ArraySubscriptExpr::from(const Stmt &parent) {
 }
 
 Expr ArraySubscriptExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ArraySubscriptExpr::index(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ArraySubscriptExpr::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ArraySubscriptExpr::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr ArraySubscriptExpr::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ArrayInitLoopExpr> ArrayInitLoopExpr::containing(const Decl &decl) {
@@ -34734,15 +32693,13 @@ std::optional<ArrayInitLoopExpr> ArrayInitLoopExpr::from(const Stmt &parent) {
 }
 
 OpaqueValueExpr ArrayInitLoopExpr::common_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ArrayInitLoopExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ArrayInitIndexExpr> ArrayInitIndexExpr::containing(const Decl &decl) {
@@ -34846,29 +32803,16 @@ std::optional<AddrLabelExpr> AddrLabelExpr::from(const Stmt &parent) {
 }
 
 Token AddrLabelExpr::amp_amp_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 LabelDecl AddrLabelExpr::label(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return LabelDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token AddrLabelExpr::label_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<AbstractConditionalOperator> AbstractConditionalOperator::containing(const Decl &decl) {
@@ -34923,41 +32867,26 @@ std::optional<AbstractConditionalOperator> AbstractConditionalOperator::from(con
 }
 
 Token AbstractConditionalOperator::colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr AbstractConditionalOperator::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr AbstractConditionalOperator::false_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token AbstractConditionalOperator::question_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr AbstractConditionalOperator::true_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ConditionalOperator> ConditionalOperator::containing(const Decl &decl) {
@@ -35015,15 +32944,13 @@ std::optional<ConditionalOperator> ConditionalOperator::from(const Stmt &parent)
 }
 
 Expr ConditionalOperator::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ConditionalOperator::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<BinaryConditionalOperator> BinaryConditionalOperator::containing(const Decl &decl) {
@@ -35081,15 +33008,13 @@ std::optional<BinaryConditionalOperator> BinaryConditionalOperator::from(const S
 }
 
 Expr BinaryConditionalOperator::common(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 OpaqueValueExpr BinaryConditionalOperator::opaque_value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return OpaqueValueExpr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<VAArgExpr> VAArgExpr::containing(const Decl &decl) {
@@ -35143,40 +33068,25 @@ std::optional<VAArgExpr> VAArgExpr::from(const Stmt &parent) {
 }
 
 Token VAArgExpr::builtin_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token VAArgExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr VAArgExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type VAArgExpr::written_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal41();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool VAArgExpr::is_microsoft_abi(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<UnaryOperator> UnaryOperator::containing(const Decl &decl) {
@@ -35230,64 +33140,48 @@ std::optional<UnaryOperator> UnaryOperator::from(const Stmt &parent) {
 }
 
 bool UnaryOperator::can_overflow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 UnaryOperatorKind UnaryOperator::opcode(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<UnaryOperatorKind>(self.getVal95());
+  return static_cast<UnaryOperatorKind>(impl->reader.getVal94());
 }
 
 Token UnaryOperator::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr UnaryOperator::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool UnaryOperator::has_stored_fp_features(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool UnaryOperator::is_arithmetic_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool UnaryOperator::is_decrement_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool UnaryOperator::is_increment_decrement_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool UnaryOperator::is_increment_operation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool UnaryOperator::is_postfix(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool UnaryOperator::is_prefix(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal99();
+  return impl->reader.getVal98();
 }
 
 gap::generator<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::containing(const Decl &decl) {
@@ -35341,67 +33235,50 @@ std::optional<UnaryExprOrTypeTraitExpr> UnaryExprOrTypeTraitExpr::from(const Stm
 }
 
 std::optional<Expr> UnaryExprOrTypeTraitExpr::argument_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> UnaryExprOrTypeTraitExpr::argument_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal39();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 UnaryExprOrTypeTrait UnaryExprOrTypeTraitExpr::expression_or_trait_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<UnaryExprOrTypeTrait>(self.getVal95());
+  return static_cast<UnaryExprOrTypeTrait>(impl->reader.getVal94());
 }
 
 Token UnaryExprOrTypeTraitExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token UnaryExprOrTypeTraitExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Type UnaryExprOrTypeTraitExpr::type_of_argument(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal42();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool UnaryExprOrTypeTraitExpr::is_argument_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<TypoExpr> TypoExpr::containing(const Decl &decl) {
@@ -35505,16 +33382,14 @@ std::optional<TypeTraitExpr> TypeTraitExpr::from(const Stmt &parent) {
 }
 
 TypeTrait TypeTraitExpr::trait(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<TypeTrait>(self.getVal95());
+  return static_cast<TypeTrait>(impl->reader.getVal94());
 }
 
 std::optional<bool> TypeTraitExpr::value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal91()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal90());
+    return static_cast<bool>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
@@ -35530,12 +33405,11 @@ std::optional<Type> TypeTraitExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Type> TypeTraitExpr::arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d15.value());
+      co_yield Type(std::move(d15));
     }
   }
   co_return;
@@ -35592,19 +33466,12 @@ std::optional<SubstNonTypeTemplateParmPackExpr> SubstNonTypeTemplateParmPackExpr
 }
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmPackExpr::parameter_pack(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token SubstNonTypeTemplateParmPackExpr::parameter_pack_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 gap::generator<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::containing(const Decl &decl) {
@@ -35658,36 +33525,26 @@ std::optional<SubstNonTypeTemplateParmExpr> SubstNonTypeTemplateParmExpr::from(c
 }
 
 Token SubstNonTypeTemplateParmExpr::name_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 NonTypeTemplateParmDecl SubstNonTypeTemplateParmExpr::parameter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return NonTypeTemplateParmDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Type SubstNonTypeTemplateParmExpr::parameter_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr SubstNonTypeTemplateParmExpr::replacement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool SubstNonTypeTemplateParmExpr::is_reference_parameter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<StringLiteral> StringLiteral::containing(const Decl &decl) {
@@ -35741,75 +33598,64 @@ std::optional<StringLiteral> StringLiteral::from(const Stmt &parent) {
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal91()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal90());
+    return static_cast<bool>(impl->reader.getVal89());
   }
   return std::nullopt;
 }
 
 std::optional<bool> StringLiteral::contains_non_ascii_or_null(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal93()) {
+  if (!impl->reader.getVal92()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal92());
+    return static_cast<bool>(impl->reader.getVal91());
   }
   return std::nullopt;
 }
 
 std::string_view StringLiteral::bytes(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 StringLiteralStringKind StringLiteral::string_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<StringLiteralStringKind>(self.getVal95());
+  return static_cast<StringLiteralStringKind>(impl->reader.getVal94());
 }
 
 std::optional<std::string_view> StringLiteral::string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal94()) {
+  if (!impl->reader.getVal93()) {
     return std::nullopt;
   } else {
-    capnp::Text::Reader data = self.getVal66();
+    capnp::Text::Reader data = impl->reader.getVal66();
     return std::string_view(data.cStr(), data.size());
   }
   return std::nullopt;
 }
 
 bool StringLiteral::is_ordinary(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool StringLiteral::is_pascal(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal98();
+  return impl->reader.getVal97();
 }
 
 bool StringLiteral::is_utf16(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal99();
+  return impl->reader.getVal98();
 }
 
 bool StringLiteral::is_utf32(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal100();
+  return impl->reader.getVal99();
 }
 
 bool StringLiteral::is_utf8(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal102();
+  return impl->reader.getVal101();
 }
 
 bool StringLiteral::is_wide(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal103();
+  return impl->reader.getVal102();
 }
 
 gap::generator<StmtExpr> StmtExpr::containing(const Decl &decl) {
@@ -35863,29 +33709,16 @@ std::optional<StmtExpr> StmtExpr::from(const Stmt &parent) {
 }
 
 Token StmtExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token StmtExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 CompoundStmt StmtExpr::sub_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<SourceLocExpr> SourceLocExpr::containing(const Decl &decl) {
@@ -35939,29 +33772,20 @@ std::optional<SourceLocExpr> SourceLocExpr::from(const Stmt &parent) {
 }
 
 std::string_view SourceLocExpr::builtin_string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 SourceLocExprIdentKind SourceLocExpr::identifier_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<SourceLocExprIdentKind>(self.getVal95());
+  return static_cast<SourceLocExprIdentKind>(impl->reader.getVal94());
 }
 
 Token SourceLocExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool SourceLocExpr::is_int_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<SizeOfPackExpr> SizeOfPackExpr::containing(const Decl &decl) {
@@ -36015,70 +33839,49 @@ std::optional<SizeOfPackExpr> SizeOfPackExpr::from(const Stmt &parent) {
 }
 
 Token SizeOfPackExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 NamedDecl SizeOfPackExpr::pack(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<unsigned> SizeOfPackExpr::pack_length(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal90()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal101());
+    return static_cast<unsigned>(impl->reader.getVal100());
   }
   return std::nullopt;
 }
 
 Token SizeOfPackExpr::pack_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 std::optional<std::vector<TemplateArgument>> SizeOfPackExpr::partial_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal91()) {
+  if (!impl->reader.getVal90()) {
     return std::nullopt;
   }
-  auto list = self.getVal89();
+  auto list = impl->reader.getVal15();
   std::vector<TemplateArgument> vec;
   vec.reserve(list.size());
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    vec.emplace_back(std::move(*ps_impl));
-  }
+    EntityId id(v);
+    if (auto d15 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      vec.emplace_back(std::move(d15));
+    }
   }
   return vec;
 }
 
 Token SizeOfPackExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool SizeOfPackExpr::is_partially_substituted(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 gap::generator<ShuffleVectorExpr> ShuffleVectorExpr::containing(const Decl &decl) {
@@ -36132,23 +33935,11 @@ std::optional<ShuffleVectorExpr> ShuffleVectorExpr::from(const Stmt &parent) {
 }
 
 Token ShuffleVectorExpr::builtin_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ShuffleVectorExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 gap::generator<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::containing(const Decl &decl) {
@@ -36202,39 +33993,20 @@ std::optional<SYCLUniqueStableNameExpr> SYCLUniqueStableNameExpr::from(const Stm
 }
 
 std::string_view SYCLUniqueStableNameExpr::compute_name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token SYCLUniqueStableNameExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token SYCLUniqueStableNameExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token SYCLUniqueStableNameExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<RequiresExpr> RequiresExpr::containing(const Decl &decl) {
@@ -36288,9 +34060,8 @@ std::optional<RequiresExpr> RequiresExpr::from(const Stmt &parent) {
 }
 
 RequiresExprBodyDecl RequiresExpr::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return RequiresExprBodyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
@@ -36304,12 +34075,11 @@ std::optional<ParmVarDecl> RequiresExpr::nth_local_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(d15.value()))) {
+      if (auto e = ParmVarDecl::from(Decl(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -36318,28 +34088,15 @@ gap::generator<ParmVarDecl> RequiresExpr::local_parameters(void) const {
 }
 
 Token RequiresExpr::r_brace_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token RequiresExpr::requires_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 bool RequiresExpr::is_satisfied(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<RecoveryExpr> RecoveryExpr::containing(const Decl &decl) {
@@ -36403,12 +34160,11 @@ std::optional<Expr> RecoveryExpr::nth_sub_expression(unsigned n) const {
 }
 
 gap::generator<Expr> RecoveryExpr::sub_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -36467,15 +34223,13 @@ std::optional<PseudoObjectExpr> PseudoObjectExpr::from(const Stmt &parent) {
 }
 
 Expr PseudoObjectExpr::result_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr PseudoObjectExpr::syntactic_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
@@ -36489,12 +34243,11 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic(unsigned n) const {
 }
 
 gap::generator<Expr> PseudoObjectExpr::semantics(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -36513,12 +34266,11 @@ std::optional<Expr> PseudoObjectExpr::nth_semantic_expression(unsigned n) const 
 }
 
 gap::generator<Expr> PseudoObjectExpr::semantic_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal26();
+  auto list = impl->reader.getVal26();
   for (auto v : list) {
     EntityId id(v);
     if (auto d26 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d26.value()))) {
+      if (auto e = Expr::from(Stmt(d26))) {
         co_yield std::move(*e);
       }
     }
@@ -36577,30 +34329,21 @@ std::optional<PredefinedExpr> PredefinedExpr::from(const Stmt &parent) {
 }
 
 StringLiteral PredefinedExpr::function_name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 PredefinedExprIdentKind PredefinedExpr::identifier_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<PredefinedExprIdentKind>(self.getVal95());
+  return static_cast<PredefinedExprIdentKind>(impl->reader.getVal94());
 }
 
 std::string_view PredefinedExpr::identifier_kind_name(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  capnp::Text::Reader data = self.getVal61();
+  capnp::Text::Reader data = impl->reader.getVal61();
   return std::string_view(data.cStr(), data.size());
 }
 
 Token PredefinedExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 gap::generator<ParenListExpr> ParenListExpr::containing(const Decl &decl) {
@@ -36654,23 +34397,11 @@ std::optional<ParenListExpr> ParenListExpr::from(const Stmt &parent) {
 }
 
 Token ParenListExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ParenListExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
@@ -36684,12 +34415,11 @@ std::optional<Expr> ParenListExpr::nth_expression(unsigned n) const {
 }
 
 gap::generator<Expr> ParenListExpr::expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -36748,29 +34478,16 @@ std::optional<ParenExpr> ParenExpr::from(const Stmt &parent) {
 }
 
 Token ParenExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ParenExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Expr ParenExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<PackExpansionExpr> PackExpansionExpr::containing(const Decl &decl) {
@@ -36824,29 +34541,21 @@ std::optional<PackExpansionExpr> PackExpansionExpr::from(const Stmt &parent) {
 }
 
 Token PackExpansionExpr::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 std::optional<unsigned> PackExpansionExpr::num_expansions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal90()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal101());
+    return static_cast<unsigned>(impl->reader.getVal100());
   }
   return std::nullopt;
 }
 
 Expr PackExpansionExpr::pattern(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<OverloadExpr> OverloadExpr::containing(const Decl &decl) {
@@ -36901,67 +34610,40 @@ std::optional<OverloadExpr> OverloadExpr::from(const Stmt &parent) {
 }
 
 Token OverloadExpr::l_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token OverloadExpr::name_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 std::optional<CXXRecordDecl> OverloadExpr::naming_class(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal40();
+    RawEntityId eid = impl->reader.getVal40();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token OverloadExpr::r_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token OverloadExpr::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 bool OverloadExpr::has_explicit_template_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool OverloadExpr::has_template_keyword(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<UnresolvedMemberExpr> UnresolvedMemberExpr::containing(const Decl &decl) {
@@ -37019,50 +34701,33 @@ std::optional<UnresolvedMemberExpr> UnresolvedMemberExpr::from(const Stmt &paren
 }
 
 Expr UnresolvedMemberExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type UnresolvedMemberExpr::base_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal44();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token UnresolvedMemberExpr::member_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal45());
 }
 
 Token UnresolvedMemberExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal46())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal46());
 }
 
 bool UnresolvedMemberExpr::has_unresolved_using(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool UnresolvedMemberExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool UnresolvedMemberExpr::is_implicit_access(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 gap::generator<UnresolvedLookupExpr> UnresolvedLookupExpr::containing(const Decl &decl) {
@@ -37120,13 +34785,11 @@ std::optional<UnresolvedLookupExpr> UnresolvedLookupExpr::from(const Stmt &paren
 }
 
 bool UnresolvedLookupExpr::is_overloaded(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool UnresolvedLookupExpr::requires_adl(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 gap::generator<OpaqueValueExpr> OpaqueValueExpr::containing(const Decl &decl) {
@@ -37180,24 +34843,16 @@ std::optional<OpaqueValueExpr> OpaqueValueExpr::from(const Stmt &parent) {
 }
 
 Token OpaqueValueExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr OpaqueValueExpr::source_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool OpaqueValueExpr::is_unique(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<OffsetOfExpr> OffsetOfExpr::containing(const Decl &decl) {
@@ -37251,23 +34906,11 @@ std::optional<OffsetOfExpr> OffsetOfExpr::from(const Stmt &parent) {
 }
 
 Token OffsetOfExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token OffsetOfExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 gap::generator<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::containing(const Decl &decl) {
@@ -37321,36 +34964,26 @@ std::optional<ObjCSubscriptRefExpr> ObjCSubscriptRefExpr::from(const Stmt &paren
 }
 
 ObjCMethodDecl ObjCSubscriptRefExpr::at_index_method_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Expr ObjCSubscriptRefExpr::base_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr ObjCSubscriptRefExpr::key_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCSubscriptRefExpr::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool ObjCSubscriptRefExpr::is_array_subscript_reference_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ObjCStringLiteral> ObjCStringLiteral::containing(const Decl &decl) {
@@ -37404,19 +35037,12 @@ std::optional<ObjCStringLiteral> ObjCStringLiteral::from(const Stmt &parent) {
 }
 
 Token ObjCStringLiteral::at_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 StringLiteral ObjCStringLiteral::string(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ObjCSelectorExpr> ObjCSelectorExpr::containing(const Decl &decl) {
@@ -37470,23 +35096,11 @@ std::optional<ObjCSelectorExpr> ObjCSelectorExpr::from(const Stmt &parent) {
 }
 
 Token ObjCSelectorExpr::at_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token ObjCSelectorExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 gap::generator<ObjCProtocolExpr> ObjCProtocolExpr::containing(const Decl &decl) {
@@ -37540,39 +35154,20 @@ std::optional<ObjCProtocolExpr> ObjCProtocolExpr::from(const Stmt &parent) {
 }
 
 Token ObjCProtocolExpr::at_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 ObjCProtocolDecl ObjCProtocolExpr::protocol(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return ObjCProtocolDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return ObjCProtocolDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCProtocolExpr::protocol_id_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token ObjCProtocolExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 gap::generator<ObjCPropertyRefExpr> ObjCPropertyRefExpr::containing(const Decl &decl) {
@@ -37626,100 +35221,74 @@ std::optional<ObjCPropertyRefExpr> ObjCPropertyRefExpr::from(const Stmt &parent)
 }
 
 Expr ObjCPropertyRefExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCInterfaceDecl ObjCPropertyRefExpr::class_receiver(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyDecl ObjCPropertyRefExpr::explicit_property(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_getter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyRefExpr::implicit_property_setter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyRefExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token ObjCPropertyRefExpr::receiver_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Type ObjCPropertyRefExpr::receiver_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal45();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal45();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCPropertyRefExpr::super_receiver_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal46();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal46();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ObjCPropertyRefExpr::is_class_receiver(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ObjCPropertyRefExpr::is_explicit_property(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool ObjCPropertyRefExpr::is_implicit_property(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_getter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool ObjCPropertyRefExpr::is_messaging_setter(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool ObjCPropertyRefExpr::is_object_receiver(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 bool ObjCPropertyRefExpr::is_super_receiver(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal98();
+  return impl->reader.getVal97();
 }
 
 gap::generator<ObjCMessageExpr> ObjCMessageExpr::containing(const Decl &decl) {
@@ -37783,12 +35352,11 @@ std::optional<Expr> ObjCMessageExpr::nth_argument(unsigned n) const {
 }
 
 gap::generator<Expr> ObjCMessageExpr::arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -37797,127 +35365,88 @@ gap::generator<Expr> ObjCMessageExpr::arguments(void) const {
 }
 
 Type ObjCMessageExpr::call_return_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal38();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCMessageExpr::class_receiver(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Type ObjCMessageExpr::class_receiver_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal40();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Expr ObjCMessageExpr::instance_receiver(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCMessageExpr::left_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 ObjCMethodDecl ObjCMessageExpr::method_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal43();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal43();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMethodFamily ObjCMessageExpr::method_family(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ObjCMethodFamily>(self.getVal95());
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal94());
 }
 
 ObjCInterfaceDecl ObjCMessageExpr::receiver_interface(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCMessageExprReceiverKind ObjCMessageExpr::receiver_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ObjCMessageExprReceiverKind>(self.getVal97());
+  return static_cast<ObjCMessageExprReceiverKind>(impl->reader.getVal96());
 }
 
 TokenRange ObjCMessageExpr::receiver_range(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal45(), self.getVal46());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal45(), impl->reader.getVal46());
 }
 
 Type ObjCMessageExpr::receiver_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal47();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal47();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token ObjCMessageExpr::right_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal48())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal48());
 }
 
 Token ObjCMessageExpr::selector_start_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal49())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal49());
 }
 
 Token ObjCMessageExpr::super_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal50())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal50());
 }
 
 Type ObjCMessageExpr::super_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal51();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal51();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ObjCMessageExpr::is_class_message(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ObjCMessageExpr::is_delegate_initializer_call(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool ObjCMessageExpr::is_implicit(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool ObjCMessageExpr::is_instance_message(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {
@@ -37931,13 +35460,17 @@ std::optional<Token> ObjCMessageExpr::nth_selector_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCMessageExpr::selector_tokens(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal26();
+  auto list = impl->reader.getVal26();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!fragment) {
+    assert(false);
+    co_return;
+  }
+  auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t26 = fragment->TokenFor(fragment, v)) {
-      co_yield std::move(t26.value());
+    if (auto t26 = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {
+      co_yield t26;
     }
   }
   co_return;
@@ -37994,45 +35527,29 @@ std::optional<ObjCIvarRefExpr> ObjCIvarRefExpr::from(const Stmt &parent) {
 }
 
 Expr ObjCIvarRefExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCIvarDecl ObjCIvarRefExpr::declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCIvarRefExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token ObjCIvarRefExpr::operation_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool ObjCIvarRefExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ObjCIvarRefExpr::is_free_instance_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<ObjCIsaExpr> ObjCIsaExpr::containing(const Decl &decl) {
@@ -38086,44 +35603,24 @@ std::optional<ObjCIsaExpr> ObjCIsaExpr::from(const Stmt &parent) {
 }
 
 Expr ObjCIsaExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token ObjCIsaExpr::base_token_end(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token ObjCIsaExpr::isa_member_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token ObjCIsaExpr::operation_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 bool ObjCIsaExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::containing(const Decl &decl) {
@@ -38177,14 +35674,12 @@ std::optional<ObjCIndirectCopyRestoreExpr> ObjCIndirectCopyRestoreExpr::from(con
 }
 
 Expr ObjCIndirectCopyRestoreExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ObjCIndirectCopyRestoreExpr::should_copy(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ObjCEncodeExpr> ObjCEncodeExpr::containing(const Decl &decl) {
@@ -38238,29 +35733,16 @@ std::optional<ObjCEncodeExpr> ObjCEncodeExpr::from(const Stmt &parent) {
 }
 
 Token ObjCEncodeExpr::at_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Type ObjCEncodeExpr::encoded_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal39();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 Token ObjCEncodeExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<ObjCDictionaryLiteral> ObjCDictionaryLiteral::containing(const Decl &decl) {
@@ -38314,9 +35796,8 @@ std::optional<ObjCDictionaryLiteral> ObjCDictionaryLiteral::from(const Stmt &par
 }
 
 ObjCMethodDecl ObjCDictionaryLiteral::dictionary_with_objects_method(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 gap::generator<ObjCBoxedExpr> ObjCBoxedExpr::containing(const Decl &decl) {
@@ -38370,30 +35851,21 @@ std::optional<ObjCBoxedExpr> ObjCBoxedExpr::from(const Stmt &parent) {
 }
 
 Token ObjCBoxedExpr::at_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 ObjCMethodDecl ObjCBoxedExpr::boxing_method(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Expr ObjCBoxedExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ObjCBoxedExpr::is_expressible_as_constant_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::containing(const Decl &decl) {
@@ -38447,18 +35919,11 @@ std::optional<ObjCBoolLiteralExpr> ObjCBoolLiteralExpr::from(const Stmt &parent)
 }
 
 Token ObjCBoolLiteralExpr::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool ObjCBoolLiteralExpr::value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::containing(const Decl &decl) {
@@ -38512,8 +35977,7 @@ std::optional<ObjCAvailabilityCheckExpr> ObjCAvailabilityCheckExpr::from(const S
 }
 
 bool ObjCAvailabilityCheckExpr::has_version(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ObjCArrayLiteral> ObjCArrayLiteral::containing(const Decl &decl) {
@@ -38567,9 +36031,8 @@ std::optional<ObjCArrayLiteral> ObjCArrayLiteral::from(const Stmt &parent) {
 }
 
 ObjCMethodDecl ObjCArrayLiteral::array_with_objects_method(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
@@ -38583,12 +36046,11 @@ std::optional<Expr> ObjCArrayLiteral::nth_element(unsigned n) const {
 }
 
 gap::generator<Expr> ObjCArrayLiteral::elements(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -38647,33 +36109,15 @@ std::optional<OMPIteratorExpr> OMPIteratorExpr::from(const Stmt &parent) {
 }
 
 Token OMPIteratorExpr::iterator_kw_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Token OMPIteratorExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token OMPIteratorExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<OMPArrayShapingExpr> OMPArrayShapingExpr::containing(const Decl &decl) {
@@ -38727,9 +36171,8 @@ std::optional<OMPArrayShapingExpr> OMPArrayShapingExpr::from(const Stmt &parent)
 }
 
 Expr OMPArrayShapingExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
@@ -38743,12 +36186,11 @@ std::optional<Expr> OMPArrayShapingExpr::nth_dimension(unsigned n) const {
 }
 
 gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -38757,23 +36199,11 @@ gap::generator<Expr> OMPArrayShapingExpr::dimensions(void) const {
 }
 
 Token OMPArrayShapingExpr::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token OMPArrayShapingExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<OMPArraySectionExpr> OMPArraySectionExpr::containing(const Decl &decl) {
@@ -38827,57 +36257,35 @@ std::optional<OMPArraySectionExpr> OMPArraySectionExpr::from(const Stmt &parent)
 }
 
 Expr OMPArraySectionExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token OMPArraySectionExpr::first_colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token OMPArraySectionExpr::second_colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr OMPArraySectionExpr::length(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPArraySectionExpr::lower_bound(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token OMPArraySectionExpr::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Expr OMPArraySectionExpr::stride(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal44();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<NoInitExpr> NoInitExpr::containing(const Decl &decl) {
@@ -38981,100 +36389,61 @@ std::optional<MemberExpr> MemberExpr::from(const Stmt &parent) {
 }
 
 Expr MemberExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MemberExpr::l_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 ValueDecl MemberExpr::member_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token MemberExpr::member_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Token MemberExpr::operator_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal42());
 }
 
 Token MemberExpr::r_angle_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal43())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal43());
 }
 
 Token MemberExpr::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal44())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 bool MemberExpr::had_multiple_candidates(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool MemberExpr::has_explicit_template_arguments(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 bool MemberExpr::has_qualifier(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool MemberExpr::has_template_keyword(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool MemberExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool MemberExpr::is_implicit_access(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 NonOdrUseReason MemberExpr::is_non_odr_use(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<NonOdrUseReason>(self.getVal95());
+  return static_cast<NonOdrUseReason>(impl->reader.getVal94());
 }
 
 gap::generator<MatrixSubscriptExpr> MatrixSubscriptExpr::containing(const Decl &decl) {
@@ -39128,36 +36497,26 @@ std::optional<MatrixSubscriptExpr> MatrixSubscriptExpr::from(const Stmt &parent)
 }
 
 Expr MatrixSubscriptExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr MatrixSubscriptExpr::column_index(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MatrixSubscriptExpr::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Expr MatrixSubscriptExpr::row_index(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool MatrixSubscriptExpr::is_incomplete(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<MaterializeTemporaryExpr> MaterializeTemporaryExpr::containing(const Decl &decl) {
@@ -39211,52 +36570,46 @@ std::optional<MaterializeTemporaryExpr> MaterializeTemporaryExpr::from(const Stm
 }
 
 std::optional<ValueDecl> MaterializeTemporaryExpr::extending_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ValueDecl::from(Decl(std::move(eptr.value())));
+      return ValueDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<LifetimeExtendedTemporaryDecl> MaterializeTemporaryExpr::lifetime_extended_temporary_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal39();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr.value())));
+      return LifetimeExtendedTemporaryDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 StorageDuration MaterializeTemporaryExpr::storage_duration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<StorageDuration>(self.getVal95());
+  return static_cast<StorageDuration>(impl->reader.getVal94());
 }
 
 Expr MaterializeTemporaryExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool MaterializeTemporaryExpr::is_bound_to_lvalue_reference(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool MaterializeTemporaryExpr::is_usable_in_constant_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<MSPropertySubscriptExpr> MSPropertySubscriptExpr::containing(const Decl &decl) {
@@ -39310,25 +36663,17 @@ std::optional<MSPropertySubscriptExpr> MSPropertySubscriptExpr::from(const Stmt 
 }
 
 Expr MSPropertySubscriptExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr MSPropertySubscriptExpr::index(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertySubscriptExpr::r_bracket_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 gap::generator<MSPropertyRefExpr> MSPropertyRefExpr::containing(const Decl &decl) {
@@ -39382,35 +36727,25 @@ std::optional<MSPropertyRefExpr> MSPropertyRefExpr::from(const Stmt &parent) {
 }
 
 Expr MSPropertyRefExpr::base_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token MSPropertyRefExpr::member_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 MSPropertyDecl MSPropertyRefExpr::property_declaration(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal40();
-  return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal40();
+  return MSPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool MSPropertyRefExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool MSPropertyRefExpr::is_implicit_access(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<LambdaExpr> LambdaExpr::containing(const Decl &decl) {
@@ -39464,47 +36799,36 @@ std::optional<LambdaExpr> LambdaExpr::from(const Stmt &parent) {
 }
 
 Stmt LambdaExpr::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal38();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 CXXMethodDecl LambdaExpr::call_operator(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 LambdaCaptureDefault LambdaExpr::capture_default(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<LambdaCaptureDefault>(self.getVal95());
+  return static_cast<LambdaCaptureDefault>(impl->reader.getVal94());
 }
 
 Token LambdaExpr::capture_default_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 CompoundStmt LambdaExpr::compound_statement_body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal41();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal41();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<FunctionTemplateDecl> LambdaExpr::dependent_call_operator(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal42();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+      return FunctionTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -39521,12 +36845,11 @@ std::optional<NamedDecl> LambdaExpr::nth_explicit_template_parameter(unsigned n)
 }
 
 gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = NamedDecl::from(Decl(d15.value()))) {
+      if (auto e = NamedDecl::from(Decl(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -39535,64 +36858,55 @@ gap::generator<NamedDecl> LambdaExpr::explicit_template_parameters(void) const {
 }
 
 TokenRange LambdaExpr::introducer_range(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal43(), self.getVal44());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal43(), impl->reader.getVal44());
 }
 
 CXXRecordDecl LambdaExpr::lambda_class(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal45();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal45();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<TemplateParameterList> LambdaExpr::template_parameter_list(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal90()) {
-    return std::nullopt;
-  } else {
-    if (RawEntityId eid = self.getVal101();
-        eid != kInvalidEntityId) {
-      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {
-        return TemplateParameterList(std::move(eptr.value()));
-      }
+  if (true) {
+    RawEntityId eid = impl->reader.getVal46();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TemplateParameterListFor(impl->ep, eid)) {
+      return TemplateParameterList(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Expr> LambdaExpr::trailing_requires_clause(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal46();
+    RawEntityId eid = impl->reader.getVal47();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool LambdaExpr::has_explicit_parameters(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool LambdaExpr::has_explicit_result_type(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool LambdaExpr::is_generic_lambda(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool LambdaExpr::is_mutable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal92();
 }
 
 gap::generator<IntegerLiteral> IntegerLiteral::containing(const Decl &decl) {
@@ -39646,13 +36960,7 @@ std::optional<IntegerLiteral> IntegerLiteral::from(const Stmt &parent) {
 }
 
 Token IntegerLiteral::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 gap::generator<InitListExpr> InitListExpr::containing(const Decl &decl) {
@@ -39706,89 +37014,71 @@ std::optional<InitListExpr> InitListExpr::from(const Stmt &parent) {
 }
 
 std::optional<Expr> InitListExpr::array_filler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal38();
+    RawEntityId eid = impl->reader.getVal38();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<FieldDecl> InitListExpr::initialized_field_in_union(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal39();
+    RawEntityId eid = impl->reader.getVal39();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr.value())));
+      return FieldDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token InitListExpr::l_brace_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token InitListExpr::r_brace_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 std::optional<InitListExpr> InitListExpr::semantic_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal42();
+    RawEntityId eid = impl->reader.getVal42();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return InitListExpr::from(Stmt(std::move(eptr.value())));
+      return InitListExpr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<InitListExpr> InitListExpr::syntactic_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal43();
+    RawEntityId eid = impl->reader.getVal43();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return InitListExpr::from(Stmt(std::move(eptr.value())));
+      return InitListExpr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool InitListExpr::had_array_range_designator(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool InitListExpr::has_array_filler(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
@@ -39802,12 +37092,11 @@ std::optional<Expr> InitListExpr::nth_initializer(unsigned n) const {
 }
 
 gap::generator<Expr> InitListExpr::initializers(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -39816,31 +37105,26 @@ gap::generator<Expr> InitListExpr::initializers(void) const {
 }
 
 bool InitListExpr::is_explicit(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal92();
+  return impl->reader.getVal91();
 }
 
 bool InitListExpr::is_semantic_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal93();
+  return impl->reader.getVal92();
 }
 
 bool InitListExpr::is_string_literal_initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal94();
+  return impl->reader.getVal93();
 }
 
 bool InitListExpr::is_syntactic_form(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal96();
+  return impl->reader.getVal95();
 }
 
 std::optional<bool> InitListExpr::is_transparent(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  if (!self.getVal99()) {
+  if (!impl->reader.getVal98()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal98());
+    return static_cast<bool>(impl->reader.getVal97());
   }
   return std::nullopt;
 }
@@ -39946,9 +37230,8 @@ std::optional<ImaginaryLiteral> ImaginaryLiteral::from(const Stmt &parent) {
 }
 
 Expr ImaginaryLiteral::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<GenericSelectionExpr> GenericSelectionExpr::containing(const Decl &decl) {
@@ -40012,12 +37295,11 @@ std::optional<Expr> GenericSelectionExpr::nth_association_expression(unsigned n)
 }
 
 gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d15.value()))) {
+      if (auto e = Expr::from(Stmt(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -40026,50 +37308,29 @@ gap::generator<Expr> GenericSelectionExpr::association_expressions(void) const {
 }
 
 Expr GenericSelectionExpr::controlling_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token GenericSelectionExpr::default_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 Token GenericSelectionExpr::generic_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal40())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal40());
 }
 
 Token GenericSelectionExpr::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal41())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 Expr GenericSelectionExpr::result_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal42();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal42();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool GenericSelectionExpr::is_result_dependent(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<GNUNullExpr> GNUNullExpr::containing(const Decl &decl) {
@@ -40123,13 +37384,7 @@ std::optional<GNUNullExpr> GNUNullExpr::from(const Stmt &parent) {
 }
 
 Token GNUNullExpr::token_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 gap::generator<FunctionParmPackExpr> FunctionParmPackExpr::containing(const Decl &decl) {
@@ -40183,19 +37438,12 @@ std::optional<FunctionParmPackExpr> FunctionParmPackExpr::from(const Stmt &paren
 }
 
 VarDecl FunctionParmPackExpr::parameter_pack(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token FunctionParmPackExpr::parameter_pack_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal39())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal39());
 }
 
 std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
@@ -40209,12 +37457,11 @@ std::optional<VarDecl> FunctionParmPackExpr::nth_expansion(unsigned n) const {
 }
 
 gap::generator<VarDecl> FunctionParmPackExpr::expansions(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = VarDecl::from(Decl(d15.value()))) {
+      if (auto e = VarDecl::from(Decl(d15))) {
         co_yield std::move(*e);
       }
     }
@@ -40274,9 +37521,8 @@ std::optional<FullExpr> FullExpr::from(const Stmt &parent) {
 }
 
 Expr FullExpr::sub_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ExprWithCleanups> ExprWithCleanups::containing(const Decl &decl) {
@@ -40334,8 +37580,7 @@ std::optional<ExprWithCleanups> ExprWithCleanups::from(const Stmt &parent) {
 }
 
 bool ExprWithCleanups::cleanups_have_side_effects(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<ConstantExpr> ConstantExpr::containing(const Decl &decl) {
@@ -40393,18 +37638,15 @@ std::optional<ConstantExpr> ConstantExpr::from(const Stmt &parent) {
 }
 
 ConstantExprResultStorageKind ConstantExpr::result_storage_kind(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ConstantExprResultStorageKind>(self.getVal95());
+  return static_cast<ConstantExprResultStorageKind>(impl->reader.getVal94());
 }
 
 bool ConstantExpr::has_ap_value_result(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 bool ConstantExpr::is_immediate_invocation(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<FloatingLiteral> FloatingLiteral::containing(const Decl &decl) {
@@ -40458,18 +37700,11 @@ std::optional<FloatingLiteral> FloatingLiteral::from(const Stmt &parent) {
 }
 
 Token FloatingLiteral::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 bool FloatingLiteral::is_exact(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<FixedPointLiteral> FixedPointLiteral::containing(const Decl &decl) {
@@ -40523,13 +37758,7 @@ std::optional<FixedPointLiteral> FixedPointLiteral::from(const Stmt &parent) {
 }
 
 Token FixedPointLiteral::token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 gap::generator<ExtVectorElementExpr> ExtVectorElementExpr::containing(const Decl &decl) {
@@ -40583,29 +37812,20 @@ std::optional<ExtVectorElementExpr> ExtVectorElementExpr::from(const Stmt &paren
 }
 
 bool ExtVectorElementExpr::contains_duplicate_elements(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 Token ExtVectorElementExpr::accessor_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal38())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal38());
 }
 
 Expr ExtVectorElementExpr::base(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal39();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal39();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ExtVectorElementExpr::is_arrow(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal91();
+  return impl->reader.getVal90();
 }
 
 gap::generator<ExpressionTraitExpr> ExpressionTraitExpr::containing(const Decl &decl) {
@@ -40659,19 +37879,16 @@ std::optional<ExpressionTraitExpr> ExpressionTraitExpr::from(const Stmt &parent)
 }
 
 Expr ExpressionTraitExpr::queried_expression(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal38();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal38();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ExpressionTrait ExpressionTraitExpr::trait(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return static_cast<ExpressionTrait>(self.getVal95());
+  return static_cast<ExpressionTrait>(impl->reader.getVal94());
 }
 
 bool ExpressionTraitExpr::value(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal90();
+  return impl->reader.getVal89();
 }
 
 gap::generator<AttributedStmt> AttributedStmt::containing(const Decl &decl) {
@@ -40721,13 +37938,7 @@ std::optional<AttributedStmt> AttributedStmt::from(const Stmt &parent) {
 }
 
 Token AttributedStmt::attribute_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
@@ -40741,21 +37952,19 @@ std::optional<Attr> AttributedStmt::nth_attribute(unsigned n) const {
 }
 
 gap::generator<Attr> AttributedStmt::attributes(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto list = self.getVal15();
+  auto list = impl->reader.getVal15();
   for (auto v : list) {
     EntityId id(v);
     if (auto d15 = impl->ep->AttrFor(impl->ep, v)) {
-      co_yield std::move(d15.value());
+      co_yield Attr(std::move(d15));
     }
   }
   co_return;
 }
 
 Stmt AttributedStmt::sub_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal11();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal11();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<SwitchStmt> SwitchStmt::containing(const Decl &decl) {
@@ -40801,116 +38010,89 @@ std::optional<SwitchStmt> SwitchStmt::from(const Stmt &parent) {
 }
 
 Stmt SwitchStmt::body(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal9();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal9();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 Expr SwitchStmt::condition(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal10();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal10();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<VarDecl> SwitchStmt::condition_variable(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<DeclStmt> SwitchStmt::condition_variable_declaration_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal13();
+    RawEntityId eid = impl->reader.getVal13();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return DeclStmt::from(Stmt(std::move(eptr.value())));
+      return DeclStmt::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Stmt> SwitchStmt::initializer(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal14();
+    RawEntityId eid = impl->reader.getVal14();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token SwitchStmt::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal17())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 Token SwitchStmt::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal18())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal18());
 }
 
 std::optional<SwitchCase> SwitchStmt::first_switch_case(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal19();
+    RawEntityId eid = impl->reader.getVal19();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return SwitchCase::from(Stmt(std::move(eptr.value())));
+      return SwitchCase::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token SwitchStmt::switch_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal20())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal20());
 }
 
 bool SwitchStmt::has_initializer_storage(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 bool SwitchStmt::has_variable_storage(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal16();
+  return impl->reader.getVal16();
 }
 
 bool SwitchStmt::is_all_enum_cases_covered(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal23();
+  return impl->reader.getVal23();
 }
 
 gap::generator<SwitchCase> SwitchCase::containing(const Decl &decl) {
@@ -40957,43 +38139,29 @@ std::optional<SwitchCase> SwitchCase::from(const Stmt &parent) {
 }
 
 Token SwitchCase::colon_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal9())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal9());
 }
 
 Token SwitchCase::keyword_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal10())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal10());
 }
 
 std::optional<SwitchCase> SwitchCase::next_switch_case(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal11();
+    RawEntityId eid = impl->reader.getVal11();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return SwitchCase::from(Stmt(std::move(eptr.value())));
+      return SwitchCase::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Stmt SwitchCase::sub_statement(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal13();
-  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal13();
+  return Stmt(impl->ep->StmtFor(impl->ep, eid));
 }
 
 gap::generator<DefaultStmt> DefaultStmt::containing(const Decl &decl) {
@@ -41043,13 +38211,7 @@ std::optional<DefaultStmt> DefaultStmt::from(const Stmt &parent) {
 }
 
 Token DefaultStmt::default_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 gap::generator<CaseStmt> CaseStmt::containing(const Decl &decl) {
@@ -41099,59 +38261,43 @@ std::optional<CaseStmt> CaseStmt::from(const Stmt &parent) {
 }
 
 bool CaseStmt::case_statement_is_gnu_range(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  return self.getVal12();
+  return impl->reader.getVal12();
 }
 
 Token CaseStmt::case_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal14())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal14());
 }
 
 Token CaseStmt::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal17())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal17());
 }
 
 Expr CaseStmt::lhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
-  RawEntityId eid = self.getVal18();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal18();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 std::optional<Expr> CaseStmt::rhs(void) const {
-  auto self = impl->Reader<ast::Stmt>();
   if (true) {
-    RawEntityId eid = self.getVal19();
+    RawEntityId eid = impl->reader.getVal19();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool Decl::is_definition(void) const {
-  return impl->Reader<ast::Decl>().getVal2();
+  return impl->reader.getVal2();
 }
 
 std::optional<Decl> Decl::parent_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (auto id = self.getVal0(); id != kInvalidEntityId) {
+  if (auto id = impl->reader.getVal0(); id != kInvalidEntityId) {
     if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
     assert(false);
   }
@@ -41159,10 +38305,9 @@ std::optional<Decl> Decl::parent_declaration(void) const {
 }
 
 std::optional<Stmt> Decl::parent_statement(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (auto id = self.getVal1(); id != kInvalidEntityId) {
+  if (auto id = impl->reader.getVal1(); id != kInvalidEntityId) {
     if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
     assert(false);
   }
@@ -41210,262 +38355,216 @@ std::optional<Attr> Decl::nth_attribute(unsigned n) const {
 }
 
 gap::generator<Attr> Decl::attributes(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal3();
+  auto list = impl->reader.getVal3();
   for (auto v : list) {
     EntityId id(v);
     if (auto d3 = impl->ep->AttrFor(impl->ep, v)) {
-      co_yield std::move(d3.value());
+      co_yield Attr(std::move(d3));
     }
   }
   co_return;
 }
 
 AccessSpecifier Decl::access(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<AccessSpecifier>(self.getVal4());
+  return static_cast<AccessSpecifier>(impl->reader.getVal4());
 }
 
 AvailabilityResult Decl::availability(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<AvailabilityResult>(self.getVal5());
+  return static_cast<AvailabilityResult>(impl->reader.getVal5());
 }
 
 std::optional<Attr> Decl::defining_attribute(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal6();
+    RawEntityId eid = impl->reader.getVal6();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
-      return Attr(std::move(eptr.value()));
+      return Attr(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<TemplateDecl> Decl::described_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal7();
+    RawEntityId eid = impl->reader.getVal7();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TemplateDecl::from(Decl(std::move(eptr.value())));
+      return TemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<TemplateParameterList> Decl::described_template_parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal9()) {
-    return std::nullopt;
-  } else {
-    if (RawEntityId eid = self.getVal8();
-        eid != kInvalidEntityId) {
-      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {
-        return TemplateParameterList(std::move(eptr.value()));
-      }
+  if (true) {
+    RawEntityId eid = impl->reader.getVal8();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TemplateParameterListFor(impl->ep, eid)) {
+      return TemplateParameterList(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ExternalSourceSymbolAttr> Decl::external_source_symbol_attribute(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal10();
+    RawEntityId eid = impl->reader.getVal9();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {
-      return ExternalSourceSymbolAttr::from(Attr(std::move(eptr.value())));
+      return ExternalSourceSymbolAttr::from(Attr(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 DeclFriendObjectKind Decl::friend_object_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<DeclFriendObjectKind>(self.getVal11());
+  return static_cast<DeclFriendObjectKind>(impl->reader.getVal10());
 }
 
 DeclModuleOwnershipKind Decl::module_ownership_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<DeclModuleOwnershipKind>(self.getVal12());
+  return static_cast<DeclModuleOwnershipKind>(impl->reader.getVal11());
 }
 
 std::optional<Decl> Decl::non_closure_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal13();
+    RawEntityId eid = impl->reader.getVal12();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool Decl::has_attributes(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal14();
+  return impl->reader.getVal13();
 }
 
 bool Decl::has_owning_module(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal15();
+  return impl->reader.getVal14();
 }
 
 bool Decl::has_tag_identifier_namespace(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal16();
+  return impl->reader.getVal15();
 }
 
 bool Decl::is_defined_outside_function_or_method(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal17();
+  return impl->reader.getVal16();
 }
 
 bool Decl::is_deprecated(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal18();
+  return impl->reader.getVal17();
 }
 
 bool Decl::is_discarded_in_global_module_fragment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal19();
+  return impl->reader.getVal18();
 }
 
 bool Decl::is_function_or_function_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal20();
+  return impl->reader.getVal19();
 }
 
 bool Decl::is_implicit(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal21();
+  return impl->reader.getVal20();
 }
 
 bool Decl::is_in_anonymous_namespace(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal22();
+  return impl->reader.getVal21();
 }
 
 bool Decl::is_in_export_declaration_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal23();
+  return impl->reader.getVal22();
 }
 
 bool Decl::is_in_local_scope_for_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal24();
+  return impl->reader.getVal23();
 }
 
 bool Decl::is_in_std_namespace(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal25();
+  return impl->reader.getVal24();
 }
 
 bool Decl::is_invalid_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal26();
+  return impl->reader.getVal25();
 }
 
 bool Decl::is_invisible_outside_the_owning_module(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal27();
+  return impl->reader.getVal26();
 }
 
 bool Decl::is_module_private(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal28();
+  return impl->reader.getVal27();
 }
 
 bool Decl::is_out_of_line(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal29();
+  return impl->reader.getVal28();
 }
 
 bool Decl::is_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal30();
+  return impl->reader.getVal29();
 }
 
 bool Decl::is_reachable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal31();
+  return impl->reader.getVal30();
 }
 
 bool Decl::is_template_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal32();
+  return impl->reader.getVal31();
 }
 
 bool Decl::is_template_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal33();
+  return impl->reader.getVal32();
 }
 
 bool Decl::is_template_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal34();
+  return impl->reader.getVal33();
 }
 
 bool Decl::is_templated(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal35();
+  return impl->reader.getVal34();
 }
 
 bool Decl::is_top_level_declaration_in_obj_c_container(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal36();
+  return impl->reader.getVal35();
 }
 
 bool Decl::is_unavailable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal37();
+  return impl->reader.getVal36();
 }
 
 bool Decl::is_unconditionally_visible(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal38();
+  return impl->reader.getVal37();
 }
 
 bool Decl::is_weak_imported(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal39();
+  return impl->reader.getVal38();
 }
 
 DeclKind Decl::kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<DeclKind>(self.getVal40());
+  return static_cast<DeclKind>(impl->reader.getVal39());
 }
 
 DeclCategory Decl::category(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<DeclCategory>(self.getVal41());
+  return static_cast<DeclCategory>(impl->reader.getVal40());
 }
 
 Token Decl::token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal42())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal41());
 }
 
 TokenRange Decl::tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal43(), self.getVal44());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal42(), impl->reader.getVal43());
 }
 
 gap::generator<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializationDecl::containing(const Decl &decl) {
@@ -41511,14 +38610,12 @@ std::optional<ClassScopeFunctionSpecializationDecl> ClassScopeFunctionSpecializa
 }
 
 CXXMethodDecl ClassScopeFunctionSpecializationDecl::specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return CXXMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ClassScopeFunctionSpecializationDecl::has_explicit_template_arguments(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 gap::generator<CapturedDecl> CapturedDecl::containing(const Decl &decl) {
@@ -41564,14 +38661,12 @@ std::optional<CapturedDecl> CapturedDecl::from(const Decl &parent) {
 }
 
 ImplicitParamDecl CapturedDecl::context_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool CapturedDecl::is_nothrow(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
@@ -41585,12 +38680,11 @@ std::optional<ImplicitParamDecl> CapturedDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ImplicitParamDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ImplicitParamDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -41599,11 +38693,10 @@ gap::generator<ImplicitParamDecl> CapturedDecl::parameters(void) const {
 }
 
 gap::generator<Decl> CapturedDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -41651,74 +38744,58 @@ std::optional<BlockDecl> BlockDecl::from(const Decl &parent) {
 }
 
 bool BlockDecl::block_missing_return_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 bool BlockDecl::can_avoid_copy_to_heap(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal49();
+  return impl->reader.getVal48();
 }
 
 bool BlockDecl::captures_cxx_this(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal50();
+  return impl->reader.getVal49();
 }
 
 bool BlockDecl::does_not_escape(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal51();
+  return impl->reader.getVal50();
 }
 
 std::optional<Decl> BlockDecl::block_mangling_context_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal45();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token BlockDecl::caret_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 CompoundStmt BlockDecl::compound_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return CompoundStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Type BlockDecl::signature_as_written(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal53();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool BlockDecl::has_captures(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal55();
+  return impl->reader.getVal54();
 }
 
 bool BlockDecl::is_conversion_from_lambda(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal56();
+  return impl->reader.getVal55();
 }
 
 bool BlockDecl::is_variadic(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal57();
+  return impl->reader.getVal56();
 }
 
 std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
@@ -41732,12 +38809,11 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> BlockDecl::parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ParmVarDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -41756,12 +38832,11 @@ std::optional<ParmVarDecl> BlockDecl::nth_parameter_declaration(unsigned n) cons
 }
 
 gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(d48.value()))) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ParmVarDecl::from(Decl(d47))) {
         co_yield std::move(*e);
       }
     }
@@ -41770,11 +38845,10 @@ gap::generator<ParmVarDecl> BlockDecl::parameter_declarations(void) const {
 }
 
 gap::generator<Decl> BlockDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal58();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -41822,23 +38896,11 @@ std::optional<AccessSpecDecl> AccessSpecDecl::from(const Decl &parent) {
 }
 
 Token AccessSpecDecl::access_specifier_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token AccessSpecDecl::colon_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 gap::generator<OMPDeclarativeDirectiveDecl> OMPDeclarativeDirectiveDecl::containing(const Decl &decl) {
@@ -41942,12 +39004,11 @@ std::optional<Expr> OMPThreadPrivateDecl::nth_varlist(unsigned n) const {
 }
 
 gap::generator<Expr> OMPThreadPrivateDecl::varlists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d47.value()))) {
+    if (auto d46 = impl->ep->StmtFor(impl->ep, v)) {
+      if (auto e = Expr::from(Stmt(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -42058,12 +39119,11 @@ std::optional<Expr> OMPAllocateDecl::nth_varlist(unsigned n) const {
 }
 
 gap::generator<Expr> OMPAllocateDecl::varlists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->StmtFor(impl->ep, v)) {
-      if (auto e = Expr::from(Stmt(d47.value()))) {
+    if (auto d46 = impl->ep->StmtFor(impl->ep, v)) {
+      if (auto e = Expr::from(Stmt(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -42114,11 +39174,10 @@ std::optional<TranslationUnitDecl> TranslationUnitDecl::from(const Decl &parent)
 }
 
 gap::generator<Decl> TranslationUnitDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -42166,30 +39225,21 @@ std::optional<StaticAssertDecl> StaticAssertDecl::from(const Decl &parent) {
 }
 
 Expr StaticAssertDecl::assert_expression(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 StringLiteral StaticAssertDecl::message(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token StaticAssertDecl::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 bool StaticAssertDecl::is_failed(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 gap::generator<RequiresExprBodyDecl> RequiresExprBodyDecl::containing(const Decl &decl) {
@@ -42235,11 +39285,10 @@ std::optional<RequiresExprBodyDecl> RequiresExprBodyDecl::from(const Decl &paren
 }
 
 gap::generator<Decl> RequiresExprBodyDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -42287,14 +39336,12 @@ std::optional<PragmaDetectMismatchDecl> PragmaDetectMismatchDecl::from(const Dec
 }
 
 std::string_view PragmaDetectMismatchDecl::name(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal59();
+  capnp::Text::Reader data = impl->reader.getVal58();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::string_view PragmaDetectMismatchDecl::value(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal59();
   return std::string_view(data.cStr(), data.size());
 }
 
@@ -42341,14 +39388,12 @@ std::optional<PragmaCommentDecl> PragmaCommentDecl::from(const Decl &parent) {
 }
 
 std::string_view PragmaCommentDecl::argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal59();
+  capnp::Text::Reader data = impl->reader.getVal58();
   return std::string_view(data.cStr(), data.size());
 }
 
 PragmaMSCommentKind PragmaCommentDecl::comment_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<PragmaMSCommentKind>(self.getVal61());
+  return static_cast<PragmaMSCommentKind>(impl->reader.getVal60());
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCPropertyImplDecl::containing(const Decl &decl) {
@@ -42394,59 +39439,45 @@ std::optional<ObjCPropertyImplDecl> ObjCPropertyImplDecl::from(const Decl &paren
 }
 
 Expr ObjCPropertyImplDecl::getter_cxx_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::getter_method_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyDecl ObjCPropertyImplDecl::property_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyImplDeclKind ObjCPropertyImplDecl::property_implementation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCPropertyImplDeclKind>(self.getVal61());
+  return static_cast<ObjCPropertyImplDeclKind>(impl->reader.getVal60());
 }
 
 ObjCIvarDecl ObjCPropertyImplDecl::property_instance_variable_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyImplDecl::property_instance_variable_declaration_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 Expr ObjCPropertyImplDecl::setter_cxx_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal62();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ObjCMethodDecl ObjCPropertyImplDecl::setter_method_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal64();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal63();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCPropertyImplDecl::is_instance_variable_name_specified(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 gap::generator<NamedDecl> NamedDecl::containing(const Decl &decl) {
@@ -42553,81 +39584,67 @@ std::optional<NamedDecl> NamedDecl::from(const Decl &parent) {
 }
 
 Linkage NamedDecl::formal_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<Linkage>(self.getVal61());
+  return static_cast<Linkage>(impl->reader.getVal60());
 }
 
 std::string_view NamedDecl::name(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal59();
+  capnp::Text::Reader data = impl->reader.getVal58();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCStringFormatFamily> NamedDecl::obj_cf_string_formatting_family(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal46()) {
+  if (!impl->reader.getVal45()) {
     return std::nullopt;
   } else {
-    return static_cast<ObjCStringFormatFamily>(self.getVal65());
+    return static_cast<ObjCStringFormatFamily>(impl->reader.getVal64());
   }
   return std::nullopt;
 }
 
 std::string_view NamedDecl::qualified_name_as_string(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal60();
+  capnp::Text::Reader data = impl->reader.getVal59();
   return std::string_view(data.cStr(), data.size());
 }
 
 NamedDecl NamedDecl::underlying_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Visibility NamedDecl::visibility(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<Visibility>(self.getVal66());
+  return static_cast<Visibility>(impl->reader.getVal65());
 }
 
 bool NamedDecl::has_external_formal_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal49();
+  return impl->reader.getVal48();
 }
 
 bool NamedDecl::has_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal50();
+  return impl->reader.getVal49();
 }
 
 bool NamedDecl::has_linkage_been_computed(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal51();
+  return impl->reader.getVal50();
 }
 
 bool NamedDecl::is_cxx_class_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal55();
+  return impl->reader.getVal54();
 }
 
 bool NamedDecl::is_cxx_instance_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal56();
+  return impl->reader.getVal55();
 }
 
 bool NamedDecl::is_externally_declarable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal57();
+  return impl->reader.getVal56();
 }
 
 bool NamedDecl::is_externally_visible(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal67();
+  return impl->reader.getVal66();
 }
 
 bool NamedDecl::is_linkage_valid(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal68();
+  return impl->reader.getVal67();
 }
 
 gap::generator<LabelDecl> LabelDecl::containing(const Decl &decl) {
@@ -42677,30 +39694,25 @@ std::optional<LabelDecl> LabelDecl::from(const Decl &parent) {
 }
 
 std::string_view LabelDecl::ms_assembly_label(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal69();
+  capnp::Text::Reader data = impl->reader.getVal68();
   return std::string_view(data.cStr(), data.size());
 }
 
 LabelStmt LabelDecl::statement(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return LabelStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return LabelStmt::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool LabelDecl::is_gnu_local(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool LabelDecl::is_ms_assembly_label(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool LabelDecl::is_resolved_ms_assembly_label(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 gap::generator<BaseUsingDecl> BaseUsingDecl::containing(const Decl &decl) {
@@ -42761,12 +39773,11 @@ std::optional<UsingShadowDecl> BaseUsingDecl::nth_shadow(unsigned n) const {
 }
 
 gap::generator<UsingShadowDecl> BaseUsingDecl::shadows(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = UsingShadowDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = UsingShadowDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -42825,29 +39836,16 @@ std::optional<UsingEnumDecl> UsingEnumDecl::from(const Decl &parent) {
 }
 
 EnumDecl UsingEnumDecl::enum_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return EnumDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token UsingEnumDecl::enum_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 Token UsingEnumDecl::using_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 gap::generator<UsingDecl> UsingDecl::containing(const Decl &decl) {
@@ -42901,23 +39899,15 @@ std::optional<UsingDecl> UsingDecl::from(const Decl &parent) {
 }
 
 Token UsingDecl::using_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 bool UsingDecl::has_typename(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool UsingDecl::is_access_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 gap::generator<ValueDecl> ValueDecl::containing(const Decl &decl) {
@@ -42993,14 +39983,12 @@ std::optional<ValueDecl> ValueDecl::from(const Decl &parent) {
 }
 
 Type ValueDecl::type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal51();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ValueDecl::is_weak(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 gap::generator<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::containing(const Decl &decl) {
@@ -43054,33 +40042,19 @@ std::optional<UnresolvedUsingValueDecl> UnresolvedUsingValueDecl::from(const Dec
 }
 
 Token UnresolvedUsingValueDecl::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 Token UnresolvedUsingValueDecl::using_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 bool UnresolvedUsingValueDecl::is_access_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool UnresolvedUsingValueDecl::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 gap::generator<UnnamedGlobalConstantDecl> UnnamedGlobalConstantDecl::containing(const Decl &decl) {
@@ -43234,52 +40208,44 @@ std::optional<OMPDeclareReductionDecl> OMPDeclareReductionDecl::from(const Decl 
 }
 
 Expr OMPDeclareReductionDecl::combiner(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_in(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::combiner_out(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal62();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal61();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_original(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal62();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer_private(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal64();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal63();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Expr OMPDeclareReductionDecl::initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal73();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal72();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 OMPDeclareReductionDeclInitKind OMPDeclareReductionDecl::initializer_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<OMPDeclareReductionDeclInitKind>(self.getVal74());
+  return static_cast<OMPDeclareReductionDeclInitKind>(impl->reader.getVal73());
 }
 
 gap::generator<Decl> OMPDeclareReductionDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -43385,12 +40351,11 @@ std::optional<IndirectFieldDecl> IndirectFieldDecl::from(const Decl &parent) {
 }
 
 gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = NamedDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = NamedDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -43399,28 +40364,26 @@ gap::generator<NamedDecl> IndirectFieldDecl::chain(void) const {
 }
 
 std::optional<FieldDecl> IndirectFieldDecl::anonymous_field(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal53();
+    RawEntityId eid = impl->reader.getVal52();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FieldDecl::from(Decl(std::move(eptr.value())));
+      return FieldDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<VarDecl> IndirectFieldDecl::variable_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal54();
+    RawEntityId eid = impl->reader.getVal53();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -43477,14 +40440,13 @@ std::optional<EnumConstantDecl> EnumConstantDecl::from(const Decl &parent) {
 }
 
 std::optional<Expr> EnumConstantDecl::initializer_expression(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal53();
+    RawEntityId eid = impl->reader.getVal52();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -43558,57 +40520,32 @@ std::optional<DeclaratorDecl> DeclaratorDecl::from(const Decl &parent) {
 }
 
 Token DeclaratorDecl::first_inner_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 Token DeclaratorDecl::first_outer_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 std::optional<Expr> DeclaratorDecl::trailing_requires_clause(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal62();
+    RawEntityId eid = impl->reader.getVal61();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token DeclaratorDecl::type_spec_end_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
 }
 
 Token DeclaratorDecl::type_spec_start_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal64())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal63());
 }
 
 std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list(unsigned n) const {
@@ -43622,12 +40559,12 @@ std::optional<TemplateParameterList> DeclaratorDecl::nth_template_parameter_list
 }
 
 gap::generator<TemplateParameterList> DeclaratorDecl::template_parameter_lists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal75();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d46 = impl->ep->TemplateParameterListFor(impl->ep, v)) {
+      co_yield TemplateParameterList(std::move(d46));
+    }
   }
   co_return;
 }
@@ -43693,327 +40630,271 @@ std::optional<VarDecl> VarDecl::from(const Decl &parent) {
 }
 
 std::optional<VarDecl> VarDecl::acting_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal73();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<VarTemplateDecl> VarDecl::described_variable_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal76();
+    RawEntityId eid = impl->reader.getVal74();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarTemplateDecl::from(Decl(std::move(eptr.value())));
+      return VarTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Expr> VarDecl::initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal77();
+    RawEntityId eid = impl->reader.getVal75();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 VarDeclInitializationStyle VarDecl::initializer_style(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<VarDeclInitializationStyle>(self.getVal74());
+  return static_cast<VarDeclInitializationStyle>(impl->reader.getVal73());
 }
 
 std::optional<VarDecl> VarDecl::initializing_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal78();
+    RawEntityId eid = impl->reader.getVal76();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<VarDecl> VarDecl::instantiated_from_static_data_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal79();
+    RawEntityId eid = impl->reader.getVal77();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 LanguageLinkage VarDecl::language_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<LanguageLinkage>(self.getVal80());
+  return static_cast<LanguageLinkage>(impl->reader.getVal78());
 }
 
 Token VarDecl::point_of_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal81())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal79());
 }
 
 StorageClass VarDecl::storage_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<StorageClass>(self.getVal82());
+  return static_cast<StorageClass>(impl->reader.getVal80());
 }
 
 StorageDuration VarDecl::storage_duration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<StorageDuration>(self.getVal83());
+  return static_cast<StorageDuration>(impl->reader.getVal81());
 }
 
 VarDeclTLSKind VarDecl::tls_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<VarDeclTLSKind>(self.getVal84());
+  return static_cast<VarDeclTLSKind>(impl->reader.getVal82());
 }
 
 ThreadStorageClassSpecifier VarDecl::tsc_spec(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ThreadStorageClassSpecifier>(self.getVal85());
+  return static_cast<ThreadStorageClassSpecifier>(impl->reader.getVal83());
 }
 
 std::optional<VarDecl> VarDecl::template_instantiation_pattern(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal86();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return VarDecl::from(Decl(std::move(eptr.value())));
+      return VarDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal87());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
 }
 
 TemplateSpecializationKind VarDecl::template_specialization_kind_for_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal88());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal86());
 }
 
 bool VarDecl::has_constant_initialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool VarDecl::has_dependent_alignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool VarDecl::has_external_storage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 std::optional<bool> VarDecl::has_flexible_array_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal91()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal90());
+    return static_cast<bool>(impl->reader.getVal88());
   }
   return std::nullopt;
 }
 
 bool VarDecl::has_global_storage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 std::optional<bool> VarDecl::has_ice_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal94()) {
+  if (!impl->reader.getVal92()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal93());
+    return static_cast<bool>(impl->reader.getVal91());
   }
   return std::nullopt;
 }
 
 bool VarDecl::has_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool VarDecl::has_local_storage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool VarDecl::is_arc_pseudo_strong(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal97();
+  return impl->reader.getVal95();
 }
 
 bool VarDecl::is_cxx_for_range_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool VarDecl::is_constexpr(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal99();
+  return impl->reader.getVal97();
 }
 
 bool VarDecl::is_direct_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal100();
+  return impl->reader.getVal98();
 }
 
 bool VarDecl::is_escaping_byref(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool VarDecl::is_exception_variable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal102();
+  return impl->reader.getVal100();
 }
 
 bool VarDecl::is_extern_c(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal103();
+  return impl->reader.getVal101();
 }
 
 bool VarDecl::is_file_variable_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal104();
+  return impl->reader.getVal102();
 }
 
 bool VarDecl::is_function_or_method_variable_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal105();
+  return impl->reader.getVal103();
 }
 
 bool VarDecl::is_in_extern_c_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal106();
+  return impl->reader.getVal104();
 }
 
 bool VarDecl::is_in_extern_cxx_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal107();
+  return impl->reader.getVal105();
 }
 
 bool VarDecl::is_initializer_capture(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal108();
+  return impl->reader.getVal106();
 }
 
 bool VarDecl::is_inline(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal109();
+  return impl->reader.getVal107();
 }
 
 bool VarDecl::is_inline_specified(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal110();
+  return impl->reader.getVal108();
 }
 
 bool VarDecl::is_known_to_be_defined(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal111();
+  return impl->reader.getVal109();
 }
 
 bool VarDecl::is_local_variable_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal112();
+  return impl->reader.getVal110();
 }
 
 bool VarDecl::is_local_variable_declaration_or_parm(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal113();
+  return impl->reader.getVal111();
 }
 
 bool VarDecl::is_nrvo_variable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal114();
+  return impl->reader.getVal112();
 }
 
 bool VarDecl::is_no_destroy(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal115();
+  return impl->reader.getVal113();
 }
 
 bool VarDecl::is_non_escaping_byref(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal116();
+  return impl->reader.getVal114();
 }
 
 bool VarDecl::is_obj_c_for_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal117();
+  return impl->reader.getVal115();
 }
 
 bool VarDecl::is_previous_declaration_in_same_block_scope(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal118();
+  return impl->reader.getVal116();
 }
 
 bool VarDecl::is_static_data_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal119();
+  return impl->reader.getVal117();
 }
 
 bool VarDecl::is_static_local(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal120();
+  return impl->reader.getVal118();
 }
 
 bool VarDecl::is_demoted_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal121();
+  return impl->reader.getVal119();
 }
 
 bool VarDecl::is_usable_in_constant_expressions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal122();
+  return impl->reader.getVal120();
 }
 
 bool VarDecl::might_be_usable_in_constant_expressions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal123();
+  return impl->reader.getVal121();
 }
 
 QualTypeDestructionKind VarDecl::needs_destruction(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<QualTypeDestructionKind>(self.getVal124());
+  return static_cast<QualTypeDestructionKind>(impl->reader.getVal122());
 }
 
 gap::generator<ParmVarDecl> ParmVarDecl::containing(const Decl &decl) {
@@ -44075,83 +40956,71 @@ std::optional<ParmVarDecl> ParmVarDecl::from(const Decl &parent) {
 }
 
 std::optional<Expr> ParmVarDecl::default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal125();
+    RawEntityId eid = impl->reader.getVal123();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TokenRange ParmVarDecl::default_argument_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal126(), self.getVal127());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal124(), impl->reader.getVal125());
 }
 
 DeclObjCDeclQualifier ParmVarDecl::obj_c_decl_qualifier(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<DeclObjCDeclQualifier>(self.getVal128());
+  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal126());
 }
 
 Type ParmVarDecl::original_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal129();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal127();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<Expr> ParmVarDecl::uninstantiated_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal130();
+    RawEntityId eid = impl->reader.getVal128();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool ParmVarDecl::has_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal131();
+  return impl->reader.getVal129();
 }
 
 bool ParmVarDecl::has_inherited_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal132();
+  return impl->reader.getVal130();
 }
 
 bool ParmVarDecl::has_uninstantiated_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal133();
+  return impl->reader.getVal131();
 }
 
 bool ParmVarDecl::has_unparsed_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal134();
+  return impl->reader.getVal132();
 }
 
 bool ParmVarDecl::is_destroyed_in_callee(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal135();
+  return impl->reader.getVal133();
 }
 
 bool ParmVarDecl::is_knr_promoted(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal136();
+  return impl->reader.getVal134();
 }
 
 bool ParmVarDecl::is_obj_c_method_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal137();
+  return impl->reader.getVal135();
 }
 
 gap::generator<OMPCapturedExprDecl> OMPCapturedExprDecl::containing(const Decl &decl) {
@@ -44271,8 +41140,7 @@ std::optional<ImplicitParamDecl> ImplicitParamDecl::from(const Decl &parent) {
 }
 
 ImplicitParamDeclImplicitParamKind ImplicitParamDecl::parameter_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ImplicitParamDeclImplicitParamKind>(self.getVal128());
+  return static_cast<ImplicitParamDeclImplicitParamKind>(impl->reader.getVal126());
 }
 
 gap::generator<DecompositionDecl> DecompositionDecl::containing(const Decl &decl) {
@@ -44344,12 +41212,11 @@ std::optional<BindingDecl> DecompositionDecl::nth_binding(unsigned n) const {
 }
 
 gap::generator<BindingDecl> DecompositionDecl::bindings(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
     EntityId id(v);
     if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = BindingDecl::from(Decl(d47.value()))) {
+      if (auto e = BindingDecl::from(Decl(d47))) {
         co_yield std::move(*e);
       }
     }
@@ -44417,24 +41284,16 @@ std::optional<VarTemplateSpecializationDecl> VarTemplateSpecializationDecl::from
 }
 
 Token VarTemplateSpecializationDecl::extern_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal125())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal123());
 }
 
 TemplateSpecializationKind VarTemplateSpecializationDecl::specialization_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal128());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal126());
 }
 
 VarTemplateDecl VarTemplateSpecializationDecl::specialized_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal126();
-  return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal124();
+  return VarTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
@@ -44448,12 +41307,12 @@ std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_argu
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_arguments(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal138();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d47 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d47));
+    }
   }
   co_return;
 }
@@ -44469,45 +41328,35 @@ std::optional<TemplateArgument> VarTemplateSpecializationDecl::nth_template_inst
 }
 
 gap::generator<TemplateArgument> VarTemplateSpecializationDecl::template_instantiation_arguments(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal139();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d57 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d57));
+    }
   }
   co_return;
 }
 
 Token VarTemplateSpecializationDecl::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal127())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal125());
 }
 
 Type VarTemplateSpecializationDecl::type_as_written(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal129();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal127();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool VarTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal131();
+  return impl->reader.getVal129();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal132();
+  return impl->reader.getVal130();
 }
 
 bool VarTemplateSpecializationDecl::is_explicit_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal133();
+  return impl->reader.getVal131();
 }
 
 gap::generator<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializationDecl::containing(const Decl &decl) {
@@ -44573,21 +41422,17 @@ std::optional<VarTemplatePartialSpecializationDecl> VarTemplatePartialSpecializa
 }
 
 VarTemplatePartialSpecializationDecl VarTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal130();
-  return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal128();
+  return VarTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList VarTemplatePartialSpecializationDecl::template_parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto offset = self.getVal140();
-  auto reader = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);
-  return TemplateParameterList(std::move(*reader));
+  RawEntityId eid = impl->reader.getVal136();
+  return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool VarTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal134();
+  return impl->reader.getVal132();
 }
 
 gap::generator<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::containing(const Decl &decl) {
@@ -44645,76 +41490,62 @@ std::optional<NonTypeTemplateParmDecl> NonTypeTemplateParmDecl::from(const Decl 
 }
 
 bool NonTypeTemplateParmDecl::default_argument_was_inherited(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal73();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token NonTypeTemplateParmDecl::default_argument_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal74());
 }
 
 std::optional<unsigned> NonTypeTemplateParmDecl::num_expansion_types(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal72()) {
+  if (!impl->reader.getVal71()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal140());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }
 
 std::optional<Expr> NonTypeTemplateParmDecl::placeholder_type_constraint(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal77();
+    RawEntityId eid = impl->reader.getVal75();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool NonTypeTemplateParmDecl::has_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool NonTypeTemplateParmDecl::has_placeholder_type_constraint(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool NonTypeTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool NonTypeTemplateParmDecl::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) const {
@@ -44728,12 +41559,11 @@ std::optional<Type> NonTypeTemplateParmDecl::nth_expansion_type(unsigned n) cons
 }
 
 gap::generator<Type> NonTypeTemplateParmDecl::expansion_types(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
     EntityId id(v);
     if (auto d47 = impl->ep->TypeFor(impl->ep, v)) {
-      co_yield std::move(d47.value());
+      co_yield Type(std::move(d47));
     }
   }
   co_return;
@@ -44794,13 +41624,11 @@ std::optional<MSPropertyDecl> MSPropertyDecl::from(const Decl &parent) {
 }
 
 bool MSPropertyDecl::has_getter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool MSPropertyDecl::has_setter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 gap::generator<FunctionDecl> FunctionDecl::containing(const Decl &decl) {
@@ -44863,464 +41691,379 @@ std::optional<FunctionDecl> FunctionDecl::from(const Decl &parent) {
 }
 
 bool FunctionDecl::uses_fp_intrin(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 std::optional<bool> FunctionDecl::does_declaration_force_externally_visible_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal89()) {
+  if (!impl->reader.getVal87()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal72());
+    return static_cast<bool>(impl->reader.getVal71());
   }
   return std::nullopt;
 }
 
 bool FunctionDecl::does_this_declaration_have_a_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 Type FunctionDecl::call_result_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal73();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal72();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ConstexprSpecKind FunctionDecl::constexpr_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ConstexprSpecKind>(self.getVal74());
+  return static_cast<ConstexprSpecKind>(impl->reader.getVal73());
 }
 
 Type FunctionDecl::declared_return_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal76();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal74();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<FunctionTemplateDecl> FunctionDecl::described_function_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal77();
+    RawEntityId eid = impl->reader.getVal75();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+      return FunctionTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token FunctionDecl::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal78())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal76());
 }
 
 TokenRange FunctionDecl::exception_spec_source_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal79(), self.getVal81());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal77(), impl->reader.getVal79());
 }
 
 ExceptionSpecificationType FunctionDecl::exception_spec_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ExceptionSpecificationType>(self.getVal80());
+  return static_cast<ExceptionSpecificationType>(impl->reader.getVal78());
 }
 
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal86();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<FunctionDecl> FunctionDecl::instantiated_from_member_function(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal125();
+    RawEntityId eid = impl->reader.getVal123();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 LanguageLinkage FunctionDecl::language_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<LanguageLinkage>(self.getVal82());
+  return static_cast<LanguageLinkage>(impl->reader.getVal80());
 }
 
 MultiVersionKind FunctionDecl::multi_version_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<MultiVersionKind>(self.getVal83());
+  return static_cast<MultiVersionKind>(impl->reader.getVal81());
 }
 
 std::optional<unsigned> FunctionDecl::odr_hash(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal91()) {
+  if (!impl->reader.getVal89()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal140());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }
 
 OverloadedOperatorKind FunctionDecl::overloaded_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<OverloadedOperatorKind>(self.getVal84());
+  return static_cast<OverloadedOperatorKind>(impl->reader.getVal82());
 }
 
 TokenRange FunctionDecl::parameters_source_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal126(), self.getVal127());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal124(), impl->reader.getVal125());
 }
 
 Token FunctionDecl::point_of_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal129())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal127());
 }
 
 std::optional<FunctionTemplateDecl> FunctionDecl::primary_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal130();
+    RawEntityId eid = impl->reader.getVal128();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+      return FunctionTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Type FunctionDecl::return_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal141();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal136();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange FunctionDecl::return_type_source_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal142(), self.getVal143());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal138(), impl->reader.getVal139());
 }
 
 StorageClass FunctionDecl::storage_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<StorageClass>(self.getVal85());
+  return static_cast<StorageClass>(impl->reader.getVal83());
 }
 
 std::optional<FunctionDecl> FunctionDecl::template_instantiation_pattern(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal144();
+    RawEntityId eid = impl->reader.getVal140();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal87());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
 }
 
 TemplateSpecializationKind FunctionDecl::template_specialization_kind_for_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal88());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal86());
 }
 
 FunctionDeclTemplatedKind FunctionDecl::templated_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<FunctionDeclTemplatedKind>(self.getVal124());
+  return static_cast<FunctionDeclTemplatedKind>(impl->reader.getVal122());
 }
 
 bool FunctionDecl::has_implicit_return_zero(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool FunctionDecl::has_inherited_prototype(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool FunctionDecl::has_one_parameter_or_default_arguments(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool FunctionDecl::has_prototype(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool FunctionDecl::has_skipped_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool FunctionDecl::has_trivial_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal97();
+  return impl->reader.getVal95();
 }
 
 bool FunctionDecl::has_written_prototype(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool FunctionDecl::instantiation_is_pending(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal99();
+  return impl->reader.getVal97();
 }
 
 bool FunctionDecl::is_cpu_dispatch_multi_version(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal100();
+  return impl->reader.getVal98();
 }
 
 bool FunctionDecl::is_cpu_specific_multi_version(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool FunctionDecl::is_consteval(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal102();
+  return impl->reader.getVal100();
 }
 
 bool FunctionDecl::is_constexpr(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal103();
+  return impl->reader.getVal101();
 }
 
 bool FunctionDecl::is_constexpr_specified(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal104();
+  return impl->reader.getVal102();
 }
 
 bool FunctionDecl::is_defaulted(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal105();
+  return impl->reader.getVal103();
 }
 
 bool FunctionDecl::is_deleted(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal106();
+  return impl->reader.getVal104();
 }
 
 bool FunctionDecl::is_deleted_as_written(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal107();
+  return impl->reader.getVal105();
 }
 
 bool FunctionDecl::is_destroying_operator_delete(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal108();
+  return impl->reader.getVal106();
 }
 
 bool FunctionDecl::is_explicitly_defaulted(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal109();
+  return impl->reader.getVal107();
 }
 
 bool FunctionDecl::is_extern_c(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal110();
+  return impl->reader.getVal108();
 }
 
 bool FunctionDecl::is_function_template_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal111();
+  return impl->reader.getVal109();
 }
 
 bool FunctionDecl::is_global(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal112();
+  return impl->reader.getVal110();
 }
 
 bool FunctionDecl::is_implicitly_instantiable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal113();
+  return impl->reader.getVal111();
 }
 
 bool FunctionDecl::is_in_extern_c_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal114();
+  return impl->reader.getVal112();
 }
 
 bool FunctionDecl::is_in_extern_cxx_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal115();
+  return impl->reader.getVal113();
 }
 
 bool FunctionDecl::is_ineligible_or_not_selected(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal116();
+  return impl->reader.getVal114();
 }
 
 bool FunctionDecl::is_inline_builtin_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal117();
+  return impl->reader.getVal115();
 }
 
 std::optional<bool> FunctionDecl::is_inline_definition_externally_visible(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal119()) {
+  if (!impl->reader.getVal117()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal118());
+    return static_cast<bool>(impl->reader.getVal116());
   }
   return std::nullopt;
 }
 
 bool FunctionDecl::is_inline_specified(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal120();
+  return impl->reader.getVal118();
 }
 
 bool FunctionDecl::is_inlined(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal121();
+  return impl->reader.getVal119();
 }
 
 bool FunctionDecl::is_late_template_parsed(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal122();
+  return impl->reader.getVal120();
 }
 
 std::optional<bool> FunctionDecl::is_ms_extern_inline(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal131()) {
+  if (!impl->reader.getVal129()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal123());
+    return static_cast<bool>(impl->reader.getVal121());
   }
   return std::nullopt;
 }
 
 bool FunctionDecl::is_msvcrt_entry_point(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal132();
+  return impl->reader.getVal130();
 }
 
 bool FunctionDecl::is_main(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal133();
+  return impl->reader.getVal131();
 }
 
 bool FunctionDecl::is_multi_version(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal134();
+  return impl->reader.getVal132();
 }
 
 bool FunctionDecl::is_no_return(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal135();
+  return impl->reader.getVal133();
 }
 
 bool FunctionDecl::is_overloaded_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal136();
+  return impl->reader.getVal134();
 }
 
 bool FunctionDecl::is_pure(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal137();
+  return impl->reader.getVal135();
 }
 
 bool FunctionDecl::is_replaceable_global_allocation_function(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal145();
+  return impl->reader.getVal141();
 }
 
 std::optional<bool> FunctionDecl::is_reserved_global_placement_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal147()) {
+  if (!impl->reader.getVal143()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal146());
+    return static_cast<bool>(impl->reader.getVal142());
   }
   return std::nullopt;
 }
 
 bool FunctionDecl::is_static(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal148();
+  return impl->reader.getVal144();
 }
 
 bool FunctionDecl::is_target_clones_multi_version(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal149();
+  return impl->reader.getVal145();
 }
 
 bool FunctionDecl::is_target_multi_version(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal150();
+  return impl->reader.getVal146();
 }
 
 bool FunctionDecl::is_template_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal151();
+  return impl->reader.getVal147();
 }
 
 bool FunctionDecl::is_this_declaration_instantiated_from_a_friend_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal152();
+  return impl->reader.getVal148();
 }
 
 bool FunctionDecl::is_trivial(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal153();
+  return impl->reader.getVal149();
 }
 
 bool FunctionDecl::is_trivial_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal154();
+  return impl->reader.getVal150();
 }
 
 bool FunctionDecl::is_user_provided(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal155();
+  return impl->reader.getVal151();
 }
 
 bool FunctionDecl::is_variadic(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal156();
+  return impl->reader.getVal152();
 }
 
 bool FunctionDecl::is_virtual_as_written(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal157();
+  return impl->reader.getVal153();
 }
 
 std::optional<ParmVarDecl> FunctionDecl::nth_parameter(unsigned n) const {
@@ -45334,12 +42077,11 @@ std::optional<ParmVarDecl> FunctionDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> FunctionDecl::parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
     EntityId id(v);
     if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(d47.value()))) {
+      if (auto e = ParmVarDecl::from(Decl(d47))) {
         co_yield std::move(*e);
       }
     }
@@ -45348,35 +42090,31 @@ gap::generator<ParmVarDecl> FunctionDecl::parameters(void) const {
 }
 
 bool FunctionDecl::uses_seh_try(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal158();
+  return impl->reader.getVal154();
 }
 
 bool FunctionDecl::will_have_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal159();
+  return impl->reader.getVal155();
 }
 
 std::optional<Stmt> FunctionDecl::body(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal160();
+    RawEntityId eid = impl->reader.getVal156();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Stmt(std::move(eptr.value()));
+      return Stmt(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 gap::generator<Decl> FunctionDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -45443,76 +42181,65 @@ std::optional<CXXMethodDecl> CXXMethodDecl::from(const Decl &parent) {
 }
 
 RefQualifierKind CXXMethodDecl::reference_qualifier(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<RefQualifierKind>(self.getVal128());
+  return static_cast<RefQualifierKind>(impl->reader.getVal126());
 }
 
 std::optional<Type> CXXMethodDecl::this_object_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal161();
+    RawEntityId eid = impl->reader.getVal157();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> CXXMethodDecl::this_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal162();
+    RawEntityId eid = impl->reader.getVal158();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool CXXMethodDecl::has_inline_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal163();
+  return impl->reader.getVal159();
 }
 
 bool CXXMethodDecl::is_const(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal164();
+  return impl->reader.getVal160();
 }
 
 bool CXXMethodDecl::is_copy_assignment_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal165();
+  return impl->reader.getVal161();
 }
 
 bool CXXMethodDecl::is_instance(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal166();
+  return impl->reader.getVal162();
 }
 
 bool CXXMethodDecl::is_lambda_static_invoker(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal167();
+  return impl->reader.getVal163();
 }
 
 bool CXXMethodDecl::is_move_assignment_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal168();
+  return impl->reader.getVal164();
 }
 
 bool CXXMethodDecl::is_virtual(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal169();
+  return impl->reader.getVal165();
 }
 
 bool CXXMethodDecl::is_volatile(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal170();
+  return impl->reader.getVal166();
 }
 
 std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) const {
@@ -45526,12 +42253,11 @@ std::optional<CXXMethodDecl> CXXMethodDecl::nth_overridden_method(unsigned n) co
 }
 
 gap::generator<CXXMethodDecl> CXXMethodDecl::overridden_methods(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal58();
+  auto list = impl->reader.getVal167();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d58 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(d58.value()))) {
+    if (auto d167 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = CXXMethodDecl::from(Decl(d167))) {
         co_yield std::move(*e);
       }
     }
@@ -45602,28 +42328,26 @@ std::optional<CXXDestructorDecl> CXXDestructorDecl::from(const Decl &parent) {
 }
 
 std::optional<FunctionDecl> CXXDestructorDecl::operator_delete(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal171();
+    RawEntityId eid = impl->reader.getVal168();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Expr> CXXDestructorDecl::operator_delete_this_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal172();
+    RawEntityId eid = impl->reader.getVal169();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -45692,19 +42416,16 @@ std::optional<CXXConversionDecl> CXXConversionDecl::from(const Decl &parent) {
 }
 
 Type CXXConversionDecl::conversion_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal171();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal168();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool CXXConversionDecl::is_explicit(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal173();
+  return impl->reader.getVal170();
 }
 
 bool CXXConversionDecl::is_lambda_to_block_pointer_conversion(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal174();
+  return impl->reader.getVal171();
 }
 
 gap::generator<CXXConstructorDecl> CXXConstructorDecl::containing(const Decl &decl) {
@@ -45770,42 +42491,36 @@ std::optional<CXXConstructorDecl> CXXConstructorDecl::from(const Decl &parent) {
 }
 
 std::optional<CXXConstructorDecl> CXXConstructorDecl::target_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal171();
+    RawEntityId eid = impl->reader.getVal168();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXConstructorDecl::from(Decl(std::move(eptr.value())));
+      return CXXConstructorDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool CXXConstructorDecl::is_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal173();
+  return impl->reader.getVal170();
 }
 
 bool CXXConstructorDecl::is_delegating_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal174();
+  return impl->reader.getVal171();
 }
 
 bool CXXConstructorDecl::is_explicit(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal175();
+  return impl->reader.getVal172();
 }
 
 bool CXXConstructorDecl::is_inheriting_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal176();
+  return impl->reader.getVal173();
 }
 
 bool CXXConstructorDecl::is_specialization_copying_object(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal177();
+  return impl->reader.getVal174();
 }
 
 gap::generator<CXXDeductionGuideDecl> CXXDeductionGuideDecl::containing(const Decl &decl) {
@@ -45867,25 +42582,21 @@ std::optional<CXXDeductionGuideDecl> CXXDeductionGuideDecl::from(const Decl &par
 }
 
 CXXConstructorDecl CXXDeductionGuideDecl::corresponding_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal161();
-  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal157();
+  return CXXConstructorDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateDecl CXXDeductionGuideDecl::deduced_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal162();
-  return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal158();
+  return TemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool CXXDeductionGuideDecl::is_copy_deduction_candidate(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal163();
+  return impl->reader.getVal159();
 }
 
 bool CXXDeductionGuideDecl::is_explicit(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal164();
+  return impl->reader.getVal160();
 }
 
 gap::generator<FieldDecl> FieldDecl::containing(const Decl &decl) {
@@ -45945,90 +42656,78 @@ std::optional<FieldDecl> FieldDecl::from(const Decl &parent) {
 }
 
 std::optional<Expr> FieldDecl::bit_width(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal73();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<VariableArrayType> FieldDecl::captured_vla_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal76();
+    RawEntityId eid = impl->reader.getVal74();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return VariableArrayType::from(Type(std::move(eptr.value())));
+      return VariableArrayType::from(Type(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 InClassInitStyle FieldDecl::in_class_initializer_style(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<InClassInitStyle>(self.getVal74());
+  return static_cast<InClassInitStyle>(impl->reader.getVal73());
 }
 
 std::optional<Expr> FieldDecl::in_class_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal77();
+    RawEntityId eid = impl->reader.getVal75();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {
-      return Expr::from(Stmt(std::move(eptr.value())));
+      return Expr::from(Stmt(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool FieldDecl::has_captured_vla_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool FieldDecl::has_in_class_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool FieldDecl::is_anonymous_struct_or_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool FieldDecl::is_bit_field(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool FieldDecl::is_mutable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool FieldDecl::is_unnamed_bitfield(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool FieldDecl::is_zero_length_bit_field(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool FieldDecl::is_zero_size(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal94();
+  return impl->reader.getVal92();
 }
 
 gap::generator<ObjCIvarDecl> ObjCIvarDecl::containing(const Decl &decl) {
@@ -46090,30 +42789,25 @@ std::optional<ObjCIvarDecl> ObjCIvarDecl::from(const Decl &parent) {
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::access_control(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCIvarDeclAccessControl>(self.getVal80());
+  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal78());
 }
 
 ObjCIvarDeclAccessControl ObjCIvarDecl::canonical_access_control(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCIvarDeclAccessControl>(self.getVal82());
+  return static_cast<ObjCIvarDeclAccessControl>(impl->reader.getVal80());
 }
 
 ObjCInterfaceDecl ObjCIvarDecl::containing_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal78();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal76();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCIvarDecl ObjCIvarDecl::next_instance_variable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal79();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal77();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCIvarDecl::synthesize(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal95();
+  return impl->reader.getVal93();
 }
 
 gap::generator<ObjCAtDefsFieldDecl> ObjCAtDefsFieldDecl::containing(const Decl &decl) {
@@ -46225,21 +42919,18 @@ std::optional<BindingDecl> BindingDecl::from(const Decl &parent) {
 }
 
 Expr BindingDecl::binding(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 ValueDecl BindingDecl::decomposed_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 VarDecl BindingDecl::holding_variable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal62();
-  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal61();
+  return VarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 gap::generator<OMPDeclarativeDirectiveValueDecl> OMPDeclarativeDirectiveValueDecl::containing(const Decl &decl) {
@@ -46347,17 +43038,15 @@ std::optional<OMPDeclareMapperDecl> OMPDeclareMapperDecl::from(const Decl &paren
 }
 
 Expr OMPDeclareMapperDecl::mapper_variable_reference(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<Decl> OMPDeclareMapperDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -46410,29 +43099,26 @@ std::optional<UsingShadowDecl> UsingShadowDecl::from(const Decl &parent) {
 }
 
 BaseUsingDecl UsingShadowDecl::introducer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return BaseUsingDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<UsingShadowDecl> UsingShadowDecl::next_using_shadow_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal53();
+    RawEntityId eid = impl->reader.getVal52();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return UsingShadowDecl::from(Decl(std::move(eptr.value())));
+      return UsingShadowDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 NamedDecl UsingShadowDecl::target_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 gap::generator<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::containing(const Decl &decl) {
@@ -46486,45 +43172,40 @@ std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::from(const
 }
 
 bool ConstructorUsingShadowDecl::constructs_virtual_base(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::constructed_base_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal62();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal61();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::constructed_base_class_shadow_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal63();
+    RawEntityId eid = impl->reader.getVal62();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ConstructorUsingShadowDecl::from(Decl(std::move(eptr.value())));
+      return ConstructorUsingShadowDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 CXXRecordDecl ConstructorUsingShadowDecl::nominated_base_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal64();
-  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal63();
+  return CXXRecordDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ConstructorUsingShadowDecl> ConstructorUsingShadowDecl::nominated_base_class_shadow_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal73();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ConstructorUsingShadowDecl::from(Decl(std::move(eptr.value())));
+      return ConstructorUsingShadowDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -46587,12 +43268,11 @@ std::optional<NamedDecl> UsingPackDecl::nth_expansion(unsigned n) const {
 }
 
 gap::generator<NamedDecl> UsingPackDecl::expansions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = NamedDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = NamedDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -46601,9 +43281,8 @@ gap::generator<NamedDecl> UsingPackDecl::expansions(void) const {
 }
 
 NamedDecl UsingPackDecl::instantiated_from_using_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 gap::generator<UsingDirectiveDecl> UsingDirectiveDecl::containing(const Decl &decl) {
@@ -46653,39 +43332,20 @@ std::optional<UsingDirectiveDecl> UsingDirectiveDecl::from(const Decl &parent) {
 }
 
 Token UsingDirectiveDecl::identifier_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 Token UsingDirectiveDecl::namespace_key_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 NamedDecl UsingDirectiveDecl::nominated_namespace_as_written(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token UsingDirectiveDecl::using_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 gap::generator<UnresolvedUsingIfExistsDecl> UnresolvedUsingIfExistsDecl::containing(const Decl &decl) {
@@ -46790,14 +43450,13 @@ std::optional<TypeDecl> TypeDecl::from(const Decl &parent) {
 }
 
 std::optional<Type> TypeDecl::type_for_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal52();
+    RawEntityId eid = impl->reader.getVal51();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
@@ -46854,71 +43513,57 @@ std::optional<TemplateTypeParmDecl> TemplateTypeParmDecl::from(const Decl &paren
 }
 
 bool TemplateTypeParmDecl::default_argument_was_inherited(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal53();
+    RawEntityId eid = impl->reader.getVal52();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> TemplateTypeParmDecl::default_argument_info(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal54();
+    RawEntityId eid = impl->reader.getVal53();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Token TemplateTypeParmDecl::default_argument_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 bool TemplateTypeParmDecl::has_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool TemplateTypeParmDecl::has_type_constraint(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool TemplateTypeParmDecl::is_expanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool TemplateTypeParmDecl::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool TemplateTypeParmDecl::was_declared_with_typename(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 gap::generator<TagDecl> TagDecl::containing(const Decl &decl) {
@@ -46976,118 +43621,89 @@ std::optional<TagDecl> TagDecl::from(const Decl &parent) {
 }
 
 TokenRange TagDecl::brace_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal53(), self.getVal54());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal52(), impl->reader.getVal53());
 }
 
 Token TagDecl::first_inner_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 Token TagDecl::first_outer_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
 }
 
 TagTypeKind TagDecl::tag_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TagTypeKind>(self.getVal74());
+  return static_cast<TagTypeKind>(impl->reader.getVal73());
 }
 
 std::optional<TypedefNameDecl> TagDecl::typedef_name_for_anonymous_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal64();
+    RawEntityId eid = impl->reader.getVal63();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TypedefNameDecl::from(Decl(std::move(eptr.value())));
+      return TypedefNameDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool TagDecl::has_name_for_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool TagDecl::is_being_defined(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool TagDecl::is_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool TagDecl::is_complete_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool TagDecl::is_complete_definition_required(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool TagDecl::is_dependent_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool TagDecl::is_embedded_in_declarator(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool TagDecl::is_enum(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool TagDecl::is_free_standing(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool TagDecl::is_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool TagDecl::is_struct(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool TagDecl::is_demoted_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal97();
+  return impl->reader.getVal95();
 }
 
 bool TagDecl::is_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool TagDecl::may_have_out_of_date_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal99();
+  return impl->reader.getVal97();
 }
 
 std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsigned n) const {
@@ -47101,22 +43717,21 @@ std::optional<TemplateParameterList> TagDecl::nth_template_parameter_list(unsign
 }
 
 gap::generator<TemplateParameterList> TagDecl::template_parameter_lists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal75();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d46 = impl->ep->TemplateParameterListFor(impl->ep, v)) {
+      co_yield TemplateParameterList(std::move(d46));
+    }
   }
   co_return;
 }
 
 gap::generator<Decl> TagDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -47179,8 +43794,7 @@ std::optional<RecordDecl> RecordDecl::from(const Decl &parent) {
 }
 
 bool RecordDecl::can_pass_in_registers(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal100();
+  return impl->reader.getVal98();
 }
 
 std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
@@ -47194,12 +43808,11 @@ std::optional<FieldDecl> RecordDecl::nth_field(unsigned n) const {
 }
 
 gap::generator<FieldDecl> RecordDecl::fields(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = FieldDecl::from(Decl(d48.value()))) {
+    if (auto d57 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = FieldDecl::from(Decl(d57))) {
         co_yield std::move(*e);
       }
     }
@@ -47208,103 +43821,83 @@ gap::generator<FieldDecl> RecordDecl::fields(void) const {
 }
 
 RecordDeclArgPassingKind RecordDecl::argument_passing_restrictions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<RecordDeclArgPassingKind>(self.getVal80());
+  return static_cast<RecordDeclArgPassingKind>(impl->reader.getVal78());
 }
 
 bool RecordDecl::has_flexible_array_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool RecordDecl::has_loaded_fields_from_external_storage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal102();
+  return impl->reader.getVal100();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_copy_c_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal103();
+  return impl->reader.getVal101();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_default_initialize_c_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal104();
+  return impl->reader.getVal102();
 }
 
 bool RecordDecl::has_non_trivial_to_primitive_destruct_c_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal105();
+  return impl->reader.getVal103();
 }
 
 bool RecordDecl::has_object_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal106();
+  return impl->reader.getVal104();
 }
 
 bool RecordDecl::has_volatile_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal107();
+  return impl->reader.getVal105();
 }
 
 bool RecordDecl::is_anonymous_struct_or_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal108();
+  return impl->reader.getVal106();
 }
 
 bool RecordDecl::is_captured_record(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal109();
+  return impl->reader.getVal107();
 }
 
 bool RecordDecl::is_injected_class_name(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal110();
+  return impl->reader.getVal108();
 }
 
 bool RecordDecl::is_lambda(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal111();
+  return impl->reader.getVal109();
 }
 
 bool RecordDecl::is_ms_struct(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal112();
+  return impl->reader.getVal110();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_copy(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal113();
+  return impl->reader.getVal111();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_default_initialize(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal114();
+  return impl->reader.getVal112();
 }
 
 bool RecordDecl::is_non_trivial_to_primitive_destroy(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal115();
+  return impl->reader.getVal113();
 }
 
 bool RecordDecl::is_or_contains_union(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal116();
+  return impl->reader.getVal114();
 }
 
 bool RecordDecl::is_parameter_destroyed_in_callee(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal117();
+  return impl->reader.getVal115();
 }
 
 bool RecordDecl::is_randomized(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal118();
+  return impl->reader.getVal116();
 }
 
 bool RecordDecl::may_insert_extra_padding(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal119();
+  return impl->reader.getVal117();
 }
 
 gap::generator<CXXRecordDecl> CXXRecordDecl::containing(const Decl &decl) {
@@ -47368,37 +43961,35 @@ std::optional<CXXRecordDecl> CXXRecordDecl::from(const Decl &parent) {
 }
 
 std::optional<bool> CXXRecordDecl::allow_const_default_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal121()) {
+  if (!impl->reader.getVal119()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal120());
+    return static_cast<bool>(impl->reader.getVal118());
   }
   return std::nullopt;
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::bases(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal122()) {
+  if (!impl->reader.getVal120()) {
     return std::nullopt;
   }
-  auto list = self.getVal138();
+  auto list = impl->reader.getVal167();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    vec.emplace_back(std::move(*ps_impl));
-  }
+    EntityId id(v);
+    if (auto d167 = impl->ep->CXXBaseSpecifierFor(impl->ep, v)) {
+      vec.emplace_back(std::move(d167));
+    }
   }
   return vec;
 }
 
 std::optional<MSInheritanceModel> CXXRecordDecl::calculate_inheritance_model(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal123()) {
+  if (!impl->reader.getVal121()) {
     return std::nullopt;
   } else {
-    return static_cast<MSInheritanceModel>(self.getVal82());
+    return static_cast<MSInheritanceModel>(impl->reader.getVal80());
   }
   return std::nullopt;
 }
@@ -47414,12 +44005,11 @@ std::optional<CXXConstructorDecl> CXXRecordDecl::nth_constructor(unsigned n) con
 }
 
 gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal58();
+  auto list = impl->reader.getVal175();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d58 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = CXXConstructorDecl::from(Decl(d58.value()))) {
+    if (auto d175 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = CXXConstructorDecl::from(Decl(d175))) {
         co_yield std::move(*e);
       }
     }
@@ -47428,17 +44018,16 @@ gap::generator<CXXConstructorDecl> CXXRecordDecl::constructors(void) const {
 }
 
 std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal131()) {
+  if (!impl->reader.getVal129()) {
     return std::nullopt;
   }
-  auto list = self.getVal178();
+  auto list = impl->reader.getVal176();
   std::vector<FriendDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d178 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = FriendDecl::from(Decl(d178.value()))) {
+    if (auto d176 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = FriendDecl::from(Decl(d176))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -47447,126 +44036,116 @@ std::optional<std::vector<FriendDecl>> CXXRecordDecl::friends(void) const {
 }
 
 std::optional<FunctionTemplateDecl> CXXRecordDecl::dependent_lambda_call_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal73();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionTemplateDecl::from(Decl(std::move(eptr.value())));
+      return FunctionTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<ClassTemplateDecl> CXXRecordDecl::described_class_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal76();
+    RawEntityId eid = impl->reader.getVal74();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ClassTemplateDecl::from(Decl(std::move(eptr.value())));
+      return ClassTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<CXXDestructorDecl> CXXRecordDecl::destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal77();
+    RawEntityId eid = impl->reader.getVal75();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXDestructorDecl::from(Decl(std::move(eptr.value())));
+      return CXXDestructorDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<TemplateParameterList> CXXRecordDecl::generic_lambda_template_parameter_list(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal132()) {
-    return std::nullopt;
-  } else {
-    if (RawEntityId eid = self.getVal140();
-        eid != kInvalidEntityId) {
-      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {
-        return TemplateParameterList(std::move(eptr.value()));
-      }
+  if (true) {
+    RawEntityId eid = impl->reader.getVal76();
+    if (eid == kInvalidEntityId) {
+      return std::nullopt;
+    }
+    if (auto eptr = impl->ep->TemplateParameterListFor(impl->ep, eid)) {
+      return TemplateParameterList(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::instantiated_from_member_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal78();
+    RawEntityId eid = impl->reader.getVal77();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<CXXMethodDecl> CXXRecordDecl::lambda_call_operator(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal79();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXMethodDecl::from(Decl(std::move(eptr.value())));
+      return CXXMethodDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<LambdaCaptureDefault> CXXRecordDecl::lambda_capture_default(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal133()) {
+  if (!impl->reader.getVal130()) {
     return std::nullopt;
   } else {
-    return static_cast<LambdaCaptureDefault>(self.getVal83());
+    return static_cast<LambdaCaptureDefault>(impl->reader.getVal81());
   }
   return std::nullopt;
 }
 
 std::optional<Decl> CXXRecordDecl::lambda_context_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal81();
+    RawEntityId eid = impl->reader.getVal84();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return Decl(std::move(eptr.value()));
+      return Decl(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal134()) {
+  if (!impl->reader.getVal131()) {
     return std::nullopt;
   }
-  auto list = self.getVal179();
+  auto list = impl->reader.getVal177();
   std::vector<NamedDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d179 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = NamedDecl::from(Decl(d179.value()))) {
+    if (auto d177 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = NamedDecl::from(Decl(d177))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -47575,904 +44154,813 @@ std::optional<std::vector<NamedDecl>> CXXRecordDecl::lambda_explicit_template_pa
 }
 
 std::optional<unsigned> CXXRecordDecl::lambda_mangling_number(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal135()) {
+  if (!impl->reader.getVal132()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal180());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }
 
 std::optional<Type> CXXRecordDecl::lambda_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal86();
+    RawEntityId eid = impl->reader.getVal123();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<MSInheritanceModel> CXXRecordDecl::ms_inheritance_model(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal136()) {
+  if (!impl->reader.getVal133()) {
     return std::nullopt;
   } else {
-    return static_cast<MSInheritanceModel>(self.getVal84());
+    return static_cast<MSInheritanceModel>(impl->reader.getVal82());
   }
   return std::nullopt;
 }
 
 MSVtorDispMode CXXRecordDecl::ms_vtor_disp_mode(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<MSVtorDispMode>(self.getVal85());
+  return static_cast<MSVtorDispMode>(impl->reader.getVal83());
 }
 
 std::optional<unsigned> CXXRecordDecl::num_bases(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal137()) {
+  if (!impl->reader.getVal134()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal181());
+    return static_cast<unsigned>(impl->reader.getVal178());
   }
   return std::nullopt;
 }
 
 std::optional<unsigned> CXXRecordDecl::num_virtual_bases(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal145()) {
+  if (!impl->reader.getVal135()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal182());
+    return static_cast<unsigned>(impl->reader.getVal179());
   }
   return std::nullopt;
 }
 
 std::optional<unsigned> CXXRecordDecl::odr_hash(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal146()) {
+  if (!impl->reader.getVal141()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal183());
+    return static_cast<unsigned>(impl->reader.getVal180());
   }
   return std::nullopt;
 }
 
 std::optional<CXXRecordDecl> CXXRecordDecl::template_instantiation_pattern(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal125();
+    RawEntityId eid = impl->reader.getVal124();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return CXXRecordDecl::from(Decl(std::move(eptr.value())));
+      return CXXRecordDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TemplateSpecializationKind CXXRecordDecl::template_specialization_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal87());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal85());
 }
 
 std::optional<bool> CXXRecordDecl::has_any_dependent_bases(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal148()) {
+  if (!impl->reader.getVal143()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal147());
+    return static_cast<bool>(impl->reader.getVal142());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal150()) {
+  if (!impl->reader.getVal145()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal149());
+    return static_cast<bool>(impl->reader.getVal144());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal152()) {
+  if (!impl->reader.getVal147()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal151());
+    return static_cast<bool>(impl->reader.getVal146());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_constexpr_non_copy_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal154()) {
+  if (!impl->reader.getVal149()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal153());
+    return static_cast<bool>(impl->reader.getVal148());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_assignment_with_const_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal156()) {
+  if (!impl->reader.getVal151()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal155());
+    return static_cast<bool>(impl->reader.getVal150());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_copy_constructor_with_const_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal158()) {
+  if (!impl->reader.getVal153()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal157());
+    return static_cast<bool>(impl->reader.getVal152());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal163()) {
+  if (!impl->reader.getVal155()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal159());
+    return static_cast<bool>(impl->reader.getVal154());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal165()) {
+  if (!impl->reader.getVal160()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal164());
+    return static_cast<bool>(impl->reader.getVal159());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_direct_fields(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal167()) {
+  if (!impl->reader.getVal162()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal166());
+    return static_cast<bool>(impl->reader.getVal161());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_friends(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal169()) {
+  if (!impl->reader.getVal164()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal168());
+    return static_cast<bool>(impl->reader.getVal163());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_in_class_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal173()) {
+  if (!impl->reader.getVal166()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal170());
+    return static_cast<bool>(impl->reader.getVal165());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal175()) {
+  if (!impl->reader.getVal171()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal174());
+    return static_cast<bool>(impl->reader.getVal170());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_inherited_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal177()) {
+  if (!impl->reader.getVal173()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal176());
+    return static_cast<bool>(impl->reader.getVal172());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_initializer_method(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal185()) {
+  if (!impl->reader.getVal181()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal184());
+    return static_cast<bool>(impl->reader.getVal174());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_irrelevant_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal187()) {
+  if (!impl->reader.getVal183()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal186());
+    return static_cast<bool>(impl->reader.getVal182());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_known_lambda_internal_linkage(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal189()) {
+  if (!impl->reader.getVal185()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal188());
+    return static_cast<bool>(impl->reader.getVal184());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal191()) {
+  if (!impl->reader.getVal187()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal190());
+    return static_cast<bool>(impl->reader.getVal186());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal193()) {
+  if (!impl->reader.getVal189()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal192());
+    return static_cast<bool>(impl->reader.getVal188());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_mutable_fields(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal195()) {
+  if (!impl->reader.getVal191()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal194());
+    return static_cast<bool>(impl->reader.getVal190());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_literal_type_fields_or_bases(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal197()) {
+  if (!impl->reader.getVal193()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal196());
+    return static_cast<bool>(impl->reader.getVal192());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal199()) {
+  if (!impl->reader.getVal195()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal198());
+    return static_cast<bool>(impl->reader.getVal194());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal201()) {
+  if (!impl->reader.getVal197()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal200());
+    return static_cast<bool>(impl->reader.getVal196());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_copy_constructor_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal203()) {
+  if (!impl->reader.getVal199()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal202());
+    return static_cast<bool>(impl->reader.getVal198());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal205()) {
+  if (!impl->reader.getVal201()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal204());
+    return static_cast<bool>(impl->reader.getVal200());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal207()) {
+  if (!impl->reader.getVal203()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal206());
+    return static_cast<bool>(impl->reader.getVal202());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_destructor_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal209()) {
+  if (!impl->reader.getVal205()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal208());
+    return static_cast<bool>(impl->reader.getVal204());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal211()) {
+  if (!impl->reader.getVal207()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal210());
+    return static_cast<bool>(impl->reader.getVal206());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal213()) {
+  if (!impl->reader.getVal209()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal212());
+    return static_cast<bool>(impl->reader.getVal208());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_non_trivial_move_constructor_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal215()) {
+  if (!impl->reader.getVal211()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal214());
+    return static_cast<bool>(impl->reader.getVal210());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_private_fields(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal217()) {
+  if (!impl->reader.getVal213()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal216());
+    return static_cast<bool>(impl->reader.getVal212());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_protected_fields(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal219()) {
+  if (!impl->reader.getVal215()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal218());
+    return static_cast<bool>(impl->reader.getVal214());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal221()) {
+  if (!impl->reader.getVal217()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal220());
+    return static_cast<bool>(impl->reader.getVal216());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_copy_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal223()) {
+  if (!impl->reader.getVal219()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal222());
+    return static_cast<bool>(impl->reader.getVal218());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal225()) {
+  if (!impl->reader.getVal221()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal224());
+    return static_cast<bool>(impl->reader.getVal220());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal227()) {
+  if (!impl->reader.getVal223()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal226());
+    return static_cast<bool>(impl->reader.getVal222());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_simple_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal229()) {
+  if (!impl->reader.getVal225()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal228());
+    return static_cast<bool>(impl->reader.getVal224());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal231()) {
+  if (!impl->reader.getVal227()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal230());
+    return static_cast<bool>(impl->reader.getVal226());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal233()) {
+  if (!impl->reader.getVal229()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal232());
+    return static_cast<bool>(impl->reader.getVal228());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_copy_constructor_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal235()) {
+  if (!impl->reader.getVal231()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal234());
+    return static_cast<bool>(impl->reader.getVal230());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal237()) {
+  if (!impl->reader.getVal233()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal236());
+    return static_cast<bool>(impl->reader.getVal232());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal239()) {
+  if (!impl->reader.getVal235()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal238());
+    return static_cast<bool>(impl->reader.getVal234());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_destructor_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal241()) {
+  if (!impl->reader.getVal237()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal240());
+    return static_cast<bool>(impl->reader.getVal236());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal243()) {
+  if (!impl->reader.getVal239()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal242());
+    return static_cast<bool>(impl->reader.getVal238());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal245()) {
+  if (!impl->reader.getVal241()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal244());
+    return static_cast<bool>(impl->reader.getVal240());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_trivial_move_constructor_for_call(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal247()) {
+  if (!impl->reader.getVal243()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal246());
+    return static_cast<bool>(impl->reader.getVal242());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_uninitialized_reference_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal249()) {
+  if (!impl->reader.getVal245()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal248());
+    return static_cast<bool>(impl->reader.getVal244());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal251()) {
+  if (!impl->reader.getVal247()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal250());
+    return static_cast<bool>(impl->reader.getVal246());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal253()) {
+  if (!impl->reader.getVal249()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal252());
+    return static_cast<bool>(impl->reader.getVal248());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_copy_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal255()) {
+  if (!impl->reader.getVal251()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal254());
+    return static_cast<bool>(impl->reader.getVal250());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal257()) {
+  if (!impl->reader.getVal253()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal256());
+    return static_cast<bool>(impl->reader.getVal252());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal259()) {
+  if (!impl->reader.getVal255()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal258());
+    return static_cast<bool>(impl->reader.getVal254());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal261()) {
+  if (!impl->reader.getVal257()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal260());
+    return static_cast<bool>(impl->reader.getVal256());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_declared_move_operation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal263()) {
+  if (!impl->reader.getVal259()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal262());
+    return static_cast<bool>(impl->reader.getVal258());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_user_provided_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal265()) {
+  if (!impl->reader.getVal261()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal264());
+    return static_cast<bool>(impl->reader.getVal260());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::has_variant_members(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal267()) {
+  if (!impl->reader.getVal263()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal266());
+    return static_cast<bool>(impl->reader.getVal262());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_assignment_has_const_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal269()) {
+  if (!impl->reader.getVal265()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal268());
+    return static_cast<bool>(impl->reader.getVal264());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::implicit_copy_constructor_has_const_parameter(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal271()) {
+  if (!impl->reader.getVal267()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal270());
+    return static_cast<bool>(impl->reader.getVal266());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_abstract(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal273()) {
+  if (!impl->reader.getVal269()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal272());
+    return static_cast<bool>(impl->reader.getVal268());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_aggregate(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal275()) {
+  if (!impl->reader.getVal271()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal274());
+    return static_cast<bool>(impl->reader.getVal270());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_any_destructor_no_return(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal277()) {
+  if (!impl->reader.getVal273()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal276());
+    return static_cast<bool>(impl->reader.getVal272());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_c_like(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal279()) {
+  if (!impl->reader.getVal275()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal278());
+    return static_cast<bool>(impl->reader.getVal274());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_cxx11_standard_layout(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal281()) {
+  if (!impl->reader.getVal277()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal280());
+    return static_cast<bool>(impl->reader.getVal276());
   }
   return std::nullopt;
 }
 
 bool CXXRecordDecl::is_dependent_lambda(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal282();
+  return impl->reader.getVal278();
 }
 
 std::optional<bool> CXXRecordDecl::is_dynamic_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal284()) {
+  if (!impl->reader.getVal280()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal283());
+    return static_cast<bool>(impl->reader.getVal279());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_effectively_final(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal286()) {
+  if (!impl->reader.getVal282()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal285());
+    return static_cast<bool>(impl->reader.getVal281());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_empty(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal288()) {
+  if (!impl->reader.getVal284()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal287());
+    return static_cast<bool>(impl->reader.getVal283());
   }
   return std::nullopt;
 }
 
 bool CXXRecordDecl::is_generic_lambda(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal289();
+  return impl->reader.getVal285();
 }
 
 std::optional<bool> CXXRecordDecl::is_interface_like(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal291()) {
+  if (!impl->reader.getVal287()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal290());
+    return static_cast<bool>(impl->reader.getVal286());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_literal(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal293()) {
+  if (!impl->reader.getVal289()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal292());
+    return static_cast<bool>(impl->reader.getVal288());
   }
   return std::nullopt;
 }
 
 std::optional<FunctionDecl> CXXRecordDecl::is_local_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal126();
+    RawEntityId eid = impl->reader.getVal125();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return FunctionDecl::from(Decl(std::move(eptr.value())));
+      return FunctionDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 bool CXXRecordDecl::is_never_dependent_lambda(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal294();
+  return impl->reader.getVal290();
 }
 
 std::optional<bool> CXXRecordDecl::is_pod(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal296()) {
+  if (!impl->reader.getVal292()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal295());
+    return static_cast<bool>(impl->reader.getVal291());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_polymorphic(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal298()) {
+  if (!impl->reader.getVal294()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal297());
+    return static_cast<bool>(impl->reader.getVal293());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_standard_layout(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal300()) {
+  if (!impl->reader.getVal296()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal299());
+    return static_cast<bool>(impl->reader.getVal295());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_structural(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal302()) {
+  if (!impl->reader.getVal298()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal301());
+    return static_cast<bool>(impl->reader.getVal297());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_trivial(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal304()) {
+  if (!impl->reader.getVal300()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal303());
+    return static_cast<bool>(impl->reader.getVal299());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::is_trivially_copyable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal306()) {
+  if (!impl->reader.getVal302()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal305());
+    return static_cast<bool>(impl->reader.getVal301());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::lambda_is_default_constructible_and_assignable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal308()) {
+  if (!impl->reader.getVal304()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal307());
+    return static_cast<bool>(impl->reader.getVal303());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::may_be_abstract(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal310()) {
+  if (!impl->reader.getVal306()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal309());
+    return static_cast<bool>(impl->reader.getVal305());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::may_be_dynamic_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal312()) {
+  if (!impl->reader.getVal308()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal311());
+    return static_cast<bool>(impl->reader.getVal307());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::may_be_non_dynamic_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal314()) {
+  if (!impl->reader.getVal310()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal313());
+    return static_cast<bool>(impl->reader.getVal309());
   }
   return std::nullopt;
 }
 
 std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal316()) {
+  if (!impl->reader.getVal312()) {
     return std::nullopt;
   }
-  auto list = self.getVal315();
+  auto list = impl->reader.getVal311();
   std::vector<CXXMethodDecl> vec;
   vec.reserve(list.size());
   for (auto v : list) {
     EntityId id(v);
-    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = CXXMethodDecl::from(Decl(d315.value()))) {
+    if (auto d311 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = CXXMethodDecl::from(Decl(d311))) {
         vec.emplace_back(std::move(*e));
       }
     }
@@ -48481,137 +44969,125 @@ std::optional<std::vector<CXXMethodDecl>> CXXRecordDecl::methods(void) const {
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal318()) {
+  if (!impl->reader.getVal314()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal317());
+    return static_cast<bool>(impl->reader.getVal313());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_copy_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal320()) {
+  if (!impl->reader.getVal316()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal319());
+    return static_cast<bool>(impl->reader.getVal315());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_default_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal322()) {
+  if (!impl->reader.getVal318()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal321());
+    return static_cast<bool>(impl->reader.getVal317());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal324()) {
+  if (!impl->reader.getVal320()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal323());
+    return static_cast<bool>(impl->reader.getVal319());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal326()) {
+  if (!impl->reader.getVal322()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal325());
+    return static_cast<bool>(impl->reader.getVal321());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_implicit_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal328()) {
+  if (!impl->reader.getVal324()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal327());
+    return static_cast<bool>(impl->reader.getVal323());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal330()) {
+  if (!impl->reader.getVal326()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal329());
+    return static_cast<bool>(impl->reader.getVal325());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_copy_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal332()) {
+  if (!impl->reader.getVal328()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal331());
+    return static_cast<bool>(impl->reader.getVal327());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_destructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal334()) {
+  if (!impl->reader.getVal330()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal333());
+    return static_cast<bool>(impl->reader.getVal329());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_assignment(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal336()) {
+  if (!impl->reader.getVal332()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal335());
+    return static_cast<bool>(impl->reader.getVal331());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::needs_overload_resolution_for_move_constructor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal338()) {
+  if (!impl->reader.getVal334()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal337());
+    return static_cast<bool>(impl->reader.getVal333());
   }
   return std::nullopt;
 }
 
 std::optional<bool> CXXRecordDecl::null_field_offset_is_zero(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal340()) {
+  if (!impl->reader.getVal336()) {
     return std::nullopt;
   } else {
-    return static_cast<bool>(self.getVal339());
+    return static_cast<bool>(impl->reader.getVal335());
   }
   return std::nullopt;
 }
 
 std::optional<std::vector<CXXBaseSpecifier>> CXXRecordDecl::virtual_bases(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal341()) {
+  if (!impl->reader.getVal338()) {
     return std::nullopt;
   }
-  auto list = self.getVal139();
+  auto list = impl->reader.getVal337();
   std::vector<CXXBaseSpecifier> vec;
   vec.reserve(list.size());
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    vec.emplace_back(std::move(*ps_impl));
-  }
+    EntityId id(v);
+    if (auto d337 = impl->ep->CXXBaseSpecifierFor(impl->ep, v)) {
+      vec.emplace_back(std::move(d337));
+    }
   }
   return vec;
 }
@@ -48680,34 +45156,20 @@ std::optional<ClassTemplateSpecializationDecl> ClassTemplateSpecializationDecl::
 }
 
 Token ClassTemplateSpecializationDecl::extern_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal127())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal127());
 }
 
 Token ClassTemplateSpecializationDecl::point_of_instantiation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal129())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal128());
 }
 
 TemplateSpecializationKind ClassTemplateSpecializationDecl::specialization_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal88());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal86());
 }
 
 ClassTemplateDecl ClassTemplateSpecializationDecl::specialized_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal130();
-  return ClassTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal136();
+  return ClassTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_argument(unsigned n) const {
@@ -48721,12 +45183,12 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_ar
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_arguments(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal342();
+  auto list = impl->reader.getVal339();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d339 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d339));
+    }
   }
   co_return;
 }
@@ -48742,53 +45204,43 @@ std::optional<TemplateArgument> ClassTemplateSpecializationDecl::nth_template_in
 }
 
 gap::generator<TemplateArgument> ClassTemplateSpecializationDecl::template_instantiation_arguments(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal343();
+  auto list = impl->reader.getVal340();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d340 = impl->ep->TemplateArgumentFor(impl->ep, v)) {
+      co_yield TemplateArgument(std::move(d340));
+    }
   }
   co_return;
 }
 
 Token ClassTemplateSpecializationDecl::template_keyword_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal141())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal138());
 }
 
 std::optional<Type> ClassTemplateSpecializationDecl::type_as_written(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal142();
+    RawEntityId eid = impl->reader.getVal139();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool ClassTemplateSpecializationDecl::is_class_scope_explicit_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal344();
+  return impl->reader.getVal341();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_instantiation_or_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal345();
+  return impl->reader.getVal342();
 }
 
 bool ClassTemplateSpecializationDecl::is_explicit_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal346();
+  return impl->reader.getVal343();
 }
 
 gap::generator<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecializationDecl::containing(const Decl &decl) {
@@ -48858,33 +45310,27 @@ std::optional<ClassTemplatePartialSpecializationDecl> ClassTemplatePartialSpecia
 }
 
 Type ClassTemplatePartialSpecializationDecl::injected_specialization_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal143();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal140();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal144();
-  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal156();
+  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ClassTemplatePartialSpecializationDecl ClassTemplatePartialSpecializationDecl::instantiated_from_member_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal160();
-  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal157();
+  return ClassTemplatePartialSpecializationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 TemplateParameterList ClassTemplatePartialSpecializationDecl::template_parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto offset = self.getVal347();
-  auto reader = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);
-  return TemplateParameterList(std::move(*reader));
+  RawEntityId eid = impl->reader.getVal158();
+  return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 bool ClassTemplatePartialSpecializationDecl::has_associated_constraints(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal348();
+  return impl->reader.getVal344();
 }
 
 gap::generator<EnumDecl> EnumDecl::containing(const Decl &decl) {
@@ -48952,12 +45398,11 @@ std::optional<EnumConstantDecl> EnumDecl::nth_enumerator(unsigned n) const {
 }
 
 gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = EnumConstantDecl::from(Decl(d48.value()))) {
+    if (auto d57 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = EnumConstantDecl::from(Decl(d57))) {
         co_yield std::move(*e);
       }
     }
@@ -48966,115 +45411,101 @@ gap::generator<EnumConstantDecl> EnumDecl::enumerators(void) const {
 }
 
 std::optional<EnumDecl> EnumDecl::instantiated_from_member_enum(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal73();
+    RawEntityId eid = impl->reader.getVal72();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return EnumDecl::from(Decl(std::move(eptr.value())));
+      return EnumDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::integer_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal76();
+    RawEntityId eid = impl->reader.getVal74();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 TokenRange EnumDecl::integer_type_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal77(), self.getVal78());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal75(), impl->reader.getVal76());
 }
 
 std::optional<unsigned> EnumDecl::odr_hash(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  if (!self.getVal100()) {
+  if (!impl->reader.getVal98()) {
     return std::nullopt;
   } else {
-    return static_cast<unsigned>(self.getVal140());
+    return static_cast<unsigned>(impl->reader.getVal137());
   }
   return std::nullopt;
 }
 
 std::optional<Type> EnumDecl::promotion_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal79();
+    RawEntityId eid = impl->reader.getVal77();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 std::optional<EnumDecl> EnumDecl::template_instantiation_pattern(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal81();
+    RawEntityId eid = impl->reader.getVal79();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return EnumDecl::from(Decl(std::move(eptr.value())));
+      return EnumDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 TemplateSpecializationKind EnumDecl::template_specialization_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<TemplateSpecializationKind>(self.getVal80());
+  return static_cast<TemplateSpecializationKind>(impl->reader.getVal78());
 }
 
 bool EnumDecl::is_closed(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool EnumDecl::is_closed_flag(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal102();
+  return impl->reader.getVal100();
 }
 
 bool EnumDecl::is_closed_non_flag(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal103();
+  return impl->reader.getVal101();
 }
 
 bool EnumDecl::is_complete(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal104();
+  return impl->reader.getVal102();
 }
 
 bool EnumDecl::is_fixed(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal105();
+  return impl->reader.getVal103();
 }
 
 bool EnumDecl::is_scoped(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal106();
+  return impl->reader.getVal104();
 }
 
 bool EnumDecl::is_scoped_using_class_tag(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal107();
+  return impl->reader.getVal105();
 }
 
 gap::generator<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::containing(const Decl &decl) {
@@ -49128,38 +45559,19 @@ std::optional<UnresolvedUsingTypenameDecl> UnresolvedUsingTypenameDecl::from(con
 }
 
 Token UnresolvedUsingTypenameDecl::ellipsis_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 Token UnresolvedUsingTypenameDecl::typename_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 Token UnresolvedUsingTypenameDecl::using_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 bool UnresolvedUsingTypenameDecl::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 gap::generator<TypedefNameDecl> TypedefNameDecl::containing(const Decl &decl) {
@@ -49215,33 +45627,29 @@ std::optional<TypedefNameDecl> TypedefNameDecl::from(const Decl &parent) {
 }
 
 std::optional<TagDecl> TypedefNameDecl::anonymous_declaration_with_typedef_name(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal53();
+    RawEntityId eid = impl->reader.getVal52();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TagDecl::from(Decl(std::move(eptr.value())));
+      return TagDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Type TypedefNameDecl::underlying_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal53();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool TypedefNameDecl::is_moded(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool TypedefNameDecl::is_transparent_tag(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 gap::generator<TypedefDecl> TypedefDecl::containing(const Decl &decl) {
@@ -49353,14 +45761,13 @@ std::optional<TypeAliasDecl> TypeAliasDecl::from(const Decl &parent) {
 }
 
 std::optional<TypeAliasTemplateDecl> TypeAliasDecl::described_alias_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal62();
+    RawEntityId eid = impl->reader.getVal61();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return TypeAliasTemplateDecl::from(Decl(std::move(eptr.value())));
+      return TypeAliasTemplateDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
@@ -49421,33 +45828,19 @@ std::optional<ObjCTypeParamDecl> ObjCTypeParamDecl::from(const Decl &parent) {
 }
 
 Token ObjCTypeParamDecl::colon_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 ObjCTypeParamVariance ObjCTypeParamDecl::variance(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCTypeParamVariance>(self.getVal74());
+  return static_cast<ObjCTypeParamVariance>(impl->reader.getVal73());
 }
 
 Token ObjCTypeParamDecl::variance_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
 }
 
 bool ObjCTypeParamDecl::has_explicit_bound(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 gap::generator<TemplateDecl> TemplateDecl::containing(const Decl &decl) {
@@ -49503,21 +45896,17 @@ std::optional<TemplateDecl> TemplateDecl::from(const Decl &parent) {
 }
 
 TemplateParameterList TemplateDecl::template_parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto offset = self.getVal140();
-  auto reader = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);
-  return TemplateParameterList(std::move(*reader));
+  RawEntityId eid = impl->reader.getVal51();
+  return TemplateParameterList(impl->ep->TemplateParameterListFor(impl->ep, eid));
 }
 
 NamedDecl TemplateDecl::templated_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool TemplateDecl::has_associated_constraints(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 gap::generator<RedeclarableTemplateDecl> RedeclarableTemplateDecl::containing(const Decl &decl) {
@@ -49574,14 +45963,12 @@ std::optional<RedeclarableTemplateDecl> RedeclarableTemplateDecl::from(const Dec
 }
 
 RedeclarableTemplateDecl RedeclarableTemplateDecl::instantiated_from_member_template(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return RedeclarableTemplateDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool RedeclarableTemplateDecl::is_member_specialization(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 gap::generator<FunctionTemplateDecl> FunctionTemplateDecl::containing(const Decl &decl) {
@@ -49639,8 +46026,7 @@ std::optional<FunctionTemplateDecl> FunctionTemplateDecl::from(const Decl &paren
 }
 
 bool FunctionTemplateDecl::is_abbreviated(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 gap::generator<ClassTemplateDecl> ClassTemplateDecl::containing(const Decl &decl) {
@@ -49856,14 +46242,12 @@ std::optional<ConceptDecl> ConceptDecl::from(const Decl &parent) {
 }
 
 Expr ConceptDecl::constraint_expression(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 bool ConceptDecl::is_type_concept(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 gap::generator<BuiltinTemplateDecl> BuiltinTemplateDecl::containing(const Decl &decl) {
@@ -49967,33 +46351,23 @@ std::optional<TemplateTemplateParmDecl> TemplateTemplateParmDecl::from(const Dec
 }
 
 bool TemplateTemplateParmDecl::default_argument_was_inherited(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 Token TemplateTemplateParmDecl::default_argument_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 bool TemplateTemplateParmDecl::has_default_argument(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool TemplateTemplateParmDecl::is_expanded_parameter_pack(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool TemplateTemplateParmDecl::is_pack_expansion(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 gap::generator<ObjCPropertyDecl> ObjCPropertyDecl::containing(const Decl &decl) {
@@ -50043,117 +46417,79 @@ std::optional<ObjCPropertyDecl> ObjCPropertyDecl::from(const Decl &parent) {
 }
 
 Token ObjCPropertyDecl::at_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 ObjCMethodDecl ObjCPropertyDecl::getter_method_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyDecl::getter_name_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 Token ObjCPropertyDecl::l_paren_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 ObjCPropertyDeclPropertyControl ObjCPropertyDecl::property_implementation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCPropertyDeclPropertyControl>(self.getVal74());
+  return static_cast<ObjCPropertyDeclPropertyControl>(impl->reader.getVal73());
 }
 
 ObjCIvarDecl ObjCPropertyDecl::property_instance_variable_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal62();
+  return ObjCIvarDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCPropertyQueryKind ObjCPropertyDecl::query_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCPropertyQueryKind>(self.getVal80());
+  return static_cast<ObjCPropertyQueryKind>(impl->reader.getVal78());
 }
 
 ObjCPropertyDeclSetterKind ObjCPropertyDecl::setter_kind(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCPropertyDeclSetterKind>(self.getVal82());
+  return static_cast<ObjCPropertyDeclSetterKind>(impl->reader.getVal80());
 }
 
 ObjCMethodDecl ObjCPropertyDecl::setter_method_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal64();
-  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal63();
+  return ObjCMethodDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCPropertyDecl::setter_name_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal73())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal72());
 }
 
 Type ObjCPropertyDecl::type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal76();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal74();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ObjCPropertyDecl::is_atomic(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool ObjCPropertyDecl::is_class_property(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool ObjCPropertyDecl::is_direct_property(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool ObjCPropertyDecl::is_instance_property(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool ObjCPropertyDecl::is_optional(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool ObjCPropertyDecl::is_read_only(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool ObjCPropertyDecl::is_retaining(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 gap::generator<ObjCMethodDecl> ObjCMethodDecl::containing(const Decl &decl) {
@@ -50203,159 +46539,121 @@ std::optional<ObjCMethodDecl> ObjCMethodDecl::from(const Decl &parent) {
 }
 
 bool ObjCMethodDecl::defined_in_ns_object(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 ObjCPropertyDecl ObjCMethodDecl::find_property_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return ObjCPropertyDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCInterfaceDecl ObjCMethodDecl::class_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ImplicitParamDecl ObjCMethodDecl::command_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal54();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal53();
+  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCMethodDecl::declarator_end_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 ObjCMethodDeclImplementationControl ObjCMethodDecl::implementation_control(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCMethodDeclImplementationControl>(self.getVal74());
+  return static_cast<ObjCMethodDeclImplementationControl>(impl->reader.getVal73());
 }
 
 ObjCMethodFamily ObjCMethodDecl::method_family(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<ObjCMethodFamily>(self.getVal80());
+  return static_cast<ObjCMethodFamily>(impl->reader.getVal78());
 }
 
 DeclObjCDeclQualifier ObjCMethodDecl::obj_c_decl_qualifier(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<DeclObjCDeclQualifier>(self.getVal82());
+  return static_cast<DeclObjCDeclQualifier>(impl->reader.getVal80());
 }
 
 Type ObjCMethodDecl::return_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal62();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 TokenRange ObjCMethodDecl::return_type_source_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal64(), self.getVal73());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal63(), impl->reader.getVal72());
 }
 
 Token ObjCMethodDecl::selector_start_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal74());
 }
 
 ImplicitParamDecl ObjCMethodDecl::self_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal77();
-  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal75();
+  return ImplicitParamDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 bool ObjCMethodDecl::has_parameter_destroyed_in_callee(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool ObjCMethodDecl::has_redeclaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool ObjCMethodDecl::has_related_result_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool ObjCMethodDecl::has_skipped_body(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 bool ObjCMethodDecl::is_class_method(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal91();
+  return impl->reader.getVal89();
 }
 
 bool ObjCMethodDecl::is_defined(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal92();
+  return impl->reader.getVal90();
 }
 
 bool ObjCMethodDecl::is_designated_initializer_for_the_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal93();
+  return impl->reader.getVal91();
 }
 
 bool ObjCMethodDecl::is_direct_method(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal94();
+  return impl->reader.getVal92();
 }
 
 bool ObjCMethodDecl::is_instance_method(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal95();
+  return impl->reader.getVal93();
 }
 
 bool ObjCMethodDecl::is_optional(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal96();
+  return impl->reader.getVal94();
 }
 
 bool ObjCMethodDecl::is_overriding(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal97();
+  return impl->reader.getVal95();
 }
 
 bool ObjCMethodDecl::is_property_accessor(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal98();
+  return impl->reader.getVal96();
 }
 
 bool ObjCMethodDecl::is_redeclaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal99();
+  return impl->reader.getVal97();
 }
 
 bool ObjCMethodDecl::is_synthesized_accessor_stub(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal100();
+  return impl->reader.getVal98();
 }
 
 bool ObjCMethodDecl::is_this_declaration_a_designated_initializer(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal101();
+  return impl->reader.getVal99();
 }
 
 bool ObjCMethodDecl::is_variadic(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal102();
+  return impl->reader.getVal100();
 }
 
 std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
@@ -50369,12 +46667,11 @@ std::optional<ParmVarDecl> ObjCMethodDecl::nth_parameter(unsigned n) const {
 }
 
 gap::generator<ParmVarDecl> ObjCMethodDecl::parameters(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ParmVarDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ParmVarDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -50393,24 +46690,27 @@ std::optional<Token> ObjCMethodDecl::nth_selector_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCMethodDecl::selector_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal47();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!fragment) {
+    assert(false);
+    co_return;
+  }
+  auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t48 = fragment->TokenFor(fragment, v)) {
-      co_yield std::move(t48.value());
+    if (auto t47 = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {
+      co_yield t47;
     }
   }
   co_return;
 }
 
 gap::generator<Decl> ObjCMethodDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal58();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -50476,12 +46776,11 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_class_method(unsigned n) co
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::class_methods(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(d47.value()))) {
+    if (auto d46 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(d46))) {
         co_yield std::move(*e);
       }
     }
@@ -50500,12 +46799,11 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_class_propertie(unsigned 
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal48();
+  auto list = impl->reader.getVal47();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d48 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(d48.value()))) {
+    if (auto d47 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(d47))) {
         co_yield std::move(*e);
       }
     }
@@ -50514,19 +46812,12 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::class_properties(void) const
 }
 
 TokenRange ObjCContainerDecl::at_end_range(void) const {
-  auto self = impl->Reader<ast::Decl>();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  return fragment->TokenRangeFor(fragment, self.getVal52(), self.getVal53());
+  return fragment->TokenRangeFor(fragment, impl->reader.getVal51(), impl->reader.getVal52());
 }
 
 Token ObjCContainerDecl::at_start_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n) const {
@@ -50540,12 +46831,11 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_instance_method(unsigned n)
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::instance_methods(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal58();
+  auto list = impl->reader.getVal57();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d58 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(d58.value()))) {
+    if (auto d57 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(d57))) {
         co_yield std::move(*e);
       }
     }
@@ -50564,12 +46854,11 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_instance_propertie(unsign
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::instance_properties(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal178();
+  auto list = impl->reader.getVal167();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d178 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(d178.value()))) {
+    if (auto d167 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(d167))) {
         co_yield std::move(*e);
       }
     }
@@ -50588,12 +46877,11 @@ std::optional<ObjCMethodDecl> ObjCContainerDecl::nth_method(unsigned n) const {
 }
 
 gap::generator<ObjCMethodDecl> ObjCContainerDecl::methods(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal179();
+  auto list = impl->reader.getVal175();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d179 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCMethodDecl::from(Decl(d179.value()))) {
+    if (auto d175 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCMethodDecl::from(Decl(d175))) {
         co_yield std::move(*e);
       }
     }
@@ -50612,12 +46900,11 @@ std::optional<ObjCPropertyDecl> ObjCContainerDecl::nth_propertie(unsigned n) con
 }
 
 gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal315();
+  auto list = impl->reader.getVal176();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d315 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCPropertyDecl::from(Decl(d315.value()))) {
+    if (auto d176 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCPropertyDecl::from(Decl(d176))) {
         co_yield std::move(*e);
       }
     }
@@ -50626,11 +46913,10 @@ gap::generator<ObjCPropertyDecl> ObjCContainerDecl::properties(void) const {
 }
 
 gap::generator<Decl> ObjCContainerDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal349();
+  auto list = impl->reader.getVal177();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -50686,56 +46972,34 @@ std::optional<ObjCCategoryDecl> ObjCCategoryDecl::from(const Decl &parent) {
 }
 
 bool ObjCCategoryDecl::is_class_extension(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 Token ObjCCategoryDecl::category_name_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 ObjCInterfaceDecl ObjCCategoryDecl::class_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal62();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 ObjCCategoryImplDecl ObjCCategoryDecl::implementation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal64();
-  return ObjCCategoryImplDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal63();
+  return ObjCCategoryImplDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCCategoryDecl::instance_variable_l_brace_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal73())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal72());
 }
 
 Token ObjCCategoryDecl::instance_variable_r_brace_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal74());
 }
 
 ObjCCategoryDecl ObjCCategoryDecl::next_class_category(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal77();
-  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal75();
+  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) const {
@@ -50749,12 +47013,11 @@ std::optional<ObjCIvarDecl> ObjCCategoryDecl::nth_instance_variable(unsigned n) 
 }
 
 gap::generator<ObjCIvarDecl> ObjCCategoryDecl::instance_variables(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal350();
+  auto list = impl->reader.getVal311();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d350 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(d350.value()))) {
+    if (auto d311 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(d311))) {
         co_yield std::move(*e);
       }
     }
@@ -50773,13 +47036,17 @@ std::optional<Token> ObjCCategoryDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCCategoryDecl::protocol_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal351();
+  auto list = impl->reader.getVal337();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!fragment) {
+    assert(false);
+    co_return;
+  }
+  auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t351 = fragment->TokenFor(fragment, v)) {
-      co_yield std::move(t351.value());
+    if (auto t337 = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {
+      co_yield t337;
     }
   }
   co_return;
@@ -50796,12 +47063,11 @@ std::optional<ObjCProtocolDecl> ObjCCategoryDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCCategoryDecl::protocols(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal352();
+  auto list = impl->reader.getVal339();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d352 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(d352.value()))) {
+    if (auto d339 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(d339))) {
         co_yield std::move(*e);
       }
     }
@@ -50860,19 +47126,16 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::from(const Decl &parent) {
 }
 
 std::string_view ObjCProtocolDecl::obj_c_runtime_name_as_string(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal69();
+  capnp::Text::Reader data = impl->reader.getVal68();
   return std::string_view(data.cStr(), data.size());
 }
 
 bool ObjCProtocolDecl::has_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool ObjCProtocolDecl::is_non_runtime_protocol(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
@@ -50886,13 +47149,17 @@ std::optional<Token> ObjCProtocolDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCProtocolDecl::protocol_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal350();
+  auto list = impl->reader.getVal311();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!fragment) {
+    assert(false);
+    co_return;
+  }
+  auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t350 = fragment->TokenFor(fragment, v)) {
-      co_yield std::move(t350.value());
+    if (auto t311 = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {
+      co_yield t311;
     }
   }
   co_return;
@@ -50909,12 +47176,11 @@ std::optional<ObjCProtocolDecl> ObjCProtocolDecl::nth_protocol(unsigned n) const
 }
 
 gap::generator<ObjCProtocolDecl> ObjCProtocolDecl::protocols(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal351();
+  auto list = impl->reader.getVal337();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d351 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(d351.value()))) {
+    if (auto d337 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(d337))) {
         co_yield std::move(*e);
       }
     }
@@ -50983,12 +47249,11 @@ std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_all_referenced_protocol(u
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal350();
+  auto list = impl->reader.getVal311();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d350 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(d350.value()))) {
+    if (auto d311 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(d311))) {
         co_yield std::move(*e);
       }
     }
@@ -50997,100 +47262,77 @@ gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::all_referenced_protocols(voi
 }
 
 bool ObjCInterfaceDecl::declares_or_inherits_designated_initializers(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 Token ObjCInterfaceDecl::end_of_definition_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 ObjCImplementationDecl ObjCInterfaceDecl::implementation(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return ObjCImplementationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal62();
+  return ObjCImplementationDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::string_view ObjCInterfaceDecl::obj_c_runtime_name_as_string(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal69();
+  capnp::Text::Reader data = impl->reader.getVal68();
   return std::string_view(data.cStr(), data.size());
 }
 
 std::optional<ObjCInterfaceDecl> ObjCInterfaceDecl::super_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal64();
+    RawEntityId eid = impl->reader.getVal63();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return ObjCInterfaceDecl::from(Decl(std::move(eptr.value())));
+      return ObjCInterfaceDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token ObjCInterfaceDecl::super_class_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal73())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal72());
 }
 
 std::optional<Type> ObjCInterfaceDecl::super_class_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal76();
+    RawEntityId eid = impl->reader.getVal74();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 Type ObjCInterfaceDecl::type_for_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal77();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal75();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 bool ObjCInterfaceDecl::has_definition(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 bool ObjCInterfaceDecl::has_designated_initializers(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal72();
+  return impl->reader.getVal71();
 }
 
 bool ObjCInterfaceDecl::is_arc_weakref_unavailable(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal89();
+  return impl->reader.getVal87();
 }
 
 bool ObjCInterfaceDecl::is_implicit_interface_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal90();
+  return impl->reader.getVal88();
 }
 
 ObjCInterfaceDecl ObjCInterfaceDecl::is_obj_c_requires_property_definitions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal78();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal76();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n) const {
@@ -51104,12 +47346,11 @@ std::optional<ObjCIvarDecl> ObjCInterfaceDecl::nth_instance_variable(unsigned n)
 }
 
 gap::generator<ObjCIvarDecl> ObjCInterfaceDecl::instance_variables(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal351();
+  auto list = impl->reader.getVal337();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d351 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(d351.value()))) {
+    if (auto d337 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(d337))) {
         co_yield std::move(*e);
       }
     }
@@ -51128,12 +47369,11 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_categorie(unsigned 
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_categories(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal352();
+  auto list = impl->reader.getVal339();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d352 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(d352.value()))) {
+    if (auto d339 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCCategoryDecl::from(Decl(d339))) {
         co_yield std::move(*e);
       }
     }
@@ -51152,12 +47392,11 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_known_extension(unsigned 
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::known_extensions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal353();
+  auto list = impl->reader.getVal340();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d353 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(d353.value()))) {
+    if (auto d340 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCCategoryDecl::from(Decl(d340))) {
         co_yield std::move(*e);
       }
     }
@@ -51176,13 +47415,17 @@ std::optional<Token> ObjCInterfaceDecl::nth_protocol_token(unsigned n) const {
 }
 
 gap::generator<Token> ObjCInterfaceDecl::protocol_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal354();
+  auto list = impl->reader.getVal345();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!fragment) {
+    assert(false);
+    co_return;
+  }
+  auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t354 = fragment->TokenFor(fragment, v)) {
-      co_yield std::move(t354.value());
+    if (auto t345 = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {
+      co_yield t345;
     }
   }
   co_return;
@@ -51199,12 +47442,11 @@ std::optional<ObjCProtocolDecl> ObjCInterfaceDecl::nth_protocol(unsigned n) cons
 }
 
 gap::generator<ObjCProtocolDecl> ObjCInterfaceDecl::protocols(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal355();
+  auto list = impl->reader.getVal346();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d355 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCProtocolDecl::from(Decl(d355.value()))) {
+    if (auto d346 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCProtocolDecl::from(Decl(d346))) {
         co_yield std::move(*e);
       }
     }
@@ -51223,12 +47465,11 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_categorie(unsigne
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_categories(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal356();
+  auto list = impl->reader.getVal347();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d356 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(d356.value()))) {
+    if (auto d347 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCCategoryDecl::from(Decl(d347))) {
         co_yield std::move(*e);
       }
     }
@@ -51247,12 +47488,11 @@ std::optional<ObjCCategoryDecl> ObjCInterfaceDecl::nth_visible_extension(unsigne
 }
 
 gap::generator<ObjCCategoryDecl> ObjCInterfaceDecl::visible_extensions(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal357();
+  auto list = impl->reader.getVal348();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d357 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCCategoryDecl::from(Decl(d357.value()))) {
+    if (auto d348 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCCategoryDecl::from(Decl(d348))) {
         co_yield std::move(*e);
       }
     }
@@ -51312,9 +47552,8 @@ std::optional<ObjCImplDecl> ObjCImplDecl::from(const Decl &parent) {
 }
 
 ObjCInterfaceDecl ObjCImplDecl::class_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal62();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal61();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(unsigned n) const {
@@ -51328,12 +47567,11 @@ std::optional<ObjCPropertyImplDecl> ObjCImplDecl::nth_property_implementation(un
 }
 
 gap::generator<ObjCPropertyImplDecl> ObjCImplDecl::property_implementations(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal350();
+  auto list = impl->reader.getVal311();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d350 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCPropertyImplDecl::from(Decl(d350.value()))) {
+    if (auto d311 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCPropertyImplDecl::from(Decl(d311))) {
         co_yield std::move(*e);
       }
     }
@@ -51396,19 +47634,12 @@ std::optional<ObjCCategoryImplDecl> ObjCCategoryImplDecl::from(const Decl &paren
 }
 
 ObjCCategoryDecl ObjCCategoryImplDecl::category_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal63();
-  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal62();
+  return ObjCCategoryDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCCategoryImplDecl::category_name_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal64())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal63());
 }
 
 gap::generator<ObjCImplementationDecl> ObjCImplementationDecl::containing(const Decl &decl) {
@@ -51466,55 +47697,33 @@ std::optional<ObjCImplementationDecl> ObjCImplementationDecl::from(const Decl &p
 }
 
 Token ObjCImplementationDecl::instance_variable_l_brace_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal63())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal62());
 }
 
 Token ObjCImplementationDecl::instance_variable_r_brace_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal64())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal63());
 }
 
 std::string_view ObjCImplementationDecl::obj_c_runtime_name_as_string(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  capnp::Text::Reader data = self.getVal69();
+  capnp::Text::Reader data = impl->reader.getVal68();
   return std::string_view(data.cStr(), data.size());
 }
 
 ObjCInterfaceDecl ObjCImplementationDecl::super_class(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal73();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal72();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token ObjCImplementationDecl::super_class_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal76())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal74());
 }
 
 bool ObjCImplementationDecl::has_destructors(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal70();
+  return impl->reader.getVal69();
 }
 
 bool ObjCImplementationDecl::has_non_zero_constructors(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal71();
+  return impl->reader.getVal70();
 }
 
 std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsigned n) const {
@@ -51528,12 +47737,11 @@ std::optional<ObjCIvarDecl> ObjCImplementationDecl::nth_instance_variable(unsign
 }
 
 gap::generator<ObjCIvarDecl> ObjCImplementationDecl::instance_variables(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal351();
+  auto list = impl->reader.getVal337();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d351 = impl->ep->DeclFor(impl->ep, v)) {
-      if (auto e = ObjCIvarDecl::from(Decl(d351.value()))) {
+    if (auto d337 = impl->ep->DeclFor(impl->ep, v)) {
+      if (auto e = ObjCIvarDecl::from(Decl(d337))) {
         co_yield std::move(*e);
       }
     }
@@ -51588,9 +47796,8 @@ std::optional<ObjCCompatibleAliasDecl> ObjCCompatibleAliasDecl::from(const Decl 
 }
 
 ObjCInterfaceDecl ObjCCompatibleAliasDecl::class_interface(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return ObjCInterfaceDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 gap::generator<NamespaceDecl> NamespaceDecl::containing(const Decl &decl) {
@@ -51640,11 +47847,10 @@ std::optional<NamespaceDecl> NamespaceDecl::from(const Decl &parent) {
 }
 
 gap::generator<Decl> NamespaceDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -51696,39 +47902,20 @@ std::optional<NamespaceAliasDecl> NamespaceAliasDecl::from(const Decl &parent) {
 }
 
 Token NamespaceAliasDecl::alias_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 NamedDecl NamespaceAliasDecl::aliased_namespace(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal52();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token NamespaceAliasDecl::namespace_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal54())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal53());
 }
 
 Token NamespaceAliasDecl::target_name_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal62())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal61());
 }
 
 gap::generator<LinkageSpecDecl> LinkageSpecDecl::containing(const Decl &decl) {
@@ -51774,11 +47961,10 @@ std::optional<LinkageSpecDecl> LinkageSpecDecl::from(const Decl &parent) {
 }
 
 gap::generator<Decl> LinkageSpecDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -51826,32 +48012,28 @@ std::optional<LifetimeExtendedTemporaryDecl> LifetimeExtendedTemporaryDecl::from
 }
 
 gap::generator<Stmt> LifetimeExtendedTemporaryDecl::children(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
     EntityId id(v);
-    if (auto d47 = impl->ep->StmtFor(impl->ep, v)) {
-      co_yield std::move(d47.value());
+    if (auto d46 = impl->ep->StmtFor(impl->ep, v)) {
+      co_yield Stmt(std::move(d46));
     }
   }
   co_return;
 }
 
 ValueDecl LifetimeExtendedTemporaryDecl::extending_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return ValueDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 StorageDuration LifetimeExtendedTemporaryDecl::storage_duration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return static_cast<StorageDuration>(self.getVal61());
+  return static_cast<StorageDuration>(impl->reader.getVal60());
 }
 
 Expr LifetimeExtendedTemporaryDecl::temporary_expression(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return Expr::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 gap::generator<ImportDecl> ImportDecl::containing(const Decl &decl) {
@@ -51907,13 +48089,17 @@ std::optional<Token> ImportDecl::nth_identifier_token(unsigned n) const {
 }
 
 gap::generator<Token> ImportDecl::identifier_tokens(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
+  if (!fragment) {
+    assert(false);
+    co_return;
+  }
+  auto tok_reader = fragment->ParsedTokenReader(fragment);
   for (auto v : list) {
     EntityId id(v);
-    if (auto t47 = fragment->TokenFor(fragment, v)) {
-      co_yield std::move(t47.value());
+    if (auto t46 = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {
+      co_yield t46;
     }
   }
   co_return;
@@ -51962,25 +48148,17 @@ std::optional<FriendTemplateDecl> FriendTemplateDecl::from(const Decl &parent) {
 }
 
 NamedDecl FriendTemplateDecl::friend_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal45();
-  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal44();
+  return NamedDecl::from(Decl(impl->ep->DeclFor(impl->ep, eid))).value();
 }
 
 Token FriendTemplateDecl::friend_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 Type FriendTemplateDecl::friend_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal53();
-  return Type(impl->ep->TypeFor(impl->ep, eid).value());
+  RawEntityId eid = impl->reader.getVal52();
+  return Type(impl->ep->TypeFor(impl->ep, eid));
 }
 
 std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_list(unsigned n) const {
@@ -51994,12 +48172,12 @@ std::optional<TemplateParameterList> FriendTemplateDecl::nth_template_parameter_
 }
 
 gap::generator<TemplateParameterList> FriendTemplateDecl::template_parameter_lists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal75();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d46 = impl->ep->TemplateParameterListFor(impl->ep, v)) {
+      co_yield TemplateParameterList(std::move(d46));
+    }
   }
   co_return;
 }
@@ -52047,46 +48225,37 @@ std::optional<FriendDecl> FriendDecl::from(const Decl &parent) {
 }
 
 std::optional<NamedDecl> FriendDecl::friend_declaration(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal45();
+    RawEntityId eid = impl->reader.getVal44();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {
-      return NamedDecl::from(Decl(std::move(eptr.value())));
+      return NamedDecl::from(Decl(std::move(eptr)));
     }
   }
   return std::nullopt;
 }
 
 Token FriendDecl::friend_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 std::optional<Type> FriendDecl::friend_type(void) const {
-  auto self = impl->Reader<ast::Decl>();
   if (true) {
-    RawEntityId eid = self.getVal53();
+    RawEntityId eid = impl->reader.getVal52();
     if (eid == kInvalidEntityId) {
       return std::nullopt;
     }
     if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {
-      return Type(std::move(eptr.value()));
+      return Type(std::move(eptr));
     }
   }
   return std::nullopt;
 }
 
 bool FriendDecl::is_unsupported_friend(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parameter_list(unsigned n) const {
@@ -52100,12 +48269,12 @@ std::optional<TemplateParameterList> FriendDecl::nth_friend_type_template_parame
 }
 
 gap::generator<TemplateParameterList> FriendDecl::friend_type_template_parameter_lists(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal75();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {
-    co_yield std::move(*ps_impl);
-  }
+    EntityId id(v);
+    if (auto d46 = impl->ep->TemplateParameterListFor(impl->ep, v)) {
+      co_yield TemplateParameterList(std::move(d46));
+    }
   }
   co_return;
 }
@@ -52153,29 +48322,16 @@ std::optional<FileScopeAsmDecl> FileScopeAsmDecl::from(const Decl &parent) {
 }
 
 Token FileScopeAsmDecl::assembly_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 StringLiteral FileScopeAsmDecl::assembly_string(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  RawEntityId eid = self.getVal52();
-  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();
+  RawEntityId eid = impl->reader.getVal51();
+  return StringLiteral::from(Stmt(impl->ep->StmtFor(impl->ep, eid))).value();
 }
 
 Token FileScopeAsmDecl::r_paren_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal53())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal52());
 }
 
 gap::generator<ExternCContextDecl> ExternCContextDecl::containing(const Decl &decl) {
@@ -52221,11 +48377,10 @@ std::optional<ExternCContextDecl> ExternCContextDecl::from(const Decl &parent) {
 }
 
 gap::generator<Decl> ExternCContextDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -52273,36 +48428,22 @@ std::optional<ExportDecl> ExportDecl::from(const Decl &parent) {
 }
 
 Token ExportDecl::export_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal45())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal44());
 }
 
 Token ExportDecl::r_brace_token(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);
-  if (auto tok = fragment->TokenFor(fragment, self.getVal52())) {
-    return tok.value();
-  } else {
-    return Token();
-  }
+  return impl->ep->TokenFor(impl->ep, impl->reader.getVal51());
 }
 
 bool ExportDecl::has_braces(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  return self.getVal46();
+  return impl->reader.getVal45();
 }
 
 gap::generator<Decl> ExportDecl::declarations_in_context(void) const {
-  auto self = impl->Reader<ast::Decl>();
-  auto list = self.getVal47();
+  auto list = impl->reader.getVal46();
   for (auto v : list) {
-    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {
-      co_yield std::move(decl.value());
+    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {
+      co_yield std::move(eptr);
     }
   }
 }
@@ -52347,623 +48488,6 @@ std::optional<EmptyDecl> EmptyDecl::from(const Decl &parent) {
       return reinterpret_cast<const EmptyDecl &>(parent);
     default: return std::nullopt;
   }
-}
-
-const char *EnumeratorName(DeclUseSelector sel) {
-  switch (sel) {
-    case DeclUseSelector::ACTING_DEFINITION: return "ACTING_DEFINITION";
-    case DeclUseSelector::ALIASED_NAMESPACE: return "ALIASED_NAMESPACE";
-    case DeclUseSelector::ANONYMOUS_DECLARATION_WITH_TYPEDEF_NAME: return "ANONYMOUS_DECLARATION_WITH_TYPEDEF_NAME";
-    case DeclUseSelector::ANONYMOUS_FIELD: return "ANONYMOUS_FIELD";
-    case DeclUseSelector::ARRAY_WITH_OBJECTS_METHOD: return "ARRAY_WITH_OBJECTS_METHOD";
-    case DeclUseSelector::AS_CXX_RECORD_DECLARATION: return "AS_CXX_RECORD_DECLARATION";
-    case DeclUseSelector::AS_DECLARATION: return "AS_DECLARATION";
-    case DeclUseSelector::AS_RECORD_DECLARATION: return "AS_RECORD_DECLARATION";
-    case DeclUseSelector::AS_TAG_DECLARATION: return "AS_TAG_DECLARATION";
-    case DeclUseSelector::AT_INDEX_METHOD_DECLARATION: return "AT_INDEX_METHOD_DECLARATION";
-    case DeclUseSelector::BLOCK_DECLARATION: return "BLOCK_DECLARATION";
-    case DeclUseSelector::BLOCK_MANGLING_CONTEXT_DECLARATION: return "BLOCK_MANGLING_CONTEXT_DECLARATION";
-    case DeclUseSelector::BODY: return "BODY";
-    case DeclUseSelector::BOXING_METHOD: return "BOXING_METHOD";
-    case DeclUseSelector::CALL_OPERATOR: return "CALL_OPERATOR";
-    case DeclUseSelector::CALLEE_DECLARATION: return "CALLEE_DECLARATION";
-    case DeclUseSelector::CAPTURED_DECLARATION: return "CAPTURED_DECLARATION";
-    case DeclUseSelector::CAPTURED_RECORD_DECLARATION: return "CAPTURED_RECORD_DECLARATION";
-    case DeclUseSelector::CATCH_PARAMETER_DECLARATION: return "CATCH_PARAMETER_DECLARATION";
-    case DeclUseSelector::CATEGORY_DECLARATION: return "CATEGORY_DECLARATION";
-    case DeclUseSelector::CLASS_INTERFACE: return "CLASS_INTERFACE";
-    case DeclUseSelector::CLASS_RECEIVER: return "CLASS_RECEIVER";
-    case DeclUseSelector::COMMAND_DECLARATION: return "COMMAND_DECLARATION";
-    case DeclUseSelector::CONDITION_VARIABLE: return "CONDITION_VARIABLE";
-    case DeclUseSelector::CONSTANT_TARGET: return "CONSTANT_TARGET";
-    case DeclUseSelector::CONSTRUCTED_BASE_CLASS: return "CONSTRUCTED_BASE_CLASS";
-    case DeclUseSelector::CONSTRUCTED_BASE_CLASS_SHADOW_DECLARATION: return "CONSTRUCTED_BASE_CLASS_SHADOW_DECLARATION";
-    case DeclUseSelector::CONSTRUCTOR: return "CONSTRUCTOR";
-    case DeclUseSelector::CONTAINING_INTERFACE: return "CONTAINING_INTERFACE";
-    case DeclUseSelector::CONTEXT_PARAMETER: return "CONTEXT_PARAMETER";
-    case DeclUseSelector::CONVERSION_FUNCTION: return "CONVERSION_FUNCTION";
-    case DeclUseSelector::CORRESPONDING_CONSTRUCTOR: return "CORRESPONDING_CONSTRUCTOR";
-    case DeclUseSelector::DECLARATION: return "DECLARATION";
-    case DeclUseSelector::DECOMPOSED_DECLARATION: return "DECOMPOSED_DECLARATION";
-    case DeclUseSelector::DEDUCED_TEMPLATE: return "DEDUCED_TEMPLATE";
-    case DeclUseSelector::DEPENDENT_CALL_OPERATOR: return "DEPENDENT_CALL_OPERATOR";
-    case DeclUseSelector::DEPENDENT_LAMBDA_CALL_OPERATOR: return "DEPENDENT_LAMBDA_CALL_OPERATOR";
-    case DeclUseSelector::DESCRIBED_ALIAS_TEMPLATE: return "DESCRIBED_ALIAS_TEMPLATE";
-    case DeclUseSelector::DESCRIBED_CLASS_TEMPLATE: return "DESCRIBED_CLASS_TEMPLATE";
-    case DeclUseSelector::DESCRIBED_FUNCTION_TEMPLATE: return "DESCRIBED_FUNCTION_TEMPLATE";
-    case DeclUseSelector::DESCRIBED_TEMPLATE: return "DESCRIBED_TEMPLATE";
-    case DeclUseSelector::DESCRIBED_VARIABLE_TEMPLATE: return "DESCRIBED_VARIABLE_TEMPLATE";
-    case DeclUseSelector::DESTRUCTOR: return "DESTRUCTOR";
-    case DeclUseSelector::DICTIONARY_WITH_OBJECTS_METHOD: return "DICTIONARY_WITH_OBJECTS_METHOD";
-    case DeclUseSelector::DIRECT_CALLEE: return "DIRECT_CALLEE";
-    case DeclUseSelector::ENUM_DECLARATION: return "ENUM_DECLARATION";
-    case DeclUseSelector::ERROR_DOMAIN: return "ERROR_DOMAIN";
-    case DeclUseSelector::EXCEPTION_DECLARATION: return "EXCEPTION_DECLARATION";
-    case DeclUseSelector::EXCEPTION_SPEC_DECLARATION: return "EXCEPTION_SPEC_DECLARATION";
-    case DeclUseSelector::EXCEPTION_SPEC_TEMPLATE: return "EXCEPTION_SPEC_TEMPLATE";
-    case DeclUseSelector::EXPLICIT_PROPERTY: return "EXPLICIT_PROPERTY";
-    case DeclUseSelector::EXTENDING_DECLARATION: return "EXTENDING_DECLARATION";
-    case DeclUseSelector::FIELD: return "FIELD";
-    case DeclUseSelector::FIND_PROPERTY_DECLARATION: return "FIND_PROPERTY_DECLARATION";
-    case DeclUseSelector::FIRST_QUALIFIER_FOUND_IN_SCOPE: return "FIRST_QUALIFIER_FOUND_IN_SCOPE";
-    case DeclUseSelector::FOUND_DECLARATION: return "FOUND_DECLARATION";
-    case DeclUseSelector::FRIEND_DECLARATION: return "FRIEND_DECLARATION";
-    case DeclUseSelector::FUNCTION: return "FUNCTION";
-    case DeclUseSelector::FUNCTION_DECLARATION: return "FUNCTION_DECLARATION";
-    case DeclUseSelector::GETTER_METHOD_DECLARATION: return "GETTER_METHOD_DECLARATION";
-    case DeclUseSelector::GUID_DECLARATION: return "GUID_DECLARATION";
-    case DeclUseSelector::HOLDING_VARIABLE: return "HOLDING_VARIABLE";
-    case DeclUseSelector::IMPLEMENTATION: return "IMPLEMENTATION";
-    case DeclUseSelector::IMPLICIT_PROPERTY_GETTER: return "IMPLICIT_PROPERTY_GETTER";
-    case DeclUseSelector::IMPLICIT_PROPERTY_SETTER: return "IMPLICIT_PROPERTY_SETTER";
-    case DeclUseSelector::INITIALIZED_FIELD_IN_UNION: return "INITIALIZED_FIELD_IN_UNION";
-    case DeclUseSelector::INITIALIZING_DECLARATION: return "INITIALIZING_DECLARATION";
-    case DeclUseSelector::INSTANTIATED_FROM_DECLARATION: return "INSTANTIATED_FROM_DECLARATION";
-    case DeclUseSelector::INSTANTIATED_FROM_MEMBER: return "INSTANTIATED_FROM_MEMBER";
-    case DeclUseSelector::INSTANTIATED_FROM_MEMBER_CLASS: return "INSTANTIATED_FROM_MEMBER_CLASS";
-    case DeclUseSelector::INSTANTIATED_FROM_MEMBER_ENUM: return "INSTANTIATED_FROM_MEMBER_ENUM";
-    case DeclUseSelector::INSTANTIATED_FROM_MEMBER_FUNCTION: return "INSTANTIATED_FROM_MEMBER_FUNCTION";
-    case DeclUseSelector::INSTANTIATED_FROM_MEMBER_TEMPLATE: return "INSTANTIATED_FROM_MEMBER_TEMPLATE";
-    case DeclUseSelector::INSTANTIATED_FROM_STATIC_DATA_MEMBER: return "INSTANTIATED_FROM_STATIC_DATA_MEMBER";
-    case DeclUseSelector::INSTANTIATED_FROM_USING_DECLARATION: return "INSTANTIATED_FROM_USING_DECLARATION";
-    case DeclUseSelector::INTERFACE: return "INTERFACE";
-    case DeclUseSelector::INTERFACE_DECLARATION: return "INTERFACE_DECLARATION";
-    case DeclUseSelector::INTRODUCER: return "INTRODUCER";
-    case DeclUseSelector::IS_LOCAL_CLASS: return "IS_LOCAL_CLASS";
-    case DeclUseSelector::IS_OBJ_C_REQUIRES_PROPERTY_DEFINITIONS: return "IS_OBJ_C_REQUIRES_PROPERTY_DEFINITIONS";
-    case DeclUseSelector::LABEL: return "LABEL";
-    case DeclUseSelector::LAMBDA_CALL_OPERATOR: return "LAMBDA_CALL_OPERATOR";
-    case DeclUseSelector::LAMBDA_CLASS: return "LAMBDA_CLASS";
-    case DeclUseSelector::LAMBDA_CONTEXT_DECLARATION: return "LAMBDA_CONTEXT_DECLARATION";
-    case DeclUseSelector::LIFETIME_EXTENDED_TEMPORARY_DECLARATION: return "LIFETIME_EXTENDED_TEMPORARY_DECLARATION";
-    case DeclUseSelector::LOOP_VARIABLE: return "LOOP_VARIABLE";
-    case DeclUseSelector::MEMBER_DECLARATION: return "MEMBER_DECLARATION";
-    case DeclUseSelector::METHOD_DECLARATION: return "METHOD_DECLARATION";
-    case DeclUseSelector::MOST_RECENT_CXX_RECORD_DECLARATION: return "MOST_RECENT_CXX_RECORD_DECLARATION";
-    case DeclUseSelector::NAMING_CLASS: return "NAMING_CLASS";
-    case DeclUseSelector::NEXT_CLASS_CATEGORY: return "NEXT_CLASS_CATEGORY";
-    case DeclUseSelector::NEXT_INSTANCE_VARIABLE: return "NEXT_INSTANCE_VARIABLE";
-    case DeclUseSelector::NEXT_USING_SHADOW_DECLARATION: return "NEXT_USING_SHADOW_DECLARATION";
-    case DeclUseSelector::NOMINATED_BASE_CLASS: return "NOMINATED_BASE_CLASS";
-    case DeclUseSelector::NOMINATED_BASE_CLASS_SHADOW_DECLARATION: return "NOMINATED_BASE_CLASS_SHADOW_DECLARATION";
-    case DeclUseSelector::NOMINATED_NAMESPACE_AS_WRITTEN: return "NOMINATED_NAMESPACE_AS_WRITTEN";
-    case DeclUseSelector::NON_CLOSURE_CONTEXT: return "NON_CLOSURE_CONTEXT";
-    case DeclUseSelector::NRVO_CANDIDATE: return "NRVO_CANDIDATE";
-    case DeclUseSelector::OPERATOR_DELETE: return "OPERATOR_DELETE";
-    case DeclUseSelector::OPERATOR_NEW: return "OPERATOR_NEW";
-    case DeclUseSelector::OWNED_TAG_DECLARATION: return "OWNED_TAG_DECLARATION";
-    case DeclUseSelector::PACK: return "PACK";
-    case DeclUseSelector::PARAMETER: return "PARAMETER";
-    case DeclUseSelector::PARAMETER_PACK: return "PARAMETER_PACK";
-    case DeclUseSelector::PARENT: return "PARENT";
-    case DeclUseSelector::POINTEE_CXX_RECORD_DECLARATION: return "POINTEE_CXX_RECORD_DECLARATION";
-    case DeclUseSelector::PRIMARY_TEMPLATE: return "PRIMARY_TEMPLATE";
-    case DeclUseSelector::PROMISE_DECLARATION: return "PROMISE_DECLARATION";
-    case DeclUseSelector::PROPERTY_DECLARATION: return "PROPERTY_DECLARATION";
-    case DeclUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION: return "PROPERTY_INSTANCE_VARIABLE_DECLARATION";
-    case DeclUseSelector::PROTOCOL: return "PROTOCOL";
-    case DeclUseSelector::RECEIVER_INTERFACE: return "RECEIVER_INTERFACE";
-    case DeclUseSelector::RECORD_DECLARATION: return "RECORD_DECLARATION";
-    case DeclUseSelector::REFERENCED_DECLARATION: return "REFERENCED_DECLARATION";
-    case DeclUseSelector::REFERENCED_DECLARATION_OF_CALLEE: return "REFERENCED_DECLARATION_OF_CALLEE";
-    case DeclUseSelector::SELF_DECLARATION: return "SELF_DECLARATION";
-    case DeclUseSelector::SETTER_METHOD_DECLARATION: return "SETTER_METHOD_DECLARATION";
-    case DeclUseSelector::SINGLE_DECLARATION: return "SINGLE_DECLARATION";
-    case DeclUseSelector::SOURCE_BIT_FIELD: return "SOURCE_BIT_FIELD";
-    case DeclUseSelector::SPECIALIZATION: return "SPECIALIZATION";
-    case DeclUseSelector::SPECIALIZED_TEMPLATE: return "SPECIALIZED_TEMPLATE";
-    case DeclUseSelector::SUPER_CLASS: return "SUPER_CLASS";
-    case DeclUseSelector::TARGET_CONSTRUCTOR: return "TARGET_CONSTRUCTOR";
-    case DeclUseSelector::TARGET_DECLARATION: return "TARGET_DECLARATION";
-    case DeclUseSelector::TARGET_UNION_FIELD: return "TARGET_UNION_FIELD";
-    case DeclUseSelector::TEMPLATE_INSTANTIATION_PATTERN: return "TEMPLATE_INSTANTIATION_PATTERN";
-    case DeclUseSelector::TEMPLATED_DECLARATION: return "TEMPLATED_DECLARATION";
-    case DeclUseSelector::TYPE_CONSTRAINT_CONCEPT: return "TYPE_CONSTRAINT_CONCEPT";
-    case DeclUseSelector::TYPEDEF_NAME_FOR_ANONYMOUS_DECLARATION: return "TYPEDEF_NAME_FOR_ANONYMOUS_DECLARATION";
-    case DeclUseSelector::UNDERLYING_DECLARATION: return "UNDERLYING_DECLARATION";
-    case DeclUseSelector::VARIABLE_DECLARATION: return "VARIABLE_DECLARATION";
-  }
-  return "<invalid>";
-}
-
-const char *EnumeratorName(StmtUseSelector sel) {
-  switch (sel) {
-    case StmtUseSelector::ADDRESS_SPACE_EXPRESSION: return "ADDRESS_SPACE_EXPRESSION";
-    case StmtUseSelector::ALIGNMENT: return "ALIGNMENT";
-    case StmtUseSelector::ALIGNMENT_EXPRESSION: return "ALIGNMENT_EXPRESSION";
-    case StmtUseSelector::ALLOCATE: return "ALLOCATE";
-    case StmtUseSelector::ALLOCATOR: return "ALLOCATOR";
-    case StmtUseSelector::ARGUMENT: return "ARGUMENT";
-    case StmtUseSelector::ARGUMENT_EXPRESSION: return "ARGUMENT_EXPRESSION";
-    case StmtUseSelector::ARRAY_FILLER: return "ARRAY_FILLER";
-    case StmtUseSelector::ARRAY_SIZE: return "ARRAY_SIZE";
-    case StmtUseSelector::ASSEMBLY_STRING: return "ASSEMBLY_STRING";
-    case StmtUseSelector::ASSERT_EXPRESSION: return "ASSERT_EXPRESSION";
-    case StmtUseSelector::ASSOCIATED_STATEMENT: return "ASSOCIATED_STATEMENT";
-    case StmtUseSelector::BASE: return "BASE";
-    case StmtUseSelector::BASE_EXPRESSION: return "BASE_EXPRESSION";
-    case StmtUseSelector::BEGIN_STATEMENT: return "BEGIN_STATEMENT";
-    case StmtUseSelector::BEST_DYNAMIC_CLASS_TYPE_EXPRESSION: return "BEST_DYNAMIC_CLASS_TYPE_EXPRESSION";
-    case StmtUseSelector::BINDING: return "BINDING";
-    case StmtUseSelector::BIT_WIDTH: return "BIT_WIDTH";
-    case StmtUseSelector::BLOCK: return "BLOCK";
-    case StmtUseSelector::BODY: return "BODY";
-    case StmtUseSelector::CALCULATE_LAST_ITERATION: return "CALCULATE_LAST_ITERATION";
-    case StmtUseSelector::CALLEE: return "CALLEE";
-    case StmtUseSelector::CAPTURED_STATEMENT: return "CAPTURED_STATEMENT";
-    case StmtUseSelector::CATCH_BODY: return "CATCH_BODY";
-    case StmtUseSelector::CHOSEN_SUB_EXPRESSION: return "CHOSEN_SUB_EXPRESSION";
-    case StmtUseSelector::COLLECTION: return "COLLECTION";
-    case StmtUseSelector::COLUMN_EXPRESSION: return "COLUMN_EXPRESSION";
-    case StmtUseSelector::COLUMN_INDEX: return "COLUMN_INDEX";
-    case StmtUseSelector::COMBINED_CONDITION: return "COMBINED_CONDITION";
-    case StmtUseSelector::COMBINED_DISTANCE_CONDITION: return "COMBINED_DISTANCE_CONDITION";
-    case StmtUseSelector::COMBINED_ENSURE_UPPER_BOUND: return "COMBINED_ENSURE_UPPER_BOUND";
-    case StmtUseSelector::COMBINED_INITIALIZER: return "COMBINED_INITIALIZER";
-    case StmtUseSelector::COMBINED_LOWER_BOUND_VARIABLE: return "COMBINED_LOWER_BOUND_VARIABLE";
-    case StmtUseSelector::COMBINED_NEXT_LOWER_BOUND: return "COMBINED_NEXT_LOWER_BOUND";
-    case StmtUseSelector::COMBINED_NEXT_UPPER_BOUND: return "COMBINED_NEXT_UPPER_BOUND";
-    case StmtUseSelector::COMBINED_PARALLEL_FOR_IN_DISTANCE_CONDITION: return "COMBINED_PARALLEL_FOR_IN_DISTANCE_CONDITION";
-    case StmtUseSelector::COMBINED_UPPER_BOUND_VARIABLE: return "COMBINED_UPPER_BOUND_VARIABLE";
-    case StmtUseSelector::COMBINER: return "COMBINER";
-    case StmtUseSelector::COMBINER_IN: return "COMBINER_IN";
-    case StmtUseSelector::COMBINER_OUT: return "COMBINER_OUT";
-    case StmtUseSelector::COMMON: return "COMMON";
-    case StmtUseSelector::COMMON_EXPRESSION: return "COMMON_EXPRESSION";
-    case StmtUseSelector::COMPOUND_BODY: return "COMPOUND_BODY";
-    case StmtUseSelector::COMPOUND_STATEMENT_BODY: return "COMPOUND_STATEMENT_BODY";
-    case StmtUseSelector::CONDITION: return "CONDITION";
-    case StmtUseSelector::CONDITION_EXPRESSION: return "CONDITION_EXPRESSION";
-    case StmtUseSelector::CONDITION_VARIABLE_DECLARATION_STATEMENT: return "CONDITION_VARIABLE_DECLARATION_STATEMENT";
-    case StmtUseSelector::CONFIG: return "CONFIG";
-    case StmtUseSelector::CONSTRAINT_EXPRESSION: return "CONSTRAINT_EXPRESSION";
-    case StmtUseSelector::CONSTRUCT_EXPRESSION: return "CONSTRUCT_EXPRESSION";
-    case StmtUseSelector::CONTROLLING_EXPRESSION: return "CONTROLLING_EXPRESSION";
-    case StmtUseSelector::COOKED_LITERAL: return "COOKED_LITERAL";
-    case StmtUseSelector::D: return "D";
-    case StmtUseSelector::DEALLOCATE: return "DEALLOCATE";
-    case StmtUseSelector::DEFAULT_ARGUMENT: return "DEFAULT_ARGUMENT";
-    case StmtUseSelector::DIMENSION_EXPRESSION: return "DIMENSION_EXPRESSION";
-    case StmtUseSelector::DISTANCE_FUNC: return "DISTANCE_FUNC";
-    case StmtUseSelector::DISTANCE_INCREMENT: return "DISTANCE_INCREMENT";
-    case StmtUseSelector::ELEMENT: return "ELEMENT";
-    case StmtUseSelector::ELSE_: return "ELSE_";
-    case StmtUseSelector::END_STATEMENT: return "END_STATEMENT";
-    case StmtUseSelector::ENSURE_UPPER_BOUND: return "ENSURE_UPPER_BOUND";
-    case StmtUseSelector::EXCEPT_HANDLER: return "EXCEPT_HANDLER";
-    case StmtUseSelector::EXCEPTION_HANDLER: return "EXCEPTION_HANDLER";
-    case StmtUseSelector::EXPRESSION: return "EXPRESSION";
-    case StmtUseSelector::EXPRESSION_OPERAND: return "EXPRESSION_OPERAND";
-    case StmtUseSelector::EXPRESSION_STATEMENT: return "EXPRESSION_STATEMENT";
-    case StmtUseSelector::FALLTHROUGH_HANDLER: return "FALLTHROUGH_HANDLER";
-    case StmtUseSelector::FALSE_EXPRESSION: return "FALSE_EXPRESSION";
-    case StmtUseSelector::FILTER_EXPRESSION: return "FILTER_EXPRESSION";
-    case StmtUseSelector::FINAL_SUSPEND_STATEMENT: return "FINAL_SUSPEND_STATEMENT";
-    case StmtUseSelector::FINALLY_BODY: return "FINALLY_BODY";
-    case StmtUseSelector::FINALLY_HANDLER: return "FINALLY_HANDLER";
-    case StmtUseSelector::FINALLY_STATEMENT: return "FINALLY_STATEMENT";
-    case StmtUseSelector::FIRST_SWITCH_CASE: return "FIRST_SWITCH_CASE";
-    case StmtUseSelector::FUNCTION_NAME: return "FUNCTION_NAME";
-    case StmtUseSelector::GETTER_CXX_CONSTRUCTOR: return "GETTER_CXX_CONSTRUCTOR";
-    case StmtUseSelector::HANDLER: return "HANDLER";
-    case StmtUseSelector::HANDLER_BLOCK: return "HANDLER_BLOCK";
-    case StmtUseSelector::IF_STATEMENT: return "IF_STATEMENT";
-    case StmtUseSelector::IGNORE_CASTS: return "IGNORE_CASTS";
-    case StmtUseSelector::IGNORE_CONTAINERS: return "IGNORE_CONTAINERS";
-    case StmtUseSelector::IGNORE_CONVERSION_OPERATOR_SINGLE_STEP: return "IGNORE_CONVERSION_OPERATOR_SINGLE_STEP";
-    case StmtUseSelector::IGNORE_IMPLICIT: return "IGNORE_IMPLICIT";
-    case StmtUseSelector::IGNORE_IMPLICIT_AS_WRITTEN: return "IGNORE_IMPLICIT_AS_WRITTEN";
-    case StmtUseSelector::IGNORE_IMPLICIT_CASTS: return "IGNORE_IMPLICIT_CASTS";
-    case StmtUseSelector::IGNORE_PARENTHESES: return "IGNORE_PARENTHESES";
-    case StmtUseSelector::IGNORE_PARENTHESIS_BASE_CASTS: return "IGNORE_PARENTHESIS_BASE_CASTS";
-    case StmtUseSelector::IGNORE_PARENTHESIS_CASTS: return "IGNORE_PARENTHESIS_CASTS";
-    case StmtUseSelector::IGNORE_PARENTHESIS_IMPLICIT_CASTS: return "IGNORE_PARENTHESIS_IMPLICIT_CASTS";
-    case StmtUseSelector::IGNORE_PARENTHESIS_L_VALUE_CASTS: return "IGNORE_PARENTHESIS_L_VALUE_CASTS";
-    case StmtUseSelector::IGNORE_PARENTHESIS_NOOP_CASTS: return "IGNORE_PARENTHESIS_NOOP_CASTS";
-    case StmtUseSelector::IGNORE_UNLESS_SPELLED_IN_SOURCE: return "IGNORE_UNLESS_SPELLED_IN_SOURCE";
-    case StmtUseSelector::IMPLICIT_OBJECT_ARGUMENT: return "IMPLICIT_OBJECT_ARGUMENT";
-    case StmtUseSelector::IN_CLASS_INITIALIZER: return "IN_CLASS_INITIALIZER";
-    case StmtUseSelector::INCREMENT: return "INCREMENT";
-    case StmtUseSelector::INDEX: return "INDEX";
-    case StmtUseSelector::INDIRECT_EXPRESSION: return "INDIRECT_EXPRESSION";
-    case StmtUseSelector::INITIALIZER: return "INITIALIZER";
-    case StmtUseSelector::INITIALIZER_EXPRESSION: return "INITIALIZER_EXPRESSION";
-    case StmtUseSelector::INITIALIZER_ORIGINAL: return "INITIALIZER_ORIGINAL";
-    case StmtUseSelector::INITIALIZER_PRIVATE: return "INITIALIZER_PRIVATE";
-    case StmtUseSelector::INITIALIZER_SUSPEND_STATEMENT: return "INITIALIZER_SUSPEND_STATEMENT";
-    case StmtUseSelector::INNERMOST_CAPTURED_STATEMENT: return "INNERMOST_CAPTURED_STATEMENT";
-    case StmtUseSelector::INSTANCE_RECEIVER: return "INSTANCE_RECEIVER";
-    case StmtUseSelector::IS_LAST_ITERATION_VARIABLE: return "IS_LAST_ITERATION_VARIABLE";
-    case StmtUseSelector::ITERATION_VARIABLE: return "ITERATION_VARIABLE";
-    case StmtUseSelector::KEY_EXPRESSION: return "KEY_EXPRESSION";
-    case StmtUseSelector::LAST_ITERATION: return "LAST_ITERATION";
-    case StmtUseSelector::LENGTH: return "LENGTH";
-    case StmtUseSelector::LHS: return "LHS";
-    case StmtUseSelector::LOOP_STATEMENT: return "LOOP_STATEMENT";
-    case StmtUseSelector::LOOP_VARIABLE_FUNC: return "LOOP_VARIABLE_FUNC";
-    case StmtUseSelector::LOOP_VARIABLE_REFERENCE: return "LOOP_VARIABLE_REFERENCE";
-    case StmtUseSelector::LOOP_VARIABLE_STATEMENT: return "LOOP_VARIABLE_STATEMENT";
-    case StmtUseSelector::LOWER_BOUND: return "LOWER_BOUND";
-    case StmtUseSelector::LOWER_BOUND_VARIABLE: return "LOWER_BOUND_VARIABLE";
-    case StmtUseSelector::MAPPER_VARIABLE_REFERENCE: return "MAPPER_VARIABLE_REFERENCE";
-    case StmtUseSelector::MAX: return "MAX";
-    case StmtUseSelector::MAX_THREADS: return "MAX_THREADS";
-    case StmtUseSelector::MESSAGE: return "MESSAGE";
-    case StmtUseSelector::MIN: return "MIN";
-    case StmtUseSelector::MIN_BLOCKS: return "MIN_BLOCKS";
-    case StmtUseSelector::NEXT_LOWER_BOUND: return "NEXT_LOWER_BOUND";
-    case StmtUseSelector::NEXT_SWITCH_CASE: return "NEXT_SWITCH_CASE";
-    case StmtUseSelector::NEXT_UPPER_BOUND: return "NEXT_UPPER_BOUND";
-    case StmtUseSelector::NOEXCEPT_EXPRESSION: return "NOEXCEPT_EXPRESSION";
-    case StmtUseSelector::NUM_BITS_EXPRESSION: return "NUM_BITS_EXPRESSION";
-    case StmtUseSelector::NUM_ITERATIONS: return "NUM_ITERATIONS";
-    case StmtUseSelector::OBJ_C_PROPERTY: return "OBJ_C_PROPERTY";
-    case StmtUseSelector::OFFSET: return "OFFSET";
-    case StmtUseSelector::OPAQUE_VALUE: return "OPAQUE_VALUE";
-    case StmtUseSelector::OPERAND: return "OPERAND";
-    case StmtUseSelector::OPERATOR_COAWAIT_LOOKUP: return "OPERATOR_COAWAIT_LOOKUP";
-    case StmtUseSelector::OPERATOR_DELETE_THIS_ARGUMENT: return "OPERATOR_DELETE_THIS_ARGUMENT";
-    case StmtUseSelector::ORDER: return "ORDER";
-    case StmtUseSelector::ORDER_FAIL: return "ORDER_FAIL";
-    case StmtUseSelector::PATTERN: return "PATTERN";
-    case StmtUseSelector::PLACEHOLDER_TYPE_CONSTRAINT: return "PLACEHOLDER_TYPE_CONSTRAINT";
-    case StmtUseSelector::POINTER: return "POINTER";
-    case StmtUseSelector::PRE_CONDITION: return "PRE_CONDITION";
-    case StmtUseSelector::PRE_INITIALIZERS: return "PRE_INITIALIZERS";
-    case StmtUseSelector::PREV_ENSURE_UPPER_BOUND: return "PREV_ENSURE_UPPER_BOUND";
-    case StmtUseSelector::PREV_LOWER_BOUND_VARIABLE: return "PREV_LOWER_BOUND_VARIABLE";
-    case StmtUseSelector::PREV_UPPER_BOUND_VARIABLE: return "PREV_UPPER_BOUND_VARIABLE";
-    case StmtUseSelector::PROMISE_CALL: return "PROMISE_CALL";
-    case StmtUseSelector::PROMISE_DECLARATION_STATEMENT: return "PROMISE_DECLARATION_STATEMENT";
-    case StmtUseSelector::QUERIED_EXPRESSION: return "QUERIED_EXPRESSION";
-    case StmtUseSelector::R: return "R";
-    case StmtUseSelector::RANGE_INITIALIZER: return "RANGE_INITIALIZER";
-    case StmtUseSelector::RANGE_STATEMENT: return "RANGE_STATEMENT";
-    case StmtUseSelector::RAW_STATEMENT: return "RAW_STATEMENT";
-    case StmtUseSelector::READY_EXPRESSION: return "READY_EXPRESSION";
-    case StmtUseSelector::REDUCTION_REFERENCE: return "REDUCTION_REFERENCE";
-    case StmtUseSelector::REFERENCE: return "REFERENCE";
-    case StmtUseSelector::REPLACEMENT: return "REPLACEMENT";
-    case StmtUseSelector::REQUIRES_CLAUSE: return "REQUIRES_CLAUSE";
-    case StmtUseSelector::RESULT_EXPRESSION: return "RESULT_EXPRESSION";
-    case StmtUseSelector::RESUME_EXPRESSION: return "RESUME_EXPRESSION";
-    case StmtUseSelector::RETURN_STATEMENT: return "RETURN_STATEMENT";
-    case StmtUseSelector::RETURN_STATEMENT_ON_ALLOC_FAILURE: return "RETURN_STATEMENT_ON_ALLOC_FAILURE";
-    case StmtUseSelector::RETURN_VALUE: return "RETURN_VALUE";
-    case StmtUseSelector::RETURN_VALUE_INITIALIZER: return "RETURN_VALUE_INITIALIZER";
-    case StmtUseSelector::RHS: return "RHS";
-    case StmtUseSelector::ROW_EXPRESSION: return "ROW_EXPRESSION";
-    case StmtUseSelector::ROW_INDEX: return "ROW_INDEX";
-    case StmtUseSelector::SCOPE: return "SCOPE";
-    case StmtUseSelector::SEMANTIC_FORM: return "SEMANTIC_FORM";
-    case StmtUseSelector::SETTER_CXX_ASSIGNMENT: return "SETTER_CXX_ASSIGNMENT";
-    case StmtUseSelector::SIMDLEN: return "SIMDLEN";
-    case StmtUseSelector::SIZE_EXPRESSION: return "SIZE_EXPRESSION";
-    case StmtUseSelector::SOURCE_EXPRESSION: return "SOURCE_EXPRESSION";
-    case StmtUseSelector::SRC_EXPRESSION: return "SRC_EXPRESSION";
-    case StmtUseSelector::STATEMENT: return "STATEMENT";
-    case StmtUseSelector::STATEMENT_EXPRESSION_RESULT: return "STATEMENT_EXPRESSION_RESULT";
-    case StmtUseSelector::STRIDE: return "STRIDE";
-    case StmtUseSelector::STRIDE_VARIABLE: return "STRIDE_VARIABLE";
-    case StmtUseSelector::STRING: return "STRING";
-    case StmtUseSelector::STRIP_LABEL_LIKE_STATEMENTS: return "STRIP_LABEL_LIKE_STATEMENTS";
-    case StmtUseSelector::STRUCTURED_BLOCK: return "STRUCTURED_BLOCK";
-    case StmtUseSelector::SUB_EXPRESSION: return "SUB_EXPRESSION";
-    case StmtUseSelector::SUB_EXPRESSION_AS_WRITTEN: return "SUB_EXPRESSION_AS_WRITTEN";
-    case StmtUseSelector::SUB_STATEMENT: return "SUB_STATEMENT";
-    case StmtUseSelector::SUCCESS_VALUE: return "SUCCESS_VALUE";
-    case StmtUseSelector::SUSPEND_EXPRESSION: return "SUSPEND_EXPRESSION";
-    case StmtUseSelector::SYNCH_BODY: return "SYNCH_BODY";
-    case StmtUseSelector::SYNCH_EXPRESSION: return "SYNCH_EXPRESSION";
-    case StmtUseSelector::SYNTACTIC_FORM: return "SYNTACTIC_FORM";
-    case StmtUseSelector::TARGET: return "TARGET";
-    case StmtUseSelector::TASK_REDUCTION_REFERENCE_EXPRESSION: return "TASK_REDUCTION_REFERENCE_EXPRESSION";
-    case StmtUseSelector::TEMPORARY_EXPRESSION: return "TEMPORARY_EXPRESSION";
-    case StmtUseSelector::THEN: return "THEN";
-    case StmtUseSelector::THROW_EXPRESSION: return "THROW_EXPRESSION";
-    case StmtUseSelector::TRAILING_REQUIRES_CLAUSE: return "TRAILING_REQUIRES_CLAUSE";
-    case StmtUseSelector::TRANSFORMED_STATEMENT: return "TRANSFORMED_STATEMENT";
-    case StmtUseSelector::TRUE_EXPRESSION: return "TRUE_EXPRESSION";
-    case StmtUseSelector::TRY_BLOCK: return "TRY_BLOCK";
-    case StmtUseSelector::TRY_BODY: return "TRY_BODY";
-    case StmtUseSelector::UNDERLYING_EXPRESSION: return "UNDERLYING_EXPRESSION";
-    case StmtUseSelector::UNINSTANTIATED_DEFAULT_ARGUMENT: return "UNINSTANTIATED_DEFAULT_ARGUMENT";
-    case StmtUseSelector::UPDATE_EXPRESSION: return "UPDATE_EXPRESSION";
-    case StmtUseSelector::UPDATER: return "UPDATER";
-    case StmtUseSelector::UPPER_BOUND_VARIABLE: return "UPPER_BOUND_VARIABLE";
-    case StmtUseSelector::V: return "V";
-    case StmtUseSelector::VALUE: return "VALUE";
-    case StmtUseSelector::VALUE1: return "VALUE1";
-    case StmtUseSelector::VALUE2: return "VALUE2";
-    case StmtUseSelector::VARIANT_FUNC_REFERENCE: return "VARIANT_FUNC_REFERENCE";
-    case StmtUseSelector::WEAK: return "WEAK";
-    case StmtUseSelector::X: return "X";
-  }
-  return "<invalid>";
-}
-
-const char *EnumeratorName(TypeUseSelector sel) {
-  switch (sel) {
-    case TypeUseSelector::ALIASED_TYPE: return "ALIASED_TYPE";
-    case TypeUseSelector::ALIGNMENT_TYPE: return "ALIGNMENT_TYPE";
-    case TypeUseSelector::ALLOCATED_TYPE: return "ALLOCATED_TYPE";
-    case TypeUseSelector::ARGUMENT_TYPE: return "ARGUMENT_TYPE";
-    case TypeUseSelector::ARRAY_ELEMENT_TYPE_NO_TYPE_QUALIFIED: return "ARRAY_ELEMENT_TYPE_NO_TYPE_QUALIFIED";
-    case TypeUseSelector::AS_COMPLEX_INTEGER_TYPE: return "AS_COMPLEX_INTEGER_TYPE";
-    case TypeUseSelector::AS_OBJ_C_INTERFACE_POINTER_TYPE: return "AS_OBJ_C_INTERFACE_POINTER_TYPE";
-    case TypeUseSelector::AS_OBJ_C_INTERFACE_TYPE: return "AS_OBJ_C_INTERFACE_TYPE";
-    case TypeUseSelector::AS_OBJ_C_QUALIFIED_CLASS_TYPE: return "AS_OBJ_C_QUALIFIED_CLASS_TYPE";
-    case TypeUseSelector::AS_OBJ_C_QUALIFIED_ID_TYPE: return "AS_OBJ_C_QUALIFIED_ID_TYPE";
-    case TypeUseSelector::AS_OBJ_C_QUALIFIED_INTERFACE_TYPE: return "AS_OBJ_C_QUALIFIED_INTERFACE_TYPE";
-    case TypeUseSelector::AS_PLACEHOLDER_TYPE: return "AS_PLACEHOLDER_TYPE";
-    case TypeUseSelector::AS_STRUCTURE_TYPE: return "AS_STRUCTURE_TYPE";
-    case TypeUseSelector::AS_TYPE: return "AS_TYPE";
-    case TypeUseSelector::AS_UNION_TYPE: return "AS_UNION_TYPE";
-    case TypeUseSelector::ATOMIC_UNQUALIFIED_TYPE: return "ATOMIC_UNQUALIFIED_TYPE";
-    case TypeUseSelector::BASE_TYPE: return "BASE_TYPE";
-    case TypeUseSelector::CALL_RESULT_TYPE: return "CALL_RESULT_TYPE";
-    case TypeUseSelector::CALL_RETURN_TYPE: return "CALL_RETURN_TYPE";
-    case TypeUseSelector::CANONICAL_TYPE: return "CANONICAL_TYPE";
-    case TypeUseSelector::CAPTURED_VLA_TYPE: return "CAPTURED_VLA_TYPE";
-    case TypeUseSelector::CAUGHT_TYPE: return "CAUGHT_TYPE";
-    case TypeUseSelector::CLASS_: return "CLASS_";
-    case TypeUseSelector::CLASS_RECEIVER: return "CLASS_RECEIVER";
-    case TypeUseSelector::CLASS_RECEIVER_TYPE: return "CLASS_RECEIVER_TYPE";
-    case TypeUseSelector::COMPUTATION_LHS_TYPE: return "COMPUTATION_LHS_TYPE";
-    case TypeUseSelector::COMPUTATION_RESULT_TYPE: return "COMPUTATION_RESULT_TYPE";
-    case TypeUseSelector::CONTAINED_AUTO_TYPE: return "CONTAINED_AUTO_TYPE";
-    case TypeUseSelector::CONTAINED_DEDUCED_TYPE: return "CONTAINED_DEDUCED_TYPE";
-    case TypeUseSelector::CONVERSION_TYPE: return "CONVERSION_TYPE";
-    case TypeUseSelector::DECLARED_RETURN_TYPE: return "DECLARED_RETURN_TYPE";
-    case TypeUseSelector::DEFAULT_ARGUMENT: return "DEFAULT_ARGUMENT";
-    case TypeUseSelector::DEFAULT_ARGUMENT_INFO: return "DEFAULT_ARGUMENT_INFO";
-    case TypeUseSelector::DEREF_TYPE: return "DEREF_TYPE";
-    case TypeUseSelector::DEREF_TYPE_TOKEN: return "DEREF_TYPE_TOKEN";
-    case TypeUseSelector::DESTROYED_TYPE: return "DESTROYED_TYPE";
-    case TypeUseSelector::DESUGAR: return "DESUGAR";
-    case TypeUseSelector::DESUGARED_TYPE: return "DESUGARED_TYPE";
-    case TypeUseSelector::ELEMENT_TYPE: return "ELEMENT_TYPE";
-    case TypeUseSelector::ENCODED_TYPE: return "ENCODED_TYPE";
-    case TypeUseSelector::EQUIVALENT_TYPE: return "EQUIVALENT_TYPE";
-    case TypeUseSelector::FRIEND_TYPE: return "FRIEND_TYPE";
-    case TypeUseSelector::FUNCTION_TYPE: return "FUNCTION_TYPE";
-    case TypeUseSelector::IGNORE_PARENTHESES: return "IGNORE_PARENTHESES";
-    case TypeUseSelector::INJECTED_SPECIALIZATION_TYPE: return "INJECTED_SPECIALIZATION_TYPE";
-    case TypeUseSelector::INJECTED_TST: return "INJECTED_TST";
-    case TypeUseSelector::INNER_TYPE: return "INNER_TYPE";
-    case TypeUseSelector::INTEGER_TYPE: return "INTEGER_TYPE";
-    case TypeUseSelector::INTERFACE: return "INTERFACE";
-    case TypeUseSelector::INTERFACE_TOKEN: return "INTERFACE_TOKEN";
-    case TypeUseSelector::INTERFACE_TYPE: return "INTERFACE_TYPE";
-    case TypeUseSelector::LAMBDA_TYPE: return "LAMBDA_TYPE";
-    case TypeUseSelector::LOCAL_UNQUALIFIED_TYPE: return "LOCAL_UNQUALIFIED_TYPE";
-    case TypeUseSelector::LOCALLY_UNQUALIFIED_SINGLE_STEP_DESUGARED_TYPE: return "LOCALLY_UNQUALIFIED_SINGLE_STEP_DESUGARED_TYPE";
-    case TypeUseSelector::MATCHING_C_TYPE: return "MATCHING_C_TYPE";
-    case TypeUseSelector::MATCHING_C_TYPE_TOKEN: return "MATCHING_C_TYPE_TOKEN";
-    case TypeUseSelector::MODIFIED_TYPE: return "MODIFIED_TYPE";
-    case TypeUseSelector::NAMED_TYPE: return "NAMED_TYPE";
-    case TypeUseSelector::NON_L_VALUE_EXPRESSION_TYPE: return "NON_L_VALUE_EXPRESSION_TYPE";
-    case TypeUseSelector::NON_PACK_EXPANSION_TYPE: return "NON_PACK_EXPANSION_TYPE";
-    case TypeUseSelector::NON_REFERENCE_TYPE: return "NON_REFERENCE_TYPE";
-    case TypeUseSelector::NULL_POINTER_TYPE: return "NULL_POINTER_TYPE";
-    case TypeUseSelector::OBJECT_TYPE: return "OBJECT_TYPE";
-    case TypeUseSelector::ORIGINAL_TYPE: return "ORIGINAL_TYPE";
-    case TypeUseSelector::PARAMETER_TYPE: return "PARAMETER_TYPE";
-    case TypeUseSelector::PARAMETER_TYPE_FOR_DECLARATION: return "PARAMETER_TYPE_FOR_DECLARATION";
-    case TypeUseSelector::PATTERN: return "PATTERN";
-    case TypeUseSelector::POINTEE_OR_ARRAY_ELEMENT_TYPE: return "POINTEE_OR_ARRAY_ELEMENT_TYPE";
-    case TypeUseSelector::POINTEE_TYPE: return "POINTEE_TYPE";
-    case TypeUseSelector::POINTEE_TYPE_AS_WRITTEN: return "POINTEE_TYPE_AS_WRITTEN";
-    case TypeUseSelector::PROMOTION_TYPE: return "PROMOTION_TYPE";
-    case TypeUseSelector::QUERIED_TYPE: return "QUERIED_TYPE";
-    case TypeUseSelector::RECEIVER_TYPE: return "RECEIVER_TYPE";
-    case TypeUseSelector::REPLACED_PARAMETER: return "REPLACED_PARAMETER";
-    case TypeUseSelector::REPLACEMENT_TYPE: return "REPLACEMENT_TYPE";
-    case TypeUseSelector::RESOLVED_TYPE: return "RESOLVED_TYPE";
-    case TypeUseSelector::RETURN_TYPE: return "RETURN_TYPE";
-    case TypeUseSelector::SCOPE_TYPE: return "SCOPE_TYPE";
-    case TypeUseSelector::SIGNATURE_AS_WRITTEN: return "SIGNATURE_AS_WRITTEN";
-    case TypeUseSelector::SINGLE_STEP_DESUGARED_TYPE: return "SINGLE_STEP_DESUGARED_TYPE";
-    case TypeUseSelector::STRIP_OBJ_C_KIND_OF_TYPE: return "STRIP_OBJ_C_KIND_OF_TYPE";
-    case TypeUseSelector::STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIERS: return "STRIP_OBJ_C_KIND_OF_TYPE_AND_QUALIFIERS";
-    case TypeUseSelector::SUPER_CLASS_TYPE: return "SUPER_CLASS_TYPE";
-    case TypeUseSelector::SUPER_RECEIVER_TYPE: return "SUPER_RECEIVER_TYPE";
-    case TypeUseSelector::SUPER_TYPE: return "SUPER_TYPE";
-    case TypeUseSelector::SVE_ELEMENT_TYPE: return "SVE_ELEMENT_TYPE";
-    case TypeUseSelector::THIS_OBJECT_TYPE: return "THIS_OBJECT_TYPE";
-    case TypeUseSelector::THIS_TYPE: return "THIS_TYPE";
-    case TypeUseSelector::TYPE: return "TYPE";
-    case TypeUseSelector::TYPE_AS_WRITTEN: return "TYPE_AS_WRITTEN";
-    case TypeUseSelector::TYPE_FOR_DECLARATION: return "TYPE_FOR_DECLARATION";
-    case TypeUseSelector::TYPE_HINT: return "TYPE_HINT";
-    case TypeUseSelector::TYPE_HINT_TOKEN: return "TYPE_HINT_TOKEN";
-    case TypeUseSelector::TYPE_OF_ARGUMENT: return "TYPE_OF_ARGUMENT";
-    case TypeUseSelector::TYPE_OPERAND: return "TYPE_OPERAND";
-    case TypeUseSelector::TYPE_OPERAND_SOURCE_INFO: return "TYPE_OPERAND_SOURCE_INFO";
-    case TypeUseSelector::TYPEDEF_TYPE: return "TYPEDEF_TYPE";
-    case TypeUseSelector::TYPEDEF_TYPE_TOKEN: return "TYPEDEF_TYPE_TOKEN";
-    case TypeUseSelector::UNDERLYING_TYPE: return "UNDERLYING_TYPE";
-    case TypeUseSelector::UNQUALIFIED_DESUGARED_TYPE: return "UNQUALIFIED_DESUGARED_TYPE";
-    case TypeUseSelector::UNQUALIFIED_TYPE: return "UNQUALIFIED_TYPE";
-    case TypeUseSelector::VALUE_TYPE: return "VALUE_TYPE";
-    case TypeUseSelector::WITH_CONST: return "WITH_CONST";
-    case TypeUseSelector::WITH_RESTRICT: return "WITH_RESTRICT";
-    case TypeUseSelector::WITH_VOLATILE: return "WITH_VOLATILE";
-    case TypeUseSelector::WITHOUT_LOCAL_FAST_QUALIFIERS: return "WITHOUT_LOCAL_FAST_QUALIFIERS";
-    case TypeUseSelector::WRAPPED_TYPE: return "WRAPPED_TYPE";
-    case TypeUseSelector::WRITTEN_TYPE: return "WRITTEN_TYPE";
-  }
-  return "<invalid>";
-}
-
-const char *EnumeratorName(TokenUseSelector sel) {
-  switch (sel) {
-    case TokenUseSelector::ACCESS_SPECIFIER_TOKEN: return "ACCESS_SPECIFIER_TOKEN";
-    case TokenUseSelector::ACCESSOR_TOKEN: return "ACCESSOR_TOKEN";
-    case TokenUseSelector::ALIAS_TOKEN: return "ALIAS_TOKEN";
-    case TokenUseSelector::AMP_AMP_TOKEN: return "AMP_AMP_TOKEN";
-    case TokenUseSelector::ASSEMBLY_TOKEN: return "ASSEMBLY_TOKEN";
-    case TokenUseSelector::AT_CATCH_TOKEN: return "AT_CATCH_TOKEN";
-    case TokenUseSelector::AT_FINALLY_TOKEN: return "AT_FINALLY_TOKEN";
-    case TokenUseSelector::AT_START_TOKEN: return "AT_START_TOKEN";
-    case TokenUseSelector::AT_SYNCHRONIZED_TOKEN: return "AT_SYNCHRONIZED_TOKEN";
-    case TokenUseSelector::AT_TOKEN: return "AT_TOKEN";
-    case TokenUseSelector::AT_TRY_TOKEN: return "AT_TRY_TOKEN";
-    case TokenUseSelector::ATTRIBUTE_TOKEN: return "ATTRIBUTE_TOKEN";
-    case TokenUseSelector::BASE_TOKEN_END: return "BASE_TOKEN_END";
-    case TokenUseSelector::BASE_TYPE_TOKEN: return "BASE_TYPE_TOKEN";
-    case TokenUseSelector::BREAK_TOKEN: return "BREAK_TOKEN";
-    case TokenUseSelector::BRIDGE_KEYWORD_TOKEN: return "BRIDGE_KEYWORD_TOKEN";
-    case TokenUseSelector::BUILTIN_TOKEN: return "BUILTIN_TOKEN";
-    case TokenUseSelector::CAPTURE_DEFAULT_TOKEN: return "CAPTURE_DEFAULT_TOKEN";
-    case TokenUseSelector::CARET_TOKEN: return "CARET_TOKEN";
-    case TokenUseSelector::CASE_TOKEN: return "CASE_TOKEN";
-    case TokenUseSelector::CATCH_TOKEN: return "CATCH_TOKEN";
-    case TokenUseSelector::CATEGORY_NAME_TOKEN: return "CATEGORY_NAME_TOKEN";
-    case TokenUseSelector::COAWAIT_TOKEN: return "COAWAIT_TOKEN";
-    case TokenUseSelector::COLON_COLON_TOKEN: return "COLON_COLON_TOKEN";
-    case TokenUseSelector::COLON_TOKEN: return "COLON_TOKEN";
-    case TokenUseSelector::CONTINUE_TOKEN: return "CONTINUE_TOKEN";
-    case TokenUseSelector::DECLARATOR_END_TOKEN: return "DECLARATOR_END_TOKEN";
-    case TokenUseSelector::DEFAULT_ARGUMENT_TOKEN: return "DEFAULT_ARGUMENT_TOKEN";
-    case TokenUseSelector::DEFAULT_TOKEN: return "DEFAULT_TOKEN";
-    case TokenUseSelector::DESTROYED_TYPE_TOKEN: return "DESTROYED_TYPE_TOKEN";
-    case TokenUseSelector::DIRECTIVE_NAME: return "DIRECTIVE_NAME";
-    case TokenUseSelector::DO_TOKEN: return "DO_TOKEN";
-    case TokenUseSelector::DOT_TOKEN: return "DOT_TOKEN";
-    case TokenUseSelector::ELLIPSIS_TOKEN: return "ELLIPSIS_TOKEN";
-    case TokenUseSelector::ELSE_TOKEN: return "ELSE_TOKEN";
-    case TokenUseSelector::END_OF_DEFINITION_TOKEN: return "END_OF_DEFINITION_TOKEN";
-    case TokenUseSelector::ENUM_TOKEN: return "ENUM_TOKEN";
-    case TokenUseSelector::EQUAL_OR_COLON_TOKEN: return "EQUAL_OR_COLON_TOKEN";
-    case TokenUseSelector::EXCEPT_TOKEN: return "EXCEPT_TOKEN";
-    case TokenUseSelector::EXPORT_TOKEN: return "EXPORT_TOKEN";
-    case TokenUseSelector::EXPRESSION_TOKEN: return "EXPRESSION_TOKEN";
-    case TokenUseSelector::EXTERN_TOKEN: return "EXTERN_TOKEN";
-    case TokenUseSelector::FIELD_TOKEN: return "FIELD_TOKEN";
-    case TokenUseSelector::FINALLY_TOKEN: return "FINALLY_TOKEN";
-    case TokenUseSelector::FIRST_COLON_TOKEN: return "FIRST_COLON_TOKEN";
-    case TokenUseSelector::FIRST_INNER_TOKEN: return "FIRST_INNER_TOKEN";
-    case TokenUseSelector::FIRST_OUTER_TOKEN: return "FIRST_OUTER_TOKEN";
-    case TokenUseSelector::FOR_TOKEN: return "FOR_TOKEN";
-    case TokenUseSelector::FRIEND_TOKEN: return "FRIEND_TOKEN";
-    case TokenUseSelector::GENERIC_TOKEN: return "GENERIC_TOKEN";
-    case TokenUseSelector::GETTER_NAME_TOKEN: return "GETTER_NAME_TOKEN";
-    case TokenUseSelector::GOTO_TOKEN: return "GOTO_TOKEN";
-    case TokenUseSelector::HASH: return "HASH";
-    case TokenUseSelector::IDENTIFIER_TOKEN: return "IDENTIFIER_TOKEN";
-    case TokenUseSelector::IF_TOKEN: return "IF_TOKEN";
-    case TokenUseSelector::INSTANCE_VARIABLE_L_BRACE_TOKEN: return "INSTANCE_VARIABLE_L_BRACE_TOKEN";
-    case TokenUseSelector::INSTANCE_VARIABLE_R_BRACE_TOKEN: return "INSTANCE_VARIABLE_R_BRACE_TOKEN";
-    case TokenUseSelector::ISA_MEMBER_TOKEN: return "ISA_MEMBER_TOKEN";
-    case TokenUseSelector::ITERATOR_KW_TOKEN: return "ITERATOR_KW_TOKEN";
-    case TokenUseSelector::KEYWORD_TOKEN: return "KEYWORD_TOKEN";
-    case TokenUseSelector::L_ANGLE_TOKEN: return "L_ANGLE_TOKEN";
-    case TokenUseSelector::L_BRACE_TOKEN: return "L_BRACE_TOKEN";
-    case TokenUseSelector::L_BRACKET_TOKEN: return "L_BRACKET_TOKEN";
-    case TokenUseSelector::L_PAREN_TOKEN: return "L_PAREN_TOKEN";
-    case TokenUseSelector::LABEL_TOKEN: return "LABEL_TOKEN";
-    case TokenUseSelector::LEAVE_TOKEN: return "LEAVE_TOKEN";
-    case TokenUseSelector::LEFT_ANGLE_TOKEN: return "LEFT_ANGLE_TOKEN";
-    case TokenUseSelector::LEFT_BRACE_TOKEN: return "LEFT_BRACE_TOKEN";
-    case TokenUseSelector::LEFT_BRACKET_TOKEN: return "LEFT_BRACKET_TOKEN";
-    case TokenUseSelector::LEFT_TOKEN: return "LEFT_TOKEN";
-    case TokenUseSelector::MEMBER_TOKEN: return "MEMBER_TOKEN";
-    case TokenUseSelector::NAME: return "NAME";
-    case TokenUseSelector::NAME_TOKEN: return "NAME_TOKEN";
-    case TokenUseSelector::NAMESPACE_KEY_TOKEN: return "NAMESPACE_KEY_TOKEN";
-    case TokenUseSelector::NAMESPACE_TOKEN: return "NAMESPACE_TOKEN";
-    case TokenUseSelector::OPERATION_TOKEN: return "OPERATION_TOKEN";
-    case TokenUseSelector::OPERATOR_TOKEN: return "OPERATOR_TOKEN";
-    case TokenUseSelector::PACK_TOKEN: return "PACK_TOKEN";
-    case TokenUseSelector::PARAMETER_PACK_TOKEN: return "PARAMETER_PACK_TOKEN";
-    case TokenUseSelector::POINT_OF_INSTANTIATION: return "POINT_OF_INSTANTIATION";
-    case TokenUseSelector::PROPERTY_INSTANCE_VARIABLE_DECLARATION_TOKEN: return "PROPERTY_INSTANCE_VARIABLE_DECLARATION_TOKEN";
-    case TokenUseSelector::PROTOCOL_ID_TOKEN: return "PROTOCOL_ID_TOKEN";
-    case TokenUseSelector::QUESTION_TOKEN: return "QUESTION_TOKEN";
-    case TokenUseSelector::R_ANGLE_TOKEN: return "R_ANGLE_TOKEN";
-    case TokenUseSelector::R_BRACE_TOKEN: return "R_BRACE_TOKEN";
-    case TokenUseSelector::R_BRACKET_TOKEN: return "R_BRACKET_TOKEN";
-    case TokenUseSelector::R_PAREN_TOKEN: return "R_PAREN_TOKEN";
-    case TokenUseSelector::RECEIVER_TOKEN: return "RECEIVER_TOKEN";
-    case TokenUseSelector::REQUIRES_KEYWORD_TOKEN: return "REQUIRES_KEYWORD_TOKEN";
-    case TokenUseSelector::RETURN_TOKEN: return "RETURN_TOKEN";
-    case TokenUseSelector::RIGHT_ANGLE_TOKEN: return "RIGHT_ANGLE_TOKEN";
-    case TokenUseSelector::RIGHT_BRACE_TOKEN: return "RIGHT_BRACE_TOKEN";
-    case TokenUseSelector::RIGHT_BRACKET_TOKEN: return "RIGHT_BRACKET_TOKEN";
-    case TokenUseSelector::RIGHT_TOKEN: return "RIGHT_TOKEN";
-    case TokenUseSelector::SECOND_COLON_TOKEN: return "SECOND_COLON_TOKEN";
-    case TokenUseSelector::SELECTOR_START_TOKEN: return "SELECTOR_START_TOKEN";
-    case TokenUseSelector::SEMI_TOKEN: return "SEMI_TOKEN";
-    case TokenUseSelector::SETTER_NAME_TOKEN: return "SETTER_NAME_TOKEN";
-    case TokenUseSelector::STAR_TOKEN: return "STAR_TOKEN";
-    case TokenUseSelector::SUPER_CLASS_TOKEN: return "SUPER_CLASS_TOKEN";
-    case TokenUseSelector::SUPER_TOKEN: return "SUPER_TOKEN";
-    case TokenUseSelector::SWITCH_TOKEN: return "SWITCH_TOKEN";
-    case TokenUseSelector::TARGET_CALL_TOKEN: return "TARGET_CALL_TOKEN";
-    case TokenUseSelector::TARGET_NAME_TOKEN: return "TARGET_NAME_TOKEN";
-    case TokenUseSelector::TEMPLATE_KEYWORD_TOKEN: return "TEMPLATE_KEYWORD_TOKEN";
-    case TokenUseSelector::THROW_TOKEN: return "THROW_TOKEN";
-    case TokenUseSelector::TILDE_TOKEN: return "TILDE_TOKEN";
-    case TokenUseSelector::TOKEN: return "TOKEN";
-    case TokenUseSelector::TOKEN_TOKEN: return "TOKEN_TOKEN";
-    case TokenUseSelector::TRY_TOKEN: return "TRY_TOKEN";
-    case TokenUseSelector::TYPE_SPEC_END_TOKEN: return "TYPE_SPEC_END_TOKEN";
-    case TokenUseSelector::TYPE_SPEC_START_TOKEN: return "TYPE_SPEC_START_TOKEN";
-    case TokenUseSelector::TYPENAME_TOKEN: return "TYPENAME_TOKEN";
-    case TokenUseSelector::UD_SUFFIX_TOKEN: return "UD_SUFFIX_TOKEN";
-    case TokenUseSelector::USED_TOKEN: return "USED_TOKEN";
-    case TokenUseSelector::USING_TOKEN: return "USING_TOKEN";
-    case TokenUseSelector::VARIADIC_DOTS: return "VARIADIC_DOTS";
-    case TokenUseSelector::VARIANCE_TOKEN: return "VARIANCE_TOKEN";
-    case TokenUseSelector::WHILE_TOKEN: return "WHILE_TOKEN";
-  }
-  return "<invalid>";
-}
-
-const char *EnumeratorName(FileUseSelector sel) {
-  switch (sel) {
-    case FileUseSelector::INCLUDED_FILE: return "INCLUDED_FILE";
-  }
-  return "<invalid>";
-}
-
-const char *EnumeratorName(AttrUseSelector sel) {
-  switch (sel) {
-    case AttrUseSelector::ATTRIBUTE: return "ATTRIBUTE";
-    case AttrUseSelector::DEFINING_ATTRIBUTE: return "DEFINING_ATTRIBUTE";
-    case AttrUseSelector::EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE: return "EXTERNAL_SOURCE_SYMBOL_ATTRIBUTE";
-    case AttrUseSelector::UNUSED_RESULT_ATTRIBUTE: return "UNUSED_RESULT_ATTRIBUTE";
-  }
-  return "<invalid>";
-}
-
-const char *EnumeratorName(MacroUseSelector sel) {
-  switch (sel) {
-    case MacroUseSelector::DEFINITION: return "DEFINITION";
-    case MacroUseSelector::PARENT: return "PARENT";
-  }
-  return "<invalid>";
 }
 
 #pragma GCC diagnostic pop

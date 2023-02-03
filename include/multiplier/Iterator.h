@@ -25,6 +25,16 @@ class TemplateParameterList;
 class Token;
 class Type;
 
+#define MX_FORWARD_DECLARE_ENTITY(type_name, lower_name, enum_name, category) \
+    class type_name; \
+    class type_name ## Impl;
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY,
+                            MX_FORWARD_DECLARE_ENTITY)
+#undef MX_FORWARD_DECLARE_ENTITY
+
 class IteratorEnd {};
 
 template <typename Enum>
@@ -267,20 +277,14 @@ class TokenContext {
   __attribute__((deprecated("Use Token::context() instead.")))
   static std::optional<TokenContext> of(const Token &tok);
 
-  // Return the declaration associated with this context, if any.
-  std::optional<Decl> as_declaration(void) const;
+#define MX_FORWARD_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
+    std::optional<type_name> as_ ## lower_name(void) const;
 
-  // Return the statement associated with this context, if any.
-  std::optional<Stmt> as_statement(void) const;
-
-  // Return the type associated with this context, if any.
-  std::optional<Type> as_type(void) const;
-
-  // Return the attribute associated with this context, if any.
-  std::optional<Attr> as_attribute(void) const;
-
-  // Return the designator associated with the designated initializer, if any.
-  std::optional<Designator> as_designator(void) const;
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_FORWARD_DECLARE_GETTER)
+#undef MX_FORWARD_DECLARE_GETTER
 
   // Return the aliased context, if any.
   std::optional<TokenContext> aliasee(void) const;

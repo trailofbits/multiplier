@@ -18,10 +18,8 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
 #include "SwitchCase.h"
 
 namespace mx {

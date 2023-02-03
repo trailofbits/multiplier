@@ -18,14 +18,13 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "StmtKind.h"
 
 namespace mx {
-class OffsetEntityImpl;
+class Reference;
 class Stmt;
+class StmtImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Stmt {
  protected:
@@ -36,20 +35,22 @@ class Stmt {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class StmtImpl;
+  std::shared_ptr<const StmtImpl> impl;
  public:
   Stmt(Stmt &&) noexcept = default;
   Stmt(const Stmt &) = default;
   Stmt &operator=(Stmt &&) noexcept = default;
   Stmt &operator=(const Stmt &) = default;
 
-  inline Stmt(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline Stmt(std::shared_ptr<const StmtImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedStmtId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   inline static std::optional<Stmt> from(const Stmt &self) {
     return self;
@@ -65,11 +66,8 @@ class Stmt {
 
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
-  std::optional<PackedDeclarationId> referenced_declaration_id(void) const;
+  std::optional<PackedDeclId> referenced_declaration_id(void) const;
   std::optional<Decl> referenced_declaration(void) const;
-  SpecificEntityId<StatementId> id(void) const;
-  gap::generator<Use<StmtUseSelector>> uses(void) const;
-
  protected:
   static gap::generator<Stmt> in_internal(const Fragment &fragment);
 

@@ -18,16 +18,15 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "PseudoKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class Expr;
 class NamedDecl;
-class OffsetEntityImpl;
+class Reference;
 class TemplateParameterList;
+class TemplateParameterListImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
@@ -38,21 +37,23 @@ class TemplateParameterList {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class TemplateParameterListImpl;
+  std::shared_ptr<const TemplateParameterListImpl> impl;
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
   TemplateParameterList(const TemplateParameterList &) = default;
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
 
-  inline TemplateParameterList(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedTemplateParameterListId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   unsigned num_parameters(void) const;
   unsigned num_required_parameters(void) const;

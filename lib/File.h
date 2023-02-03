@@ -74,7 +74,7 @@ class ReadFileTokensFromFile final : public TokenReader {
 };
 
 // Interface for accessing the tokens of a file.
-class FileImpl final : public EntityImpl {
+class FileImpl final : public EntityImpl<rpc::File> {
  public:
   using Ptr = std::shared_ptr<const FileImpl>;
   using WeakPtr = std::weak_ptr<const FileImpl>;
@@ -91,19 +91,16 @@ class FileImpl final : public EntityImpl {
   //            is the raw ID that would go into a `FileId`.
   const RawEntityId file_id;
 
-  // Reader for the file data.
-  const FileReader reader;
-
   // Number of tokens in this file.
   const unsigned num_tokens;
 
   ~FileImpl(void) noexcept;
 
-  explicit FileImpl(FileId id_, EntityProvider::Ptr ep_, std::string data_);
+  explicit FileImpl(EntityProvider::Ptr ep_, std::string data_, RawEntityId id_);
 
   // Return a reader for the tokens in the file.
   inline std::shared_ptr<const class TokenReader> TokenReader(
-      const FileImpl::Ptr &self) const {
+      const FileImplPtr &self) const {
     return TokenReader::Ptr(self, &file_token_reader);
   }
 

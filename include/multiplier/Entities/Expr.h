@@ -18,14 +18,10 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "ExprObjectKind.h"
 #include "ExprValueKind.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
-#include "TypeUseSelector.h"
 #include "ValueStmt.h"
 
 namespace mx {

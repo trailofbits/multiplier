@@ -18,16 +18,14 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "PseudoKind.h"
 #include "TemplateArgumentKind.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
-class OffsetEntityImpl;
+class Reference;
 class TemplateArgument;
+class TemplateArgumentImpl;
 class Type;
 class ValueDecl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -40,21 +38,23 @@ class TemplateArgument {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class TemplateArgumentImpl;
+  std::shared_ptr<const TemplateArgumentImpl> impl;
  public:
   TemplateArgument(TemplateArgument &&) noexcept = default;
   TemplateArgument(const TemplateArgument &) = default;
   TemplateArgument &operator=(TemplateArgument &&) noexcept = default;
   TemplateArgument &operator=(const TemplateArgument &) = default;
 
-  inline TemplateArgument(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline TemplateArgument(std::shared_ptr<const TemplateArgumentImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedTemplateArgumentId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   TemplateArgumentKind kind(void) const;
   bool is_null(void) const;

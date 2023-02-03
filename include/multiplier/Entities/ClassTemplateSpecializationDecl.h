@@ -18,12 +18,10 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CXXRecordDecl.h"
 #include "DeclKind.h"
 #include "TemplateSpecializationKind.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class CXXRecordDecl;

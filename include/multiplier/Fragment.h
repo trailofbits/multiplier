@@ -55,7 +55,7 @@ class Fragment {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class RemoteEntityProvider;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
@@ -67,13 +67,10 @@ class Fragment {
 
   std::shared_ptr<const FragmentImpl> impl;
 
-  inline Fragment(std::shared_ptr<const FragmentImpl> impl_)
-      : impl(std::move(impl_)) {}
-
  public:
-  // Return the list of fragments in a file.
-  [[deprecated("Use File::fragments() instead.")]]
-  static gap::generator<Fragment> in(const File &);
+
+  /* implicit */ inline Fragment(std::shared_ptr<const FragmentImpl> impl_)
+      : impl(std::move(impl_)) {}
 
   // Return the fragment containing a query match.
   static Fragment containing(const WeggliQueryMatch &);
@@ -84,10 +81,12 @@ class Fragment {
   static Fragment containing(const Stmt &);
   static Fragment containing(const Type &);
   static Fragment containing(const Attr &);
+  static Fragment containing(const TemplateArgument &);
+  static Fragment containing(const TemplateParameterList &);
+  static Fragment containing(const CXXBaseSpecifier &);
   static Fragment containing(const Designator &);
   static std::optional<Fragment> containing(const Token &);
   static Fragment containing(const Macro &);
-  static Fragment containing(const UseBase &);
 
   // Return the entity ID of this fragment.
   SpecificEntityId<FragmentId> id(void) const noexcept;

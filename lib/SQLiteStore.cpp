@@ -40,22 +40,44 @@ namespace {
 
 static void IdToFragmentOffset(sqlite3_context *sql_ctx, int,
                                sqlite3_value **argv) {
-  mx::EntityOffset offset = mx::FragmentOffsetFromEntityId(
+  std::optional<mx::EntityOffset> offset = mx::FragmentOffsetFromEntityId(
       static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
-  if (offset == ~0u) {
-    sqlite3_result_error(
-        sql_ctx,
-        "Input ID does not correspond to a fragment-specific entity", -1);
+  if (!offset.has_value()) {
+    sqlite3_result_int64(sql_ctx, -1);
     return;
   }
 
   if constexpr (sizeof(mx::EntityOffset) == 8u) {
     sqlite3_result_int64(
-        sql_ctx, static_cast<mx::SignedEntityOffset>(offset));
+        sql_ctx, static_cast<mx::SignedEntityOffset>(offset.value()));
   } else {
     sqlite3_result_int(
-        sql_ctx, static_cast<mx::SignedEntityOffset>(offset));
+        sql_ctx, static_cast<mx::SignedEntityOffset>(offset.value()));
   }
+}
+
+static void IdToFragmentId(sqlite3_context *sql_ctx, int,
+                           sqlite3_value **argv) {
+  std::optional<mx::PackedFragmentId> id = mx::FragmentIdFromEntityId(
+      static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
+  if (!id.has_value()) {
+    sqlite3_result_int64(sql_ctx, 0);
+  } else {
+    sqlite3_result_int64(sql_ctx, static_cast<int64_t>(id->Pack()));
+  }
+}
+
+static void IdToCategory(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  sqlite3_result_int(
+      sql_ctx,
+      static_cast<int>(mx::CategoryFromEntityId(
+          static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])))));
+}
+
+static void IdToKind(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  sqlite3_result_int(
+      sql_ctx,
+      mx::KindFromEntityId(static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0]))));
 }
 
 }  // namespace
@@ -223,9 +245,9 @@ void Statement::Execute(void) {
     if (SQLITE_ROW == ret) {
       throw Error("Execute() does not expect results. Use executeStep.");
     } else if (ret == sqlite3_errcode(db)) {
-      throw Error("Execute() failed with Errorcode", db);
+      throw Error("Execute() failed with error code", db);
     } else {
-      throw Error("Execute() failed with Error", db);
+      throw Error("Execute() failed with error", db);
     }
   }
 
@@ -313,10 +335,21 @@ Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
     : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
 
-
-  CreateFunction("id_to_fragment_offset", 1,
+  CreateFunction("entity_id_to_fragment_offset", 1,
                  SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  IdToFragmentOffset, nullptr, nullptr, nullptr);
+
+  CreateFunction("entity_id_to_fragment_id", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToFragmentId, nullptr, nullptr, nullptr);
+
+  CreateFunction("entity_id_to_category", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToCategory, nullptr, nullptr, nullptr);
+
+  CreateFunction("entity_id_to_kind", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToKind, nullptr, nullptr, nullptr);
 
   CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  ZstdCompress, nullptr, nullptr, nullptr,

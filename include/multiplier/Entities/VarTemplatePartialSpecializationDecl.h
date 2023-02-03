@@ -18,7 +18,6 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "VarTemplateSpecializationDecl.h"
@@ -27,6 +26,7 @@ namespace mx {
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
+class TemplateParameterList;
 class ValueDecl;
 class VarDecl;
 class VarTemplatePartialSpecializationDecl;

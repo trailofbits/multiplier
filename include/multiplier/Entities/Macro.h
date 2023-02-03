@@ -18,14 +18,13 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroKind.h"
-#include "MacroUseSelector.h"
 
 namespace mx {
 class Macro;
-class OffsetEntityImpl;
+class MacroImpl;
+class Reference;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -36,21 +35,23 @@ class Macro {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class MacroImpl;
+  std::shared_ptr<const MacroImpl> impl;
  public:
   Macro(Macro &&) noexcept = default;
   Macro(const Macro &) = default;
   Macro &operator=(Macro &&) noexcept = default;
   Macro &operator=(const Macro &) = default;
 
-  inline Macro(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline Macro(std::shared_ptr<const MacroImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedMacroId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   inline static std::optional<Macro> from(const Macro &self) {
     return self;
@@ -59,9 +60,6 @@ class Macro {
   inline static std::optional<Macro> from(const std::optional<Macro> &self) {
     return self;
   }
-
-  SpecificEntityId<MacroId> id(void) const;
-  gap::generator<Use<MacroUseSelector>> uses(void) const;
 
  protected:
   static gap::generator<Macro> in_internal(const Fragment &fragment);

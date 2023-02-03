@@ -136,9 +136,9 @@ struct Fragment @0xe5f27760091f9a3a {
   # iff parsedTokenOffsetToIndex[macroTokenIndexToParsedTokenOffset[i]] == i.
   macroTokenIndexToParsedTokenOffset @6 :List(UInt32);
   
-  # Inverted map of macro tokens -> offset of containing macro. The macro
-  # containing the `i`th token is `macros[macroTokenIndexToMacroOffset[i]]`.
-  macroTokenIndexToMacroOffset @7 :List(UInt32);
+  # Inverted map of macro tokens -> macro id of containing macro. The macro
+  # containing the `i`th token is `macroTokenIndexToMacroId[i]`.
+  macroTokenIndexToMacroId @7 :List(UInt64);
   
   # List of token contexts. There is one token context per parsed token.
   # Non-parsed tokens don't have token contexts. Whitespace doesn't have

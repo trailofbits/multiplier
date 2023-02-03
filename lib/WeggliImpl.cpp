@@ -25,7 +25,7 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(
       fragments(std::move(fragment_ids)) {}
 
 WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
-                                             FragmentImpl::Ptr frag_)
+                                             FragmentImplPtr frag_)
     : query(query_),
       ep(frag_->ep) {
 
@@ -34,7 +34,7 @@ WeggliQueryResultImpl::WeggliQueryResultImpl(const WeggliQuery &query_,
   (void) InitForFragment(std::move(frag_));
 }
 
-bool WeggliQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
+bool WeggliQueryResultImpl::InitForFragment(FragmentImplPtr frag_) {
   frag = std::move(frag_);
   next_weggli_match = 0u;
   weggli_matches.clear();
@@ -76,7 +76,7 @@ gap::generator<WeggliQueryMatch> WeggliQueryResultImpl::Enumerate(void) {
     // Reset the caches of data in the fragment, and the mapping of offsets
     // to token ids.
     if (!frag) {
-      auto frag_ptr = ep->FragmentFor(ep, fragments[index]);
+      auto frag_ptr = ep->FragmentFor(ep, fragments[index].Pack());
       if (!frag_ptr) {
         ++index;
         continue;
@@ -257,7 +257,7 @@ WeggliQuery::match_fragments(const File &file) const {
     co_return;
   }
 
-  const FileReader &reader = file.impl->reader;
+  const auto &reader = file.impl->reader;
   const auto byte_offsets = reader.getTokenOffsets();
   const auto tok_kinds = reader.getTokenKinds();
   const auto num_file_toks = tok_kinds.size();
@@ -297,7 +297,8 @@ WeggliQuery::match_fragments(const File &file) const {
 }
 
 // Match this Weggli query against a fragment.
-gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(const Fragment &frag) const {
+gap::generator<WeggliQueryMatch> WeggliQuery::match_fragments(
+    const Fragment &frag) const {
   WeggliQueryResultImpl it(*this, frag.impl);
   for (auto match : it.Enumerate()) {
     co_yield match;

@@ -106,6 +106,7 @@ class Statement {
       : impl(std::move(impl_)) {}
 
  public:
+  Statement(void) = delete;
 
   // Bind values with a sqlite statement. It does not
   // support binding to a blob yet

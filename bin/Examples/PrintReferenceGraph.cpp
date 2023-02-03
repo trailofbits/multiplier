@@ -23,12 +23,12 @@ using UseEdge = std::pair<mx::RawEntityId, const char *>;
 static std::pair<const char *, const char *>
 KindAndColor(mx::RawEntityId id) {
   mx::VariantId vid = mx::EntityId(id).Unpack();
-  if (std::holds_alternative<mx::DeclarationId>(vid)) {
-    auto eid = std::get<mx::DeclarationId>(vid);
+  if (std::holds_alternative<mx::DeclId>(vid)) {
+    auto eid = std::get<mx::DeclId>(vid);
     return {mx::EnumeratorName(eid.kind), "antiquewhite"};
 
-  } else if (std::holds_alternative<mx::StatementId>(vid)) {
-    auto eid = std::get<mx::StatementId>(vid);
+  } else if (std::holds_alternative<mx::StmtId>(vid)) {
+    auto eid = std::get<mx::StmtId>(vid);
     return {mx::EnumeratorName(eid.kind), "aquamarine"};
 
   } else if (std::holds_alternative<mx::MacroId>(vid)) {
@@ -93,9 +93,10 @@ extern "C" int main(int argc, char *argv[]) {
       if (std::holds_alternative<mx::Decl>(ent)) {
         mx::Decl decl = std::get<mx::Decl>(ent);
 
-        for (mx::Stmt ref_stmt : decl.references()) {
-          auto stmt_id = ref_stmt.id().Pack();
-          add_edge(stmt_id, user_id, "reference", path_len);
+        for (mx::Reference ref : decl.references()) {
+          if (auto ref_stmt = ref.as_statement()) {
+            add_edge(ref_stmt->id().Pack(), user_id, "reference", path_len);
+          }
         }
 
         if (auto parent_decl = decl.parent_declaration()) {
@@ -131,9 +132,11 @@ extern "C" int main(int argc, char *argv[]) {
         mx::Macro macro = std::get<mx::Macro>(ent);
 
         if (auto def = mx::DefineMacroDirective::from(macro)) {
-          for (mx::Macro ref : def->references()) {
-            auto macro_id = ref.id().Pack();  // Expansion.
-            add_back_edge(macro_id, user_id, "reference", path_len);
+          for (mx::Reference ref : def->references()) {
+            if (auto ref_macro = ref.as_macro()) {
+              auto macro_id = ref_macro->id().Pack();  // Expansion.
+              add_back_edge(macro_id, user_id, "reference", path_len);
+            }
           }
         }
 
@@ -145,9 +148,11 @@ extern "C" int main(int argc, char *argv[]) {
       } else if (std::holds_alternative<mx::File>(ent)) {
         mx::File file = std::get<mx::File>(ent);
 
-        for (mx::Macro ref : file.references()) {
-          auto macro_id = ref.id().Pack();  // Include.
-          add_back_edge(macro_id, user_id, "reference", path_len);
+        for (mx::Reference ref : file.references()) {
+          if (auto ref_macro = ref.as_macro()) {
+            auto macro_id = ref_macro->id().Pack();  // Include.
+            add_back_edge(macro_id, user_id, "reference", path_len);
+          }
         }
       }
     }

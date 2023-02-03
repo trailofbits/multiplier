@@ -18,14 +18,11 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CanThrowResult.h"
-#include "DeclUseSelector.h"
 #include "ExceptionSpecificationType.h"
 #include "FunctionType.h"
 #include "RefQualifierKind.h"
-#include "StmtUseSelector.h"
 #include "TypeKind.h"
 
 namespace mx {

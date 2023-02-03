@@ -18,9 +18,7 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "FileUseSelector.h"
 #include "MacroDirective.h"
 #include "MacroKind.h"
 

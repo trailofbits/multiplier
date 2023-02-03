@@ -5,11 +5,13 @@
 // the LICENSE file found in the root directory of this source tree.
 
 #include "Fragment.h"
+
+#include <cassert>
 #include <multiplier/Entities/Attr.h>
 #include <multiplier/Entities/Designator.h>
 #include <multiplier/Entities/Type.h>
 
-#include <cassert>
+#include "Types.h"
 
 namespace mx {
 
@@ -42,7 +44,7 @@ std::optional<TokenContext> Token::context(void) const {
     return std::nullopt;
   }
 
-  const FragmentReader &frag_reader = frag->reader;
+  const auto &frag_reader = frag->reader;
   unsigned tagged_offset = frag_reader.getParsedTokenContextOffsets()[offset];
   if (!(tagged_offset & 1u)) {
     assert(!tagged_offset);
@@ -77,60 +79,21 @@ std::optional<TokenContext> Token::context(void) const {
   return ret;
 }
 
-// Return the declaration associated with this context, if any.
-std::optional<Decl> TokenContext::as_declaration(void) const {
-  VariantId vid = EntityId(entity_id).Unpack();
-  if (impl && std::holds_alternative<DeclarationId>(vid)) {
-    if (auto ptr = impl->ep->DeclFor(impl->ep, entity_id)) {
-      return Decl(std::move(ptr.value()));
+#define MX_DEFINE_GETTER(type_name, lower_name, enum_name, category) \
+    std::optional<type_name> TokenContext::as_ ## lower_name(void) const { \
+      if (impl && CategoryFromEntityId(entity_id) == EntityCategory::enum_name) { \
+        if (auto ptr = impl->ep->type_name ## For(impl->ep, entity_id)) { \
+          return type_name(std::move(ptr)); \
+        } \
+      } \
+      return std::nullopt; \
     }
-  }
-  return std::nullopt;
-}
 
-// Return the statement associated with this context, if any.
-std::optional<Stmt> TokenContext::as_statement(void) const {
-  VariantId vid = EntityId(entity_id).Unpack();
-  if (impl && std::holds_alternative<StatementId>(vid)) {
-    if (auto ptr = impl->ep->StmtFor(impl->ep, entity_id)) {
-      return Stmt(std::move(ptr.value()));
-    }
-  }
-  return std::nullopt;
-}
-
-// Return the type associated with this context, if any.
-std::optional<Type> TokenContext::as_type(void) const {
-  VariantId vid = EntityId(entity_id).Unpack();
-  if (impl && std::holds_alternative<TypeId>(vid)) {
-    if (auto ptr = impl->ep->TypeFor(impl->ep, entity_id)) {
-      return Type(std::move(ptr.value()));
-    }
-  }
-  return std::nullopt;
-}
-
-// Return the attribute associated with this context, if any.
-std::optional<Attr> TokenContext::as_attribute(void) const {
-  VariantId vid = EntityId(entity_id).Unpack();
-  if (impl && std::holds_alternative<AttributeId>(vid)) {
-    if (auto ptr = impl->ep->AttrFor(impl->ep, entity_id)) {
-      return Attr(std::move(ptr.value()));
-    }
-  }
-  return std::nullopt;
-}
-
-// Return the designator associated with the designated initializer, if any.
-std::optional<Designator> TokenContext::as_designator(void) const {
-  VariantId vid = EntityId(entity_id).Unpack();
-  if (impl && std::holds_alternative<DesignatorId>(vid)) {
-    if (auto ptr = impl->ep->PseudoFor(impl->ep, entity_id)) {
-      return Designator(std::move(ptr.value()));
-    }
-  }
-  return std::nullopt;
-}
+MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DEFINE_GETTER)
+#undef MX_DEFINE_GETTER
 
 // Return the aliased context.
 std::optional<TokenContext> TokenContext::aliasee(void) const {

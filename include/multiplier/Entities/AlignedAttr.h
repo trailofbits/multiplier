@@ -18,13 +18,10 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AlignedAttrSpelling.h"
 #include "AttrKind.h"
 #include "InheritableAttr.h"
-#include "StmtUseSelector.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class AlignedAttr;

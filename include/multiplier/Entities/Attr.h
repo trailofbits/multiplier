@@ -18,14 +18,13 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AttrKind.h"
-#include "AttrUseSelector.h"
 
 namespace mx {
 class Attr;
-class OffsetEntityImpl;
+class AttrImpl;
+class Reference;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Attr {
  protected:
@@ -35,21 +34,23 @@ class Attr {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class AttrImpl;
+  std::shared_ptr<const AttrImpl> impl;
  public:
   Attr(Attr &&) noexcept = default;
   Attr(const Attr &) = default;
   Attr &operator=(Attr &&) noexcept = default;
   Attr &operator=(const Attr &) = default;
 
-  inline Attr(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline Attr(std::shared_ptr<const AttrImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedAttrId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   inline static std::optional<Attr> from(const Attr &self) {
     return self;
@@ -62,9 +63,6 @@ class Attr {
   inline static std::optional<Attr> from(const TokenContext &c) {
     return c.as_attribute();
   }
-
-  SpecificEntityId<AttributeId> id(void) const;
-  gap::generator<Use<AttrUseSelector>> uses(void) const;
 
  protected:
   static gap::generator<Attr> in_internal(const Fragment &fragment);

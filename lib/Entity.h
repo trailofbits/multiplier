@@ -13,16 +13,24 @@
 #include <multiplier/Types.h>
 
 namespace mx {
+namespace {
+static const capnp::ReaderOptions kOptions = {
+  .traversalLimitInWords = ~0ull,
+  .nestingLimit = 64
+};
+}  // namespace
 
 class EntityProvider;
 
 // Base class for a serialized entity, taken from the database.
+template <typename Root>
 class EntityImpl {
  private:
-
-  // Stores the Cap'n-Proto serialized data.
+  // Stores the Cap'n-Proto serialized data.;
   const std::string data;
   capnp::FlatArrayMessageReader message;
+
+  using Reader = typename Root::Reader;
 
  public:
 
@@ -30,26 +38,18 @@ class EntityImpl {
   // or look up entities related to other fragments.
   const std::shared_ptr<EntityProvider> ep;
 
-  explicit EntityImpl(std::shared_ptr<EntityProvider> ep_, std::string data_);
+  // The reader used to read all things from inside of this entity.
+  const Reader reader;
 
-  template <typename T>
-  inline auto Reader(void) & noexcept -> typename T::Reader {
-    return message.getRoot<T>();
-  }
-};
-
-class OffsetEntityImpl : public EntityImpl {
- public:
-  const PackedFragmentId fragment_id;
-  const EntityOffset offset;
-
-  explicit inline OffsetEntityImpl(std::shared_ptr<EntityProvider> ep_,
-                                   std::string data_,
-                                   PackedFragmentId fragment_id_,
-                                   EntityOffset offset_)
-      : EntityImpl(std::move(ep_), std::move(data_)),
-        fragment_id(fragment_id_),
-        offset(offset_) {}
+  explicit EntityImpl(std::shared_ptr<EntityProvider> ep_, std::string data_)
+      : data(std::move(data_)),
+        message(
+            capnp::arrayPtr(
+                reinterpret_cast<const capnp::word *>(data.data()),
+                data.size()),
+            kOptions),
+        ep(std::move(ep_)),
+        reader(message.getRoot<Root>()) {}
 };
 
 }  // namespace mx

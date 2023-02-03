@@ -9,12 +9,18 @@
 #include <gap/core/generator.hpp>
 #include <multiplier/Database.h>
 #include <multiplier/Entities/TokenKind.h>
-#include <multiplier/Types.h>
 
 #include "API.h"
+#include "Attr.h"
+#include "Decl.h"
 #include "File.h"
 #include "Fragment.h"
+#include "Macro.h"
+#include "Pseudo.h"
 #include "SQLiteStore.h"
+#include "Stmt.h"
+#include "Type.h"
+#include "Types.h"
 
 namespace mx {
 namespace {
@@ -55,37 +61,8 @@ static std::vector<RawEntityId> GetEntityIds(sqlite::Statement &query,
   return ids;
 }
 
-// Get an entity by its ID.
-static std::optional<EntityImplPtr> GetEntityById(
-    const std::shared_ptr<EntityProvider> &ep, sqlite::Statement &query,
-    RawEntityId id) {
-
-  query.BindValues(id);
-  if (!query.ExecuteStep()) {
-    query.Reset();
-    return std::nullopt;
-  }
-
-  auto row = query.Row();
-  std::string storage;
-  RawEntityId frag_id = kInvalidEntityId;
-  EntityOffset offset = 0u;
-
-  row.Columns(storage, frag_id, offset);
-  query.Reset();
-
-  VariantId vid = EntityId(frag_id).Unpack();
-  if (!std::holds_alternative<FragmentId>(vid)) {
-    assert(false);
-    return std::nullopt;
-  }
-
-  return std::make_shared<OffsetEntityImpl>(
-      ep, std::move(storage), std::get<FragmentId>(vid), offset);
-}
-
 // Get an entity ID by its fragment offset. In theory we could get an entity's
-// data and return an `EntityImplPtr`. In practice, we want to roundtrip through
+// data and return an entity pointer. In practice, we want to roundtrip through
 // the entity provider to benefit from ID-based caching.
 static RawEntityId GetEntityIdByFragmentOffset(sqlite::Statement &query,
                                                PackedFragmentId frag_id,
@@ -111,13 +88,9 @@ class SQLiteEntityProviderImpl {
  public:
   const std::string entity_id_list;
   sqlite::Connection db;
-  sqlite::Statement get_file_by_id;
-  sqlite::Statement get_frag_by_id;
   sqlite::Statement get_version_number;
   sqlite::Statement get_file_paths;
   sqlite::Statement get_file_fragments;
-  sqlite::Statement get_file_data;
-  sqlite::Statement get_fragment_data;
   sqlite::Statement clear_entity_id_list;
   sqlite::Statement add_entity_id_to_list;
   sqlite::Statement get_entity_ids;
@@ -127,21 +100,20 @@ class SQLiteEntityProviderImpl {
   sqlite::Statement get_references;
   sqlite::Statement get_fragments_covered_by_tokens;
 
-#define DECLARE_GETTERS(name, lower_name) \
-    sqlite::Statement get_ ## lower_name ## s ; \
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
     sqlite::Statement get_ ## lower_name ## _by_id ; \
-    sqlite::Statement get_ ## lower_name ## _by_offset ;
+    sqlite::Statement get_ ## lower_name ## _id_by_fragment_offset ;
 
-  MX_FOR_EACH_ENTITY_RECORD(DECLARE_GETTERS)
+  MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              DECLARE_GETTERS)
 #undef DECLARE_GETTERS
 
   SQLiteEntityProviderImpl(unsigned worker_index, std::filesystem::path path)
       : entity_id_list("entity_id_list_" + std::to_string(worker_index)),
         db(Connect(path, entity_id_list)),
-        get_file_by_id(db.Prepare(
-            "SELECT zstd_decompress(data) FROM file WHERE file_id = ?1")),
-        get_frag_by_id(db.Prepare(
-            "SELECT zstd_decompress(data) FROM fragment WHERE fragment_id = ?1")),
         get_version_number(db.Prepare(
             "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
         get_file_paths(db.Prepare(
@@ -150,10 +122,6 @@ class SQLiteEntityProviderImpl {
             "SELECT DISTINCT(fragment_id) "
             "FROM fragment_file "
             "WHERE file_id = ?1")),
-        get_file_data(db.Prepare(
-            "SELECT zstd_decompress(data) FROM file WHERE file_id = ?1")),
-        get_fragment_data(db.Prepare(
-            "SELECT zstd_decompress(data) FROM fragment WHERE fragment_id = ?1")),
         clear_entity_id_list(db.Prepare(
             "DELETE FROM " + entity_id_list)),
         add_entity_id_to_list(db.Prepare(
@@ -206,22 +174,26 @@ class SQLiteEntityProviderImpl {
             "AND ffr.last_file_token_offset >= el.entity_id "
             "AND ffr.file_id = ?1"))
 
-#define INIT_GETTERS(name, lower_name) \
-      , get_ ## lower_name ## s(db.Prepare( \
+#define INIT_GETTERS(type_name, lower_name, enum_name, id) \
+      , get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
             "SELECT " #lower_name "_id " \
-            "FROM " #lower_name " WHERE fragment_id = ?1 " \
+            "FROM " #lower_name " " \
+            "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
             "ORDER BY " #lower_name "_id ASC")) \
       , get_ ## lower_name ## _by_id(db.Prepare( \
-            "SELECT zstd_decompress(data), " \
-            "       fragment_id, " \
-            "       id_to_fragment_offset(?1) " \
-            "FROM " #lower_name " WHERE " #lower_name "_id = ?1")) \
-      , get_ ## lower_name ## _by_offset(db.Prepare( \
+            "SELECT data " \
+            "FROM " #lower_name " " \
+            "WHERE " #lower_name "_id = ?1")) \
+      , get_ ## lower_name ## _id_by_fragment_offset(db.Prepare( \
             "SELECT " #lower_name "_id " \
-            "FROM " #lower_name " WHERE fragment_id = ?1 " \
-            "                       AND fragment_offset = ?2"))
+            "FROM " #lower_name " " \
+            "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
+            "  AND entity_id_to_fragment_offset(" #lower_name "_id) = ?2"))
 
-  MX_FOR_EACH_ENTITY_RECORD(INIT_GETTERS)
+      MX_FOR_EACH_ENTITY_CATEGORY(INIT_GETTERS,
+                                  MX_IGNORE_ENTITY_CATEGORY,
+                                  INIT_GETTERS,
+                                  INIT_GETTERS)
 #undef INIT_GETTERS
 
   {}  // Constructor body.
@@ -338,54 +310,6 @@ FragmentIdList SQLiteEntityProvider::ListFragmentsInFile(
   return res;
 }
 
-std::shared_ptr<const FileImpl> SQLiteEntityProvider::FileFor(
-    const Ptr &self, SpecificEntityId<FileId> file_id) {
-
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_file_data;
-  query.BindValues(file_id.Pack());
-
-  if (!query.ExecuteStep()) {
-    query.Reset();
-    return {};
-  }
-
-  std::string data;
-  query.Row().Columns(data);
-  query.Reset();
-
-  if (data.empty()) {
-    assert(false);
-    return {};
-  }
-
-  return std::make_shared<FileImpl>(file_id.Unpack(), self, std::move(data));
-}
-
-std::shared_ptr<const FragmentImpl> SQLiteEntityProvider::FragmentFor(
-    const Ptr &self, SpecificEntityId<FragmentId> fragment_id) {
-
-  ImplPtr context = impl.Lock();
-  sqlite::Statement &query = context->get_fragment_data;
-  query.BindValues(fragment_id.Pack());
-  if (!query.ExecuteStep()) {
-    query.Reset();
-    return {};
-  }
-
-  std::string data;
-  query.Row().Columns(data);
-  query.Reset();
-
-  if (data.empty()) {
-    assert(false);
-    return {};
-  }
-
-  return std::make_shared<FragmentImpl>(
-      fragment_id.Unpack(), self, std::move(data));
-}
-
 // Return the list of fragments covering / overlapping some tokens in a file.
 FragmentIdList SQLiteEntityProvider::FragmentsCoveringTokens(
     const Ptr &, PackedFileId file_id, std::vector<EntityOffset> offsets) {
@@ -429,7 +353,7 @@ FragmentIdList SQLiteEntityProvider::FragmentsCoveringTokens(
 }
 
 RawEntityIdList SQLiteEntityProvider::Redeclarations(
-    const Ptr &, SpecificEntityId<DeclarationId> id) {
+    const Ptr &, SpecificEntityId<DeclId> id) {
 
   ImplPtr context = impl.Lock();
   auto add_entity_id = context->add_entity_id_to_list;
@@ -459,7 +383,7 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
     get_redecl_ids.Row().Columns(raw_id);
 
     VariantId vid = EntityId(raw_id).Unpack();
-    if (std::holds_alternative<DeclarationId>(vid)) {
+    if (std::holds_alternative<DeclId>(vid)) {
       ret.emplace_back(raw_id);
     } else {
       assert(false);
@@ -477,7 +401,7 @@ RawEntityIdList SQLiteEntityProvider::ReadRedeclarations(
   std::partition(
       ret.begin(), ret.end(),
       [] (RawEntityId eid) {
-        return std::get<DeclarationId>(EntityId(eid).Unpack()).is_definition;
+        return std::get<DeclId>(EntityId(eid).Unpack()).is_definition;
       });
 
   return ret;
@@ -507,7 +431,7 @@ void SQLiteEntityProvider::FillUses(
   VariantId vid = eid.Unpack();
 
   // We need to find uses of declarations.
-  if (std::holds_alternative<DeclarationId>(vid)) {
+  if (std::holds_alternative<DeclId>(vid)) {
 
     // If we don't have a set of redeclarations, then calculate them.
     if (redecl_ids_out.empty()) {
@@ -574,7 +498,7 @@ void SQLiteEntityProvider::FillReferences(
   VariantId vid = eid.Unpack();
 
   // We need to find uses of declarations.
-  if (std::holds_alternative<DeclarationId>(vid)) {
+  if (std::holds_alternative<DeclId>(vid)) {
 
     // If we don't have a set of redeclarations, then calculate them.
     if (redecl_ids_out.empty()) {
@@ -607,7 +531,7 @@ void SQLiteEntityProvider::FillReferences(
     get_references.Row().Columns(raw_id);
 
     vid = EntityId(raw_id).Unpack();
-    if (std::holds_alternative<StatementId>(vid) ||
+    if (std::holds_alternative<StmtId>(vid) ||
         std::holds_alternative<MacroId>(vid)) {
       references_ids_out.emplace_back(raw_id);
     } else {
@@ -629,7 +553,7 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
     symbol_query.Row().Columns(entity_id);
     VariantId vid = EntityId(entity_id).Unpack();
     if (std::holds_alternative<MacroId>(vid) ||
-        std::holds_alternative<DeclarationId>(vid)) {
+        std::holds_alternative<DeclId>(vid)) {
       entity_ids.push_back(entity_id);
 
     } else {
@@ -643,32 +567,49 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
   entity_ids.erase(it, entity_ids.end());
 }
 
-#define DEFINE_GETTERS(name, lower_name) \
-    gap::generator<EntityImplPtr> SQLiteEntityProvider:: name ## sFor( \
+#define DEFINE_GETTERS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> SQLiteEntityProvider:: type_name ## sFor( \
         const Ptr &ep, PackedFragmentId id) { \
       ImplPtr context = impl.Lock(); \
       for (RawEntityId eid : GetEntityIds( \
-                                 context->get_ ## lower_name ## s, id)) { \
-        if (auto ptr = ep->name ## For(ep, eid)) { \
-          co_yield std::move(ptr.value()); \
+               context->get_ ## lower_name ## _ids_by_fragment, id)) { \
+        if (type_name ## ImplPtr ptr = ep->type_name ## For(ep, eid)) { \
+          co_yield ptr; \
         } \
       } \
     } \
-    std::optional<EntityImplPtr> SQLiteEntityProvider:: name ## For( \
-        const Ptr &ep, RawEntityId eid) { \
+    \
+    type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
+        const Ptr &ep, RawEntityId raw_id) { \
       ImplPtr context = impl.Lock(); \
-      return GetEntityById(ep, context->get_ ## lower_name ## _by_id, eid); \
+      sqlite::Statement &query = context->get_ ## lower_name ## _by_id; \
+      query.BindValues(raw_id); \
+      if (!query.ExecuteStep()) { \
+        query.Reset(); \
+        return {}; \
+      } \
+      \
+      std::string data; \
+      query.Row().Columns(data); \
+      query.Reset(); \
+      \
+      return std::make_shared<type_name ## Impl>(ep, std::move(data), raw_id); \
     } \
-    std::optional<EntityImplPtr> SQLiteEntityProvider:: name ## For( \
+    \
+    type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &ep, PackedFragmentId fid, EntityOffset offset) { \
       ImplPtr context = impl.Lock(); \
-      return ep->name ## For( \
+      return ep->type_name ## For( \
           ep, \
           GetEntityIdByFragmentOffset( \
-              context->get_ ## lower_name ## _by_offset, fid, offset)); \
+              context->get_ ## lower_name ## _id_by_fragment_offset, \
+              fid, offset)); \
     }
 
-  MX_FOR_EACH_ENTITY_RECORD(DEFINE_GETTERS)
+MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_GETTERS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            DEFINE_GETTERS,
+                            DEFINE_GETTERS)
 #undef DEFINE_GETTERS
 
 EntityProvider::Ptr EntityProvider::from_database(std::filesystem::path path) {

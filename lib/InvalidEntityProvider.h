@@ -11,7 +11,6 @@
 #include "File.h"
 #include "Fragment.h"
 #include "Token.h"
-#include "Use.h"
 
 namespace mx {
 
@@ -31,19 +30,12 @@ class InvalidEntityProvider final : public EntityProvider {
   FragmentIdList ListFragmentsInFile(
       const Ptr &, SpecificEntityId<FileId> id);
 
-  std::shared_ptr<const FileImpl> FileFor(
-      const Ptr &, SpecificEntityId<FileId> id) final;
-
-  // Download a fragment by its unique ID.
-  std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
-
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(
       const Ptr &, PackedFileId, std::vector<EntityOffset>) final;
 
   RawEntityIdList Redeclarations(
-      const Ptr &, SpecificEntityId<DeclarationId>) final;
+      const Ptr &, SpecificEntityId<DeclId>) final;
 
   void FillUses(const Ptr &, RawEntityId eid,
                 RawEntityIdList &redecl_ids_out,
@@ -56,16 +48,21 @@ class InvalidEntityProvider final : public EntityProvider {
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
 
-#define DECLARE_ENTITY_METHODS(name, lower_name) \
-    gap::generator<EntityImplPtr> \
-    name ## sFor(const Ptr &, PackedFragmentId) final; \
-    std::optional<EntityImplPtr> \
-    name ## For(const Ptr &, PackedFragmentId, EntityOffset) final; \
-    std::optional<EntityImplPtr> \
-    name ## For(const Ptr &, RawEntityId) final;
+#define MX_DECLARE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, PackedFragmentId id) final; \
+    \
+    type_name ## ImplPtr type_name ## For( \
+        const Ptr &, PackedFragmentId id, EntityOffset offset) final; \
+    \
+    type_name ## ImplPtr type_name ## For( \
+        const Ptr &ep, RawEntityId id) final;
 
-  MX_FOR_EACH_ENTITY_RECORD(DECLARE_ENTITY_METHODS)
-#undef DECLARE_ENTITY_METHODS
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_METHODS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_METHODS,
+                              MX_DECLARE_ENTITY_METHODS)
+#undef MX_DECLARE_ENTITY_METHODS
 };
 
 }  // namespace mx

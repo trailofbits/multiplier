@@ -18,23 +18,20 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AccessSpecifier.h"
-#include "AttrUseSelector.h"
 #include "AvailabilityResult.h"
 #include "DeclCategory.h"
 #include "DeclFriendObjectKind.h"
 #include "DeclKind.h"
 #include "DeclModuleOwnershipKind.h"
-#include "DeclUseSelector.h"
 
 namespace mx {
 class Attr;
 class Decl;
+class DeclImpl;
 class ExternalSourceSymbolAttr;
-class OffsetEntityImpl;
-class Stmt;
+class Reference;
 class TemplateDecl;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -46,21 +43,23 @@ class Decl {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class DeclImpl;
+  std::shared_ptr<const DeclImpl> impl;
  public:
   Decl(Decl &&) noexcept = default;
   Decl(const Decl &) = default;
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
 
-  inline Decl(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedDeclId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   inline static std::optional<Decl> from(const Decl &self) {
     return self;
@@ -80,10 +79,6 @@ class Decl {
   bool is_definition(void) const;
   Decl canonical_declaration(void) const;
   gap::generator<Decl> redeclarations(void) const;
-  SpecificEntityId<DeclarationId> id(void) const;
-  gap::generator<Use<DeclUseSelector>> uses(void) const;
-  gap::generator<Stmt> references(void) const;
-
  protected:
   static gap::generator<Decl> in_internal(const Fragment &fragment);
 

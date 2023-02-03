@@ -95,6 +95,11 @@
 "directory": ""
 },
 {
+"file": "NonTreeTrailingMacroExpansion.c",
+"command": "clang NonTreeTrailingMacroExpansion.c",
+"directory": ""
+},
+{
 "file": "ParameterSubstitutions.c",
 "command": "clang ParameterSubstitutions.c",
 "directory": ""

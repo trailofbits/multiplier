@@ -18,12 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Expr.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
-#include "TypeUseSelector.h"
 #include "UnaryExprOrTypeTrait.h"
 
 namespace mx {

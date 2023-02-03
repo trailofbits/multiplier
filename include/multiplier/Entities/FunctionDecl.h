@@ -18,18 +18,15 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "ConstexprSpecKind.h"
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 #include "DeclaratorDecl.h"
 #include "ExceptionSpecificationType.h"
 #include "FunctionDeclTemplatedKind.h"
 #include "LanguageLinkage.h"
 #include "MultiVersionKind.h"
 #include "OverloadedOperatorKind.h"
-#include "StmtUseSelector.h"
 #include "StorageClass.h"
 #include "TemplateSpecializationKind.h"
 

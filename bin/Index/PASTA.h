@@ -9,6 +9,7 @@
 #pragma once
 
 namespace pasta {
+class File;
 enum class TokenRole : unsigned short;
 enum class DeclKind : unsigned;
 enum class AttrKind : unsigned;
@@ -2198,11 +2199,4 @@ PseudoKind FromPasta(pasta::PseudoKind pasta_val);
 enum class TokenCategory : unsigned char;
 TokenCategory FromPasta(pasta::TokenCategory pasta_val);
 
-enum class DeclUseSelector : unsigned short;
-enum class StmtUseSelector : unsigned short;
-enum class TypeUseSelector : unsigned short;
-enum class TokenUseSelector : unsigned short;
-enum class FileUseSelector : unsigned short;
-enum class AttrUseSelector : unsigned short;
-enum class MacroUseSelector : unsigned short;
 }  // namespace mx

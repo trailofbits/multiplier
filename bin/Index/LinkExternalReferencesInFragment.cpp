@@ -30,12 +30,12 @@ void LinkExternalReferencesInFragment(
   for (const pasta::Stmt &stmt : pf.stmts_to_serialize) {
     mx::RawEntityId stmt_id = em.EntityId(stmt);
     mx::VariantId vid = mx::EntityId(stmt_id).Unpack();
-    if (!std::holds_alternative<mx::StatementId>(vid)) {
+    if (!std::holds_alternative<mx::StmtId>(vid)) {
       assert(false);
       continue;
     }
 
-    mx::StatementId sid = std::get<mx::StatementId>(vid);
+    mx::StmtId sid = std::get<mx::StmtId>(vid);
     if (sid.fragment_id != pf.fragment_index) {
       assert(false);
       continue;  // This is weird?
@@ -48,7 +48,7 @@ void LinkExternalReferencesInFragment(
 
     mx::RawEntityId decl_id = em.EntityId(ref_decl.value());
     vid = mx::EntityId(decl_id).Unpack();
-    if (!std::holds_alternative<mx::DeclarationId>(vid)) {
+    if (!std::holds_alternative<mx::DeclId>(vid)) {
       assert(false);
       continue;
     }

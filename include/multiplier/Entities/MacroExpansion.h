@@ -18,11 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroKind.h"
 #include "MacroSubstitution.h"
-#include "MacroUseSelector.h"
 
 namespace mx {
 class DefineMacroDirective;

@@ -18,11 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Type.h"
 #include "TypeKind.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class TemplateArgument;

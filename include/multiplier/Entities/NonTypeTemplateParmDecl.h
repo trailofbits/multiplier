@@ -18,11 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "DeclaratorDecl.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class Decl;

@@ -18,16 +18,15 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AccessSpecifier.h"
 #include "PseudoKind.h"
 #include "TagTypeKind.h"
-#include "TokenUseSelector.h"
 
 namespace mx {
 class CXXBaseSpecifier;
-class OffsetEntityImpl;
+class CXXBaseSpecifierImpl;
+class Reference;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -40,21 +39,23 @@ class CXXBaseSpecifier {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class CXXBaseSpecifierImpl;
+  std::shared_ptr<const CXXBaseSpecifierImpl> impl;
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
-  inline CXXBaseSpecifier(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedCXXBaseSpecifierId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;

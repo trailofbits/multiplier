@@ -33,7 +33,7 @@
 #include <vector>
 
 #include "../Index/Macro.h"
-#include "../Index/Pseudo.h"
+#include "../Index/Entity.h"
 
 #define IGNORE(name)
 #define DECL_NAME(name) #name "Decl",
@@ -100,8 +100,6 @@ static const std::unordered_set<std::string> gAbstractTypes{
                             IGNORE, STR_NAME)
 };
 
-clang::ClassTemplateDecl * x;
-
 static const std::unordered_set<std::string> gUnserializableTypes{
    // These are not contained in fragments.
   "NamespaceDecl",
@@ -114,6 +112,12 @@ static const std::unordered_set<std::string> gUnserializableTypes{
 
   // These aren't real PASTA types.
   CUSTOM_MACRO_KINDS(MACRO_NAME)
+};
+
+static const std::unordered_set<std::string> gFragmentEntityTypes{
+#define FRAG_ENT_TYPE(type_name, lower_name) #type_name ,
+  FOR_EACH_ENTITY_CATEGORY(FRAG_ENT_TYPE)
+#undef FRAG_ENT_TYPE
 };
 
 static const std::unordered_set<std::string> gDeclNames{
@@ -139,26 +143,46 @@ static const std::unordered_set<std::string> gMacroNames{
   CUSTOM_MACRO_KINDS(MACRO_NAME)
 };
 
-#define PSEUDO_ENTITY_TYPE_NAME_STRING(n) #n ,
+static const std::unordered_set<std::string> gTemplateArgumentNames{
+  "TemplateArgument"
+};
 
-#define FRAGMENT_NON_REF_TYPES \
-    PSEUDO_ENTITY_TYPES(PSEUDO_ENTITY_TYPE_NAME_STRING)
+static const std::unordered_set<std::string> gTemplateParameterListNames{
+  "TemplateParameterList"
+};
 
-#define NON_REF_TYPES FRAGMENT_NON_REF_TYPES
+static const std::unordered_set<std::string> gCXXBaseSpecifierNames{
+  "CXXBaseSpecifier"
+};
+
+static const std::unordered_set<std::string> gDesignatorNames{
+  "Designator"
+};
+
+static const std::unordered_set<std::string> gFileNames{
+  "File"
+};
+
+static const std::unordered_set<std::string> gFragmentNames{
+  "Fragment"
+};
+
+static const std::unordered_set<std::string> gTokenNames{
+  "Token"
+};
 
 //#define NON_REF_TYPES \
 //    "IncludePath", \
 //    "Compiler", \
 //    "CompileCommand", \
-//    "CompileJob", \
-//    FRAGMENT_NON_REF_TYPES
+//    "CompileJob",
 
 static const std::unordered_set<std::string> gNotReferenceTypesRelatedToEntities{
-  FRAGMENT_NON_REF_TYPES
+
 };
 
 static const std::unordered_set<std::string> gNotReferenceTypes{
-  NON_REF_TYPES
+
 };
 
 static const std::unordered_set<std::string> kDeclContextTypes{
@@ -200,7 +224,7 @@ static const std::unordered_set<std::string> gConcreteClassNames{
   "FileToken",
   "MacroToken",
   "MacroRange",
-  NON_REF_TYPES
+  FOR_EACH_PSEUDO_ENTITY_TYPE(STR_NAME)
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, IGNORE)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, IGNORE)
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, IGNORE)
@@ -216,6 +240,7 @@ static const std::unordered_set<std::string> gEntityClassNames{
   "FileToken",
   "MacroToken",
   "File",
+  FOR_EACH_PSEUDO_ENTITY_TYPE(STR_NAME)
   PASTA_FOR_EACH_DECL_IMPL(DECL_NAME, STR_NAME)
   PASTA_FOR_EACH_STMT_IMPL(STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME, STR_NAME)
   PASTA_FOR_EACH_TYPE_IMPL(TYPE_NAME, STR_NAME)
@@ -649,28 +674,12 @@ static std::string NameAndHash(std::string name) {
 using MethodList = std::unordered_set<std::string>;
 using MethodListPtr = std::shared_ptr<MethodList>;
 
-struct UseList {
-  std::vector<std::pair<ClassHierarchy *, unsigned>> offsets;
-
-  void SetId(ClassHierarchy *h, unsigned id) {
-    offsets.emplace_back(h, id);
-  }
-};
-
 class CodeGenerator {
  private:
   std::string base_dir; // `include/multiplier/`
   std::vector<ClassHierarchy *> roots;
 
   std::unordered_set<std::string> enum_names;
-
-  std::map<std::string, UseList> decl_use_ids;
-  std::map<std::string, UseList> stmt_use_ids;
-  std::map<std::string, UseList> type_use_ids;
-  std::map<std::string, UseList> token_use_ids;
-  std::map<std::string, UseList> attr_use_ids;
-  std::map<std::string, UseList> macro_use_ids;
-  std::map<std::string, UseList> file_use_ids;
 
   std::ofstream schema_os;  // `lib/Common/AST.capnp`
   std::ofstream lib_cpp_os;  // `lib/AST/AST.cpp`
@@ -692,12 +701,12 @@ class CodeGenerator {
   std::vector<pasta::NamespaceDecl> pastas;
 
   std::vector<pasta::EnumDecl> enums;
-  std::vector<pasta::CXXRecordDecl> decls;
-  std::vector<pasta::CXXRecordDecl> stmts;
-  std::vector<pasta::CXXRecordDecl> types;
-  std::vector<pasta::CXXRecordDecl> attrs;
-  std::vector<pasta::CXXRecordDecl> macros;
-  std::vector<pasta::CXXRecordDecl> pseudos;
+
+#define DECLARE_ENTITY_LIST(name, lower_name) \
+    std::vector<pasta::CXXRecordDecl> lower_name ## s;
+
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_ENTITY_LIST)
+#undef DECLARE_ENTITY_LIST
 
   // We extend `TokenKind` with these.
   std::optional<pasta::EnumDecl> pp_keyword_kinds;
@@ -710,12 +719,12 @@ class CodeGenerator {
 
   void RunOnEnum(pasta::EnumDecl enum_decl);
 
-  AnyEntityStorage root_decl_storage;
-  AnyEntityStorage root_stmt_storage;
-  AnyEntityStorage root_type_storage;
-  AnyEntityStorage root_attr_storage;
-  AnyEntityStorage root_macro_storage;
-  AnyEntityStorage root_pseudo_storage;
+#define DECLARE_STORAGE(name, lower_name) \
+    AnyEntityStorage root_ ## lower_name ## _storage;
+
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_STORAGE)
+#undef DECLARE_STORAGE
+
   std::unordered_map<ClassHierarchy *, SpecificEntityStorage> specific_storage;
 
   MethodListPtr RunOnClass(ClassHierarchy *, MethodListPtr parent_methods);
@@ -723,14 +732,11 @@ class CodeGenerator {
   void RunOnClasses(void);
   int RunOnNamespaces(void);
 
-  void RunOnUseSet(const std::map<std::string, UseList> &set,
-                   const char *sel_name);
-
   void RunOnOptional(
       std::ostream &os, ClassHierarchy *cls, SpecificEntityStorage &storage,
       const std::optional<pasta::RecordDecl> &record,
       const std::string &class_name, const std::string &api_name,
-      const std::string &method_name, const char *nth_entity_reader,
+      const std::string &method_name, const std::string &nth_entity_reader,
       std::set<std::string> &fwd_decls, std::set<std::string> &needed_decls,
       const std::string& base_name);
 
@@ -738,7 +744,7 @@ class CodeGenerator {
       std::ostream &os, SpecificEntityStorage &storage,
       const std::optional<pasta::RecordDecl> &record,
       const std::string &class_name, const std::string &api_name,
-      const std::string &method_name, const char *nth_entity_reader,
+      const std::string &method_name, const std::string &nth_entity_reader,
       bool optional, std::set<std::string> &fwd_decls,
       std::set<std::string> &needed_decls, const std::string& base_name);
 
@@ -1025,7 +1031,7 @@ void CodeGenerator::RunOnOptional(
     const std::optional<pasta::RecordDecl> &record,
     const std::string &class_name, const std::string &api_name,
     const std::string &method_name,
-    const char *nth_entity_reader, std::set<std::string>& fwd_decls,
+    const std::string &nth_entity_reader, std::set<std::string>& fwd_decls,
     std::set<std::string>& needed_decls, const std::string& base_name) {
 
   std::optional<std::string> element_name =
@@ -1122,8 +1128,7 @@ void CodeGenerator::RunOnOptional(
 
     lib_cpp_os
         << "Token " << class_name << "::" << api_name
-        << "(void) const {\n"
-        << "  auto self = impl->Reader<ast::" << base_name << ">();\n";
+        << "(void) const {\n";
   } else {
     os
         << "  std::optional<" << cxx_element_name << "> "
@@ -1132,19 +1137,18 @@ void CodeGenerator::RunOnOptional(
     lib_cpp_os
         << "std::optional<" << cxx_element_name << "> "
         << class_name << "::" << api_name
-        << "(void) const {\n"
-        << "  auto self = impl->Reader<ast::" << base_name << ">();\n";
+        << "(void) const {\n";
   }
 
   if (needs_test) {
     if (is_token) {
       lib_cpp_os
-          << "  if (!self." << ip_getter_name << "()) {\n"
+          << "  if (!impl->reader." << ip_getter_name << "()) {\n"
           << "    return Token();\n"
           << "  } else {\n";
     } else {
       lib_cpp_os
-          << "  if (!self." << ip_getter_name << "()) {\n"
+          << "  if (!impl->reader." << ip_getter_name << "()) {\n"
           << "    return std::nullopt;\n"
           << "  } else {\n";
     }
@@ -1157,7 +1161,6 @@ void CodeGenerator::RunOnOptional(
       << "  auto v" << i << " = e." << method_name << "();\n";
 
   const char *serializer = nullptr;
-  std::stringstream selector;
 
   // Strings.
   if (element_name.value() == "string" ||
@@ -1174,7 +1177,7 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    capnp::Text::Reader data = self." << getter_name
+        << "    capnp::Text::Reader data = impl->reader." << getter_name
         << "();\n"
         << "    return " << cxx_element_name
         << "(data.cStr(), data.size());\n";
@@ -1202,7 +1205,7 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    capnp::Text::Reader data = self." << getter_name
+        << "    capnp::Text::Reader data = impl->reader." << getter_name
         << "();\n"
         << "    return " << cxx_element_name
         << "(data.cStr(), data.size());\n";
@@ -1223,7 +1226,7 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    capnp::Text::Reader data = self." << getter_name
+        << "    capnp::Text::Reader data = impl->reader." << getter_name
         << "();\n"
         << "    return data.cStr();\n";
 
@@ -1247,7 +1250,7 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    RawEntityId eid = self." << getter_name << "();\n"
+        << "    RawEntityId eid = impl->reader." << getter_name << "();\n"
         << "    if (eid == kInvalidEntityId) {\n";
 
     if (is_token) {
@@ -1261,129 +1264,35 @@ void CodeGenerator::RunOnOptional(
     lib_cpp_os
         << "    }\n";
 
-    selector << ", ";
-
     // Tokens are more like pseudo-entities but whatever.
     if (is_token) {
-      needed_decls.insert("TokenUseSelector");
-      token_use_ids[api_name].SetId(cls, i);
-      selector << "TokenUseSelector";
       element_name = "Token";
       lib_cpp_os
-          << "    if (auto frag = impl->ep->FragmentFor(impl->ep, impl->fragment_id)) {\n"
-          << "      return frag->TokenFor(frag, eid, true /* can_fail */).value();\n"
+          << "    return impl->ep->TokenFor(impl->ep, eid);\n";
+
+#define OPTIONAL_ENTITY(name, lower_name) \
+    } else if (*element_name == #name) { \
+      lib_cpp_os \
+          << "    if (auto eptr = impl->ep->" #name "For(impl->ep, eid)) {\n" \
+          << "      return " #name "(std::move(eptr));\n" \
+          << "    }\n"; \
+    \
+    } else if (g ## name ## Names.count(element_name.value())) { \
+      lib_cpp_os \
+          << "    if (auto eptr = impl->ep->" #name "For(impl->ep, eid)) {\n" \
+          << "      return " << element_name.value() \
+          << "::from(" #name "(std::move(eptr)));\n" \
           << "    }\n";
 
-    } else if (*element_name == "File") {
-      needed_decls.insert("FileUseSelector");
-      file_use_ids[api_name].SetId(cls, i);
-      selector << "FileUseSelector";
-      lib_cpp_os
-          << "    if (auto file = impl->ep->FileFor(impl->ep, eid)) {\n"
-          << "      return File(std::move(file));\n"
-          << "    }\n";
 
-    } else if (*element_name == "Decl") {
-      needed_decls.insert("DeclUseSelector");
-      decl_use_ids[api_name].SetId(cls, i);
-      selector << "DeclUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {\n"
-          << "      return Decl(std::move(eptr.value()));\n"
-          << "    }\n";
-
-    } else if (*element_name == "Stmt") {
-      needed_decls.insert("StmtUseSelector");
-      stmt_use_ids[api_name].SetId(cls, i);
-      selector << "StmtUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {\n"
-          << "      return Stmt(std::move(eptr.value()));\n"
-          << "    }\n";
-
-    } else if (*element_name == "Type") {
-      needed_decls.insert("TypeUseSelector");
-      type_use_ids[api_name].SetId(cls, i);
-      selector << "TypeUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {\n"
-          << "      return Type(std::move(eptr.value()));\n"
-          << "    }\n";
-
-    } else if (*element_name == "Attr") {
-      needed_decls.insert("AttrUseSelector");
-      attr_use_ids[api_name].SetId(cls, i);
-      selector << "AttrUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {\n"
-          << "      return Attr(std::move(eptr.value()));\n"
-          << "    }\n";
-
-    } else if (*element_name == "Macro") {
-      needed_decls.insert("MacroUseSelector");
-      macro_use_ids[api_name].SetId(cls, i);
-      selector << "MacroUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {\n"
-          << "      return Macro(std::move(eptr.value()));\n"
-          << "    }\n";
-
-    } else if (gDeclNames.count(element_name.value())) {
-      needed_decls.insert("DeclUseSelector");
-      decl_use_ids[api_name].SetId(cls, i);
-      selector << "DeclUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, eid)) {\n"
-          << "      return " << element_name.value()
-          << "::from(Decl(std::move(eptr.value())));\n"
-          << "    }\n";
-
-    } else if (gStmtNames.count(element_name.value())) {
-      needed_decls.insert("StmtUseSelector");
-      stmt_use_ids[api_name].SetId(cls, i);
-      selector << "StmtUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->StmtFor(impl->ep, eid)) {\n"
-          << "      return " << element_name.value()
-          << "::from(Stmt(std::move(eptr.value())));\n"
-          << "    }\n";
-
-    } else if (gTypeNames.count(element_name.value())) {
-      needed_decls.insert("TypeUseSelector");
-      type_use_ids[api_name].SetId(cls, i);
-      selector << "TypeUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->TypeFor(impl->ep, eid)) {\n"
-          << "      return " << element_name.value()
-          << "::from(Type(std::move(eptr.value())));\n"
-          << "    }\n";
-
-    } else if (gAttrNames.count(element_name.value())) {
-      needed_decls.insert("AttrUseSelector");
-      attr_use_ids[api_name].SetId(cls, i);
-      selector << "AttrUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->AttrFor(impl->ep, eid)) {\n"
-          << "      return " << element_name.value()
-          << "::from(Attr(std::move(eptr.value())));\n"
-          << "    }\n";
-
-    } else if (gMacroNames.count(element_name.value())) {
-      needed_decls.insert("MacroUseSelector");
-      macro_use_ids[api_name].SetId(cls, i);
-      selector << "MacroUseSelector";
-      lib_cpp_os
-          << "    if (auto eptr = impl->ep->MacroFor(impl->ep, eid)) {\n"
-          << "      return " << element_name.value()
-          << "::from(Macro(std::move(eptr.value())));\n"
-          << "    }\n";
+    OPTIONAL_ENTITY(File, file)
+    FOR_EACH_ENTITY_CATEGORY(OPTIONAL_ENTITY)
+#undef OPTIONAL_ENTITY
 
     } else {
       std::cerr << "??? optional element_name=" << (*element_name) << '\n';
       abort();
     }
-
-    selector << "::" << SnakeCaseToEnumCase(api_name);
 
   // Pseudo-entities.
   } else if (gNotReferenceTypesRelatedToEntities.count(element_name.value())) {
@@ -1401,7 +1310,7 @@ void CodeGenerator::RunOnOptional(
         << "  }\n";
 
     lib_cpp_os
-        << "    if (RawEntityId eid = self." << getter_name << "();\n"
+        << "    if (RawEntityId eid = impl->reader." << getter_name << "();\n"
         << "        eid != kInvalidEntityId) {\n"
         << "      if (auto eptr = impl->ep->PseudoFor(impl->ep, eid)) {\n"
         << "        return " << element_name.value() << "(std::move(eptr.value()));\n"
@@ -1433,7 +1342,7 @@ void CodeGenerator::RunOnOptional(
 
     lib_cpp_os
         << "    return static_cast<" << cxx_element_name
-        << ">(self." << getter_name << "());\n";
+        << ">(impl->reader." << getter_name << "());\n";
   }
 
   lib_cpp_os
@@ -1453,17 +1362,16 @@ void CodeGenerator::RunOnOptional(
   serialize_inc_os
       << "  " << serializer << "(" << class_name << ", " << api_name
       << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
-      << element_name.value() << ", " << nth_entity_reader << selector.str()
-      << ")\n";
+      << element_name.value() << ", " << nth_entity_reader << ")\n";
 }
 
 void CodeGenerator::RunOnVector(
     std::ostream &os, SpecificEntityStorage &storage,
     const std::optional<pasta::RecordDecl> &record,
     const std::string &class_name, const std::string &api_name,
-    const std::string &method_name, const char *nth_entity_reader,
+    const std::string &method_name, const std::string &nth_entity_reader,
     bool optional, std::set<std::string> &fwd_decls,
-    std::set<std::string> &needed_decls, const std::string& base_name) {
+    std::set<std::string> &needed_decls, const std::string &base_name) {
 
   std::optional<std::string> element_name =
       GetFirstTemplateParameterType(record);
@@ -1564,25 +1472,43 @@ void CodeGenerator::RunOnVector(
 
   lib_cpp_os
       << class_name << "::" << api_name
-      << "(void) const {\n"
-      << "  auto self = impl->Reader<ast::" << base_name << ">();\n";
+      << "(void) const {\n";
 
   if (optional) {
     lib_cpp_os
-        << "  if (!self." << opt_getter_name << "()) {\n"
+        << "  if (!impl->reader." << opt_getter_name << "()) {\n"
         << "    return std::nullopt;\n"
         << "  }\n"
-        << "  auto list = self." << getter_name << "();\n"
+        << "  auto list = impl->reader." << getter_name << "();\n"
         << "  std::vector<" << cxx_element_name << "> vec;\n"
         << "  vec.reserve(list.size());\n";
   } else {
     lib_cpp_os
-        << "  auto list = self." << getter_name << "();\n";
+        << "  auto list = impl->reader." << getter_name << "();\n";
   }
 
   if (is_token) {
     lib_cpp_os
-        << "  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n";
+        << "  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n"
+        << "  if (!fragment) {\n"
+        << "    assert(false);\n";
+    if (optional) {
+      lib_cpp_os
+          << "    return std::nullopt;\n";
+    } else {
+      lib_cpp_os
+          << "    co_return;\n";
+    }
+    lib_cpp_os
+        << "  }\n";
+
+    if (base_name == "Macro") {
+      lib_cpp_os
+          << "  auto tok_reader = fragment->MacroTokenReader(fragment);\n";
+    } else {
+      lib_cpp_os
+          << "  auto tok_reader = fragment->ParsedTokenReader(fragment);\n";
+    }
   }
 
   lib_cpp_os
@@ -1687,45 +1613,43 @@ void CodeGenerator::RunOnVector(
     if (is_token) {
       if (optional) {
         lib_cpp_os
-            << "    if (auto t" << i << " = fragment->TokenFor(fragment, v)) {\n"
-            << "      vec.emplace_back(std::move(t" << i << ".value()));\n"
+            << "    if (auto t" << i << " = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {\n"
+            << "      vec.emplace_back(std::move(t" << i << "));\n"
             << "    }\n";
       } else {
         lib_cpp_os
-            << "    if (auto t" << i << " = fragment->TokenFor(fragment, v)) {\n"
-            << "      co_yield std::move(t" << i << ".value());\n"
+            << "    if (auto t" << i << " = fragment->ep->TokenFor(fragment->ep, tok_reader, v)) {\n"
+            << "      co_yield t" << i << ";\n"
             << "    }\n";
       }
 
-#define YIELD_ENTITY(name) \
+
+#define YIELD_ENTITY(name, lower_name) \
     } else if (*element_name == #name) { \
       if (optional) { \
         lib_cpp_os \
             << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
-            << "      vec.emplace_back(std::move(d" << i << ".value()));\n" \
+            << "      vec.emplace_back(std::move(d" << i << "));\n" \
             << "    }\n"; \
       } else { \
         lib_cpp_os \
             << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
-            << "      co_yield std::move(d" << i << ".value());\n" \
+            << "      co_yield " << #name << "(std::move(d" << i << "));\n" \
             << "    }\n"; \
       }
 
-    YIELD_ENTITY(Decl)
-    YIELD_ENTITY(Stmt)
-    YIELD_ENTITY(Type)
-    YIELD_ENTITY(Attr)
-    YIELD_ENTITY(Macro)
+    YIELD_ENTITY(File, file)
+    FOR_EACH_ENTITY_CATEGORY(YIELD_ENTITY)
 
 #undef YIELD_ENTITY
 
-#define YIELD_DERIVED_ENTITY(name) \
+#define YIELD_DERIVED_ENTITY(name, lower_name) \
     } else if (g ## name ## Names.count(*element_name)) { \
       if (optional) { \
         lib_cpp_os \
             << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
             << "      if (auto e = " << (*element_name) \
-            << "::from(" #name "(d" << i << ".value()))) {\n" \
+            << "::from(" #name "(d" << i << "))) {\n" \
             << "        vec.emplace_back(std::move(*e));\n" \
             << "      }\n" \
             << "    }\n"; \
@@ -1733,17 +1657,14 @@ void CodeGenerator::RunOnVector(
         lib_cpp_os \
             << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
             << "      if (auto e = " << (*element_name) \
-            << "::from(" #name "(d" << i << ".value()))) {\n" \
+            << "::from(" #name "(d" << i << "))) {\n" \
             << "        co_yield std::move(*e);\n" \
             << "      }\n" \
             << "    }\n"; \
       }
 
-    YIELD_DERIVED_ENTITY(Decl)
-    YIELD_DERIVED_ENTITY(Stmt)
-    YIELD_DERIVED_ENTITY(Type)
-    YIELD_DERIVED_ENTITY(Attr)
-    YIELD_DERIVED_ENTITY(Macro)
+    YIELD_DERIVED_ENTITY(File, file)
+    FOR_EACH_ENTITY_CATEGORY(YIELD_DERIVED_ENTITY)
 
 #undef YIELD_DERIVED_ENTITY
 
@@ -1754,26 +1675,7 @@ void CodeGenerator::RunOnVector(
 
   // Not reference types, need to serialize offsets.
   } else {
-
-    fwd_decls.insert(cxx_element_name);
-    static const char *_serializer[] = {"MX_VISIT_PSEUDO_LIST",
-                                        "MX_VISIT_OPTIONAL_PSEUDO_LIST"};
-    serializer = _serializer;
-
-    serialize_cpp_os
-        << "      sv" << i << ".set(i" << i << ", es.PseudoId(e" << i << "));\n";
-
-    if (optional) {
-      lib_cpp_os
-          << "  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {\n"
-          << "    vec.emplace_back(std::move(*ps_impl));\n"
-          << "  }\n";
-    } else {
-      lib_cpp_os
-          << "  if (auto ps_impl = impl->ep->PseudoFor(impl->ep, impl->fragment_id, v)) {\n"
-          << "    co_yield std::move(*ps_impl);\n"
-          << "  }\n";
-    }
+    abort();
   }
 
   lib_cpp_os
@@ -1831,27 +1733,24 @@ MethodListPtr CodeGenerator::RunOnClass(
 
   forward_decls.insert(class_name);
 
-  const auto is_decl = gDeclNames.count(class_name);
-  const auto is_stmt = gStmtNames.count(class_name);
-  const auto is_type = gTypeNames.count(class_name);
-  const auto is_attr = gAttrNames.count(class_name);
-  const auto is_macro = gMacroNames.count(class_name);
+#define DECLARE_IS_A(name, lower_name) \
+    const auto is_ ## lower_name = g ## name ## Names.count(class_name);
+
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_IS_A)
+#undef DECLARE_IS_A
+
   const auto is_concrete = gConcreteClassNames.count(class_name);
 
   if (cls->base) {
     specific_storage.try_emplace(cls, specific_storage.find(cls->base)->second);
-  } else if (is_decl) {
-    specific_storage.try_emplace(cls, root_decl_storage);
-  } else if (is_stmt) {
-    specific_storage.try_emplace(cls, root_stmt_storage);
-  } else if (is_type) {
-    specific_storage.try_emplace(cls, root_type_storage);
-  } else if (is_attr) {
-    specific_storage.try_emplace(cls, root_attr_storage);
-  } else if (is_macro) {
-    specific_storage.try_emplace(cls, root_macro_storage);
-  } else {
-    specific_storage.try_emplace(cls, root_pseudo_storage);
+
+#define SET_STORAGE(name, lower_name) \
+    } else if (is_ ## lower_name) { \
+      specific_storage.try_emplace(cls, root_ ## lower_name ## _storage);
+
+  FOR_EACH_ENTITY_CATEGORY(SET_STORAGE)
+#undef SET_STORAGE
+
   }
 
   auto &storage = specific_storage.find(cls)->second;
@@ -1859,7 +1758,8 @@ MethodListPtr CodeGenerator::RunOnClass(
   // We have our own representation for these.
   if (class_name == "Token" || class_name == "TokenRange" ||
       class_name == "FileToken" || class_name == "MacroToken" ||
-      class_name == "MacroRange") {
+      class_name == "MacroRange" || class_name == "File" ||
+      class_name == "Fragment") {
     return parent_methods;
   }
 
@@ -1881,12 +1781,11 @@ MethodListPtr CodeGenerator::RunOnClass(
     << "#include <gap/core/generator.hpp>\n"
     << "#include \"../Iterator.h\"\n"
     << "#include \"../Types.h\"\n"
-    << "#include \"../Token.h\"\n"
-    << "#include \"../Use.h\"\n\n";
+    << "#include \"../Token.h\"\n\n";
 
   include_h_os << "#include \"Entities/" << class_name << ".h\"\n";
 
-  const char *nth_entity_reader = nullptr;
+  std::string nth_entity_reader;
   const char *end_serializer = nullptr;
 
   serialize_inc_os
@@ -1911,12 +1810,15 @@ MethodListPtr CodeGenerator::RunOnClass(
       << "\n#endif\n\n";
 
   std::string base_name;
-  if (is_decl) { base_name = "Decl"; }
-  else if (is_type) { base_name = "Type"; }
-  else if (is_stmt) { base_name = "Stmt"; }
-  else if (is_attr) { base_name = "Attr"; }
-  else if (is_macro) { base_name = "Macro"; }
-  else { base_name = "Pseudo"; }
+  if (false) {
+
+#define SET_BASE_NAME(name, lower_name) \
+    } else if (is_ ## lower_name) { \
+      base_name = #lower_name;
+
+  FOR_EACH_ENTITY_CATEGORY(SET_BASE_NAME)
+#undef SET_STORAGE
+  }
 
   if (is_decl) {
     needed_decls.insert("DeclKind");
@@ -1924,7 +1826,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(const EntityMapper &es, mx::ast::Decl::Builder b, const pasta::"
-        << class_name << " &e) {\n"
+        << class_name << " &e, const TokenTree *) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1950,7 +1852,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(const EntityMapper &es, mx::ast::Stmt::Builder b, const pasta::"
-        << class_name << " &e) {\n";
+        << class_name << " &e, const TokenTree *) {\n";
 
     if (is_concrete) {
       serialize_inc_os
@@ -1972,7 +1874,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(const EntityMapper &es, mx::ast::Type::Builder b, const pasta::"
-        << class_name << " &e) {\n"
+        << class_name << " &e, const TokenTree *) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -1998,7 +1900,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     serialize_cpp_os
         << "void Serialize" << class_name
         << "(const EntityMapper &es, mx::ast::Attr::Builder b, const pasta::"
-        << class_name << " &e) {\n"
+        << class_name << " &e, const TokenTree *) {\n"
         << "  (void) es;\n"
         << "  (void) b;\n"
         << "  (void) e;\n";
@@ -2048,27 +1950,36 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthMacro";
 
-  // Pseudo entities.
+#define HANDLE_PSEUDO(type_name, lower_name) \
+    } else if (is_ ## lower_name) { \
+      needed_decls.insert("PseudoKind"); \
+      serialize_cpp_os \
+          << "void Serialize" << class_name \
+          << "(const EntityMapper &es, mx::ast::" #type_name \
+          << "::Builder b, const pasta::" \
+          << class_name << " &e, const TokenTree *) {\n" \
+          << "  (void) es;\n" \
+          << "  (void) b;\n" \
+          << "  (void) e;\n"; \
+      \
+      if (is_concrete) { \
+        serialize_inc_os << "MX_BEGIN_VISIT_PSEUDO"; \
+      } else { \
+        serialize_inc_os << "MX_BEGIN_VISIT_ABSTRACT_PSEUDO"; \
+      } \
+      serialize_inc_os \
+          << "(" << class_name << ")\n" \
+          << "  MX_ENTER_VISIT_" << class_name << "\n"; \
+      end_serializer = "MX_END_VISIT_PSEUDO"; \
+      \
+      nth_entity_reader = "Nth" #type_name;
+
+  FOR_EACH_ENTITY_CATEGORY(HANDLE_PSEUDO)
+#undef HANDLE_PSEUDO
+
   } else {
-    auto pk = storage.AddMethod("UInt8");  // pseudo kind.
-    auto [pk_getter_name, pk_setter_name, pk_init_name] = NamesFor(pk);
-
-    needed_decls.insert("PseudoKind");
-
-    serialize_cpp_os
-        << "void Serialize" << class_name
-        << "(const EntityMapper &es, mx::ast::Pseudo::Builder b, const pasta::"
-        << class_name << " &e) {\n  b." << pk_setter_name
-        << "(static_cast<uint8_t>(pasta::PseudoKind::k" << class_name << "));\n";
-
-    serialize_inc_os
-        << "MX_BEGIN_VISIT_PSEUDO(" << class_name << ")\n"
-        << "  MX_ENTER_VISIT_" << class_name << "\n"
-        << "  MX_VISIT_PSEUDO_KIND(" << class_name << ", " << pk << ")\n";
-
-    end_serializer = "MX_END_VISIT_PSEUDO";
-
-    nth_entity_reader = "NthPseudo";
+    std::cerr << "Unhandled top-level entity type: " << class_name << '\n';
+    abort();
   }
 
   class_os
@@ -2104,7 +2015,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  Serialize" << base_name << "(es, b, e, tt);\n";
       } else {
         serialize_cpp_os
-            << "  Serialize" << base_name << "(es, b, e);\n";
+            << "  Serialize" << base_name << "(es, b, e, nullptr);\n";
       }
 
       serialize_inc_os
@@ -2121,10 +2032,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   // Things like `TemplateParameterList`, that aren't themselves entities, but
   // are derived from entities in fragments, and link to entities in fragments,
   // and so we need to carry around a fragment pointer.
-  } else if (class_name == "Decl" || class_name == "Stmt" ||
-             class_name == "Type" || class_name == "Attr" ||
-             class_name == "Macro" ||
-             gNotReferenceTypesRelatedToEntities.count(class_name)) {
+  } else if (gFragmentEntityTypes.count(class_name)) {
     unsigned cd = 0;  // Containing decl.
     unsigned cs = 0;  // Containing stmt.
 
@@ -2159,7 +2067,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
         lib_cpp_os
             << "bool Decl::is_definition(void) const {\n"
-            << "  return impl->Reader<ast::Decl>()." << def_getter_name << "();\n"
+            << "  return impl->reader." << def_getter_name << "();\n"
             << "}\n\n";
 
         serialize_cpp_os
@@ -2168,22 +2076,20 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       lib_cpp_os
           << "std::optional<Decl> " << class_name << "::parent_declaration(void) const {\n"
-          << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-          << "  if (auto id = self." << cd_getter_name << "(); "
+          << "  if (auto id = impl->reader." << cd_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
           << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
-          << "      return Decl(std::move(eptr.value()));\n"
+          << "      return Decl(std::move(eptr));\n"
           << "    }\n"
           << "    assert(false);\n"
           << "  }\n"
           << "  return std::nullopt;\n"
           << "}\n\n"
           << "std::optional<Stmt> " << class_name << "::parent_statement(void) const {\n"
-          << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-          << "  if (auto id = self." << cs_getter_name << "(); "
+          << "  if (auto id = impl->reader." << cs_getter_name << "(); "
           << "id != kInvalidEntityId) {\n"
           << "    if (auto eptr = impl->ep->StmtFor(impl->ep, id)) {\n"
-          << "      return Stmt(std::move(eptr.value()));\n"
+          << "      return Stmt(std::move(eptr));\n"
           << "    }\n"
           << "    assert(false);\n"
           << "  }\n"
@@ -2201,26 +2107,31 @@ MethodListPtr CodeGenerator::RunOnClass(
         << FriendOf(class_os, class_name, "FragmentImpl")
         << FriendOf(class_os, class_name, "Index")
         << FriendOf(class_os, class_name, "Macro")
-        << FriendOf(class_os, class_name, "ReferenceIteratorImpl")
+        << FriendOf(class_os, class_name, "Reference")
         << FriendOf(class_os, class_name, "Stmt")
         << FriendOf(class_os, class_name, "TokenContext")
         << FriendOf(class_os, class_name, "Type")
-        << FriendOf(class_os, class_name, "UseBase")
-        << FriendOf(class_os, class_name, "UseIteratorImpl")
-        << "  std::shared_ptr<OffsetEntityImpl> impl;\n"
+        << FriendOf(class_os, class_name, class_name + "Impl")
+        << "  std::shared_ptr<const " << class_name << "Impl> impl;\n"
         << " public:\n"
         << "  " << class_name << "(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << "(const " << class_name << " &) = default;\n"
         << "  " << class_name << " &operator=(" << class_name << " &&) noexcept = default;\n"
         << "  " << class_name << " &operator=(const " << class_name << " &) = default;\n\n"
-        << "  inline " << class_name
-        << "(std::shared_ptr<OffsetEntityImpl> impl_)\n"
+        << "  /* implicit */ inline " << class_name
+        << "(std::shared_ptr<const " << class_name << "Impl> impl_)\n"
         << "      : impl(std::move(impl_)) {}\n\n";
-    forward_decls.insert("OffsetEntityImpl");
+
+    forward_decls.insert("Reference");
+    forward_decls.insert(class_name + "Impl");
+
+    class_os
+        << "  Packed" << class_name << "Id id(void) const;\n"
+        << "  gap::generator<Reference> references(void) const;\n\n";
+    seen_methods->emplace("id");  // Manual.
+    seen_methods->emplace("references");  // Manual.
 
     if (class_name == "Decl") {
-      needed_decls.insert("DeclUseSelector");
-      forward_decls.insert("Stmt");
       class_os
           << "  inline static std::optional<Decl> from(const Decl &self) {\n"
           << "    return self;\n"
@@ -2237,13 +2148,11 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  bool is_definition(void) const;\n"
           << "  Decl canonical_declaration(void) const;\n"
           << "  gap::generator<Decl> redeclarations(void) const;\n"
-          << "  SpecificEntityId<DeclarationId> id(void) const;\n"
-          << "  gap::generator<Use<DeclUseSelector>> uses(void) const;\n"
-          << "  gap::generator<Stmt> references(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Decl> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
+      seen_methods->emplace("uses");  // Manual.
       seen_methods->emplace("definition");  // Manual.
       seen_methods->emplace("canonical_declaration");  // Disable this.
       seen_methods->emplace("is_canonical_declaration");  // Disable this.
@@ -2263,7 +2172,6 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("previous_declaration");  // Disable this.
 
     } else if (class_name == "Stmt") {
-      needed_decls.insert("DeclUseSelector");
       class_os
           << "  inline static std::optional<Stmt> from(const Stmt &self) {\n"
           << "    return self;\n"
@@ -2276,10 +2184,8 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
-          << "  std::optional<PackedDeclarationId> referenced_declaration_id(void) const;\n"
+          << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
           << "  std::optional<Decl> referenced_declaration(void) const;\n"
-          << "  SpecificEntityId<StatementId> id(void) const;\n"
-          << "  gap::generator<Use<StmtUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Stmt> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -2287,19 +2193,17 @@ MethodListPtr CodeGenerator::RunOnClass(
       // `Stmt::referenced_declaration`.
       const auto ref = storage.AddMethod("UInt64");
       auto [ref_getter_name, ref_setter_name, ref_init_name] = NamesFor(ref);
-      decl_use_ids["referenced_declaration"].SetId(cls, ref);
       serialize_inc_os
           << "  MX_VISIT_OPTIONAL_ENTITY(Stmt, referenced_declaration, " << ref
-          << ", MX_APPLY_FUNC, ReferencedDecl, Decl, NthStmt, "
-          << "DeclUseSelector::REFERENCED_DECLARATION)\n";
+          << ", MX_APPLY_FUNC, ReferencedDecl, Decl, NthStmt)\n";
 
       lib_cpp_os
-          << "std::optional<PackedDeclarationId> Stmt::referenced_declaration_id(void) const {\n"
-          << "  if (auto id = impl->Reader<ast::Stmt>()." << ref_getter_name << "();\n"
+          << "std::optional<PackedDeclId> Stmt::referenced_declaration_id(void) const {\n"
+          << "  if (auto id = impl->reader." << ref_getter_name << "();\n"
           << "      id != kInvalidEntityId) {\n"
           << "    VariantId vid = EntityId(id).Unpack();\n"
-          << "    if (std::holds_alternative<DeclarationId>(vid)) {\n"
-          << "      return std::get<DeclarationId>(vid);\n"
+          << "    if (std::holds_alternative<DeclId>(vid)) {\n"
+          << "      return std::get<DeclId>(vid);\n"
           << "    }\n"
           << "    assert(false);\n"
           << "  }\n"
@@ -2308,10 +2212,10 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       lib_cpp_os
           << "std::optional<Decl> Stmt::referenced_declaration(void) const {\n"
-          << "  if (auto id = impl->Reader<ast::Stmt>()." << ref_getter_name << "();\n"
+          << "  if (auto id = impl->reader." << ref_getter_name << "();\n"
           << "      id != kInvalidEntityId) {\n"
           << "    if (auto eptr = impl->ep->DeclFor(impl->ep, id)) {\n"
-          << "      return Decl(std::move(eptr.value()));\n"
+          << "      return Decl(std::move(eptr));\n"
           << "    }\n"
           << "    assert(false);\n"
           << "  }\n"
@@ -2324,11 +2228,11 @@ MethodListPtr CodeGenerator::RunOnClass(
           << ".value()));\n"
           << "  }\n";
 
+      seen_methods->emplace("uses");  // Manual.
       seen_methods->emplace("begin_token");  // Disable this.
       seen_methods->emplace("end_token");  // Disable this.
 
     } else if (class_name == "Type") {
-      needed_decls.insert("TypeUseSelector");
       class_os
           << "  inline static std::optional<Type> from(const Type &self) {\n"
           << "    return self;\n"
@@ -2339,14 +2243,13 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Type> from(const TokenContext &c) {\n"
           << "    return c.as_type();\n"
           << "  }\n\n"
-          << "  SpecificEntityId<TypeId> id(void) const;\n"
-          << "  gap::generator<Use<TypeUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Type> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
+
+      seen_methods->emplace("uses");  // Manual.
     
     } else if (class_name == "Attr") {
-      needed_decls.insert("AttrUseSelector");
       class_os
           << "  inline static std::optional<Attr> from(const Attr &self) {\n"
           << "    return self;\n"
@@ -2357,14 +2260,13 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Attr> from(const TokenContext &c) {\n"
           << "    return c.as_attribute();\n"
           << "  }\n\n"
-          << "  SpecificEntityId<AttributeId> id(void) const;\n"
-          << "  gap::generator<Use<AttrUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Attr> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
 
+      seen_methods->emplace("uses");  // Manual.
+
     } else if (class_name == "Macro") {
-      needed_decls.insert("MacroUseSelector");
       class_os
           << "  inline static std::optional<Macro> from(const Macro &self) {\n"
           << "    return self;\n"
@@ -2372,8 +2274,6 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  inline static std::optional<Macro> from(const std::optional<Macro> &self) {\n"
           << "    return self;\n"
           << "  }\n\n"
-          << "  SpecificEntityId<MacroId> id(void) const;\n"
-          << "  gap::generator<Use<MacroUseSelector>> uses(void) const;\n\n"
           << " protected:\n"
           << "  static gap::generator<Macro> in_internal(const Fragment &fragment);\n"
           << "  static gap::generator<Macro> containing_internal(const Token &token);\n\n"
@@ -2382,6 +2282,10 @@ MethodListPtr CodeGenerator::RunOnClass(
       // Serialization of these tokens is manually performed in
       // `bin/Index/Persist.cpp`.
     }
+
+  } else if (gNotReferenceTypesRelatedToEntities.count(class_name)) {
+    std::cerr << class_name << " is a pseudo class?\n";
+    abort();
 
   } else if (gEntityClassNames.count(class_name)) {
     std::cerr << class_name << " is an entity class?\n";
@@ -2617,14 +2521,6 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "    }\n"
         << "  }\n"
         << "}\n\n";
-
-    // Add in our custom uses iterator. We have a custom definition of this
-    // in the API.
-    if (class_name == "DefineMacroDirective") {
-      forward_decls.insert("Macro");
-      class_os
-          << "  gap::generator<Macro> references(void) const;\n\n";
-    }
   }
 
   if (is_decl && class_name != "Decl") {
@@ -2902,14 +2798,11 @@ MethodListPtr CodeGenerator::RunOnClass(
         const auto i = storage.AddMethod("UInt64");  // Reference.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
 
-        token_use_ids[api_name].SetId(cls, i);
-
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name
             << ", " << record_name << ", "
-            << nth_entity_reader << ", TokenUseSelector::"
-            << SnakeCaseToEnumCase(snake_name) << ")\n";
+            << nth_entity_reader << ")\n";
 
         class_os
             << "  Token " << api_name << "(void) const;\n";
@@ -2917,14 +2810,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "Token " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n"
-            << "  if (auto tok = fragment->TokenFor(fragment, self."
-            << getter_name << "())) {\n"
-            << "    return tok.value();\n"
-            << "  } else {\n"
-            << "    return Token();\n"
-            << "  }\n"
+            << "  return impl->ep->TokenFor(impl->ep, impl->reader."
+            << getter_name << "());\n"
             << "}\n\n";
 
         serialize_cpp_os
@@ -2949,10 +2836,10 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "TokenRange " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
             << "  auto fragment = impl->ep->FragmentFor(impl->ep, impl->fragment_id);\n"
-            << "  return fragment->TokenRangeFor(fragment, self."
-            << begin_getter_name << "(), self." << end_getter_name << "());\n"
+            << "  return fragment->TokenRangeFor(fragment, impl->reader."
+            << begin_getter_name << "(), impl->reader."
+            << end_getter_name << "());\n"
             << "}\n\n";
 
         serialize_cpp_os
@@ -2984,9 +2871,8 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "gap::generator<" << cxx_element_name << "> "
             << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
             << "  auto index = Index(impl->ep);\n"
-            << "  auto list = self." << getter_name << "();\n"
+            << "  auto list = impl->reader." << getter_name << "();\n"
             << "  for (auto v : list) {\n"
             << "    VariantEntity e = index.entity(EntityId(v));\n"
             << "    if (std::holds_alternative<Macro>(e)) {\n"
@@ -3031,20 +2917,14 @@ MethodListPtr CodeGenerator::RunOnClass(
 
       // Handle `pasta::File`.
       } else if (record_name == "File") {
-
-        needed_decls.insert("FileUseSelector");
-
         const auto i = storage.AddMethod("UInt64");  // Reference.
         auto [getter_name, setter_name, init_name] = NamesFor(i);
-
-        file_use_ids[api_name].SetId(cls, i);
 
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name
             << ", " << record_name << ", "
-            << nth_entity_reader << ", FileUseSelector::"
-            << SnakeCaseToEnumCase(snake_name) << ")\n";
+            << nth_entity_reader << ")\n";
 
         class_os
             << "  File " << api_name << "(void) const;\n";
@@ -3052,8 +2932,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "File " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  auto file = impl->ep->FileFor(impl->ep, self."
+            << "  auto file = impl->ep->FileFor(impl->ep, impl->reader."
             << getter_name << "());\n"
             << "  return File(std::move(file));\n"
             << "}\n\n";
@@ -3079,8 +2958,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  capnp::Text::Reader data = self." << getter_name
+            << "  capnp::Text::Reader data = impl->reader." << getter_name
             << "();\n"
             << "  return std::string_view(data.cStr(), data.size());\n"
             << "}\n\n";
@@ -3108,8 +2986,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::string_view " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  capnp::Text::Reader data = self." << getter_name
+            << "  capnp::Text::Reader data = impl->reader." << getter_name
             << "();\n"
             << "  return std::string_view(data.cStr(), data.size());\n"
             << "}\n\n";
@@ -3141,8 +3018,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "std::filesystem::path " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  capnp::Text::Reader data = self." << getter_name
+            << "  capnp::Text::Reader data = impl->reader." << getter_name
             << "();\n"
             << "  return data.cStr();\n"
             << "}\n\n";
@@ -3188,76 +3064,23 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << record_name << " " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  RawEntityId eid = self." << getter_name
+            << "  RawEntityId eid = impl->reader." << getter_name
             << "();\n";
 
-        const char *selector = nullptr;
+        if (false) {
+#define GET_ENTITY(name, lower_name) \
+    } else if (record_name == #name) { \
+      lib_cpp_os \
+          << "  return " #name "(impl->ep->" #name "For(impl->ep, eid));\n"; \
+    \
+    } else if (g ## name ## Names.count(record_name)) { \
+      lib_cpp_os \
+          << "  return " << record_name \
+          << "::from(" #name "(impl->ep->" #name "For(impl->ep, eid))).value();\n";
 
-        if (record_name == "Decl") {
-          decl_use_ids[api_name].SetId(cls, i);
-          selector = "DeclUseSelector";
-          lib_cpp_os
-              << "  return Decl(impl->ep->DeclFor(impl->ep, eid).value());\n";
-
-        } else if (record_name == "Stmt") {
-          stmt_use_ids[api_name].SetId(cls, i);
-          selector = "StmtUseSelector";
-          lib_cpp_os
-              << "  return Stmt(impl->ep->StmtFor(impl->ep, eid).value());\n";
-
-        } else if (record_name == "Type") {
-          type_use_ids[api_name].SetId(cls, i);
-          selector = "TypeUseSelector";
-          lib_cpp_os
-              << "  return Type(impl->ep->TypeFor(impl->ep, eid).value());\n";
-
-        } else if (record_name == "Attr") {
-          attr_use_ids[api_name].SetId(cls, i);
-          selector = "AttrUseSelector";
-          lib_cpp_os
-              << "  return Attr(impl->ep->AttrFor(impl->ep, eid).value());\n";
-
-        } else if (record_name == "Macro") {
-          macro_use_ids[api_name].SetId(cls, i);
-          selector = "MacroUseSelector";
-          lib_cpp_os
-              << "  return Macro(impl->ep->MacroFor(impl->ep, eid).value());\n";
-
-        } else if (gDeclNames.count(record_name)) {
-          decl_use_ids[api_name].SetId(cls, i);
-          selector = "DeclUseSelector";
-          lib_cpp_os
-              << "  return " << record_name
-              << "::from(Decl(impl->ep->DeclFor(impl->ep, eid).value())).value();\n";
-
-        } else if (gStmtNames.count(record_name)) {
-          stmt_use_ids[api_name].SetId(cls, i);
-          selector = "StmtUseSelector";
-          lib_cpp_os
-              << "  return " << record_name
-              << "::from(Stmt(impl->ep->StmtFor(impl->ep, eid).value())).value();\n";
-
-        } else if (gTypeNames.count(record_name)) {
-          type_use_ids[api_name].SetId(cls, i);
-          selector = "TypeUseSelector";
-          lib_cpp_os
-              << "  return " << record_name
-              << "::from(Type(impl->ep->TypeFor(impl->ep, eid).value())).value();\n";
-
-        } else if (gAttrNames.count(record_name)) {
-          attr_use_ids[api_name].SetId(cls, i);
-          selector = "AttrUseSelector";
-          lib_cpp_os
-              << "  return " << record_name
-              << "::from(Attr(impl->ep->AttrFor(impl->ep, eid).value())).value();\n";
-
-        } else if (gMacroNames.count(record_name)) {
-          macro_use_ids[api_name].SetId(cls, i);
-          selector = "MacroUseSelector";
-          lib_cpp_os
-              << "  return " << record_name
-              << "::from(Macro(impl->ep->MacroFor(impl->ep, eid).value())).value();\n";
+        GET_ENTITY(File, file)
+        FOR_EACH_ENTITY_CATEGORY(GET_ENTITY)
+#undef GET_ENTITY
 
         } else {
           std::cerr << "??? record " << record_name << '\n';
@@ -3267,38 +3090,13 @@ MethodListPtr CodeGenerator::RunOnClass(
         serialize_inc_os
             << "  MX_VISIT_ENTITY(" << class_name << ", " << api_name
             << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
-            << record_name << ", " << nth_entity_reader << ", " << selector
-            << "::" << SnakeCaseToEnumCase(api_name) << ")\n";
+            << record_name << ", " << nth_entity_reader << ")\n";
 
         lib_cpp_os
             << "}\n\n";
 
-      // E.g. `TemplateParameterList`.
       } else if (gNotReferenceTypesRelatedToEntities.count(record_name)) {
-        const auto i = storage.AddMethod("UInt32");  // Offset in `EntityList::entities`.
-        auto [getter_name, setter_name, init_name] = NamesFor(i);
-
-        serialize_inc_os
-            << "  MX_VISIT_PSEUDO(" << class_name << ", " << api_name
-            << ", " << i << ", MX_APPLY_METHOD, " << method_name << ", "
-            << record_name << ", " << nth_entity_reader << ", InvalidSelector)\n";
-
-        class_os
-            << "  " << record_name << " " << api_name
-            << "(void) const;\n";
-
-        lib_cpp_os
-            << record_name << " " << class_name << "::" << api_name
-            << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  auto offset = self." << getter_name << "();\n"
-            << "  auto reader = impl->ep->PseudoFor(impl->ep, impl->fragment_id, offset);\n"
-            << "  return " << record_name << "(std::move(*reader));\n"
-            << "}\n\n";
-
-        serialize_cpp_os
-            << "  b." << setter_name << "(es.PseudoId(e."
-            << method_name << "()));\n";
+        abort();
 
       } else if (gNotReferenceTypes.count(record_name)) {
         std::cerr << "unhandled record " << record_name << "\n";
@@ -3328,9 +3126,8 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << enum_name << " " << class_name << "::" << api_name
             << "(void) const {\n"
-            << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-            << "  return static_cast<" << enum_name << ">(self." << getter_name
-            << "());\n"
+            << "  return static_cast<" << enum_name << ">(impl->reader."
+            << getter_name << "());\n"
             << "}\n\n";
 
         // Take the kind from the `TokenTree` if we have it.
@@ -3393,8 +3190,7 @@ MethodListPtr CodeGenerator::RunOnClass(
       lib_cpp_os
           << cxx_int_type << " " << class_name << "::" << api_name
           << "(void) const {\n"
-          << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-          << "  return self." << getter_name << "();\n"
+          << "  return impl->reader." << getter_name << "();\n"
           << "}\n\n";
 
       serialize_cpp_os
@@ -3427,11 +3223,10 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "gap::generator<Decl> "
           << class_name << "::" << api_name
           << "(void) const {\n"
-          << "  auto self = impl->Reader<ast::" << base_name << ">();\n"
-          << "  auto list = self." << getter_name << "();\n"
+          << "  auto list = impl->reader." << getter_name << "();\n"
           << "  for (auto v : list) {\n"
-          << "    if (auto decl = impl->ep->DeclFor(impl->ep, v)) {\n"
-          << "      co_yield std::move(decl.value());\n"
+          << "    if (auto eptr = impl->ep->DeclFor(impl->ep, v)) {\n"
+          << "      co_yield std::move(eptr);\n"
           << "    }\n"
           << "  }\n"
           << "}\n\n";
@@ -3484,7 +3279,10 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       work_list;
 
   auto empty_list = std::make_shared<MethodList>();
-  for (auto root : roots) {
+  for (ClassHierarchy *root : roots) {
+    if (root->record.Name() == "File") {
+      continue;
+    }
     work_list.emplace_back(root, empty_list);
   }
 
@@ -3507,8 +3305,15 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#include <multiplier/AST.h>\n"
-      << "#include <cassert>\n"
-      << "#include \"Fragment.h\"\n\n"
+      << "#include <cassert>\n\n"
+      << "#include \"Attr.h\"\n"
+      << "#include \"Decl.h\"\n"
+      << "#include \"File.h\"\n"
+      << "#include \"Fragment.h\"\n"
+      << "#include \"Macro.h\"\n"
+      << "#include \"Pseudo.h\"\n"
+      << "#include \"Stmt.h\"\n"
+      << "#include \"Type.h\"\n\n"
       << "namespace mx {\n";
 
   lib_pasta_cpp_os
@@ -3733,9 +3538,9 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#include <pasta/Compile/Job.h>\n"
       << "#include <pasta/Util/ArgumentVector.h>\n\n"
       << "#include <glog/logging.h>\n"
+      << "#include \"Entity.h\"\n"
       << "#include \"EntityMapper.h\"\n"
       << "#include \"PASTA.h\"\n"
-      << "#include \"Pseudo.h\"\n"
       << "#include \"TokenTree.h\"\n"
       << "#include \"Util.h\"\n"
       << "namespace indexer {\n\n"
@@ -3759,27 +3564,18 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "// the LICENSE file found in the root directory of this source tree.\n\n"
       << "// Auto-generated file; do not modify!\n\n"
       << "#pragma once\n\n"
-      << "namespace pasta {\n";
+      << "namespace pasta {\n"
+      << "class File;\n";
 
   // Forward declarations.
-  for (const pasta::CXXRecordDecl &record : decls) {
-    serialize_h_os << "class " << record.Name() << ";\n";
-  }
-  for (const pasta::CXXRecordDecl &record : stmts) {
-    serialize_h_os << "class " << record.Name() << ";\n";
-  }
-  for (const pasta::CXXRecordDecl &record : types) {
-    serialize_h_os << "class " << record.Name() << ";\n";
-  }
-  for (const pasta::CXXRecordDecl &record : attrs) {
-    serialize_h_os << "class " << record.Name() << ";\n";
-  }
-  for (const pasta::CXXRecordDecl &record : macros) {
-    serialize_h_os << "class " << record.Name() << ";\n";
-  }
-  for (const pasta::CXXRecordDecl &record : pseudos) {
-    serialize_h_os << "class " << record.Name() << ";\n";
-  }
+#define DECLARE_ENTITY_CLASSES(name, lower_name) \
+    for (const pasta::CXXRecordDecl &record : lower_name ## s) { \
+      serialize_h_os << "class " << record.Name() << ";\n"; \
+    }
+
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_ENTITY_CLASSES)
+#undef DECLARE_ENTITY_CLASSES
+
   for (const pasta::EnumDecl &tag : enums) {
     if (auto itype = CxxIntType(tag.IntegerType())) {
       serialize_h_os << "enum class " << tag.Name() << " : " << itype << ";\n";
@@ -3817,56 +3613,18 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "class TokenTree;\n";
 
   // Forward declarations.
-  for (const pasta::CXXRecordDecl &record : decls) {
-    std::string name = record.Name();
-    serialize_h_os
-        << "void Serialize" << name
-        << "(const EntityMapper &, mx::ast::Decl::Builder, const pasta::"
-        << name << " &);\n";
-  }
-
-  for (const pasta::CXXRecordDecl &record : stmts) {
-    std::string name = record.Name();
-    serialize_h_os
-        << "void Serialize" << name
-        << "(const EntityMapper &, mx::ast::Stmt::Builder, const pasta::"
-        << name << " &);\n";
-  }
-
-  for (const pasta::CXXRecordDecl &record : types) {
-    std::string name = record.Name();
-    serialize_h_os
-        << "void Serialize" << name
-        << "(const EntityMapper &, mx::ast::Type::Builder, const pasta::"
-        << name << " &);\n";
-  }
-
-  for (const pasta::CXXRecordDecl &record : attrs) {
-    std::string name = record.Name();
-    serialize_h_os
-        << "void Serialize" << name
-        << "(const EntityMapper &, mx::ast::Attr::Builder, const pasta::"
-        << name << " &);\n";
-  }
-
-  for (const pasta::CXXRecordDecl &record : macros) {
-    std::string name = record.Name();
-    serialize_h_os
-        << "void Serialize" << name
-        << "(const EntityMapper &, mx::ast::Macro::Builder, const pasta::"
-        << name << " &, const TokenTree *tt);\n";
-  }
-
-  for (const pasta::CXXRecordDecl &record : pseudos) {
-    std::string name = record.Name();
-    if (name != "Token" && name != "TokenRange" && name != "FileToken" &&
-        name != "MacroToken" && name != "MacroRange") {
-      serialize_h_os
-          << "void Serialize" << name
-          << "(const EntityMapper &, mx::ast::Pseudo::Builder, const pasta::"
-          << name << " &);\n";
+#define DECLARE_ENTITY_SERIALIZERS(type_name, lower_name) \
+    for (const pasta::CXXRecordDecl &record : lower_name ## s) { \
+      std::string name = record.Name(); \
+      serialize_h_os \
+          << "void Serialize" << name \
+          << "(const EntityMapper &, mx::ast::" #type_name \
+          << "::Builder, const pasta::" << name \
+          << " &, const TokenTree *);\n"; \
     }
-  }
+
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_ENTITY_SERIALIZERS)
+#undef DECLARE_ENTITY_SERIALIZERS
 
   lib_cpp_os
       << "#if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)\n"
@@ -3885,78 +3643,21 @@ void CodeGenerator::RunOnClassHierarchies(void) {
     auto class_name = cls->record.Name();
   }
 
-  schema_os
-      << NameAndHash("struct Decl") << " {\n";
-
   auto i = 0u;
-  for (const auto &[type, ids] : root_decl_storage.max_method_count) {
-    for (auto id : ids) {
-      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
-    }
-  }
 
-  // The entity list is a storage for zero-or-more entities.
-  schema_os
-      << "}\n\n"
-      << NameAndHash("struct Stmt") << " {\n";
+#define DEFINE_PROTO(name, lower_name) \
+    schema_os << NameAndHash("struct " #name ) << "{\n"; \
+    i = 0u; \
+    for (const auto &[type, ids] : \
+             root_ ## lower_name ## _storage.max_method_count) { \
+      for (auto id : ids) { \
+        schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";\
+      } \
+    } \
+    schema_os << "}\n\n";
 
-  i = 0u;
-  for (const auto &[type, ids] : root_stmt_storage.max_method_count) {
-    for (auto id : ids) {
-      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
-    }
-  }
-  schema_os
-      << "}\n\n"
-      << NameAndHash("struct Type") << " {\n";
-  i = 0u;
-  for (const auto &[type, ids] : root_type_storage.max_method_count) {
-    for (auto id : ids) {
-      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
-    }
-  }
-  schema_os
-      << "}\n\n"
-      << NameAndHash("struct Attr") << " {\n";
-  i = 0u;
-  for (const auto &[type, ids] : root_attr_storage.max_method_count) {
-    for (auto id : ids) {
-      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
-    }
-  }
-  schema_os
-      << "}\n\n"
-      << NameAndHash("struct Macro") << " {\n";
-  i = 0u;
-  for (const auto &[type, ids] : root_macro_storage.max_method_count) {
-    for (auto id : ids) {
-      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
-    }
-  }
-  schema_os
-      << "}\n\n"
-      << NameAndHash("struct Pseudo") << " {\n";
-  i = 0u;
-  for (const auto &[type, ids] : root_pseudo_storage.max_method_count) {
-    for (auto id : ids) {
-      schema_os << "  val" << id << " @" << (i++) << " :" << type << ";\n";
-    }
-  }
-  schema_os
-      << "}\n\n";
-
-//  auto i = 0u;
-//  for (const auto &class_name : gEntityClassNames) {
-//    if (class_name != "FileToken") {
-//      std::string snake_name = CapitalCaseToSnakeCase(class_name);
-//      std::string camel_name = SnakeCaseToCamelCase(snake_name);
-//      schema_os
-//          << "  " << camel_name << " @" << i
-//          << " :List(Entity);\n";
-//      ++i;
-//    }
-//  }
-//  schema_os << "}\n";
+  FOR_EACH_ENTITY_CATEGORY(DEFINE_PROTO)
+#undef DEFINE_PROTO
 
   serialize_inc_os
       << late_serialize_inc_os.str()
@@ -4018,14 +3719,6 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "#undef MX_ENUM_CLASS_ENTRY\n"
       << "#undef MX_END_ENUM_CLASS\n";
 
-  RunOnUseSet(decl_use_ids, "DeclUseSelector");
-  RunOnUseSet(stmt_use_ids, "StmtUseSelector");
-  RunOnUseSet(type_use_ids, "TypeUseSelector");
-  RunOnUseSet(token_use_ids, "TokenUseSelector");
-  RunOnUseSet(file_use_ids, "FileUseSelector");
-  RunOnUseSet(attr_use_ids, "AttrUseSelector");
-  RunOnUseSet(macro_use_ids, "MacroUseSelector");
-
   lib_cpp_os
       << "#pragma GCC diagnostic pop\n"
       << "#endif\n";
@@ -4039,70 +3732,16 @@ void CodeGenerator::RunOnClassHierarchies(void) {
       << "}  // namespace indexer\n";
 }
 
-void CodeGenerator::RunOnUseSet(
-    const std::map<std::string, UseList> &use_set,
-    const char *sel_name) {
-  std::ofstream os(base_dir + "/Entities/" + sel_name + ".h");
-
-  lib_pasta_h_os << "enum class " << sel_name << " : unsigned short;\n";
-  os
-    << "// Copyright (c) 2022-present, Trail of Bits, Inc.\n"
-    << "// All rights reserved.\n"
-    << "//\n"
-    << "// This source code is licensed in accordance with the terms specified in\n"
-    << "// the LICENSE file found in the root directory of this source tree.\n\n"
-    << "// Auto-generated file; do not modify!\n\n"
-    << "#pragma once\n\n"
-    << "#include <cstdint>\n\n"
-    << "namespace mx {\n"
-    << "enum class " << sel_name << " : unsigned short {\n";
-  lib_cpp_os
-      << "const char *EnumeratorName(" << sel_name << " sel) {\n"
-      << "  switch (sel) {\n";
-
-  std::map<unsigned, std::vector<std::pair<std::string, ClassHierarchy *>>>
-      indexed_uses;
-
-  for (const auto &[api_name, use_list] : use_set) {
-    const auto enum_name = SnakeCaseToEnumCase(api_name);
-
-    os << "  " << enum_name << ",\n";
-
-    lib_cpp_os
-        << "    case " << sel_name << "::"
-        << enum_name << ": return \"" << enum_name << "\";\n";
-
-    for (auto [cls_, id] : use_list.offsets) {
-      ClassHierarchy *cls = cls_;
-      indexed_uses[id].emplace_back(api_name, cls);
-    }
-  }
-
-  lib_cpp_os
-      << "  }\n"
-      << "  return \"<invalid>\";\n"
-      << "}\n\n";
-
-  os
-      << "};\n\n"
-      << "inline static const char *EnumerationName(" << sel_name << ") {\n"
-      << "  return \"" << sel_name << "\";\n"
-      << "}\n\n"
-      << "inline static constexpr unsigned NumEnumerators(" << sel_name << ") {\n"
-      << "  return " << use_set.size() << ";\n"
-      << "}\n\n"
-      << "const char *EnumeratorName(" << sel_name << ");\n\n"
-      << "} // namespace mx\n";
-}
-
 void CodeGenerator::RunOnClasses(void) {
   std::vector<std::unique_ptr<ClassHierarchy>> alloc;
-  BuildHierarchy(alloc, decls, roots);
-  BuildHierarchy(alloc, stmts, roots);
-  BuildHierarchy(alloc, types, roots);
-  BuildHierarchy(alloc, attrs, roots);
-  BuildHierarchy(alloc, macros, roots);
-  BuildHierarchy(alloc, pseudos, roots);
+
+  // Make class hierarchies.
+#define BUILD_HIERARCHY(name, lower_name) \
+    BuildHierarchy(alloc, lower_name ## s, roots);
+
+  FOR_EACH_ENTITY_CATEGORY(BUILD_HIERARCHY)
+#undef BUILD_HIERARCHY
+
   RunOnClassHierarchies();
 }
 
@@ -4112,18 +3751,13 @@ int CodeGenerator::RunOnNamespaces(void) {
       if (auto cls = pasta::CXXRecordDecl::From(decl);
           cls && cls->IsThisDeclarationADefinition()) {
         auto name = cls->Name();
-        if (gDeclNames.count(name)) {
-          decls.emplace_back(std::move(*cls));
-        } else if (gStmtNames.count(name)) {
-          stmts.emplace_back(std::move(*cls));
-        } else if (gTypeNames.count(name)) {
-          types.emplace_back(std::move(*cls));
-        } else if (gAttrNames.count(name)) {
-          attrs.emplace_back(std::move(*cls));
-        } else if (gMacroNames.count(name)) {
-          macros.emplace_back(std::move(*cls));
-        } else if (gConcreteClassNames.count(name)) {
-          pseudos.emplace_back(std::move(*cls));
+        if (false) {
+#define ADD_TO_LIST(type_name, lower_name) \
+    } else if (g ## type_name ## Names.count(name)) { \
+      lower_name ## s.emplace_back(std::move(*cls));
+
+  FOR_EACH_ENTITY_CATEGORY(ADD_TO_LIST)
+#undef ADD_TO_LIST
         }
       } else if (auto e = pasta::EnumDecl::From(decl);
                  e && e->IsThisDeclarationADefinition()) {
@@ -4135,34 +3769,8 @@ int CodeGenerator::RunOnNamespaces(void) {
     }
   }
 
-  if (decls.empty()) {
-    std::cerr << "Could not locate any declarations.\n";
-    return EXIT_FAILURE;
-
-  } else if (stmts.empty()) {
-    std::cerr << "Could not locate any statements.\n";
-    return EXIT_FAILURE;
-
-  } else if (types.empty()) {
-    std::cerr << "Could not locate any types.\n";
-    return EXIT_FAILURE;
-
-  } else if (pseudos.empty()) {
-    std::cerr << "Could not locate pasta::Token.\n";
-    return EXIT_FAILURE;
-
-  } else if (attrs.empty()) {
-    std::cerr << "Could not locate any attributes.\n";
-    return EXIT_FAILURE;
-
-  } else if (macros.empty()) {
-    std::cerr << "Could not locate any macros.\n";
-    return EXIT_FAILURE;
-
-  } else {
-    RunOnClasses();
-    return EXIT_SUCCESS;
-  }
+  RunOnClasses();
+  return EXIT_SUCCESS;
 }
 
 int CodeGenerator::RunOnTranslationUnit(pasta::TranslationUnitDecl tu) {

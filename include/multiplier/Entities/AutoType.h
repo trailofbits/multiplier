@@ -18,10 +18,8 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AutoTypeKeyword.h"
-#include "DeclUseSelector.h"
 #include "DeducedType.h"
 #include "TypeKind.h"
 

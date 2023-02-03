@@ -105,7 +105,7 @@ class ReadParsedTokensFromFragment final
   bool Equals(const class TokenReader *that) const final;
 };
 
-class FragmentImpl final : public EntityImpl {
+class FragmentImpl final : public EntityImpl<rpc::Fragment> {
  public:
   using Ptr = std::shared_ptr<const FragmentImpl>;
   using WeakPtr = std::weak_ptr<const FragmentImpl>;
@@ -126,16 +126,12 @@ class FragmentImpl final : public EntityImpl {
 
  public:
 
-  const FragmentReader reader;
-
   // For bounds checking.
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
 
-  ~FragmentImpl(void) noexcept;
-
-  explicit FragmentImpl(FragmentId id_, EntityProvider::Ptr ep_,
-                        std::string data_);
+  explicit FragmentImpl(EntityProvider::Ptr ep_, std::string data_,
+                        RawEntityId id_);
 
   // Return the ID of the file containing the first token.
   //
@@ -145,38 +141,23 @@ class FragmentImpl final : public EntityImpl {
   // Return a reader for the macro tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   std::shared_ptr<const class TokenReader>
-  MacroTokenReader(const FragmentImpl::Ptr &) const;
+  MacroTokenReader(const FragmentImplPtr &) const;
 
   // Return a reader for the parsed tokens in the fragment. This doesn't
   // include all tokens, i.e. macro use tokens, comments, etc.
   std::shared_ptr<const class TokenReader>
-  ParsedTokenReader(const FragmentImpl::Ptr &) const;
-
-  // Return a specific type of entity.
-  std::optional<EntityImplPtr> NthDecl(unsigned offset) const;
-  std::optional<EntityImplPtr> NthStmt(unsigned offset) const;
-  std::optional<EntityImplPtr> NthType(unsigned offset) const;
-  std::optional<EntityImplPtr> NthAttr(unsigned offset) const;
-  std::optional<EntityImplPtr> NthMacro(unsigned offset) const;
-  std::optional<EntityImplPtr> NthPseudo(unsigned offset) const;
-
-  gap::generator<EntityImplPtr> Decls() const;
-  gap::generator<EntityImplPtr> Stmts() const;
-  gap::generator<EntityImplPtr> Types() const;
-  gap::generator<EntityImplPtr> Attrs() const;
-  gap::generator<EntityImplPtr> Macros() const;
-  gap::generator<EntityImplPtr> Pseudos() const;
+  ParsedTokenReader(const FragmentImplPtr &) const;
 
   std::string_view SourceIR(void) const & noexcept;
 
   std::string_view Data(void) const & noexcept;
 
   // Return the token associated with a specific entity ID.
-  std::optional<Token> TokenFor(const FragmentImpl::Ptr &, EntityId id,
+  std::optional<Token> TokenFor(const FragmentImplPtr &, EntityId id,
                                 bool can_fail=false) const;
 
   // Return the inclusive token range associated with two entity IDs.
-  TokenRange TokenRangeFor(const FragmentImpl::Ptr &, EntityId begin_id,
+  TokenRange TokenRangeFor(const FragmentImplPtr &, EntityId begin_id,
                            EntityId end_id) const;
 };
 

@@ -61,6 +61,8 @@ class TokenReader {
 
   virtual const FragmentImpl *OwningFragment(void) const noexcept;
   virtual const FileImpl *OwningFile(void) const noexcept;
+
+  static Token TokenFor(const Ptr &self, RawEntityId eid) noexcept;
 };
 
 // Used for invalid tokens.

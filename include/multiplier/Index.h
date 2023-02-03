@@ -13,26 +13,27 @@
 #include <vector>
 
 #include "Database.h"
-#include "Iterator.h"
-#include "Use.h"
-#include "Fragment.h"
-#include "Query.h"
 #include "Entities/Attr.h"
+#include "Entities/CXXBaseSpecifier.h"
 #include "Entities/DefineMacroDirective.h"
 #include "Entities/Designator.h"
 #include "Entities/Macro.h"
 #include "Entities/NamedDecl.h"
 #include "Entities/Stmt.h"
+#include "Entities/TemplateArgument.h"
+#include "Entities/TemplateParameterList.h"
 #include "Entities/Type.h"
+#include "Fragment.h"
+#include "Iterator.h"
+#include "Query.h"
+#include "Reference.h"
 
 namespace mx {
 
 class CachingEntityProvider;
 class EntityProvider;
 class File;
-class FileImpl;
 class Fragment;
-class FragmentImpl;
 class IncludeLikeMacroDirective;
 class Index;
 class InvalidEntityProvider;
@@ -41,24 +42,25 @@ class RemoteEntityProvider;
 class RegexQuery;
 class RegexQueryImpl;
 class RegexQueryMatch;
+class Token;
 class TokenReader;
 class WeggliQuery;
 class WeggliQueryMatch;
-class OffsetEntityImpl;
 
-using EntityImplPtr = std::shared_ptr<OffsetEntityImpl>;
-using WeakEntityImplPtr = std::weak_ptr<OffsetEntityImpl>;
+#define MX_FORWARD_DECLARE_IMPL_CLASS(type_name, ln, e, c) \
+    class type_name ## Impl; \
+    using type_name ## ImplPtr = std::shared_ptr<const type_name ## Impl>; \
+    using Weak ## type_name ## ImplPtr = std::weak_ptr<const type_name ## Impl>;
 
-using DeclUse = Use<DeclUseSelector>;
-using StmtUse = Use<StmtUseSelector>;
-using TypeUse = Use<TypeUseSelector>;
-using FileUse = Use<FileUseSelector>;
-using TokenUse = Use<TokenUseSelector>;
-using MacroUse = Use<MacroUseSelector>;
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_FORWARD_DECLARE_IMPL_CLASS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_FORWARD_DECLARE_IMPL_CLASS,
+                              MX_FORWARD_DECLARE_IMPL_CLASS)
+#undef MX_FORWARD_DECLARE_IMPL_CLASS
 
 using FilePathMap = std::map<std::filesystem::path, PackedFileId>;
 using FragmentIdList = std::vector<PackedFragmentId>;
-using DeclarationIdList = std::vector<PackedDeclarationId>;
+using DeclIdList = std::vector<PackedDeclId>;
 using RawEntityIdList = std::vector<RawEntityId>;
 
 using NamedEntity = std::variant<NamedDecl, DefineMacroDirective>;
@@ -80,23 +82,19 @@ class EntityProvider {
   friend class CachingEntityProvider;
   friend class Decl;
   friend class File;
-  friend class FileImpl;
   friend class Fragment;
-  friend class FragmentImpl;
   friend class IncludeLikeMacroDirective;
   friend class Index;
   friend class Macro;
   friend class ReadMacroTokensFromFragment;
   friend class ReadParsedTokensFromFragment;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RemoteEntityProvider;
   friend class Token;
   friend class TokenReader;
   friend class TokenContext;
-  friend class UseBase;
-  friend class UseIteratorImpl;
   friend class WeggliQuery;
   friend class WeggliQueryResultImpl;
 
@@ -126,50 +124,36 @@ class EntityProvider {
   // Download a list of fragment IDs contained in a specific file.
   virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
 
-  std::shared_ptr<const FileImpl> FileFor(const Ptr &self, RawEntityId id) {
-    VariantId vid = EntityId(id).Unpack();
-    if (std::holds_alternative<FileId>(vid)) {
-      return FileFor(self, PackedFileId(std::get<FileId>(vid)));
-    } else {
-      return {};
+  // Get a token by its entity ID.
+  Token TokenFor(const Ptr &, RawEntityId id);
+
+  // Get a token by its entity ID, and given the presence of an existing reader
+  // that can be used as a hint for being the current reader for the token.
+  Token TokenFor(const Ptr &, const std::shared_ptr<const TokenReader> &,
+                 RawEntityId id);
+
+#define MX_DECLARE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+    friend class type_name ## Impl; \
+    \
+    virtual gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, PackedFragmentId id) = 0; \
+    \
+    virtual type_name ## ImplPtr type_name ## For( \
+        const Ptr &, PackedFragmentId id, EntityOffset offset) = 0; \
+    \
+    virtual type_name ## ImplPtr type_name ## For( \
+        const Ptr &ep, RawEntityId id) = 0; \
+    \
+    inline type_name ## ImplPtr type_name ## For( \
+        const Ptr &ep, Packed ## type_name ## Id id) { \
+      return ep->type_name ## For(ep, id.Pack()); \
     }
-  }
 
-  std::shared_ptr<const FragmentImpl> FragmentFor(
-      const Ptr &self, RawEntityId id) {
-    VariantId vid = EntityId(id).Unpack();
-    if (std::holds_alternative<FragmentId>(vid)) {
-      return FragmentFor(self, PackedFragmentId(std::get<FragmentId>(vid)));
-    } else {
-      return {};
-    }
-  }
-
-  // Download a file by its unique ID.
-  //
-  // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
-  //            raw file id.
-  virtual std::shared_ptr<const FileImpl>
-  FileFor(const Ptr &, PackedFileId id) = 0;
-
-  // Download a fragment by its unique ID.
-  //
-  // NOTE(pag): The `id` is *NOT* a packed representation, is the underlying/
-  //            raw fragment id.
-  virtual std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, PackedFragmentId id) = 0;
-
-
-#define DECLARE_ENTITY_METHODS(name, lower_name) \
-    virtual gap::generator<EntityImplPtr> \
-    name ## sFor(const Ptr &, PackedFragmentId id) = 0; \
-    virtual std::optional<EntityImplPtr> \
-    name ## For(const Ptr &, PackedFragmentId id, EntityOffset offset) = 0; \
-    virtual std::optional<EntityImplPtr> \
-    name ## For(const Ptr &ep, RawEntityId id) = 0;
-
-  MX_FOR_EACH_ENTITY_RECORD(DECLARE_ENTITY_METHODS)
-#undef DECLARE_ENTITY_METHODS
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_METHODS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_METHODS,
+                              MX_DECLARE_ENTITY_METHODS)
+#undef MX_DECLARE_ENTITY_METHODS
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   virtual FragmentIdList FragmentsCoveringTokens(
@@ -177,7 +161,7 @@ class EntityProvider {
 
   // Return the redeclarations of a given declaration.
   virtual RawEntityIdList Redeclarations(
-      const Ptr &, SpecificEntityId<DeclarationId> eid) = 0;
+      const Ptr &, SpecificEntityId<DeclId> eid) = 0;
 
   // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
   // to analyze when looking for uses.
@@ -199,8 +183,15 @@ class EntityProvider {
                           RawEntityIdList &ids_out) = 0;
 };
 
-using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
-                                   Token, Designator, Fragment, File>;
+#define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
+    , type_name
+
+using VariantEntity = std::variant<
+    NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT)>;
+#undef MX_DECLARE_ENTITY_VARIANT
 
 enum class IndexStatus : unsigned {
   UNINITIALIZED,
@@ -259,15 +250,17 @@ class Index {
   // in the returned list of fetched files will be `start_at`.
   FilePathMap file_paths(void) const;
 
-  // Download a file by its unique ID.
-  std::optional<File> file(SpecificEntityId<FileId> id) const;
-  std::optional<File> file(FileId id) const;
-  std::optional<File> file(RawEntityId id) const;
+#define MX_DECLARE_GETTER(type_name, lower_name, enum_name, category) \
+  std::optional<type_name> lower_name(RawEntityId id) const; \
+  \
+  inline std::optional<type_name> lower_name( \
+      Packed ## type_name ## Id id) const { \
+    return lower_name(id.Pack()); \
+  }
 
-  // Download a fragment by its unique ID.
-  std::optional<Fragment> fragment(SpecificEntityId<FragmentId> id) const;
-  std::optional<Fragment> fragment(FragmentId id) const;
-  std::optional<Fragment> fragment(RawEntityId id) const;
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_GETTER, MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_GETTER, MX_DECLARE_GETTER)
+#undef MX_DECLARE_GETTER
 
   // Download a fragment based off of an entity ID.
   std::optional<Fragment> fragment_containing(EntityId) const;

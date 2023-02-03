@@ -18,11 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Stmt.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class CompoundStmt;

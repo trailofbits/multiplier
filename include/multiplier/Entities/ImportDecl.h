@@ -18,7 +18,6 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Decl.h"
 #include "DeclKind.h"

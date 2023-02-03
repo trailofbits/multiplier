@@ -31,7 +31,7 @@ class RegexQueryResultImpl final {
   std::map<unsigned, unsigned> offset_to_index;
 
   // The fragment containing the match.
-  FragmentImpl::Ptr frag;
+  FragmentImplPtr frag;
 
   // Range of file tokens covering this fragment.
   TokenRange frag_file_tokens;
@@ -56,9 +56,9 @@ class RegexQueryResultImpl final {
       const RegexQuery &re_, EntityProvider::Ptr ep_,
       FragmentIdList fragment_ids);
 
-  RegexQueryResultImpl(const RegexQuery &re_, FragmentImpl::Ptr frag_);
+  RegexQueryResultImpl(const RegexQuery &re_, FragmentImplPtr frag_);
 
-  bool InitForFragment(FragmentImpl::Ptr frag_);
+  bool InitForFragment(FragmentImplPtr frag_);
   bool InitForFragment(SpecificEntityId<FragmentId> frag_id);
 
   std::optional<RegexQueryMatch> GetNextMatchInFragment(void);

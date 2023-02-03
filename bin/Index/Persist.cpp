@@ -74,10 +74,6 @@ extern void LinkExternalReferencesInFragment(
     mx::DatabaseWriter &database, const PendingFragment &pf,
     EntityMapper &em);
 
-extern void LinkExternalUsesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    EntityBuilder<mx::ast::Macro> &entity);
-
 // Serialize all entities into the Cap'n Proto version of the fragment.
 extern void SerializePendingFragment(mx::DatabaseWriter &database,
                                      const PendingFragment &pf,
@@ -207,7 +203,7 @@ void GlobalIndexingState::PersistFile(
   // Add it to the database.
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::FileRecord{file_id, GetSerializedData(message)});
+      mx::EntityRecord{file_id.Pack(), GetSerializedData(message)});
 }
 
 namespace {
@@ -465,22 +461,23 @@ static void PersistParsedTokens(
   auto re = fb.initRelatedEntityId(num_tokens);
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
   auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
-  auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
+  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   auto i = 0u;
 
   // Serialize the tokens.
   for (const pasta::Token &tok : parsed_tokens) {
     pto2i.set(i, i);  // Parsed tokens to macro tokens.
     mti2po.set(i, i);  // Macro tokens to parsed tokens.
-    mti2mo.set(i, num_macros);  // Mapping of token to containing macros.
+    mti2mi.set(i, mx::kInvalidEntityId);  // Mapping of token to containing macros.
 
     if (std::optional<pasta::MacroToken> mt = tok.MacroLocation()) {
       if (auto pm = mt->Parent()) {
-        mx::VariantId vid = mx::EntityId(em.EntityId(pm.value())).Unpack();
+        mx::RawEntityId eid = em.EntityId(pm.value());
+        mx::VariantId vid = mx::EntityId(eid).Unpack();
         if (std::holds_alternative<mx::MacroId>(vid)) {
           mx::MacroId mid = std::get<mx::MacroId>(vid);
           if (mid.fragment_id == pf.fragment_index) {
-            mti2mo.set(i, mid.offset);
+            mti2mi.set(i, eid);
           }
         }
       }
@@ -502,14 +499,13 @@ static void PersistParsedTokens(
     EntityBuilder<mx::ast::Macro> storage;
     DispatchSerializeMacro(em, storage.builder, macros_to_serialize[i],
                            nullptr);
-    LinkExternalUsesInFragment(database, pf, storage);
 
     mx::MacroId id;
     id.fragment_id = pf.fragment_index;
     id.offset = i;
     id.kind = mx::FromPasta(macros_to_serialize[i].Kind());
     database.AddAsync(
-        mx::MacroEntityRecord{
+        mx::EntityRecord{
           mx::EntityId(id).Pack(), GetSerializedData(storage.message)});
   }
 
@@ -597,17 +593,18 @@ static void PersistTokenTree(
   // Map the serialized tokens to the parsed tokens.
   i = 0u;
   auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
-  auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
+  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   for (; i < num_tokens; ++i) {
     mti2po.set(i, num_parsed_tokens);
-    mti2mo.set(i, num_macros);
+    mti2mi.set(i, mx::kInvalidEntityId);
 
     // Map the token to its containing macro.
-    mx::VariantId vid = mx::EntityId(sched.containing_macro[i]).Unpack();
+    mx::EntityId eid(sched.containing_macro[i]);
+    mx::VariantId vid = eid.Unpack();
     if (std::holds_alternative<mx::MacroId>(vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(vid);
       CHECK_EQ(mid.fragment_id, pf.fragment_index);
-      mti2mo.set(i, mid.offset);
+      mti2mi.set(i, eid.Pack());
     } else {
       CHECK(std::holds_alternative<mx::InvalidId>(vid));
     }
@@ -680,10 +677,9 @@ static void PersistTokenTree(
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
       EntityBuilder<mx::ast::Macro> storage;
       DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
-      LinkExternalUsesInFragment(database, pf, storage);
 
       database.AddAsync(
-          mx::MacroEntityRecord{eid, GetSerializedData(storage.message)});
+          mx::EntityRecord{eid, GetSerializedData(storage.message)});
     }
   }
 
@@ -708,21 +704,31 @@ static void PersistTokenTree(
 //            do so results in `kInvalidEntityId` instead of just falling back
 //            on the ID of the canonical decl.
 static mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index, pasta::Decl canon_decl) {
+    const EntityMapper &em, mx::RawEntityId frag_index,
+    pasta::Decl canon_decl) {
+
+  mx::RawEntityId ret_id = em.EntityId(canon_decl);
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
     mx::RawEntityId eid = em.EntityId(redecl);
     if (eid == mx::kInvalidEntityId) {
       continue;
     }
+
+    // If we come across a definition, then reference it if we're not able
+    // to reference a redecl that's in the right fragment.
+    if (IsDefinition(redecl)) {
+      ret_id = eid;
+    }
+
     mx::VariantId vid = mx::EntityId(eid).Unpack();
-    CHECK(std::holds_alternative<mx::DeclarationId>(vid));
-    mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
+    CHECK(std::holds_alternative<mx::DeclId>(vid));
+    mx::DeclId id = std::get<mx::DeclId>(vid);
     if (id.fragment_id == frag_index) {
       return eid;
     }
   }
 
-  return em.EntityId(canon_decl);
+  return ret_id;
 }
 
 // Persist the token contexts. The token contexts are a kind of inverted tree,
@@ -771,33 +777,16 @@ static void PersistTokenContexts(
           contexts[eid].insert(context.value());
         }
 
-      } else if (auto stmt = pasta::Stmt::From(c)) {
-        const mx::RawEntityId eid = em.EntityId(*stmt);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
+#define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
+    } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
+      const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
+      if (eid != mx::kInvalidEntityId) { \
+        contexts[eid].insert(context.value()); \
+      }
 
-      } else if (auto type = pasta::Type::From(c)) {
-        const mx::RawEntityId eid = em.EntityId(*type);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
+      FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
+#undef ADD_ENTITY_TO_CONTEXT
 
-      } else if (auto attr = pasta::Attr::From(c)) {
-        const mx::RawEntityId eid = em.EntityId(*attr);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
-      
-      } else if (auto designator = pasta::Designator::From(c)) {
-        const uint32_t offset = em.PseudoId(*designator);
-        mx::DesignatorId did;
-        did.fragment_id = frag_index;
-        did.offset = offset;
-        const mx::RawEntityId eid = mx::EntityId(did).Pack();
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
       }
     }
   }
@@ -1038,7 +1027,7 @@ void GlobalIndexingState::PersistFragment(
 
   // Add the fragment to the database.
   database.AddAsync(
-      mx::FragmentRecord{pf.fragment_id, GetSerializedData(message)});
+      mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
 }
 
 }  // namespace indexer

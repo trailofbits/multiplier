@@ -39,10 +39,13 @@ void CachingEntityProvider::ClearCacheLocked(unsigned new_version_number) {
   has_file_list = false;
   version_number = new_version_number;
 
-#define CLEAR_ENTITY_CACHE(name, lower_name) \
+#define CLEAR_ENTITY_CACHE(type, lower_name, enum_name, id) \
     lower_name ## s.clear();
 
-  MX_FOR_EACH_ENTITY_RECORD(CLEAR_ENTITY_CACHE)
+  MX_FOR_EACH_ENTITY_CATEGORY(CLEAR_ENTITY_CACHE,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              CLEAR_ENTITY_CACHE,
+                              CLEAR_ENTITY_CACHE)
 #undef CLEAR_ENTITY_CACHE
 
   next->VersionNumberChanged(new_version_number);
@@ -82,52 +85,6 @@ FragmentIdList CachingEntityProvider::ListFragmentsInFile(
   }
 }
 
-FileImpl::Ptr CachingEntityProvider::FileFor(
-    const Ptr &self, PackedFileId id) {
-  
-  RawEntityId raw_id = id.Pack();
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  FileImpl::Ptr ptr;
-  if (auto it = files.find(raw_id); it != files.end()) {
-    ptr = it->second.lock();
-  }
-
-  // NOTE(pag): This may lead to `files` being wiped out due to a cache
-  //            invalidation.
-  if (!ptr) {
-    ptr = next->FileFor(self, id);
-    files[raw_id] = ptr;
-  }
-
-  // Extend liftime of `ptr`.
-  entities.emplace_back(ptr, ptr.get());
-
-  return ptr;
-}
-
-FragmentImpl::Ptr CachingEntityProvider::FragmentFor(
-    const Ptr &self, PackedFragmentId id) {
-  
-  RawEntityId raw_id = id.Pack();
-  std::lock_guard<std::recursive_mutex> locker(lock);
-  FragmentImpl::Ptr ptr;
-  if (auto it = fragments.find(raw_id); it != fragments.end()) {
-    ptr = it->second.lock();
-  }
-
-  // NOTE(pag): This may lead to `fragments` being wiped out due to a cache
-  //            invalidation.
-  if (!ptr) {
-    ptr = next->FragmentFor(self, id);
-    fragments[raw_id] = ptr;
-  }
-
-  // Extend the lifetime of `ptr`.
-  entities.emplace_back(ptr, ptr.get());
-  
-  return ptr;
-}
-
 // Return the list of fragments covering / overlapping some tokens in a file.
 FragmentIdList CachingEntityProvider::FragmentsCoveringTokens(
     const Ptr &self, PackedFileId file_id, std::vector<EntityOffset> tokens) {
@@ -135,7 +92,7 @@ FragmentIdList CachingEntityProvider::FragmentsCoveringTokens(
 }
 
 RawEntityIdList CachingEntityProvider::Redeclarations(
-    const Ptr &self, SpecificEntityId<DeclarationId> eid) {
+    const Ptr &self, SpecificEntityId<DeclId> eid) {
 
   auto raw_id = eid.Pack();
 
@@ -164,7 +121,7 @@ void CachingEntityProvider::FillUses(
     RawEntityIdList &redecl_ids_out,
     FragmentIdList &fragment_ids_out) {
 
-  if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
+  if (!std::holds_alternative<DeclId>(EntityId(eid).Unpack())) {
     next->FillUses(self, eid, redecl_ids_out, fragment_ids_out);
     return;
   }
@@ -196,7 +153,7 @@ void CachingEntityProvider::FillReferences(
     RawEntityIdList &redecl_ids_out,
     RawEntityIdList &references_ids_out) {
 
-  if (!std::holds_alternative<DeclarationId>(EntityId(eid).Unpack())) {
+  if (!std::holds_alternative<DeclId>(EntityId(eid).Unpack())) {
     next->FillReferences(self, eid, redecl_ids_out, references_ids_out);
     return;
   }
@@ -228,36 +185,41 @@ void CachingEntityProvider::FindSymbol(
   return next->FindSymbol(self, std::move(name), ids_out);
 }
 
-#define DEFINE_GETTERS(name, lower_name) \
-    gap::generator<EntityImplPtr> CachingEntityProvider:: name ## sFor( \
+#define DEFINE_GETTERS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> \
+    CachingEntityProvider::type_name ## sFor( \
         const Ptr &ep, PackedFragmentId id) { \
-      return next->name ## sFor(ep, id); \
+      return next->type_name ## sFor(ep, id); \
     } \
-    std::optional<EntityImplPtr> CachingEntityProvider:: name ## For( \
-        const Ptr &ep, RawEntityId eid) { \
-      EntityImplPtr ptr; \
+    \
+    type_name ## ImplPtr CachingEntityProvider::type_name ## For( \
+        const Ptr &ep, PackedFragmentId id, EntityOffset offset) { \
+      return next->type_name ## For(ep, id, offset); \
+    } \
+    \
+    type_name ## ImplPtr CachingEntityProvider::type_name ## For( \
+        const Ptr &ep, RawEntityId raw_id) { \
+      type_name ## ImplPtr ptr; \
       std::lock_guard<std::recursive_mutex> locker(lock); \
-      if (auto it = lower_name ## s.find(eid); it != lower_name ## s.end()) {\
+      if (auto it = lower_name ## s.find(raw_id); \
+          it != lower_name ## s.end()) { \
         ptr = it->second.lock(); \
       } \
+      \
       if (!ptr) { \
-        if (auto ret = next->name ## For(ep, eid)) { \
-          ptr = std::move(ret.value()); \
-          lower_name ## s[eid] = ptr; \
-        } \
+        ptr = next->type_name ## For(ep, raw_id); \
+        lower_name ## s[raw_id] = ptr; \
       } \
-      if (ptr) { \
-        entities.emplace_back(ptr, ptr.get()); /* extend the lifetime */ \
-        return ptr; \
-      } \
-      return std::nullopt; \
-    } \
-    std::optional<EntityImplPtr> CachingEntityProvider:: name ## For( \
-        const Ptr &ep, PackedFragmentId id, EntityOffset offset) { \
-      return next->name ## For(ep, id, offset); \
+      \
+      entities.emplace_back(ptr, ptr.get()); \
+      \
+      return ptr; \
     }
 
-  MX_FOR_EACH_ENTITY_RECORD(DEFINE_GETTERS)
+  MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DEFINE_GETTERS,
+                              DEFINE_GETTERS)
 #undef DEFINE_GETTERS
 
 // Returns an entity provider that gets entities from a UNIX domain socket.

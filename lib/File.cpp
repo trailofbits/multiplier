@@ -14,12 +14,22 @@
 #include <multiplier/AST.h>
 #include <mutex>
 
+#include "Attr.h"
+#include "Decl.h"
 #include "Fragment.h"
+#include "Macro.h"
+#include "Pseudo.h"
 #include "Re2Impl.h"
-#include "Use.h"
+#include "Stmt.h"
+#include "Type.h"
 #include "WeggliImpl.h"
 
 namespace mx {
+namespace {
+
+static thread_local RawEntityIdList tIgnoredRedecls;
+
+}  // namespace
 
 FileLocationCache::~FileLocationCache(void) {}
 
@@ -171,67 +181,8 @@ std::optional<std::pair<unsigned, unsigned>> Token::next_location(
 // Return the file containing a specific fragment.
 std::optional<File> File::containing(const Fragment &fragment) {
   const auto &ep = fragment.impl->ep;
-  if (auto fp = ep->FileFor(ep, fragment.impl->FileContaingFirstToken())) {
-    return File(std::move(fp));
-  }
-  return std::nullopt;
-}
-
-// Return the file containing a specific token substitution.
-std::optional<File> File::containing(const Designator &entity) {
-  const auto &ep = entity.impl->ep;
-  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
-  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
-    return File(std::move(fp));
-  }
-  return std::nullopt;
-}
-
-// Return the file containing the fragment containing a specific entity.
-std::optional<File> File::containing(const Decl &entity) {
-  const auto &ep = entity.impl->ep;
-  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
-  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
-    return File(std::move(fp));
-  }
-  return std::nullopt;
-}
-
-// Return the file containing the fragment containing a specific entity.
-std::optional<File> File::containing(const Stmt &entity) {
-  const auto &ep = entity.impl->ep;
-  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
-  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
-    return File(std::move(fp));
-  }
-  return std::nullopt;
-}
-
-// Return the file containing the fragment containing a specific entity.
-std::optional<File> File::containing(const Type &entity) {
-  const auto &ep = entity.impl->ep;
-  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
-  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
-    return File(std::move(fp));
-  }
-  return std::nullopt;
-}
-
-// Return the file containing a specific fragment.
-std::optional<File> File::containing(const Attr &entity) {
-  const auto &ep = entity.impl->ep;
-  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
-  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
-    return File(std::move(fp));
-  }
-  return std::nullopt;
-}
-
-// Return the file containing a specific fragment.
-std::optional<File> File::containing(const Macro &entity) {
-  const auto &ep = entity.impl->ep;
-  auto fragment = ep->FragmentFor(ep, entity.impl->fragment_id);
-  if (auto fp = ep->FileFor(ep, fragment->FileContaingFirstToken())) {
+  RawEntityId ftid = fragment.impl->FileContaingFirstToken();
+  if (FileImplPtr fp = ep->FileFor(ep, ftid)) {
     return File(std::move(fp));
   }
   return std::nullopt;
@@ -241,10 +192,10 @@ std::optional<File> File::containing(const Macro &entity) {
 std::optional<File> File::containing(const Token &token) {
 
   if (auto file = token.impl->OwningFile()) {
-    return File(FileImpl::Ptr(token.impl, file));
+    return File(FileImplPtr(token.impl, file));
 
   } else if (auto frag = token.impl->OwningFragment()) {
-    return File::containing(Fragment(FragmentImpl::Ptr(token.impl, frag)));
+    return File::containing(Fragment(FragmentImplPtr(token.impl, frag)));
 
   } else {
     return std::nullopt;
@@ -254,7 +205,7 @@ std::optional<File> File::containing(const Token &token) {
 // Return the file containing a regex match.
 std::optional<File> File::containing(const RegexQueryMatch &match) {
   if (auto file = match.impl->OwningFile()) {
-    return File(FileImpl::Ptr(match.impl, file));
+    return File(FileImplPtr(match.impl, file));
 
   } else {
     return File::containing(Fragment::containing(match));
@@ -264,17 +215,35 @@ std::optional<File> File::containing(const RegexQueryMatch &match) {
 // Return the file containing a specific fragment.
 std::optional<File> File::containing(const WeggliQueryMatch &match) {
   if (auto file = match.impl->OwningFile()) {
-    return File(FileImpl::Ptr(match.impl, file));
+    return File(FileImplPtr(match.impl, file));
 
   } else {
     return File::containing(Fragment::containing(match));
   }
 }
 
-// Return all files in a given index.
-gap::generator<File> File::in(const Index &index) {
-  return index.files();
-}
+#define MX_DEFINE_CONTAINING(type_name, lower_name, enum_name, category) \
+    std::optional<File> File::containing(const type_name &entity) { \
+      auto &ep = entity.impl->ep; \
+      RawEntityId fid = entity.impl->fragment_id.Pack(); \
+      if (FragmentImplPtr fptr = ep->FragmentFor(ep, fid)) { \
+        RawEntityId ftid = fptr->FileContaingFirstToken(); \
+        if (ftid == kInvalidEntityId) { \
+          return std::nullopt; \
+        } \
+        if (FileImplPtr fp = ep->FileFor(ep, ftid)) { \
+          return File(std::move(fp)); \
+        } \
+      } \
+      assert(false); \
+      return std::nullopt; \
+    }
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DEFINE_CONTAINING)
+#undef MX_DEFINE_CONTAINING
 
 // Return the ID of this file.
 SpecificEntityId<FileId> File::id(void) const noexcept {
@@ -285,10 +254,11 @@ gap::generator<Fragment> File::fragments(void) const {
   FileId fid(impl->file_id);
   auto &ep = impl->ep;
   auto ids = ep->ListFragmentsInFile(ep, fid);
-  for (auto id : ids) {
-    auto frag = ep->FragmentFor(ep, id);
-    if (frag) {
-      co_yield frag;
+  for (PackedFragmentId id : ids) {
+    if (FragmentImplPtr frag = ep->FragmentFor(ep, id.Pack())) {
+      co_yield Fragment(std::move(frag));
+    } else {
+      assert(false);
     }
   }
 }
@@ -308,11 +278,28 @@ std::string_view File::data(void) const noexcept {
   return impl->Data();
 }
 
-gap::generator<Use<FileUseSelector>> File::uses(void) const {
-  UseIteratorImpl it(impl->ep, *this);
-  for (auto use : it.Enumerate<FileUseSelector>()) {
-    co_yield use;
-  }
+// References of this file.
+gap::generator<Reference> File::references(void) const {
+  // TODO!!!
+  co_return;
+//  const EntityProvider::Ptr &ep = impl->ep;
+//  RawEntityIdList references_ids;
+//
+//  tIgnoredRedecls.clear();
+//  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
+//  assert(tIgnoredRedecls.empty());
+//
+//  for (RawEntityId raw_stmt_id : references_ids) {
+//    VariantId vid = EntityId(raw_stmt_id).Unpack();
+//    if (!std::holds_alternative<MacroId>(vid)) {
+//      assert(false);
+//      continue;
+//    }
+//
+//    if (auto eptr = ep->MacroFor(ep, raw_stmt_id)) {
+//      co_yield Macro(std::move(eptr));
+//    }
+//  }
 }
 
 }  // namespace mx

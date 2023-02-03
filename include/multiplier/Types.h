@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
+#include <multiplier/Entities/PseudoKind.h>
 #include <utility>
 #include <optional>
 #include <variant>
@@ -20,16 +21,7 @@ namespace rpc {
 class FileInfo;
 }  // namespace rpc
 
-class Attr;
-class Decl;
-class Designator;
-class File;
-class Fragment;
-class FragmentImpl;
-class Macro;
-class Stmt;
 class Token;
-class Type;
 
 enum class AttrKind : unsigned short;
 enum class DeclKind : unsigned char;
@@ -37,6 +29,43 @@ enum class MacroKind : unsigned char;
 enum class StmtKind : unsigned char;
 enum class TokenKind : unsigned short;
 enum class TypeKind : unsigned char;
+
+#define MX_IGNORE_ENTITY_CATEGORY(type_name, lower_name, enum_name, category)
+#define MX_FOR_EACH_ENTITY_CATEGORY(file_, token_, frag_, frag_offset) \
+    frag_offset(Decl, declaration, DECLARATION, 1) \
+    frag_offset(Stmt, statement, STATEMENT, 2) \
+    frag_offset(Type, type, TYPE, 3) \
+    frag_offset(Attr, attribute, ATTRIBUTE, 4) \
+    frag_offset(Macro, macro, MACRO, 5) \
+    frag_(Fragment, fragment, FRAGMENT, 6) \
+    file_(File, file, FILE, 7) \
+    token_(Token, token, TOKEN, 8) \
+    frag_offset(TemplateArgument, template_argument, TEMPLATE_ARGUMENT, 9) \
+    frag_offset(TemplateParameterList, template_parameter_list, TEMPLATE_PARAMETER_LIST, 10) \
+    frag_offset(CXXBaseSpecifier, cxx_base_specifier, CXX_BASE_SPECIFIER, 11) \
+    frag_offset(Designator, designator, DESIGNATOR, 12)
+
+#define MX_DECLARE_ENTITY_CLASS(type, lower, enum_, val) \
+    class type;\
+    class type ## Impl;
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CLASS,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_DECLARE_ENTITY_CLASS,
+                            MX_DECLARE_ENTITY_CLASS)
+#undef MX_DECLARE_ENTITY_CLASS
+
+using NotAnEntity = std::monostate;
+
+enum class EntityCategory {
+  NOT_AN_ENTITY,
+#define MX_DECLARE_ENTITY_CATEGORY_ENUM(type, lower, enum_, val) enum_ = val,
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM,
+                              MX_DECLARE_ENTITY_CATEGORY_ENUM)
+#undef MX_DECLARE_ENTITY_CATEGORY_ENUM
+};
 
 using RawEntityId = uint64_t;
 
@@ -54,18 +83,38 @@ static constexpr uint64_t kNumTokensInBigFragment =
 static constexpr unsigned kFileIdNumBits = 20u;
 static constexpr RawEntityId kMaxFileId = 1ull << kFileIdNumBits;
 
-struct AttributeId;
-struct DeclarationId;
-struct StatementId;
+struct AttrId;
+struct DeclId;
+struct StmtId;
 struct TypeId;
 struct FileTokenId;
 struct MacroTokenId;
 struct ParsedTokenId;
 struct MacroId;
+
+// Pseudo entities.
+struct TemplateArgumentId;
+struct TemplateParameterListId;
+struct CXXBaseSpecifierId;
 struct DesignatorId;
 
 using EntityOffset = uint32_t;
 using SignedEntityOffset = int32_t;
+
+inline static constexpr unsigned NumEnumerators(EntityCategory) {
+#define MX_COUNT_ENTITY_CATEGORIES(...) + 1u
+  return 1 MX_FOR_EACH_ENTITY_CATEGORY(MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES,
+                                       MX_COUNT_ENTITY_CATEGORIES);
+#undef MX_COUNT_ENTITY_CATEGORIES
+}
+
+inline static constexpr const char *EnumerationName(EntityCategory) {
+  return "EntityCategory";
+}
+
+const char *EnumeratorName(EntityCategory) noexcept;
 
 // Identifies a serialized file.
 struct FileId {
@@ -81,7 +130,7 @@ struct FileId {
 
 // Identifies a serialized version of a `clang::Decl` or `pasta::Decl`
 // inside of a `Fragment`.
-struct DeclarationId {
+struct DeclId {
   RawEntityId fragment_id;
   DeclKind kind;
 
@@ -92,12 +141,12 @@ struct DeclarationId {
   // Is this declaration a definition?
   bool is_definition;
 
-  auto operator<=>(const DeclarationId &) const noexcept = default;
+  auto operator<=>(const DeclId &) const noexcept = default;
 };
 
 // Identifies a serialized version of a `clang::Stmt` or `pasta::Stmt`
 // inside of a `Fragment`.
-struct StatementId {
+struct StmtId {
   RawEntityId fragment_id;
   StmtKind kind;
 
@@ -105,7 +154,7 @@ struct StatementId {
   // `rpc::Fragment::statements`.
   EntityOffset offset;
 
-  auto operator<=>(const StatementId &) const noexcept = default;
+  auto operator<=>(const StmtId &) const noexcept = default;
 };
 
 // Identifies a serialized version of a `clang::Type`, `clang::QualType`, or
@@ -123,7 +172,7 @@ struct TypeId {
 
 // Identifies a serialized version of a `clang::Attr` or `pasta::Attr` inside
 // of a `Fragment`.
-struct AttributeId {
+struct AttrId {
   RawEntityId fragment_id;
   AttrKind kind;
 
@@ -131,7 +180,7 @@ struct AttributeId {
   // `rpc::Fragment::attrs`.
   EntityOffset offset;
 
-  auto operator<=>(const AttributeId &) const noexcept = default;
+  auto operator<=>(const AttrId &) const noexcept = default;
 };
 
 // Identifies a parsed token inside of a `Fragment`.
@@ -186,12 +235,50 @@ struct MacroId {
   auto operator<=>(const MacroId &) const noexcept = default;
 };
 
+struct TemplateArgumentId {
+ public:
+  RawEntityId fragment_id;
+
+  // Offset of the argument inside of the fragment.
+  EntityOffset offset;
+
+  static constexpr PseudoKind kind = PseudoKind::TEMPLATE_ARGUMENT;
+
+  auto operator<=>(const TemplateArgumentId &) const noexcept = default;
+};
+
+struct TemplateParameterListId {
+ public:
+  RawEntityId fragment_id;
+
+  // Offset of the parameter list inside of the fragment.
+  EntityOffset offset;
+
+  static constexpr PseudoKind kind = PseudoKind::TEMPLATE_PARAMETER_LIST;
+
+  auto operator<=>(const TemplateParameterListId &) const noexcept = default;
+};
+
+struct CXXBaseSpecifierId {
+ public:
+  RawEntityId fragment_id;
+
+  // Offset of the base specifier inside of the fragment.
+  EntityOffset offset;
+
+  static constexpr PseudoKind kind = PseudoKind::CXX_BASE_SPECIFIER;
+
+  auto operator<=>(const CXXBaseSpecifierId &) const noexcept = default;
+};
+
 struct DesignatorId {
  public:
   RawEntityId fragment_id;
 
   // Offset of the designator inside of the fragment.
   EntityOffset offset;
+
+  static constexpr PseudoKind kind = PseudoKind::DESIGNATOR;
 
   auto operator<=>(const DesignatorId &) const noexcept = default;
 };
@@ -205,19 +292,25 @@ struct FragmentId {
   inline explicit FragmentId(RawEntityId fragment_id_)
       : fragment_id(fragment_id_) {}
 
-  inline /* implicit */ FragmentId(const DeclarationId &id_)
+  inline /* implicit */ FragmentId(const DeclId &id_)
     : fragment_id(id_.fragment_id) {}
-  inline /* implicit */ FragmentId(const StatementId &id_)
+  inline /* implicit */ FragmentId(const StmtId &id_)
     : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const TypeId &id_)
     : fragment_id(id_.fragment_id) {}
-  inline /* implicit */ FragmentId(const AttributeId &id_)
+  inline /* implicit */ FragmentId(const AttrId &id_)
     : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const ParsedTokenId &id_)
     : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const MacroTokenId &id_)
     : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const MacroId &id_)
+    : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const TemplateArgumentId &id_)
+    : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const TemplateParameterListId &id_)
+    : fragment_id(id_.fragment_id) {}
+  inline /* implicit */ FragmentId(const CXXBaseSpecifierId &id_)
     : fragment_id(id_.fragment_id) {}
   inline /* implicit */ FragmentId(const DesignatorId &id_)
     : fragment_id(id_.fragment_id) {}
@@ -229,12 +322,20 @@ inline FileId::FileId(const FileTokenId &id_)
 // A tag type representing an invalid entity id.
 using InvalidId = std::monostate;
 
+// Different types of token IDs.
+using TokenId = std::variant<ParsedTokenId, MacroTokenId, FileTokenId>;
+
 // Possible types of entity ids represented by a packed
 // `EntityId`.
-using VariantId = std::variant<InvalidId, FileId, FragmentId,
-                               DeclarationId, StatementId, TypeId, AttributeId,
-                               ParsedTokenId, MacroTokenId, FileTokenId,
-                               MacroId, DesignatorId>;
+#define MX_ENTITY_ID_VARIANT(type, lower, enum_, val) type ## Id,
+using VariantId = std::variant<
+    InvalidId,
+    MX_FOR_EACH_ENTITY_CATEGORY(MX_ENTITY_ID_VARIANT,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                MX_ENTITY_ID_VARIANT,
+                                MX_ENTITY_ID_VARIANT)
+    ParsedTokenId, MacroTokenId, FileTokenId>;
+#undef MX_ENTITY_ID_VARIANT
 
 // An opaque, compressed entity id.
 class EntityId final {
@@ -252,23 +353,26 @@ class EntityId final {
   // Pack an elaborated entity ID into an opaque entity ID.
   /* implicit */ EntityId(FileId id);
   /* implicit */ EntityId(FragmentId id);
-  /* implicit */ EntityId(DeclarationId id);
-  /* implicit */ EntityId(StatementId id);
+  /* implicit */ EntityId(DeclId id);
+  /* implicit */ EntityId(StmtId id);
   /* implicit */ EntityId(TypeId id);
-  /* implicit */ EntityId(AttributeId id);
+  /* implicit */ EntityId(AttrId id);
   /* implicit */ EntityId(ParsedTokenId id);
   /* implicit */ EntityId(MacroTokenId id);
   /* implicit */ EntityId(MacroId id);
-  /* implicit */ EntityId(DesignatorId id);
   /* implicit */ EntityId(FileTokenId id);
+  /* implicit */ EntityId(TemplateArgumentId id);
+  /* implicit */ EntityId(TemplateParameterListId id);
+  /* implicit */ EntityId(CXXBaseSpecifierId id);
+  /* implicit */ EntityId(DesignatorId id);
 
-  inline EntityId &operator=(DeclarationId id) {
+  inline EntityId &operator=(DeclId id) {
     EntityId self(id);
     opaque = self.opaque;
     return *this;
   }
 
-  inline EntityId &operator=(StatementId id) {
+  inline EntityId &operator=(StmtId id) {
     EntityId self(id);
     opaque = self.opaque;
     return *this;
@@ -398,36 +502,27 @@ class SpecificEntityId final {
   }
 };
 
-using PackedFragmentId = SpecificEntityId<FragmentId>;
-using PackedFileId = SpecificEntityId<FileId>;
 using PackedFileTokenId = SpecificEntityId<FileTokenId>;
-using PackedDeclarationId = SpecificEntityId<DeclarationId>;
-using PackedStatementId = SpecificEntityId<StatementId>;
-using PackedTypeId = SpecificEntityId<TypeId>;
-using PackedAttributeId = SpecificEntityId<AttributeId>;
-using PackedDesignatorId = SpecificEntityId<DesignatorId>;
-using PackedMacroId = SpecificEntityId<MacroId>;
+using PackedDeclId = SpecificEntityId<DeclId>;
+using PackedStmtId = SpecificEntityId<StmtId>;
+using PackedAttrId = SpecificEntityId<AttrId>;
 
 template <typename T>
 struct EntityTypeImpl;
 
-#define MX_MAP_ENTITY_TYPE(id, t) \
+#define MX_MAP_ENTITY_TYPE(type, lower, enum_, val) \
+    using Packed ## type ## Id = SpecificEntityId<type ## Id>; \
+    \
     template <> \
-    struct EntityTypeImpl<id> { \
-      using Entity = t; \
-    }
+    struct EntityTypeImpl<type ## Id> { \
+      using Entity = type; \
+    };
 
-MX_MAP_ENTITY_TYPE(AttributeId, Attr);
-MX_MAP_ENTITY_TYPE(DeclarationId, Decl);
-MX_MAP_ENTITY_TYPE(DesignatorId, Designator);
-MX_MAP_ENTITY_TYPE(FileId, File);
-MX_MAP_ENTITY_TYPE(FragmentId, Fragment);
-MX_MAP_ENTITY_TYPE(MacroId, Macro);
-MX_MAP_ENTITY_TYPE(StatementId, Stmt);
-MX_MAP_ENTITY_TYPE(MacroTokenId, Token);
-MX_MAP_ENTITY_TYPE(FileTokenId, Token);
-MX_MAP_ENTITY_TYPE(ParsedTokenId, Token);
-MX_MAP_ENTITY_TYPE(TypeId, Type);
+MX_FOR_EACH_ENTITY_CATEGORY(MX_MAP_ENTITY_TYPE,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_MAP_ENTITY_TYPE,
+                            MX_MAP_ENTITY_TYPE)
+#undef MX_MAP_ENTITY_TYPE
 
 #undef MX_MAP_ENTITY_TYPE
 

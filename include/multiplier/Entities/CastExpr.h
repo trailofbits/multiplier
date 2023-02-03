@@ -18,10 +18,8 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CastKind.h"
-#include "DeclUseSelector.h"
 #include "Expr.h"
 #include "StmtKind.h"
 

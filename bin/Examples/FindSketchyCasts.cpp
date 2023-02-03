@@ -226,10 +226,14 @@ extern "C" int main(int argc, char *argv[]) {
     }
 
     mx::Decl decl = std::get<mx::Decl>(maybe_entity);
-    for (mx::Stmt ref_stmt : decl.references()) {
-      for (const mx::CallExpr &call_expr : mx::CallExpr::containing(ref_stmt)) {
-        CheckCallForImplicitCast(call_expr);
+    for (mx::Reference ref : decl.references()) {
+      if (auto ref_stmt = ref.as_statement()) {
+        for (const mx::CallExpr &call_expr :
+                 mx::CallExpr::containing(*ref_stmt)) {
+          CheckCallForImplicitCast(call_expr);
+        }
       }
+
     }
 
   } else if (FLAGS_fragment_id) {

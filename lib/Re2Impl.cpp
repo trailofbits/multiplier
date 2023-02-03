@@ -30,7 +30,7 @@ RegexQueryResultImpl::RegexQueryResultImpl(
       fragment_ids(std::move(fragment_ids_)) {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, FragmentImpl::Ptr frag_)
+    const RegexQuery &query_, FragmentImplPtr frag_)
     : query(query_),
       ep(frag_->ep) {
   FragmentId fid(frag_->fragment_id);
@@ -38,7 +38,7 @@ RegexQueryResultImpl::RegexQueryResultImpl(
   (void) InitForFragment(std::move(frag_));
 }
 
-bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
+bool RegexQueryResultImpl::InitForFragment(FragmentImplPtr frag_) {
   frag = std::move(frag_);
   Fragment hl_frag(frag);
 
@@ -75,9 +75,8 @@ bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
   return true;
 }
 
-bool RegexQueryResultImpl::InitForFragment(
-    SpecificEntityId<FragmentId> frag_id) {
-  return InitForFragment(ep->FragmentFor(ep, frag_id));
+bool RegexQueryResultImpl::InitForFragment(PackedFragmentId frag_id) {
+  return InitForFragment(ep->FragmentFor(ep, frag_id.Pack()));
 }
 
 std::optional<RegexQueryMatch>
@@ -282,7 +281,6 @@ gap::generator<RegexQueryMatch> RegexQueryResultImpl::Enumerate(void) {
       }
     }
 
-    GetNextMatchInFragment();
     if (auto result = GetNextMatchInFragment()) {
       co_yield *result;
     }
@@ -296,8 +294,9 @@ RegexQuery RegexQuery::from(const RegexQueryMatch &match) {
 }
 
 // Match this regular expression against a file.
-gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &file) const {
-  const FileReader &reader = file.impl->reader;
+gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
+    const File &file) const {
+  const auto &reader = file.impl->reader;
   std::vector<EntityOffset> matched_offsets;
 
   this->for_each_match(
@@ -356,7 +355,8 @@ gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const File &file) co
 }
 
 // Match this regular expression against a fragment.
-gap::generator<RegexQueryMatch> RegexQuery::match_fragments(const Fragment &frag) const {
+gap::generator<RegexQueryMatch> RegexQuery::match_fragments(
+    const Fragment &frag) const {
   RegexQueryResultImpl result_impl(*this, frag.impl);
   for (auto match : result_impl.Enumerate()) {
     co_yield match;
@@ -376,11 +376,11 @@ RegexQueryResultImpl::RegexQueryResultImpl(
       ep(std::move(ep_)) {}
 
 RegexQueryResultImpl::RegexQueryResultImpl(
-    const RegexQuery &query_, FragmentImpl::Ptr frag_)
+    const RegexQuery &query_, FragmentImplPtr frag_)
     : query(query_),
       ep(frag_->ep) {}
 
-bool RegexQueryResultImpl::InitForFragment(FragmentImpl::Ptr frag_) {
+bool RegexQueryResultImpl::InitForFragment(FragmentImplPtr frag_) {
   return false;
 }
 

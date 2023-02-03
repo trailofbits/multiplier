@@ -18,7 +18,6 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "NamedDecl.h"
@@ -27,6 +26,7 @@ namespace mx {
 class Decl;
 class NamedDecl;
 class TemplateDecl;
+class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateDecl : public NamedDecl {
  private:

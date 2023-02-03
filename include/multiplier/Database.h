@@ -20,28 +20,16 @@
 namespace mx {
 class DatabaseWriterImpl;
 
-#define MX_FOR_EACH_ENTITY_RECORD(m, ...) \
-    m(Decl, decl __VA_OPT__(,) __VA_ARGS__) \
-    m(Type, type __VA_OPT__(,) __VA_ARGS__) \
-    m(Stmt, stmt __VA_OPT__(,) __VA_ARGS__) \
-    m(Attr, attr __VA_OPT__(,) __VA_ARGS__) \
-    m(Macro, macro __VA_OPT__(,) __VA_ARGS__) \
-    m(Pseudo, pseudo __VA_OPT__(,) __VA_ARGS__)
-
-#define MX_ASYNC_REORD_TYPE(name, lower_name, m) m(name ## EntityRecord)
-
 #define MX_FOR_EACH_ASYNC_RECORD_TYPE(m) \
     m(FilePathRecord) \
-    m(FileRecord) \
     m(FragmentFileRecord) \
     m(FragmentFileRangeRecord) \
-    m(FragmentRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
     m(UseRecord) \
     m(ReferenceRecord) \
     m(SymbolNameRecord) \
-    MX_FOR_EACH_ENTITY_RECORD(MX_ASYNC_REORD_TYPE, m)
+    m(DictionaryRecord)
 
 
 // Tells us one of the valid file paths associated with a file id.
@@ -50,10 +38,10 @@ struct FilePathRecord {
 
   static constexpr const char *kInitStatements[] = {
       R"(CREATE TABLE IF NOT EXISTS file_path (
-           file_id INT NOT NULL,
+           file_id INTEGER NOT NULL,
            path TEXT NOT NULL,
            PRIMARY KEY(path)
-         ) WITHOUT rowid)"};
+         ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
@@ -70,10 +58,10 @@ struct FileRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS file (
-            file_id INT NOT NULL,
+            file_id INTEGER NOT NULL,
             data BLOB NOT NULL,
             PRIMARY KEY(file_id)
-          ) WITHOUT rowid)"};
+          ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
@@ -91,17 +79,16 @@ struct FragmentFileRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS fragment_file (
-            fragment_id INT NOT NULL PRIMARY KEY,
-            file_id INT NOT NULL
-          ) WITHOUT rowid)"};
+            fragment_id INTEGER NOT NULL PRIMARY KEY,
+            file_id INTEGER NOT NULL
+          ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_in_file
          ON fragment_file(file_id))"};
 
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO fragment_file
-         (fragment_id, file_id)
+      R"(INSERT OR IGNORE INTO fragment_file (fragment_id, file_id)
          VALUES (?1, ?2))";
 
   PackedFragmentId fragment_id;
@@ -115,10 +102,10 @@ struct FragmentFileRangeRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE VIRTUAL TABLE IF NOT EXISTS fragment_file_range USING rtree_i32(
-            fragment_id INT PRIMARY KEY NOT NULL,
-            first_file_token_offset INT NOT NULL,
-            last_file_token_offset INT NOT NULL,
-            +file_id INT NOT NULL
+            fragment_id INTEGER PRIMARY KEY NOT NULL,
+            first_file_token_offset INTEGER NOT NULL,
+            last_file_token_offset INTEGER NOT NULL,
+            +file_id INTEGER NOT NULL
           ))"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
@@ -139,10 +126,10 @@ struct FragmentRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS fragment (
-            fragment_id INT NOT NULL,
+            fragment_id INTEGER NOT NULL,
             data BLOB NOT NULL,
             PRIMARY KEY(fragment_id)
-          ) WITHOUT rowid)"};
+          ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {nullptr};
 
@@ -160,10 +147,10 @@ struct RedeclarationRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS redeclaration (
-            decl_id INT NOT NULL,
-            redecl_id INT NOT NULL,
+            decl_id INTEGER NOT NULL,
+            redecl_id INTEGER NOT NULL,
             PRIMARY KEY(decl_id, redecl_id)
-          ) WITHOUT rowid)"};
+          ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS redecl_id_from_decl_id
@@ -175,8 +162,8 @@ struct RedeclarationRecord {
       R"(INSERT OR IGNORE INTO redeclaration (decl_id, redecl_id)
          VALUES (?1, ?2))";
 
-  PackedDeclarationId decl_id;
-  PackedDeclarationId redecl_id;
+  PackedDeclId decl_id;
+  PackedDeclId redecl_id;
 };
 
 // Maps a declaration ID to a mangled name. We use mangled names to help us
@@ -189,10 +176,10 @@ struct MangledNameRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS mangled_name (
-            entity_id INT NOT NULL,
+            entity_id INTEGER NOT NULL,
             data TEXT NOT NULL,
             PRIMARY KEY(entity_id)
-          ) WITHOUT rowid)"};
+          ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS mangled_name_from_entity_id
@@ -211,7 +198,7 @@ struct MangledNameRecord {
       R"(INSERT INTO mangled_name (entity_id, data)
          VALUES (?1, ?2))";
 
-  // A `DeclarationId` or a `MacroId`.
+  // A `DeclId` or a `MacroId`.
   RawEntityId entity_id;
 
   std::string mangled_name;
@@ -242,7 +229,7 @@ struct SymbolNameRecord {
       R"(INSERT OR IGNORE INTO symbol (rowid, name)
          VALUES (?1, ?2))";
 
-  // A `DeclarationId` or a `MacroId`.
+  // A `DeclId` or a `MacroId`.
   RawEntityId entity_id;
 
   // A name, e.g. `std::abs`.
@@ -263,10 +250,10 @@ struct UseRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS use (
-            fragment_id INT NOT NULL,
-            entity_id INT NOT NULL,
+            fragment_id INTEGER NOT NULL,
+            entity_id INTEGER NOT NULL,
             PRIMARY KEY(fragment_id, entity_id)
-          ) WITHOUT rowid)"};
+          ) WITHOUT ROWID)"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS fragments_using_entities
@@ -288,53 +275,95 @@ struct ReferenceRecord {
 
   static constexpr const char *kInitStatements[] =
       {R"(CREATE TABLE IF NOT EXISTS reference (
-            from_entity_id INT NOT NULL,
-            to_entity_id INT NOT NULL,
-            PRIMARY KEY(from_entity_id, to_entity_id)
-          ) WITHOUT rowid)"};
+            from_entity_id INTEGER NOT NULL,
+            to_entity_id INTEGER NOT NULL,
+            kind_id INTEGER NOT NULL,
+            PRIMARY KEY(from_entity_id, to_entity_id, kind_id)
+          ) WITHOUT ROWID)",
+
+       R"(CREATE TABLE IF NOT EXISTS reference_kind (
+            kind_id INTEGER PRIMARY KEY,
+            description TEXT NOT NULL
+          ) WITHOUT ROWID)",
+
+       R"(INSERT OR IGNORE INTO reference_kind (kind_id, description)
+          VALUES (1, "Explicit code reference"))"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS references_by_target
          ON reference(to_entity_id))"};
 
+  // NOTE(pag): Reference id `1` is `ReferenceKind::EXPLICIT_CODE_REFERENCE`.
   static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id)
-         VALUES (?1, ?2))";
+      R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind_id)
+         VALUES (?1, ?2, 1))";
 
   RawEntityId from_entity_id;
   RawEntityId to_entity_id;
 };
 
-#define DEFINE_ENTITY_TABLE(name, lower_name) \
-  struct name ## EntityRecord { \
-    static constexpr const char *kTableName = #lower_name; \
-    \
-    static constexpr const char *kInitStatements[] = { \
-        "CREATE TABLE IF NOT EXISTS " #lower_name "(" \
-        "  " #lower_name "_id INT PRIMARY KEY, " \
-        "  fragment_id INT NOT NULL, " \
-        "  fragment_offset INT NOT NULL, " \
-        "  data BLOB NOT NULL " \
-        ") WITHOUT rowid"}; \
-    \
-    static constexpr const char *kExitStatements[] = { \
-        "CREATE INDEX IF NOT EXISTS " #lower_name "_fragment_index " \
-        "ON " #lower_name "(fragment_id)", \
-        \
-        "CREATE INDEX IF NOT EXISTS " #lower_name "_offset_index " \
-        "ON " #lower_name "(fragment_id, fragment_offset)"}; \
-    \
-    static constexpr const char *kInsertStatement = \
-        "INSERT INTO " #lower_name " (" #lower_name "_id, fragment_id, " \
-        "                             fragment_offset, data) "\
-        "VALUES (?1, ?2, ?3, zstd_compress(?4))"; \
-    \
-    mx::RawEntityId id; \
-    std::string data; \
-  };
+// Records a ZSTD dictionary for a category of entities into the database.
+struct DictionaryRecord {
+  static constexpr const char *kTableName = "entity_dictionary";
 
-MX_FOR_EACH_ENTITY_RECORD(DEFINE_ENTITY_TABLE)
-#undef DEFINE_ENTITY_TABLE
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS entity_dictionary (
+            entity_category INT PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)"};
+
+  static constexpr const char *kExitStatements[] = {nullptr};
+
+  static constexpr const char *kInsertStatement =
+      "INSERT INTO entity_dictionary (entity_category, data) VALUES (?1, ?2)";
+
+  EntityCategory category;
+  std::string data;
+};
+
+// Records an entity into the database
+struct EntityRecord {
+  static constexpr const char *kTableName = "entity";
+
+  static constexpr const char *kInitStatements[] =
+      {R"(CREATE TABLE IF NOT EXISTS entity (
+            entity_id INTEGER PRIMARY KEY,
+            data BLOB NOT NULL
+          ) WITHOUT ROWID)"};
+
+  static constexpr const char *kExitStatements[] = {
+      R"(CREATE INDEX IF NOT EXISTS entities_by_category
+         ON entity(entity_id_to_category(entity_id) ASC))",
+
+      R"(CREATE INDEX IF NOT EXISTS entities_by_fragment
+         ON entity(entity_id_to_category(entity_id) ASC,
+                   entity_id_to_fragment_id(entity_id) ASC,
+                   entity_id_to_fragment_offset(entity_id) ASC))",
+
+      R"(CREATE INDEX IF NOT EXISTS entities_by_kind
+         ON entity(entity_id_to_category(entity_id) ASC,
+                   entity_id_to_kind(entity_id) ASC,
+                   entity_id_to_fragment_id(entity_id) ASC))",
+
+#define MX_CREATE_ENTITY_VIEW(type, name, enum_, id) \
+     "CREATE VIEW IF NOT EXISTS " #name " AS " \
+     "SELECT entity_id AS " #name "_id, data " \
+     "FROM entity " \
+     "WHERE id_to_category(entity_id) = " #id,
+
+MX_FOR_EACH_ENTITY_CATEGORY(MX_CREATE_ENTITY_VIEW,
+                            MX_IGNORE_ENTITY_CATEGORY,
+                            MX_CREATE_ENTITY_VIEW,
+                            MX_CREATE_ENTITY_VIEW)
+#undef MX_CREATE_ENTITY_VIEW
+      };
+
+  static constexpr const char *kInsertStatement =
+      "INSERT OR IGNORE INTO entity (entity_id, data) VALUES (?1, ?2)";
+
+  RawEntityId id;
+  std::string data;
+};
 
 // API for write access to the Multiplier database.
 class DatabaseWriter final {
@@ -354,13 +383,13 @@ class DatabaseWriter final {
       "PRAGMA journal_mode = " MX_DATABASE_JOURNAL_MODE,
 
       R"(CREATE TABLE IF NOT EXISTS metadata (
-           next_file_index INT NOT NULL,
-           next_small_fragment_index INT NOT NULL,
-           next_big_fragment_index INT NOT NULL
+           next_file_index INTEGER NOT NULL,
+           next_small_fragment_index INTEGER NOT NULL,
+           next_big_fragment_index INTEGER NOT NULL
          ))",
 
       R"(CREATE TABLE IF NOT EXISTS version (
-           action INT NOT NULL
+           action INTEGER NOT NULL
          ))",
 
       R"(CREATE INDEX IF NOT EXISTS version_action ON version(action))"};
@@ -412,7 +441,7 @@ class DatabaseWriter final {
     void AddAsync(name);
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_ADD_RECORD)
-
+  MX_DECLARE_ADD_RECORD(EntityRecord)
 #undef MX_DECLARE_ADD_RECORD
 
   template <typename T1, typename T2, typename... Ts>

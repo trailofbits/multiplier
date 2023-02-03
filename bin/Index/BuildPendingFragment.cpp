@@ -83,19 +83,19 @@ class FragmentBuilder final {
   void MaybeVisitNext(const pasta::File &) {}
 
   void MaybeVisitNext(const pasta::TemplateArgument &pseudo) {
-    fragment.Add(pseudo);
+    fragment.Add(pseudo, entity_ids);
   }
 
   void MaybeVisitNext(const pasta::CXXBaseSpecifier &pseudo) {
-    fragment.Add(pseudo);
+    fragment.Add(pseudo, entity_ids);
   }
 
   void MaybeVisitNext(const pasta::TemplateParameterList &pseudo) {
-    fragment.Add(pseudo);
+    fragment.Add(pseudo, entity_ids);
   }
 
   void MaybeVisitNext(const pasta::Designator &pseudo) {
-    fragment.Add(pseudo);
+    fragment.Add(pseudo, entity_ids);
   }
 };
 
@@ -103,7 +103,7 @@ class FragmentBuilder final {
     Visit ## base_type(entity);
 
 #define MX_VISIT_ENTITY(cls, api_method, storage, apply, method, entity_type, \
-                        get_storage_list, selector) \
+                        get_storage_list) \
     MaybeVisitNext(apply(entity, method));
 
 
@@ -248,7 +248,7 @@ bool PendingFragment::Add(const pasta::Decl &entity, EntityIdMap &entity_ids) {
       break;
   }
 
-  mx::DeclarationId id;
+  mx::DeclId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(decls_to_serialize.size());
   id.kind = mx::FromPasta(kind);
@@ -270,7 +270,7 @@ bool PendingFragment::Add(const pasta::Stmt &entity, EntityIdMap &entity_ids) {
   }
 
   auto kind = entity.Kind();
-  mx::StatementId id;
+  mx::StmtId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(stmts_to_serialize.size());
   id.kind = mx::FromPasta(kind);
@@ -301,7 +301,7 @@ bool PendingFragment::Add(const pasta::Type &entity) {
 
 bool PendingFragment::Add(const pasta::Attr &entity, EntityIdMap &entity_ids) {
   auto kind = entity.Kind();
-  mx::AttributeId id;
+  mx::AttrId id;
   id.fragment_id = fragment_index;
   id.offset = static_cast<mx::EntityOffset>(attrs_to_serialize.size());
   id.kind = mx::FromPasta(kind);
@@ -314,42 +314,56 @@ bool PendingFragment::Add(const pasta::Attr &entity, EntityIdMap &entity_ids) {
   return false;
 }
 
-bool PendingFragment::Add(const pasta::TemplateArgument &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
-  if (pseudo_offsets.emplace(
-          pseudo.RawTemplateArgument(), offset).second) {
-    pseudos_to_serialize.emplace_back(pseudo);
-    return true;
-  }
+bool PendingFragment::Add(const pasta::TemplateArgument &entity,
+                          EntityIdMap &entity_ids) {
+  mx::TemplateArgumentId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(
+      template_arguments_to_serialize.size());
 
-  return false;
-}
-
-bool PendingFragment::Add(const pasta::CXXBaseSpecifier &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
-  if (pseudo_offsets.emplace(
-          pseudo.RawCXXBaseSpecifier(), offset).second) {
-    pseudos_to_serialize.emplace_back(pseudo);
+  if (entity_ids.emplace(entity.RawTemplateArgument(), id).second) {
+    template_arguments_to_serialize.emplace_back(entity);
     return true;
   }
   return false;
 }
 
-bool PendingFragment::Add(const pasta::TemplateParameterList &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
-  if (pseudo_offsets.emplace(
-          pseudo.RawTemplateParameterList(), offset).second) {
-    pseudos_to_serialize.emplace_back(pseudo);
+bool PendingFragment::Add(const pasta::TemplateParameterList &entity,
+                          EntityIdMap &entity_ids) {
+  mx::TemplateParameterListId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(
+      template_parameter_lists_to_serialize.size());
+
+  if (entity_ids.emplace(entity.RawTemplateParameterList(), id).second) {
+    template_parameter_lists_to_serialize.emplace_back(entity);
     return true;
   }
   return false;
 }
 
-bool PendingFragment::Add(const pasta::Designator &pseudo) {
-  auto offset = static_cast<mx::EntityOffset>(pseudos_to_serialize.size());
-  if (pseudo_offsets.emplace(
-          pseudo.RawDesignator(), offset).second) {
-    pseudos_to_serialize.emplace_back(pseudo);
+bool PendingFragment::Add(const pasta::CXXBaseSpecifier &entity,
+                          EntityIdMap &entity_ids) {
+  mx::CXXBaseSpecifierId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(
+      cxx_base_specifiers_to_serialize.size());
+
+  if (entity_ids.emplace(entity.RawCXXBaseSpecifier(), id).second) {
+    cxx_base_specifiers_to_serialize.emplace_back(entity);
+    return true;
+  }
+  return false;
+}
+
+bool PendingFragment::Add(const pasta::Designator &entity,
+                          EntityIdMap &entity_ids) {
+  mx::DesignatorId id;
+  id.fragment_id = fragment_index;
+  id.offset = static_cast<mx::EntityOffset>(designators_to_serialize.size());
+
+  if (entity_ids.emplace(entity.RawDesignator(), id).second) {
+    designators_to_serialize.emplace_back(entity);
     return true;
   }
   return false;

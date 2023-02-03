@@ -97,6 +97,10 @@ class PendingFragment {
   std::vector<pasta::Stmt> stmts_to_serialize;
   std::vector<pasta::Type> types_to_serialize;
   std::vector<pasta::Attr> attrs_to_serialize;
+  std::vector<pasta::TemplateArgument> template_arguments_to_serialize;
+  std::vector<pasta::TemplateParameterList> template_parameter_lists_to_serialize;
+  std::vector<pasta::CXXBaseSpecifier> cxx_base_specifiers_to_serialize;
+  std::vector<pasta::Designator> designators_to_serialize;
 
   // We distinguish entities from "pseudo" entities, where an entity is uniquely
   // identifiable via an `mx::EntityId`, whereas a pseudo entity is not uniquely
@@ -108,10 +112,10 @@ class PendingFragment {
   bool Add(const pasta::Stmt &entity, EntityIdMap &entity_ids);
   bool Add(const pasta::Type &entity);
   bool Add(const pasta::Attr &entity, EntityIdMap &entity_ids);
-  bool Add(const pasta::TemplateArgument &pseudo);
-  bool Add(const pasta::CXXBaseSpecifier &pseudo);
-  bool Add(const pasta::TemplateParameterList &pseudo);
-  bool Add(const pasta::Designator &pseudo);
+  bool Add(const pasta::TemplateArgument &pseudo, EntityIdMap &entity_ids);
+  bool Add(const pasta::CXXBaseSpecifier &pseudo, EntityIdMap &entity_ids);
+  bool Add(const pasta::TemplateParameterList &pseudo, EntityIdMap &entity_ids);
+  bool Add(const pasta::Designator &pseudo, EntityIdMap &entity_ids);
 
   // Find and initialize `parent_decl_ids` and `last_file_token_id`.
   void InitFileLocationRange(

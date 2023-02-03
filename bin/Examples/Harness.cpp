@@ -71,9 +71,9 @@ static void CollectEntities(
 
   mx::Fragment frag = index.fragment(frag_id).value();
 
-  std::vector<mx::PackedDeclarationId> strong_decl_ids;
-  std::vector<mx::PackedDeclarationId> weak_decl_ids;
-  std::vector<mx::PackedDeclarationId> pending_decl_ids;
+  std::vector<mx::PackedDeclId> strong_decl_ids;
+  std::vector<mx::PackedDeclId> weak_decl_ids;
+  std::vector<mx::PackedDeclId> pending_decl_ids;
 
   for (mx::Token tok : frag.parsed_tokens()) {
     if (tok.kind() != mx::TokenKind::IDENTIFIER) {
@@ -233,7 +233,7 @@ static void CollectEntities(
   weak_decl_ids.erase(it, weak_decl_ids.end());
 
   // A strong connection requires a definition.
-  for (mx::PackedDeclarationId id : strong_decl_ids) {
+  for (mx::PackedDeclId id : strong_decl_ids) {
     mx::Decl decl = index.entity(id).value();
 
     // A strong connection back into our own fragment, ignore it.
@@ -252,7 +252,7 @@ static void CollectEntities(
 
   // A weak connection requires a declaration, and ideally also brings in
   // a definition.
-  for (mx::PackedDeclarationId id : weak_decl_ids) {
+  for (mx::PackedDeclId id : weak_decl_ids) {
 
     // We've already added it as a strong declaration; skip it.
     if (std::find(strong_decl_ids.begin(), strong_decl_ids.end(), id) !=

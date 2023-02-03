@@ -18,15 +18,14 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "PseudoKind.h"
 
 namespace mx {
 class Designator;
+class DesignatorImpl;
 class FieldDecl;
-class OffsetEntityImpl;
+class Reference;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
  protected:
@@ -37,21 +36,23 @@ class Designator {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<OffsetEntityImpl> impl;
+  friend class DesignatorImpl;
+  std::shared_ptr<const DesignatorImpl> impl;
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
 
-  inline Designator(std::shared_ptr<OffsetEntityImpl> impl_)
+  /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
       : impl(std::move(impl_)) {}
+
+  PackedDesignatorId id(void) const;
+  gap::generator<Reference> references(void) const;
 
   bool is_field_designator(void) const;
   bool is_array_designator(void) const;

@@ -75,8 +75,12 @@ static void FindDivergentCandidates(const mx::Fragment fragment) {
           std::vector<mx::ArraySubscriptExpr> mem_accesses;
           std::vector<mx::Stmt> outside_uses;
 
-          for (mx::Stmt ref_stmt : decl.references()) {
-            if (auto parent = ref_stmt.parent_statement()) { 
+          for (mx::Reference ref : decl.references()) {
+            auto ref_stmt = ref.as_statement();
+            if (!ref_stmt) {
+              continue;
+            }
+            if (auto parent = ref_stmt->parent_statement()) {
               if (parent->kind() == mx::StmtKind::IMPLICIT_CAST_EXPR) {
                 // Might be None 
                 // TODO: Check

@@ -17,11 +17,11 @@
 DEFINE_uint64(entity_id, 0, "ID of the entity to print the call hierarchy of");
 DEFINE_uint64(reachable_from_entity_id, 0, "ID of the entity from which `--entity_id` must be reachable");
 
-using Edge = std::pair<mx::PackedDeclarationId, mx::PackedDeclarationId>;
+using Edge = std::pair<mx::PackedDeclId, mx::PackedDeclId>;
 static std::map<Edge, unsigned> edge_weights;
-static std::map<mx::PackedDeclarationId, std::vector<mx::PackedDeclarationId>> back_edges;
+static std::map<mx::PackedDeclId, std::vector<mx::PackedDeclId>> back_edges;
 
-static std::unordered_set<mx::PackedDeclarationId> entities;
+static std::unordered_set<mx::PackedDeclId> entities;
 
 static unsigned max_edge_weight = 0u;
 
@@ -56,7 +56,7 @@ void PrintCallGraphEdge(const mx::Decl &from_entity, mx::Stmt entity) {
 }
 
 void PrintCallGraph(mx::Decl entity) {
-  mx::PackedDeclarationId id = entity.id();
+  mx::PackedDeclId id = entity.id();
   
   if (auto [it, added] = entities.insert(id); !added) {
     return;  // Seen it before.
@@ -91,8 +91,13 @@ void PrintCallGraph(mx::Decl entity) {
   if (decl != decls.end()) {
     PrintCallGraphEdge(entity, decl->canonical_declaration());
   } else {
-    for (mx::Stmt ref : entity.references()) {
-      PrintCallGraphEdge(entity, ref);
+    for (mx::Reference ref : entity.references()) {
+      if (auto ref_stmt = ref.as_statement()) {
+        PrintCallGraphEdge(entity, *ref_stmt);
+
+      } else if (auto ref_decl = ref.as_declaration()) {
+        PrintCallGraphEdge(entity, *ref_decl);
+      }
     }
   }
 }
@@ -162,16 +167,16 @@ extern "C" int main(int argc, char *argv[]) {
     mx::Decl reach_entity =
         std::get<mx::Decl>(maybe_reach_entity).canonical_declaration();
 
-    std::vector<mx::PackedDeclarationId> next_reaching_edges;
-    std::vector<mx::PackedDeclarationId> curr_reaching_edges;
+    std::vector<mx::PackedDeclId> next_reaching_edges;
+    std::vector<mx::PackedDeclId> curr_reaching_edges;
     next_reaching_edges.emplace_back(reach_entity.id());
 
     while (!next_reaching_edges.empty()) {
       curr_reaching_edges.swap(next_reaching_edges);
       next_reaching_edges.clear();
 
-      for (mx::PackedDeclarationId to_id : curr_reaching_edges) {
-        for (mx::PackedDeclarationId from_id : back_edges[to_id]) {
+      for (mx::PackedDeclId to_id : curr_reaching_edges) {
+        for (mx::PackedDeclId from_id : back_edges[to_id]) {
           Edge key(from_id, to_id);
           if (reaching_edges.emplace(key).second) {
             next_reaching_edges.push_back(from_id);

@@ -18,11 +18,9 @@
 #include "../Iterator.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Macro.h"
 #include "MacroKind.h"
-#include "TokenUseSelector.h"
 
 namespace mx {
 class Macro;
