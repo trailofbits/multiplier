@@ -53,9 +53,6 @@ class InvalidEntityProvider final : public EntityProvider {
         const Ptr &, PackedFragmentId id) final; \
     \
     type_name ## ImplPtr type_name ## For( \
-        const Ptr &, PackedFragmentId id, EntityOffset offset) final; \
-    \
-    type_name ## ImplPtr type_name ## For( \
         const Ptr &ep, RawEntityId id) final;
 
   MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_METHODS,

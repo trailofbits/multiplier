@@ -70,11 +70,6 @@ void InvalidEntityProvider::FindSymbol(
     } \
     \
     type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
-        const Ptr &, PackedFragmentId, EntityOffset) { \
-      return {}; \
-    } \
-    \
-    type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
         const Ptr &, RawEntityId) { \
       return {}; \
     }

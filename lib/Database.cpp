@@ -305,7 +305,8 @@ struct DictionaryCompressor {
 
   // Build the dictionary if it hasn't yet been built. This will enqueue any
   // pending records to `queue`.
-  void Build(Queue &queue, DictionaryContext &context);
+  void Build(Queue &queue, DictionaryContext &context,
+             std::unique_lock<std::mutex> locker);
 
   // Add `record`, either as a pending item for training a dictionary, or passed
   // through to `CompressAndAdd`.
@@ -393,11 +394,12 @@ void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
     return;
   }
 
-  std::lock_guard<std::mutex> locker(lock);
+  std::unique_lock<std::mutex> locker(lock);
 
   // If there was a race condition and if the dictionary has been created in the
   // time that it took to acquire the lock, then use it to add the record.
   if (ZSTD_CDict *d = dict.load(std::memory_order_relaxed)) {
+    locker.unlock();
     CompressAndAdd(queue, context, std::move(record), d);
     return;
   }
@@ -414,12 +416,13 @@ void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
     return;
   }
 
-  Build(queue, context);
+  Build(queue, context, std::move(locker));
 }
 
 // Build the dictionary if it hasn't yet been built. This will enqueue any
 // pending records to `queue`.
-void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context) {
+void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
+                                 std::unique_lock<std::mutex> locker) {
 
   if (dict.load(std::memory_order_relaxed)) {
     return;  // Don't re-build a dictionary.
@@ -445,10 +448,16 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context) {
   dictionary.data.resize(dictionary_size);
 
   // Publish the newly trained dictionary so that other threads can immediately
-  // benefit from it.
+  // benefit from it. This will unlock the mutex and let any blocked threads
+  // proceed with the new dictionary. Their racy check will pick up the now-
+  // published dictionary.
   auto d = ZSTD_createCDict(dictionary.data.data(), dictionary_size,
                             ZSTD_maxCLevel());
   dict.store(d, std::memory_order_release);
+  locker.unlock();
+
+  // Persist the dictionary.
+  queue.enqueue(std::move(dictionary));
 
   // Now use it locally.
   auto context_and_index = context.AcquireContext();
@@ -463,8 +472,6 @@ void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context) {
   }
 
   context.ReleaseContext(context_and_index);
-
-  queue.enqueue(std::move(dictionary));
 
   // Force free the training resources.
   std::vector<RawEntityId>().swap(entity_ids);
@@ -576,6 +583,8 @@ void DatabaseWriterImpl::InitDictionaries(void) {
     dict.InitFromSavedDictionary(std::move(data));
   }
 
+  dictionaries.Reset();
+
   // Initialize the empty dictionaries.
   for (auto i = 1u; i < kNumEntityCategories; ++i) {
     DictionaryCompressor &dict = entity_dictionaries[i];
@@ -583,14 +592,13 @@ void DatabaseWriterImpl::InitDictionaries(void) {
       dict.InitWithoutDictionary();
     }
   }
-
-  dictionaries.Reset();
 }
 
 void DatabaseWriterImpl::ExitDictionaries(void) {
   for (auto i = 1u; i < kNumEntityCategories; ++i) {
     DictionaryCompressor &dict = entity_dictionaries[i];
-    dict.Build(insertion_queue, dictionary_context);
+    dict.Build(insertion_queue, dictionary_context,
+               std::unique_lock<std::mutex>(dict.lock));
   }
 }
 

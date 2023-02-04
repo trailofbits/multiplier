@@ -77,9 +77,6 @@ class SQLiteEntityProvider final : public EntityProvider {
     gap::generator<type_name ## ImplPtr> \
     type_name ## sFor(const Ptr &, PackedFragmentId id) final; \
     \
-    type_name ## ImplPtr type_name ## For(const Ptr &, PackedFragmentId id, \
-                                          EntityOffset offset) final; \
-    \
     type_name ## ImplPtr type_name ## For(const Ptr &ep, RawEntityId id) final;
 
   MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_ENTITY_METHODS,

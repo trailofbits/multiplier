@@ -193,11 +193,6 @@ void CachingEntityProvider::FindSymbol(
     } \
     \
     type_name ## ImplPtr CachingEntityProvider::type_name ## For( \
-        const Ptr &ep, PackedFragmentId id, EntityOffset offset) { \
-      return next->type_name ## For(ep, id, offset); \
-    } \
-    \
-    type_name ## ImplPtr CachingEntityProvider::type_name ## For( \
         const Ptr &ep, RawEntityId raw_id) { \
       type_name ## ImplPtr ptr; \
       std::lock_guard<std::recursive_mutex> locker(lock); \

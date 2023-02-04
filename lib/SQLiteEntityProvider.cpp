@@ -61,27 +61,6 @@ static std::vector<RawEntityId> GetEntityIds(sqlite::Statement &query,
   return ids;
 }
 
-// Get an entity ID by its fragment offset. In theory we could get an entity's
-// data and return an entity pointer. In practice, we want to roundtrip through
-// the entity provider to benefit from ID-based caching.
-static RawEntityId GetEntityIdByFragmentOffset(sqlite::Statement &query,
-                                               PackedFragmentId frag_id,
-                                               EntityOffset offset) {
-
-  RawEntityId eid = kInvalidEntityId;
-
-  query.BindValues(frag_id.Pack(), offset);
-  if (!query.ExecuteStep()) {
-    query.Reset();
-    return eid;
-  }
-
-  auto row = query.Row();
-  row.Columns(eid);
-  query.Reset();
-  return eid;
-}
-
 }  // namespace
 
 class SQLiteEntityProviderImpl {
@@ -103,7 +82,6 @@ class SQLiteEntityProviderImpl {
 #define DECLARE_GETTERS(type_name, lower_name, ...) \
     sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
     sqlite::Statement get_ ## lower_name ## _by_id ; \
-    sqlite::Statement get_ ## lower_name ## _id_by_fragment_offset ;
 
   MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_GETTERS,
                               MX_IGNORE_ENTITY_CATEGORY,
@@ -183,12 +161,7 @@ class SQLiteEntityProviderImpl {
       , get_ ## lower_name ## _by_id(db.Prepare( \
             "SELECT data " \
             "FROM " #lower_name " " \
-            "WHERE " #lower_name "_id = ?1")) \
-      , get_ ## lower_name ## _id_by_fragment_offset(db.Prepare( \
-            "SELECT " #lower_name "_id " \
-            "FROM " #lower_name " " \
-            "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
-            "  AND entity_id_to_fragment_offset(" #lower_name "_id) = ?2"))
+            "WHERE " #lower_name "_id = ?1"))
 
       MX_FOR_EACH_ENTITY_CATEGORY(INIT_GETTERS,
                                   MX_IGNORE_ENTITY_CATEGORY,
@@ -594,16 +567,6 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
       query.Reset(); \
       \
       return std::make_shared<type_name ## Impl>(ep, std::move(data), raw_id); \
-    } \
-    \
-    type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
-        const Ptr &ep, PackedFragmentId fid, EntityOffset offset) { \
-      ImplPtr context = impl.Lock(); \
-      return ep->type_name ## For( \
-          ep, \
-          GetEntityIdByFragmentOffset( \
-              context->get_ ## lower_name ## _id_by_fragment_offset, \
-              fid, offset)); \
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_GETTERS,

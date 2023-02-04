@@ -139,9 +139,6 @@ class EntityProvider {
         const Ptr &, PackedFragmentId id) = 0; \
     \
     virtual type_name ## ImplPtr type_name ## For( \
-        const Ptr &, PackedFragmentId id, EntityOffset offset) = 0; \
-    \
-    virtual type_name ## ImplPtr type_name ## For( \
         const Ptr &ep, RawEntityId id) = 0; \
     \
     inline type_name ## ImplPtr type_name ## For( \

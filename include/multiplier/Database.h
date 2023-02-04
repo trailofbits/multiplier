@@ -337,8 +337,7 @@ struct EntityRecord {
 
       R"(CREATE INDEX IF NOT EXISTS entities_by_fragment
          ON entity(entity_id_to_category(entity_id) ASC,
-                   entity_id_to_fragment_id(entity_id) ASC,
-                   entity_id_to_fragment_offset(entity_id) ASC))",
+                   entity_id_to_fragment_id(entity_id) ASC))",
 
       R"(CREATE INDEX IF NOT EXISTS entities_by_kind
          ON entity(entity_id_to_category(entity_id) ASC,
@@ -349,7 +348,7 @@ struct EntityRecord {
      "CREATE VIEW IF NOT EXISTS " #name " AS " \
      "SELECT entity_id AS " #name "_id, data " \
      "FROM entity " \
-     "WHERE id_to_category(entity_id) = " #id,
+     "WHERE entity_id_to_category(entity_id) = " #id,
 
 MX_FOR_EACH_ENTITY_CATEGORY(MX_CREATE_ENTITY_VIEW,
                             MX_IGNORE_ENTITY_CATEGORY,
