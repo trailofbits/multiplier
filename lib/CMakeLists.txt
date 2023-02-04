@@ -124,8 +124,6 @@ add_library("mx-api" STATIC
   "Reference.cpp"
   "SQLiteEntityProvider.cpp"
   "SQLiteEntityProvider.h"
-  "SQLiteCompression.cpp"
-  "SQLiteCompression.h"
   "SQLiteStore.cpp"
   "SQLiteStore.h"
   "Stmt.h"
@@ -158,13 +156,13 @@ target_link_libraries("mx-api"
   PUBLIC
     "CapnProto::capnp-rpc"
     "mx-sqlite"
-    gap::gap
-    gap::gap-core
-    std::coroutines
-    gap::gap-settings
+    "gap::gap"
+    "gap::gap-core"
+    "std::coroutines"
+    "gap::gap-settings"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
-    $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>
+    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
 )
 
 if(MX_ENABLE_RE2)

@@ -12,28 +12,8 @@
 #include <shared_mutex>
 #include <sqlite3.h>
 #include <vector>
-#include <zstd.h>
 
-#include "SQLiteCompression.h"
 #include "Types.h"
-
-namespace std {
-
-template <>
-struct default_delete<ZSTD_CCtx> {
-  inline void operator()(ZSTD_CCtx *cctx) {
-    ZSTD_freeCCtx(cctx);
-  }
-};
-
-template <>
-struct default_delete<ZSTD_DCtx> {
-  inline void operator()(ZSTD_DCtx *cctx) {
-    ZSTD_freeDCtx(cctx);
-  }
-};
-
-}  // namespace std
 
 namespace sqlite {
 namespace {
@@ -92,9 +72,6 @@ class ConnectionImpl {
   std::shared_mutex busy_handler_lock;
   std::function<int(unsigned)> busy_handler;
 
-  std::unique_ptr<ZSTD_CCtx> compression_ctx;
-  std::unique_ptr<ZSTD_DCtx> decompression_ctx;
-
   ConnectionImpl(const std::filesystem::path &db_path_,
                  bool read_only);
 
@@ -108,9 +85,7 @@ ConnectionImpl::ConnectionImpl(const std::filesystem::path &db_path_,
       busy_handler([] (unsigned) -> int {
         std::this_thread::yield();
         return 1;
-      }),
-      compression_ctx(ZSTD_createCCtx()),
-      decompression_ctx(ZSTD_createDCtx()) {
+      }) {
 
   int ro_flag = read_only
       ? SQLITE_OPEN_READONLY
@@ -350,30 +325,6 @@ Connection::Connection(const std::filesystem::path &db_path,
   CreateFunction("entity_id_to_kind", 1,
                  SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
                  IdToKind, nullptr, nullptr, nullptr);
-
-  CreateFunction("zstd_compress", 1, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
-                 ZstdCompress, nullptr, nullptr, nullptr,
-                 impl->compression_ctx.get());
-
-  CreateFunction("zstd_compress", 2, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
-                 ZstdCompressDict, nullptr, nullptr, nullptr,
-                 impl->compression_ctx.get());
-
-  CreateFunction("zstd_decompress", 1, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
-                 ZstdDecompress, nullptr, nullptr, nullptr,
-                 impl->decompression_ctx.get());
-
-  CreateFunction("zstd_decompress", 2, SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
-                 ZstdDecompressDict, nullptr, nullptr, nullptr,
-                 impl->decompression_ctx.get());
-
-  CreateFunction("zstd_create_cdict", 1, 0,
-                 ZstdCreateCDict, nullptr, nullptr, nullptr,
-                 impl->compression_ctx.get());
-
-  CreateFunction("zstd_create_ddict", 1, 0,
-                 ZstdCreateDDict, nullptr, nullptr, nullptr,
-                 impl->decompression_ctx.get());
 }
 
 // Get the filename used to open the database

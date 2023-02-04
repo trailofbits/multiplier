@@ -13,6 +13,7 @@
 #include <variant>
 #include <gap/core/generator.hpp>
 
+#include "Iterator.h"
 #include "Types.h"
 
 namespace mx {
