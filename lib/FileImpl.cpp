@@ -14,8 +14,8 @@ namespace mx {
 FileImpl::~FileImpl(void) noexcept {}
 
 FileImpl::FileImpl(
-    EntityProvider::Ptr ep_, std::string data_, RawEntityId id_)
-    : EntityImpl<rpc::File>(std::move(ep_), std::move(data_)),
+    EntityProvider::Ptr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
+    : EntityImpl<rpc::File>(std::move(ep_), kj::mv(data_)),
       file_token_reader(this),
       file_id(EntityId(id_).Extract<FileId>()->file_id),
       num_tokens(reader.getTokenKinds().size()) {

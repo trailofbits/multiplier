@@ -13,9 +13,10 @@
 
 namespace mx {
 
-TypeImpl::TypeImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+TypeImpl::TypeImpl(std::shared_ptr<EntityProvider> ep_,
+                   kj::Array<capnp::word> data_,
                    RawEntityId id_)
-    : EntityImpl<ast::Type>(std::move(ep_), std::move(data_)),
+    : EntityImpl<ast::Type>(std::move(ep_), kj::mv(data_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()) {}
 

@@ -691,13 +691,6 @@ class CodeGenerator {
   std::ofstream lib_pasta_h_os;  // `bin/Index/PASTA.h`
   std::stringstream late_serialize_inc_os;
 
-  // Keep track of where the decl/stmt/type/attr/macro kind is stored.
-  unsigned decl_kind_id{0u};
-  unsigned stmt_kind_id{0u};
-  unsigned type_kind_id{0u};
-  unsigned attr_kind_id{0u};
-  unsigned macro_kind_id{0u};
-
   std::vector<pasta::NamespaceDecl> pastas;
 
   std::vector<pasta::EnumDecl> enums;
@@ -1649,7 +1642,7 @@ void CodeGenerator::RunOnVector(
         lib_cpp_os \
             << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
             << "      if (auto e = " << (*element_name) \
-            << "::from(" #name "(d" << i << "))) {\n" \
+            << "::from(" #name "(std::move(d" << i << ")))) {\n" \
             << "        vec.emplace_back(std::move(*e));\n" \
             << "      }\n" \
             << "    }\n"; \
@@ -1657,7 +1650,7 @@ void CodeGenerator::RunOnVector(
         lib_cpp_os \
             << "    if (auto d" << i << " = impl->ep->" #name "For(impl->ep, v)) {\n" \
             << "      if (auto e = " << (*element_name) \
-            << "::from(" #name "(d" << i << "))) {\n" \
+            << "::from(" #name "(std::move(d" << i << ")))) {\n" \
             << "        co_yield std::move(*e);\n" \
             << "      }\n" \
             << "    }\n"; \
@@ -1820,7 +1813,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 #undef SET_STORAGE
   }
 
-  if (is_decl) {
+  if (is_declaration) {
     needed_decls.insert("DeclKind");
 
     serialize_cpp_os
@@ -2157,11 +2150,11 @@ MethodListPtr CodeGenerator::RunOnClass(
       seen_methods->emplace("canonical_declaration");  // Disable this.
       seen_methods->emplace("is_canonical_declaration");  // Disable this.
       seen_methods->emplace("is_referenced");  // Disable this.
-      seen_methods->emplace("is_this_declaration_referenced");  // Disable this.
+      seen_methods->emplace("is_this_declarationaration_referenced");  // Disable this.
       seen_methods->emplace("is_used");  // Disable this.
       seen_methods->emplace("is_first_declaration");  // Disable this.
       seen_methods->emplace("is_definition");  // Disable this; we've added it manually.
-      seen_methods->emplace("is_this_declaration_a_definition");  // Disable this.
+      seen_methods->emplace("is_this_declarationaration_a_definition");  // Disable this.
       seen_methods->emplace("parent");  // Disable this.
       seen_methods->emplace("prev_declaration_in_scope");  // TODO(pag): Disable this?
       seen_methods->emplace("most_recent_declaration");  // Disable this.
@@ -2298,7 +2291,7 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   // NOTE(pag): Macro containing a token is handled later.
-  if (is_decl || is_stmt || is_type || is_attr) {
+  if (is_declaration || is_stmt || is_type || is_attr) {
 
     class_os
         << "  inline static gap::generator<"
@@ -2337,7 +2330,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  }\n\n";
   }
 
-  if (is_decl) {
+  if (is_declaration) {
 
     if (is_concrete) {
       auto snake_name = CapitalCaseToSnakeCase(class_name);
@@ -2523,7 +2516,14 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n";
   }
 
-  if (is_decl && class_name != "Decl") {
+  // TODO!!!! Make `::from(const Reference &)` :-D
+#define DECLARE_DEFINE_FROM(type_name, lower_name) \
+    if (#type_name ==)
+
+  FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
+#undef DECLARE_DEFINE_FROM
+
+  if (is_declaration && class_name != "Decl") {
     class_os
         << "  static std::optional<" << class_name
         << "> from(const TokenContext &c);\n";
@@ -2593,7 +2593,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         grand_parent_class_name != "Type" &&
         grand_parent_class_name != "Attr" &&
         grand_parent_class_name != "Macro") {
-      if (is_decl) {
+      if (is_declaration) {
         lib_cpp_os
             << "  return from(reinterpret_cast<const Decl &>(parent));\n"
             << "}\n\n";
@@ -2644,7 +2644,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         continue;
       }
 
-      if (is_decl) {
+      if (is_declaration) {
         grand_child_class_name.pop_back();  // `l`
         grand_child_class_name.pop_back();  // `c`
         grand_child_class_name.pop_back();  // `e`
@@ -2730,10 +2730,10 @@ MethodListPtr CodeGenerator::RunOnClass(
     std::string snake_name = CapitalCaseToSnakeCase(method_name);
 
     // We have a custom implementation of `redeclarations`.
-    if (snake_name == "is_this_declaration_a_definition") {
+    if (snake_name == "is_this_declarationaration_a_definition") {
       snake_name = "is_definition";
 
-    } else if (snake_name == "is_this_declaration_a_demoted_definition") {
+    } else if (snake_name == "is_this_declarationaration_a_demoted_definition") {
       snake_name = "is_demoted_definition";
     
     } else if (snake_name == "kind") {
@@ -3146,21 +3146,6 @@ MethodListPtr CodeGenerator::RunOnClass(
               << "  b." << setter_name
               << "(static_cast<" << types.first << ">(mx::FromPasta(e."
               << method_name << "())));\n";
-        }
-
-        // Keep track of where the decl/stmt/type kind is stored.
-        if (api_name == "kind") {
-          if (is_decl) {
-            decl_kind_id = i;
-          } else if (is_stmt) {
-            stmt_kind_id = i;
-          } else if (is_type) {
-            type_kind_id = i;
-          } else if (is_attr) {
-            attr_kind_id = i;
-          } else if (is_macro) {
-            macro_kind_id = i;
-          }
         }
       }
 

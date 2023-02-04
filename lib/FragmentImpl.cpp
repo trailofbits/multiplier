@@ -15,9 +15,10 @@
 
 namespace mx {
 
-FragmentImpl::FragmentImpl(EntityProvider::Ptr ep_, std::string data_,
+FragmentImpl::FragmentImpl(EntityProvider::Ptr ep_,
+                           kj::Array<capnp::word> data_,
                            RawEntityId id_)
-    : EntityImpl<rpc::Fragment>(std::move(ep_), std::move(data_)),
+    : EntityImpl<rpc::Fragment>(std::move(ep_), kj::mv(data_)),
       fragment_id(EntityId(id_).Extract<FragmentId>()->fragment_id),
       parsed_token_reader(this),
       macro_token_reader(this),

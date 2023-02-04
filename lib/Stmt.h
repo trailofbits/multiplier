@@ -19,7 +19,8 @@ class StmtImpl final : public EntityImpl<ast::Stmt> {
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit StmtImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+  explicit StmtImpl(std::shared_ptr<EntityProvider> ep_,
+                    kj::Array<capnp::word> data_,
                     RawEntityId id_);
 };
 

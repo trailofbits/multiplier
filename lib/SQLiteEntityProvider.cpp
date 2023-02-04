@@ -9,6 +9,8 @@
 #include <gap/core/generator.hpp>
 #include <multiplier/Database.h>
 #include <multiplier/Entities/TokenKind.h>
+#include <zdict.h>
+#include <zstd.h>
 
 #include "API.h"
 #include "Attr.h"
@@ -20,9 +22,60 @@
 #include "SQLiteStore.h"
 #include "Stmt.h"
 #include "Type.h"
-#include "Types.h"
 
 namespace mx {
+
+// Holds on to the dictionaries.
+class SQLiteDecompressionDictionary {
+ private:
+  SQLiteDecompressionDictionary(void) = delete;
+
+ public:
+  static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
+
+  std::array<ZSTD_DDict *, kNumEntityCategories> dict;
+
+  explicit SQLiteDecompressionDictionary(
+      std::filesystem::path path,
+      SQLiteDecompressionDictionary *prev = nullptr);
+
+  ~SQLiteDecompressionDictionary(void);
+};
+
+class SQLiteEntityProviderImpl {
+ public:
+  const std::string entity_id_list;
+  sqlite::Connection db;
+  sqlite::Statement get_version_number;
+  sqlite::Statement get_file_paths;
+  sqlite::Statement get_file_fragments;
+  sqlite::Statement clear_entity_id_list;
+  sqlite::Statement add_entity_id_to_list;
+  sqlite::Statement get_entity_ids;
+  sqlite::Statement expand_entity_id_list_with_redecls;
+  sqlite::Statement get_entities_by_name;
+  sqlite::Statement get_uses;
+  sqlite::Statement get_references;
+  sqlite::Statement get_fragments_covered_by_tokens;
+
+#define DECLARE_GETTERS(type_name, lower_name, ...) \
+    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
+    sqlite::Statement get_ ## lower_name ## _by_id ; \
+
+  MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_GETTERS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_GETTERS,
+                              DECLARE_GETTERS)
+#undef DECLARE_GETTERS
+
+  // Context used to decompress compressed Cap'n Proto entity structures
+  // (see AST.capnp).
+  ZSTD_DCtx * const decompression_context;
+
+  ~SQLiteEntityProviderImpl(void);
+  SQLiteEntityProviderImpl(unsigned worker_index, std::filesystem::path path);
+};
+
 namespace {
 
 static sqlite::Connection Connect(std::filesystem::path path,
@@ -61,119 +114,161 @@ static std::vector<RawEntityId> GetEntityIds(sqlite::Statement &query,
   return ids;
 }
 
+// Decompress a compressed entity into a kj array, or use by `EntityImpl`.
+static kj::Array<capnp::word> Decompress(ZSTD_DCtx *context, ZSTD_DDict *dict,
+                                         std::string data) {
+  size_t bound = ZSTD_getFrameContentSize(data.data(), data.size());
+  kj::Array<capnp::word> array = kj::heapArray<capnp::word>(
+      (bound + sizeof(capnp::word) - 1u) / sizeof(capnp::word));
+
+  size_t ret = ZSTD_decompress_usingDDict(
+      context, array.asPtr().begin(), bound,
+      data.data(), data.size(), dict);
+
+  assert(!ZSTD_isError(ret));
+  assert(ret <= bound);
+  (void) ret;
+
+  return array;
+}
+
 }  // namespace
 
-class SQLiteEntityProviderImpl {
- public:
-  const std::string entity_id_list;
-  sqlite::Connection db;
-  sqlite::Statement get_version_number;
-  sqlite::Statement get_file_paths;
-  sqlite::Statement get_file_fragments;
-  sqlite::Statement clear_entity_id_list;
-  sqlite::Statement add_entity_id_to_list;
-  sqlite::Statement get_entity_ids;
-  sqlite::Statement expand_entity_id_list_with_redecls;
-  sqlite::Statement get_entities_by_name;
-  sqlite::Statement get_uses;
-  sqlite::Statement get_references;
-  sqlite::Statement get_fragments_covered_by_tokens;
+SQLiteDecompressionDictionary::SQLiteDecompressionDictionary(
+    std::filesystem::path path,
+    SQLiteDecompressionDictionary *prev) {
 
-#define DECLARE_GETTERS(type_name, lower_name, ...) \
-    sqlite::Statement get_ ## lower_name ## _ids_by_fragment ; \
-    sqlite::Statement get_ ## lower_name ## _by_id ; \
+  sqlite::Connection db(path, true  /* read_only */);
+  sqlite::Statement dictionaries = db.Prepare(
+      "SELECT entity_category, data FROM entity_dictionary");
 
-  MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_GETTERS,
-                              MX_IGNORE_ENTITY_CATEGORY,
-                              DECLARE_GETTERS,
-                              DECLARE_GETTERS)
-#undef DECLARE_GETTERS
+  std::string data;
+  while (dictionaries.ExecuteStep()) {
+    unsigned category = 0u;
+    data.clear();
+    dictionaries.Row().Columns(category, data);
+    if (!category || category >= kNumEntityCategories) {
+      assert(false);
+      continue;
+    }
 
-  SQLiteEntityProviderImpl(unsigned worker_index, std::filesystem::path path)
-      : entity_id_list("entity_id_list_" + std::to_string(worker_index)),
-        db(Connect(path, entity_id_list)),
-        get_version_number(db.Prepare(
-            "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
-        get_file_paths(db.Prepare(
-            "SELECT file_id, path FROM file_path")),
-        get_file_fragments(db.Prepare(
-            "SELECT DISTINCT(fragment_id) "
-            "FROM fragment_file "
-            "WHERE file_id = ?1")),
-        clear_entity_id_list(db.Prepare(
-            "DELETE FROM " + entity_id_list)),
-        add_entity_id_to_list(db.Prepare(
-            "INSERT OR IGNORE INTO " + entity_id_list +
-            " (entity_id) VALUES (?1)")),
-        get_entity_ids(db.Prepare(
-            "SELECT entity_id FROM " + entity_id_list)),
-        expand_entity_id_list_with_redecls(db.Prepare(
-            "INSERT OR IGNORE INTO " + entity_id_list  + " (entity_id) "
-            "WITH RECURSIVE transitive_redeclaration(entity_id) "
-            "AS NOT MATERIALIZED ("
-            "      SELECT l.entity_id FROM " + entity_id_list + " AS l"
-            "    UNION"
-            "      SELECT r1.redecl_id"
-            "      FROM transitive_redeclaration AS tc1"
-            "      JOIN redeclaration AS r1 ON tc1.entity_id = r1.decl_id"
-            "    UNION"
-            "      SELECT r2.decl_id"
-            "      FROM transitive_redeclaration AS tc2"
-            "      JOIN redeclaration AS r2 ON tc2.entity_id = r2.redecl_id"
-            "    UNION"
-            "      SELECT mn2.entity_id"
-            "      FROM transitive_redeclaration AS tc3"
-            "      JOIN mangled_name AS mn1 ON tc3.entity_id = mn1.entity_id"
-            "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
-            ") SELECT entity_id FROM transitive_redeclaration")),
+    // ZSTD dictionaries must be at least 8 bytes (for the header).
+    if (8u > data.size()) {
+      assert(false);
+      continue;
+    }
+
+    // Steal the old dictionary.
+    if (prev && prev->dict[category]) {
+      dict[category] = prev->dict[category];
+      prev->dict[category] = nullptr;
+      continue;
+    }
+
+    dict[category] = ZSTD_createDDict(data.data(), data.size());
+  }
+
+  dictionaries.Reset();
+}
+
+SQLiteDecompressionDictionary::~SQLiteDecompressionDictionary(void) {
+  for (ZSTD_DDict *d : dict) {
+    if (d) {
+      ZSTD_freeDDict(d);
+    }
+  }
+}
+
+SQLiteEntityProviderImpl::~SQLiteEntityProviderImpl(void) {
+  ZSTD_freeDCtx(decompression_context);
+}
+
+SQLiteEntityProviderImpl::SQLiteEntityProviderImpl(unsigned worker_index,
+                                                   std::filesystem::path path)
+    : entity_id_list("entity_id_list_" + std::to_string(worker_index)),
+      db(Connect(path, entity_id_list)),
+      get_version_number(db.Prepare(
+          "SELECT COUNT(rowid) FROM version WHERE action = ?1")),
+      get_file_paths(db.Prepare(
+          "SELECT file_id, path FROM file_path")),
+      get_file_fragments(db.Prepare(
+          "SELECT DISTINCT(fragment_id) "
+          "FROM fragment_file "
+          "WHERE file_id = ?1")),
+      clear_entity_id_list(db.Prepare(
+          "DELETE FROM " + entity_id_list)),
+      add_entity_id_to_list(db.Prepare(
+          "INSERT OR IGNORE INTO " + entity_id_list +
+          " (entity_id) VALUES (?1)")),
+      get_entity_ids(db.Prepare(
+          "SELECT entity_id FROM " + entity_id_list)),
+      expand_entity_id_list_with_redecls(db.Prepare(
+          "INSERT OR IGNORE INTO " + entity_id_list  + " (entity_id) "
+          "WITH RECURSIVE transitive_redeclaration(entity_id) "
+          "AS NOT MATERIALIZED ("
+          "      SELECT l.entity_id FROM " + entity_id_list + " AS l"
+          "    UNION"
+          "      SELECT r1.redecl_id"
+          "      FROM transitive_redeclaration AS tc1"
+          "      JOIN redeclaration AS r1 ON tc1.entity_id = r1.decl_id"
+          "    UNION"
+          "      SELECT r2.decl_id"
+          "      FROM transitive_redeclaration AS tc2"
+          "      JOIN redeclaration AS r2 ON tc2.entity_id = r2.redecl_id"
+          "    UNION"
+          "      SELECT mn2.entity_id"
+          "      FROM transitive_redeclaration AS tc3"
+          "      JOIN mangled_name AS mn1 ON tc3.entity_id = mn1.entity_id"
+          "      JOIN mangled_name AS mn2 ON mn1.data = mn2.data"
+          ") SELECT entity_id FROM transitive_redeclaration")),
 
 #if MX_DATABASE_HAS_FTS5
-        get_entities_by_name(db.Prepare(
-            "SELECT rowid FROM symbol WHERE name MATCH ?1 || '*'")),
+      get_entities_by_name(db.Prepare(
+          "SELECT rowid FROM symbol WHERE name MATCH ?1 || '*'")),
 #else
-        get_entities_by_name(db.Prepare(
-            "SELECT rowid FROM symbol WHERE name LIKE '%' || ?1 || '%'")),
+      get_entities_by_name(db.Prepare(
+          "SELECT rowid FROM symbol WHERE name LIKE '%' || ?1 || '%'")),
 #endif
-        get_uses(db.Prepare(
-            "SELECT DISTINCT(u.fragment_id) FROM use AS u "
-            "JOIN " + entity_id_list + " AS l "
-            "ON u.entity_id = l.entity_id")),
+      get_uses(db.Prepare(
+          "SELECT DISTINCT(u.fragment_id) FROM use AS u "
+          "JOIN " + entity_id_list + " AS l "
+          "ON u.entity_id = l.entity_id")),
 
-        get_references(db.Prepare(
-            "SELECT DISTINCT(r.from_entity_id) FROM reference AS r "
-            "JOIN " + entity_id_list + " AS l "
-            "ON r.to_entity_id = l.entity_id")),
+      get_references(db.Prepare(
+          "SELECT DISTINCT(r.from_entity_id) FROM reference AS r "
+          "JOIN " + entity_id_list + " AS l "
+          "ON r.to_entity_id = l.entity_id")),
 
-        get_fragments_covered_by_tokens(db.Prepare(
-            "SELECT DISTINCT(ffr.fragment_id) "
-            "FROM fragment_file_range AS ffr "
-            "JOIN " + entity_id_list + " AS el "
-            "ON ffr.first_file_token_offset <= el.entity_id "
-            "AND ffr.last_file_token_offset >= el.entity_id "
-            "AND ffr.file_id = ?1"))
+      get_fragments_covered_by_tokens(db.Prepare(
+          "SELECT DISTINCT(ffr.fragment_id) "
+          "FROM fragment_file_range AS ffr "
+          "JOIN " + entity_id_list + " AS el "
+          "ON ffr.first_file_token_offset <= el.entity_id "
+          "AND ffr.last_file_token_offset >= el.entity_id "
+          "AND ffr.file_id = ?1")),
 
 #define INIT_GETTERS(type_name, lower_name, enum_name, id) \
-      , get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
-            "SELECT " #lower_name "_id " \
-            "FROM " #lower_name " " \
-            "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
-            "ORDER BY " #lower_name "_id ASC")) \
-      , get_ ## lower_name ## _by_id(db.Prepare( \
-            "SELECT data " \
-            "FROM " #lower_name " " \
-            "WHERE " #lower_name "_id = ?1"))
+    get_ ## lower_name ## _ids_by_fragment(db.Prepare( \
+          "SELECT " #lower_name "_id " \
+          "FROM " #lower_name " " \
+          "WHERE entity_id_to_fragment_id(" #lower_name "_id) = ?1 " \
+          "ORDER BY " #lower_name "_id ASC")), \
+    get_ ## lower_name ## _by_id(db.Prepare( \
+          "SELECT data " \
+          "FROM " #lower_name " " \
+          "WHERE " #lower_name "_id = ?1")),
 
-      MX_FOR_EACH_ENTITY_CATEGORY(INIT_GETTERS,
-                                  MX_IGNORE_ENTITY_CATEGORY,
-                                  INIT_GETTERS,
-                                  INIT_GETTERS)
+    MX_FOR_EACH_ENTITY_CATEGORY(INIT_GETTERS,
+                                MX_IGNORE_ENTITY_CATEGORY,
+                                INIT_GETTERS,
+                                INIT_GETTERS)
 #undef INIT_GETTERS
 
-  {}  // Constructor body.
-};
+    decompression_context(ZSTD_createDCtx()) {}
 
 SQLiteEntityProvider::SQLiteEntityProvider(std::filesystem::path path)
     : db_path(path),
+      dict(new SQLiteDecompressionDictionary(path)),
       impl(
           [this] (unsigned worker_id) -> SQLiteEntityProviderImpl * {
             return new SQLiteEntityProviderImpl(worker_id, db_path);
@@ -192,31 +287,25 @@ unsigned SQLiteEntityProvider::VersionNumber(void) {
 
   ImplPtr context = impl.Lock();
 
-//  try {
-    sqlite::Transaction locker(context->db);
-    sqlite::Statement &stmt = context->get_version_number;
-    stmt.BindValues(0u);
-    if (!stmt.ExecuteStep()) {
-      stmt.Reset();
-      return 0u;
-    }
-
-    stmt.Row().Columns(start_version_number);
+  sqlite::Transaction locker(context->db);
+  sqlite::Statement &stmt = context->get_version_number;
+  stmt.BindValues(0u);
+  if (!stmt.ExecuteStep()) {
     stmt.Reset();
+    return 0u;
+  }
 
-    stmt.BindValues(1u);
-    if (!stmt.ExecuteStep()) {
-      stmt.Reset();
-      return 0u;
-    }
+  stmt.Row().Columns(start_version_number);
+  stmt.Reset();
 
-    stmt.Row().Columns(end_version_number);
+  stmt.BindValues(1u);
+  if (!stmt.ExecuteStep()) {
     stmt.Reset();
+    return 0u;
+  }
 
-//  } catch (...) {
-//    assert(false);
-//    return 0u;
-//  }
+  stmt.Row().Columns(end_version_number);
+  stmt.Reset();
 
   if (!start_version_number || !end_version_number) {
     return 0u;  // Uninitialized.
@@ -233,7 +322,9 @@ unsigned SQLiteEntityProvider::VersionNumber(const Ptr &) {
   return VersionNumber();
 }
 
-void SQLiteEntityProvider::VersionNumberChanged(unsigned) {}
+void SQLiteEntityProvider::VersionNumberChanged(unsigned) {
+  dict.reset(new SQLiteDecompressionDictionary(db_path, dict.get()));
+}
 
 FilePathMap SQLiteEntityProvider::ListFiles(const Ptr &) {
   FilePathMap res;
@@ -540,7 +631,7 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
   entity_ids.erase(it, entity_ids.end());
 }
 
-#define DEFINE_GETTERS(type_name, lower_name, enum_name, category) \
+#define DEFINE_GETTERS(type_name, lower_name, enum_name, category_) \
     gap::generator<type_name ## ImplPtr> SQLiteEntityProvider:: type_name ## sFor( \
         const Ptr &ep, PackedFragmentId id) { \
       ImplPtr context = impl.Lock(); \
@@ -554,6 +645,16 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
     \
     type_name ## ImplPtr SQLiteEntityProvider:: type_name ## For( \
         const Ptr &ep, RawEntityId raw_id) { \
+      if (raw_id == kInvalidEntityId) { \
+        return {}; \
+      } \
+      \
+      assert(CategoryFromEntityId(raw_id) == EntityCategory::enum_name); \
+      const auto cat_index = static_cast<unsigned>(EntityCategory::enum_name); \
+      auto ddict = dict->dict[cat_index]; \
+      if (!ddict) { \
+        return {}; \
+      } \
       ImplPtr context = impl.Lock(); \
       sqlite::Statement &query = context->get_ ## lower_name ## _by_id; \
       query.BindValues(raw_id); \
@@ -566,7 +667,11 @@ void SQLiteEntityProvider::FindSymbol(const Ptr &, std::string symbol,
       query.Row().Columns(data); \
       query.Reset(); \
       \
-      return std::make_shared<type_name ## Impl>(ep, std::move(data), raw_id); \
+      return std::make_shared<type_name ## Impl>( \
+          ep, \
+          Decompress(context->decompression_context, dict->dict[cat_index], \
+                     std::move(data)), \
+          raw_id); \
     }
 
 MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_GETTERS,

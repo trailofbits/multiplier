@@ -26,7 +26,7 @@ namespace mx {
       const EntityOffset offset; \
       \
       explicit name ## Impl(std::shared_ptr<EntityProvider> ep_, \
-                            std::string data_, RawEntityId id_); \
+                            kj::Array<capnp::word> data_, RawEntityId id_); \
     };
 
 MX_FOR_EACH_PSEUDO(MX_DEFINE_PSEUDO)

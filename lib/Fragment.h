@@ -130,7 +130,7 @@ class FragmentImpl final : public EntityImpl<rpc::Fragment> {
   const EntityOffset num_parsed_tokens;
   const EntityOffset num_tokens;
 
-  explicit FragmentImpl(EntityProvider::Ptr ep_, std::string data_,
+  explicit FragmentImpl(EntityProvider::Ptr ep_, kj::Array<capnp::word> data_,
                         RawEntityId id_);
 
   // Return the ID of the file containing the first token.

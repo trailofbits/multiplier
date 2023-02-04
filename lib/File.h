@@ -96,7 +96,8 @@ class FileImpl final : public EntityImpl<rpc::File> {
 
   ~FileImpl(void) noexcept;
 
-  explicit FileImpl(EntityProvider::Ptr ep_, std::string data_, RawEntityId id_);
+  explicit FileImpl(EntityProvider::Ptr ep_, kj::Array<capnp::word> data_,
+                    RawEntityId id_);
 
   // Return a reader for the tokens in the file.
   inline std::shared_ptr<const class TokenReader> TokenReader(

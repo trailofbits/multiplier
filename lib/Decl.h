@@ -19,7 +19,8 @@ class DeclImpl final : public EntityImpl<ast::Decl> {
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit DeclImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+  explicit DeclImpl(std::shared_ptr<EntityProvider> ep_,
+                    kj::Array<capnp::word> data_,
                     RawEntityId id_);
 };
 

@@ -19,7 +19,8 @@ class AttrImpl final : public EntityImpl<ast::Attr> {
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit AttrImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+  explicit AttrImpl(std::shared_ptr<EntityProvider> ep_,
+                    kj::Array<capnp::word> data_,
                     RawEntityId id_);
 };
 

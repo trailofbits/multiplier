@@ -14,8 +14,8 @@ namespace mx {
 
 #define MX_DEFINE_PSEUDO(name) \
     name ## Impl::name ## Impl(std::shared_ptr<EntityProvider> ep_, \
-                               std::string data_, RawEntityId id_) \
-        : EntityImpl<ast::name>(std::move(ep_), std::move(data_)), \
+                               kj::Array<capnp::word> data_, RawEntityId id_) \
+        : EntityImpl<ast::name>(std::move(ep_), kj::mv(data_)), \
           fragment_id(FragmentIdFromEntityId(id_).value()), \
           offset(FragmentOffsetFromEntityId(id_).value()) {} \
     \

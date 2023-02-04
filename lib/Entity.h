@@ -27,7 +27,7 @@ template <typename Root>
 class EntityImpl {
  private:
   // Stores the Cap'n-Proto serialized data.;
-  const std::string data;
+  const kj::Array<capnp::word> data;
   capnp::FlatArrayMessageReader message;
 
   using Reader = typename Root::Reader;
@@ -41,13 +41,10 @@ class EntityImpl {
   // The reader used to read all things from inside of this entity.
   const Reader reader;
 
-  explicit EntityImpl(std::shared_ptr<EntityProvider> ep_, std::string data_)
-      : data(std::move(data_)),
-        message(
-            capnp::arrayPtr(
-                reinterpret_cast<const capnp::word *>(data.data()),
-                data.size()),
-            kOptions),
+  explicit EntityImpl(std::shared_ptr<EntityProvider> ep_,
+                      kj::Array<capnp::word> data_)
+      : data(kj::mv(data_)),
+        message(data, kOptions),
         ep(std::move(ep_)),
         reader(message.getRoot<Root>()) {}
 };

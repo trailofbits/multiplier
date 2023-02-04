@@ -19,7 +19,8 @@ class MacroImpl final : public EntityImpl<ast::Macro> {
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit MacroImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+  explicit MacroImpl(std::shared_ptr<EntityProvider> ep_,
+                     kj::Array<capnp::word> data_,
                      RawEntityId id_);
 };
 

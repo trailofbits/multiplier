@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <memory>
 #include <multiplier/Types.h>
 
 namespace mx {

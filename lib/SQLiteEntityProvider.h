@@ -6,12 +6,14 @@
 
 #pragma once
 
+#include <array>
 #include <filesystem>
 #include <memory>
 #include <multiplier/Index.h>
 #include <vector>
 
 #include "ThreadLocal.h"
+#include "Types.h"
 
 namespace sqlite {
 class Statement;
@@ -28,6 +30,7 @@ class RegexQueryResultImpl;
 class WeggliQueryResultImpl;
 
 class SQLiteEntityProviderImpl;
+class SQLiteDecompressionDictionary;
 
 class SQLiteEntityProvider final : public EntityProvider {
  private:
@@ -36,6 +39,8 @@ class SQLiteEntityProvider final : public EntityProvider {
   using ImplPtr = std::shared_ptr<SQLiteEntityProviderImpl>;
 
   const std::filesystem::path db_path;
+
+  std::unique_ptr<SQLiteDecompressionDictionary> dict;
   ThreadLocal<SQLiteEntityProviderImpl> impl;
 
   RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context);

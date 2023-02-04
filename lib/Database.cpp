@@ -575,7 +575,7 @@ void DatabaseWriterImpl::InitDictionaries(void) {
     }
 
     // ZSTD dictionaries must be at least 8 bytes (for the header).
-    if (8u < data.size()) {
+    if (8u > data.size()) {
       assert(false);
       continue;
     }

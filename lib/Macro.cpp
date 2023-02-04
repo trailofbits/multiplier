@@ -18,9 +18,10 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 
 }  // namespace
 
-MacroImpl::MacroImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
-                    RawEntityId id_)
-    : EntityImpl<ast::Macro>(std::move(ep_), std::move(data_)),
+MacroImpl::MacroImpl(std::shared_ptr<EntityProvider> ep_,
+                     kj::Array<capnp::word> data_,
+                     RawEntityId id_)
+    : EntityImpl<ast::Macro>(std::move(ep_), kj::mv(data_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()) {}
 

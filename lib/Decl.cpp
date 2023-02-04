@@ -18,9 +18,10 @@ static thread_local RawEntityIdList tIgnoredRedecls;
 
 }  // namespace
 
-DeclImpl::DeclImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+DeclImpl::DeclImpl(std::shared_ptr<EntityProvider> ep_,
+                   kj::Array<capnp::word> data_,
                    RawEntityId id_)
-    : EntityImpl<ast::Decl>(std::move(ep_), std::move(data_)),
+    : EntityImpl<ast::Decl>(std::move(ep_), kj::mv(data_)),
       fragment_id(FragmentIdFromEntityId(id_).value()),
       offset(FragmentOffsetFromEntityId(id_).value()) {}
 

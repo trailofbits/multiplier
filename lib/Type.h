@@ -19,7 +19,8 @@ class TypeImpl final : public EntityImpl<ast::Type> {
   const PackedFragmentId fragment_id;
   const EntityOffset offset;
 
-  explicit TypeImpl(std::shared_ptr<EntityProvider> ep_, std::string data_,
+  explicit TypeImpl(std::shared_ptr<EntityProvider> ep_,
+                    kj::Array<capnp::word> data_,
                     RawEntityId id_);
 };
 
