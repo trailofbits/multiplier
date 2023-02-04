@@ -10,6 +10,7 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include <vector>

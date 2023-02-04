@@ -7,10 +7,10 @@
 #pragma once
 
 #define FOR_EACH_ENTITY_CATEGORY(m) \
-    m(Decl, decl) \
-    m(Stmt, stmt) \
+    m(Decl, declaration) \
+    m(Stmt, statement) \
     m(Type, type) \
-    m(Attr, attr) \
+    m(Attr, attribute) \
     m(Macro, macro) \
     m(TemplateArgument, template_argument) \
     m(TemplateParameterList, template_parameter_list)\
