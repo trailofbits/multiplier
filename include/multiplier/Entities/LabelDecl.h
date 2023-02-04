@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -34,29 +35,9 @@ class LabelDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<LabelDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<LabelDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : LabelDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<LabelDecl> in(const Fragment &frag);
+  static gap::generator<LabelDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::LABEL;
@@ -68,7 +49,15 @@ class LabelDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<LabelDecl> from(const TokenContext &c);
+  gap::generator<LabelDecl> redeclarations(void) const;
+  inline static std::optional<LabelDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<LabelDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<LabelDecl> from(const NamedDecl &parent);
 
   inline static std::optional<LabelDecl> from(const std::optional<NamedDecl> &parent) {

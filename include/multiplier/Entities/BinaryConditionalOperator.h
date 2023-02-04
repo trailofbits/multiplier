@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -38,29 +39,9 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<BinaryConditionalOperator> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<BinaryConditionalOperator> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : BinaryConditionalOperator::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<BinaryConditionalOperator> in(const Fragment &frag);
+  static gap::generator<BinaryConditionalOperator> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::BINARY_CONDITIONAL_OPERATOR;
@@ -72,7 +53,14 @@ class BinaryConditionalOperator : public AbstractConditionalOperator {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<BinaryConditionalOperator> from(const TokenContext &c);
+  inline static std::optional<BinaryConditionalOperator> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<BinaryConditionalOperator> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<BinaryConditionalOperator> from(const AbstractConditionalOperator &parent);
 
   inline static std::optional<BinaryConditionalOperator> from(const std::optional<AbstractConditionalOperator> &parent) {

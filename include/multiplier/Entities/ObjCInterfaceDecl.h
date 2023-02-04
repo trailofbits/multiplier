@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -41,29 +42,9 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCInterfaceDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCInterfaceDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag);
+  static gap::generator<ObjCInterfaceDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_INTERFACE;
@@ -75,7 +56,15 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCInterfaceDecl> from(const TokenContext &c);
+  gap::generator<ObjCInterfaceDecl> redeclarations(void) const;
+  inline static std::optional<ObjCInterfaceDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCInterfaceDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
 
   inline static std::optional<ObjCInterfaceDecl> from(const std::optional<ObjCContainerDecl> &parent) {
@@ -121,6 +110,7 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool is_arc_weakref_unavailable(void) const;
   bool is_implicit_interface_declaration(void) const;
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
+  bool is_this_declaration_a_definition(void) const;
   std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
   gap::generator<ObjCIvarDecl> instance_variables(void) const;
   std::optional<ObjCCategoryDecl> nth_known_categorie(unsigned n) const;

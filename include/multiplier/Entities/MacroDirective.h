@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -32,19 +33,21 @@ class MacroDirective : public Macro {
   friend class FragmentImpl;
   friend class Macro;
  public:
-  inline static gap::generator<MacroDirective> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<MacroDirective> in(const Fragment &frag);
 
   static gap::generator<MacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
   static gap::generator<MacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<MacroDirective> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<MacroDirective> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<MacroDirective> from(const Macro &parent);
 

@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -61,18 +62,6 @@ class Decl {
   PackedDeclId id(void) const;
   gap::generator<Reference> references(void) const;
 
-  inline static std::optional<Decl> from(const Decl &self) {
-    return self;
-  }
-
-  inline static std::optional<Decl> from(const std::optional<Decl> &self) {
-    return self;
-  }
-
-  inline static std::optional<Decl> from(const TokenContext &c) {
-    return c.as_declaration();
-  }
-
   std::optional<Decl> parent_declaration(void) const;
   std::optional<Stmt> parent_statement(void) const;
   std::optional<Decl> definition(void) const;
@@ -83,35 +72,31 @@ class Decl {
   static gap::generator<Decl> in_internal(const Fragment &fragment);
 
  public:
-  inline static gap::generator<Decl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<Decl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : Decl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<Decl> containing(const Decl &decl);
   static gap::generator<Decl> containing(const Stmt &stmt);
 
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
+
+  inline static std::optional<Decl> from(const Decl &self) {
+    return self;
+  }
+
+  inline static std::optional<Decl> from(const std::optional<Decl> &self) {
+    return self;
+  }
+
+  inline static std::optional<Decl> from(const Reference &r) {
+    return r.as_declaration();
+  }
+
+  inline static std::optional<Decl> from(const TokenContext &t) {
+    return t.as_declaration();
+  }
 
   std::optional<Attr> nth_attribute(unsigned n) const;
   gap::generator<Attr> attributes(void) const;
@@ -146,6 +131,7 @@ class Decl {
   bool is_template_parameter(void) const;
   bool is_template_parameter_pack(void) const;
   bool is_templated(void) const;
+  bool is_this_declaration_referenced(void) const;
   bool is_top_level_declaration_in_obj_c_container(void) const;
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;

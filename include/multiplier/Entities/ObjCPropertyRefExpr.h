@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -39,29 +40,9 @@ class ObjCPropertyRefExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<ObjCPropertyRefExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCPropertyRefExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCPropertyRefExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCPropertyRefExpr> in(const Fragment &frag);
+  static gap::generator<ObjCPropertyRefExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_PROPERTY_REF_EXPR;
@@ -73,7 +54,14 @@ class ObjCPropertyRefExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCPropertyRefExpr> from(const TokenContext &c);
+  inline static std::optional<ObjCPropertyRefExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCPropertyRefExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<ObjCPropertyRefExpr> from(const Expr &parent);
 
   inline static std::optional<ObjCPropertyRefExpr> from(const std::optional<Expr> &parent) {

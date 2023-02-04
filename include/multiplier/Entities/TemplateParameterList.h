@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -54,6 +55,22 @@ class TemplateParameterList {
 
   PackedTemplateParameterListId id(void) const;
   gap::generator<Reference> references(void) const;
+
+  inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
+    return self;
+  }
+
+  inline static std::optional<TemplateParameterList> from(const std::optional<TemplateParameterList> &self) {
+    return self;
+  }
+
+  inline static std::optional<TemplateParameterList> from(const Reference &r) {
+    return r.as_template_parameter_list();
+  }
+
+  inline static std::optional<TemplateParameterList> from(const TokenContext &t) {
+    return t.as_template_parameter_list();
+  }
 
   unsigned num_parameters(void) const;
   unsigned num_required_parameters(void) const;

@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -53,6 +54,19 @@ class Macro {
   PackedMacroId id(void) const;
   gap::generator<Reference> references(void) const;
 
+ protected:
+  static gap::generator<Macro> in_internal(const Fragment &fragment);
+  static gap::generator<Macro> containing_internal(const Token &token);
+
+ public:
+  static gap::generator<Macro> in(const Fragment &frag);
+
+  static gap::generator<Macro> containing(const Macro &macro);
+  bool contains(const Macro &macro);
+
+  static gap::generator<Macro> containing(const Token &token);
+  bool contains(const Token &token);
+
   inline static std::optional<Macro> from(const Macro &self) {
     return self;
   }
@@ -61,24 +75,13 @@ class Macro {
     return self;
   }
 
- protected:
-  static gap::generator<Macro> in_internal(const Fragment &fragment);
-  static gap::generator<Macro> containing_internal(const Token &token);
-
- public:
-  inline static gap::generator<Macro> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
+  inline static std::optional<Macro> from(const Reference &r) {
+    return r.as_macro();
   }
 
-  static gap::generator<Macro> containing(const Macro &macro);
-  bool contains(const Macro &macro);
-
-  static gap::generator<Macro> containing(const Token &token);
-  bool contains(const Token &token);
+  inline static std::optional<Macro> from(const TokenContext &t) {
+    return t.as_macro();
+  }
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;

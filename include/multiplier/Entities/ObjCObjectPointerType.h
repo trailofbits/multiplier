@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -35,35 +36,22 @@ class ObjCObjectPointerType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static gap::generator<ObjCObjectPointerType> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCObjectPointerType> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCObjectPointerType::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCObjectPointerType> in(const Fragment &frag);
+  static gap::generator<ObjCObjectPointerType> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::OBJ_C_OBJECT_POINTER;
   }
 
-  static std::optional<ObjCObjectPointerType> from(const TokenContext &c);
+  inline static std::optional<ObjCObjectPointerType> from(const Reference &r) {
+    return from(r.as_type());
+  }
+
+  inline static std::optional<ObjCObjectPointerType> from(const TokenContext &t) {
+    return from(t.as_type());
+  }
+
   static std::optional<ObjCObjectPointerType> from(const Type &parent);
 
   inline static std::optional<ObjCObjectPointerType> from(const std::optional<Type> &parent) {

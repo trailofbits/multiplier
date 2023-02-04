@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -33,29 +34,9 @@ class OMPMaskedDirective : public OMPExecutableDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static gap::generator<OMPMaskedDirective> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<OMPMaskedDirective> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : OMPMaskedDirective::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<OMPMaskedDirective> in(const Fragment &frag);
+  static gap::generator<OMPMaskedDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OMP_MASKED_DIRECTIVE;
@@ -67,7 +48,14 @@ class OMPMaskedDirective : public OMPExecutableDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPMaskedDirective> from(const TokenContext &c);
+  inline static std::optional<OMPMaskedDirective> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<OMPMaskedDirective> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<OMPMaskedDirective> from(const OMPExecutableDirective &parent);
 
   inline static std::optional<OMPMaskedDirective> from(const std::optional<OMPExecutableDirective> &parent) {

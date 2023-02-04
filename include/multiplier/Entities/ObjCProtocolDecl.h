@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -36,29 +37,9 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<ObjCProtocolDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCProtocolDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCProtocolDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCProtocolDecl> in(const Fragment &frag);
+  static gap::generator<ObjCProtocolDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_PROTOCOL;
@@ -70,7 +51,15 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCProtocolDecl> from(const TokenContext &c);
+  gap::generator<ObjCProtocolDecl> redeclarations(void) const;
+  inline static std::optional<ObjCProtocolDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCProtocolDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ObjCProtocolDecl> from(const ObjCContainerDecl &parent);
 
   inline static std::optional<ObjCProtocolDecl> from(const std::optional<ObjCContainerDecl> &parent) {
@@ -104,6 +93,7 @@ class ObjCProtocolDecl : public ObjCContainerDecl {
   std::string_view obj_c_runtime_name_as_string(void) const;
   bool has_definition(void) const;
   bool is_non_runtime_protocol(void) const;
+  bool is_this_declaration_a_definition(void) const;
   std::optional<Token> nth_protocol_token(unsigned n) const;
   gap::generator<Token> protocol_tokens(void) const;
   std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;

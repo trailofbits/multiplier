@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -33,13 +34,7 @@ class MacroVAOpt : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
-  inline static gap::generator<MacroVAOpt> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<MacroVAOpt> in(const Fragment &frag);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::VA_OPT;
@@ -50,6 +45,14 @@ class MacroVAOpt : public MacroSubstitution {
 
   static gap::generator<MacroVAOpt> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<MacroVAOpt> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<MacroVAOpt> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<MacroVAOpt> from(const MacroSubstitution &parent);
 

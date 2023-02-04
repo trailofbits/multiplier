@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -53,6 +54,22 @@ class Designator {
 
   PackedDesignatorId id(void) const;
   gap::generator<Reference> references(void) const;
+
+  inline static std::optional<Designator> from(const Designator &self) {
+    return self;
+  }
+
+  inline static std::optional<Designator> from(const std::optional<Designator> &self) {
+    return self;
+  }
+
+  inline static std::optional<Designator> from(const Reference &r) {
+    return r.as_designator();
+  }
+
+  inline static std::optional<Designator> from(const TokenContext &t) {
+    return t.as_designator();
+  }
 
   bool is_field_designator(void) const;
   bool is_array_designator(void) const;

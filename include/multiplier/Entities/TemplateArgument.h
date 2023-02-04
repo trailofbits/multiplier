@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -55,6 +56,22 @@ class TemplateArgument {
 
   PackedTemplateArgumentId id(void) const;
   gap::generator<Reference> references(void) const;
+
+  inline static std::optional<TemplateArgument> from(const TemplateArgument &self) {
+    return self;
+  }
+
+  inline static std::optional<TemplateArgument> from(const std::optional<TemplateArgument> &self) {
+    return self;
+  }
+
+  inline static std::optional<TemplateArgument> from(const Reference &r) {
+    return r.as_template_argument();
+  }
+
+  inline static std::optional<TemplateArgument> from(const TokenContext &t) {
+    return t.as_template_argument();
+  }
 
   TemplateArgumentKind kind(void) const;
   bool is_null(void) const;

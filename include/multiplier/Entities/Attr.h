@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -52,6 +53,14 @@ class Attr {
   PackedAttrId id(void) const;
   gap::generator<Reference> references(void) const;
 
+ protected:
+  static gap::generator<Attr> in_internal(const Fragment &fragment);
+
+ public:
+  static gap::generator<Attr> in(const Fragment &frag);
+  static gap::generator<Attr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
   inline static std::optional<Attr> from(const Attr &self) {
     return self;
   }
@@ -60,36 +69,12 @@ class Attr {
     return self;
   }
 
-  inline static std::optional<Attr> from(const TokenContext &c) {
-    return c.as_attribute();
+  inline static std::optional<Attr> from(const Reference &r) {
+    return r.as_attribute();
   }
 
- protected:
-  static gap::generator<Attr> in_internal(const Fragment &fragment);
-
- public:
-  inline static gap::generator<Attr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<Attr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : Attr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
+  inline static std::optional<Attr> from(const TokenContext &t) {
+    return t.as_attribute();
   }
 
   Token token(void) const;

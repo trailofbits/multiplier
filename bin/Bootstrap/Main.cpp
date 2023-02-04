@@ -1773,6 +1773,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     << "#include <vector>\n\n"
     << "#include <gap/core/generator.hpp>\n"
     << "#include \"../Iterator.h\"\n"
+    << "#include \"../Reference.h\"\n"
     << "#include \"../Types.h\"\n"
     << "#include \"../Token.h\"\n\n";
 
@@ -1839,7 +1840,7 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     nth_entity_reader = "NthDecl";
 
-  } else if (is_stmt) {
+  } else if (is_statement) {
     needed_decls.insert("StmtKind");
 
     serialize_cpp_os
@@ -1887,7 +1888,7 @@ MethodListPtr CodeGenerator::RunOnClass(
     nth_entity_reader = "NthType";
 
   // Attributes. Treated like entities because they have a class hierarchy.
-  } else if (is_attr) {
+  } else if (is_attribute) {
     needed_decls.insert("AttrKind");
 
     serialize_cpp_os
@@ -2121,20 +2122,12 @@ MethodListPtr CodeGenerator::RunOnClass(
     class_os
         << "  Packed" << class_name << "Id id(void) const;\n"
         << "  gap::generator<Reference> references(void) const;\n\n";
+
     seen_methods->emplace("id");  // Manual.
     seen_methods->emplace("references");  // Manual.
 
     if (class_name == "Decl") {
       class_os
-          << "  inline static std::optional<Decl> from(const Decl &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Decl> from(const std::optional<Decl> &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Decl> from(const TokenContext &c) {\n"
-          << "    return c.as_declaration();\n"
-          << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<Decl> definition(void) const;\n"
@@ -2166,15 +2159,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (class_name == "Stmt") {
       class_os
-          << "  inline static std::optional<Stmt> from(const Stmt &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Stmt> from(const std::optional<Stmt> &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Stmt> from(const TokenContext &c) {\n"
-          << "    return c.as_statement();\n"
-          << "  }\n\n"
           << "  std::optional<Decl> parent_declaration(void) const;\n"
           << "  std::optional<Stmt> parent_statement(void) const;\n"
           << "  std::optional<PackedDeclId> referenced_declaration_id(void) const;\n"
@@ -2227,15 +2211,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (class_name == "Type") {
       class_os
-          << "  inline static std::optional<Type> from(const Type &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Type> from(const std::optional<Type> &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Type> from(const TokenContext &c) {\n"
-          << "    return c.as_type();\n"
-          << "  }\n\n"
           << " protected:\n"
           << "  static gap::generator<Type> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -2244,15 +2219,6 @@ MethodListPtr CodeGenerator::RunOnClass(
     
     } else if (class_name == "Attr") {
       class_os
-          << "  inline static std::optional<Attr> from(const Attr &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Attr> from(const std::optional<Attr> &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Attr> from(const TokenContext &c) {\n"
-          << "    return c.as_attribute();\n"
-          << "  }\n\n"
           << " protected:\n"
           << "  static gap::generator<Attr> in_internal(const Fragment &fragment);\n\n"
           << " public:\n";
@@ -2261,12 +2227,6 @@ MethodListPtr CodeGenerator::RunOnClass(
 
     } else if (class_name == "Macro") {
       class_os
-          << "  inline static std::optional<Macro> from(const Macro &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
-          << "  inline static std::optional<Macro> from(const std::optional<Macro> &self) {\n"
-          << "    return self;\n"
-          << "  }\n\n"
           << " protected:\n"
           << "  static gap::generator<Macro> in_internal(const Fragment &fragment);\n"
           << "  static gap::generator<Macro> containing_internal(const Token &token);\n\n"
@@ -2291,43 +2251,54 @@ MethodListPtr CodeGenerator::RunOnClass(
   }
 
   // NOTE(pag): Macro containing a token is handled later.
-  if (is_declaration || is_stmt || is_type || is_attr) {
+  if (is_declaration || is_statement || is_attribute || is_type) {
 
     class_os
-        << "  inline static gap::generator<"
-        << class_name << "> in(const Fragment &frag) {\n"
-        << "    for (auto e : in_internal(frag)) {\n"
-        << "      if (auto d = from(e)) {\n"
-        << "        co_yield *d;\n"
-        << "      }\n"
+        << "  static gap::generator<"
+        << class_name << "> in(const Fragment &frag);\n"
+        << "  static gap::generator<" << class_name
+        << "> containing(const Token &tok);\n"
+        << "  bool contains(const Token &tok) const;\n\n";
+
+    lib_cpp_os
+        << "gap::generator<"
+        << class_name << "> " << class_name << "::in(const Fragment &frag) {\n"
+        << "  for (auto e : in_internal(frag)) {\n"
+        << "    if (auto d = from(e)) {\n"
+        << "      co_yield *d;\n"
         << "    }\n"
-        << "  }\n\n"
-        << "  inline static gap::generator<" << class_name
-        << "> containing(const Token &tok) {\n"
-        << "    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {\n"
-        << "      if (auto d = from(*ctx)) {\n"
-        << "        co_yield *d;\n"
-        << "      }\n"
+        << "  }\n"
+        << "}\n\n"
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::containing(const Token &tok) {\n"
+        << "  for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {\n"
+        << "    if (auto d = from(*ctx)) {\n"
+        << "      co_yield *d;\n"
         << "    }\n"
-        << "  }\n\n"
-        << "  inline bool contains(const Token &tok) {\n"
-        << "    auto id_ = id();\n"
-        << "    for (auto &parent : " << class_name << "::containing(tok)) {\n"
-        << "      if (parent.id() == id_) { return true; }\n"
-        << "    }\n"
-        << "    return false;\n"
-        << "  }\n\n";
+        << "  }\n"
+        << "}\n\n"
+        << "bool " << class_name << "::contains(const Token &tok) const {\n"
+        << "  auto id_ = id();\n"
+        << "  for (auto &parent : " << class_name << "::containing(tok)) {\n"
+        << "    if (parent.id() == id_) { return true; }\n"
+        << "  }\n"
+        << "  return false;\n"
+        << "}\n\n";
 
   } else if (is_macro) {
     class_os
-        << "  inline static gap::generator<" << class_name
-        << "> in(const Fragment &frag) {\n"
-        << "    for (auto m : in_internal(frag)) {\n"
-        << "      if (auto d = from(m)) {\n"
-        << "        co_yield *d;\n"
-        << "      }\n"
+        << "  static gap::generator<" << class_name
+        << "> in(const Fragment &frag);\n\n";
+
+    lib_cpp_os
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::in(const Fragment &frag) {\n"
+        << "  for (auto m : in_internal(frag)) {\n"
+        << "    if (auto d = from(m)) {\n"
+        << "      co_yield std::move(d.value());\n"
         << "    }\n"
-        << "  }\n\n";
+        << "  }\n"
+        << "}\n\n";
   }
 
   if (is_declaration) {
@@ -2380,7 +2351,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "  return false;\n"
         << "}\n\n";
 
-  } else if (is_stmt) {
+  } else if (is_statement) {
 
     if (is_concrete) {
       auto snake_name = CapitalCaseToSnakeCase(class_name);
@@ -2441,7 +2412,7 @@ MethodListPtr CodeGenerator::RunOnClass(
           << "  }\n\n";
     }
   
-  } else if (is_attr) {
+  } else if (is_attribute) {
     if (is_concrete) {
       auto snake_name = CapitalCaseToSnakeCase(class_name);
       snake_name = snake_name.substr(0u, snake_name.size() - 5u);
@@ -2516,55 +2487,63 @@ MethodListPtr CodeGenerator::RunOnClass(
         << "}\n\n";
   }
 
-  // TODO!!!! Make `::from(const Reference &)` :-D
+  // Add derived overrides for redeclarations.
+  if (class_name != "Decl" && gDeclNames.count(class_name)) {
+    class_os
+        << "  gap::generator<" << class_name
+        << "> redeclarations(void) const;\n";
+
+    lib_cpp_os
+        << "gap::generator<" << class_name
+        << "> " << class_name << "::redeclarations(void) const {\n"
+        << "  for (Decl r : Decl::redeclarations()) {\n"
+        << "    if (std::optional<" << class_name << "> dr = "
+        << class_name << "::from(r)) {\n"
+        << "      co_yield std::move(dr.value());\n"
+        << "      continue;\n"
+        << "    }\n"
+        << "    assert(false);\n  // Wrong type?\n"
+        << "  }\n"
+        << "  co_return;\n"
+        << "}\n\n";
+  }
+
+  // Conversions from token contexts and references to entities.
+  if (false) {
 #define DECLARE_DEFINE_FROM(type_name, lower_name) \
-    if (#type_name ==)
+    } else if (class_name == #type_name) { \
+      class_os \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const " << class_name << " &self) {\n" \
+          << "    return self;\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const std::optional<" << class_name \
+          << "> &self) {\n" \
+          << "    return self;\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const Reference &r) {\n" \
+          << "    return r.as_" #lower_name "();\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const TokenContext &t) {\n" \
+          << "    return t.as_" #lower_name "();\n" \
+          << "  }\n\n"; \
+      \
+    } else if (g ## type_name ## Names.count(class_name)) { \
+      class_os \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const Reference &r) {\n" \
+          << "    return from(r.as_" #lower_name "());\n" \
+          << "  }\n\n" \
+          << "  inline static std::optional<" << class_name \
+          << "> from(const TokenContext &t) {\n" \
+          << "    return from(t.as_" #lower_name "());\n" \
+          << "  }\n\n";
 
   FOR_EACH_ENTITY_CATEGORY(DECLARE_DEFINE_FROM)
 #undef DECLARE_DEFINE_FROM
-
-  if (is_declaration && class_name != "Decl") {
-    class_os
-        << "  static std::optional<" << class_name
-        << "> from(const TokenContext &c);\n";
-    lib_cpp_os
-        << "std::optional<" << class_name
-        << "> " << class_name << "::from(const TokenContext &c) {\n"
-        << "  return from(c.as_declaration());\n"
-        << "}\n\n";
-
-  } else if (is_stmt && class_name != "Stmt") {
-    class_os
-        << "  static std::optional<" << class_name
-        << "> from(const TokenContext &c);\n";
-
-    lib_cpp_os
-        << "std::optional<" << class_name
-        << "> " << class_name << "::from(const TokenContext &c) {\n"
-        << "  return from(c.as_statement());\n"
-        << "}\n\n";
-
-  } else if (is_type && class_name != "Type") {
-    class_os
-        << "  static std::optional<" << class_name
-        << "> from(const TokenContext &c);\n";
-
-    lib_cpp_os
-        << "std::optional<" << class_name
-        << "> " << class_name << "::from(const TokenContext &c) {\n"
-        << "  return from(c.as_type());\n"
-        << "}\n\n";
-
-  } else if (is_attr && class_name != "Attr") {
-    class_os
-        << "  static std::optional<" << class_name
-        << "> from(const TokenContext &c);\n";
-
-    lib_cpp_os
-        << "std::optional<" << class_name
-        << "> " << class_name << "::from(const TokenContext &c) {\n"
-        << "  return from(c.as_attribute());\n"
-        << "}\n\n";
   }
 
   // Derived classes have optional conversion operators with all of their
@@ -2598,7 +2577,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  return from(reinterpret_cast<const Decl &>(parent));\n"
             << "}\n\n";
 
-      } else if (is_stmt) {
+      } else if (is_statement) {
         lib_cpp_os
             << "  return from(reinterpret_cast<const Stmt &>(parent));\n"
             << "}\n\n";
@@ -2608,7 +2587,7 @@ MethodListPtr CodeGenerator::RunOnClass(
             << "  return from(reinterpret_cast<const Type &>(parent));\n"
             << "}\n\n";
 
-      } else if (is_attr) {
+      } else if (is_attribute) {
         lib_cpp_os
             << "  return from(reinterpret_cast<const Attr &>(parent));\n"
             << "}\n\n";
@@ -2652,7 +2631,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "    case mx::DeclKind::";
 
-      } else if (is_stmt) {
+      } else if (is_statement) {
         lib_cpp_os
             << "    case mx::StmtKind::";
 
@@ -2664,7 +2643,7 @@ MethodListPtr CodeGenerator::RunOnClass(
         lib_cpp_os
             << "    case mx::TypeKind::";
 
-      } else if (is_attr) {
+      } else if (is_attribute) {
         grand_child_class_name.pop_back();  // `r`
         grand_child_class_name.pop_back();  // `t`
         grand_child_class_name.pop_back();  // `t`

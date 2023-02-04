@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -37,29 +38,9 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<FunctionTemplateDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<FunctionTemplateDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : FunctionTemplateDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<FunctionTemplateDecl> in(const Fragment &frag);
+  static gap::generator<FunctionTemplateDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION_TEMPLATE;
@@ -71,7 +52,15 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<FunctionTemplateDecl> from(const TokenContext &c);
+  gap::generator<FunctionTemplateDecl> redeclarations(void) const;
+  inline static std::optional<FunctionTemplateDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<FunctionTemplateDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<FunctionTemplateDecl> from(const RedeclarableTemplateDecl &parent);
 
   inline static std::optional<FunctionTemplateDecl> from(const std::optional<RedeclarableTemplateDecl> &parent) {
@@ -113,6 +102,7 @@ class FunctionTemplateDecl : public RedeclarableTemplateDecl {
   }
 
   bool is_abbreviated(void) const;
+  bool is_this_declaration_a_definition(void) const;
 };
 
 static_assert(sizeof(FunctionTemplateDecl) == sizeof(RedeclarableTemplateDecl));

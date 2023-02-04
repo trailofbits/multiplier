@@ -16,6 +16,7 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
 
@@ -56,6 +57,22 @@ class CXXBaseSpecifier {
 
   PackedCXXBaseSpecifierId id(void) const;
   gap::generator<Reference> references(void) const;
+
+  inline static std::optional<CXXBaseSpecifier> from(const CXXBaseSpecifier &self) {
+    return self;
+  }
+
+  inline static std::optional<CXXBaseSpecifier> from(const std::optional<CXXBaseSpecifier> &self) {
+    return self;
+  }
+
+  inline static std::optional<CXXBaseSpecifier> from(const Reference &r) {
+    return r.as_cxx_base_specifier();
+  }
+
+  inline static std::optional<CXXBaseSpecifier> from(const TokenContext &t) {
+    return t.as_cxx_base_specifier();
+  }
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;
