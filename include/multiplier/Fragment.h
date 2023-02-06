@@ -97,8 +97,11 @@ class Fragment {
   // The range of parsed tokens in this fragment.
   TokenRange parsed_tokens(void) const;
 
+  // Return references to this fragment.
+  gap::generator<Reference> references(void) const;
+
   // Return the list of top-level declarations in this fragment.
-  std::vector<Decl> top_level_declarations(void) const;
+  gap::generator<Decl> top_level_declarations(void) const;
 
   // Return the list of top-level macros or macro tokens in this code.
   gap::generator<MacroOrToken> preprocessed_code(void) const;

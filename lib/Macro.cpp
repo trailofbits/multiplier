@@ -9,6 +9,7 @@
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
+#include "Reference.h"
 #include "Types.h"
 
 namespace mx {
@@ -35,7 +36,7 @@ SpecificEntityId<MacroId> Macro::id(void) const {
 
 gap::generator<Macro> Macro::in_internal(const Fragment &fragment) {
   FragmentId fid(fragment.impl->fragment_id);
-  auto &ep = fragment.impl->ep;
+  const EntityProvider::Ptr &ep = fragment.impl->ep;
   for (MacroImplPtr reader : ep->MacrosFor(ep, fid)) {
     co_yield Macro(std::move(reader));
   }
@@ -73,26 +74,12 @@ gap::generator<Macro> Macro::containing_internal(const Token &token) {
 
 // References to this macro definition.
 gap::generator<Reference> Macro::references(void) const {
-  // TODO!!!
-  co_return;
-//  const EntityProvider::Ptr &ep = impl->ep;
-//  RawEntityIdList references_ids;
-//
-//  tIgnoredRedecls.clear();
-//  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
-//  assert(tIgnoredRedecls.empty());
-//
-//  for (RawEntityId raw_macro_id : references_ids) {
-//    VariantId vid = EntityId(raw_macro_id).Unpack();
-//    if (!std::holds_alternative<MacroId>(vid)) {
-//      assert(false);
-//      continue;
-//    }
-//
-//    if (auto eptr = ep->MacroFor(ep, raw_macro_id)) {
-//      co_yield Macro(std::move(eptr));
-//    }
-//  }
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    }
+  }
 }
 
 }  // namespace mx

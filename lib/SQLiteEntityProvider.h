@@ -43,7 +43,8 @@ class SQLiteEntityProvider final : public EntityProvider {
   std::unique_ptr<SQLiteDecompressionDictionary> dict;
   ThreadLocal<SQLiteEntityProviderImpl> impl;
 
-  RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context);
+  RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context,
+                                     EntityCategory category);
 
  public:
   virtual ~SQLiteEntityProvider(void) noexcept;
@@ -64,16 +65,19 @@ class SQLiteEntityProvider final : public EntityProvider {
   FragmentIdList FragmentsCoveringTokens(
       const Ptr &, PackedFileId, std::vector<EntityOffset> tokens) final;
 
-  RawEntityIdList Redeclarations(
-      const Ptr &, SpecificEntityId<DeclId>) final;
+  ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, RawEntityId kind_id) final;
 
-  void FillUses(const Ptr &, RawEntityId eid,
-                RawEntityIdList &redecl_ids_out,
-                FragmentIdList &fragment_ids_out) final;
+  ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, std::string_view kind_data) final;
 
-  void FillReferences(const Ptr &, RawEntityId eid,
-                      RawEntityIdList &redecl_ids_out,
-                      RawEntityIdList &references_ids_out) final;
+  bool AddReference(const Ptr &ep, RawEntityId kind_id,
+                              RawEntityId from_id, RawEntityId to_id) final;
+
+  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+
+  gap::generator<std::pair<RawEntityId, RawEntityId>>
+  References(const Ptr &, RawEntityId eid) final;
 
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;

@@ -18,6 +18,7 @@
 #include "Decl.h"
 #include "File.h"
 #include "Macro.h"
+#include "Reference.h"
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
@@ -128,13 +129,9 @@ TokenRange Fragment::parsed_tokens(void) const {
 }
 
 // Return the list of top-level declarations in this fragment.
-std::vector<Decl> Fragment::top_level_declarations(void) const {
-  std::vector<Decl> decls;
-  EntityIdListReader decl_ids = impl->reader.getTopLevelDeclarations();
-  decls.reserve(decl_ids.size());
-
+gap::generator<Decl> Fragment::top_level_declarations(void) const {
   auto &ep = impl->ep;
-  for (RawEntityId eid : decl_ids) {
+  for (RawEntityId eid : impl->reader.getTopLevelDeclarations()) {
     VariantId vid = EntityId(eid).Unpack();
     if (!std::holds_alternative<DeclId>(vid)) {
       assert(false);
@@ -153,9 +150,18 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
       continue;
     }
 
-    decls.emplace_back(std::move(decl_ptr));
+    co_yield Decl(std::move(decl_ptr));
   }
-  return decls;
+}
+
+// Return references to this fragment.
+gap::generator<Reference> Fragment::references(void) const {
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    }
+  }
 }
 
 // Return the list of top-level macros in this fragment.
@@ -163,7 +169,7 @@ std::vector<Decl> Fragment::top_level_declarations(void) const {
 gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
 
-  auto &ep = impl->ep;
+  const EntityProvider::Ptr &ep = impl->ep;
   for (RawEntityId eid : macro_ids) {
     VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
@@ -193,8 +199,21 @@ gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const {
         assert(false);
       }
 
+    // File tokens can come up via whitespace injection.
     } else if (std::holds_alternative<FileTokenId>(vid)) {
-      assert(false);
+      FileTokenId tid = std::get<FileTokenId>(vid);
+      FileId fid(tid.file_id);
+      FileImplPtr file = ep->FileFor(ep, fid);
+      if (!file) {
+        assert(false);
+        continue;
+      }
+
+      if (tid.offset < file->num_tokens) {
+        co_yield Token(file->TokenReader(file), tid.offset);
+      } else {
+        assert(false);
+      }
 
     } else {
       assert(false);

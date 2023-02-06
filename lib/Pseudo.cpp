@@ -8,6 +8,7 @@
 
 #include <multiplier/Index.h>
 
+#include "Reference.h"
 #include "Types.h"
 
 namespace mx {
@@ -27,7 +28,12 @@ namespace mx {
     } \
     \
     gap::generator<Reference> name::references(void) const { \
-      co_return; \
+      const EntityProvider::Ptr &ep = impl->ep; \
+      for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) { \
+        if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) { \
+          co_yield Reference(std::move(eptr), ref_id, category, ref_kind); \
+        } \
+      } \
     }
 
 MX_FOR_EACH_PSEUDO(MX_DEFINE_PSEUDO)

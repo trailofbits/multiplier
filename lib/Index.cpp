@@ -172,7 +172,7 @@ VariantEntity Index::entity(EntityId eid) const {
     ParsedTokenId id = std::get<ParsedTokenId>(vid);
     FragmentId fid(id.fragment_id);
 
-    if (FragmentImplPtr fptr = impl->FragmentFor(impl, EntityId(fid).Pack());
+    if (FragmentImplPtr fptr = impl->FragmentFor(impl, fid);
         id.offset < fptr->num_parsed_tokens) {
       Token tok(fptr->ParsedTokenReader(fptr), id.offset);
       if (tok.id() == eid) {
@@ -186,7 +186,7 @@ VariantEntity Index::entity(EntityId eid) const {
     MacroTokenId id = std::get<MacroTokenId>(vid);
     FragmentId fid(id.fragment_id);
 
-    if (FragmentImplPtr frag_ptr = impl->FragmentFor(impl, EntityId(fid).Pack());
+    if (FragmentImplPtr frag_ptr = impl->FragmentFor(impl, fid);
         frag_ptr && id.offset < frag_ptr->num_tokens) {
       Token tok(frag_ptr->MacroTokenReader(frag_ptr), id.offset);
       if (tok.id() == eid) {
@@ -200,7 +200,7 @@ VariantEntity Index::entity(EntityId eid) const {
     FileTokenId id = std::get<FileTokenId>(vid);
     FileId fid(id.file_id);
 
-    if (FileImplPtr file_ptr = impl->FileFor(impl, EntityId(fid).Pack());
+    if (FileImplPtr file_ptr = impl->FileFor(impl, fid);
         file_ptr && id.offset < file_ptr->num_tokens) {
       Token tok(file_ptr->TokenReader(file_ptr), id.offset);
       if (tok.id() == eid) {
@@ -233,10 +233,16 @@ VariantEntity Index::entity(EntityId eid) const {
 }
 
 // Search for entities by their name and category.
-NamedEntityList Index::query_entities(std::string name) const {
+//
+// NOTE(pag): This might return redeclarations.
+gap::generator<NamedEntity> Index::query_entities(std::string name) const {
   std::vector<RawEntityId> entity_ids;
   impl->FindSymbol(impl, std::move(name), entity_ids);
   
+  if (entity_ids.empty()) {
+    co_return;
+  }
+
   NamedEntityList entities;
   entities.reserve(entity_ids.size());
 
@@ -255,7 +261,7 @@ NamedEntityList Index::query_entities(std::string name) const {
         continue;
       }
 
-      entities.emplace_back(std::move(nd.value()));
+      co_yield std::move(nd.value());
 
     } else if (std::holds_alternative<MacroId>(vid)) {
       MacroImplPtr macro_ptr = impl->MacroFor(impl, eid);
@@ -270,32 +276,12 @@ NamedEntityList Index::query_entities(std::string name) const {
         continue;
       }
 
-      entities.emplace_back(std::move(def.value()));
+      co_yield std::move(def.value());
 
     } else {
       assert(false);
     }
   }
-
-  constexpr auto id_of = +[] (const NamedEntity &a) {
-    return std::visit<RawEntityId>([] (auto &&x) { return x.id().Pack(); }, a);
-  };
-
-  std::sort(
-      entities.begin(), entities.end(),
-      [] (const NamedEntity &a, const NamedEntity &b) {
-        return id_of(a) < id_of(b);
-      });
-
-  auto it = std::unique(
-      entities.begin(), entities.end(),
-      [] (const NamedEntity &a, const NamedEntity &b) {
-        return id_of(a) == id_of(b);
-      });
-
-  entities.erase(it, entities.end());
-  
-  return entities;
 }
 
 }  // namespace mx

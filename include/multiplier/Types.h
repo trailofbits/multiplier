@@ -337,6 +337,9 @@ using VariantId = std::variant<
     ParsedTokenId, MacroTokenId, FileTokenId>;
 #undef MX_ENTITY_ID_VARIANT
 
+template <typename T>
+class SpecificEntityId;
+
 // An opaque, compressed entity id.
 class EntityId final {
  protected:
@@ -365,6 +368,9 @@ class EntityId final {
   /* implicit */ EntityId(TemplateParameterListId id);
   /* implicit */ EntityId(CXXBaseSpecifierId id);
   /* implicit */ EntityId(DesignatorId id);
+
+  template <typename T>
+  /* implicit */ inline EntityId(SpecificEntityId<T>);
 
   inline EntityId &operator=(DeclId id) {
     EntityId self(id);
@@ -502,10 +508,11 @@ class SpecificEntityId final {
   }
 };
 
+template <typename T>
+EntityId::EntityId(SpecificEntityId<T> id_)
+    : EntityId(id_.Pack()) {}
+
 using PackedFileTokenId = SpecificEntityId<FileTokenId>;
-using PackedDeclId = SpecificEntityId<DeclId>;
-using PackedStmtId = SpecificEntityId<StmtId>;
-using PackedAttrId = SpecificEntityId<AttrId>;
 
 template <typename T>
 struct EntityTypeImpl;

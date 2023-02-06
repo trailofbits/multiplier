@@ -9,6 +9,7 @@
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
+#include "Reference.h"
 #include "Types.h"
 
 namespace mx {
@@ -35,7 +36,7 @@ SpecificEntityId<DeclId> Decl::id(void) const {
 }
 
 std::optional<Decl> Decl::definition(void) const {
-  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id())) {
+  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id().Pack())) {
     if (DeclImplPtr redecl = impl->ep->DeclFor(impl->ep, raw_id)) {
       Decl decl(std::move(redecl));
       if (decl.is_definition()) {
@@ -47,8 +48,9 @@ std::optional<Decl> Decl::definition(void) const {
 }
 
 Decl Decl::canonical_declaration(void) const {
-  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id())) {
-    if (DeclImplPtr redecl = impl->ep->DeclFor(impl->ep, raw_id)) {
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
+    if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
       return Decl(std::move(redecl));
     }
   }
@@ -58,8 +60,9 @@ Decl Decl::canonical_declaration(void) const {
 
 gap::generator<Decl> Decl::redeclarations(void) const {
   auto any = false;
-  for (RawEntityId raw_id : impl->ep->Redeclarations(impl->ep, id())) {
-    if (DeclImplPtr redecl = impl->ep->DeclFor(impl->ep, raw_id)) {
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (RawEntityId raw_id : ep->Redeclarations(ep, id().Pack())) {
+    if (DeclImplPtr redecl = ep->DeclFor(ep, raw_id)) {
       any = true;
       co_yield Decl(std::move(redecl));
     }
@@ -70,32 +73,19 @@ gap::generator<Decl> Decl::redeclarations(void) const {
   }
 }
 
+// Return references to this declaration.
 gap::generator<Reference> Decl::references(void) const {
-  co_return;  // TODO!!!!
-//  const EntityProvider::Ptr &ep = impl->ep;
-//  RawEntityIdList references_ids;
-//
-//  tIgnoredRedecls.clear();
-//  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
-//  assert(!tIgnoredRedecls.empty());
-//
-//  for (RawEntityId raw_stmt_id : references_ids) {
-//    VariantId vid = EntityId(raw_stmt_id).Unpack();
-//    if (!std::holds_alternative<StmtId>(vid)) {
-//      assert(false);
-//      continue;
-//    }
-//
-//    auto entity_reader = ep->StmtFor(ep, raw_stmt_id);
-//    if (entity_reader.has_value()) {
-//      co_yield Stmt(std::move(entity_reader.value()));
-//    }
-//  }
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    }
+  }
 }
 
 gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
   FragmentId fid(fragment.impl->fragment_id);
-  auto &ep = fragment.impl->ep;
+  const EntityProvider::Ptr &ep = fragment.impl->ep;
   for (DeclImplPtr reader : ep->DeclsFor(ep, fid)) {
     co_yield Decl(std::move(reader));
   }

@@ -58,6 +58,7 @@ class WeggliQueryMatch;
                               MX_FORWARD_DECLARE_IMPL_CLASS)
 #undef MX_FORWARD_DECLARE_IMPL_CLASS
 
+using FilePathEntry = std::pair<std::filesystem::path, PackedFileId>;
 using FilePathMap = std::map<std::filesystem::path, PackedFileId>;
 using FragmentIdList = std::vector<PackedFragmentId>;
 using DeclIdList = std::vector<PackedDeclId>;
@@ -89,6 +90,7 @@ class EntityProvider {
   friend class ReadMacroTokensFromFragment;
   friend class ReadParsedTokensFromFragment;
   friend class Reference;
+  friend class ReferenceKind;
   friend class RegexQuery;
   friend class RegexQueryResultImpl;
   friend class RemoteEntityProvider;
@@ -124,6 +126,15 @@ class EntityProvider {
   // Download a list of fragment IDs contained in a specific file.
   virtual FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id) = 0;
 
+  virtual ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, RawEntityId kind_id) = 0;
+
+  virtual ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, std::string_view kind_data) = 0;
+
+  virtual bool AddReference(const Ptr &ep, RawEntityId kind_id,
+                            RawEntityId from_id, RawEntityId to_id) = 0;
+
   // Get a token by its entity ID.
   Token TokenFor(const Ptr &, RawEntityId id);
 
@@ -157,23 +168,13 @@ class EntityProvider {
       const Ptr &, PackedFileId, std::vector<EntityOffset> tokens) = 0;
 
   // Return the redeclarations of a given declaration.
-  virtual RawEntityIdList Redeclarations(
-      const Ptr &, SpecificEntityId<DeclId> eid) = 0;
-
-  // Fill out `redecl_ids_out` and `fragment_ids_out` with the set of things
-  // to analyze when looking for uses.
-  //
-  // NOTE(pag): `fragment_ids_out` will always contain the fragment associated
-  //            with `eid` if `eid` resides in a fragment.
-  virtual void FillUses(const Ptr &, RawEntityId eid,
-                        RawEntityIdList &redecl_ids_out,
-                        FragmentIdList &fragment_ids_out) = 0;
+  virtual gap::generator<RawEntityId> Redeclarations(
+      const Ptr &, RawEntityId eid) = 0;
 
   // Fill out `redecl_ids_out` and `references_ids_out` with the set of things
   // to analyze when looking for references.
-  virtual void FillReferences(const Ptr &, RawEntityId eid,
-                              RawEntityIdList &redecl_ids_out,
-                              RawEntityIdList &references_ids_out) = 0;
+  virtual gap::generator<std::pair<RawEntityId, RawEntityId>>
+  References(const Ptr &, RawEntityId eid) = 0;
 
   // Find the entity ids matching the name
   virtual void FindSymbol(const Ptr &, std::string name,
@@ -211,6 +212,8 @@ class Index {
  private:
   friend class File;
   friend class Fragment;
+  friend class Reference;
+  friend class ReferenceKind;
 
   EntityProvider::Ptr impl;
 
@@ -285,9 +288,6 @@ class Index {
   // Return an entity given its ID.
   VariantEntity entity(EntityId eid) const;
 
-  // Return all files in the index.
-  gap::generator<File> files(void) const;
-
   // Return an entity given its ID.
   template <typename T>
   inline auto
@@ -299,8 +299,13 @@ class Index {
     }
   }
 
+  // Return all files in the index.
+  gap::generator<File> files(void) const;
+
   // Search for entities by their name and category.
-  NamedEntityList query_entities(std::string name) const;
+  //
+  // NOTE(pag): This might return redeclarations.
+  gap::generator<NamedEntity> query_entities(std::string name) const;
 };
 
 }  // namespace mx

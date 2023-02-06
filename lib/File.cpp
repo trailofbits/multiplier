@@ -19,6 +19,7 @@
 #include "Fragment.h"
 #include "Macro.h"
 #include "Pseudo.h"
+#include "Reference.h"
 #include "Re2Impl.h"
 #include "Stmt.h"
 #include "Type.h"
@@ -252,7 +253,7 @@ SpecificEntityId<FileId> File::id(void) const noexcept {
 
 gap::generator<Fragment> File::fragments(void) const {
   FileId fid(impl->file_id);
-  auto &ep = impl->ep;
+  const EntityProvider::Ptr &ep = impl->ep;
   auto ids = ep->ListFragmentsInFile(ep, fid);
   for (PackedFragmentId id : ids) {
     if (FragmentImplPtr frag = ep->FragmentFor(ep, id.Pack())) {
@@ -280,26 +281,12 @@ std::string_view File::data(void) const noexcept {
 
 // References of this file.
 gap::generator<Reference> File::references(void) const {
-  // TODO!!!
-  co_return;
-//  const EntityProvider::Ptr &ep = impl->ep;
-//  RawEntityIdList references_ids;
-//
-//  tIgnoredRedecls.clear();
-//  ep->FillReferences(ep, id().Pack(), tIgnoredRedecls, references_ids);
-//  assert(tIgnoredRedecls.empty());
-//
-//  for (RawEntityId raw_stmt_id : references_ids) {
-//    VariantId vid = EntityId(raw_stmt_id).Unpack();
-//    if (!std::holds_alternative<MacroId>(vid)) {
-//      assert(false);
-//      continue;
-//    }
-//
-//    if (auto eptr = ep->MacroFor(ep, raw_stmt_id)) {
-//      co_yield Macro(std::move(eptr));
-//    }
-//  }
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    }
+  }
 }
 
 }  // namespace mx

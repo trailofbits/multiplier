@@ -37,25 +37,29 @@ FragmentIdList InvalidEntityProvider::FragmentsCoveringTokens(
   return {};
 }
 
-RawEntityIdList InvalidEntityProvider::Redeclarations(
-    const Ptr &, SpecificEntityId<DeclId>) {
+ReferenceKindImplPtr
+InvalidEntityProvider::ReferenceKindFor(const Ptr &, RawEntityId) {
   return {};
 }
 
-void InvalidEntityProvider::FillUses(
-    const Ptr &, RawEntityId,
-    RawEntityIdList &redecl_ids_out,
-    FragmentIdList &fragment_ids_out) {
-  redecl_ids_out.clear();
-  fragment_ids_out.clear();
+ReferenceKindImplPtr
+InvalidEntityProvider::ReferenceKindFor(const Ptr &, std::string_view) {
+  return {};
 }
 
-void InvalidEntityProvider::FillReferences(
-    const Ptr &, RawEntityId,
-    RawEntityIdList &redecl_ids_out,
-    RawEntityIdList &references_ids_out) {
-  redecl_ids_out.clear();
-  references_ids_out.clear();
+bool InvalidEntityProvider::AddReference(const Ptr &, RawEntityId,
+                                         RawEntityId, RawEntityId) {
+  return false;
+}
+
+gap::generator<RawEntityId> InvalidEntityProvider::Redeclarations(
+    const Ptr &, RawEntityId) {
+  co_return;
+}
+
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+InvalidEntityProvider::References(const Ptr &, RawEntityId) {
+  co_return;
 }
 
 void InvalidEntityProvider::FindSymbol(

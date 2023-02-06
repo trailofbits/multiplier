@@ -11,9 +11,9 @@
 #include <string_view>
 #include <utility>
 #include <variant>
-#include <gap/core/generator.hpp>
 
 #include "Iterator.h"
+#include "Reference.h"
 #include "Types.h"
 
 namespace mx {
@@ -97,6 +97,9 @@ class Token {
       -> decltype(mx::RawEntityId() <=> mx::RawEntityId()) {
     return id().Pack() <=> that.id().Pack();
   }
+
+  // References to this token.
+  gap::generator<Reference> references(void) const;
 
   // Return the context node that identifies how this token relates to the AST.
   //

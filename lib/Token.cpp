@@ -23,6 +23,7 @@
 
 #include "File.h"
 #include "Fragment.h"
+#include "Reference.h"
 
 namespace mx {
 
@@ -818,6 +819,27 @@ std::string_view Token::data(void) const & {
 // Return the ID of this token.
 EntityId Token::id(void) const {
   return impl->NthTokenId(offset);
+}
+
+// References to this token.
+gap::generator<Reference> Token::references(void) const {
+  EntityProvider::Ptr ep;
+  if (!impl) {
+    co_return;
+  } else if (const FragmentImpl *frag = impl->OwningFragment()) {
+    ep = frag->ep;
+  } else if (const FileImpl *file = impl->OwningFile()) {
+    ep = file->ep;
+  } else {
+    assert(false);
+    co_return;
+  }
+
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    }
+  }
 }
 
 // Return the version of this token that was actually parsed. If this was a

@@ -26,7 +26,6 @@ class DatabaseWriterImpl;
     m(FragmentFileRangeRecord) \
     m(RedeclarationRecord) \
     m(MangledNameRecord) \
-    m(UseRecord) \
     m(ReferenceRecord) \
     m(SymbolNameRecord) \
     m(DictionaryRecord)
@@ -236,37 +235,6 @@ struct SymbolNameRecord {
   std::string name;
 };
 
-// Records an entry telling us that something in a particular fragment uses
-// `entity_id`. An entity use is an API method that returns an entity, or an
-// optional entity. The type of use (the edge label) is not recorded; instead
-// we determine those at runtime by visiting all entities serialized in the
-// fragment and looking for the uses.
-//
-// NOTE(pag): We opportunistically assume all entities are used by their own
-//            fragments, so we don't record edges between a fragment and its
-//            own entities.
-struct UseRecord {
-  static constexpr const char *kTableName = "use";
-
-  static constexpr const char *kInitStatements[] =
-      {R"(CREATE TABLE IF NOT EXISTS use (
-            fragment_id INTEGER NOT NULL,
-            entity_id INTEGER NOT NULL,
-            PRIMARY KEY(fragment_id, entity_id)
-          ) WITHOUT ROWID)"};
-
-  static constexpr const char *kExitStatements[] = {
-      R"(CREATE INDEX IF NOT EXISTS fragments_using_entities
-         ON use(entity_id))"};
-
-  static constexpr const char *kInsertStatement =
-      R"(INSERT OR IGNORE INTO use (fragment_id, entity_id)
-         VALUES (?1, ?2))";
-
-  PackedFragmentId fragment_id;
-  RawEntityId entity_id;
-};
-
 // Records an entry telling us that one entity references another entity.
 // A reference has a to-entity-specific meaning, and so we don't need an
 // edge label.
@@ -282,21 +250,20 @@ struct ReferenceRecord {
           ) WITHOUT ROWID)",
 
        R"(CREATE TABLE IF NOT EXISTS reference_kind (
-            kind_id INTEGER PRIMARY KEY,
-            description TEXT NOT NULL
-          ) WITHOUT ROWID)",
+            kind BLOB NOT NULL PRIMARY KEY
+          ))",
 
-       R"(INSERT OR IGNORE INTO reference_kind (kind_id, description)
-          VALUES (1, "Explicit code reference"))"};
+       R"(INSERT OR IGNORE INTO reference_kind (rowid, kind)
+          VALUES (0, "Explicit code reference"))"};
 
   static constexpr const char *kExitStatements[] = {
       R"(CREATE INDEX IF NOT EXISTS references_by_target
          ON reference(to_entity_id))"};
 
-  // NOTE(pag): Reference id `1` is `ReferenceKind::EXPLICIT_CODE_REFERENCE`.
+  // NOTE(pag): Reference id `0` is the id of an "explicit code reference."
   static constexpr const char *kInsertStatement =
       R"(INSERT OR IGNORE INTO reference (from_entity_id, to_entity_id, kind_id)
-         VALUES (?1, ?2, 1))";
+         VALUES (?1, ?2, 0))";
 
   RawEntityId from_entity_id;
   RawEntityId to_entity_id;

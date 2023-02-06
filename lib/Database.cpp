@@ -849,16 +849,6 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    UseRecord record, sqlite::Statement &insert) {
-  if (auto raw_frag_id = record.fragment_id.Pack();
-      record.entity_id != kInvalidEntityId) {
-    insert.BindValues(raw_frag_id, record.entity_id);
-    return true;
-  }
-  return false;
-}
-
-bool BulkInserterState::InsertAsync(
     ReferenceRecord record, sqlite::Statement &insert) {
   if (record.from_entity_id != kInvalidEntityId &&
       record.to_entity_id != kInvalidEntityId) {

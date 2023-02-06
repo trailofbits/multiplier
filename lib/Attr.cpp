@@ -9,6 +9,7 @@
 #include <multiplier/Index.h>
 
 #include "Fragment.h"
+#include "Reference.h"
 #include "Types.h"
 
 namespace mx {
@@ -33,9 +34,19 @@ SpecificEntityId<AttrId> Attr::id(void) const {
   return eid;
 }
 
+// Return references to this attribute.
+gap::generator<Reference> Attr::references(void) const {
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
+    }
+  }
+}
+
 gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
   FragmentId fid(fragment.impl->fragment_id);
-  auto &ep = fragment.impl->ep;
+  const EntityProvider::Ptr &ep = fragment.impl->ep;
   for (AttrImplPtr reader : ep->AttrsFor(ep, fid)) {
     co_yield Attr(std::move(reader));
   }

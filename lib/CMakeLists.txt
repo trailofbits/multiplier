@@ -122,6 +122,7 @@ add_library("mx-api" STATIC
   "Re2Impl.cpp"
   "Re2Impl.h"
   "Reference.cpp"
+  "Reference.h"
   "SQLiteEntityProvider.cpp"
   "SQLiteEntityProvider.h"
   "SQLiteStore.cpp"
