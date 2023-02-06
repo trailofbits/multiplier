@@ -10,32 +10,43 @@
 #include <capnp/serialize.h>
 #include <memory>
 #include <string>
+#include <multiplier/Types.h>
 
 namespace mx {
+namespace {
+static const capnp::ReaderOptions kOptions = {
+  .traversalLimitInWords = ~0ull,
+  .nestingLimit = 64
+};
+}  // namespace
 
 class EntityProvider;
 
 // Base class for a serialized entity, taken from the database.
+template <typename Root>
 class EntityImpl {
  private:
-
-  // Stores the Cap'n-Proto serialized data.
-  const std::string data;
+  // Stores the Cap'n-Proto serialized data.;
+  const kj::Array<capnp::word> data;
   capnp::FlatArrayMessageReader message;
 
- protected:
-  explicit EntityImpl(std::shared_ptr<EntityProvider> ep_, std::string data_);
-
-  template <typename T>
-  inline auto Reader(void) & noexcept -> typename T::Reader {
-    return message.getRoot<T>();
-  }
+  using Reader = typename Root::Reader;
 
  public:
 
   // Needed for us to be able to look up the file containing this fragment,
   // or look up entities related to other fragments.
   const std::shared_ptr<EntityProvider> ep;
+
+  // The reader used to read all things from inside of this entity.
+  const Reader reader;
+
+  explicit EntityImpl(std::shared_ptr<EntityProvider> ep_,
+                      kj::Array<capnp::word> data_)
+      : data(kj::mv(data_)),
+        message(data, kOptions),
+        ep(std::move(ep_)),
+        reader(message.getRoot<Root>()) {}
 };
 
 }  // namespace mx

@@ -16,15 +16,13 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "DeclaratorDecl.h"
 #include "InClassInitStyle.h"
-#include "StmtUseSelector.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class Decl;
@@ -43,29 +41,9 @@ class FieldDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<FieldDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<FieldDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : FieldDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<FieldDecl> in(const Fragment &frag);
+  static gap::generator<FieldDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FIELD;
@@ -77,7 +55,15 @@ class FieldDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<FieldDecl> from(const TokenContext &c);
+  gap::generator<FieldDecl> redeclarations(void) const;
+  inline static std::optional<FieldDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<FieldDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<FieldDecl> from(const DeclaratorDecl &parent);
 
   inline static std::optional<FieldDecl> from(const std::optional<DeclaratorDecl> &parent) {

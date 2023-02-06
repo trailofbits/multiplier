@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Expr.h"
 #include "ObjCMessageExprReceiverKind.h"
@@ -42,29 +42,9 @@ class ObjCMessageExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<ObjCMessageExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCMessageExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCMessageExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCMessageExpr> in(const Fragment &frag);
+  static gap::generator<ObjCMessageExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_MESSAGE_EXPR;
@@ -76,7 +56,14 @@ class ObjCMessageExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCMessageExpr> from(const TokenContext &c);
+  inline static std::optional<ObjCMessageExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCMessageExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<ObjCMessageExpr> from(const Expr &parent);
 
   inline static std::optional<ObjCMessageExpr> from(const std::optional<Expr> &parent) {
@@ -107,7 +94,8 @@ class ObjCMessageExpr : public Expr {
     }
   }
 
-  std::vector<Expr> arguments(void) const;
+  std::optional<Expr> nth_argument(unsigned n) const;
+  gap::generator<Expr> arguments(void) const;
   Type call_return_type(void) const;
   Type class_receiver(void) const;
   Type class_receiver_type(void) const;
@@ -127,7 +115,8 @@ class ObjCMessageExpr : public Expr {
   bool is_delegate_initializer_call(void) const;
   bool is_implicit(void) const;
   bool is_instance_message(void) const;
-  std::vector<Token> selector_tokens(void) const;
+  std::optional<Token> nth_selector_token(unsigned n) const;
+  gap::generator<Token> selector_tokens(void) const;
 };
 
 static_assert(sizeof(ObjCMessageExpr) == sizeof(Expr));

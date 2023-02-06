@@ -16,16 +16,14 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CanThrowResult.h"
-#include "DeclUseSelector.h"
 #include "ExceptionSpecificationType.h"
 #include "FunctionType.h"
 #include "RefQualifierKind.h"
-#include "StmtUseSelector.h"
 #include "TypeKind.h"
 
 namespace mx {
@@ -41,35 +39,22 @@ class FunctionProtoType : public FunctionType {
   friend class FunctionType;
   friend class Type;
  public:
-  inline static gap::generator<FunctionProtoType> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<FunctionProtoType> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : FunctionProtoType::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<FunctionProtoType> in(const Fragment &frag);
+  static gap::generator<FunctionProtoType> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::FUNCTION_PROTO;
   }
 
-  static std::optional<FunctionProtoType> from(const TokenContext &c);
+  inline static std::optional<FunctionProtoType> from(const Reference &r) {
+    return from(r.as_type());
+  }
+
+  inline static std::optional<FunctionProtoType> from(const TokenContext &t) {
+    return from(t.as_type());
+  }
+
   static std::optional<FunctionProtoType> from(const FunctionType &parent);
 
   inline static std::optional<FunctionProtoType> from(const std::optional<FunctionType> &parent) {
@@ -97,7 +82,8 @@ class FunctionProtoType : public FunctionType {
   std::optional<FunctionDecl> exception_spec_template(void) const;
   ExceptionSpecificationType exception_spec_type(void) const;
   std::optional<Expr> noexcept_expression(void) const;
-  std::vector<Type> parameter_types(void) const;
+  std::optional<Type> nth_parameter_type(unsigned n) const;
+  gap::generator<Type> parameter_types(void) const;
   RefQualifierKind reference_qualifier(void) const;
   bool has_dependent_exception_spec(void) const;
   bool has_dynamic_exception_spec(void) const;
@@ -110,7 +96,8 @@ class FunctionProtoType : public FunctionType {
   bool is_sugared(void) const;
   bool is_template_variadic(void) const;
   bool is_variadic(void) const;
-  std::vector<Type> exception_types(void) const;
+  std::optional<Type> nth_exception_type(unsigned n) const;
+  gap::generator<Type> exception_types(void) const;
 };
 
 static_assert(sizeof(FunctionProtoType) == sizeof(FunctionType));

@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroKind.h"
 #include "MacroSubstitution.h"
@@ -34,13 +34,7 @@ class MacroStringify : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
-  inline static gap::generator<MacroStringify> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<MacroStringify> in(const Fragment &frag);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::STRINGIFY;
@@ -51,6 +45,14 @@ class MacroStringify : public MacroSubstitution {
 
   static gap::generator<MacroStringify> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<MacroStringify> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<MacroStringify> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<MacroStringify> from(const MacroSubstitution &parent);
 

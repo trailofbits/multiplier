@@ -161,7 +161,7 @@ class TLDFinder final : public pasta::DeclVisitor {
   }
 
   void VisitDecl(const pasta::Decl &decl) final {
-    if (!decl.IsImplicit()) {
+    if (!decl.IsInvalidDeclaration()) {
       tlds.emplace_back(decl, order++);
     }
   }
@@ -458,6 +458,17 @@ static std::pair<uint64_t, uint64_t> FindDeclRange(
 // out the compiler builtins to a file and then introduced those as a special
 // preamble.
 static bool IsProbablyABuiltinDecl(const pasta::Decl &decl) {
+
+  // NOTE(pag): Not all implicit declarations are builtin, but in general, most
+  //            top-level implicit declarations are builtins. An example of a
+  //            nested implicit decl is the implicit field decl for the `union`:
+  //
+  //                    struct Blah {
+  //                      union {
+  //                        int foo;
+  //                        float bar;
+  //                      } /* implicit field here */ ;
+  //                    };
   if (decl.IsImplicit()) {
     return true;
 
@@ -595,7 +606,7 @@ static void AddDeclRangeToEntityList(
   }
 
   // There should always be at least two tokens in any top-level decl.
-  LOG_IF(ERROR, begin_index == end_index)
+  LOG_IF(ERROR, begin_index == end_index && !IsProbablyABuiltinDecl(decl))
       << "Only found one token " << tok.Data() << " for: "
       << DeclToString(decl) << PrefixedLocation(decl, " at or near ")
       << " on main job file " << main_file_path;
@@ -818,8 +829,8 @@ static std::vector<EntityRange> SortEntities(const pasta::AST &ast,
         open_indexes.push_back(tok.Index());
         break;
       case pasta::TokenRole::kEndOfFileMarker:
-        if (open_indexes.empty()) {
-          assert(false);  // Unbalanced EOF marker.
+        if (open_indexes.empty()) {  // Unbalanced EOF marker.
+          assert((tok.Index() + 1u) == tokens.Size());
         } else {
           bof_to_eof.emplace(open_indexes.back(), tok.Index());
           open_indexes.pop_back();
@@ -1016,12 +1027,12 @@ found_tokens:
   mx::FileTokenId btid;
   btid.file_id = file_index;
   btid.kind = TokenKindFromPasta(begin_tok.value());
-  btid.offset = static_cast<unsigned>(begin_tok->Index());
+  btid.offset = static_cast<mx::EntityOffset>(begin_tok->Index());
 
   mx::FileTokenId etid;
   etid.file_id = file_index;
   etid.kind = TokenKindFromPasta(end_tok.value());
-  etid.offset = static_cast<unsigned>(end_tok->Index());
+  etid.offset = static_cast<mx::EntityOffset>(end_tok->Index());
 
   return FileLocationOfFragment(fid, btid, etid);
 }

@@ -14,11 +14,10 @@ namespace mx {
 FileImpl::~FileImpl(void) noexcept {}
 
 FileImpl::FileImpl(
-    FileId id_, EntityProvider::Ptr ep_, std::string data_)
-    : EntityImpl(std::move(ep_), std::move(data_)),
+    EntityProvider::Ptr ep_, kj::Array<capnp::word> data_, RawEntityId id_)
+    : EntityImpl<rpc::File>(std::move(ep_), kj::mv(data_)),
       file_token_reader(this),
-      file_id(id_.file_id),
-      reader(this->EntityImpl::Reader<rpc::File>()),
+      file_id(EntityId(id_).Extract<FileId>()->file_id),
       num_tokens(reader.getTokenKinds().size()) {
   assert((num_tokens + 1u) == reader.getTokenOffsets().size());
 }

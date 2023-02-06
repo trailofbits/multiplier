@@ -100,8 +100,13 @@ void PrintCallHierarchy(mx::Decl entity, unsigned depth) {
   } else if (decl != decls.end()) {
     PrintCallHierarchy(*decl, depth + 1u);
   } else {
-    for (const mx::StmtReference &ref : entity.references()) {
-      PrintCallHierarchy(ref, depth + 1u);
+    for (mx::Reference ref : entity.references()) {
+      if (auto ref_stmt = ref.as_statement()) {
+        PrintCallHierarchy(*ref_stmt, depth + 1u);
+
+      } else if (auto ref_decl = ref.as_declaration()) {
+        PrintCallHierarchy(*ref_decl, depth + 1u);
+      }
     }
   }
 }

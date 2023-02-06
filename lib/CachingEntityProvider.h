@@ -34,11 +34,23 @@ class CachingEntityProvider final : public EntityProvider {
   // cycles.
   std::vector<std::shared_ptr<const void>> entities;
 
-  std::unordered_map<RawEntityId, FragmentImpl::WeakPtr> fragments;
-  std::unordered_map<RawEntityId, FileImpl::WeakPtr> files;
+  // NOTE(pag): These are not reset upon version updates. Entity data is
+  //            read-only once written, and so these don't generally change.
+#define DECLARE_ENTITY_CACHE(type_name, lower_name, ...) \
+    std::unordered_map<RawEntityId, Weak ## type_name ## ImplPtr> \
+        lower_name ## s;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_ENTITY_CACHE,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_ENTITY_CACHE,
+                              DECLARE_ENTITY_CACHE)
+#undef DECLARE_ENTITY_CACHE
 
   // Cached list of fragments inside of files.
   std::unordered_map<RawEntityId, FragmentIdList> file_fragments;
+
+  // Caches reference kinds.
+  std::unordered_map<RawEntityId, WeakReferenceKindImplPtr> reference_kinds;
 
   // Cached redeclarations.
   std::unordered_map<RawEntityId, std::shared_ptr<RawEntityIdList>>
@@ -65,31 +77,39 @@ class CachingEntityProvider final : public EntityProvider {
   FragmentIdList ListFragmentsInFile(
       const Ptr &, SpecificEntityId<FileId> id) final;
 
-  std::shared_ptr<const FileImpl> FileFor(
-      const Ptr &, SpecificEntityId<FileId> id) final;
-
-  // Download a fragment by its unique ID.
-  std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
-
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(
       const Ptr &, PackedFileId, std::vector<EntityOffset>) final;
 
-  RawEntityIdList Redeclarations(
-      const Ptr &, SpecificEntityId<DeclarationId>) final;
+  ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, RawEntityId kind_id) final;
 
-  void FillUses(const Ptr &, RawEntityId eid,
-                RawEntityIdList &redecl_ids_out,
-                FragmentIdList &fragment_ids_out) final;
+  ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, std::string_view kind_data) final;
 
-  void FillReferences(const Ptr &, RawEntityId eid,
-                      RawEntityIdList &redecl_ids_out,
-                      FragmentIdList &fragment_ids_out) final;
+  bool AddReference(const Ptr &ep, RawEntityId kind_id,
+                    RawEntityId from_id, RawEntityId to_id) final;
+
+  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+
+  gap::generator<std::pair<RawEntityId, RawEntityId>>
+  References(const Ptr &, RawEntityId eid) final;
 
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
 
+#define MX_DECLARE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> type_name ## sFor( \
+        const Ptr &, PackedFragmentId id) final; \
+    \
+    type_name ## ImplPtr type_name ## For( \
+        const Ptr &ep, RawEntityId id) final;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_METHODS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_ENTITY_METHODS,
+                              MX_DECLARE_ENTITY_METHODS)
+#undef MX_DECLARE_ENTITY_METHODS
 };
 
 }  // namespace mx

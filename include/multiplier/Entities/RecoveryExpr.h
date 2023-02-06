@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Expr.h"
 #include "StmtKind.h"
@@ -36,29 +36,9 @@ class RecoveryExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<RecoveryExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<RecoveryExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : RecoveryExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<RecoveryExpr> in(const Fragment &frag);
+  static gap::generator<RecoveryExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::RECOVERY_EXPR;
@@ -70,7 +50,14 @@ class RecoveryExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<RecoveryExpr> from(const TokenContext &c);
+  inline static std::optional<RecoveryExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<RecoveryExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<RecoveryExpr> from(const Expr &parent);
 
   inline static std::optional<RecoveryExpr> from(const std::optional<Expr> &parent) {
@@ -101,7 +88,8 @@ class RecoveryExpr : public Expr {
     }
   }
 
-  std::vector<Expr> sub_expressions(void) const;
+  std::optional<Expr> nth_sub_expression(unsigned n) const;
+  gap::generator<Expr> sub_expressions(void) const;
 };
 
 static_assert(sizeof(RecoveryExpr) == sizeof(Expr));

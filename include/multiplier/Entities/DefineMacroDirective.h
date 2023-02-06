@@ -16,19 +16,17 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroDirective.h"
 #include "MacroKind.h"
-#include "TokenUseSelector.h"
 
 namespace mx {
 class DefineMacroDirective;
 class Macro;
 class MacroDirective;
-class MacroReference;
 class Token;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class DefineMacroDirective : public MacroDirective {
@@ -37,13 +35,7 @@ class DefineMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static gap::generator<DefineMacroDirective> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<DefineMacroDirective> in(const Fragment &frag);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::DEFINE_DIRECTIVE;
@@ -55,7 +47,13 @@ class DefineMacroDirective : public MacroDirective {
   static gap::generator<DefineMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
 
-  gap::generator<MacroReference> references(void) const;
+  inline static std::optional<DefineMacroDirective> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<DefineMacroDirective> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<DefineMacroDirective> from(const MacroDirective &parent);
 
@@ -78,11 +76,11 @@ class DefineMacroDirective : public MacroDirective {
   }
 
   Token name(void) const;
-  std::vector<MacroOrToken> body(void) const;
+  gap::generator<MacroOrToken> body(void) const;
   unsigned num_explicit_parameters(void) const;
   bool is_variadic(void) const;
   bool is_function_like(void) const;
-  std::vector<MacroOrToken> parameters(void) const;
+  gap::generator<MacroOrToken> parameters(void) const;
 };
 
 static_assert(sizeof(DefineMacroDirective) == sizeof(MacroDirective));

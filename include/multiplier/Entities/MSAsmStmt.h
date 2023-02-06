@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AsmStmt.h"
 #include "StmtKind.h"
@@ -35,29 +35,9 @@ class MSAsmStmt : public AsmStmt {
   friend class AsmStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<MSAsmStmt> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<MSAsmStmt> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : MSAsmStmt::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<MSAsmStmt> in(const Fragment &frag);
+  static gap::generator<MSAsmStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::MS_ASM_STMT;
@@ -69,7 +49,14 @@ class MSAsmStmt : public AsmStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<MSAsmStmt> from(const TokenContext &c);
+  inline static std::optional<MSAsmStmt> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<MSAsmStmt> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<MSAsmStmt> from(const AsmStmt &parent);
 
   inline static std::optional<MSAsmStmt> from(const std::optional<AsmStmt> &parent) {
@@ -90,8 +77,10 @@ class MSAsmStmt : public AsmStmt {
     }
   }
 
-  std::vector<std::string_view> all_constraints(void) const;
-  std::vector<Expr> all_expressions(void) const;
+  std::optional<std::string_view> nth_all_constraint(unsigned n) const;
+  gap::generator<std::string_view> all_constraints(void) const;
+  std::optional<Expr> nth_all_expression(unsigned n) const;
+  gap::generator<Expr> all_expressions(void) const;
   std::string_view assembly_string(void) const;
   Token l_brace_token(void) const;
   bool has_braces(void) const;

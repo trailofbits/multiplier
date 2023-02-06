@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "OMPDeclarativeDirectiveDecl.h"
@@ -35,29 +35,9 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   friend class OMPDeclarativeDirectiveDecl;
   friend class Decl;
  public:
-  inline static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : OMPThreadPrivateDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<OMPThreadPrivateDecl> in(const Fragment &frag);
+  static gap::generator<OMPThreadPrivateDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OMP_THREAD_PRIVATE;
@@ -69,7 +49,15 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPThreadPrivateDecl> from(const TokenContext &c);
+  gap::generator<OMPThreadPrivateDecl> redeclarations(void) const;
+  inline static std::optional<OMPThreadPrivateDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<OMPThreadPrivateDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<OMPThreadPrivateDecl> from(const OMPDeclarativeDirectiveDecl &parent);
 
   inline static std::optional<OMPThreadPrivateDecl> from(const std::optional<OMPDeclarativeDirectiveDecl> &parent) {
@@ -90,7 +78,8 @@ class OMPThreadPrivateDecl : public OMPDeclarativeDirectiveDecl {
     }
   }
 
-  std::vector<Expr> varlists(void) const;
+  std::optional<Expr> nth_varlist(unsigned n) const;
+  gap::generator<Expr> varlists(void) const;
 };
 
 static_assert(sizeof(OMPThreadPrivateDecl) == sizeof(OMPDeclarativeDirectiveDecl));

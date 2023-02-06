@@ -16,14 +16,12 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CXXMethodDecl.h"
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class CXXDestructorDecl;
@@ -45,29 +43,9 @@ class CXXDestructorDecl : public CXXMethodDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<CXXDestructorDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<CXXDestructorDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : CXXDestructorDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<CXXDestructorDecl> in(const Fragment &frag);
+  static gap::generator<CXXDestructorDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CXX_DESTRUCTOR;
@@ -79,7 +57,15 @@ class CXXDestructorDecl : public CXXMethodDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CXXDestructorDecl> from(const TokenContext &c);
+  gap::generator<CXXDestructorDecl> redeclarations(void) const;
+  inline static std::optional<CXXDestructorDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<CXXDestructorDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<CXXDestructorDecl> from(const CXXMethodDecl &parent);
 
   inline static std::optional<CXXDestructorDecl> from(const std::optional<CXXMethodDecl> &parent) {

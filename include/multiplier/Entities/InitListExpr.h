@@ -16,14 +16,12 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "Expr.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class Expr;
@@ -39,29 +37,9 @@ class InitListExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<InitListExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<InitListExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : InitListExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<InitListExpr> in(const Fragment &frag);
+  static gap::generator<InitListExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::INIT_LIST_EXPR;
@@ -73,7 +51,14 @@ class InitListExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<InitListExpr> from(const TokenContext &c);
+  inline static std::optional<InitListExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<InitListExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<InitListExpr> from(const Expr &parent);
 
   inline static std::optional<InitListExpr> from(const std::optional<Expr> &parent) {
@@ -112,7 +97,8 @@ class InitListExpr : public Expr {
   std::optional<InitListExpr> syntactic_form(void) const;
   bool had_array_range_designator(void) const;
   bool has_array_filler(void) const;
-  std::vector<Expr> initializers(void) const;
+  std::optional<Expr> nth_initializer(unsigned n) const;
+  gap::generator<Expr> initializers(void) const;
   bool is_explicit(void) const;
   bool is_semantic_form(void) const;
   bool is_string_literal_initializer(void) const;

@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AttrKind.h"
 #include "InheritableParamAttr.h"
@@ -37,31 +37,18 @@ class ParameterABIAttr : public InheritableParamAttr {
   friend class InheritableAttr;
   friend class Attr;
  public:
-  inline static gap::generator<ParameterABIAttr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
+  static gap::generator<ParameterABIAttr> in(const Fragment &frag);
+  static gap::generator<ParameterABIAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  inline static std::optional<ParameterABIAttr> from(const Reference &r) {
+    return from(r.as_attribute());
   }
 
-  inline static gap::generator<ParameterABIAttr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
+  inline static std::optional<ParameterABIAttr> from(const TokenContext &t) {
+    return from(t.as_attribute());
   }
 
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ParameterABIAttr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
-
-  static std::optional<ParameterABIAttr> from(const TokenContext &c);
   static std::optional<ParameterABIAttr> from(const InheritableParamAttr &parent);
 
   inline static std::optional<ParameterABIAttr> from(const std::optional<InheritableParamAttr> &parent) {

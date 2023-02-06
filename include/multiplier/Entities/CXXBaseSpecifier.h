@@ -16,17 +16,18 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AccessSpecifier.h"
 #include "PseudoKind.h"
 #include "TagTypeKind.h"
-#include "TokenUseSelector.h"
 
 namespace mx {
 class CXXBaseSpecifier;
+class CXXBaseSpecifierImpl;
+class Reference;
 class Token;
 class Type;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -39,24 +40,39 @@ class CXXBaseSpecifier {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  friend class CXXBaseSpecifierImpl;
+  std::shared_ptr<const CXXBaseSpecifierImpl> impl;
  public:
   CXXBaseSpecifier(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier(const CXXBaseSpecifier &) = default;
   CXXBaseSpecifier &operator=(CXXBaseSpecifier &&) noexcept = default;
   CXXBaseSpecifier &operator=(const CXXBaseSpecifier &) = default;
 
-  inline CXXBaseSpecifier(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  /* implicit */ inline CXXBaseSpecifier(std::shared_ptr<const CXXBaseSpecifierImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+  PackedCXXBaseSpecifierId id(void) const;
+  gap::generator<Reference> references(void) const;
+
+  inline static std::optional<CXXBaseSpecifier> from(const CXXBaseSpecifier &self) {
+    return self;
+  }
+
+  inline static std::optional<CXXBaseSpecifier> from(const std::optional<CXXBaseSpecifier> &self) {
+    return self;
+  }
+
+  inline static std::optional<CXXBaseSpecifier> from(const Reference &r) {
+    return r.as_cxx_base_specifier();
+  }
+
+  inline static std::optional<CXXBaseSpecifier> from(const TokenContext &t) {
+    return t.as_cxx_base_specifier();
+  }
 
   TokenRange tokens(void) const;
   Token base_type_token(void) const;

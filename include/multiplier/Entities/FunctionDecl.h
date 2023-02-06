@@ -16,20 +16,18 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "ConstexprSpecKind.h"
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 #include "DeclaratorDecl.h"
 #include "ExceptionSpecificationType.h"
 #include "FunctionDeclTemplatedKind.h"
 #include "LanguageLinkage.h"
 #include "MultiVersionKind.h"
 #include "OverloadedOperatorKind.h"
-#include "StmtUseSelector.h"
 #include "StorageClass.h"
 #include "TemplateSpecializationKind.h"
 
@@ -52,29 +50,9 @@ class FunctionDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<FunctionDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<FunctionDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : FunctionDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<FunctionDecl> in(const Fragment &frag);
+  static gap::generator<FunctionDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::FUNCTION;
@@ -86,7 +64,15 @@ class FunctionDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<FunctionDecl> from(const TokenContext &c);
+  gap::generator<FunctionDecl> redeclarations(void) const;
+  inline static std::optional<FunctionDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<FunctionDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<FunctionDecl> from(const DeclaratorDecl &parent);
 
   inline static std::optional<FunctionDecl> from(const std::optional<DeclaratorDecl> &parent) {
@@ -196,17 +182,19 @@ class FunctionDecl : public DeclaratorDecl {
   bool is_target_clones_multi_version(void) const;
   bool is_target_multi_version(void) const;
   bool is_template_instantiation(void) const;
+  bool is_this_declaration_a_definition(void) const;
   bool is_this_declaration_instantiated_from_a_friend_definition(void) const;
   bool is_trivial(void) const;
   bool is_trivial_for_call(void) const;
   bool is_user_provided(void) const;
   bool is_variadic(void) const;
   bool is_virtual_as_written(void) const;
-  std::vector<ParmVarDecl> parameters(void) const;
+  std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  gap::generator<ParmVarDecl> parameters(void) const;
   bool uses_seh_try(void) const;
   bool will_have_body(void) const;
   std::optional<Stmt> body(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(FunctionDecl) == sizeof(DeclaratorDecl));

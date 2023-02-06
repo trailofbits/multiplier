@@ -16,15 +16,13 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "Expr.h"
 #include "LambdaCaptureDefault.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class CXXMethodDecl;
@@ -45,29 +43,9 @@ class LambdaExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<LambdaExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<LambdaExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : LambdaExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<LambdaExpr> in(const Fragment &frag);
+  static gap::generator<LambdaExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::LAMBDA_EXPR;
@@ -79,7 +57,14 @@ class LambdaExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<LambdaExpr> from(const TokenContext &c);
+  inline static std::optional<LambdaExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<LambdaExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<LambdaExpr> from(const Expr &parent);
 
   inline static std::optional<LambdaExpr> from(const std::optional<Expr> &parent) {
@@ -116,7 +101,8 @@ class LambdaExpr : public Expr {
   Token capture_default_token(void) const;
   CompoundStmt compound_statement_body(void) const;
   std::optional<FunctionTemplateDecl> dependent_call_operator(void) const;
-  std::vector<NamedDecl> explicit_template_parameters(void) const;
+  std::optional<NamedDecl> nth_explicit_template_parameter(unsigned n) const;
+  gap::generator<NamedDecl> explicit_template_parameters(void) const;
   TokenRange introducer_range(void) const;
   CXXRecordDecl lambda_class(void) const;
   std::optional<TemplateParameterList> template_parameter_list(void) const;

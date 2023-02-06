@@ -16,16 +16,13 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "ExprObjectKind.h"
 #include "ExprValueKind.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
-#include "TypeUseSelector.h"
 #include "ValueStmt.h"
 
 namespace mx {
@@ -43,29 +40,9 @@ class Expr : public ValueStmt {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<Expr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<Expr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : Expr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<Expr> in(const Fragment &frag);
+  static gap::generator<Expr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<Expr> containing(const Decl &decl);
   static gap::generator<Expr> containing(const Stmt &stmt);
@@ -73,7 +50,14 @@ class Expr : public ValueStmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<Expr> from(const TokenContext &c);
+  inline static std::optional<Expr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<Expr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<Expr> from(const ValueStmt &parent);
 
   inline static std::optional<Expr> from(const std::optional<ValueStmt> &parent) {

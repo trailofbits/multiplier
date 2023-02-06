@@ -13,16 +13,18 @@
 #include <multiplier/Entities/Macro.h>
 #include <multiplier/Entities/Type.h>
 
+#include "Attr.h"
+#include "Pseudo.h"
+#include "Decl.h"
 #include "File.h"
+#include "Macro.h"
+#include "Reference.h"
 #include "Re2Impl.h"
+#include "Stmt.h"
+#include "Type.h"
 #include "WeggliImpl.h"
 
 namespace mx {
-
-// Return the list of fragments in a file.
-gap::generator<Fragment> Fragment::in(const File &file) {
-  return file.fragments();
-}
 
 // Return the fragment containing a query match.
 Fragment Fragment::containing(const WeggliQueryMatch &match) {
@@ -35,54 +37,66 @@ Fragment Fragment::containing(const RegexQueryMatch &match) {
 }
 
 Fragment Fragment::containing(const Decl &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Stmt &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Type &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Attr &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id.Pack()));
+}
+
+Fragment Fragment::containing(const TemplateArgument &entity) {
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
+}
+
+Fragment Fragment::containing(const TemplateParameterList &entity) {
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
+}
+
+Fragment Fragment::containing(const CXXBaseSpecifier &entity) {
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
 }
 
 Fragment Fragment::containing(const Designator &entity) {
-  return Fragment(entity.fragment);
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
+}
+
+Fragment Fragment::containing(const Macro &entity) {
+  return Fragment(entity.impl->ep->FragmentFor(
+      entity.impl->ep, entity.impl->fragment_id));
 }
 
 std::optional<Fragment> Fragment::containing(const Token &entity) {
   if (auto frag = entity.impl->OwningFragment()) {
-    std::shared_ptr<const FragmentImpl> ptr(entity.impl, frag);
-    return Fragment(std::move(ptr));
+    return Fragment(FragmentImplPtr(entity.impl, frag));
   } else {
     return std::nullopt;
   }
 }
 
-Fragment Fragment::containing(const Macro &entity) {
-  return Fragment(entity.fragment);
-}
-
-Fragment Fragment::containing(const UseBase &use) {
-  return Fragment(use.fragment);
-}
-
-Fragment Fragment::containing(const StmtReference &ref) {
-  return Fragment(ref.fragment);
-}
-
 // Return the ID of this fragment.
 SpecificEntityId<FragmentId> Fragment::id(void) const noexcept {
-  return FragmentId{impl->fragment_id};
+  return FragmentId(impl->fragment_id);
 }
 
 // The range of file tokens in this fragment.
 TokenRange Fragment::file_tokens(void) const {
-  const FragmentReader &fr = impl->reader;
+  const auto &fr = impl->reader;
   VariantId first_vid = EntityId(fr.getFirstFileTokenId()).Unpack();
   VariantId last_vid = EntityId(fr.getLastFileTokenId()).Unpack();
   if (!std::holds_alternative<FileTokenId>(first_vid) ||
@@ -98,7 +112,7 @@ TokenRange Fragment::file_tokens(void) const {
   }
 
   FileId fid(first_fid.file_id);
-  auto file = impl->ep->FileFor(impl->ep, fid);
+  FileImplPtr file = impl->ep->FileFor(impl->ep, EntityId(fid).Pack());
   auto raw_file = file.get();
   return TokenRange(
       raw_file->TokenReader(std::move(file)),
@@ -115,68 +129,96 @@ TokenRange Fragment::parsed_tokens(void) const {
 }
 
 // Return the list of top-level declarations in this fragment.
-std::vector<Decl> Fragment::top_level_declarations(void) const {
-  std::vector<Decl> decls;
-  EntityIdListReader decl_ids = impl->reader.getTopLevelDeclarations();
-  decls.reserve(decl_ids.size());
-  for (RawEntityId eid_ : decl_ids) {
-    EntityId eid(eid_);
-    VariantId vid = eid.Unpack();
-    if (std::holds_alternative<DeclarationId>(vid)) {
-      DeclarationId decl_id = std::get<DeclarationId>(vid);
-      if (decl_id.fragment_id == impl->fragment_id) {
-        decls.emplace_back(impl, decl_id.offset);
-      } else {
-        assert(false);
-      }
-    } else {
+gap::generator<Decl> Fragment::top_level_declarations(void) const {
+  auto &ep = impl->ep;
+  for (RawEntityId eid : impl->reader.getTopLevelDeclarations()) {
+    VariantId vid = EntityId(eid).Unpack();
+    if (!std::holds_alternative<DeclId>(vid)) {
       assert(false);
+      continue;
+    }
+
+    DeclId decl_id = std::get<DeclId>(vid);
+    if (decl_id.fragment_id != impl->fragment_id) {
+      assert(false);
+      continue;
+    }
+
+    DeclImplPtr decl_ptr = ep->DeclFor(ep, eid);
+    if (!decl_ptr) {
+      assert(false);
+      continue;
+    }
+
+    co_yield Decl(std::move(decl_ptr));
+  }
+}
+
+// Return references to this fragment.
+gap::generator<Reference> Fragment::references(void) const {
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (auto [ref_id, ref_kind] : ep->References(ep, id().Pack())) {
+    if (auto [eptr, category] = ReferencedEntity(ep, ref_id); eptr) {
+      co_yield Reference(std::move(eptr), ref_id, category, ref_kind);
     }
   }
-  return decls;
 }
 
 // Return the list of top-level macros in this fragment.
 // This will return a mix of `Macro` or `Token` values.
-std::vector<MacroOrToken> Fragment::preprocessed_code(void) const {
-  std::vector<std::variant<Macro, Token>> macros;
+gap::generator<MacroOrToken> Fragment::preprocessed_code(void) const {
   EntityIdListReader macro_ids = impl->reader.getTopLevelMacros();
-  macros.reserve(macro_ids.size());
-  for (RawEntityId eid_ : macro_ids) {
-    EntityId eid(eid_);
-    VariantId vid = eid.Unpack();
+
+  const EntityProvider::Ptr &ep = impl->ep;
+  for (RawEntityId eid : macro_ids) {
+    VariantId vid = EntityId(eid).Unpack();
     if (std::holds_alternative<MacroId>(vid)) {
       MacroId macro_id = std::get<MacroId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id) {
-        macros.emplace_back(Macro(impl, macro_id.offset));
+      MacroImplPtr eptr = ep->MacroFor(ep, eid);
+      if (macro_id.fragment_id == impl->fragment_id && eptr) {
+        co_yield Macro(std::move(eptr));
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<MacroTokenId>(vid)) {
       MacroTokenId macro_id = std::get<MacroTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id) {
-        macros.emplace_back(Token(impl->MacroTokenReader(impl), macro_id.offset));
+      if (macro_id.fragment_id == impl->fragment_id &&
+          macro_id.offset < impl->num_tokens) {
+        co_yield Token(impl->MacroTokenReader(impl), macro_id.offset);
       } else {
         assert(false);
       }
 
     } else if (std::holds_alternative<ParsedTokenId>(vid)) {
       ParsedTokenId macro_id = std::get<ParsedTokenId>(vid);
-      if (macro_id.fragment_id == impl->fragment_id) {
-        macros.emplace_back(Token(impl->ParsedTokenReader(impl), macro_id.offset));
+      if (macro_id.fragment_id == impl->fragment_id &&
+          macro_id.offset < impl->num_parsed_tokens) {
+        co_yield Token(impl->ParsedTokenReader(impl), macro_id.offset);
       } else {
         assert(false);
       }
 
+    // File tokens can come up via whitespace injection.
     } else if (std::holds_alternative<FileTokenId>(vid)) {
-      assert(false);
+      FileTokenId tid = std::get<FileTokenId>(vid);
+      FileId fid(tid.file_id);
+      FileImplPtr file = ep->FileFor(ep, fid);
+      if (!file) {
+        assert(false);
+        continue;
+      }
+
+      if (tid.offset < file->num_tokens) {
+        co_yield Token(file->TokenReader(file), tid.offset);
+      } else {
+        assert(false);
+      }
 
     } else {
       assert(false);
     }
   }
-  return macros;
 }
 
 // Returns source IR for the fragment.

@@ -27,6 +27,10 @@
 #include <pasta/AST/Type.h>
 #include <pasta/Util/File.h>
 #include <sstream>
+#include <capnp/common.h>
+#include <capnp/message.h>
+#include <capnp/serialize-packed.h>
+#include <kj/io.h>
 
 #include "EntityMapper.h"
 #include "PASTA.h"
@@ -822,6 +826,22 @@ mx::RawEntityId RelatedEntityId(
   return eid;
 }
 
+class StringOutputStream final : public kj::OutputStream {
+ private:
+  std::string &str;
+
+ public:
+  virtual ~StringOutputStream(void) = default;
+
+  explicit StringOutputStream(std::string &str_)
+      : str(str_) {}
+
+  void write(const void *buffer_, size_t size) final {
+    auto ptr = reinterpret_cast<const char *>(buffer_);
+    str.append(ptr, &(ptr[size]));
+  }
+};
+
 }  // namespace
 
 // Find the entity ID of the declaration that is most related to a particular
@@ -858,6 +878,20 @@ mx::RawEntityId RelatedEntityId(
     const EntityMapper &em, const pasta::MacroToken &tok,
     RelatedEntityIds &related_ids) {
   return RelatedEntityId(em, tok.ParsedLocation(), related_ids);
+}
+
+std::string GetSerializedData(capnp::MessageBuilder &builder) {
+  std::string ret;
+  ret.reserve(builder.sizeInWords() * sizeof(capnp::word));
+  StringOutputStream os(ret);
+  capnp::writeMessage(os, builder);
+
+  // Pad it to a multiple of the word size.
+  while (ret.size() % sizeof(capnp::word)) {
+    ret.push_back('\0');
+  }
+
+  return ret;
 }
 
 }  // namespace indexer

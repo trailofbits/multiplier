@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "ConditionalMacroDirective.h"
 #include "MacroKind.h"
@@ -36,13 +36,7 @@ class ElseIfDefinedMacroDirective : public ConditionalMacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static gap::generator<ElseIfDefinedMacroDirective> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<ElseIfDefinedMacroDirective> in(const Fragment &frag);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::ELSE_IF_DEFINED_DIRECTIVE;
@@ -53,6 +47,14 @@ class ElseIfDefinedMacroDirective : public ConditionalMacroDirective {
 
   static gap::generator<ElseIfDefinedMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<ElseIfDefinedMacroDirective> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<ElseIfDefinedMacroDirective> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<ElseIfDefinedMacroDirective> from(const ConditionalMacroDirective &parent);
 

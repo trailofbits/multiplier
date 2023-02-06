@@ -27,7 +27,7 @@ class WeggliQueryResultImpl final {
   const EntityProvider::Ptr ep;
 
   // Buffer of fragment data.
-  FragmentImpl::Ptr frag;
+  FragmentImplPtr frag;
   TokenRange frag_file_tokens;
   std::map<unsigned, unsigned> offset_to_index;
   std::vector<WeggliMatchData> weggli_matches;
@@ -41,9 +41,9 @@ class WeggliQueryResultImpl final {
   WeggliQueryResultImpl(const WeggliQuery &query_, EntityProvider::Ptr ep_,
                         FragmentIdList fragment_ids);
 
-  WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImpl::Ptr frag_);
+  WeggliQueryResultImpl(const WeggliQuery &query_, FragmentImplPtr frag_);
 
-  bool InitForFragment(FragmentImpl::Ptr frag_);
+  bool InitForFragment(FragmentImplPtr frag_);
 
   gap::generator<WeggliQueryMatch> Enumerate(void);
 };

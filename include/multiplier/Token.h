@@ -11,10 +11,10 @@
 #include <string_view>
 #include <utility>
 #include <variant>
-#include <gap/core/generator.hpp>
 
+#include "Iterator.h"
+#include "Reference.h"
 #include "Types.h"
-#include "Use.h"
 
 namespace mx {
 
@@ -30,6 +30,7 @@ class FragmentImpl;
 class Index;
 class Macro;
 class NamedDecl;
+class Reference;
 class RegexQuery;
 class RegexQueryResultIterator;
 class Stmt;
@@ -44,26 +45,36 @@ class WeggliQueryResultIterator;
 enum class TokenKind : unsigned short;
 enum class TokenCategory : unsigned char;
 
-using TokenUse = Use<TokenUseSelector>;
-using VariantEntity = std::variant<NotAnEntity, Decl, Stmt, Type, Attr, Macro,
-                                   Token, Designator, Fragment, File>;
+#define MX_DECLARE_ENTITY_VARIANT(type_name, lower_name, enum_name, category) \
+    , type_name
+
+using VariantEntity = std::variant<
+    NotAnEntity MX_FOR_EACH_ENTITY_CATEGORY(MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT,
+                                            MX_DECLARE_ENTITY_VARIANT)>;
+#undef MX_DECLARE_ENTITY_VARIANT
+
+using TokenImplPtr = std::shared_ptr<const TokenReader>;
 
 // A single token, e.g. from a file or from a macro expansion.
 class Token {
  private:
+  friend class EntityProvider;
   friend class File;
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
+  friend class Reference;
   friend class TokenContext;
   friend class TokenRangeIterator;
   friend class TokenRange;
 
-  std::shared_ptr<const TokenReader> impl;
-  unsigned offset;
+  TokenImplPtr impl;
+  EntityOffset offset;
 
-  inline Token(std::shared_ptr<const TokenReader> impl_, unsigned offset_)
+  inline Token(std::shared_ptr<const TokenReader> impl_, EntityOffset offset_)
       : impl(std::move(impl_)),
         offset(offset_) {}
 
@@ -86,6 +97,9 @@ class Token {
       -> decltype(mx::RawEntityId() <=> mx::RawEntityId()) {
     return id().Pack() <=> that.id().Pack();
   }
+
+  // References to this token.
+  gap::generator<Reference> references(void) const;
 
   // Return the context node that identifies how this token relates to the AST.
   //
@@ -123,10 +137,6 @@ class Token {
 
   // The category of this token. This takes into account any related entities.
   TokenCategory category(void) const;
-
-  // Return the set of all uses of this token within its fragment (if it's a
-  // fragment token).
-  gap::generator<Use<TokenUseSelector>> uses(void) const;
 
   // Return the line and column number for this token, if any.
   std::optional<std::pair<unsigned, unsigned>> location(

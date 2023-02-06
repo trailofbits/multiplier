@@ -7,8 +7,6 @@
 #pragma once
 
 #include <memory>
-#include <multiplier/Entities/FileUseSelector.h>
-#include <multiplier/Reference.h>
 #include <string_view>
 #include <gap/core/generator.hpp>
 
@@ -24,7 +22,7 @@ class FileLocationCacheImpl;
 class Fragment;
 class FragmentImpl;
 class Index;
-class MacroReference;
+class Reference;
 class RegexQueryMatch;
 class WeggliQueryMatch;
 
@@ -88,10 +86,10 @@ class File {
 
   Ptr impl;
 
-  inline File(std::shared_ptr<const FileImpl> impl_)
-      : impl(std::move(impl_)) {}
-
  public:
+
+  /* implicit */ inline File(std::shared_ptr<const FileImpl> impl_)
+      : impl(std::move(impl_)) {}
 
   // Return the file containing a regex match.
   static std::optional<File> containing(const RegexQueryMatch &match);
@@ -99,36 +97,22 @@ class File {
   // Return the file containing a specific fragment.
   static std::optional<File> containing(const WeggliQueryMatch &match);
 
-  // Return the file containing a specific fragment.
-  static std::optional<File> containing(const Fragment &fragment);
+#define MX_DECLARE_CONTAINING(type_name, lower_name, enum_name, category) \
+    static std::optional<File> containing(const type_name &entity);
 
-  // Return the file containing a specific designator.
-  static std::optional<File> containing(const Designator &entity);
-
-  // Return the file containing the fragment containing a specific entity.
-  static std::optional<File> containing(const Decl &entity);
-
-  // Return the file containing the fragment containing a specific entity.
-  static std::optional<File> containing(const Stmt &entity);
-
-  // Return the file containing the fragment containing a specific entity.
-  static std::optional<File> containing(const Type &type);
-
-  // Return the file containing the fragment containing a specific entity.
-  static std::optional<File> containing(const Attr &type);
-
-  // Return the file containing a specific token substitution.
-  static std::optional<File> containing(const Macro &entity);
+  MX_FOR_EACH_ENTITY_CATEGORY(MX_IGNORE_ENTITY_CATEGORY,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              MX_DECLARE_CONTAINING,
+                              MX_DECLARE_CONTAINING)
+#undef MX_DECLARE_CONTAINING
 
   // Return the file containing a specific token.
   //
   // NOTE(pag): In the case of tokens from fragments, this returns the file
-  //            containing the fragment itself.
+  //            containing the fragment itself. That might be very different
+  //            than the file from which the token came. For that, once should
+  //            use `File::containing` on the result of `Token::file_token`.
   static std::optional<File> containing(const Token &token);
-
-  // Return all files in a given index.
-  [[deprecated("Use Index::files() instead.")]]
-  static gap::generator<File> in(const Index &index);
 
   // Return the entity ID of this file.
   SpecificEntityId<FileId> id(void) const noexcept;
@@ -145,11 +129,8 @@ class File {
   // Return the contents of the file as a UTF-8 string.
   std::string_view data(void) const noexcept;
 
-  // Uses of this file.
-  gap::generator<Use<FileUseSelector>> uses(void) const;
-
   // References of this file.
-  gap::generator<MacroReference> references(void) const;
+  gap::generator<Reference> references(void) const;
 
   inline bool operator==(const File &that) const noexcept {
     return id() == that.id();

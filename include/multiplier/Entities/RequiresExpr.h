@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Expr.h"
 #include "StmtKind.h"
@@ -38,29 +38,9 @@ class RequiresExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<RequiresExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<RequiresExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : RequiresExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<RequiresExpr> in(const Fragment &frag);
+  static gap::generator<RequiresExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::REQUIRES_EXPR;
@@ -72,7 +52,14 @@ class RequiresExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<RequiresExpr> from(const TokenContext &c);
+  inline static std::optional<RequiresExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<RequiresExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<RequiresExpr> from(const Expr &parent);
 
   inline static std::optional<RequiresExpr> from(const std::optional<Expr> &parent) {
@@ -104,7 +91,8 @@ class RequiresExpr : public Expr {
   }
 
   RequiresExprBodyDecl body(void) const;
-  std::vector<ParmVarDecl> local_parameters(void) const;
+  std::optional<ParmVarDecl> nth_local_parameter(unsigned n) const;
+  gap::generator<ParmVarDecl> local_parameters(void) const;
   Token r_brace_token(void) const;
   Token requires_keyword_token(void) const;
   bool is_satisfied(void) const;

@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "ObjCContainerDecl.h"
@@ -38,29 +38,9 @@ class ObjCImplDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<ObjCImplDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCImplDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCImplDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCImplDecl> in(const Fragment &frag);
+  static gap::generator<ObjCImplDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<ObjCImplDecl> containing(const Decl &decl);
   static gap::generator<ObjCImplDecl> containing(const Stmt &stmt);
@@ -68,7 +48,15 @@ class ObjCImplDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCImplDecl> from(const TokenContext &c);
+  gap::generator<ObjCImplDecl> redeclarations(void) const;
+  inline static std::optional<ObjCImplDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCImplDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ObjCImplDecl> from(const ObjCContainerDecl &parent);
 
   inline static std::optional<ObjCImplDecl> from(const std::optional<ObjCContainerDecl> &parent) {
@@ -100,7 +88,8 @@ class ObjCImplDecl : public ObjCContainerDecl {
   }
 
   ObjCInterfaceDecl class_interface(void) const;
-  std::vector<ObjCPropertyImplDecl> property_implementations(void) const;
+  std::optional<ObjCPropertyImplDecl> nth_property_implementation(unsigned n) const;
+  gap::generator<ObjCPropertyImplDecl> property_implementations(void) const;
 };
 
 static_assert(sizeof(ObjCImplDecl) == sizeof(ObjCContainerDecl));

@@ -16,13 +16,12 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroKind.h"
 #include "MacroSubstitution.h"
-#include "MacroUseSelector.h"
 
 namespace mx {
 class DefineMacroDirective;
@@ -37,13 +36,7 @@ class MacroExpansion : public MacroSubstitution {
   friend class MacroSubstitution;
   friend class Macro;
  public:
-  inline static gap::generator<MacroExpansion> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<MacroExpansion> in(const Fragment &frag);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::EXPANSION;
@@ -54,6 +47,14 @@ class MacroExpansion : public MacroSubstitution {
 
   static gap::generator<MacroExpansion> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<MacroExpansion> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<MacroExpansion> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<MacroExpansion> from(const MacroSubstitution &parent);
 
@@ -76,7 +77,8 @@ class MacroExpansion : public MacroSubstitution {
   }
 
   std::optional<DefineMacroDirective> definition(void) const;
-  std::vector<MacroArgument> arguments(void) const;
+  std::optional<MacroArgument> nth_argument(unsigned n) const;
+  gap::generator<MacroArgument> arguments(void) const;
 };
 
 static_assert(sizeof(MacroExpansion) == sizeof(MacroSubstitution));

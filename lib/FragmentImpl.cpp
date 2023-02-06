@@ -15,23 +15,13 @@
 
 namespace mx {
 
-FragmentImpl::~FragmentImpl(void) noexcept {}
-
-
-FragmentImpl::FragmentImpl(FragmentId id_,
-                           EntityProvider::Ptr ep_,
-                           std::string data_)
-    : EntityImpl(std::move(ep_), std::move(data_)),
-      fragment_id(id_.fragment_id),
+FragmentImpl::FragmentImpl(EntityProvider::Ptr ep_,
+                           kj::Array<capnp::word> data_,
+                           RawEntityId id_)
+    : EntityImpl<rpc::Fragment>(std::move(ep_), kj::mv(data_)),
+      fragment_id(EntityId(id_).Extract<FragmentId>()->fragment_id),
       parsed_token_reader(this),
       macro_token_reader(this),
-      reader(EntityImpl::Reader<rpc::Fragment>()),
-      num_decls(reader.getDeclarations().size()),
-      num_stmts(reader.getStatements().size()),
-      num_types(reader.getTypes().size()),
-      num_attrs(reader.getAttributes().size()),
-      num_macros(reader.getMacros().size()),
-      num_pseudos(reader.getOthers().size()),
       num_parsed_tokens(reader.getParsedTokenContextOffsets().size()),
       num_tokens(reader.getTokenKinds().size()) {
 
@@ -60,13 +50,13 @@ RawEntityId FragmentImpl::FileContaingFirstToken(void) const {
 // Return a reader for the parsed tokens in the fragment. This doesn't
 // include all tokens, i.e. macro use tokens, comments, etc.
 TokenReader::Ptr FragmentImpl::ParsedTokenReader(
-    const FragmentImpl::Ptr &self) const {
+    const FragmentImplPtr &self) const {
   return TokenReader::Ptr(self, &parsed_token_reader);
 }
 
 // Return a reader for the macro tokens in the fragment.
 TokenReader::Ptr FragmentImpl::MacroTokenReader(
-    const FragmentImpl::Ptr &self) const {
+    const FragmentImplPtr &self) const {
   return TokenReader::Ptr(self, &macro_token_reader);
 }
 
@@ -92,7 +82,7 @@ std::string_view ReadMacroTokensFromFragment::NthTokenData(
     return {};
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto tor = reader.getTokenOffsets();
   auto bo = tor[ti];
   auto eo = tor[ti + 1u];
@@ -115,7 +105,7 @@ EntityId ReadMacroTokensFromFragment::NthParsedTokenId(EntityOffset ti) const {
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto mti2o = reader.getMacroTokenIndexToParsedTokenOffset();
   auto to = mti2o[ti];
 
@@ -142,21 +132,8 @@ EntityId ReadMacroTokensFromFragment::NthContainingMacroId(
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
-  auto mti2o = reader.getMacroTokenIndexToMacroOffset();
-  auto mo = mti2o[ti];
-
-  // NOTE(pag): Not an asserting condition; the serialization code stores
-  //            `num_parsed_tokens` for "no relation" and stores
-  //            `num_parsed_tokens + 1` for a one-to-many relation.
-  if (mo >= fragment->num_macros) {
-    return kInvalidEntityId;
-  }
-
-  // NOTE(pag): This is a huge hack. We can't let this `frag` pointer leak.
-  FragmentImpl::Ptr frag(fragment->ep, fragment);
-  Macro m(std::move(frag), mo);
-  return m.id().Pack();
+  const auto &reader = fragment->reader;
+  return reader.getMacroTokenIndexToMacroId()[ti];
 }
 
 // Return an entity id associated with the Nth token.
@@ -185,7 +162,7 @@ EntityId ReadMacroTokensFromFragment::NthTokenId(EntityOffset ti) const {
 }
 
 EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto dt = reader.getDerivedTokenIds();
   while (ti < fragment->num_tokens) {
     mx::EntityId eid(dt[ti]);
@@ -210,7 +187,7 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
           return kInvalidEntityId;
         }
 
-      } else if (FragmentImpl::Ptr frag = fragment->ep->FragmentFor(
+      } else if (FragmentImplPtr frag = fragment->ep->FragmentFor(
           fragment->ep, fid)) {
         assert(false);
         return frag->ParsedTokenReader(frag)->NthFileTokenId(tid.offset);
@@ -225,7 +202,7 @@ EntityId ReadMacroTokensFromFragment::NthFileTokenId(EntityOffset ti) const {
       if (tid.fragment_id == fragment->fragment_id) {
         ti = tid.offset;  // Follow to the next one.
 
-      } else if (FragmentImpl::Ptr frag =
+      } else if (FragmentImplPtr frag =
           fragment->ep->FragmentFor(fragment->ep, fid)) {
         assert(false);
         return frag->MacroTokenReader(frag)->NthFileTokenId(tid.offset);
@@ -290,7 +267,7 @@ TokenKind ReadParsedTokensFromFragment::NthTokenKind(EntityOffset to) const {
     return TokenKind::UNKNOWN;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto ti = reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
@@ -328,7 +305,7 @@ EntityId ReadParsedTokensFromFragment::NthDerivedTokenId(
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto ti = reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
@@ -348,7 +325,7 @@ EntityId ReadParsedTokensFromFragment::NthParsedTokenId(EntityOffset to) const {
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto ti = reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
@@ -369,27 +346,14 @@ EntityId ReadParsedTokensFromFragment::NthContainingMacroId(
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto ti = reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
     return kInvalidEntityId;
   }
 
-  auto mti2o = reader.getMacroTokenIndexToMacroOffset();
-  auto mo = mti2o[ti];
-
-  // NOTE(pag): Not an asserting condition; the serialization code stores
-  //            `num_parsed_tokens` for "no relation" and stores
-  //            `num_parsed_tokens + 1` for a one-to-many relation.
-  if (mo >= fragment->num_macros) {
-    return kInvalidEntityId;
-  }
-
-  // NOTE(pag): This is a huge hack. We can't let this `frag` pointer leak.
-  FragmentImpl::Ptr frag(fragment->ep, fragment);
-  Macro m(std::move(frag), mo);
-  return m.id().Pack();
+  return reader.getMacroTokenIndexToMacroId()[ti];
 }
 
 // Return an entity id associated with the Nth token.
@@ -399,7 +363,7 @@ EntityId ReadParsedTokensFromFragment::NthRelatedEntityId(
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto ti = reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
@@ -416,7 +380,7 @@ EntityId ReadParsedTokensFromFragment::NthTokenId(EntityOffset to) const {
     return kInvalidEntityId;
   }
 
-  const FragmentReader &reader = fragment->reader;
+  const auto &reader = fragment->reader;
   auto ti = reader.getParsedTokenOffsetToIndex()[to];
   if (ti >= fragment->num_tokens) {
     assert(false);
@@ -461,31 +425,6 @@ bool ReadParsedTokensFromFragment::Equals(const class TokenReader *that_) const 
   return true;
 }
 
-// Return a specific type of entity.
-DeclReader FragmentImpl::NthDecl(EntityOffset offset) const & {
-  return reader.getDeclarations()[offset];
-}
-
-StmtReader FragmentImpl::NthStmt(EntityOffset offset) const & {
-  return reader.getStatements()[offset];
-}
-
-TypeReader FragmentImpl::NthType(EntityOffset offset) const & {
-  return reader.getTypes()[offset];
-}
-
-AttrReader FragmentImpl::NthAttr(EntityOffset offset) const & {
-  return reader.getAttributes()[offset];
-}
-
-MacroReader FragmentImpl::NthMacro(EntityOffset offset) const & {
-  return reader.getMacros()[offset];
-}
-
-PseudoReader FragmentImpl::NthPseudo(EntityOffset offset) const & {
-  return reader.getOthers()[offset];
-}
-
 std::string_view FragmentImpl::SourceIR(void) const & noexcept {
   if (reader.hasMlir()) {
     if (auto mlir = reader.getMlir(); auto size = mlir.size()) {
@@ -506,7 +445,7 @@ std::string_view FragmentImpl::Data(void) const & noexcept {
 
 // Return the token associated with a specific entity ID.
 std::optional<Token> FragmentImpl::TokenFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
+    const FragmentImplPtr &self, EntityId eid, bool can_fail) const {
   (void) can_fail;
 
   VariantId vid = eid.Unpack();
@@ -527,7 +466,8 @@ std::optional<Token> FragmentImpl::TokenFor(
       }
 
     // It's a token inside of another fragment, go get the other fragment.
-    } else if (auto other_frag = ep->FragmentFor(ep, fid)) {
+    } else if (FragmentImplPtr other_frag =
+                   ep->FragmentFor(ep, fid)) {
       return other_frag->TokenFor(other_frag, eid, can_fail);
     }
 
@@ -556,7 +496,7 @@ std::optional<Token> FragmentImpl::TokenFor(
   } else if (std::holds_alternative<FileTokenId>(vid)) {
     const FileTokenId tid = std::get<FileTokenId>(vid);
     FileId fid(tid.file_id);
-    if (FileImpl::Ptr file = ep->FileFor(ep, SpecificEntityId<FileId>(fid));
+    if (FileImplPtr file = ep->FileFor(ep, fid);
         file && tid.offset < file->num_tokens) {
       Token tok(file->TokenReader(file), tid.offset);
       if (tok.id() == eid) {
@@ -577,7 +517,7 @@ std::optional<Token> FragmentImpl::TokenFor(
 
 // Return the inclusive token range associated with two entity IDs.
 TokenRange FragmentImpl::TokenRangeFor(
-    const FragmentImpl::Ptr &self, EntityId begin_id, EntityId end_id) const {
+    const FragmentImplPtr &self, EntityId begin_id, EntityId end_id) const {
   VariantId bvid = begin_id.Unpack();
   VariantId evid = end_id.Unpack();
 
@@ -603,7 +543,8 @@ TokenRange FragmentImpl::TokenRangeFor(
       }
 
     // It's a token inside of another fragment, go get the other fragment.
-    } else if (auto other_frag = ep->FragmentFor(ep, fid)) {
+    } else if (FragmentImplPtr other_frag =
+                   ep->FragmentFor(ep, fid)) {
       return other_frag->TokenRangeFor(self, begin_id, end_id);
 
     } else {
@@ -632,7 +573,8 @@ TokenRange FragmentImpl::TokenRangeFor(
       }
 
     // It's a token inside of another fragment, go get the other fragment.
-    } else if (auto other_frag = ep->FragmentFor(ep, fid)) {
+    } else if (FragmentImplPtr other_frag =
+                   ep->FragmentFor(ep, fid)) {
       return other_frag->TokenRangeFor(self, begin_id, end_id);
 
     } else {
@@ -652,221 +594,13 @@ TokenRange FragmentImpl::TokenRangeFor(
     }
 
     FileId fid(bfid.file_id);
-    if (auto file = ep->FileFor(ep, SpecificEntityId<FileId>(fid));
+    if (FileImplPtr file = ep->FileFor(ep, fid);
         file && efid.offset < file->num_tokens) {
       return TokenRange(file->TokenReader(file), bfid.offset, efid.offset + 1u);
     }
   }
 
   return TokenRange();
-}
-
-// Return the declaration associated with a specific entity ID.
-std::optional<Decl> FragmentImpl::DeclFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<DeclarationId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  DeclarationId decl_id = std::get<DeclarationId>(vid);
-
-  if (decl_id.fragment_id == fragment_id) {
-    if (decl_id.offset < num_decls) {
-      Decl decl(self, decl_id.offset);
-      if (decl.id() == eid) {
-        return decl;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's a decl inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, FragmentId(decl_id.fragment_id))) {
-    if (decl_id.offset < frag->num_decls) {
-      Decl decl(std::move(frag), decl_id.offset);
-      if (decl.id() == eid) {
-        return decl;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the statement associated with a specific entity ID.
-std::optional<Stmt> FragmentImpl::StmtFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<StatementId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  StatementId stmt_id = std::get<StatementId>(vid);
-  FragmentId fid(stmt_id.fragment_id);
-
-  // It's a statement inside of the current fragment.
-  if (stmt_id.fragment_id == fragment_id) {
-    if (stmt_id.offset < num_stmts) {
-      Stmt stmt(self, stmt_id.offset);
-      if (stmt.id() == eid) {
-        return stmt;
-      } else {
-        assert(false);
-      }
-    }
-  // It's a statement inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    if (stmt_id.offset < frag->num_stmts) {
-      Stmt stmt(std::move(frag), stmt_id.offset);
-      if (stmt.id() == eid) {
-        return stmt;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the type associated with a specific entity ID.
-std::optional<Type> FragmentImpl::TypeFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<TypeId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  TypeId type_id = std::get<TypeId>(vid);
-  FragmentId fid(type_id.fragment_id);
-
-  // It's a type inside of the current fragment.
-  if (type_id.fragment_id == fragment_id) {
-    if (type_id.offset < num_types) {
-      Type type(self, type_id.offset);
-      if (type.id() == eid) {
-        return type;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's a type inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    if (type_id.offset < frag->num_types) {
-      Type type(std::move(frag), type_id.offset);
-      if (type.id() == eid) {
-        return type;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the attribute associated with a specific entity ID.
-std::optional<Macro> FragmentImpl::MacroFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<MacroId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  MacroId macro_id = std::get<MacroId>(vid);
-  FragmentId fid(macro_id.fragment_id);
-
-  // It's a type inside of the current fragment.
-  if (macro_id.fragment_id == fragment_id) {
-    if (macro_id.offset < num_macros) {
-      Macro macro(self, macro_id.offset);
-      if (macro.id() == eid) {
-        return macro;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's a type inside of another fragment, go get the other fragment.
-  } else if (auto frag = ep->FragmentFor(ep, fid)) {
-    if (macro_id.offset < frag->num_macros) {
-      Macro macro(std::move(frag), macro_id.offset);
-      if (macro.id() == eid) {
-        return macro;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
-}
-
-// Return the type associated with a specific entity ID.
-std::optional<Attr> FragmentImpl::AttrFor(
-    const FragmentImpl::Ptr &self, EntityId eid, bool can_fail) const {
-  (void) can_fail;
-
-  VariantId vid = eid.Unpack();
-
-  if (!std::holds_alternative<AttributeId>(vid)) {
-    assert(can_fail);
-    return std::nullopt;
-  }
-
-  AttributeId attr_id = std::get<AttributeId>(vid);
-  FragmentId fid(attr_id.fragment_id);
-
-  // It's an attribute inside of the current fragment.
-  if (attr_id.fragment_id == fragment_id) {
-    if (attr_id.offset < num_attrs) {
-      Attr attr(self, attr_id.offset);
-      if (attr.id() == eid) {
-        return attr;
-      } else {
-        assert(false);
-      }
-    }
-
-  // It's an attribute inside of another fragment, go get the other fragment.
-  } else {
-    auto frag = ep->FragmentFor(ep, fid);
-    if (frag && attr_id.offset < frag->num_attrs) {
-      Attr attr(std::move(frag), attr_id.offset);
-      if (attr.id() == eid) {
-        return attr;
-      } else {
-        assert(false);
-      }
-    }
-  }
-
-  assert(can_fail);
-  return std::nullopt;
 }
 
 }  // namespace mx

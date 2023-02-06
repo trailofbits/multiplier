@@ -16,12 +16,11 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AutoTypeKeyword.h"
-#include "DeclUseSelector.h"
 #include "DeducedType.h"
 #include "TypeKind.h"
 
@@ -38,35 +37,22 @@ class AutoType : public DeducedType {
   friend class DeducedType;
   friend class Type;
  public:
-  inline static gap::generator<AutoType> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<AutoType> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : AutoType::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<AutoType> in(const Fragment &frag);
+  static gap::generator<AutoType> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr TypeKind static_kind(void) {
     return TypeKind::AUTO;
   }
 
-  static std::optional<AutoType> from(const TokenContext &c);
+  inline static std::optional<AutoType> from(const Reference &r) {
+    return from(r.as_type());
+  }
+
+  inline static std::optional<AutoType> from(const TokenContext &t) {
+    return from(t.as_type());
+  }
+
   static std::optional<AutoType> from(const DeducedType &parent);
 
   inline static std::optional<AutoType> from(const std::optional<DeducedType> &parent) {
@@ -88,7 +74,8 @@ class AutoType : public DeducedType {
   }
 
   AutoTypeKeyword keyword(void) const;
-  std::vector<TemplateArgument> type_constraint_arguments(void) const;
+  std::optional<TemplateArgument> nth_type_constraint_argument(unsigned n) const;
+  gap::generator<TemplateArgument> type_constraint_arguments(void) const;
   std::optional<ConceptDecl> type_constraint_concept(void) const;
   bool is_constrained(void) const;
   bool is_decltype_auto(void) const;

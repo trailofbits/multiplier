@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "OMPLoopBasedDirective.h"
 #include "StmtKind.h"
@@ -37,29 +37,9 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   friend class OMPExecutableDirective;
   friend class Stmt;
  public:
-  inline static gap::generator<OMPLoopDirective> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<OMPLoopDirective> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : OMPLoopDirective::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<OMPLoopDirective> in(const Fragment &frag);
+  static gap::generator<OMPLoopDirective> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<OMPLoopDirective> containing(const Decl &decl);
   static gap::generator<OMPLoopDirective> containing(const Stmt &stmt);
@@ -67,7 +47,14 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<OMPLoopDirective> from(const TokenContext &c);
+  inline static std::optional<OMPLoopDirective> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<OMPLoopDirective> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<OMPLoopDirective> from(const OMPLoopBasedDirective &parent);
 
   inline static std::optional<OMPLoopDirective> from(const std::optional<OMPLoopBasedDirective> &parent) {
@@ -98,11 +85,16 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
     }
   }
 
-  std::vector<Expr> counters(void) const;
-  std::vector<Expr> dependent_counters(void) const;
-  std::vector<Expr> dependent_initializers(void) const;
-  std::vector<Expr> finals(void) const;
-  std::vector<Expr> finals_conditions(void) const;
+  std::optional<Expr> nth_counter(unsigned n) const;
+  gap::generator<Expr> counters(void) const;
+  std::optional<Expr> nth_dependent_counter(unsigned n) const;
+  gap::generator<Expr> dependent_counters(void) const;
+  std::optional<Expr> nth_dependent_initializer(unsigned n) const;
+  gap::generator<Expr> dependent_initializers(void) const;
+  std::optional<Expr> nth_final(unsigned n) const;
+  gap::generator<Expr> finals(void) const;
+  std::optional<Expr> nth_finals_condition(unsigned n) const;
+  gap::generator<Expr> finals_conditions(void) const;
   Stmt body(void) const;
   Expr calculate_last_iteration(void) const;
   Expr combined_condition(void) const;
@@ -133,9 +125,12 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   Expr prev_upper_bound_variable(void) const;
   Expr stride_variable(void) const;
   Expr upper_bound_variable(void) const;
-  std::vector<Expr> initializers(void) const;
-  std::vector<Expr> private_counters(void) const;
-  std::vector<Expr> updates(void) const;
+  std::optional<Expr> nth_initializer(unsigned n) const;
+  gap::generator<Expr> initializers(void) const;
+  std::optional<Expr> nth_private_counter(unsigned n) const;
+  gap::generator<Expr> private_counters(void) const;
+  std::optional<Expr> nth_update(unsigned n) const;
+  gap::generator<Expr> updates(void) const;
 };
 
 static_assert(sizeof(OMPLoopDirective) == sizeof(OMPLoopBasedDirective));

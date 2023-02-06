@@ -6,9 +6,18 @@
 
 #pragma once
 
-#ifndef PSEUDO_ENTITY_TYPES
+#define FOR_EACH_ENTITY_CATEGORY(m) \
+    m(Decl, declaration) \
+    m(Stmt, statement) \
+    m(Type, type) \
+    m(Attr, attribute) \
+    m(Macro, macro) \
+    m(TemplateArgument, template_argument) \
+    m(TemplateParameterList, template_parameter_list)\
+    m(CXXBaseSpecifier, cxx_base_specifier) \
+    m(Designator, designator)
 
-#define PSEUDO_ENTITY_TYPES(p) \
+#define FOR_EACH_PSEUDO_ENTITY_TYPE(p) \
     p(TemplateArgument) \
     p(TemplateParameterList) \
     p(CXXBaseSpecifier) \
@@ -23,9 +32,7 @@ namespace pasta {
 //
 // NOTE(pag): Keep this in sync with `bin/Index/Util.h`.
 enum class PseudoKind : unsigned char {
-  PSEUDO_ENTITY_TYPES(PSEUDO_ENTITY_TYPE_ENUMERATOR)
+  FOR_EACH_PSEUDO_ENTITY_TYPE(PSEUDO_ENTITY_TYPE_ENUMERATOR)
 };
 
 }  // namespace pasta
-
-#endif  // PSEUDO_ENTITY_TYPES

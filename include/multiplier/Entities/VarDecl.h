@@ -16,16 +16,14 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 #include "DeclaratorDecl.h"
 #include "LanguageLinkage.h"
 #include "QualTypeDestructionKind.h"
-#include "StmtUseSelector.h"
 #include "StorageClass.h"
 #include "StorageDuration.h"
 #include "TemplateSpecializationKind.h"
@@ -50,29 +48,9 @@ class VarDecl : public DeclaratorDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<VarDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<VarDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : VarDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<VarDecl> in(const Fragment &frag);
+  static gap::generator<VarDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR;
@@ -84,7 +62,15 @@ class VarDecl : public DeclaratorDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<VarDecl> from(const TokenContext &c);
+  gap::generator<VarDecl> redeclarations(void) const;
+  inline static std::optional<VarDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<VarDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<VarDecl> from(const DeclaratorDecl &parent);
 
   inline static std::optional<VarDecl> from(const std::optional<DeclaratorDecl> &parent) {
@@ -172,7 +158,7 @@ class VarDecl : public DeclaratorDecl {
   bool is_previous_declaration_in_same_block_scope(void) const;
   bool is_static_data_member(void) const;
   bool is_static_local(void) const;
-  bool is_demoted_definition(void) const;
+  bool is_this_declaration_a_demoted_definition(void) const;
   bool is_usable_in_constant_expressions(void) const;
   bool might_be_usable_in_constant_expressions(void) const;
   QualTypeDestructionKind needs_destruction(void) const;

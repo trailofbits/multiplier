@@ -104,8 +104,6 @@ static void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
 
 static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
                      const mx::MacroSubstitution &macro) {
-  auto nodes = macro.children();
-  auto after_nodes = macro.replacement_children();
   auto id = macro.id().Pack();
   os
       << "m" << id
@@ -116,17 +114,21 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
       << "b" << id
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>";
 
-  if (nodes.empty()) {
-    os << "<TD></TD>";
-  }
-  for (const mx::MacroOrToken &node : nodes) {
+  auto empty = true;
+  for (mx::MacroOrToken node : macro.replacement_children()) {
     if (std::holds_alternative<mx::Token>(node)) {
+      empty = false;
       const mx::Token &mt = std::get<mx::Token>(node);
       os << "<TD port=\"t" << mt.id().Pack() << "\">" << TokData(mt) << "</TD>";
     } else if (std::holds_alternative<mx::Macro>(node)) {
+      empty = false;
       const mx::Macro &m = std::get<mx::Macro>(node);
       os << "<TD port=\"m" << m.id().Pack() << "\"> </TD>";
     }
+  }
+
+  if (empty) {
+    os << "<TD></TD>";
   }
 
   os
@@ -134,23 +136,23 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
       << "a" << id
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>";
 
-  if (after_nodes.empty()) {
+  if (empty) {
     os << "<TD></TD>";
-  }
-
-  for (const mx::MacroOrToken &node : after_nodes) {
-    if (std::holds_alternative<mx::Token>(node)) {
-      const mx::Token &mt = std::get<mx::Token>(node);
-      os << "<TD port=\"t" << mt.id().Pack() << "\">" << TokData(mt) << "</TD>";
-    } else if (std::holds_alternative<mx::Macro>(node)) {
-      const mx::Macro &m = std::get<mx::Macro>(node);
-      os << "<TD port=\"m" << m.id().Pack() << "\"> </TD>";
+  } else {
+    for (mx::MacroOrToken node : macro.replacement_children()) {
+      if (std::holds_alternative<mx::Token>(node)) {
+        const mx::Token &mt = std::get<mx::Token>(node);
+        os << "<TD port=\"t" << mt.id().Pack() << "\">" << TokData(mt) << "</TD>";
+      } else if (std::holds_alternative<mx::Macro>(node)) {
+        const mx::Macro &m = std::get<mx::Macro>(node);
+        os << "<TD port=\"m" << m.id().Pack() << "\"> </TD>";
+      }
     }
   }
 
   os << "</TR></TABLE>>];\n";
 
-  for (const mx::MacroOrToken &node : nodes) {
+  for (mx::MacroOrToken node : macro.children()) {
     if (std::holds_alternative<mx::Token>(node)) {
       PrintToken(os, file_toks, "b", id, std::get<mx::Token>(node));
     } else if (std::holds_alternative<mx::Macro>(node)) {
@@ -161,7 +163,7 @@ static void PrintSub(std::ostream &os, const mx::TokenRange &file_toks,
     }
   }
 
-  for (const mx::MacroOrToken &node : after_nodes) {
+  for (mx::MacroOrToken node : macro.replacement_children()) {
     if (std::holds_alternative<mx::Token>(node)) {
       PrintToken(os, file_toks, "a", id, std::get<mx::Token>(node));
     } else if (std::holds_alternative<mx::Macro>(node)) {
@@ -181,14 +183,13 @@ void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
     return;
   }
 
-  auto nodes = macro.children();
   auto id = macro.id().Pack();
   os
       << "m" << id
       << " [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>"
       << "<TD bgcolor=\"darkseagreen2\">" << mx::EnumeratorName(macro.kind()) << "</TD>";
 
-  for (const mx::MacroOrToken &node : nodes) {
+  for (mx::MacroOrToken node : macro.children()) {
     if (std::holds_alternative<mx::Token>(node)) {
       const mx::Token &mt = std::get<mx::Token>(node);
       os << "<TD port=\"t" << mt.id().Pack() << "\">" << TokData(mt) << "</TD>";
@@ -199,7 +200,7 @@ void PrintMacro(std::ostream &os, const mx::TokenRange &file_toks,
   }
   os << "</TR></TABLE>>];\n";
 
-  for (const mx::MacroOrToken &node : nodes) {
+  for (mx::MacroOrToken node : macro.children()) {
     if (std::holds_alternative<mx::Token>(node)) {
       PrintToken(os, file_toks, "m", id, std::get<mx::Token>(node));
     } else if (std::holds_alternative<mx::Macro>(node)) {
@@ -248,7 +249,6 @@ extern "C" int main(int argc, char *argv[]) {
 
   mx::TokenRange file_toks = fragment->file_tokens();
   mx::TokenRange parsed_toks = fragment->parsed_tokens();
-  std::vector<mx::MacroOrToken> code = fragment->preprocessed_code();
 
   auto &os = std::cout;
   os
@@ -267,7 +267,7 @@ extern "C" int main(int argc, char *argv[]) {
       << "ct0  [label=<<TABLE cellpadding=\"2\" cellspacing=\"0\" border=\"1\"><TR>"
       << "<TD bgcolor=\"beige\">PRE_PROCESSED</TD>";
 
-  for (const mx::MacroOrToken &node : code) {
+  for (mx::MacroOrToken node : fragment->preprocessed_code()) {
     if (std::holds_alternative<mx::Macro>(node)) {
       const mx::Macro &macro = std::get<mx::Macro>(node);
       os << "<TD port=\"m" << macro.id().Pack() << "\"> </TD>";
@@ -280,7 +280,7 @@ extern "C" int main(int argc, char *argv[]) {
 
   os << "</TR></TABLE>>];\n";
 
-  for (const mx::MacroOrToken &node : code) {
+  for (mx::MacroOrToken node : fragment->preprocessed_code()) {
     if (std::holds_alternative<mx::Token>(node)) {
       PrintToken(os, file_toks, "ct", 0, std::get<mx::Token>(node));
     } else if (std::holds_alternative<mx::Macro>(node)) {

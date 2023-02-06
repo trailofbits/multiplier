@@ -52,11 +52,11 @@ class ParentTrackerVisitor : public EntityVisitor {
   void Accept(const pasta::Decl &entity) final {
     mx::RawEntityId rid = em.EntityId(entity);
     mx::VariantId vid = mx::EntityId(rid).Unpack();
-    if (!std::holds_alternative<mx::DeclarationId>(vid)) {
+    if (!std::holds_alternative<mx::DeclId>(vid)) {
       return;
     }
 
-    mx::DeclarationId eid = std::get<mx::DeclarationId>(vid);
+    mx::DeclId eid = std::get<mx::DeclId>(vid);
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.
@@ -79,11 +79,11 @@ class ParentTrackerVisitor : public EntityVisitor {
   void Accept(const pasta::Stmt &entity) final {
     mx::RawEntityId rid = em.EntityId(entity);
     mx::VariantId vid = mx::EntityId(rid).Unpack();
-    if (!std::holds_alternative<mx::StatementId>(vid)) {
+    if (!std::holds_alternative<mx::StmtId>(vid)) {
       return;
     }
 
-    mx::StatementId eid = std::get<mx::StatementId>(vid);
+    mx::StmtId eid = std::get<mx::StmtId>(vid);
 
     // This entity doesn't belong in this code chunk. Not sure if/when this will
     // happen.

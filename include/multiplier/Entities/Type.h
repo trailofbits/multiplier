@@ -16,11 +16,10 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "LangAS.h"
 #include "Linkage.h"
 #include "NullabilityKind.h"
@@ -29,7 +28,6 @@
 #include "QualTypePrimitiveDefaultInitializeKind.h"
 #include "TypeKind.h"
 #include "TypeScalarTypeKind.h"
-#include "TypeUseSelector.h"
 #include "Visibility.h"
 
 namespace mx {
@@ -42,8 +40,10 @@ class ObjCObjectPointerType;
 class ObjCObjectType;
 class RecordDecl;
 class RecordType;
+class Reference;
 class TagDecl;
 class Type;
+class TypeImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Type {
  protected:
@@ -54,23 +54,30 @@ class Type {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  friend class TypeImpl;
+  std::shared_ptr<const TypeImpl> impl;
  public:
   Type(Type &&) noexcept = default;
   Type(const Type &) = default;
   Type &operator=(Type &&) noexcept = default;
   Type &operator=(const Type &) = default;
 
-  inline Type(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  /* implicit */ inline Type(std::shared_ptr<const TypeImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+  PackedTypeId id(void) const;
+  gap::generator<Reference> references(void) const;
+
+ protected:
+  static gap::generator<Type> in_internal(const Fragment &fragment);
+
+ public:
+  static gap::generator<Type> in(const Fragment &frag);
+  static gap::generator<Type> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static std::optional<Type> from(const Type &self) {
     return self;
@@ -80,39 +87,12 @@ class Type {
     return self;
   }
 
-  inline static std::optional<Type> from(const TokenContext &c) {
-    return c.as_type();
+  inline static std::optional<Type> from(const Reference &r) {
+    return r.as_type();
   }
 
-  SpecificEntityId<TypeId> id(void) const;
-  gap::generator<Use<TypeUseSelector>> uses(void) const;
-
- protected:
-  static gap::generator<Type> in_internal(const Fragment &fragment);
-
- public:
-  inline static gap::generator<Type> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<Type> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : Type::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
+  inline static std::optional<Type> from(const TokenContext &t) {
+    return t.as_type();
   }
 
   bool is_qualified(void) const;

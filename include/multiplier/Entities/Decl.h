@@ -16,25 +16,23 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "AccessSpecifier.h"
-#include "AttrUseSelector.h"
 #include "AvailabilityResult.h"
 #include "DeclCategory.h"
 #include "DeclFriendObjectKind.h"
 #include "DeclKind.h"
 #include "DeclModuleOwnershipKind.h"
-#include "DeclUseSelector.h"
 
 namespace mx {
 class Attr;
 class Decl;
+class DeclImpl;
 class ExternalSourceSymbolAttr;
-class Stmt;
-class StmtReference;
+class Reference;
 class TemplateDecl;
 class TemplateParameterList;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
@@ -46,24 +44,43 @@ class Decl {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  friend class DeclImpl;
+  std::shared_ptr<const DeclImpl> impl;
  public:
   Decl(Decl &&) noexcept = default;
   Decl(const Decl &) = default;
   Decl &operator=(Decl &&) noexcept = default;
   Decl &operator=(const Decl &) = default;
 
-  inline Decl(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  /* implicit */ inline Decl(std::shared_ptr<const DeclImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+  PackedDeclId id(void) const;
+  gap::generator<Reference> references(void) const;
+
+  std::optional<Decl> parent_declaration(void) const;
+  std::optional<Stmt> parent_statement(void) const;
+  std::optional<Decl> definition(void) const;
+  bool is_definition(void) const;
+  Decl canonical_declaration(void) const;
+  gap::generator<Decl> redeclarations(void) const;
+ protected:
+  static gap::generator<Decl> in_internal(const Fragment &fragment);
+
+ public:
+  static gap::generator<Decl> in(const Fragment &frag);
+  static gap::generator<Decl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  static gap::generator<Decl> containing(const Decl &decl);
+  static gap::generator<Decl> containing(const Stmt &stmt);
+
+  bool contains(const Decl &decl);
+  bool contains(const Stmt &stmt);
 
   inline static std::optional<Decl> from(const Decl &self) {
     return self;
@@ -73,54 +90,16 @@ class Decl {
     return self;
   }
 
-  inline static std::optional<Decl> from(const TokenContext &c) {
-    return c.as_declaration();
+  inline static std::optional<Decl> from(const Reference &r) {
+    return r.as_declaration();
   }
 
-  std::optional<Decl> parent_declaration(void) const;
-  std::optional<Stmt> parent_statement(void) const;
-  std::optional<Decl> definition(void) const;
-  bool is_definition(void) const;
-  std::vector<Decl> redeclarations(void) const;
-  SpecificEntityId<DeclarationId> id(void) const;
-  gap::generator<Use<DeclUseSelector>> uses(void) const;
-  gap::generator<StmtReference> references(void) const;
-
- protected:
-  static gap::generator<Decl> in_internal(const Fragment &fragment);
-
- public:
-  inline static gap::generator<Decl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
+  inline static std::optional<Decl> from(const TokenContext &t) {
+    return t.as_declaration();
   }
 
-  inline static gap::generator<Decl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : Decl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
-
-  static gap::generator<Decl> containing(const Decl &decl);
-  static gap::generator<Decl> containing(const Stmt &stmt);
-
-  bool contains(const Decl &decl);
-  bool contains(const Stmt &stmt);
-
-  std::vector<Attr> attributes(void) const;
+  std::optional<Attr> nth_attribute(unsigned n) const;
+  gap::generator<Attr> attributes(void) const;
   AccessSpecifier access(void) const;
   AvailabilityResult availability(void) const;
   std::optional<Attr> defining_attribute(void) const;
@@ -152,6 +131,7 @@ class Decl {
   bool is_template_parameter(void) const;
   bool is_template_parameter_pack(void) const;
   bool is_templated(void) const;
+  bool is_this_declaration_referenced(void) const;
   bool is_top_level_declaration_in_obj_c_container(void) const;
   bool is_unavailable(void) const;
   bool is_unconditionally_visible(void) const;

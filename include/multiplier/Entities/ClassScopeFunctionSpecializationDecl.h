@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Decl.h"
 #include "DeclKind.h"
@@ -33,29 +33,9 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ClassScopeFunctionSpecializationDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ClassScopeFunctionSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassScopeFunctionSpecializationDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_SCOPE_FUNCTION_SPECIALIZATION;
@@ -67,7 +47,15 @@ class ClassScopeFunctionSpecializationDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &c);
+  gap::generator<ClassScopeFunctionSpecializationDecl> redeclarations(void) const;
+  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ClassScopeFunctionSpecializationDecl> from(const Decl &parent);
 
   inline static std::optional<ClassScopeFunctionSpecializationDecl> from(const std::optional<Decl> &parent) {

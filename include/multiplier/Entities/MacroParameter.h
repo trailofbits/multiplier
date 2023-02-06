@@ -16,13 +16,12 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Macro.h"
 #include "MacroKind.h"
-#include "TokenUseSelector.h"
 
 namespace mx {
 class Macro;
@@ -34,13 +33,7 @@ class MacroParameter : public Macro {
   friend class FragmentImpl;
   friend class Macro;
  public:
-  inline static gap::generator<MacroParameter> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<MacroParameter> in(const Fragment &frag);
 
   inline static constexpr MacroKind static_kind(void) {
     return MacroKind::PARAMETER;
@@ -51,6 +44,14 @@ class MacroParameter : public Macro {
 
   static gap::generator<MacroParameter> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<MacroParameter> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<MacroParameter> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<MacroParameter> from(const Macro &parent);
 

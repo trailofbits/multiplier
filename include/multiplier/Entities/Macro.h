@@ -16,15 +16,16 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "MacroKind.h"
-#include "MacroUseSelector.h"
 
 namespace mx {
 class Macro;
+class MacroImpl;
+class Reference;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 using MacroOrToken = std::variant<Macro, Token>;
 class Macro {
@@ -35,24 +36,36 @@ class Macro {
   friend class Fragment;
   friend class FragmentImpl;
   friend class Index;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  friend class MacroImpl;
+  std::shared_ptr<const MacroImpl> impl;
  public:
   Macro(Macro &&) noexcept = default;
   Macro(const Macro &) = default;
   Macro &operator=(Macro &&) noexcept = default;
   Macro &operator=(const Macro &) = default;
 
-  inline Macro(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  /* implicit */ inline Macro(std::shared_ptr<const MacroImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+  PackedMacroId id(void) const;
+  gap::generator<Reference> references(void) const;
+
+ protected:
+  static gap::generator<Macro> in_internal(const Fragment &fragment);
+  static gap::generator<Macro> containing_internal(const Token &token);
+
+ public:
+  static gap::generator<Macro> in(const Fragment &frag);
+
+  static gap::generator<Macro> containing(const Macro &macro);
+  bool contains(const Macro &macro);
+
+  static gap::generator<Macro> containing(const Token &token);
+  bool contains(const Token &token);
 
   inline static std::optional<Macro> from(const Macro &self) {
     return self;
@@ -62,31 +75,17 @@ class Macro {
     return self;
   }
 
-  SpecificEntityId<MacroId> id(void) const;
-  gap::generator<Use<MacroUseSelector>> uses(void) const;
-
- protected:
-  static gap::generator<Macro> in_internal(const Fragment &fragment);
-  static gap::generator<Macro> containing_internal(const Token &token);
-
- public:
-  inline static gap::generator<Macro> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
+  inline static std::optional<Macro> from(const Reference &r) {
+    return r.as_macro();
   }
 
-  static gap::generator<Macro> containing(const Macro &macro);
-  bool contains(const Macro &macro);
-
-  static gap::generator<Macro> containing(const Token &token);
-  bool contains(const Token &token);
+  inline static std::optional<Macro> from(const TokenContext &t) {
+    return t.as_macro();
+  }
 
   MacroKind kind(void) const;
   std::optional<Macro> parent(void) const;
-  std::vector<MacroOrToken> children(void) const;
+  gap::generator<MacroOrToken> children(void) const;
 };
 
 #endif

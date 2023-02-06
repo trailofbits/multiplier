@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Type.h"
 #include "TypeKind.h"
@@ -32,31 +32,18 @@ class ReferenceType : public Type {
   friend class FragmentImpl;
   friend class Type;
  public:
-  inline static gap::generator<ReferenceType> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
+  static gap::generator<ReferenceType> in(const Fragment &frag);
+  static gap::generator<ReferenceType> containing(const Token &tok);
+  bool contains(const Token &tok) const;
+
+  inline static std::optional<ReferenceType> from(const Reference &r) {
+    return from(r.as_type());
   }
 
-  inline static gap::generator<ReferenceType> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
+  inline static std::optional<ReferenceType> from(const TokenContext &t) {
+    return from(t.as_type());
   }
 
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ReferenceType::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
-
-  static std::optional<ReferenceType> from(const TokenContext &c);
   static std::optional<ReferenceType> from(const Type &parent);
 
   inline static std::optional<ReferenceType> from(const std::optional<Type> &parent) {

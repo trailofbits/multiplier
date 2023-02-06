@@ -16,12 +16,11 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 #include "TagTypeKind.h"
 #include "TypeDecl.h"
 
@@ -40,29 +39,9 @@ class TagDecl : public TypeDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<TagDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<TagDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : TagDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<TagDecl> in(const Fragment &frag);
+  static gap::generator<TagDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<TagDecl> containing(const Decl &decl);
   static gap::generator<TagDecl> containing(const Stmt &stmt);
@@ -70,7 +49,15 @@ class TagDecl : public TypeDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<TagDecl> from(const TokenContext &c);
+  gap::generator<TagDecl> redeclarations(void) const;
+  inline static std::optional<TagDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<TagDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<TagDecl> from(const TypeDecl &parent);
 
   inline static std::optional<TagDecl> from(const std::optional<TypeDecl> &parent) {
@@ -117,11 +104,13 @@ class TagDecl : public TypeDecl {
   bool is_free_standing(void) const;
   bool is_interface(void) const;
   bool is_struct(void) const;
-  bool is_demoted_definition(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  bool is_this_declaration_a_demoted_definition(void) const;
   bool is_union(void) const;
   bool may_have_out_of_date_definition(void) const;
-  std::vector<TemplateParameterList> template_parameter_lists(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  std::optional<TemplateParameterList> nth_template_parameter_list(unsigned n) const;
+  gap::generator<TemplateParameterList> template_parameter_lists(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(TagDecl) == sizeof(TypeDecl));

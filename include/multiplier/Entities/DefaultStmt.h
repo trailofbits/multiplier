@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "StmtKind.h"
 #include "SwitchCase.h"
@@ -34,29 +34,9 @@ class DefaultStmt : public SwitchCase {
   friend class SwitchCase;
   friend class Stmt;
  public:
-  inline static gap::generator<DefaultStmt> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<DefaultStmt> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : DefaultStmt::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<DefaultStmt> in(const Fragment &frag);
+  static gap::generator<DefaultStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::DEFAULT_STMT;
@@ -68,7 +48,14 @@ class DefaultStmt : public SwitchCase {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<DefaultStmt> from(const TokenContext &c);
+  inline static std::optional<DefaultStmt> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<DefaultStmt> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<DefaultStmt> from(const SwitchCase &parent);
 
   inline static std::optional<DefaultStmt> from(const std::optional<SwitchCase> &parent) {

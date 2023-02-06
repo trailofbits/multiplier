@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "VarTemplateSpecializationDecl.h"
@@ -27,6 +27,7 @@ namespace mx {
 class Decl;
 class DeclaratorDecl;
 class NamedDecl;
+class TemplateParameterList;
 class ValueDecl;
 class VarDecl;
 class VarTemplatePartialSpecializationDecl;
@@ -42,29 +43,9 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<VarTemplatePartialSpecializationDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : VarTemplatePartialSpecializationDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<VarTemplatePartialSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<VarTemplatePartialSpecializationDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::VAR_TEMPLATE_PARTIAL_SPECIALIZATION;
@@ -76,7 +57,15 @@ class VarTemplatePartialSpecializationDecl : public VarTemplateSpecializationDec
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &c);
+  gap::generator<VarTemplatePartialSpecializationDecl> redeclarations(void) const;
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<VarTemplatePartialSpecializationDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<VarTemplatePartialSpecializationDecl> from(const VarTemplateSpecializationDecl &parent);
 
   inline static std::optional<VarTemplatePartialSpecializationDecl> from(const std::optional<VarTemplateSpecializationDecl> &parent) {

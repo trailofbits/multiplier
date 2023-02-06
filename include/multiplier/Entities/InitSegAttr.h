@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Attr.h"
 #include "AttrKind.h"
@@ -32,35 +32,22 @@ class InitSegAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static gap::generator<InitSegAttr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<InitSegAttr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : InitSegAttr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<InitSegAttr> in(const Fragment &frag);
+  static gap::generator<InitSegAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::INIT_SEG;
   }
 
-  static std::optional<InitSegAttr> from(const TokenContext &c);
+  inline static std::optional<InitSegAttr> from(const Reference &r) {
+    return from(r.as_attribute());
+  }
+
+  inline static std::optional<InitSegAttr> from(const TokenContext &t) {
+    return from(t.as_attribute());
+  }
+
   static std::optional<InitSegAttr> from(const Attr &parent);
 
   inline static std::optional<InitSegAttr> from(const std::optional<Attr> &parent) {

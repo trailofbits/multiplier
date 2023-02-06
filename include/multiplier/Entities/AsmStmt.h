@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Stmt.h"
 #include "StmtKind.h"
@@ -33,29 +33,9 @@ class AsmStmt : public Stmt {
   friend class FragmentImpl;
   friend class Stmt;
  public:
-  inline static gap::generator<AsmStmt> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<AsmStmt> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : AsmStmt::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<AsmStmt> in(const Fragment &frag);
+  static gap::generator<AsmStmt> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<AsmStmt> containing(const Decl &decl);
   static gap::generator<AsmStmt> containing(const Stmt &stmt);
@@ -63,7 +43,14 @@ class AsmStmt : public Stmt {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<AsmStmt> from(const TokenContext &c);
+  inline static std::optional<AsmStmt> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<AsmStmt> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<AsmStmt> from(const Stmt &parent);
 
   inline static std::optional<AsmStmt> from(const std::optional<Stmt> &parent) {
@@ -76,15 +63,22 @@ class AsmStmt : public Stmt {
 
   std::string_view generate_assembly_string(void) const;
   Token assembly_token(void) const;
-  std::vector<Expr> inputs(void) const;
+  std::optional<Expr> nth_input(unsigned n) const;
+  gap::generator<Expr> inputs(void) const;
   bool is_simple(void) const;
   bool is_volatile(void) const;
-  std::vector<Expr> outputs(void) const;
-  std::vector<std::string_view> output_constraints(void) const;
-  std::vector<Expr> output_expressions(void) const;
-  std::vector<std::string_view> input_constraints(void) const;
-  std::vector<Expr> input_expressions(void) const;
-  std::vector<std::string_view> clobbers(void) const;
+  std::optional<Expr> nth_output(unsigned n) const;
+  gap::generator<Expr> outputs(void) const;
+  std::optional<std::string_view> nth_output_constraint(unsigned n) const;
+  gap::generator<std::string_view> output_constraints(void) const;
+  std::optional<Expr> nth_output_expression(unsigned n) const;
+  gap::generator<Expr> output_expressions(void) const;
+  std::optional<std::string_view> nth_input_constraint(unsigned n) const;
+  gap::generator<std::string_view> input_constraints(void) const;
+  std::optional<Expr> nth_input_expression(unsigned n) const;
+  gap::generator<Expr> input_expressions(void) const;
+  std::optional<std::string_view> nth_clobber(unsigned n) const;
+  gap::generator<std::string_view> clobbers(void) const;
 };
 
 static_assert(sizeof(AsmStmt) == sizeof(Stmt));

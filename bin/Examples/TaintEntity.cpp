@@ -439,11 +439,9 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
     return;
   }
 
-  std::vector<mx::ParmVarDecl> params = called_func->parameters();
-
   // Go try to match the argument to a parameter.
+  std::optional<mx::ParmVarDecl> matched_param;
   auto arg_num = 0u;
-  auto matched = false;
   for (mx::Expr arg : call.arguments()) {
     if (arg.id() != taint_source.id()) {
       ++arg_num;
@@ -451,17 +449,12 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
     }
 
     // TODO(pag): Taint `va_arg` macro use when variadic arguments are used.
-    if (arg_num >= params.size()) {
-      break;
-    }
-
-    // Found the parameter associated with this call argument.
-    matched = true;
+    matched_param = called_func->nth_parameter(arg_num);
     break;
   }
 
   // Didn't match the argument to a parameter.
-  if (!matched) {
+  if (!matched_param) {
     std::cerr
         << ESC(ATTR_BRIGHT) "Tainted argument cannot be matched with "
            "function parameter at "
@@ -487,10 +480,10 @@ static void TaintTrackCallArg(const mx::CallExpr &call,
   std::optional<mx::Decl> def = called_func->definition();
 
   if (std::optional<mx::FunctionDecl> func_def = mx::FunctionDecl::from(def)) {
-    TaintTrackVarOrVarLike(func_def->parameters()[arg_num], entry, seen);
+    TaintTrackVarOrVarLike(matched_param.value(), entry, seen);
 
   } else {
-    ModelLibraryFunction(call, called_func.value(), params[arg_num],
+    ModelLibraryFunction(call, called_func.value(), matched_param.value(),
                          taint_source, arg_num, entry, seen);
   }
 }
@@ -636,13 +629,14 @@ void TaintTrackFunc(const mx::FunctionDecl &taint_source,
   if (!taint_source.return_type().unqualified_desugared_type().is_void_type()) {
     UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
     if (!AlreadySeen(entry, seen)) {
-      for (mx::StmtReference ref : taint_source.references()) {
-        mx::Stmt stmt_taint_source = ref.statement();
-        auto calls = mx::CallExpr::containing(stmt_taint_source);
-        auto call = calls.begin();
-        if (call != calls.end()) {
-          TaintTrackCallRet(*call, stmt_taint_source, taint_source,
-                            entry, seen);
+      for (mx::Reference ref : taint_source.references()) {
+        if (auto stmt_taint_source = ref.as_statement()) {
+          auto calls = mx::CallExpr::containing(*stmt_taint_source);
+          auto call = calls.begin();
+          if (call != calls.end()) {
+            TaintTrackCallRet(*call, *stmt_taint_source, taint_source,
+                              entry, seen);
+          }
         }
       }
     }
@@ -656,17 +650,18 @@ void TaintTrackVarOrVarLike(const mx::Decl &taint_source,
 
   UsePath entry{&prev, PreferDefinition(taint_source).id().Pack()};
   if (!AlreadySeen(entry, seen)) {
-    for (mx::StmtReference ref : taint_source.references()) {
-      mx::Stmt stmt = ref.statement();
-      if (std::optional<mx::Expr> expr = mx::Expr::from(stmt)) {
-        TaintTrackExpr(*expr, entry, seen);
-      } else {
-        std::cerr
-            << ESC(ATTR_BRIGHT) "Not tainting non-expression use at "
-            << stmt.id() << ":" ESC(ATTR_RESET) "\n";
-        ReportTaintedChild(stmt, stmt);
-        std::cerr << "\n\n";
-        return;
+    for (mx::Reference ref : taint_source.references()) {
+      if (auto ref_stmt = ref.as_statement()) {
+        if (std::optional<mx::Expr> expr = mx::Expr::from(*ref_stmt)) {
+          TaintTrackExpr(*expr, entry, seen);
+        } else {
+          std::cerr
+              << ESC(ATTR_BRIGHT) "Not tainting non-expression use at "
+              << ref_stmt->id() << ":" ESC(ATTR_RESET) "\n";
+          ReportTaintedChild(*ref_stmt, *ref_stmt);
+          std::cerr << "\n\n";
+          return;
+        }
       }
     }
   }
@@ -675,12 +670,12 @@ void TaintTrackVarOrVarLike(const mx::Decl &taint_source,
 static std::pair<const char *, const char *>
 KindAndColor(mx::RawEntityId id) {
   mx::VariantId vid = mx::EntityId(id).Unpack();
-  if (std::holds_alternative<mx::DeclarationId>(vid)) {
-    auto eid = std::get<mx::DeclarationId>(vid);
+  if (std::holds_alternative<mx::DeclId>(vid)) {
+    auto eid = std::get<mx::DeclId>(vid);
     return {mx::EnumeratorName(eid.kind), "antiquewhite"};
 
-  } else if (std::holds_alternative<mx::StatementId>(vid)) {
-    auto eid = std::get<mx::StatementId>(vid);
+  } else if (std::holds_alternative<mx::StmtId>(vid)) {
+    auto eid = std::get<mx::StmtId>(vid);
     return {mx::EnumeratorName(eid.kind), "aquamarine"};
 
   } else if (std::holds_alternative<mx::TypeId>(vid)) {
@@ -695,8 +690,8 @@ KindAndColor(mx::RawEntityId id) {
     auto eid = std::get<mx::FileTokenId>(vid);
     return {mx::EnumeratorName(eid.kind), "deepskyblue3"};
 
-  } else if (std::holds_alternative<mx::AttributeId>(vid)) {
-    auto eid = std::get<mx::AttributeId>(vid);
+  } else if (std::holds_alternative<mx::AttrId>(vid)) {
+    auto eid = std::get<mx::AttrId>(vid);
     return {mx::EnumeratorName(eid.kind), "antiquewhite3"};
 
   } else if (std::holds_alternative<mx::DesignatorId>(vid)) {

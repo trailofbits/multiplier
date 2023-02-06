@@ -6,12 +6,14 @@
 
 #pragma once
 
+#include <array>
 #include <filesystem>
 #include <memory>
 #include <multiplier/Index.h>
 #include <vector>
 
 #include "ThreadLocal.h"
+#include "Types.h"
 
 namespace sqlite {
 class Statement;
@@ -28,6 +30,7 @@ class RegexQueryResultImpl;
 class WeggliQueryResultImpl;
 
 class SQLiteEntityProviderImpl;
+class SQLiteDecompressionDictionary;
 
 class SQLiteEntityProvider final : public EntityProvider {
  private:
@@ -36,13 +39,12 @@ class SQLiteEntityProvider final : public EntityProvider {
   using ImplPtr = std::shared_ptr<SQLiteEntityProviderImpl>;
 
   const std::filesystem::path db_path;
+
+  std::unique_ptr<SQLiteDecompressionDictionary> dict;
   ThreadLocal<SQLiteEntityProviderImpl> impl;
 
-  RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context);
-
-  void FillFragments(SQLiteEntityProviderImpl &context, sqlite::Statement &get_fragments,
-                     RawEntityId eid, RawEntityIdList &redecl_ids_out,
-                     FragmentIdList &fragment_ids_out);
+  RawEntityIdList ReadRedeclarations(SQLiteEntityProviderImpl &context,
+                                     EntityCategory category);
 
  public:
   virtual ~SQLiteEntityProvider(void) noexcept;
@@ -57,32 +59,40 @@ class SQLiteEntityProvider final : public EntityProvider {
 
   FilePathMap ListFiles(const Ptr &) final;
 
-  FragmentIdList ListFragmentsInFile(const Ptr &, SpecificEntityId<FileId> id);
-
-  std::shared_ptr<const FileImpl> FileFor(
-      const Ptr &, SpecificEntityId<FileId> id) final;
-
-  // Download a fragment by its unique ID.
-  std::shared_ptr<const FragmentImpl>
-  FragmentFor(const Ptr &, SpecificEntityId<FragmentId> id) final;
+  FragmentIdList ListFragmentsInFile(const Ptr &, PackedFileId id);
 
   // Return the list of fragments covering / overlapping some tokens in a file.
   FragmentIdList FragmentsCoveringTokens(
       const Ptr &, PackedFileId, std::vector<EntityOffset> tokens) final;
 
-  RawEntityIdList Redeclarations(
-      const Ptr &, SpecificEntityId<DeclarationId>) final;
+  ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, RawEntityId kind_id) final;
 
-  void FillUses(const Ptr &, RawEntityId eid,
-                RawEntityIdList &redecl_ids_out,
-                FragmentIdList &fragment_ids_out) final;
+  ReferenceKindImplPtr
+  ReferenceKindFor(const Ptr &, std::string_view kind_data) final;
 
-  void FillReferences(const Ptr &, RawEntityId eid,
-                      RawEntityIdList &redecl_ids_out,
-                      FragmentIdList &fragment_ids_out) final;
+  bool AddReference(const Ptr &ep, RawEntityId kind_id,
+                              RawEntityId from_id, RawEntityId to_id) final;
+
+  gap::generator<RawEntityId> Redeclarations(const Ptr &, RawEntityId) final;
+
+  gap::generator<std::pair<RawEntityId, RawEntityId>>
+  References(const Ptr &, RawEntityId eid) final;
 
   void FindSymbol(const Ptr &, std::string name,
                   std::vector<RawEntityId> &ids_out) final;
+
+#define DECLARE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> \
+    type_name ## sFor(const Ptr &, PackedFragmentId id) final; \
+    \
+    type_name ## ImplPtr type_name ## For(const Ptr &ep, RawEntityId id) final;
+
+  MX_FOR_EACH_ENTITY_CATEGORY(DECLARE_ENTITY_METHODS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DECLARE_ENTITY_METHODS,
+                              DECLARE_ENTITY_METHODS)
+#undef DECLARE_ENTITY_METHODS
 };
 
 }  // namespace mx

@@ -16,17 +16,18 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "PseudoKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class Expr;
 class NamedDecl;
+class Reference;
 class TemplateParameterList;
+class TemplateParameterListImpl;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class TemplateParameterList {
  protected:
@@ -37,24 +38,39 @@ class TemplateParameterList {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  friend class TemplateParameterListImpl;
+  std::shared_ptr<const TemplateParameterListImpl> impl;
  public:
   TemplateParameterList(TemplateParameterList &&) noexcept = default;
   TemplateParameterList(const TemplateParameterList &) = default;
   TemplateParameterList &operator=(TemplateParameterList &&) noexcept = default;
   TemplateParameterList &operator=(const TemplateParameterList &) = default;
 
-  inline TemplateParameterList(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  /* implicit */ inline TemplateParameterList(std::shared_ptr<const TemplateParameterListImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+  PackedTemplateParameterListId id(void) const;
+  gap::generator<Reference> references(void) const;
+
+  inline static std::optional<TemplateParameterList> from(const TemplateParameterList &self) {
+    return self;
+  }
+
+  inline static std::optional<TemplateParameterList> from(const std::optional<TemplateParameterList> &self) {
+    return self;
+  }
+
+  inline static std::optional<TemplateParameterList> from(const Reference &r) {
+    return r.as_template_parameter_list();
+  }
+
+  inline static std::optional<TemplateParameterList> from(const TokenContext &t) {
+    return t.as_template_parameter_list();
+  }
 
   unsigned num_parameters(void) const;
   unsigned num_required_parameters(void) const;
@@ -66,7 +82,8 @@ class TemplateParameterList {
   Token left_angle_token(void) const;
   Token right_angle_token(void) const;
   TokenRange tokens(void) const;
-  std::vector<NamedDecl> parameters(void) const;
+  std::optional<NamedDecl> nth_parameter(unsigned n) const;
+  gap::generator<NamedDecl> parameters(void) const;
 };
 
 #endif

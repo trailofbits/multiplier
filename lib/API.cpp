@@ -6,188 +6,160 @@
 
 #include "API.h"
 
-#include <atomic>
-#include <cassert>
-#include <iostream>
-#include <multiplier/Entities/Attr.h>
-#include <multiplier/Entities/DefineMacroDirective.h>
-#include <multiplier/Entities/Type.h>
-#include <multiplier/Entities/VarDecl.h>
-#include <multiplier/Entities/TokenKind.h>
-#include <multiplier/Compress.h>
-#include <multiplier/AST.h>
-#include <sstream>
-#include <stdexcept>
-#include <thread>
-#include <set>
-
 #include "File.h"
 #include "Fragment.h"
-#include "InvalidEntityProvider.h"
-#include "Re2Impl.h"
 #include "Token.h"
-#include "Use.h"
-#include "WeggliImpl.h"
 
 namespace mx {
 
 EntityProvider::~EntityProvider(void) noexcept {}
 
-SpecificEntityId<DeclarationId> Decl::id(void) const {
-  DeclarationId eid;
-  eid.fragment_id = fragment->fragment_id;
-  eid.is_definition = is_definition();
-  eid.kind = kind();
-  eid.offset = offset_;
-  return eid;
-}
-
-std::optional<Decl> Decl::definition(void) const {
-  for (const Decl &decl : redeclarations()) {
-    if (decl.is_definition()) {
-      return decl;
+// Get a token by its entity ID.
+Token EntityProvider::TokenFor(const Ptr &self, RawEntityId id) {
+  VariantId vid = EntityId(id).Unpack();
+  if (std::holds_alternative<FileTokenId>(vid)) {
+    FileTokenId tid = std::get<FileTokenId>(vid);
+    FileId fid(tid.file_id);
+    FileImplPtr fptr = self->FileFor(self, fid);
+    if (!fptr) {
+      assert(false);
+      return Token();
     }
-  }
-  return std::nullopt;
-}
 
-std::vector<Decl> Decl::redeclarations(void) const {
-  std::vector<Decl> redecls;
-  for (RawEntityId raw_id : fragment->ep->Redeclarations(fragment->ep, id())) {
-    if (std::optional<Decl> redecl = fragment->DeclFor(fragment, raw_id)) {
-      redecls.emplace_back(std::move(redecl.value()));
+    if (tid.offset >= fptr->num_tokens) {
+      assert(false);
+      return Token();
     }
-  }
 
-  return redecls;
-}
+    return Token(fptr->TokenReader(fptr), tid.offset);
 
-gap::generator<Use<DeclUseSelector>> Decl::uses(void) const {
-  UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.Enumerate<DeclUseSelector>()) {
-    co_yield use;
-  }
-}
-
-gap::generator<StmtReference> Decl::references(void) const {
-  ReferenceIteratorImpl it(fragment->ep, *this);
-  for (auto ref : it.EnumerateStatements()) {
-    co_yield ref;
-  }
-}
-
-gap::generator<Decl> Decl::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_decls; ++i) {
-    co_yield Decl(fragment.impl, i);
-  }
-}
-
-SpecificEntityId<StatementId> Stmt::id(void) const {
-  StatementId eid;
-  eid.fragment_id = fragment->fragment_id;
-  eid.kind = kind();
-  eid.offset = offset_;
-  return eid;
-}
-
-gap::generator<Stmt> Stmt::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_stmts; ++i) {
-    co_yield Stmt(fragment.impl, i);
-  }
-}
-
-gap::generator<Use<StmtUseSelector>> Stmt::uses(void) const {
-  UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.Enumerate<StmtUseSelector>()) {
-    co_yield use;
-  }
-}
-
-SpecificEntityId<TypeId> Type::id(void) const {
-  TypeId eid;
-  eid.fragment_id = fragment->fragment_id;
-  eid.kind = kind();
-  eid.offset = offset_;
-  return eid;
-}
-
-gap::generator<Type> Type::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_types; ++i) {
-    co_yield Type(fragment.impl, i);
-  }
-}
-
-gap::generator<Use<TypeUseSelector>> Type::uses(void) const {
-  UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.Enumerate<TypeUseSelector>()) {
-    co_yield use;
-  }
-}
-
-SpecificEntityId<AttributeId> Attr::id(void) const {
-  AttributeId eid;
-  eid.fragment_id = fragment->fragment_id;
-  eid.kind = kind();
-  eid.offset = offset_;
-  return eid;
-}
-
-gap::generator<Attr> Attr::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_attrs; ++i) {
-    co_yield Attr(fragment.impl, i);
-  }
-}
-
-gap::generator<Use<AttrUseSelector>> Attr::uses(void) const {
-  UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.Enumerate<AttrUseSelector>()) {
-    co_yield use;
-  }
-}
-
-SpecificEntityId<MacroId> Macro::id(void) const {
-  MacroId eid;
-  eid.fragment_id = fragment->fragment_id;
-  eid.kind = kind();
-  eid.offset = offset_;
-  return eid;
-}
-
-gap::generator<Macro> Macro::in_internal(const Fragment &fragment) {
-  for (EntityOffset i = 0; i < fragment.impl->num_macros; ++i) {
-    co_yield Macro(fragment.impl, i);
-  }
-}
-
-gap::generator<Macro> Macro::containing_internal(const Token &token) {
-  std::optional<Macro> macro;
-  if (auto frag = token.impl->OwningFragment()) {
-    auto vid = token.impl->NthContainingMacroId(token.offset).Unpack();
-    if (std::holds_alternative<MacroId>(vid)) {
-      MacroId mid = std::get<MacroId>(vid);
-      if (mid.fragment_id == frag->fragment_id) {
-        macro.emplace(FragmentImpl::Ptr(token.impl, frag), mid.offset);
-      }
+  } else if (std::holds_alternative<ParsedTokenId>(vid)) {
+    ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
+    FragmentImplPtr fptr = self->FragmentFor(self, fid);
+    if (!fptr) {
+      assert(false);
+      return Token();
     }
-  }
 
-  for (; macro; macro = macro->parent()) {
-    co_yield *macro;
+    if (tid.offset >= fptr->num_parsed_tokens) {
+      assert(false);
+      return Token();
+    }
+
+    return Token(fptr->ParsedTokenReader(fptr), tid.offset);
+
+  } else if (std::holds_alternative<MacroTokenId>(vid)) {
+    MacroTokenId tid = std::get<MacroTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
+    FragmentImplPtr fptr = self->FragmentFor(self, fid);
+    if (!fptr) {
+      assert(false);
+      return Token();
+    }
+
+    if (tid.offset >= fptr->num_tokens) {
+      assert(false);
+      return Token();
+    }
+
+    return Token(fptr->MacroTokenReader(fptr), tid.offset);
+
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(id == kInvalidEntityId);
+    return Token();
+
+  } else {
+    assert(false);
+    return Token();
   }
 }
 
-gap::generator<Use<MacroUseSelector>> Macro::uses(void) const {
-  UseIteratorImpl impl(fragment->ep, *this);
-  for (auto use : impl.Enumerate<MacroUseSelector>()) {
-    co_yield use;
-  }
-}
+// Get a token by its entity ID, and given the presence of an existing reader
+// that can be used as a hint for being the current reader for the token.
+Token EntityProvider::TokenFor(
+    const Ptr &self, const std::shared_ptr<const TokenReader> &reader,
+    RawEntityId id) {
+  VariantId vid = EntityId(id).Unpack();
+  if (std::holds_alternative<FileTokenId>(vid)) {
+    FileTokenId tid = std::get<FileTokenId>(vid);
+    FileId fid(tid.file_id);
+    FileImplPtr fptr;
 
+    if (const FileImpl *raw_file = reader->OwningFile();
+        raw_file && raw_file->file_id == tid.file_id) {
+      fptr = FileImplPtr(reader, raw_file);
+    } else {
+      fptr = self->FileFor(self, fid);
+    }
 
-gap::generator<MacroReference> DefineMacroDirective::references(void) const {
-  ReferenceIteratorImpl it(fragment->ep, *this);
-  for (auto ref : it.EnumerateMacros()) {
-    co_yield ref;
+    if (!fptr) {
+      assert(false);
+      return Token();
+    }
+
+    if (tid.offset >= fptr->num_tokens) {
+      assert(false);
+      return Token();
+    }
+
+    return Token(fptr->TokenReader(fptr), tid.offset);
+
+  } else if (std::holds_alternative<ParsedTokenId>(vid)) {
+    ParsedTokenId tid = std::get<ParsedTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
+    FragmentImplPtr fptr;
+
+    if (const FragmentImpl *raw_frag = reader->OwningFragment();
+        raw_frag && raw_frag->fragment_id == tid.fragment_id) {
+      fptr = FragmentImplPtr(reader, raw_frag);
+    } else {
+      fptr = self->FragmentFor(self, fid);
+    }
+
+    if (!fptr) {
+      assert(false);
+      return Token();
+    }
+
+    if (tid.offset >= fptr->num_parsed_tokens) {
+      assert(false);
+      return Token();
+    }
+
+    return Token(fptr->ParsedTokenReader(fptr), tid.offset);
+
+  } else if (std::holds_alternative<MacroTokenId>(vid)) {
+    MacroTokenId tid = std::get<MacroTokenId>(vid);
+    FragmentId fid(tid.fragment_id);
+    FragmentImplPtr fptr;
+
+    if (const FragmentImpl *raw_frag = reader->OwningFragment();
+        raw_frag && raw_frag->fragment_id == tid.fragment_id) {
+      fptr = FragmentImplPtr(reader, raw_frag);
+    } else {
+      fptr = self->FragmentFor(self, fid);
+    }
+
+    if (!fptr) {
+      assert(false);
+      return Token();
+    }
+
+    if (tid.offset >= fptr->num_tokens) {
+      assert(false);
+      return Token();
+    }
+
+    return Token(fptr->MacroTokenReader(fptr), tid.offset);
+
+  } else if (std::holds_alternative<InvalidId>(vid)) {
+    assert(id == kInvalidEntityId);
+    return Token();
+
+  } else {
+    assert(false);
+    return Token();
   }
 }
 

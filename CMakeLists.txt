@@ -47,7 +47,7 @@ add_subdirectory("vendor")
 
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
 find_package(CapnProto CONFIG REQUIRED)
-find_package(ZLIB REQUIRED)
+find_package(zstd CONFIG REQUIRED)
 find_package(gflags CONFIG REQUIRED)
 
 if(NOT TARGET gflags::gflags)

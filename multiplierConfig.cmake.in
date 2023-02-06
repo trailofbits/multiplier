@@ -21,8 +21,8 @@ if(NOT TARGET @PROJECT_NAME@::mx-api)
     find_package(CapnProto CONFIG REQUIRED)
   endif()
 
-  if(NOT TARGET ZLIB::ZLIB)
-    find_package(ZLIB REQUIRED)
+  if(NOT TARGET zstd::libzstd_shared AND NOT TARGET zstd::libzstd_static)
+    find_package(zstd CONFIG REQUIRED)
   endif()
 
   if(MX_ENABLE_RE2 AND NOT TARGET re2::re2)

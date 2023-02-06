@@ -74,7 +74,6 @@ add_custom_target("copy_headers"
 
 set(api_headers
   "${source_include_dir}/AST.h"
-  $<BUILD_INTERFACE:${source_include_dir}/Compress.h>
   $<BUILD_INTERFACE:${source_include_dir}/Database.h>
   "${source_include_dir}/File.h"
   "${source_include_dir}/Fragment.h"
@@ -85,7 +84,6 @@ set(api_headers
   "${source_include_dir}/Reference.h"
   "${source_include_dir}/Token.h"
   "${source_include_dir}/Types.h"
-  "${source_include_dir}/Use.h"
   "${source_include_dir}/Weggli.h"
   "${MX_BOOTSTRAP_INCLUDE_VISITOR_INC_H}"
 )
@@ -98,13 +96,14 @@ add_library("mx-api" STATIC
   
   "API.cpp"
   "API.h"
-  "Compress.cpp"
-  "Compress.h"
+  "Attr.h"
+  "Attr.cpp"
   "CachingEntityProvider.cpp"
   "CachingEntityProvider.h"
   "Database.cpp"
+  "Decl.h"
+  "Decl.cpp"
   "Entity.h"
-  "EntityImpl.cpp"
   "File.cpp"
   "FileImpl.cpp"
   "File.h"
@@ -114,22 +113,31 @@ add_library("mx-api" STATIC
   "Index.cpp"
   "InvalidEntityProvider.cpp"
   "InvalidEntityProvider.h"
+  "Macro.h"
+  "Macro.cpp"
+  "Pseudo.h"
+  "Pseudo.cpp"
   "Re2.cpp"
   "Re2.h"
   "Re2Impl.cpp"
   "Re2Impl.h"
+  "Reference.cpp"
+  "Reference.h"
   "SQLiteEntityProvider.cpp"
   "SQLiteEntityProvider.h"
   "SQLiteStore.cpp"
   "SQLiteStore.h"
+  "Stmt.h"
+  "Stmt.cpp"
   "ThreadLocal.cpp"
   "ThreadLocal.h"
   "TokenContext.cpp"
   "Token.cpp"
   "Token.h"
+  "Type.h"
+  "Type.cpp"
+  "Types.h"
   "Types.cpp"
-  "Use.cpp"
-  "Use.h"
   "Util.h"
   "Weggli.cpp"
   "WeggliImpl.cpp"
@@ -149,13 +157,13 @@ target_link_libraries("mx-api"
   PUBLIC
     "CapnProto::capnp-rpc"
     "mx-sqlite"
-    gap::gap
-    gap::gap-core
-    std::coroutines
-    gap::gap-settings
+    "gap::gap"
+    "gap::gap-core"
+    "std::coroutines"
+    "gap::gap-settings"
   PRIVATE
     $<BUILD_INTERFACE:concurrentqueue>
-    "ZLIB::ZLIB"
+    $<IF:$<TARGET_EXISTS:zstd::libzstd_static>,zstd::libzstd_static,zstd::libzstd_shared>
 )
 
 if(MX_ENABLE_RE2)

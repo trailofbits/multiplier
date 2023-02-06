@@ -16,14 +16,12 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 #include "ObjCContainerDecl.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class Decl;
@@ -44,29 +42,9 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCInterfaceDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCInterfaceDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCInterfaceDecl> in(const Fragment &frag);
+  static gap::generator<ObjCInterfaceDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::OBJ_C_INTERFACE;
@@ -78,7 +56,15 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCInterfaceDecl> from(const TokenContext &c);
+  gap::generator<ObjCInterfaceDecl> redeclarations(void) const;
+  inline static std::optional<ObjCInterfaceDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCInterfaceDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ObjCInterfaceDecl> from(const ObjCContainerDecl &parent);
 
   inline static std::optional<ObjCInterfaceDecl> from(const std::optional<ObjCContainerDecl> &parent) {
@@ -109,7 +95,8 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
     }
   }
 
-  std::vector<ObjCProtocolDecl> all_referenced_protocols(void) const;
+  std::optional<ObjCProtocolDecl> nth_all_referenced_protocol(unsigned n) const;
+  gap::generator<ObjCProtocolDecl> all_referenced_protocols(void) const;
   bool declares_or_inherits_designated_initializers(void) const;
   Token end_of_definition_token(void) const;
   ObjCImplementationDecl implementation(void) const;
@@ -123,13 +110,21 @@ class ObjCInterfaceDecl : public ObjCContainerDecl {
   bool is_arc_weakref_unavailable(void) const;
   bool is_implicit_interface_declaration(void) const;
   ObjCInterfaceDecl is_obj_c_requires_property_definitions(void) const;
-  std::vector<ObjCIvarDecl> instance_variables(void) const;
-  std::vector<ObjCCategoryDecl> known_categories(void) const;
-  std::vector<ObjCCategoryDecl> known_extensions(void) const;
-  std::vector<Token> protocol_tokens(void) const;
-  std::vector<ObjCProtocolDecl> protocols(void) const;
-  std::vector<ObjCCategoryDecl> visible_categories(void) const;
-  std::vector<ObjCCategoryDecl> visible_extensions(void) const;
+  bool is_this_declaration_a_definition(void) const;
+  std::optional<ObjCIvarDecl> nth_instance_variable(unsigned n) const;
+  gap::generator<ObjCIvarDecl> instance_variables(void) const;
+  std::optional<ObjCCategoryDecl> nth_known_categorie(unsigned n) const;
+  gap::generator<ObjCCategoryDecl> known_categories(void) const;
+  std::optional<ObjCCategoryDecl> nth_known_extension(unsigned n) const;
+  gap::generator<ObjCCategoryDecl> known_extensions(void) const;
+  std::optional<Token> nth_protocol_token(unsigned n) const;
+  gap::generator<Token> protocol_tokens(void) const;
+  std::optional<ObjCProtocolDecl> nth_protocol(unsigned n) const;
+  gap::generator<ObjCProtocolDecl> protocols(void) const;
+  std::optional<ObjCCategoryDecl> nth_visible_categorie(unsigned n) const;
+  gap::generator<ObjCCategoryDecl> visible_categories(void) const;
+  std::optional<ObjCCategoryDecl> nth_visible_extension(unsigned n) const;
+  gap::generator<ObjCCategoryDecl> visible_extensions(void) const;
 };
 
 static_assert(sizeof(ObjCInterfaceDecl) == sizeof(ObjCContainerDecl));

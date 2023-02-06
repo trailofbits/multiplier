@@ -16,14 +16,13 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CXXNewExprInitializationStyle.h"
 #include "Expr.h"
 #include "StmtKind.h"
-#include "StmtUseSelector.h"
 
 namespace mx {
 class CXXConstructExpr;
@@ -41,29 +40,9 @@ class CXXNewExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<CXXNewExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<CXXNewExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : CXXNewExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<CXXNewExpr> in(const Fragment &frag);
+  static gap::generator<CXXNewExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CXX_NEW_EXPR;
@@ -75,7 +54,14 @@ class CXXNewExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CXXNewExpr> from(const TokenContext &c);
+  inline static std::optional<CXXNewExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<CXXNewExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<CXXNewExpr> from(const Expr &parent);
 
   inline static std::optional<CXXNewExpr> from(const std::optional<Expr> &parent) {
@@ -121,7 +107,8 @@ class CXXNewExpr : public Expr {
   bool is_global_new(void) const;
   bool is_parenthesis_type_id(void) const;
   bool pass_alignment(void) const;
-  std::vector<Expr> placement_arguments(void) const;
+  std::optional<Expr> nth_placement_argument(unsigned n) const;
+  gap::generator<Expr> placement_arguments(void) const;
   bool should_null_check_allocation(void) const;
 };
 

@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Attr.h"
 #include "AttrKind.h"
@@ -32,35 +32,22 @@ class SwiftObjCMembersAttr : public Attr {
   friend class FragmentImpl;
   friend class Attr;
  public:
-  inline static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : SwiftObjCMembersAttr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<SwiftObjCMembersAttr> in(const Fragment &frag);
+  static gap::generator<SwiftObjCMembersAttr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr AttrKind static_kind(void) {
     return AttrKind::SWIFT_OBJ_C_MEMBERS;
   }
 
-  static std::optional<SwiftObjCMembersAttr> from(const TokenContext &c);
+  inline static std::optional<SwiftObjCMembersAttr> from(const Reference &r) {
+    return from(r.as_attribute());
+  }
+
+  inline static std::optional<SwiftObjCMembersAttr> from(const TokenContext &t) {
+    return from(t.as_attribute());
+  }
+
   static std::optional<SwiftObjCMembersAttr> from(const Attr &parent);
 
   inline static std::optional<SwiftObjCMembersAttr> from(const std::optional<Attr> &parent) {

@@ -16,13 +16,12 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Decl.h"
 #include "DeclKind.h"
-#include "DeclUseSelector.h"
 
 namespace mx {
 class BlockDecl;
@@ -36,29 +35,9 @@ class BlockDecl : public Decl {
   friend class FragmentImpl;
   friend class Decl;
  public:
-  inline static gap::generator<BlockDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<BlockDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : BlockDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<BlockDecl> in(const Fragment &frag);
+  static gap::generator<BlockDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::BLOCK;
@@ -70,7 +49,15 @@ class BlockDecl : public Decl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<BlockDecl> from(const TokenContext &c);
+  gap::generator<BlockDecl> redeclarations(void) const;
+  inline static std::optional<BlockDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<BlockDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<BlockDecl> from(const Decl &parent);
 
   inline static std::optional<BlockDecl> from(const std::optional<Decl> &parent) {
@@ -92,9 +79,11 @@ class BlockDecl : public Decl {
   bool has_captures(void) const;
   bool is_conversion_from_lambda(void) const;
   bool is_variadic(void) const;
-  std::vector<ParmVarDecl> parameters(void) const;
-  std::vector<ParmVarDecl> parameter_declarations(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  std::optional<ParmVarDecl> nth_parameter(unsigned n) const;
+  gap::generator<ParmVarDecl> parameters(void) const;
+  std::optional<ParmVarDecl> nth_parameter_declaration(unsigned n) const;
+  gap::generator<ParmVarDecl> parameter_declarations(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(BlockDecl) == sizeof(Decl));

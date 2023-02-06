@@ -45,9 +45,9 @@ void PrintToken(std::ostream &os, mx::Token token) {
   os << token.data(); 
 }
 
-bool ContainsHighlightedTokens(std::vector<mx::MacroOrToken> nodes,
+bool ContainsHighlightedTokens(gap::generator<mx::MacroOrToken> nodes,
                                const mx::TokenRange &entity_tokens) {
-  for (const mx::MacroOrToken &node : nodes) {
+  for (mx::MacroOrToken node : nodes) {
     if (std::holds_alternative<mx::Token>(node)) {
       if (entity_tokens.index_of(std::get<mx::Token>(node))) {
         return true;
@@ -67,7 +67,7 @@ bool ContainsHighlightedTokens(std::vector<mx::MacroOrToken> nodes,
 //            parsed token is inside of a substitution; you can only ask if a
 //            token derived from a parsed token is in the right range.
 void PrintUnparsedTokens(
-    std::ostream &os, std::vector<mx::MacroOrToken> nodes,
+    std::ostream &os, gap::generator<mx::MacroOrToken> nodes,
     const mx::TokenRange &entity_tokens, bool force_highlight) {
 
   for (mx::MacroOrToken &node : nodes) {

@@ -16,16 +16,17 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "DeclUseSelector.h"
 #include "PseudoKind.h"
 
 namespace mx {
 class Designator;
+class DesignatorImpl;
 class FieldDecl;
+class Reference;
 #if !defined(MX_DISABLE_API) || defined(MX_ENABLE_API)
 class Designator {
  protected:
@@ -36,24 +37,39 @@ class Designator {
   friend class FragmentImpl;
   friend class Index;
   friend class Macro;
-  friend class ReferenceIteratorImpl;
+  friend class Reference;
   friend class Stmt;
   friend class TokenContext;
   friend class Type;
-  friend class UseBase;
-  friend class UseIteratorImpl;
-  std::shared_ptr<const FragmentImpl> fragment;
-  unsigned offset_;
-
+  friend class DesignatorImpl;
+  std::shared_ptr<const DesignatorImpl> impl;
  public:
   Designator(Designator &&) noexcept = default;
   Designator(const Designator &) = default;
   Designator &operator=(Designator &&) noexcept = default;
   Designator &operator=(const Designator &) = default;
 
-  inline Designator(std::shared_ptr<const FragmentImpl> fragment_, unsigned offset__)
-      : fragment(std::move(fragment_)),
-        offset_(offset__) {}
+  /* implicit */ inline Designator(std::shared_ptr<const DesignatorImpl> impl_)
+      : impl(std::move(impl_)) {}
+
+  PackedDesignatorId id(void) const;
+  gap::generator<Reference> references(void) const;
+
+  inline static std::optional<Designator> from(const Designator &self) {
+    return self;
+  }
+
+  inline static std::optional<Designator> from(const std::optional<Designator> &self) {
+    return self;
+  }
+
+  inline static std::optional<Designator> from(const Reference &r) {
+    return r.as_designator();
+  }
+
+  inline static std::optional<Designator> from(const TokenContext &t) {
+    return t.as_designator();
+  }
 
   bool is_field_designator(void) const;
   bool is_array_designator(void) const;

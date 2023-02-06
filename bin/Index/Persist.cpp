@@ -56,7 +56,7 @@ extern void DispatchSerializeMacro(const EntityMapper &em,
 // NOTE(pag): Implemented in `BuildPendingFragment.cpp`.
 extern void BuildPendingFragment(
     PendingFragment &pf, EntityIdMap &entity_ids,
-    TypeIdMap &type_ids, const pasta::TokenRange &tokens);
+    const pasta::TokenRange &tokens);
 
 // Label the parent entity ids.
 extern void LabelParentsInPendingFragment(PendingFragment &pf,
@@ -68,12 +68,6 @@ extern void LinkEntitiesAcrossFragments(
     mx::DatabaseWriter &database, const PendingFragment &pf,
     const EntityMapper &em, const NameMangler &mangler);
 
-// Identify all unique entity IDs used by this fragment, and map them to the
-// fragment ID in the data store.
-extern void LinkExternalUsesInFragment(
-    mx::DatabaseWriter &database, const PendingFragment &pf,
-    mx::rpc::Fragment::Builder &b);
-
 // Identify all unique entity IDs referenced by this fragment,
 // and map them to the fragment ID in the data store.
 extern void LinkExternalReferencesInFragment(
@@ -81,9 +75,9 @@ extern void LinkExternalReferencesInFragment(
     EntityMapper &em);
 
 // Serialize all entities into the Cap'n Proto version of the fragment.
-extern void SerializePendingFragment(const PendingFragment &pf,
-                                     const EntityMapper &em,
-                                     mx::rpc::Fragment::Builder &b);
+extern void SerializePendingFragment(mx::DatabaseWriter &database,
+                                     const PendingFragment &pf,
+                                     const EntityMapper &em);
 
 // Save the symbolic names of all declarations into the database.
 extern void LinkEntityNamesToFragment(
@@ -132,22 +126,6 @@ static void AccumulateTokenData(std::string &data, const Tok &tok) {
     AccumulateUTF8Data(data, llvm::json::fixUTF8(tok_data));
   }
 }
-
-class StringOutputStream final : public kj::OutputStream {
- private:
-  std::string &str;
-
- public:
-  virtual ~StringOutputStream(void) = default;
-
-  explicit StringOutputStream(std::string &str_)
-      : str(str_) {}
-
-  void write(const void *buffer_, size_t size) final {
-    auto ptr = reinterpret_cast<const char *>(buffer_);
-    str.append(ptr, &(ptr[size]));
-  }
-};
 
 }  // namespace
 
@@ -222,22 +200,10 @@ void GlobalIndexingState::PersistFile(
     ubb.setVal(eol_offset_line_num.second);
   }
 
-  // Serialize the message into a flat Cap'n Proto.
-  std::string data;
-  data.reserve(message.sizeInWords() * sizeof(capnp::word));
-  StringOutputStream os(data);
-  capnp::writeMessage(os, message);
-  assert(!data.empty());
-
-  // Pad the size out to be a multiple of the `capnp::word` size.
-  while (data.size() % sizeof(capnp::word)) {
-    data.push_back('\0');
-  }
-
   // Add it to the database.
   database.AddAsync(
       mx::FilePathRecord{file_id, std::move(file_path)},
-      mx::SerializedFileRecord{file_id, std::move(data)});
+      mx::EntityRecord{file_id.Pack(), GetSerializedData(message)});
 }
 
 namespace {
@@ -473,6 +439,7 @@ void VisitMacros(
 //
 // NOTE(pag): This is a *backup* approach when building a token tree fails.
 static void PersistParsedTokens(
+    mx::DatabaseWriter &database,
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
     const std::vector<pasta::Token> &parsed_tokens) {
 
@@ -494,22 +461,23 @@ static void PersistParsedTokens(
   auto re = fb.initRelatedEntityId(num_tokens);
   auto pto2i = fb.initParsedTokenOffsetToIndex(num_parsed_tokens);
   auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
-  auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
+  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   auto i = 0u;
 
   // Serialize the tokens.
   for (const pasta::Token &tok : parsed_tokens) {
     pto2i.set(i, i);  // Parsed tokens to macro tokens.
     mti2po.set(i, i);  // Macro tokens to parsed tokens.
-    mti2mo.set(i, num_macros);  // Mapping of token to containing macros.
+    mti2mi.set(i, mx::kInvalidEntityId);  // Mapping of token to containing macros.
 
     if (std::optional<pasta::MacroToken> mt = tok.MacroLocation()) {
       if (auto pm = mt->Parent()) {
-        mx::VariantId vid = mx::EntityId(em.EntityId(pm.value())).Unpack();
+        mx::RawEntityId eid = em.EntityId(pm.value());
+        mx::VariantId vid = mx::EntityId(eid).Unpack();
         if (std::holds_alternative<mx::MacroId>(vid)) {
           mx::MacroId mid = std::get<mx::MacroId>(vid);
           if (mid.fragment_id == pf.fragment_index) {
-            mti2mo.set(i, mid.offset);
+            mti2mi.set(i, eid);
           }
         }
       }
@@ -527,10 +495,18 @@ static void PersistParsedTokens(
   to.set(i, static_cast<unsigned>(utf8_fragment_data.size()));
   fb.setTokenData(utf8_fragment_data);
 
-  auto ms = fb.initMacros(num_macros);
   for (i = 0u; i < num_macros; ++i) {
-    mx::ast::Macro::Builder mb = ms[i];
-    DispatchSerializeMacro(em, mb, macros_to_serialize[i], nullptr);
+    EntityBuilder<mx::ast::Macro> storage;
+    DispatchSerializeMacro(em, storage.builder, macros_to_serialize[i],
+                           nullptr);
+
+    mx::MacroId id;
+    id.fragment_id = pf.fragment_index;
+    id.offset = i;
+    id.kind = mx::FromPasta(macros_to_serialize[i].Kind());
+    database.AddAsync(
+        mx::EntityRecord{
+          mx::EntityId(id).Pack(), GetSerializedData(storage.message)});
   }
 
   auto tlms = fb.initTopLevelMacros(pf.num_top_level_macros);
@@ -558,6 +534,7 @@ static std::string DiagnoseParsedTokens(
 // are macro tokens. The top-level substitution points to the macro code in
 // before IDs, and the
 static void PersistTokenTree(
+    mx::DatabaseWriter &database,
     PendingFragment &pf, EntityMapper &em, mx::rpc::Fragment::Builder &fb,
     TokenTreeNodeRange nodes, const std::vector<pasta::Token> &parsed_tokens) {
 
@@ -616,17 +593,18 @@ static void PersistTokenTree(
   // Map the serialized tokens to the parsed tokens.
   i = 0u;
   auto mti2po = fb.initMacroTokenIndexToParsedTokenOffset(num_tokens);
-  auto mti2mo = fb.initMacroTokenIndexToMacroOffset(num_tokens);
+  auto mti2mi = fb.initMacroTokenIndexToMacroId(num_tokens);
   for (; i < num_tokens; ++i) {
     mti2po.set(i, num_parsed_tokens);
-    mti2mo.set(i, num_macros);
+    mti2mi.set(i, mx::kInvalidEntityId);
 
     // Map the token to its containing macro.
-    mx::VariantId vid = mx::EntityId(sched.containing_macro[i]).Unpack();
+    mx::EntityId eid(sched.containing_macro[i]);
+    mx::VariantId vid = eid.Unpack();
     if (std::holds_alternative<mx::MacroId>(vid)) {
       mx::MacroId mid = std::get<mx::MacroId>(vid);
       CHECK_EQ(mid.fragment_id, pf.fragment_index);
-      mti2mo.set(i, mid.offset);
+      mti2mi.set(i, eid.Pack());
     } else {
       CHECK(std::holds_alternative<mx::InvalidId>(vid));
     }
@@ -641,7 +619,7 @@ static void PersistTokenTree(
   for (const pasta::Token &parsed_tok : parsed_tokens) {
     auto it = sched.parsed_token_index.find(parsed_tok.RawToken());
     if (it != sched.parsed_token_index.end()) {
-      auto mi = static_cast<unsigned>(it->second);
+      auto mi = static_cast<mx::EntityOffset>(it->second);
       pto2i.set(i, mi);
       mti2po.set(mi, i);
     } else {
@@ -689,17 +667,19 @@ static void PersistTokenTree(
   }
 
   // Serialize the token trees / macros.
-  auto ms = fb.initMacros(num_macros);
   for (const std::optional<TokenTree> &tt : pf.macros_to_serialize) {
     const void *raw_tt = tt->RawNode();
 
-    mx::MacroId id = std::get<mx::MacroId>(
-        mx::EntityId(em.EntityId(raw_tt)).Unpack());
+    mx::RawEntityId eid = em.EntityId(raw_tt);
+    mx::MacroId id = std::get<mx::MacroId>(mx::EntityId(eid).Unpack());
 
     CHECK_LT(id.offset, num_macros);
-    mx::ast::Macro::Builder mb = ms[id.offset];
     if (std::optional<pasta::Macro> macro = tt->Macro()) {
-      DispatchSerializeMacro(em, mb, macro.value(), &(tt.value()));
+      EntityBuilder<mx::ast::Macro> storage;
+      DispatchSerializeMacro(em, storage.builder, macro.value(), &(tt.value()));
+
+      database.AddAsync(
+          mx::EntityRecord{eid, GetSerializedData(storage.message)});
     }
   }
 
@@ -724,21 +704,31 @@ static void PersistTokenTree(
 //            do so results in `kInvalidEntityId` instead of just falling back
 //            on the ID of the canonical decl.
 static mx::RawEntityId IdOfRedeclInFragment(
-    const EntityMapper &em, mx::RawEntityId frag_index, pasta::Decl canon_decl) {
+    const EntityMapper &em, mx::RawEntityId frag_index,
+    pasta::Decl canon_decl) {
+
+  mx::RawEntityId ret_id = em.EntityId(canon_decl);
   for (pasta::Decl redecl : canon_decl.Redeclarations()) {
     mx::RawEntityId eid = em.EntityId(redecl);
     if (eid == mx::kInvalidEntityId) {
       continue;
     }
+
+    // If we come across a definition, then reference it if we're not able
+    // to reference a redecl that's in the right fragment.
+    if (IsDefinition(redecl)) {
+      ret_id = eid;
+    }
+
     mx::VariantId vid = mx::EntityId(eid).Unpack();
-    CHECK(std::holds_alternative<mx::DeclarationId>(vid));
-    mx::DeclarationId id = std::get<mx::DeclarationId>(vid);
+    CHECK(std::holds_alternative<mx::DeclId>(vid));
+    mx::DeclId id = std::get<mx::DeclId>(vid);
     if (id.fragment_id == frag_index) {
       return eid;
     }
   }
 
-  return em.EntityId(canon_decl);
+  return ret_id;
 }
 
 // Persist the token contexts. The token contexts are a kind of inverted tree,
@@ -787,33 +777,16 @@ static void PersistTokenContexts(
           contexts[eid].insert(context.value());
         }
 
-      } else if (auto stmt = pasta::Stmt::From(c)) {
-        const mx::RawEntityId eid = em.EntityId(*stmt);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
+#define ADD_ENTITY_TO_CONTEXT(type_name, lower_name) \
+    } else if (auto lower_name ## _ = pasta::type_name::From(c)) { \
+      const mx::RawEntityId eid = em.EntityId(*lower_name ## _); \
+      if (eid != mx::kInvalidEntityId) { \
+        contexts[eid].insert(context.value()); \
+      }
 
-      } else if (auto type = pasta::Type::From(c)) {
-        const mx::RawEntityId eid = em.EntityId(*type);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
+      FOR_EACH_ENTITY_CATEGORY(ADD_ENTITY_TO_CONTEXT)
+#undef ADD_ENTITY_TO_CONTEXT
 
-      } else if (auto attr = pasta::Attr::From(c)) {
-        const mx::RawEntityId eid = em.EntityId(*attr);
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
-      
-      } else if (auto designator = pasta::Designator::From(c)) {
-        const uint32_t offset = em.PseudoId(*designator);
-        mx::DesignatorId did;
-        did.fragment_id = frag_index;
-        did.offset = offset;
-        const mx::RawEntityId eid = mx::EntityId(did).Pack();
-        if (eid != mx::kInvalidEntityId) {
-          contexts[eid].insert(context.value());
-        }
       }
     }
   }
@@ -962,7 +935,6 @@ void GlobalIndexingState::PersistFragment(
     NameMangler &mangler, EntityIdMap &entity_ids,
     PendingFragment &pf) {
 
-  TypeIdMap type_ids;
   const mx::SpecificEntityId<mx::FragmentId> fragment_id = pf.fragment_id;
   const uint64_t begin_index = pf.begin_index;
   const uint64_t end_index = pf.end_index;
@@ -972,15 +944,15 @@ void GlobalIndexingState::PersistFragment(
 
   // Identify all of the declarations, statements, types, and pseudo-entities,
   // and build lists of the entities to serialize.
-  BuildPendingFragment(pf, entity_ids, type_ids, tokens);
+  BuildPendingFragment(pf, entity_ids, tokens);
 
-  EntityMapper em(entity_ids, type_ids, pf);
+  EntityMapper em(entity_ids, pf);
 
   // Figure out parentage/inheritance between the entities.
   LabelParentsInPendingFragment(pf, em);
 
   // Serialize all discovered entities.
-  SerializePendingFragment(pf, em, fb);
+  SerializePendingFragment(database, pf, em);
 
   std::vector<pasta::Token> parsed_tokens = FindParsedTokens(
       tokens, begin_index, end_index);
@@ -1023,7 +995,8 @@ void GlobalIndexingState::PersistFragment(
       tokens, begin_index, end_index, tok_tree_err);
 
   if (maybe_tt) {
-    PersistTokenTree(pf, em, fb, std::move(maybe_tt.value()), parsed_tokens);
+    PersistTokenTree(database, pf, em, fb, std::move(maybe_tt.value()),
+                     parsed_tokens);
 
   // If we don't have the normal or the backup token tree, then do a best
   // effort saving of macro tokens. Don't bother organizing them into
@@ -1044,30 +1017,17 @@ void GlobalIndexingState::PersistFragment(
           << ast.MainFile().Path().generic_string();
     }
 
-    PersistParsedTokens(pf, em, fb, parsed_tokens);
+    PersistParsedTokens(database, pf, em, fb, parsed_tokens);
   }
 
   PersistTokenContexts(em, parsed_tokens, pf.fragment_index, fb);
   LinkEntitiesAcrossFragments(database, pf, em, mangler);
-  LinkExternalUsesInFragment(database, pf, fb);
   LinkExternalReferencesInFragment(database, pf, em);
   LinkEntityNamesToFragment(database, pf, em);
 
-  // Serialize the message into a flat Cap'n Proto.
-  std::string data;
-  data.reserve(message.sizeInWords() * sizeof(capnp::word));
-  StringOutputStream os(data);
-  capnp::writeMessage(os, message);
-  assert(!data.empty());
-
-  // Pad the size out to be a multiple of the `capnp::word` size.
-  while (data.size() % sizeof(capnp::word)) {
-    data.push_back('\0');
-  }
-
   // Add the fragment to the database.
   database.AddAsync(
-      mx::SerializedFragmentRecord{pf.fragment_id, std::move(data)});
+      mx::EntityRecord{pf.fragment_id.Pack(), GetSerializedData(message)});
 }
 
 }  // namespace indexer

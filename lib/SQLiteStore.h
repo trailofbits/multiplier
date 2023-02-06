@@ -106,6 +106,7 @@ class Statement {
       : impl(std::move(impl_)) {}
 
  public:
+  Statement(void) = delete;
 
   // Bind values with a sqlite statement. It does not
   // support binding to a blob yet
@@ -248,14 +249,14 @@ class Connection {
   void SetBusyTimeout(std::chrono::milliseconds ms);
 
   // Attach custom function to your sqlite database
-  void CreateFunction(std::string func_name, unsigned n_args, int flags,
+  void CreateFunction(const char *func_name, unsigned n_args, int flags,
                       void (*x_func)(sqlite3_context *, int, sqlite3_value **),
                       void (*x_step)(sqlite3_context *, int, sqlite3_value **),
                       void (*x_final)(sqlite3_context *),
-                      void (*x_destroy)(void *));
+                      void (*x_destroy)(void *), void* pApp = nullptr);
 
   // Delete custom function from the sqlite database
-  void DeleteFunction(std::string func_name, unsigned n_args, int flags);
+  void DeleteFunction(const char *func_name, unsigned n_args, int flags);
 
   // Get the filename used to open the database
   std::filesystem::path GetFilename(void) const;

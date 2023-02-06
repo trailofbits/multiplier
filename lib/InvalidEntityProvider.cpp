@@ -31,47 +31,58 @@ FragmentIdList InvalidEntityProvider::ListFragmentsInFile(
   return {};
 }
 
-FileImpl::Ptr InvalidEntityProvider::FileFor(
-    const Ptr &, SpecificEntityId<FileId>) {
-  return {};
-}
-
-FragmentImpl::Ptr InvalidEntityProvider::FragmentFor(
-    const Ptr &, SpecificEntityId<FragmentId>) {
-  return {};
-}
-
 // Return the list of fragments covering / overlapping some tokens in a file.
 FragmentIdList InvalidEntityProvider::FragmentsCoveringTokens(
     const Ptr &, PackedFileId, std::vector<EntityOffset>) {
   return {};
 }
 
-RawEntityIdList InvalidEntityProvider::Redeclarations(
-    const Ptr &, SpecificEntityId<DeclarationId>) {
+ReferenceKindImplPtr
+InvalidEntityProvider::ReferenceKindFor(const Ptr &, RawEntityId) {
   return {};
 }
 
-void InvalidEntityProvider::FillUses(
-    const Ptr &, RawEntityId,
-    RawEntityIdList &redecl_ids_out,
-    FragmentIdList &fragment_ids_out) {
-  redecl_ids_out.clear();
-  fragment_ids_out.clear();
+ReferenceKindImplPtr
+InvalidEntityProvider::ReferenceKindFor(const Ptr &, std::string_view) {
+  return {};
 }
 
-void InvalidEntityProvider::FillReferences(
-    const Ptr &, RawEntityId,
-    RawEntityIdList &redecl_ids_out,
-    FragmentIdList &fragment_ids_out) {
-  redecl_ids_out.clear();
-  fragment_ids_out.clear();
+bool InvalidEntityProvider::AddReference(const Ptr &, RawEntityId,
+                                         RawEntityId, RawEntityId) {
+  return false;
+}
+
+gap::generator<RawEntityId> InvalidEntityProvider::Redeclarations(
+    const Ptr &, RawEntityId) {
+  co_return;
+}
+
+gap::generator<std::pair<RawEntityId, RawEntityId>>
+InvalidEntityProvider::References(const Ptr &, RawEntityId) {
+  co_return;
 }
 
 void InvalidEntityProvider::FindSymbol(
     const Ptr &, std::string, std::vector<RawEntityId> &ids_out) {
   ids_out.clear();
 }
+
+#define DEFINE_ENTITY_METHODS(type_name, lower_name, enum_name, category) \
+    gap::generator<type_name ## ImplPtr> \
+    InvalidEntityProvider::type_name ## sFor(const Ptr &, PackedFragmentId) { \
+      co_return; \
+    } \
+    \
+    type_name ## ImplPtr InvalidEntityProvider::type_name ## For( \
+        const Ptr &, RawEntityId) { \
+      return {}; \
+    }
+
+  MX_FOR_EACH_ENTITY_CATEGORY(DEFINE_ENTITY_METHODS,
+                              MX_IGNORE_ENTITY_CATEGORY,
+                              DEFINE_ENTITY_METHODS,
+                              DEFINE_ENTITY_METHODS)
+#undef DEFINE_ENTITY_METHODS
 
 Index::Index(void)
     : impl(std::make_shared<InvalidEntityProvider>()) {}

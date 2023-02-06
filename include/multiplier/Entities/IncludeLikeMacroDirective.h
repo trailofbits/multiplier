@@ -16,11 +16,10 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "FileUseSelector.h"
 #include "MacroDirective.h"
 #include "MacroKind.h"
 
@@ -36,19 +35,21 @@ class IncludeLikeMacroDirective : public MacroDirective {
   friend class MacroDirective;
   friend class Macro;
  public:
-  inline static gap::generator<IncludeLikeMacroDirective> in(const Fragment &frag) {
-    for (auto m : in_internal(frag)) {
-      if (auto d = from(m)) {
-        co_yield *d;
-      }
-    }
-  }
+  static gap::generator<IncludeLikeMacroDirective> in(const Fragment &frag);
 
   static gap::generator<IncludeLikeMacroDirective> containing(const Macro &macro);
   bool contains(const Macro &macro);
 
   static gap::generator<IncludeLikeMacroDirective> containing(const Token &token);
   bool contains(const Token &token);
+
+  inline static std::optional<IncludeLikeMacroDirective> from(const Reference &r) {
+    return from(r.as_macro());
+  }
+
+  inline static std::optional<IncludeLikeMacroDirective> from(const TokenContext &t) {
+    return from(t.as_macro());
+  }
 
   static std::optional<IncludeLikeMacroDirective> from(const MacroDirective &parent);
 

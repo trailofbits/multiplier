@@ -13,7 +13,54 @@
 #include <sqlite3.h>
 #include <vector>
 
+#include "Types.h"
+
 namespace sqlite {
+namespace {
+
+static void IdToFragmentOffset(sqlite3_context *sql_ctx, int,
+                               sqlite3_value **argv) {
+  std::optional<mx::EntityOffset> offset = mx::FragmentOffsetFromEntityId(
+      static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
+  if (!offset.has_value()) {
+    sqlite3_result_int64(sql_ctx, -1);
+    return;
+  }
+
+  if constexpr (sizeof(mx::EntityOffset) == 8u) {
+    sqlite3_result_int64(
+        sql_ctx, static_cast<mx::SignedEntityOffset>(offset.value()));
+  } else {
+    sqlite3_result_int(
+        sql_ctx, static_cast<mx::SignedEntityOffset>(offset.value()));
+  }
+}
+
+static void IdToFragmentId(sqlite3_context *sql_ctx, int,
+                           sqlite3_value **argv) {
+  std::optional<mx::PackedFragmentId> id = mx::FragmentIdFromEntityId(
+      static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])));
+  if (!id.has_value()) {
+    sqlite3_result_int64(sql_ctx, 0);
+  } else {
+    sqlite3_result_int64(sql_ctx, static_cast<int64_t>(id->Pack()));
+  }
+}
+
+static void IdToCategory(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  sqlite3_result_int(
+      sql_ctx,
+      static_cast<int>(mx::CategoryFromEntityId(
+          static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0])))));
+}
+
+static void IdToKind(sqlite3_context *sql_ctx, int, sqlite3_value **argv) {
+  sqlite3_result_int(
+      sql_ctx,
+      mx::KindFromEntityId(static_cast<mx::RawEntityId>(sqlite3_value_int64(argv[0]))));
+}
+
+}  // namespace
 
 class ConnectionImpl {
  public:
@@ -173,9 +220,9 @@ void Statement::Execute(void) {
     if (SQLITE_ROW == ret) {
       throw Error("Execute() does not expect results. Use executeStep.");
     } else if (ret == sqlite3_errcode(db)) {
-      throw Error("Execute() failed with Errorcode", db);
+      throw Error("Execute() failed with error code", db);
     } else {
-      throw Error("Execute() failed with Error", db);
+      throw Error("Execute() failed with error", db);
     }
   }
 
@@ -261,7 +308,24 @@ void Statement::bind(const size_t i, const std::string_view &value) {
 
 Connection::Connection(const std::filesystem::path &db_path,
                        bool read_only)
-    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {}
+    : impl(std::make_shared<ConnectionImpl>(db_path, read_only)) {
+
+  CreateFunction("entity_id_to_fragment_offset", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToFragmentOffset, nullptr, nullptr, nullptr);
+
+  CreateFunction("entity_id_to_fragment_id", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToFragmentId, nullptr, nullptr, nullptr);
+
+  CreateFunction("entity_id_to_category", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToCategory, nullptr, nullptr, nullptr);
+
+  CreateFunction("entity_id_to_kind", 1,
+                 SQLITE_DETERMINISTIC | SQLITE_INNOCUOUS,
+                 IdToKind, nullptr, nullptr, nullptr);
+}
 
 // Get the filename used to open the database
 std::filesystem::path Connection::GetFilename(void) const {
@@ -274,27 +338,27 @@ bool Connection::IsReadOnly(void) const {
 }
 
 void Connection::CreateFunction(
-    std::string func_name, unsigned n_args, int flags,
+    const char *func_name, unsigned n_args, int flags,
     void (*x_func)(sqlite3_context *, int, sqlite3_value **),
     void (*x_step)(sqlite3_context *, int, sqlite3_value **),
     void (*x_final)(sqlite3_context *),
-    void (*x_destroy)(void *)) {
+    void (*x_destroy)(void *), void *pApp) {
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
-      impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
-      nullptr, x_func, x_step, x_final, x_destroy);
+      impl->db, func_name, static_cast<int>(n_args), rflags,
+      pApp, x_func, x_step, x_final, x_destroy);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);
   }
 }
 
 void Connection::DeleteFunction(
-    std::string func_name, unsigned n_args, int flags) {
+    const char *func_name, unsigned n_args, int flags) {
 
   int rflags = flags | SQLITE_UTF8;
   auto ret = sqlite3_create_function_v2(
-      impl->db, func_name.c_str(), static_cast<int>(n_args), rflags,
+      impl->db, func_name, static_cast<int>(n_args), rflags,
       nullptr, nullptr, nullptr, nullptr, nullptr);
   if (ret != SQLITE_OK) {
     throw Error("Failed to create function", impl->db);

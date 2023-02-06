@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "DeclKind.h"
 #include "NamedDecl.h"
@@ -36,29 +36,9 @@ class ObjCContainerDecl : public NamedDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<ObjCContainerDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCContainerDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCContainerDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCContainerDecl> in(const Fragment &frag);
+  static gap::generator<ObjCContainerDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   static gap::generator<ObjCContainerDecl> containing(const Decl &decl);
   static gap::generator<ObjCContainerDecl> containing(const Stmt &stmt);
@@ -66,7 +46,15 @@ class ObjCContainerDecl : public NamedDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCContainerDecl> from(const TokenContext &c);
+  gap::generator<ObjCContainerDecl> redeclarations(void) const;
+  inline static std::optional<ObjCContainerDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ObjCContainerDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ObjCContainerDecl> from(const NamedDecl &parent);
 
   inline static std::optional<ObjCContainerDecl> from(const std::optional<NamedDecl> &parent) {
@@ -87,15 +75,21 @@ class ObjCContainerDecl : public NamedDecl {
     }
   }
 
-  std::vector<ObjCMethodDecl> class_methods(void) const;
-  std::vector<ObjCPropertyDecl> class_properties(void) const;
+  std::optional<ObjCMethodDecl> nth_class_method(unsigned n) const;
+  gap::generator<ObjCMethodDecl> class_methods(void) const;
+  std::optional<ObjCPropertyDecl> nth_class_propertie(unsigned n) const;
+  gap::generator<ObjCPropertyDecl> class_properties(void) const;
   TokenRange at_end_range(void) const;
   Token at_start_token(void) const;
-  std::vector<ObjCMethodDecl> instance_methods(void) const;
-  std::vector<ObjCPropertyDecl> instance_properties(void) const;
-  std::vector<ObjCMethodDecl> methods(void) const;
-  std::vector<ObjCPropertyDecl> properties(void) const;
-  std::vector<Decl> declarations_in_context(void) const;
+  std::optional<ObjCMethodDecl> nth_instance_method(unsigned n) const;
+  gap::generator<ObjCMethodDecl> instance_methods(void) const;
+  std::optional<ObjCPropertyDecl> nth_instance_propertie(unsigned n) const;
+  gap::generator<ObjCPropertyDecl> instance_properties(void) const;
+  std::optional<ObjCMethodDecl> nth_method(unsigned n) const;
+  gap::generator<ObjCMethodDecl> methods(void) const;
+  std::optional<ObjCPropertyDecl> nth_propertie(unsigned n) const;
+  gap::generator<ObjCPropertyDecl> properties(void) const;
+  gap::generator<Decl> declarations_in_context(void) const;
 };
 
 static_assert(sizeof(ObjCContainerDecl) == sizeof(NamedDecl));

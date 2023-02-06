@@ -16,14 +16,13 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "CXXRecordDecl.h"
 #include "DeclKind.h"
 #include "TemplateSpecializationKind.h"
-#include "TypeUseSelector.h"
 
 namespace mx {
 class CXXRecordDecl;
@@ -47,29 +46,9 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   friend class NamedDecl;
   friend class Decl;
  public:
-  inline static gap::generator<ClassTemplateSpecializationDecl> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ClassTemplateSpecializationDecl> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ClassTemplateSpecializationDecl::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ClassTemplateSpecializationDecl> in(const Fragment &frag);
+  static gap::generator<ClassTemplateSpecializationDecl> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr DeclKind static_kind(void) {
     return DeclKind::CLASS_TEMPLATE_SPECIALIZATION;
@@ -81,7 +60,15 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &c);
+  gap::generator<ClassTemplateSpecializationDecl> redeclarations(void) const;
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const Reference &r) {
+    return from(r.as_declaration());
+  }
+
+  inline static std::optional<ClassTemplateSpecializationDecl> from(const TokenContext &t) {
+    return from(t.as_declaration());
+  }
+
   static std::optional<ClassTemplateSpecializationDecl> from(const CXXRecordDecl &parent);
 
   inline static std::optional<ClassTemplateSpecializationDecl> from(const std::optional<CXXRecordDecl> &parent) {
@@ -146,8 +133,10 @@ class ClassTemplateSpecializationDecl : public CXXRecordDecl {
   Token point_of_instantiation(void) const;
   TemplateSpecializationKind specialization_kind(void) const;
   ClassTemplateDecl specialized_template(void) const;
-  std::vector<TemplateArgument> template_arguments(void) const;
-  std::vector<TemplateArgument> template_instantiation_arguments(void) const;
+  std::optional<TemplateArgument> nth_template_argument(unsigned n) const;
+  gap::generator<TemplateArgument> template_arguments(void) const;
+  std::optional<TemplateArgument> nth_template_instantiation_argument(unsigned n) const;
+  gap::generator<TemplateArgument> template_instantiation_arguments(void) const;
   Token template_keyword_token(void) const;
   std::optional<Type> type_as_written(void) const;
   bool is_class_scope_explicit_specialization(void) const;

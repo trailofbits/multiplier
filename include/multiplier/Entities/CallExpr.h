@@ -16,13 +16,11 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
-#include "AttrUseSelector.h"
 #include "CallExprADLCallKind.h"
-#include "DeclUseSelector.h"
 #include "Expr.h"
 #include "StmtKind.h"
 
@@ -43,29 +41,9 @@ class CallExpr : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<CallExpr> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<CallExpr> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : CallExpr::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<CallExpr> in(const Fragment &frag);
+  static gap::generator<CallExpr> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::CALL_EXPR;
@@ -77,7 +55,14 @@ class CallExpr : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<CallExpr> from(const TokenContext &c);
+  inline static std::optional<CallExpr> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<CallExpr> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<CallExpr> from(const Expr &parent);
 
   inline static std::optional<CallExpr> from(const std::optional<Expr> &parent) {
@@ -108,7 +93,8 @@ class CallExpr : public Expr {
     }
   }
 
-  std::vector<Expr> arguments(void) const;
+  std::optional<Expr> nth_argument(unsigned n) const;
+  gap::generator<Expr> arguments(void) const;
   CallExprADLCallKind adl_call_kind(void) const;
   Type call_return_type(void) const;
   Expr callee(void) const;

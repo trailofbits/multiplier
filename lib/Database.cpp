@@ -10,10 +10,13 @@
 #include <cassert>
 #include <chrono>
 #include <deque>
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include <vector>
 #include <variant>
+#include <zdict.h>
+#include <zstd.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -24,8 +27,10 @@
 
 #include "SQLiteStore.h"
 #include "ThreadLocal.h"
+#include "Types.h"
 
 namespace mx {
+namespace {
 
 // Fragment hashes are sharded by the file token index and with the file ID.
 //
@@ -38,16 +43,27 @@ static constexpr size_t kNumFragmentShards = 256u;
 // TODO(pag): Use a hash function that is the same across platforms.
 static const std::hash<std::string> kHasher;
 
+// Number of INSERT statements to try to add in a single transaction.
 static constexpr size_t kMaxTransactionSize = 10000u;
+
+// Upper bound on the size of a trained entity dictionary.
+static constexpr size_t kMaxDictionarySize = 112640;  // 110 KiB.
+
+// The minimum size of the buffer used for training entity dictionaries.
+static constexpr size_t kMinTrainingSetSize = 128ull * (1ull << 20ul);
+
+static constexpr size_t kNumEntityCategories = NumEnumerators(EntityCategory{});
 
 #define MX_RECORD_VARIANT_ENTRY(name) , name
 
 struct ExitSignal {};
 struct FlushSignal {};
 using QueueItem = std::variant<
-    std::monostate, ExitSignal, FlushSignal
+    std::monostate, ExitSignal, FlushSignal, EntityRecord
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_RECORD_VARIANT_ENTRY) >;
 #undef MX_RECORD_VARIANT_ENTRY
+
+using Queue = moodycamel::BlockingConcurrentQueue<QueueItem>;
 
 // Thread-local database connection.
 class WriterThreadState {
@@ -181,6 +197,7 @@ class BulkInserterState {
     } \
     bool InsertAsync(record, sqlite::Statement &);
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DECLARE_INSERT_STMT)
+  MX_DECLARE_INSERT_STMT(EntityRecord)
 #undef MX_DECLARE_INSERT_STMT
 
   BulkInserterState(std::filesystem::path db_path)
@@ -190,9 +207,280 @@ class BulkInserterState {
       , INSERT_INTO_ ## record(db.Prepare( \
         record::kInsertStatement))
     MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_STMT)
+    MX_DEFINE_STMT(EntityRecord)
 #undef MX_DEFINE_STMT
       {}  // End of constructor
 };
+
+// A set of compression contexts. Compression contexts aren't thread safe. We
+// implement a lock-free mechanism using `AcquireContext` and `ReleaseContext`
+// to get the next available context for a given thread.
+struct DictionaryContext {
+
+  // Should ideally more than the number of indexing threads.
+  static constexpr size_t kNumContexts = 256u;
+
+  std::atomic<size_t> next_context_index;
+  std::array<std::atomic<ZSTD_CCtx *>, kNumContexts> contexts;
+
+  DictionaryContext(void);
+  ~DictionaryContext(void);
+
+  // A kind of ticket-based busy loop to get a thread-specific context.
+  std::pair<ZSTD_CCtx *, size_t> AcquireContext(void);
+
+  // Put the context back for another thread to use.
+  void ReleaseContext(std::pair<ZSTD_CCtx *, size_t> c);
+};
+
+DictionaryContext::DictionaryContext(void) {
+  for (auto &context : contexts) {
+    context.store(ZSTD_createCCtx(), std::memory_order_relaxed);
+  }
+}
+
+DictionaryContext::~DictionaryContext(void) {
+  for (auto &context : contexts) {
+    ZSTD_freeCCtx(context.load(std::memory_order_relaxed));
+  }
+}
+
+// A kind of ticket-based busy loop to get a thread-specific context.
+std::pair<ZSTD_CCtx *, size_t> DictionaryContext::AcquireContext(void) {
+  ZSTD_CCtx *context = nullptr;
+  size_t context_index = 0u;
+
+  for (auto num_failed = 0u; !context; ++num_failed) {
+    context_index = next_context_index.fetch_add(1u) % kNumContexts;
+    context = contexts[context_index].load(std::memory_order_acquire);
+    if (!context) {
+      continue;
+    }
+
+    if (num_failed > 8u) {
+      if (!contexts[context_index].compare_exchange_strong(context, nullptr)) {
+        context = nullptr;
+      }
+    } else {
+      if (!contexts[context_index].compare_exchange_weak(context, nullptr)) {
+        context = nullptr;
+      }
+    }
+  }
+
+  return {context, context_index};
+}
+
+// Put the context back for another thread to use.
+void DictionaryContext::ReleaseContext(std::pair<ZSTD_CCtx *, size_t> c) {
+  contexts[c.second].store(c.first, std::memory_order_release);
+}
+
+struct DictionaryCompressor {
+
+  // The ZSTD dictionary to use to compress an entity record. If this contains
+  // `nullptr` then it means we're in training mode and we haven't yet made the
+  // dictionary.
+  std::atomic<ZSTD_CDict *> dict;
+
+  // Lock over `training_data`, etc.
+  std::mutex lock;
+
+  // Training data. We accumulate the (uncompressed) `EntityRecord::data` into
+  // `training_data`. `data_sizes` contains the size of each record entry, and
+  // `entity_ids` holds the entity IDs of each record. This is a format that
+  // is compatible with ZSTD dictionary training, as well as `CompressAndAdd`.
+  std::string training_data;
+  std::vector<size_t> data_sizes;
+  std::vector<RawEntityId> entity_ids;
+
+  DictionaryCompressor(void);
+  ~DictionaryCompressor(void);
+
+  // Initialize this `EntityDictionary` with a pre-trained dictionary taken
+  // from the database.
+  void InitFromSavedDictionary(std::string data);
+
+  // Empty initialization, we have no dictionary and we need to create one.
+  void InitWithoutDictionary(void);
+
+  // Build the dictionary if it hasn't yet been built. This will enqueue any
+  // pending records to `queue`.
+  void Build(Queue &queue, DictionaryContext &context,
+             std::unique_lock<std::mutex> locker);
+
+  // Add `record`, either as a pending item for training a dictionary, or passed
+  // through to `CompressAndAdd`.
+  void Add(Queue &queue, DictionaryContext &context, EntityRecord record);
+
+  void CompressAndAdd(Queue &queue, DictionaryContext &context,
+                      EntityRecord record, ZSTD_CDict *d);
+
+  void CompressAndAdd(Queue &queue, DictionaryContext &context,
+                      RawEntityId id, const void *data,
+                      size_t data_size, ZSTD_CDict *d);
+
+  void CompressAndAdd(Queue &queue, RawEntityId id, const void *data,
+                      size_t data_size, ZSTD_CDict *d, ZSTD_CCtx *context);
+};
+
+DictionaryCompressor::DictionaryCompressor(void)
+    : dict(nullptr) {}
+
+DictionaryCompressor::~DictionaryCompressor(void) {
+  if (auto d = dict.load()) {
+    ZSTD_freeCDict(d);
+  }
+}
+
+// Initialize this `EntityDictionary` with a pre-trained dictionary taken
+// from the database.
+void DictionaryCompressor::InitFromSavedDictionary(std::string data) {
+  assert(data.size() <= kMaxDictionarySize);
+  dict.store(ZSTD_createCDict(data.data(), data.size(), ZSTD_maxCLevel()));
+}
+
+// Empty initialization, we have no dictionary and we need to create one.
+void DictionaryCompressor::InitWithoutDictionary(void) {
+  training_data.reserve(kMinTrainingSetSize + 8192u);
+}
+
+void DictionaryCompressor::CompressAndAdd(
+    Queue &queue, RawEntityId id, const void *data, size_t data_size,
+    ZSTD_CDict *d, ZSTD_CCtx *context) {
+
+  EntityRecord record;
+  record.id = id;
+
+  const size_t maybe_compressed_data_size = ZSTD_compressBound(data_size);
+  record.data.resize(maybe_compressed_data_size);
+
+  auto compressed_data_size = ZSTD_compress_usingCDict(
+      context,
+      record.data.data(), maybe_compressed_data_size,
+      data, data_size,
+      d);
+
+  assert(!ZSTD_isError(compressed_data_size));
+  record.data.resize(compressed_data_size);
+
+  // Swap the uncompressed data with the compressed data, and add it to the
+  // bulk insertion queue.
+  queue.enqueue(std::move(record));
+}
+
+void DictionaryCompressor::CompressAndAdd(
+    Queue &queue, DictionaryContext &context, RawEntityId id,
+    const void *data, size_t data_size, ZSTD_CDict *d) {
+  auto context_and_index = context.AcquireContext();
+  CompressAndAdd(queue, id, data, data_size, d, context_and_index.first);
+  context.ReleaseContext(context_and_index);
+}
+
+// Compress the data from `record`, then add it to our insertion queue.
+void DictionaryCompressor::CompressAndAdd(
+    Queue &queue, DictionaryContext &context, EntityRecord record,
+    ZSTD_CDict *d) {
+  CompressAndAdd(queue, context, record.id, record.data.data(), record.data.size(), d);
+}
+
+// Add `record`, either as a pending item for training a dictionary, or passed
+// through to `CompressAndAdd`.
+void DictionaryCompressor::Add(Queue &queue, DictionaryContext &context,
+                               EntityRecord record) {
+
+  // If we already have a dictionary, then use it.
+  if (ZSTD_CDict *d = dict.load(std::memory_order_acquire)) {
+    CompressAndAdd(queue, context, std::move(record), d);
+    return;
+  }
+
+  std::unique_lock<std::mutex> locker(lock);
+
+  // If there was a race condition and if the dictionary has been created in the
+  // time that it took to acquire the lock, then use it to add the record.
+  if (ZSTD_CDict *d = dict.load(std::memory_order_relaxed)) {
+    locker.unlock();
+    CompressAndAdd(queue, context, std::move(record), d);
+    return;
+  }
+
+  // We don't yet have a dictionary. In this case, we collect the data into
+  // a format that allows us to reconstruct the (compressed) records later,
+  // while also being able to traint a ZSTD dictionary.
+  training_data.append(record.data);
+  data_sizes.push_back(record.data.size());
+  entity_ids.push_back(record.id);
+
+  // If we haven't yet collected enough training data then stop here.
+  if (training_data.size() < kMinTrainingSetSize) {
+    return;
+  }
+
+  Build(queue, context, std::move(locker));
+}
+
+// Build the dictionary if it hasn't yet been built. This will enqueue any
+// pending records to `queue`.
+void DictionaryCompressor::Build(Queue &queue, DictionaryContext &context,
+                                 std::unique_lock<std::mutex> locker) {
+
+  if (dict.load(std::memory_order_relaxed)) {
+    return;  // Don't re-build a dictionary.
+  }
+
+  const char *record_data = training_data.data();
+  const auto num_records = static_cast<unsigned>(data_sizes.size());
+
+  if (!num_records) {
+    return;  // Don't build an empty dictionary.
+  }
+
+  DictionaryRecord dictionary;
+  dictionary.category = CategoryFromEntityId(entity_ids[0]);
+
+  // Train a ZSTD dictionary on our training set of entity records.
+  dictionary.data.resize(kMaxDictionarySize);
+  size_t dictionary_size = ZDICT_trainFromBuffer(
+      dictionary.data.data(), kMaxDictionarySize,
+      record_data, data_sizes.data(), num_records);
+
+  assert(!ZSTD_isError(dictionary_size));
+  dictionary.data.resize(dictionary_size);
+
+  // Publish the newly trained dictionary so that other threads can immediately
+  // benefit from it. This will unlock the mutex and let any blocked threads
+  // proceed with the new dictionary. Their racy check will pick up the now-
+  // published dictionary.
+  auto d = ZSTD_createCDict(dictionary.data.data(), dictionary_size,
+                            ZSTD_maxCLevel());
+  dict.store(d, std::memory_order_release);
+  locker.unlock();
+
+  // Persist the dictionary.
+  queue.enqueue(std::move(dictionary));
+
+  // Now use it locally.
+  auto context_and_index = context.AcquireContext();
+
+  // Compress and add all of the training records.
+  for (auto i = 0u; i < num_records; ++i) {
+    auto record_id = entity_ids[i];
+    auto record_data_size = data_sizes[i];
+    CompressAndAdd(queue, record_id, record_data, record_data_size, d,
+                   context_and_index.first);
+    record_data = &(record_data[record_data_size]);
+  }
+
+  context.ReleaseContext(context_and_index);
+
+  // Force free the training resources.
+  std::vector<RawEntityId>().swap(entity_ids);
+  std::vector<size_t>().swap(data_sizes);
+  std::string().swap(training_data);
+}
+
+}  // namespace
 
 class DatabaseWriterImpl {
  public:
@@ -234,14 +522,24 @@ class DatabaseWriterImpl {
   // bit for token offset bits.
   std::atomic<RawEntityId> next_big_fragment_index;
 
+  // Entity-specific compression dictionaries.
+  DictionaryContext dictionary_context;
+  std::array<DictionaryCompressor, kNumEntityCategories> entity_dictionaries;
+
+  // Number of rows pending insertion.
+  std::atomic<size_t> num_pending_rows;
+
   // A thread and it's multiple-producer, single-consumer.
-  moodycamel::BlockingConcurrentQueue<QueueItem> insertion_queue;
+  Queue insertion_queue;
   std::thread bulk_insertion_thread;
 
   DatabaseWriterImpl(const std::filesystem::path &db_path);
   ~DatabaseWriterImpl(void);
 
   void BulkInserter(void);
+
+  void InitDictionaries(void);
+  void ExitDictionaries(void);
 
   void InitMetadata(void);
   void ExitMetadata(void);
@@ -262,6 +560,49 @@ void DatabaseWriterImpl::ExitMetadata(void) {
   update_meta_stmt.Execute();
 }
 
+// Load in the dictionaries.
+void DatabaseWriterImpl::InitDictionaries(void) {
+  sqlite::Statement dictionaries = db.Prepare(
+      "SELECT entity_category, data FROM entity_dictionary");
+
+  while (dictionaries.ExecuteStep()) {
+    unsigned category = 0u;
+    std::string data;
+    dictionaries.Row().Columns(category, data);
+    if (!category || category >= kNumEntityCategories) {
+      assert(false);
+      continue;
+    }
+
+    // ZSTD dictionaries must be at least 8 bytes (for the header).
+    if (8u > data.size()) {
+      assert(false);
+      continue;
+    }
+
+    DictionaryCompressor &dict = entity_dictionaries[category];
+    dict.InitFromSavedDictionary(std::move(data));
+  }
+
+  dictionaries.Reset();
+
+  // Initialize the empty dictionaries.
+  for (auto i = 1u; i < kNumEntityCategories; ++i) {
+    DictionaryCompressor &dict = entity_dictionaries[i];
+    if (!dict.dict.load(std::memory_order_relaxed)) {
+      dict.InitWithoutDictionary();
+    }
+  }
+}
+
+void DatabaseWriterImpl::ExitDictionaries(void) {
+  for (auto i = 1u; i < kNumEntityCategories; ++i) {
+    DictionaryCompressor &dict = entity_dictionaries[i];
+    dict.Build(insertion_queue, dictionary_context,
+               std::unique_lock<std::mutex>(dict.lock));
+  }
+}
+
 // Initialize the metadata table. It only stores one row of data.
 void DatabaseWriterImpl::InitMetadata(void) {
 
@@ -270,7 +611,8 @@ void DatabaseWriterImpl::InitMetadata(void) {
   // will cause repeated initializations to be ignored.
   sqlite::Statement set_meta_stmt = db.Prepare(
       R"(INSERT OR IGNORE INTO metadata 
-         (rowid, next_file_index, next_small_fragment_index, next_big_fragment_index)
+         (rowid, next_file_index, next_small_fragment_index,
+          next_big_fragment_index)
          VALUES (1, 1, ?1, 1))");
 
   set_meta_stmt.BindValues(
@@ -312,11 +654,12 @@ void DatabaseWriterImpl::InitMetadata(void) {
 void DatabaseWriterImpl::BulkInserter(void) {
   BulkInserterState async(db_path);
 
-
   bool should_exit{false};
   bool should_flush{false};
+  size_t num_added_rows = 0u;
 
-  for (; !should_exit; should_flush = false) {
+  for (; !should_exit || num_added_rows < num_pending_rows.load();
+      should_flush = false) {
 
     QueueItem item;
 
@@ -339,17 +682,17 @@ void DatabaseWriterImpl::BulkInserter(void) {
               should_exit = true;
               should_flush = true;
 
-            // Flush signal.
+            // Build signal.
             } else if constexpr (std::is_same_v<FlushSignal, arg_t>) {
               should_flush = true;
 
             } else {
               async.DoInsertAsync(std::move(arg));
+              ++transaction_size;
             }
           },
           std::move(item));
 
-      ++transaction_size;
       if (transaction_size >= kMaxTransactionSize) {
         should_flush = true;
       }
@@ -361,6 +704,8 @@ void DatabaseWriterImpl::BulkInserter(void) {
     // Try to get the next thing.
     } while (insertion_queue.try_dequeue(item) ||
              insertion_queue.wait_dequeue_timed(item, 10 * 1000));
+
+    num_added_rows += transaction_size;
   }
 }
 
@@ -405,6 +750,9 @@ std::filesystem::path CreateDatabase(const std::filesystem::path &db_path_) {
 }  // namespace
 
 DatabaseWriterImpl::~DatabaseWriterImpl(void) {
+
+  ExitDictionaries();
+
   insertion_queue.enqueue(ExitSignal{});
   bulk_insertion_thread.join();
 
@@ -425,7 +773,8 @@ DatabaseWriterImpl::DatabaseWriterImpl(
       add_version(db.Prepare(
           R"(INSERT INTO version (action) VALUES (?1))")),
       get_ids(db.Prepare(
-          R"(SELECT next_file_index, next_small_fragment_index, next_big_fragment_index
+          R"(SELECT next_file_index, next_small_fragment_index, 
+                    next_big_fragment_index
              FROM metadata
              WHERE rowid = 1
              LIMIT 1)")),
@@ -442,13 +791,21 @@ DatabaseWriterImpl::DatabaseWriterImpl(
           [] (void *ptr) {
             delete reinterpret_cast<WriterThreadState *>(ptr);
           }),
-      insertion_queue() {
+      insertion_queue(kMaxTransactionSize) {
 
   InitMetadata();
   InitRecords();
+  InitDictionaries();
+
   bulk_insertion_thread = std::thread([this] (void) {
     this->BulkInserter();
   });
+}
+
+bool BulkInserterState::InsertAsync(
+    DictionaryRecord record, sqlite::Statement &insert) {
+  insert.BindValues(static_cast<unsigned>(record.category), record.data);
+  return true;
 }
 
 bool BulkInserterState::InsertAsync(
@@ -476,20 +833,6 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    SerializedFileRecord record, sqlite::Statement &insert) {
-  assert(!record.data.empty());
-  insert.BindValues(record.file_id.Pack(), record.data);
-  return true;
-}
-
-bool BulkInserterState::InsertAsync(
-    SerializedFragmentRecord record, sqlite::Statement &insert) {
-  assert(!record.data.empty());
-  insert.BindValues(record.fragment_id.Pack(), record.data);
-  return true;
-}
-
-bool BulkInserterState::InsertAsync(
     RedeclarationRecord record, sqlite::Statement &insert) {
   insert.BindValues(record.decl_id.Pack(), record.redecl_id.Pack());
   return true;
@@ -506,15 +849,13 @@ bool BulkInserterState::InsertAsync(
 }
 
 bool BulkInserterState::InsertAsync(
-    UseRecord record, sqlite::Statement &insert) {
-  insert.BindValues(record.fragment_id.Pack(), record.entity_id);
-  return true;
-}
-
-bool BulkInserterState::InsertAsync(
     ReferenceRecord record, sqlite::Statement &insert) {
-  insert.BindValues(record.fragment_id.Pack(), record.entity_id);
-  return true;
+  if (record.from_entity_id != kInvalidEntityId &&
+      record.to_entity_id != kInvalidEntityId) {
+    insert.BindValues(record.from_entity_id, record.to_entity_id);
+    return true;
+  }
+  return false;
 }
 
 bool BulkInserterState::InsertAsync(
@@ -524,6 +865,12 @@ bool BulkInserterState::InsertAsync(
     return true;
   }
   return false;
+}
+
+bool BulkInserterState::InsertAsync(EntityRecord record,
+                                    sqlite::Statement &insert) {
+  insert.BindValues(record.id, record.data);
+  return true;
 }
 
 DatabaseWriter::DatabaseWriter(
@@ -637,6 +984,7 @@ void DatabaseWriterImpl::InitRecords(void) {
   }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_EXEC_INITS)
+  MX_EXEC_INITS(EntityRecord)
 #undef MX_EXEC_INITS
 }
 
@@ -649,16 +997,26 @@ void DatabaseWriterImpl::ExitRecords(void) {
   }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_EXEC_TEARDOWNS)
+  MX_EXEC_TEARDOWNS(EntityRecord)
 #undef MX_EXEC_TEARDOWNS
 }
 
 #define MX_DEFINE_ADD_RECORD(name) \
     void DatabaseWriter::AddAsync(name record) { \
+      impl->num_pending_rows.fetch_add(1u); \
       impl->insertion_queue.enqueue(std::move(record)); \
     }
 
   MX_FOR_EACH_ASYNC_RECORD_TYPE(MX_DEFINE_ADD_RECORD)
 
 #undef MX_DECLARE_ADD_RECORD
+
+void DatabaseWriter::AddAsync(EntityRecord record) {
+  EntityCategory category = CategoryFromEntityId(record.id);
+  assert(category != EntityCategory::NOT_AN_ENTITY);
+  impl->num_pending_rows.fetch_add(1u);
+  impl->entity_dictionaries[static_cast<unsigned>(category)].Add(
+      impl->insertion_queue, impl->dictionary_context, std::move(record));
+}
 
 } // namespace mx

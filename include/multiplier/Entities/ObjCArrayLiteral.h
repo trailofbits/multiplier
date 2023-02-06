@@ -16,9 +16,9 @@
 
 #include <gap/core/generator.hpp>
 #include "../Iterator.h"
+#include "../Reference.h"
 #include "../Types.h"
 #include "../Token.h"
-#include "../Use.h"
 
 #include "Expr.h"
 #include "StmtKind.h"
@@ -37,29 +37,9 @@ class ObjCArrayLiteral : public Expr {
   friend class ValueStmt;
   friend class Stmt;
  public:
-  inline static gap::generator<ObjCArrayLiteral> in(const Fragment &frag) {
-    for (auto e : in_internal(frag)) {
-      if (auto d = from(e)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline static gap::generator<ObjCArrayLiteral> containing(const Token &tok) {
-    for (auto ctx = tok.context(); ctx.has_value(); ctx = ctx->parent()) {
-      if (auto d = from(*ctx)) {
-        co_yield *d;
-      }
-    }
-  }
-
-  inline bool contains(const Token &tok) {
-    auto id_ = id();
-    for (auto &parent : ObjCArrayLiteral::containing(tok)) {
-      if (parent.id() == id_) { return true; }
-    }
-    return false;
-  }
+  static gap::generator<ObjCArrayLiteral> in(const Fragment &frag);
+  static gap::generator<ObjCArrayLiteral> containing(const Token &tok);
+  bool contains(const Token &tok) const;
 
   inline static constexpr StmtKind static_kind(void) {
     return StmtKind::OBJ_C_ARRAY_LITERAL;
@@ -71,7 +51,14 @@ class ObjCArrayLiteral : public Expr {
   bool contains(const Decl &decl);
   bool contains(const Stmt &stmt);
 
-  static std::optional<ObjCArrayLiteral> from(const TokenContext &c);
+  inline static std::optional<ObjCArrayLiteral> from(const Reference &r) {
+    return from(r.as_statement());
+  }
+
+  inline static std::optional<ObjCArrayLiteral> from(const TokenContext &t) {
+    return from(t.as_statement());
+  }
+
   static std::optional<ObjCArrayLiteral> from(const Expr &parent);
 
   inline static std::optional<ObjCArrayLiteral> from(const std::optional<Expr> &parent) {
@@ -103,7 +90,8 @@ class ObjCArrayLiteral : public Expr {
   }
 
   ObjCMethodDecl array_with_objects_method(void) const;
-  std::vector<Expr> elements(void) const;
+  std::optional<Expr> nth_element(unsigned n) const;
+  gap::generator<Expr> elements(void) const;
 };
 
 static_assert(sizeof(ObjCArrayLiteral) == sizeof(Expr));
