@@ -422,16 +422,6 @@ class EntityId final {
   // Unpack this entity ID into a concrete type.
   VariantId Unpack(void) const noexcept;
 
-  // Test if an entity ID is valid-looking.
-  inline operator bool(void) const noexcept {
-    if (opaque == kInvalidEntityId) {
-      return false;
-    } else {
-      assert(!std::holds_alternative<InvalidId>(Unpack()));
-      return true;
-    }
-  }
-
   inline RawEntityId Pack(void) const noexcept {
     return opaque;
   }

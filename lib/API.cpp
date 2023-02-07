@@ -79,8 +79,8 @@ Token EntityProvider::TokenFor(const Ptr &self, RawEntityId id) {
 // that can be used as a hint for being the current reader for the token.
 Token EntityProvider::TokenFor(
     const Ptr &self, const std::shared_ptr<const TokenReader> &reader,
-    RawEntityId id) {
-  VariantId vid = EntityId(id).Unpack();
+    RawEntityId eid) {
+  VariantId vid = EntityId(eid).Unpack();
   if (std::holds_alternative<FileTokenId>(vid)) {
     FileTokenId tid = std::get<FileTokenId>(vid);
     FileId fid(tid.file_id);
@@ -154,7 +154,7 @@ Token EntityProvider::TokenFor(
     return Token(fptr->MacroTokenReader(fptr), tid.offset);
 
   } else if (std::holds_alternative<InvalidId>(vid)) {
-    assert(id == kInvalidEntityId);
+    assert(eid == kInvalidEntityId);
     return Token();
 
   } else {

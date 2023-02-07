@@ -864,7 +864,7 @@ Token Token::parsed_token(void) const {
 // Return the token from which this token was derived. This can be a macro
 // token or a file token.
 Token Token::derived_token(void) const {
-  return TokenReader::TokenFor(impl, impl->NthDerivedTokenId(offset));
+  return TokenReader::TokenFor(impl, impl->NthDerivedTokenId(offset).Pack());
 }
 
 // Return the version of this token from a file, if any. If this is a parsed
