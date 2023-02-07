@@ -17,8 +17,10 @@ DEFINE_uint64(fragment_id, 0, "ID of the fragment to check for sketch strchr usa
 DEFINE_uint64(file_id, 0, "ID of the file to check for sketch strchr usage");
 DEFINE_bool(show_locations, false, "Show the file locations of the functions?");
 
-using Visited = std::vector<mx::RawEntityId>;
+using TaintPair = std::pair<mx::PackedDeclId, std::vector<mx::PackedStmtId>>;
+using TaintMap = std::unordered_map<mx::PackedDeclId, std::vector<mx::PackedStmtId>>;
 
+// TODO: remove if we don't care about fragment granularity of searches
 static void FindSketchyStrchr(mx::Fragment fragment) {
   for (mx::FunctionDecl func : mx::FunctionDecl::in(fragment)) {
     auto file = mx::File::containing(fragment);
@@ -82,7 +84,7 @@ static std::optional<mx::FunctionDecl> StrchrEntityExists(const mx::Index &index
     return std::nullopt;
 }
 
-void TaintTrack(const mx::FunctionDecl &strchr) {
+void TaintTrack(const mx::FunctionDecl &strchr, TaintMap &map) {
     for (mx::Reference ref : strchr.references()) {
         auto taint_source = ref.as_statement();
         for (mx::CallExpr call : mx::CallExpr::containing(*taint_source)) {
@@ -92,13 +94,21 @@ void TaintTrack(const mx::FunctionDecl &strchr) {
               continue;
             }
 
-            // is this DeclRefExpr now?
             std::optional<mx::DeclRefExpr> ptr_arg = mx::DeclRefExpr::from(first_arg->ignore_casts());
             if (!ptr_arg) {
               continue;
             }
 
-            std::cout << ptr_arg->id() << std::endl;        
+            // originating declaration source (parameter or variable declaration)
+            mx::ValueDecl decl_source = ptr_arg->declaration();
+            mx::PackedDeclId decl_source_id = decl_source.id();
+
+            // check if strchr argument has the originating source used by another strchr
+            if (map.contains(decl_source_id)) {
+              map[decl_source_id].push_back(call.id());
+            } else {
+              map.insert(std::make_pair(decl_source_id, std::vector<mx::PackedStmtId>()));
+            }
         }
     }
 }
@@ -122,7 +132,26 @@ extern "C" int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
   }
 
-  TaintTrack(*func);
+  TaintMap map;
+  TaintTrack(*func, map);
+
+  for (const auto& [decl_source_id, sinks] : map) {
+
+    // unless specified, only care about matchings where strchr operates multiple times
+    if (sinks.size() != 2) {
+      continue;
+    }
+
+    auto source = index.entity(decl_source_id);
+    std::cout << "Variable source (id: " << decl_source_id << "): " << source->tokens().data()
+      << " propagates to " << sinks.size() << " calls to strchr:" << std::endl;
+
+
+    for (const auto& sink_id : sinks) {
+        auto sink = index.entity(sink_id);
+        std::cout << "\t" << sink_id << " " << sink->tokens().data() << std::endl;
+    }
+  }
 
   /*
   if (FLAGS_fragment_id) {
