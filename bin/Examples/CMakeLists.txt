@@ -66,6 +66,7 @@ define_example("mx-regex-query" "RegexQuery.cpp")
 define_example("mx-find-sketchy-casts" "FindSketchyCasts.cpp")
 define_example("mx-find-divergent-candidates" "FindDivergentCandidates.cpp")
 define_example("mx-find-symbol" "FindSymbol.cpp")
+define_example("mx-track-null-termination" "TrackNullTermination.cpp")
 define_example("mx-taint-entity" "TaintEntity.cpp")
 define_example("mx-harness" "Harness.cpp")
 
